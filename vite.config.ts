@@ -14,6 +14,7 @@ export default defineConfig({
         name: 'FitLog Lite',
         short_name: 'FitLog',
         description: '本地优先的个人健身日志',
+        lang: 'zh-CN',
         display: 'standalone',
         start_url: '.',
         scope: '.',
