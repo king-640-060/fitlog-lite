@@ -9,20 +9,20 @@ export default defineConfig({
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'pwa-192.svg', 'pwa-512.svg'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'pwa-192.png', 'pwa-512.png'],
       manifest: {
         name: 'FitLog Lite',
-        short_name: 'FitLog',
+        short_name: 'FitLog Lite',
         description: '本地优先的个人健身日志',
         lang: 'zh-CN',
         display: 'standalone',
         start_url: '.',
         scope: '.',
-        theme_color: '#2563eb',
-        background_color: '#f6f8fb',
+        theme_color: '#f4f5f7',
+        background_color: '#f4f5f7',
         icons: [
-          { src: 'pwa-192.svg', sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },
-          { src: 'pwa-512.svg', sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' },
+          { src: 'pwa-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'pwa-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
         ],
       },
       workbox: {
