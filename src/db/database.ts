@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { Exercise, Food, FoodLog, WeightLog, Workout } from './types'
+import type { DietTemplate, Exercise, Food, FoodLog, WeightLog, Workout, WorkoutTemplate } from './types'
 
 export class FitLogDatabase extends Dexie {
   foods!: EntityTable<Food, 'id'>
@@ -7,6 +7,8 @@ export class FitLogDatabase extends Dexie {
   exercises!: EntityTable<Exercise, 'id'>
   workouts!: EntityTable<Workout, 'id'>
   weights!: EntityTable<WeightLog, 'id'>
+  workoutTemplates!: EntityTable<WorkoutTemplate, 'id'>
+  dietTemplates!: EntityTable<DietTemplate, 'id'>
 
   constructor(name = 'fitlog-lite-db') {
     super(name)
@@ -16,6 +18,15 @@ export class FitLogDatabase extends Dexie {
       exercises: 'id, name, createdAt',
       workouts: 'id, date, finishedAt, createdAt',
       weights: 'id, &date, createdAt',
+    })
+    this.version(2).stores({
+      foods: 'id, name, brand, [name+brand], createdAt',
+      foodLogs: 'id, date, foodId, createdAt',
+      exercises: 'id, name, createdAt',
+      workouts: 'id, date, finishedAt, createdAt',
+      weights: 'id, &date, createdAt',
+      workoutTemplates: 'id, name, createdAt, updatedAt, lastUsedAt',
+      dietTemplates: 'id, name, createdAt, updatedAt, lastUsedAt',
     })
   }
 }

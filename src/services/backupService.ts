@@ -1,10 +1,11 @@
-import type { BackupData } from '../db/types'
+import type { BackupData, BackupDataV2 } from '../db/types'
 import { db, type FitLogDatabase } from '../db/database'
 
 type UnknownRecord = Record<string, unknown>
 
 const storeLabels = {
   foods: '食物', foodLogs: '饮食记录', exercises: '动作', workouts: '训练记录', weights: '体重记录',
+  workoutTemplates: '训练模板', dietTemplates: '饮食模板',
 } as const
 
 function objectValue(value: unknown, location: string): UnknownRecord {
@@ -66,6 +67,11 @@ function validateIds(records: unknown[], store: keyof typeof storeLabels): Unkno
 function validateTimestamps(record: UnknownRecord, location: string): void {
   timestamp(record.createdAt, `${location} createdAt`)
   timestamp(record.updatedAt, `${location} updatedAt`)
+}
+
+function validateTemplateTimestamps(record: UnknownRecord, location: string): void {
+  validateTimestamps(record, location)
+  if (record.lastUsedAt !== undefined) timestamp(record.lastUsedAt, `${location} lastUsedAt`)
 }
 
 function validateFood(record: UnknownRecord, index: number): void {
@@ -146,14 +152,76 @@ function validateWeight(record: UnknownRecord, index: number): string {
   return date
 }
 
-export function validateBackup(value: unknown): BackupData {
+function validateWorkoutTemplate(record: UnknownRecord, index: number): void {
+  const location = `训练模板第 ${index + 1} 项`
+  nonEmptyString(record.name, `${location} name`)
+  optionalString(record.description, `${location} description`)
+  if (!Array.isArray(record.exercises)) throw new Error(`${location} exercises：必须是 array`)
+  const exerciseIds = new Set<string>()
+  const nestedSetIds = new Set<string>()
+  record.exercises.forEach((exerciseValue, exerciseIndex) => {
+    const exerciseLocation = `${location}，第 ${exerciseIndex + 1} 个动作`
+    const exercise = objectValue(exerciseValue, exerciseLocation)
+    const id = nonEmptyString(exercise.id, `${exerciseLocation} id`)
+    if (exerciseIds.has(id)) throw new Error(`${exerciseLocation}：id 重复`)
+    exerciseIds.add(id)
+    if (exercise.exerciseId !== undefined) nonEmptyString(exercise.exerciseId, `${exerciseLocation} exerciseId`)
+    nonEmptyString(exercise.exerciseName, `${exerciseLocation} exerciseName`)
+    optionalString(exercise.note, `${exerciseLocation} note`)
+    if (!Array.isArray(exercise.sets)) throw new Error(`${exerciseLocation} sets：必须是 array`)
+    exercise.sets.forEach((setValue, setIndex) => {
+      const setLocation = `${exerciseLocation}，第 ${setIndex + 1} 组`
+      const set = objectValue(setValue, setLocation)
+      const setId = nonEmptyString(set.id, `${setLocation} id`)
+      if (nestedSetIds.has(setId)) throw new Error(`${setLocation}：id 重复`)
+      nestedSetIds.add(setId)
+      finite(set.reps, `${setLocation} reps`, 1, true)
+      optionalFinite(set.weightKg, `${setLocation} weightKg`, 0)
+      optionalFinite(set.rpe, `${setLocation} rpe`, 1, 10)
+      optionalString(set.note, `${setLocation} note`)
+    })
+  })
+  validateTemplateTimestamps(record, location)
+}
+
+function validateDietTemplate(record: UnknownRecord, index: number): void {
+  const location = `饮食模板第 ${index + 1} 项`
+  nonEmptyString(record.name, `${location} name`)
+  optionalString(record.description, `${location} description`)
+  if (!Array.isArray(record.items)) throw new Error(`${location} items：必须是 array`)
+  const itemIds = new Set<string>()
+  record.items.forEach((itemValue, itemIndex) => {
+    const itemLocation = `${location}，第 ${itemIndex + 1} 个食物`
+    const item = objectValue(itemValue, itemLocation)
+    const id = nonEmptyString(item.id, `${itemLocation} id`)
+    if (itemIds.has(id)) throw new Error(`${itemLocation}：id 重复`)
+    itemIds.add(id)
+    if (item.foodId !== undefined) nonEmptyString(item.foodId, `${itemLocation} foodId`)
+    nonEmptyString(item.foodName, `${itemLocation} foodName`)
+    optionalString(item.brand, `${itemLocation} brand`)
+    finite(item.grams, `${itemLocation} grams`, Number.EPSILON)
+    const fallback = objectValue(item.fallback, `${itemLocation} fallback`)
+    finite(fallback.referenceGrams, `${itemLocation} fallback.referenceGrams`, Number.EPSILON)
+    finite(fallback.calories, `${itemLocation} fallback.calories`, 0)
+    optionalFinite(fallback.protein, `${itemLocation} fallback.protein`, 0)
+    optionalFinite(fallback.carbs, `${itemLocation} fallback.carbs`, 0)
+    optionalFinite(fallback.fat, `${itemLocation} fallback.fat`, 0)
+  })
+  validateTemplateTimestamps(record, location)
+}
+
+export function validateBackup(value: unknown): BackupDataV2 {
   if (!value || typeof value !== 'object') throw new Error('备份文件格式不正确')
   const backup = value as Partial<BackupData>
-  if (backup.app !== 'FitLog Lite' || backup.schemaVersion !== 1) throw new Error('不是兼容的 FitLog Lite 备份')
+  if (backup.app !== 'FitLog Lite' || (backup.schemaVersion !== 1 && backup.schemaVersion !== 2)) throw new Error('不是兼容的 FitLog Lite 备份')
   if (!backup.data || typeof backup.data !== 'object' || Array.isArray(backup.data)) throw new Error('备份 data 必须是 object')
   timestamp(backup.exportedAt, '备份 exportedAt')
   const keys = ['foods', 'foodLogs', 'exercises', 'workouts', 'weights'] as const
   for (const key of keys) if (!Array.isArray(backup.data[key])) throw new Error(`备份缺少 ${key} 数据`)
+  const workoutTemplates = backup.schemaVersion === 2 ? backup.data.workoutTemplates : []
+  const dietTemplates = backup.schemaVersion === 2 ? backup.data.dietTemplates : []
+  if (!Array.isArray(workoutTemplates)) throw new Error('备份缺少 workoutTemplates 数据')
+  if (!Array.isArray(dietTemplates)) throw new Error('备份缺少 dietTemplates 数据')
 
   const foods = validateIds(backup.data.foods, 'foods'); foods.forEach(validateFood)
   const foodLogs = validateIds(backup.data.foodLogs, 'foodLogs'); foodLogs.forEach(validateFoodLog)
@@ -166,27 +234,39 @@ export function validateBackup(value: unknown): BackupData {
     if (weightDates.has(date)) throw new Error(`体重记录第 ${index + 1} 项：date 重复`)
     weightDates.add(date)
   })
-  return backup as BackupData
+  const checkedWorkoutTemplates = validateIds(workoutTemplates, 'workoutTemplates'); checkedWorkoutTemplates.forEach(validateWorkoutTemplate)
+  const checkedDietTemplates = validateIds(dietTemplates, 'dietTemplates'); checkedDietTemplates.forEach(validateDietTemplate)
+  return {
+    app: 'FitLog Lite', schemaVersion: 2, exportedAt: backup.exportedAt!,
+    data: {
+      foods: backup.data.foods, foodLogs: backup.data.foodLogs, exercises: backup.data.exercises,
+      workouts: backup.data.workouts, weights: backup.data.weights,
+      workoutTemplates, dietTemplates,
+    },
+  } as BackupDataV2
 }
 
-export async function exportBackup(): Promise<BackupData> {
+export async function exportBackup(database: FitLogDatabase = db): Promise<BackupDataV2> {
   return {
-    app: 'FitLog Lite', schemaVersion: 1, exportedAt: new Date().toISOString(),
+    app: 'FitLog Lite', schemaVersion: 2, exportedAt: new Date().toISOString(),
     data: {
-      foods: await db.foods.toArray(), foodLogs: await db.foodLogs.toArray(), exercises: await db.exercises.toArray(),
-      workouts: await db.workouts.toArray(), weights: await db.weights.toArray(),
+      foods: await database.foods.toArray(), foodLogs: await database.foodLogs.toArray(), exercises: await database.exercises.toArray(),
+      workouts: await database.workouts.toArray(), weights: await database.weights.toArray(),
+      workoutTemplates: await database.workoutTemplates.toArray(), dietTemplates: await database.dietTemplates.toArray(),
     },
   }
 }
 
-export async function restoreBackup(backup: BackupData, database: FitLogDatabase = db): Promise<void> {
+export async function restoreBackup(backup: BackupData | unknown, database: FitLogDatabase = db): Promise<void> {
   const validated = validateBackup(backup)
-  await database.transaction('rw', [database.foods, database.foodLogs, database.exercises, database.workouts, database.weights], async () => {
-    await Promise.all([database.foods.clear(), database.foodLogs.clear(), database.exercises.clear(), database.workouts.clear(), database.weights.clear()])
+  await database.transaction('rw', [database.foods, database.foodLogs, database.exercises, database.workouts, database.weights, database.workoutTemplates, database.dietTemplates], async () => {
+    await Promise.all([database.foods.clear(), database.foodLogs.clear(), database.exercises.clear(), database.workouts.clear(), database.weights.clear(), database.workoutTemplates.clear(), database.dietTemplates.clear()])
     await database.foods.bulkAdd(validated.data.foods)
     await database.foodLogs.bulkAdd(validated.data.foodLogs)
     await database.exercises.bulkAdd(validated.data.exercises)
     await database.workouts.bulkAdd(validated.data.workouts)
     await database.weights.bulkAdd(validated.data.weights)
+    await database.workoutTemplates.bulkAdd(validated.data.workoutTemplates)
+    await database.dietTemplates.bulkAdd(validated.data.dietTemplates)
   })
 }

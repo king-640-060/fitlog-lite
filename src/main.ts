@@ -2,12 +2,17 @@ import './styles/main.css'
 import { Chart, registerables } from 'chart.js'
 import { registerSW } from 'virtual:pwa-register'
 import { db, seedExercises } from './db/database'
-import type { BackupData, Exercise, Food, Workout, WorkoutExercise, WorkoutSet } from './db/types'
+import type { BackupDataV2, DietTemplate, Exercise, Food, FoodLog, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
 import { exportBackup, restoreBackup, validateBackup } from './services/backupService'
 import { logFood, saveFood, updateFoodLogGrams, validateFoodInput } from './services/foodService'
 import { buildImportPreview, parseFoodCsv, parseFoodJson, type ImportPreview } from './services/importService'
 import { upsertWeight } from './services/weightService'
 import { createWorkout, findOpenWorkout, finishWorkout, normalizeWorkoutForSave, saveExercise, saveWorkout, WorkoutAutosaveController } from './services/workoutService'
+import {
+  applyDietTemplate, dietTemplateFromLogs, dietTemplateItemFromFood, duplicateDietTemplate, duplicateWorkoutTemplate,
+  resolveDietTemplateFoods, saveDietTemplate, saveWorkoutTemplate,
+  sortTemplates, startWorkoutFromTemplate, workoutTemplateFromWorkout,
+} from './services/templateService'
 import { loadMonthSummaries, renderMonthCalendar, type CalendarDaySummary } from './ui/calendarPage'
 import { formatShortDate, getLocalDateString } from './utils/date'
 import { calculateNutrition, formatNumber } from './utils/nutrition'
@@ -255,12 +260,14 @@ async function renderFoodPage(): Promise<void> {
   const hasMacros = logs.some((log) => log.totalProtein !== undefined || log.totalCarbs !== undefined || log.totalFat !== undefined)
   const view = document.querySelector<HTMLElement>('#view')!
   view.innerHTML = `
-    <section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>记录日期</span><input id="food-date" type="date" value="${foodDate}" aria-label="饮食记录日期"></label><button class="text-btn" id="food-library">食物库 ${icon('chevron', 16)}</button></section>
+    <section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>记录日期</span><input id="food-date" type="date" value="${foodDate}" aria-label="饮食记录日期"></label><div class="context-actions"><button class="text-btn" id="use-diet-template">使用模板</button><button class="text-btn" id="food-library">食物库 ${icon('chevron', 16)}</button></div></section>
     <section class="nutrition-hero" aria-label="今日营养汇总"><div class="hero-number"><strong>${formatNumber(totals.calories)}</strong><span>kcal</span></div><div class="macros ${hasMacros ? '' : 'is-empty'}"><span><b>P</b>${formatNumber(totals.protein)}g</span><span><b>C</b>${formatNumber(totals.carbs)}g</span><span><b>F</b>${formatNumber(totals.fat)}g</span></div></section>
-    <section class="section-head"><div><h2>今日饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '还没有记录'}</span></div><button class="icon-btn add-button" id="add-food-log" aria-label="添加食物">${icon('plus')}</button></section>
+    <section class="section-head"><div><h2>今日饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '还没有记录'}</span></div><div class="section-actions">${logs.length ? '<button class="text-btn" id="save-day-diet-template">保存为模板</button>' : ''}<button class="icon-btn add-button" id="add-food-log" aria-label="添加食物">${icon('plus')}</button></div></section>
     <div class="food-list">${logs.length ? logs.map((log) => `<article class="food-row"><button class="food-row-main" data-edit-log="${log.id}" aria-label="编辑 ${esc(log.foodName)}"><span><strong>${esc(log.foodName)}</strong><small>${log.brand ? `${esc(log.brand)} · ` : ''}${formatNumber(log.grams)} g</small></span><span class="food-kcal"><strong>${formatNumber(log.totalCalories)}</strong><small>kcal</small></span></button><button class="icon-btn row-delete" data-delete-log="${log.id}" aria-label="删除 ${esc(log.foodName)}">${icon('trash', 17)}</button></article>`).join('') : `<div class="empty minimal"><div class="empty-icon">${icon('utensils', 25)}</div><h3>今天还没有记录饮食</h3><p>添加第一份食物，营养汇总会自动更新。</p><button class="primary" id="empty-add-food">${icon('plus', 18)} 添加第一份食物</button></div>`}</div>`
   view.querySelector<HTMLInputElement>('#food-date')?.addEventListener('change', (event) => { foodDate = (event.target as HTMLInputElement).value; void render() })
   view.querySelector('#food-library')?.addEventListener('click', () => void showFoodLibrary())
+  view.querySelector('#use-diet-template')?.addEventListener('click', () => void showDietTemplatePicker())
+  view.querySelector('#save-day-diet-template')?.addEventListener('click', () => void saveDayAsDietTemplate(logs))
   view.querySelector('#add-food-log')?.addEventListener('click', () => void showAddFoodLog())
   view.querySelector('#empty-add-food')?.addEventListener('click', () => void showAddFoodLog())
   view.querySelectorAll<HTMLButtonElement>('[data-delete-log]').forEach((button) => button.addEventListener('click', async () => {
@@ -401,10 +408,16 @@ async function renderWorkoutPage(): Promise<void> {
   const todayWorkouts = await db.workouts.where('date').equals(workoutDate).toArray()
   const recentWorkouts = (await db.workouts.toArray()).filter((item) => item.finishedAt).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt)).slice(0, 4)
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `<section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>训练日期</span><input id="workout-date" type="date" value="${workoutDate}" aria-label="训练日期"></label><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></section><div class="empty workout-empty minimal"><div class="empty-icon">${icon('dumbbell', 27)}</div><h2>${openWorkout ? '训练还在进行中' : todayWorkouts.length ? '这一天的训练已完成' : '今天还没有训练'}</h2><p>${openWorkout ? '上次输入已自动保存，可以随时继续。' : '重量、次数和 RPE 会在输入后自动保存。'}</p><button class="primary start-button" id="start-workout">${openWorkout ? icon('activity', 18) + ' 继续训练' : icon('plus', 18) + ' 开始训练'}</button></div><section class="section-head"><div><h2>最近训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 17)}</button>`).join('')}</div>`
+  view.innerHTML = `<section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>训练日期</span><input id="workout-date" type="date" value="${workoutDate}" aria-label="训练日期"></label><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section><div class="empty workout-empty minimal"><div class="empty-icon">${icon('dumbbell', 27)}</div><h2>${openWorkout ? '训练还在进行中' : todayWorkouts.length ? '这一天的训练已完成' : '今天还没有训练'}</h2><p>${openWorkout ? '上次输入已自动保存，可以随时继续。' : '可从模板开始，也可以创建空白训练。'}</p><button class="primary start-button" id="start-workout">${openWorkout ? icon('activity', 18) + ' 继续训练' : icon('plus', 18) + ' 开始训练'}</button></div><section class="section-head"><div><h2>最近训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 17)}</button>`).join('')}</div>`
   view.querySelector<HTMLInputElement>('#workout-date')?.addEventListener('change', (event) => { workoutDate = (event.target as HTMLInputElement).value; currentWorkout = undefined; workoutEditorOpen = false; void render().catch(fail) })
   view.querySelector('#exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
-  view.querySelector('#start-workout')?.addEventListener('click', async () => { try { currentWorkout = openWorkout ?? await createWorkout(workoutDate); workoutEditorOpen = true; await renderWorkoutPage() } catch (error) { fail(error) } })
+  view.querySelector('#workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
+  view.querySelector('#start-workout')?.addEventListener('click', async () => {
+    try {
+      if (openWorkout) { currentWorkout = openWorkout; workoutEditorOpen = true; await renderWorkoutPage(); return }
+      await showWorkoutStartSheet()
+    } catch (error) { fail(error) }
+  })
   view.querySelector('#history-workout')?.addEventListener('click', () => { showWorkoutHistory = true; void renderWorkoutPage().catch(fail) })
   view.querySelectorAll<HTMLButtonElement>('[data-workout]').forEach((button) => button.addEventListener('click', async () => { try { currentWorkout = await db.workouts.get(button.dataset.workout!); workoutEditorOpen = true; await renderWorkoutPage() } catch (error) { fail(error) } }))
 }
@@ -414,7 +427,7 @@ function renderWorkoutEditor(workout: Workout): void {
   window.clearInterval(workoutClockTimer)
   document.body.classList.add('immersive')
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `<header class="active-workout-head"><button class="icon-btn quiet" id="exit-workout" aria-label="返回训练首页">${icon('x')}</button><div><strong>${completed ? '训练详情' : '训练中'}</strong><span id="workout-clock">${formatElapsed(workout.startedAt, workout.finishedAt)}</span></div>${completed ? '<span class="head-spacer"></span>' : '<button class="finish-text" id="finish-workout">完成</button>'}</header><section class="workout-meta"><span>${formatHeaderDate(workout.date)}</span><span id="autosave-state">${completed ? '可编辑' : '已自动保存'}</span></section><div id="workout-exercises">${workout.exercises.length ? workout.exercises.map(workoutExerciseHtml).join('') : `<div class="empty compact minimal"><div class="empty-icon">${icon('dumbbell', 24)}</div><h3>还没有动作</h3><p>添加第一个动作开始记录。</p></div>`}</div><button id="add-exercise" class="secondary full-btn">${icon('plus', 18)} 添加动作</button><label class="note-field">训练备注<textarea id="workout-note" rows="2" placeholder="可选">${esc(workout.note)}</textarea></label><div class="action-stack">${completed ? '<button id="back-history" class="primary">返回历史</button><button id="delete-workout" class="danger-button">删除训练</button>' : '<button id="history-workout">查看历史训练</button>'}</div>`
+  view.innerHTML = `<header class="active-workout-head"><button class="icon-btn quiet" id="exit-workout" aria-label="返回训练首页">${icon('x')}</button><div><strong>${completed ? '训练详情' : '训练中'}</strong><span id="workout-clock">${formatElapsed(workout.startedAt, workout.finishedAt)}</span></div>${completed ? '<span class="head-spacer"></span>' : '<button class="finish-text" id="finish-workout">完成</button>'}</header><section class="workout-meta"><span>${formatHeaderDate(workout.date)}</span><span id="autosave-state">${completed ? '可编辑' : '已自动保存'}</span></section><div id="workout-exercises">${workout.exercises.length ? workout.exercises.map(workoutExerciseHtml).join('') : `<div class="empty compact minimal"><div class="empty-icon">${icon('dumbbell', 24)}</div><h3>还没有动作</h3><p>添加第一个动作开始记录。</p></div>`}</div><button id="add-exercise" class="secondary full-btn">${icon('plus', 18)} 添加动作</button><label class="note-field">训练备注<textarea id="workout-note" rows="2" placeholder="可选">${esc(workout.note)}</textarea></label><div class="action-stack">${completed ? '<button id="save-workout-template" class="secondary">保存为模板</button><button id="back-history" class="primary">返回历史</button><button id="delete-workout" class="danger-button">删除训练</button>' : '<button id="history-workout">查看历史训练</button>'}</div>`
   if (!completed) workoutClockTimer = window.setInterval(() => { const clock = document.querySelector('#workout-clock'); if (clock) clock.textContent = formatElapsed(workout.startedAt) }, 1000)
   bindWorkoutEditor(workout)
 }
@@ -475,6 +488,7 @@ function bindWorkoutEditor(workout: Workout): void {
   view.querySelector('#back-history')?.addEventListener('click', async () => {
     try { await flushWorkoutAutosave(workout); currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = true; await renderWorkoutPage() } catch (error) { fail(error) }
   })
+  view.querySelector('#save-workout-template')?.addEventListener('click', () => void saveWorkoutAsTemplate(workout))
   view.querySelector('#delete-workout')?.addEventListener('click', async () => {
     if (!await confirmAction('删除整次训练？', '所有动作和组记录都会被删除，此操作无法撤销。')) return
     try { workoutAutosave.cancel(); await db.workouts.delete(workout.id); currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = true; toast('已删除'); await renderWorkoutPage() } catch (error) { fail(error) }
@@ -522,6 +536,261 @@ async function renderWorkoutHistory(): Promise<void> {
   view.innerHTML = `<div class="section-head history-head"><div><h2>历史训练</h2><span>${workouts.length} 次训练</span></div><button class="text-btn" id="close-history">返回</button></div><div class="history-list">${workouts.length ? workouts.map((workout) => `<button class="history-card" data-workout="${workout.id}"><div class="history-card-title"><strong>${formatShortDate(workout.date)}</strong><span>${workout.exercises.length} 个动作 · ${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span></div><div class="history-details">${workout.exercises.map((item) => `<div><strong>${esc(item.exerciseName)}</strong><small>${item.sets.map(workoutSetSummary).join(' · ') || '暂无组数'}</small></div>`).join('')}</div>${icon('chevron', 17)}</button>`).join('') : `<div class="empty minimal"><div class="empty-icon">${icon('activity', 24)}</div><h3>还没有训练历史</h3></div>`}</div>`
   view.querySelector('#close-history')?.addEventListener('click', () => { showWorkoutHistory = false; void renderWorkoutPage().catch(fail) })
   view.querySelectorAll<HTMLButtonElement>('[data-workout]').forEach((button) => button.addEventListener('click', async () => { try { currentWorkout = await db.workouts.get(button.dataset.workout!); workoutEditorOpen = true; showWorkoutHistory = false; await renderWorkoutPage() } catch (error) { fail(error) } }))
+}
+
+function defaultTemplateName(date: string, suffix: string): string {
+  const value = new Date(`${date}T12:00:00`)
+  return `${value.getMonth() + 1}月${value.getDate()}日${suffix}`
+}
+
+async function showWorkoutStartSheet(): Promise<void> {
+  const openWorkout = (await db.workouts.toArray()).find((item) => !item.finishedAt)
+  const templates = sortTemplates(await db.workoutTemplates.toArray())
+  const cards = templates.slice(0, 5).map(workoutTemplateCardHtml).join('')
+  const dialog = openModal('开始训练', `<div class="template-picker">${openWorkout ? `<div class="warning soft-warning"><strong>有未完成训练</strong><span>${formatShortDate(openWorkout.date)} · ${openWorkout.exercises.length} 个动作</span><button class="primary" id="continue-open-workout">继续训练</button></div>` : ''}${templates.length ? `<div class="template-list">${cards}</div>` : '<div class="empty compact minimal"><h3>还没有训练模板</h3><p>可以先创建模板，或直接开始空白训练。</p></div>'}<div class="template-picker-actions"><button class="secondary" id="blank-workout">空白训练</button><button id="manage-workout-templates">${templates.length ? '管理全部模板' : '创建第一个模板'}</button></div></div>`, true)
+  dialog.querySelector('#continue-open-workout')?.addEventListener('click', async () => {
+    if (!openWorkout) return
+    dialog.close(); workoutDate = openWorkout.date; currentWorkout = openWorkout; workoutEditorOpen = true; await render()
+  })
+  dialog.querySelector('#blank-workout')?.addEventListener('click', async () => {
+    try {
+      if (openWorkout) throw new Error('请先完成已有的未完成训练')
+      currentWorkout = await createWorkout(workoutDate); workoutEditorOpen = true; dialog.close(); await renderWorkoutPage()
+    } catch (error) { fail(error) }
+  })
+  dialog.querySelector('#manage-workout-templates')?.addEventListener('click', () => { dialog.close(); void showWorkoutTemplateManager() })
+  dialog.querySelectorAll<HTMLButtonElement>('[data-start-workout-template]').forEach((button) => button.addEventListener('click', () => {
+    const template = templates.find((item) => item.id === button.dataset.startWorkoutTemplate)
+    if (template) void launchWorkoutTemplate(template, dialog)
+  }))
+}
+
+function workoutTemplateCardHtml(template: WorkoutTemplate): string {
+  const exerciseNames = template.exercises.slice(0, 3).map((item) => esc(item.exerciseName)).join(' · ')
+  const extra = Math.max(0, template.exercises.length - 3)
+  const sets = template.exercises.reduce((sum, item) => sum + item.sets.length, 0)
+  return `<article class="template-card"><div><h3>${esc(template.name)}</h3><p>${exerciseNames || '暂无动作'}${extra ? ` · +${extra}` : ''}</p><small>${template.exercises.length} 个动作 · ${sets} 组</small></div><button class="primary compact-button" data-start-workout-template="${template.id}">开始</button></article>`
+}
+
+async function launchWorkoutTemplate(template: WorkoutTemplate, dialog?: HTMLDialogElement): Promise<void> {
+  try {
+    const openWorkout = (await db.workouts.toArray()).find((item) => !item.finishedAt)
+    if (openWorkout) throw new Error('已有未完成训练，请先继续或完成它')
+    currentWorkout = await startWorkoutFromTemplate(template, workoutDate)
+    workoutEditorOpen = true; showWorkoutHistory = false; dialog?.close(); await renderWorkoutPage()
+  } catch (error) { fail(error) }
+}
+
+async function showWorkoutTemplateManager(query = ''): Promise<void> {
+  const templates = sortTemplates(await db.workoutTemplates.toArray())
+  const exerciseIds = [...new Set(templates.flatMap((template) => template.exercises.map((item) => item.exerciseId).filter((id): id is string => Boolean(id))))]
+  const existingIds = new Set((await db.exercises.bulkGet(exerciseIds)).filter((item): item is Exercise => Boolean(item)).map((item) => item.id))
+  const dialog = openModal('训练模板', `<div class="toolbar"><label class="search-field"><span class="sr-only">搜索训练模板</span>${icon('search', 19)}<input id="workout-template-search" type="search" value="${esc(query)}" placeholder="搜索模板"></label><button class="icon-btn add-button" id="new-workout-template" aria-label="新建训练模板">${icon('plus')}</button></div><div class="template-manager-list"></div>`, true)
+  const draw = (value: string) => {
+    const normalized = value.trim().toLocaleLowerCase()
+    const filtered = templates.filter((item) => item.name.toLocaleLowerCase().includes(normalized))
+    dialog.querySelector('.template-manager-list')!.innerHTML = filtered.length ? filtered.map((template) => {
+      const missing = template.exercises.filter((item) => item.exerciseId && !existingIds.has(item.exerciseId)).length
+      return `<article class="manager-card"><button class="manager-main" data-edit-workout-template="${template.id}"><strong>${esc(template.name)}</strong><span>${template.exercises.length} 个动作 · ${template.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${missing ? `<small class="warning-text">${missing} 个动作已从动作库删除，仍可使用快照</small>` : ''}</button><div class="manager-actions"><button data-start-workout-template="${template.id}">开始</button><button data-duplicate-workout-template="${template.id}">复制</button><button class="danger" data-delete-workout-template="${template.id}">删除</button></div></article>`
+    }).join('') : '<p class="muted padded">没有匹配的训练模板</p>'
+    bindWorkoutTemplateManagerActions(dialog, templates)
+  }
+  draw(query)
+  dialog.querySelector<HTMLInputElement>('#workout-template-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
+  dialog.querySelector('#new-workout-template')?.addEventListener('click', () => { dialog.close(); void showWorkoutTemplateEditor() })
+}
+
+function bindWorkoutTemplateManagerActions(dialog: HTMLDialogElement, templates: WorkoutTemplate[]): void {
+  dialog.querySelectorAll<HTMLButtonElement>('[data-edit-workout-template]').forEach((button) => button.addEventListener('click', () => {
+    const template = templates.find((item) => item.id === button.dataset.editWorkoutTemplate)
+    if (template) { dialog.close(); void showWorkoutTemplateEditor(template) }
+  }))
+  dialog.querySelectorAll<HTMLButtonElement>('[data-start-workout-template]').forEach((button) => button.addEventListener('click', () => {
+    const template = templates.find((item) => item.id === button.dataset.startWorkoutTemplate)
+    if (template) void launchWorkoutTemplate(template, dialog)
+  }))
+  dialog.querySelectorAll<HTMLButtonElement>('[data-duplicate-workout-template]').forEach((button) => button.addEventListener('click', async () => {
+    const template = templates.find((item) => item.id === button.dataset.duplicateWorkoutTemplate)
+    if (!template) return
+    try { await db.workoutTemplates.add(duplicateWorkoutTemplate(template)); dialog.close(); toast('模板已复制'); await showWorkoutTemplateManager() } catch (error) { fail(error) }
+  }))
+  dialog.querySelectorAll<HTMLButtonElement>('[data-delete-workout-template]').forEach((button) => button.addEventListener('click', async () => {
+    if (!await confirmAction('删除训练模板？', '只删除模板，历史训练不会受影响。')) return
+    try { await db.workoutTemplates.delete(button.dataset.deleteWorkoutTemplate!); dialog.close(); toast('模板已删除，历史训练未受影响'); await showWorkoutTemplateManager() } catch (error) { fail(error) }
+  }))
+}
+
+async function showWorkoutTemplateEditor(source?: WorkoutTemplate): Promise<void> {
+  const draft = source ? structuredClone(source) : { id: crypto.randomUUID(), name: '', exercises: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+  const exerciseIds = draft.exercises.map((item) => item.exerciseId).filter((id): id is string => Boolean(id))
+  const existingIds = new Set((await db.exercises.bulkGet(exerciseIds)).filter((item): item is Exercise => Boolean(item)).map((item) => item.id))
+  const dialog = openModal(source?.createdAt ? '编辑训练模板' : '新建训练模板', '<div id="workout-template-editor"></div>', true)
+  const draw = () => {
+    dialog.querySelector('#workout-template-editor')!.innerHTML = `<form id="workout-template-form" class="form template-editor"><label>模板名称 *<input name="name" value="${esc(draft.name)}" placeholder="Push Day" required></label><label>说明<textarea name="description" rows="2" placeholder="可选">${esc(draft.description)}</textarea></label><div class="template-editor-items">${draft.exercises.map((exercise, index) => workoutTemplateExerciseEditorHtml(exercise, index, draft.exercises.length, Boolean(exercise.exerciseId && !existingIds.has(exercise.exerciseId)))).join('') || '<p class="muted padded">还没有动作</p>'}</div><button type="button" class="secondary" id="add-template-exercise">${icon('plus', 18)} 添加动作</button><button class="primary" type="submit">保存模板</button></form>`
+    bindWorkoutTemplateEditor()
+  }
+  const syncText = () => {
+    const form = dialog.querySelector<HTMLFormElement>('#workout-template-form')
+    if (!form) return
+    const data = new FormData(form); draft.name = valueOf(data, 'name'); draft.description = valueOf(data, 'description').trim() || undefined
+  }
+  const bindWorkoutTemplateEditor = () => {
+    const form = dialog.querySelector<HTMLFormElement>('#workout-template-form')!
+    form.querySelectorAll<HTMLInputElement>('[data-template-set]').forEach((input) => input.addEventListener('input', () => {
+      const exercise = draft.exercises.find((item) => item.id === input.closest<HTMLElement>('[data-template-exercise]')?.dataset.templateExercise)
+      const set = exercise?.sets.find((item) => item.id === input.closest<HTMLElement>('[data-template-set-row]')?.dataset.templateSetRow)
+      if (!set) return
+      if (input.dataset.templateSet === 'reps') set.reps = input.value === '' ? 0 : Number(input.value)
+      if (input.dataset.templateSet === 'weightKg') set.weightKg = input.value === '' ? undefined : Number(input.value)
+      if (input.dataset.templateSet === 'rpe') set.rpe = input.value === '' ? undefined : Number(input.value)
+      if (input.dataset.templateSet === 'note') set.note = input.value.trim() || undefined
+    }))
+    form.querySelectorAll<HTMLTextAreaElement>('[data-template-exercise-note]').forEach((input) => input.addEventListener('input', () => {
+      const exercise = draft.exercises.find((item) => item.id === input.dataset.templateExerciseNote); if (exercise) exercise.note = input.value.trim() || undefined
+    }))
+    form.querySelectorAll<HTMLButtonElement>('[data-template-add-set]').forEach((button) => button.addEventListener('click', () => {
+      syncText(); const exercise = draft.exercises.find((item) => item.id === button.dataset.templateAddSet)!
+      const previous = exercise.sets.at(-1); exercise.sets.push({ id: crypto.randomUUID(), weightKg: previous?.weightKg, reps: previous?.reps ?? 10, rpe: previous?.rpe }); draw()
+    }))
+    form.querySelectorAll<HTMLButtonElement>('[data-template-remove-set]').forEach((button) => button.addEventListener('click', () => {
+      syncText(); const exercise = draft.exercises.find((item) => item.id === button.closest<HTMLElement>('[data-template-exercise]')?.dataset.templateExercise)!
+      exercise.sets = exercise.sets.filter((set) => set.id !== button.dataset.templateRemoveSet); draw()
+    }))
+    form.querySelectorAll<HTMLButtonElement>('[data-template-remove-exercise]').forEach((button) => button.addEventListener('click', () => { syncText(); draft.exercises = draft.exercises.filter((item) => item.id !== button.dataset.templateRemoveExercise); draw() }))
+    form.querySelectorAll<HTMLButtonElement>('[data-template-move]').forEach((button) => button.addEventListener('click', () => {
+      syncText(); const index = draft.exercises.findIndex((item) => item.id === button.dataset.templateMove); const next = index + Number(button.dataset.direction)
+      if (index < 0 || next < 0 || next >= draft.exercises.length) return
+      const [moved] = draft.exercises.splice(index, 1); draft.exercises.splice(next, 0, moved!); draw()
+    }))
+    form.querySelector('#add-template-exercise')?.addEventListener('click', () => { syncText(); dialog.close(); void showWorkoutTemplateExercisePicker(draft) })
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault(); syncText()
+      try { await saveWorkoutTemplate(draft); dialog.close(); toast('训练模板已保存'); await showWorkoutTemplateManager() } catch (error) { fail(error) }
+    })
+  }
+  draw()
+}
+
+function workoutTemplateExerciseEditorHtml(exercise: WorkoutTemplateExercise, index: number, count: number, missing: boolean): string {
+  return `<article class="exercise-card template-exercise" data-template-exercise="${exercise.id}"><div class="exercise-head"><div><h3>${esc(exercise.exerciseName)}</h3>${missing ? '<small class="warning-text">动作已删除，将使用名称快照</small>' : ''}</div><div class="reorder-actions"><button type="button" data-template-move="${exercise.id}" data-direction="-1" ${index === 0 ? 'disabled' : ''} aria-label="上移">↑</button><button type="button" data-template-move="${exercise.id}" data-direction="1" ${index === count - 1 ? 'disabled' : ''} aria-label="下移">↓</button><button type="button" class="icon-btn quiet danger" data-template-remove-exercise="${exercise.id}" aria-label="删除动作">${icon('trash', 17)}</button></div></div><div class="sets"><div class="set-header"><span>组</span><span>重量 <small>kg</small></span><span>次数</span><span>RPE</span><span></span></div>${exercise.sets.map((set, setIndex) => `<div class="set-row" data-template-set-row="${set.id}"><span>${setIndex + 1}</span><input data-template-set="weightKg" type="number" inputmode="decimal" min="0" step="0.5" value="${set.weightKg ?? ''}" placeholder="—"><input data-template-set="reps" type="number" inputmode="numeric" min="1" step="1" value="${set.reps || ''}" placeholder="—"><input data-template-set="rpe" type="number" inputmode="decimal" min="1" max="10" step="0.5" value="${set.rpe ?? ''}" placeholder="—"><button type="button" class="icon-btn quiet danger" data-template-remove-set="${set.id}">${icon('x', 17)}</button><input class="set-note" data-template-set="note" value="${esc(set.note)}" placeholder="本组备注（可选）"></div>`).join('')}</div><button type="button" class="text-btn add-set" data-template-add-set="${exercise.id}">${icon('plus', 17)} 添加一组</button><label class="compact-label">动作备注<textarea data-template-exercise-note="${exercise.id}" rows="2" placeholder="可选">${esc(exercise.note)}</textarea></label></article>`
+}
+
+async function showWorkoutTemplateExercisePicker(draft: WorkoutTemplate): Promise<void> {
+  const exercises = await db.exercises.orderBy('name').toArray()
+  const dialog = openModal('添加模板动作', `<label class="search-field">${icon('search', 19)}<input id="template-exercise-search" type="search" placeholder="搜索动作"></label><div id="template-exercise-results" class="picker-list"></div>`, true)
+  const draw = (query = '') => {
+    const matches = exercises.filter((item) => item.name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
+    dialog.querySelector('#template-exercise-results')!.innerHTML = matches.map((exercise) => `<button class="picker-item" data-pick-template-exercise="${exercise.id}"><strong>${esc(exercise.name)}</strong></button>`).join('') || '<p class="muted">没有匹配动作</p>'
+    dialog.querySelectorAll<HTMLButtonElement>('[data-pick-template-exercise]').forEach((button) => button.addEventListener('click', () => {
+      const exercise = exercises.find((item) => item.id === button.dataset.pickTemplateExercise)!
+      draft.exercises.push({ id: crypto.randomUUID(), exerciseId: exercise.id, exerciseName: exercise.name, sets: [{ id: crypto.randomUUID(), reps: 10 }] })
+      dialog.close(); void showWorkoutTemplateEditor(draft)
+    }))
+  }
+  draw(); dialog.querySelector<HTMLInputElement>('#template-exercise-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
+}
+
+function saveWorkoutAsTemplate(workout: Workout): void {
+  const suggested = defaultTemplateName(workout.date, '训练')
+  const dialog = openModal('保存为训练模板', `<form id="save-workout-as-template" class="form"><label>模板名称<input name="name" value="${esc(suggested)}" required></label><p class="muted">模板与这次训练相互独立，之后修改不会影响历史。</p><button class="primary" type="submit">保存模板</button></form>`)
+  dialog.querySelector<HTMLFormElement>('#save-workout-as-template')?.addEventListener('submit', async (event) => {
+    event.preventDefault()
+    try { await db.workoutTemplates.add(workoutTemplateFromWorkout(workout, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'name'))); dialog.close(); toast('已保存为训练模板') } catch (error) { fail(error) }
+  })
+}
+
+async function showDietTemplatePicker(): Promise<void> {
+  const templates = sortTemplates(await db.dietTemplates.toArray())
+  const cards = await Promise.all(templates.slice(0, 5).map(dietTemplateCardHtml))
+  const dialog = openModal('使用饮食模板', `<div class="template-picker">${templates.length ? `<div class="template-list">${cards.join('')}</div>` : '<div class="empty compact minimal"><h3>还没有饮食模板</h3><p>把常吃的食物组合保存起来，下次一键添加。</p></div>'}<div class="template-picker-actions"><button id="manage-diet-templates">${templates.length ? '管理全部模板' : '创建第一个模板'}</button></div></div>`, true)
+  dialog.querySelector('#manage-diet-templates')?.addEventListener('click', () => { dialog.close(); void showDietTemplateManager() })
+  dialog.querySelectorAll<HTMLButtonElement>('[data-apply-diet-template]').forEach((button) => button.addEventListener('click', () => {
+    const template = templates.find((item) => item.id === button.dataset.applyDietTemplate); if (template) void applySelectedDietTemplate(template, dialog)
+  }))
+}
+
+async function dietTemplateCardHtml(template: DietTemplate): Promise<string> {
+  const resolved = await resolveDietTemplateFoods(template)
+  const calories = resolved.reduce((sum, value) => sum + calculateNutrition(value.food, value.item.grams).calories, 0)
+  const names = template.items.slice(0, 4).map((item) => esc(item.foodName)).join(' · ')
+  return `<article class="template-card"><div><h3>${esc(template.name)}</h3><p>${names || '暂无食物'}</p><small>${template.items.length} 项 · ${formatNumber(calories)} kcal</small></div><button class="primary compact-button" data-apply-diet-template="${template.id}">添加</button></article>`
+}
+
+async function applySelectedDietTemplate(template: DietTemplate, dialog?: HTMLDialogElement): Promise<void> {
+  try {
+    const resolved = await resolveDietTemplateFoods(template)
+    await applyDietTemplate(template, foodDate); dialog?.close()
+    const missing = resolved.filter((item) => item.missing).length
+    toast(missing ? `已添加 ${template.items.length} 项，${missing} 项使用模板快照` : `已添加 ${template.items.length} 项`)
+    await renderFoodPage()
+  } catch (error) { fail(error) }
+}
+
+async function showDietTemplateManager(query = ''): Promise<void> {
+  const templates = sortTemplates(await db.dietTemplates.toArray())
+  const summaries = new Map<string, string>()
+  await Promise.all(templates.map(async (template) => {
+    const resolved = await resolveDietTemplateFoods(template)
+    const kcal = resolved.reduce((sum, value) => sum + calculateNutrition(value.food, value.item.grams).calories, 0)
+    const missing = resolved.filter((item) => item.missing).length
+    summaries.set(template.id, `${template.items.length} 项 · ${formatNumber(kcal)} kcal${missing ? ` · ${missing} 项使用快照` : ''}`)
+  }))
+  const dialog = openModal('饮食模板', `<div class="toolbar"><label class="search-field">${icon('search', 19)}<input id="diet-template-search" type="search" value="${esc(query)}" placeholder="搜索模板"></label><button class="icon-btn add-button" id="new-diet-template" aria-label="新建饮食模板">${icon('plus')}</button></div><div class="template-manager-list"></div>`, true)
+  const draw = (value: string) => {
+    const normalized = value.trim().toLocaleLowerCase(); const filtered = templates.filter((item) => item.name.toLocaleLowerCase().includes(normalized))
+    dialog.querySelector('.template-manager-list')!.innerHTML = filtered.length ? filtered.map((template) => `<article class="manager-card"><button class="manager-main" data-edit-diet-template="${template.id}"><strong>${esc(template.name)}</strong><span>${esc(summaries.get(template.id))}</span></button><div class="manager-actions"><button data-apply-diet-template="${template.id}">添加</button><button data-duplicate-diet-template="${template.id}">复制</button><button class="danger" data-delete-diet-template="${template.id}">删除</button></div></article>`).join('') : '<p class="muted padded">没有匹配的饮食模板</p>'
+    bindDietTemplateManagerActions(dialog, templates)
+  }
+  draw(query); dialog.querySelector<HTMLInputElement>('#diet-template-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
+  dialog.querySelector('#new-diet-template')?.addEventListener('click', () => { dialog.close(); void showDietTemplateEditor() })
+}
+
+function bindDietTemplateManagerActions(dialog: HTMLDialogElement, templates: DietTemplate[]): void {
+  dialog.querySelectorAll<HTMLButtonElement>('[data-edit-diet-template]').forEach((button) => button.addEventListener('click', () => { const template = templates.find((item) => item.id === button.dataset.editDietTemplate); if (template) { dialog.close(); void showDietTemplateEditor(template) } }))
+  dialog.querySelectorAll<HTMLButtonElement>('[data-apply-diet-template]').forEach((button) => button.addEventListener('click', () => { const template = templates.find((item) => item.id === button.dataset.applyDietTemplate); if (template) void applySelectedDietTemplate(template, dialog) }))
+  dialog.querySelectorAll<HTMLButtonElement>('[data-duplicate-diet-template]').forEach((button) => button.addEventListener('click', async () => { const template = templates.find((item) => item.id === button.dataset.duplicateDietTemplate); if (!template) return; try { await db.dietTemplates.add(duplicateDietTemplate(template)); dialog.close(); toast('模板已复制'); await showDietTemplateManager() } catch (error) { fail(error) } }))
+  dialog.querySelectorAll<HTMLButtonElement>('[data-delete-diet-template]').forEach((button) => button.addEventListener('click', async () => { if (!await confirmAction('删除饮食模板？', '只删除模板，历史饮食记录不会受影响。')) return; try { await db.dietTemplates.delete(button.dataset.deleteDietTemplate!); dialog.close(); toast('模板已删除，历史记录未受影响'); await showDietTemplateManager() } catch (error) { fail(error) } }))
+}
+
+async function showDietTemplateEditor(source?: DietTemplate): Promise<void> {
+  const draft = source ? structuredClone(source) : { id: crypto.randomUUID(), name: '', items: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+  const resolved = await resolveDietTemplateFoods(draft)
+  const missingIds = new Set(resolved.filter((item) => item.missing).map((item) => item.item.id))
+  const dialog = openModal(source?.createdAt ? '编辑饮食模板' : '新建饮食模板', '<div id="diet-template-editor"></div>', true)
+  const syncText = () => {
+    const form = dialog.querySelector<HTMLFormElement>('#diet-template-form'); if (!form) return
+    const data = new FormData(form); draft.name = valueOf(data, 'name'); draft.description = valueOf(data, 'description').trim() || undefined
+  }
+  const draw = () => {
+    dialog.querySelector('#diet-template-editor')!.innerHTML = `<form id="diet-template-form" class="form template-editor"><label>模板名称 *<input name="name" value="${esc(draft.name)}" placeholder="训练日早餐" required></label><label>说明<textarea name="description" rows="2" placeholder="可选">${esc(draft.description)}</textarea></label><div class="template-editor-items">${draft.items.map((item, index) => `<article class="diet-template-item" data-diet-template-item="${item.id}"><div><strong>${esc(item.foodName)}</strong>${item.brand ? `<small>${esc(item.brand)}</small>` : ''}${missingIds.has(item.id) ? '<small class="warning-text">食物已删除，将使用营养快照</small>' : ''}</div><label><input data-diet-grams type="number" inputmode="decimal" min="0.1" step="0.1" value="${item.grams}"><span>g</span></label><div class="reorder-actions"><button type="button" data-diet-move="${item.id}" data-direction="-1" ${index === 0 ? 'disabled' : ''}>↑</button><button type="button" data-diet-move="${item.id}" data-direction="1" ${index === draft.items.length - 1 ? 'disabled' : ''}>↓</button><button type="button" class="icon-btn quiet danger" data-remove-diet-item="${item.id}">${icon('trash', 17)}</button></div></article>`).join('') || '<p class="muted padded">还没有食物</p>'}</div><button type="button" class="secondary" id="add-diet-template-food">${icon('plus', 18)} 添加食物</button><button class="primary" type="submit">保存模板</button></form>`
+    bind()
+  }
+  const bind = () => {
+    const form = dialog.querySelector<HTMLFormElement>('#diet-template-form')!
+    form.querySelectorAll<HTMLInputElement>('[data-diet-grams]').forEach((input) => input.addEventListener('input', () => { const item = draft.items.find((value) => value.id === input.closest<HTMLElement>('[data-diet-template-item]')?.dataset.dietTemplateItem); if (item) item.grams = Number(input.value) }))
+    form.querySelectorAll<HTMLButtonElement>('[data-remove-diet-item]').forEach((button) => button.addEventListener('click', () => { syncText(); draft.items = draft.items.filter((item) => item.id !== button.dataset.removeDietItem); draw() }))
+    form.querySelectorAll<HTMLButtonElement>('[data-diet-move]').forEach((button) => button.addEventListener('click', () => { syncText(); const index = draft.items.findIndex((item) => item.id === button.dataset.dietMove); const next = index + Number(button.dataset.direction); if (index < 0 || next < 0 || next >= draft.items.length) return; const [moved] = draft.items.splice(index, 1); draft.items.splice(next, 0, moved!); draw() }))
+    form.querySelector('#add-diet-template-food')?.addEventListener('click', () => { syncText(); dialog.close(); void showDietTemplateFoodPicker(draft) })
+    form.addEventListener('submit', async (event) => { event.preventDefault(); syncText(); try { await saveDietTemplate(draft); dialog.close(); toast('饮食模板已保存'); await showDietTemplateManager() } catch (error) { fail(error) } })
+  }
+  draw()
+}
+
+async function showDietTemplateFoodPicker(draft: DietTemplate): Promise<void> {
+  const foods = await db.foods.orderBy('name').toArray()
+  const dialog = openModal('添加模板食物', `<label class="search-field">${icon('search', 19)}<input id="diet-template-food-search" type="search" placeholder="搜索食物或品牌"></label><div id="diet-template-food-results" class="picker-list"></div>`, true)
+  const draw = (query = '') => {
+    const normalized = query.trim().toLocaleLowerCase(); const matches = foods.filter((food) => `${food.name} ${food.brand ?? ''}`.toLocaleLowerCase().includes(normalized))
+    dialog.querySelector('#diet-template-food-results')!.innerHTML = matches.map((food) => `<button class="picker-item" data-pick-diet-food="${food.id}"><span><strong>${esc(food.name)}</strong>${food.brand ? `<small>${esc(food.brand)}</small>` : ''}</span><em>${formatNumber(food.calories)} kcal / ${formatNumber(food.referenceGrams)}g</em></button>`).join('') || '<p class="muted">食物库中没有匹配项</p>'
+    dialog.querySelectorAll<HTMLButtonElement>('[data-pick-diet-food]').forEach((button) => button.addEventListener('click', () => { const food = foods.find((item) => item.id === button.dataset.pickDietFood)!; draft.items.push(dietTemplateItemFromFood(food, 100)); dialog.close(); void showDietTemplateEditor(draft) }))
+  }
+  draw(); dialog.querySelector<HTMLInputElement>('#diet-template-food-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
+}
+
+function saveDayAsDietTemplate(logs: FoodLog[]): void {
+  const suggested = defaultTemplateName(foodDate, '饮食')
+  const dialog = openModal('保存当天为饮食模板', `<form id="save-day-diet-template-form" class="form"><label>模板名称<input name="name" value="${esc(suggested)}" required></label><p class="muted">保存当前 ${logs.length} 项记录，之后修改模板不会影响今天的饮食记录。</p><button class="primary" type="submit">保存模板</button></form>`)
+  dialog.querySelector<HTMLFormElement>('#save-day-diet-template-form')?.addEventListener('submit', async (event) => { event.preventDefault(); try { await db.dietTemplates.add(dietTemplateFromLogs(logs, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'name'))); dialog.close(); toast('已保存为饮食模板') } catch (error) { fail(error) } })
 }
 
 async function renderWeightPage(): Promise<void> {
@@ -574,8 +843,8 @@ async function showSettings(): Promise<void> {
   fileInput.addEventListener('change', async () => { const file = fileInput.files?.[0]; if (!file) return; try { const backup = validateBackup(JSON.parse(await file.text())); dialog.close(); showRestorePreview(backup) } catch (error) { fail(error) } })
 }
 
-function showRestorePreview(backup: BackupData): void {
-  const counts = [{ label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }]
+function showRestorePreview(backup: BackupDataV2): void {
+  const counts = [{ label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }, { label: '训练模板', count: backup.data.workoutTemplates.length }, { label: '饮食模板', count: backup.data.dietTemplates.length }]
   const dialog = openModal('确认恢复备份', `<div class="restore-counts">${counts.map((item) => `<p><span>${item.label}</span><strong>${item.count}</strong></p>`).join('')}</div><div class="warning">恢复将清除当前所有数据，并替换为该备份。</div><button class="danger-button full-btn" id="confirm-restore">继续恢复</button>`)
   dialog.querySelector('#confirm-restore')?.addEventListener('click', async () => { if (!await confirmAction('覆盖当前全部数据？', '恢复会清除当前数据并替换为备份内容，此操作无法撤销。', '恢复备份')) return; try { await restoreBackup(backup); dialog.close(); currentWorkout = undefined; workoutEditorOpen = false; toast('恢复完成'); await render() } catch (error) { fail(error) } })
 }

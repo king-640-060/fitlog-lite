@@ -107,8 +107,8 @@ describe('体重', () => {
 describe('备份', () => {
   it('验证备份 schema', () => {
     const backup = { app: 'FitLog Lite', schemaVersion: 1, exportedAt: new Date().toISOString(), data: { foods: [], foodLogs: [], exercises: [], workouts: [], weights: [] } }
-    expect(validateBackup(backup)).toEqual(backup)
-    expect(() => validateBackup({ ...backup, schemaVersion: 2 })).toThrow()
+    expect(validateBackup(backup)).toMatchObject({ schemaVersion: 2, data: { workoutTemplates: [], dietTemplates: [] } })
+    expect(() => validateBackup({ ...backup, schemaVersion: 3 })).toThrow()
   })
 })
 

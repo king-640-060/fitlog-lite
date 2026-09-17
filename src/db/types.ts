@@ -73,10 +73,66 @@ export interface WeightLog {
   updatedAt: string
 }
 
-export interface BackupData {
+export interface WorkoutTemplateSet {
+  id: string
+  weightKg?: number
+  reps: number
+  rpe?: number
+  note?: string
+}
+
+export interface WorkoutTemplateExercise {
+  id: string
+  exerciseId?: string
+  exerciseName: string
+  sets: WorkoutTemplateSet[]
+  note?: string
+}
+
+export interface WorkoutTemplate {
+  id: string
+  name: string
+  description?: string
+  exercises: WorkoutTemplateExercise[]
+  createdAt: string
+  updatedAt: string
+  lastUsedAt?: string
+}
+
+export interface DietTemplateFallback {
+  referenceGrams: number
+  calories: number
+  protein?: number
+  carbs?: number
+  fat?: number
+}
+
+export interface DietTemplateItem {
+  id: string
+  foodId?: string
+  foodName: string
+  brand?: string
+  grams: number
+  fallback: DietTemplateFallback
+}
+
+export interface DietTemplate {
+  id: string
+  name: string
+  description?: string
+  items: DietTemplateItem[]
+  createdAt: string
+  updatedAt: string
+  lastUsedAt?: string
+}
+
+interface BackupBase {
   app: 'FitLog Lite'
-  schemaVersion: 1
   exportedAt: string
+}
+
+export interface BackupDataV1 extends BackupBase {
+  schemaVersion: 1
   data: {
     foods: Food[]
     foodLogs: FoodLog[]
@@ -85,3 +141,13 @@ export interface BackupData {
     weights: WeightLog[]
   }
 }
+
+export interface BackupDataV2 extends BackupBase {
+  schemaVersion: 2
+  data: BackupDataV1['data'] & {
+    workoutTemplates: WorkoutTemplate[]
+    dietTemplates: DietTemplate[]
+  }
+}
+
+export type BackupData = BackupDataV1 | BackupDataV2
