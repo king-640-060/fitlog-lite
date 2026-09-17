@@ -23,10 +23,38 @@ let showWorkoutHistory = false
 let weightRange: '30' | '90' | 'all' = '30'
 let weightChart: Chart | undefined
 let workoutSaveTimer: number | undefined
+const LAST_BACKUP_KEY = 'fitlog-last-backup-at'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 const esc = (value: unknown): string => String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]!)
 const valueOf = (form: FormData, key: string): string => String(form.get(key) ?? '')
+
+function formatBackupTime(value: string | null): string {
+  if (!value) return '尚未备份'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return '尚未备份'
+  return new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false,
+  }).format(date)
+}
+
+function setupMobileViewport(): void {
+  const viewport = window.visualViewport
+  if (!viewport) return
+  const update = () => {
+    const keyboardOpen = viewport.height < window.innerHeight - 120
+    document.body.classList.toggle('keyboard-open', keyboardOpen)
+    document.documentElement.style.setProperty('--visual-viewport-height', `${viewport.height}px`)
+  }
+  viewport.addEventListener('resize', update)
+  viewport.addEventListener('scroll', update)
+  document.addEventListener('focusin', (event) => {
+    const target = event.target
+    if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return
+    window.setTimeout(() => target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 180)
+  })
+  update()
+}
 
 function toast(message: string, tone: 'normal' | 'error' = 'normal'): void {
   document.querySelector('.toast')?.remove()
@@ -342,8 +370,9 @@ async function renderWeightPage(): Promise<void> {
 async function showSettings(): Promise<void> {
   let persistText = '浏览器不支持'
   try { if (navigator.storage?.persist) persistText = await navigator.storage.persist() ? '已授权' : '未授权' } catch { persistText = '未授权' }
-  const dialog = openModal('数据与设置', `<section class="settings-section"><h3>本地数据</h3><p>所有数据默认仅保存在当前浏览器中。清除浏览器数据可能导致记录丢失，请定期导出备份。</p><p class="storage-state">持久化存储：<strong>${persistText}</strong></p></section><section class="settings-section"><h3>备份与恢复</h3><button class="primary full-btn" id="export-backup">导出完整备份</button><button class="full-btn" id="restore-backup">恢复完整备份</button><input id="backup-file" type="file" accept=".json,application/json" hidden></section><section class="settings-section"><h3>关于</h3><p>FitLog Lite · 数据只保存在你的设备上</p></section>`)
-  dialog.querySelector('#export-backup')?.addEventListener('click', async () => { try { const backup = await exportBackup(); const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `fitlog-backup-${getLocalDateString()}.json`; link.click(); URL.revokeObjectURL(link.href); toast('备份已导出') } catch (error) { fail(error) } })
+  const lastBackup = formatBackupTime(localStorage.getItem(LAST_BACKUP_KEY))
+  const dialog = openModal('数据与设置', `<section class="settings-section"><h3>本地数据</h3><div class="data-safety"><strong>数据保存在当前设备。清除 Safari 网站数据或更换设备前，请先导出备份。</strong><p>上次导出备份：<span id="last-backup">${esc(lastBackup)}</span></p></div><p class="storage-state">持久化存储：<strong>${persistText}</strong></p></section><section class="settings-section"><h3>备份与恢复</h3><button class="primary full-btn" id="export-backup">导出完整备份</button><button class="full-btn" id="restore-backup">恢复完整备份</button><input id="backup-file" type="file" accept=".json,application/json" hidden></section><section class="settings-section"><h3>关于</h3><p>FitLog Lite · 数据只保存在你的设备上</p></section>`)
+  dialog.querySelector('#export-backup')?.addEventListener('click', async () => { try { const backup = await exportBackup(); const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `fitlog-backup-${getLocalDateString()}.json`; link.click(); URL.revokeObjectURL(link.href); const exportedAt = new Date().toISOString(); localStorage.setItem(LAST_BACKUP_KEY, exportedAt); const label = dialog.querySelector('#last-backup'); if (label) label.textContent = formatBackupTime(exportedAt); toast('备份已导出') } catch (error) { fail(error) } })
   const fileInput = dialog.querySelector<HTMLInputElement>('#backup-file')!
   dialog.querySelector('#restore-backup')?.addEventListener('click', () => fileInput.click())
   fileInput.addEventListener('change', async () => { const file = fileInput.files?.[0]; if (!file) return; try { const backup = validateBackup(JSON.parse(await file.text())); dialog.close(); showRestorePreview(backup) } catch (error) { fail(error) } })
@@ -356,6 +385,7 @@ function showRestorePreview(backup: BackupData): void {
 }
 
 async function start(): Promise<void> {
+  setupMobileViewport()
   try { await db.open(); await seedExercises(); await render() } catch (error) { app.innerHTML = `<div class="fatal"><h1>无法打开 FitLog Lite</h1><p>${esc(error instanceof Error ? error.message : '请刷新后重试')}</p></div>` }
 }
 

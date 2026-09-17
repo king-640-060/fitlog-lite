@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'pwa-192.svg', 'pwa-512.svg'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'pwa-192.svg', 'pwa-512.svg'],
       manifest: {
         name: 'FitLog Lite',
         short_name: 'FitLog',
@@ -27,7 +27,7 @@ export default defineConfig({
       },
       workbox: {
         navigateFallback: 'index.html',
-        globPatterns: ['**/*.{js,css,html,svg,webmanifest}'],
+        globPatterns: ['**/*.{js,css,html,png,svg,webmanifest}'],
         cleanupOutdatedCaches: true,
       },
     }),
