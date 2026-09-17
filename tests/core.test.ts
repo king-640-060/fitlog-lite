@@ -5,6 +5,7 @@ import type { Food, Workout } from '../src/db/types'
 import { validateBackup } from '../src/services/backupService'
 import { buildImportPreview, parseFoodCsv } from '../src/services/importService'
 import { upsertWeight } from '../src/services/weightService'
+import { getMonthGridDays, loadMonthSummaries } from '../src/ui/calendarPage'
 import { getLocalDateString } from '../src/utils/date'
 import { calculateNutrition, createFoodLogSnapshot } from '../src/utils/nutrition'
 
@@ -26,6 +27,27 @@ describe('日期', () => {
   it('通过本地年月日生成业务日期，不经过 UTC', () => {
     const localMidnight = new Date(2026, 8, 16, 0, 5)
     expect(getLocalDateString(localMidnight)).toBe('2026-09-16')
+  })
+
+  it('生成周一开始的固定 6 周月历网格', () => {
+    const days = getMonthGridDays(2026, 8)
+    expect(days).toHaveLength(42)
+    expect(days[0]).toMatchObject({ date: '2026-08-31', isCurrentMonth: false })
+    expect(days[1]).toMatchObject({ date: '2026-09-01', isCurrentMonth: true })
+    expect(days.at(-1)).toMatchObject({ date: '2026-10-11', isCurrentMonth: false })
+  })
+
+  it('按月聚合饮食、训练和体重摘要', async () => {
+    const database = newDatabase()
+    const now = new Date().toISOString()
+    await database.foodLogs.bulkAdd([
+      { id: 'log-1', date: '2026-09-16', foodName: '鸡胸肉', grams: 100, referenceGrams: 100, caloriesPerReference: 165, totalCalories: 165, createdAt: now, updatedAt: now },
+      { id: 'log-2', date: '2026-09-16', foodName: '米饭', grams: 200, referenceGrams: 100, caloriesPerReference: 116, totalCalories: 232, createdAt: now, updatedAt: now },
+    ])
+    await database.workouts.add({ id: 'workout-calendar', date: '2026-09-16', startedAt: now, finishedAt: now, exercises: [{ id: 'entry-calendar', exerciseName: '杠铃卧推', sets: [{ id: 'set-1', weightKg: 80, reps: 10 }, { id: 'set-2', weightKg: 80, reps: 9 }] }], createdAt: now, updatedAt: now })
+    await upsertWeight('2026-09-16', 72.4, database)
+
+    expect((await loadMonthSummaries(2026, 8, database)).get('2026-09-16')).toMatchObject({ calories: 397, hasWorkout: true, workoutCount: 1, setCount: 2, weightKg: 72.4 })
   })
 })
 

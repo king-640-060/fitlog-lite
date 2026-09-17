@@ -8,6 +8,7 @@ import { logFood, saveFood, updateFoodLogGrams, validateFoodInput } from './serv
 import { buildImportPreview, parseFoodCsv, parseFoodJson, type ImportPreview } from './services/importService'
 import { upsertWeight } from './services/weightService'
 import { createWorkout, findOpenWorkout, saveExercise, saveWorkout, validateWorkoutSet } from './services/workoutService'
+import { loadMonthSummaries, renderMonthCalendar, type CalendarDaySummary } from './ui/calendarPage'
 import { formatShortDate, getLocalDateString } from './utils/date'
 import { calculateNutrition, formatNumber } from './utils/nutrition'
 
@@ -16,6 +17,10 @@ registerSW({ immediate: true })
 
 type Tab = 'food' | 'workout' | 'weight'
 let activeTab: Tab = 'food'
+let showCalendar = false
+let calendarSelectedDate = getLocalDateString()
+let calendarYear = new Date().getFullYear()
+let calendarMonth = new Date().getMonth()
 let foodDate = getLocalDateString()
 let workoutDate = getLocalDateString()
 let currentWorkout: Workout | undefined
@@ -139,11 +144,11 @@ async function render(): Promise<void> {
   weightChart?.destroy()
   window.clearInterval(workoutClockTimer)
   document.body.classList.remove('immersive')
-  const title = activeTab === 'food' ? '饮食' : activeTab === 'workout' ? '训练' : '体重'
-  const subtitle = activeTab === 'food' ? formatHeaderDate(foodDate) : activeTab === 'workout' ? formatHeaderDate(workoutDate) : formatHeaderDate(getLocalDateString())
+  const title = showCalendar ? '日历总览' : activeTab === 'food' ? '饮食' : activeTab === 'workout' ? '训练' : '体重'
+  const subtitle = showCalendar ? `${calendarYear}年${calendarMonth + 1}月` : activeTab === 'food' ? formatHeaderDate(foodDate) : activeTab === 'workout' ? formatHeaderDate(workoutDate) : formatHeaderDate(getLocalDateString())
   app.innerHTML = `
     <div class="app-frame">
-      <header class="topbar"><div><h1>${title}</h1><p class="header-date">${subtitle}</p></div><button class="icon-btn settings-btn" id="settings" aria-label="数据与设置">${icon('settings', 21)}</button></header>
+      <header class="topbar"><div><h1>${title}</h1><p class="header-date">${subtitle}</p></div><div class="topbar-actions"><button class="icon-btn settings-btn ${showCalendar ? 'active' : ''}" id="calendar-toggle" aria-label="${showCalendar ? '关闭日历总览' : '打开日历总览'}">${icon(showCalendar ? 'x' : 'calendar', 21)}</button><button class="icon-btn settings-btn" id="settings" aria-label="数据与设置">${icon('settings', 21)}</button></div></header>
       <main id="view" aria-live="polite"></main>
       <nav class="bottom-nav" aria-label="主导航">
         <button data-tab="food" class="${activeTab === 'food' ? 'active' : ''}" aria-current="${activeTab === 'food' ? 'page' : 'false'}">${icon('utensils', 21)}<span>饮食</span></button>
@@ -153,12 +158,72 @@ async function render(): Promise<void> {
     </div>`
   document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((button) => button.addEventListener('click', () => {
     activeTab = button.dataset.tab as Tab
+    showCalendar = false
     void render()
   }))
+  document.querySelector('#calendar-toggle')?.addEventListener('click', () => { showCalendar = !showCalendar; void render() })
   document.querySelector('#settings')?.addEventListener('click', () => void showSettings())
+  if (showCalendar) { await renderCalendarOverview(); return }
   if (activeTab === 'food') await renderFoodPage()
   if (activeTab === 'workout') await renderWorkoutPage()
   if (activeTab === 'weight') await renderWeightPage()
+}
+
+async function renderCalendarOverview(): Promise<void> {
+  const summaries = await loadMonthSummaries(calendarYear, calendarMonth)
+  const recordedDays = [...summaries.values()].length
+  const workoutDays = [...summaries.values()].filter((summary) => summary.hasWorkout).length
+  const totalCalories = [...summaries.values()].reduce((total, summary) => total + (summary.calories ?? 0), 0)
+  const view = document.querySelector<HTMLElement>('#view')!
+  view.innerHTML = `<section class="calendar-overview-head"><button class="icon-btn quiet calendar-prev" id="calendar-prev" aria-label="上个月">${icon('chevron', 20)}</button><div><strong>${calendarYear}年 ${calendarMonth + 1}月</strong><button class="text-btn" id="calendar-today">回到今天</button></div><button class="icon-btn quiet" id="calendar-next" aria-label="下个月">${icon('chevron', 20)}</button></section><div id="calendar-host"></div><section class="calendar-legend" aria-label="日历标记说明"><span><i class="legend-calories"></i>热量</span><span><i class="legend-workout"></i>训练</span><span><i class="legend-weight"></i>体重</span></section><section class="calendar-month-summary"><div><strong>${recordedDays}</strong><span>有记录天数</span></div><div><strong>${workoutDays}</strong><span>训练天数</span></div><div><strong>${formatNumber(totalCalories)}</strong><span>本月 kcal</span></div></section>`
+  const host = view.querySelector<HTMLElement>('#calendar-host')!
+  host.append(renderMonthCalendar({
+    year: calendarYear,
+    month: calendarMonth,
+    selectedDate: calendarSelectedDate,
+    summaries,
+    onDateClick: (date) => void handleCalendarDateClick(date, summaries.get(date)),
+  }))
+  view.querySelector('#calendar-prev')?.addEventListener('click', () => { shiftCalendarMonth(-1); void render() })
+  view.querySelector('#calendar-next')?.addEventListener('click', () => { shiftCalendarMonth(1); void render() })
+  view.querySelector('#calendar-today')?.addEventListener('click', () => {
+    const today = new Date()
+    calendarYear = today.getFullYear(); calendarMonth = today.getMonth(); calendarSelectedDate = getLocalDateString(today); void render()
+  })
+}
+
+function shiftCalendarMonth(offset: number): void {
+  const next = new Date(calendarYear, calendarMonth + offset, 1)
+  calendarYear = next.getFullYear()
+  calendarMonth = next.getMonth()
+}
+
+async function handleCalendarDateClick(date: string, summary?: CalendarDaySummary): Promise<void> {
+  calendarSelectedDate = date
+  const selected = new Date(`${date}T12:00:00`)
+  if (selected.getFullYear() !== calendarYear || selected.getMonth() !== calendarMonth) {
+    calendarYear = selected.getFullYear()
+    calendarMonth = selected.getMonth()
+    const summaries = await loadMonthSummaries(calendarYear, calendarMonth)
+    await render()
+    showCalendarDaySheet(date, summaries.get(date))
+    return
+  }
+  document.querySelectorAll('.calendar-day.selected').forEach((element) => { element.classList.remove('selected'); element.removeAttribute('aria-selected') })
+  const selectedButton = document.querySelector<HTMLButtonElement>(`.calendar-day[data-date="${date}"]`)
+  selectedButton?.classList.add('selected')
+  selectedButton?.setAttribute('aria-selected', 'true')
+  showCalendarDaySheet(date, summary)
+}
+
+function showCalendarDaySheet(date: string, summary?: CalendarDaySummary): void {
+  const calories = summary?.calories === undefined ? '未记录' : `${formatNumber(summary.calories)} kcal`
+  const workout = summary?.hasWorkout ? `${summary.workoutCount} 次 · ${summary.setCount} 组` : '未训练'
+  const weight = summary?.weightKg === undefined ? '未记录' : `${formatNumber(summary.weightKg)} kg`
+  const dialog = openModal(formatHeaderDate(date), `<div class="calendar-day-sheet"><div><span>饮食热量</span><strong>${calories}</strong></div><div><span>训练</span><strong>${workout}</strong></div><div><span>体重</span><strong>${weight}</strong></div></div><div class="calendar-day-actions"><button id="calendar-day-food">${icon('utensils', 18)} 饮食</button><button id="calendar-day-workout">${icon('dumbbell', 18)} 训练</button><button id="calendar-day-weight">${icon('scale', 18)} 体重</button></div>`)
+  dialog.querySelector('#calendar-day-food')?.addEventListener('click', () => { dialog.close(); showCalendar = false; activeTab = 'food'; foodDate = date; void render() })
+  dialog.querySelector('#calendar-day-workout')?.addEventListener('click', () => { dialog.close(); showCalendar = false; activeTab = 'workout'; workoutDate = date; currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = false; void render() })
+  dialog.querySelector('#calendar-day-weight')?.addEventListener('click', () => { dialog.close(); showWeightForm(date, summary?.weightKg) })
 }
 
 async function renderFoodPage(): Promise<void> {
@@ -446,7 +511,8 @@ async function renderWeightPage(): Promise<void> {
 }
 
 function showWeightForm(date: string, value?: number): void {
-  const dialog = openModal(value === undefined ? '今日体重' : '编辑体重', `<form id="weight-sheet-form" class="form weight-sheet-form"><p>${formatHeaderDate(date)}</p><label class="weight-input"><span class="sr-only">体重（千克）</span><input name="weight" type="number" inputmode="decimal" min="0.1" step="0.1" value="${value ?? ''}" placeholder="72.4" required autofocus><b>kg</b></label><button class="primary" type="submit">保存</button></form>`)
+  const title = value === undefined ? date === getLocalDateString() ? '今日体重' : '记录体重' : '编辑体重'
+  const dialog = openModal(title, `<form id="weight-sheet-form" class="form weight-sheet-form"><p>${formatHeaderDate(date)}</p><label class="weight-input"><span class="sr-only">体重（千克）</span><input name="weight" type="number" inputmode="decimal" min="0.1" step="0.1" value="${value ?? ''}" placeholder="72.4" required autofocus><b>kg</b></label><button class="primary" type="submit">保存</button></form>`)
   dialog.querySelector<HTMLFormElement>('#weight-sheet-form')?.addEventListener('submit', async (event) => { event.preventDefault(); try { await upsertWeight(date, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'weight')); dialog.close(); toast('已保存'); await renderWeightPage() } catch (error) { fail(error) } })
 }
 
