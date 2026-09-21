@@ -1,5 +1,7 @@
 # FitLog Lite — Chat Handoff
 
+> Historical architecture snapshot. For the current verified production state, read [`LATEST_DEV_REPORT.md`](../LATEST_DEV_REPORT.md) first. If documents conflict, use current code, then `LATEST_DEV_REPORT.md`, then this handoff.
+
 Generated: 2026-09-21 14:51:22 CST
 Branch: `main`
 Commit: `47b1625efd5757563b49b24c859699cdd05ce38a`
