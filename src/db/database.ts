@@ -1,6 +1,8 @@
 import Dexie, { type EntityTable } from 'dexie'
 import type { DietTemplate, Exercise, Food, FoodLog, WeightLog, Workout, WorkoutTemplate } from './types'
 
+export const STARTER_EXERCISE_NAMES = ['杠铃卧推', '深蹲', '硬拉', '引体向上', '哑铃弯举', '杠铃划船', '哑铃侧平举'] as const
+
 export class FitLogDatabase extends Dexie {
   foods!: EntityTable<Food, 'id'>
   foodLogs!: EntityTable<FoodLog, 'id'>
@@ -28,17 +30,13 @@ export class FitLogDatabase extends Dexie {
       workoutTemplates: 'id, name, createdAt, updatedAt, lastUsedAt',
       dietTemplates: 'id, name, createdAt, updatedAt, lastUsedAt',
     })
+    this.on('populate', () => {
+      const now = new Date().toISOString()
+      return this.exercises.bulkAdd(STARTER_EXERCISE_NAMES.map((name) => ({
+        id: crypto.randomUUID(), name, createdAt: now, updatedAt: now,
+      })))
+    })
   }
 }
 
 export const db = new FitLogDatabase()
-
-export async function seedExercises(): Promise<void> {
-  if ((await db.exercises.count()) > 0) return
-  const now = new Date().toISOString()
-  await db.exercises.bulkAdd(
-    ['杠铃卧推', '深蹲', '硬拉', '引体向上', '哑铃弯举', '杠铃划船', '哑铃侧平举'].map((name) => ({
-      id: crypto.randomUUID(), name, createdAt: now, updatedAt: now,
-    })),
-  )
-}

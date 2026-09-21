@@ -1,7 +1,7 @@
 import './styles/main.css'
 import { Chart, registerables } from 'chart.js'
 import { registerSW } from 'virtual:pwa-register'
-import { db, seedExercises } from './db/database'
+import { db } from './db/database'
 import type { BackupDataV2, DietTemplate, Exercise, Food, FoodLog, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
 import { exportBackup, restoreBackup, validateBackup } from './services/backupService'
 import { logFood, saveFood, updateFoodLogGrams, validateFoodInput } from './services/foodService'
@@ -89,17 +89,76 @@ function formatBackupTime(value: string | null): string {
 function setupMobileViewport(): void {
   const viewport = window.visualViewport
   if (!viewport) return
+
+  type EditableControl = HTMLInputElement | HTMLTextAreaElement
+  let focusedControl: EditableControl | undefined
+  let visibilityFrame: number | undefined
+
+  const isEditableControl = (value: Element | null): value is EditableControl => (
+    value instanceof HTMLInputElement || value instanceof HTMLTextAreaElement
+  )
+
+  const keepFocusedControlVisible = (target: EditableControl): void => {
+    if (!target.isConnected || document.activeElement !== target) return
+    const rect = target.getBoundingClientRect()
+    const topPadding = 16
+    const bottomPadding = 20
+    const visibleTop = viewport.offsetTop + topPadding
+    const visibleBottom = viewport.offsetTop + viewport.height - bottomPadding
+    let scrollDelta = 0
+    if (rect.bottom > visibleBottom) scrollDelta = rect.bottom - visibleBottom
+    else if (rect.top < visibleTop) scrollDelta = rect.top - visibleTop
+    if (Math.abs(scrollDelta) < 1) return
+
+    const modalBody = target.closest<HTMLElement>('.modal-body')
+    if (modalBody) modalBody.scrollBy({ top: scrollDelta, behavior: 'auto' })
+    else window.scrollBy({ top: scrollDelta, behavior: 'auto' })
+  }
+
+  const scheduleVisibilityCheck = (): void => {
+    if (!focusedControl) return
+    if (visibilityFrame !== undefined) window.cancelAnimationFrame(visibilityFrame)
+    let previousViewport = ''
+    let stableFrames = 0
+    const waitForStableViewport = () => {
+      const currentViewport = `${viewport.height}:${viewport.offsetTop}:${viewport.offsetLeft}:${viewport.scale}`
+      stableFrames = currentViewport === previousViewport ? stableFrames + 1 : 0
+      previousViewport = currentViewport
+      if (stableFrames < 2) {
+        visibilityFrame = window.requestAnimationFrame(waitForStableViewport)
+        return
+      }
+      visibilityFrame = undefined
+      if (focusedControl) keepFocusedControlVisible(focusedControl)
+    }
+    visibilityFrame = window.requestAnimationFrame(waitForStableViewport)
+  }
+
   const update = () => {
-    const keyboardOpen = viewport.height < window.innerHeight - 120
+    const keyboardOpen = isEditableControl(document.activeElement) && viewport.height < window.innerHeight - 120
+    const bottomInset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
     document.body.classList.toggle('keyboard-open', keyboardOpen)
     document.documentElement.style.setProperty('--visual-viewport-height', `${viewport.height}px`)
+    document.documentElement.style.setProperty('--visual-viewport-offset-top', `${viewport.offsetTop}px`)
+    document.documentElement.style.setProperty('--visual-viewport-bottom-inset', `${bottomInset}px`)
+    if (focusedControl) scheduleVisibilityCheck()
   }
   viewport.addEventListener('resize', update)
   viewport.addEventListener('scroll', update)
   document.addEventListener('focusin', (event) => {
-    const target = event.target
-    if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return
-    window.setTimeout(() => target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 180)
+    const target = event.target instanceof Element ? event.target : null
+    if (!isEditableControl(target)) return
+    focusedControl = target
+    update()
+  })
+  document.addEventListener('focusout', () => {
+    window.requestAnimationFrame(() => {
+      if (isEditableControl(document.activeElement)) return
+      focusedControl = undefined
+      if (visibilityFrame !== undefined) window.cancelAnimationFrame(visibilityFrame)
+      visibilityFrame = undefined
+      update()
+    })
   })
   update()
 }
@@ -854,7 +913,7 @@ async function start(): Promise<void> {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden' && workoutEditorOpen && currentWorkout) void flushWorkoutAutosave(currentWorkout).catch(fail)
   })
-  try { await db.open(); await seedExercises(); await render() } catch (error) { app.innerHTML = `<div class="fatal"><h1>无法打开 FitLog Lite</h1><p>${esc(error instanceof Error ? error.message : '请刷新后重试')}</p></div>` }
+  try { await db.open(); await render() } catch (error) { app.innerHTML = `<div class="fatal"><h1>无法打开 FitLog Lite</h1><p>${esc(error instanceof Error ? error.message : '请刷新后重试')}</p></div>` }
 }
 
 void start()

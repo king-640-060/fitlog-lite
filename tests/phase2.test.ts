@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto'
 import Dexie from 'dexie'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { FitLogDatabase } from '../src/db/database'
+import { FitLogDatabase, STARTER_EXERCISE_NAMES } from '../src/db/database'
 import type { BackupDataV1, BackupDataV2, DietTemplate, Food, Workout, WorkoutTemplate } from '../src/db/types'
 import { exportBackup, restoreBackup, validateBackup } from '../src/services/backupService'
 import {
@@ -58,6 +58,71 @@ afterEach(async () => {
     database.close()
     await database.delete()
   }
+})
+
+describe('Exercise starter data lifecycle', () => {
+  it('首次创建数据库时自动加入 7 个默认动作', async () => {
+    const database = newDatabase()
+    await database.open()
+
+    const names = (await database.exercises.toArray()).map((exercise) => exercise.name)
+    expect(names).toHaveLength(STARTER_EXERCISE_NAMES.length)
+    expect(new Set(names)).toEqual(new Set(STARTER_EXERCISE_NAMES))
+  })
+
+  it('删除一个默认动作后 close/reopen 不会重新出现', async () => {
+    const database = newDatabase()
+    await database.open()
+    const deleted = await database.exercises.where('name').equals(STARTER_EXERCISE_NAMES[0]).first()
+    await database.exercises.delete(deleted!.id)
+    database.close()
+
+    await database.open()
+    expect(await database.exercises.where('name').equals(STARTER_EXERCISE_NAMES[0]).count()).toBe(0)
+    expect(await database.exercises.count()).toBe(STARTER_EXERCISE_NAMES.length - 1)
+  })
+
+  it('删除全部默认动作后 close/reopen 仍保持为空', async () => {
+    const database = newDatabase()
+    await database.open()
+    await database.exercises.clear()
+    database.close()
+
+    await database.open()
+    expect(await database.exercises.count()).toBe(0)
+  })
+
+  it('已经存在且动作列表为空的 V2 DB 不会 seed', async () => {
+    const name = `fitlog-existing-empty-${crypto.randomUUID()}`
+    const existing = new Dexie(name)
+    existing.version(2).stores({
+      foods: 'id, name, brand, [name+brand], createdAt',
+      foodLogs: 'id, date, foodId, createdAt',
+      exercises: 'id, name, createdAt',
+      workouts: 'id, date, finishedAt, createdAt',
+      weights: 'id, &date, createdAt',
+      workoutTemplates: 'id, name, createdAt, updatedAt, lastUsedAt',
+      dietTemplates: 'id, name, createdAt, updatedAt, lastUsedAt',
+    })
+    await existing.open()
+    existing.close()
+
+    const database = newDatabase(name)
+    await database.open()
+    expect(await database.exercises.count()).toBe(0)
+  })
+
+  it('Restore 空 Exercise 列表后 close/reopen 仍保持为空', async () => {
+    const database = newDatabase()
+    await database.open()
+    const backup = v1Backup()
+    backup.data.exercises = []
+    await restoreBackup(backup, database)
+    database.close()
+
+    await database.open()
+    expect(await database.exercises.count()).toBe(0)
+  })
 })
 
 describe('数据库 V2 migration', () => {
