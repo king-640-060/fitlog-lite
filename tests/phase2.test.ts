@@ -257,11 +257,11 @@ describe('Diet Templates', () => {
   })
 })
 
-describe('Backup V2', () => {
-  it('导出包含两个模板 stores，并可完整恢复 V2', async () => {
+describe('Backup template compatibility', () => {
+  it('V3 导出包含两个模板 stores，并可完整恢复', async () => {
     const source = newDatabase(); await source.foods.add(food()); await source.workoutTemplates.add(workoutTemplate()); await source.dietTemplates.add(dietTemplate())
     const backup = await exportBackup(source)
-    expect(backup.schemaVersion).toBe(2)
+    expect(backup.schemaVersion).toBe(3)
     expect(backup.data.workoutTemplates).toHaveLength(1)
     expect(backup.data.dietTemplates).toHaveLength(1)
     const target = newDatabase(); await restoreBackup(backup, target)

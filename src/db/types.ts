@@ -116,14 +116,47 @@ export interface DietTemplateItem {
   fallback: DietTemplateFallback
 }
 
+export interface NutritionGoal {
+  calories?: number
+  protein?: number
+  carbs?: number
+  fat?: number
+}
+
 export interface DietTemplate {
   id: string
   name: string
   description?: string
   items: DietTemplateItem[]
+  nutritionGoal?: NutritionGoal
   createdAt: string
   updatedAt: string
   lastUsedAt?: string
+}
+
+export interface NutritionTarget extends NutritionGoal {
+  id: string
+  date: string
+  sourceTemplateId?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface PelvicFloorPhase {
+  type: 'contract' | 'relax'
+  durationSeconds: number
+}
+
+export interface PelvicFloorSession {
+  id: string
+  date: string
+  startedAt: string
+  finishedAt: string
+  phases: PelvicFloorPhase[]
+  repetitions: number
+  completedRepetitions: number
+  createdAt: string
+  updatedAt: string
 }
 
 interface BackupBase {
@@ -150,4 +183,12 @@ export interface BackupDataV2 extends BackupBase {
   }
 }
 
-export type BackupData = BackupDataV1 | BackupDataV2
+export interface BackupDataV3 extends BackupBase {
+  schemaVersion: 3
+  data: BackupDataV2['data'] & {
+    nutritionTargets: NutritionTarget[]
+    pelvicFloorSessions: PelvicFloorSession[]
+  }
+}
+
+export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3

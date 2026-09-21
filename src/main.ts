@@ -2,14 +2,20 @@ import './styles/main.css'
 import { Chart, registerables } from 'chart.js'
 import { registerSW } from 'virtual:pwa-register'
 import { db } from './db/database'
-import type { BackupDataV2, DietTemplate, Exercise, Food, FoodLog, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
+import type { BackupDataV3, DietTemplate, Exercise, Food, FoodLog, NutritionGoal, NutritionTarget, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
 import { exportBackup, restoreBackup, validateBackup } from './services/backupService'
 import { logFood, saveFood, updateFoodLogGrams, validateFoodInput } from './services/foodService'
 import { buildImportPreview, parseFoodCsv, parseFoodJson, type ImportPreview } from './services/importService'
 import { upsertWeight } from './services/weightService'
+import { deleteNutritionTarget, normalizeNutritionGoal, saveNutritionTarget } from './services/nutritionTargetService'
+import { pelvicFloorSessionDurationSeconds, savePelvicFloorSession, sessionFromPelvicFloorTimer } from './services/pelvicFloorService'
+import {
+  advancePelvicFloorTimer, createPelvicFloorTimer, finishPelvicFloorTimer, getPelvicFloorRemainingSeconds,
+  pausePelvicFloorTimer, resumePelvicFloorTimer, startPelvicFloorTimer, type PelvicFloorTimerState,
+} from './services/pelvicFloorTimer'
 import { createWorkout, findOpenWorkout, finishWorkout, normalizeWorkoutForSave, saveExercise, saveWorkout, WorkoutAutosaveController } from './services/workoutService'
 import {
-  applyDietTemplate, dietTemplateFromLogs, dietTemplateItemFromFood, duplicateDietTemplate, duplicateWorkoutTemplate,
+  NutritionTargetConflictError, applyDietTemplate, dietTemplateFromLogs, dietTemplateItemFromFood, duplicateDietTemplate, duplicateWorkoutTemplate,
   resolveDietTemplateFoods, saveDietTemplate, saveWorkoutTemplate,
   sortTemplates, startWorkoutFromTemplate, workoutTemplateFromWorkout,
 } from './services/templateService'
@@ -35,6 +41,12 @@ let showWorkoutHistory = false
 let weightRange: '30' | '90' | 'all' = '30'
 let weightChart: Chart | undefined
 let workoutClockTimer: number | undefined
+let pelvicTimerState: PelvicFloorTimerState | undefined
+let pelvicTimerDate = getLocalDateString()
+let pelvicTimerInterval: number | undefined
+let pelvicSessionSaving = false
+let pelvicAudioContext: AudioContext | undefined
+let pelvicWakeLock: { release: () => Promise<void> } | undefined
 const LAST_BACKUP_KEY = 'fitlog-last-backup-at'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
@@ -207,16 +219,29 @@ function openModal(title: string, body: string, wide = false): HTMLDialogElement
   return dialog
 }
 
-function confirmAction(title: string, message: string, confirmLabel = '确认删除', danger = true): Promise<boolean> {
+function confirmAction(title: string, message: string, confirmLabel = '确认删除', danger = true, cancelLabel = '取消'): Promise<boolean> {
   return new Promise((resolve) => {
     const dialog = document.createElement('dialog')
     dialog.className = 'confirm-dialog'
-    dialog.innerHTML = `<div class="confirm-mark ${danger ? 'danger-mark' : ''}">${icon(danger ? 'trash' : 'check', 24)}</div><h2>${esc(title)}</h2><p>${esc(message)}</p><div class="dialog-actions"><button data-cancel>取消</button><button class="${danger ? 'danger-solid' : 'primary'}" data-confirm>${esc(confirmLabel)}</button></div>`
+    dialog.innerHTML = `<div class="confirm-mark ${danger ? 'danger-mark' : ''}">${icon(danger ? 'trash' : 'check', 24)}</div><h2>${esc(title)}</h2><p>${esc(message)}</p><div class="dialog-actions"><button data-cancel>${esc(cancelLabel)}</button><button class="${danger ? 'danger-solid' : 'primary'}" data-confirm>${esc(confirmLabel)}</button></div>`
     document.body.append(dialog)
     let result = false
     dialog.querySelector('[data-cancel]')?.addEventListener('click', () => dialog.close())
     dialog.querySelector('[data-confirm]')?.addEventListener('click', () => { result = true; dialog.close() })
     dialog.addEventListener('close', () => { dialog.remove(); resolve(result) }, { once: true })
+    dialog.showModal()
+  })
+}
+
+function chooseNutritionTargetConflict(): Promise<'preserve' | 'replace' | undefined> {
+  return new Promise((resolve) => {
+    const dialog = document.createElement('dialog')
+    dialog.className = 'confirm-dialog'
+    dialog.innerHTML = `<div class="confirm-mark">${icon('activity', 24)}</div><h2>这一天已经有营养目标</h2><p>添加食物记录时，要保留现有目标，还是使用模板中的目标？</p><div class="dialog-actions"><button data-choice="preserve">保留现有目标</button><button class="primary" data-choice="replace">使用模板目标</button></div>`
+    document.body.append(dialog)
+    let choice: 'preserve' | 'replace' | undefined
+    dialog.querySelectorAll<HTMLButtonElement>('[data-choice]').forEach((button) => button.addEventListener('click', () => { choice = button.dataset.choice as 'preserve' | 'replace'; dialog.close() }))
+    dialog.addEventListener('close', () => { dialog.remove(); resolve(choice) }, { once: true })
     dialog.showModal()
   })
 }
@@ -253,10 +278,16 @@ async function render(): Promise<void> {
 async function renderCalendarOverview(): Promise<void> {
   const summaries = await loadMonthSummaries(calendarYear, calendarMonth)
   const recordedDays = [...summaries.values()].length
-  const workoutDays = [...summaries.values()].filter((summary) => summary.hasWorkout).length
-  const totalCalories = [...summaries.values()].reduce((total, summary) => total + (summary.calories ?? 0), 0)
+  const workoutCount = [...summaries.values()].reduce((total, summary) => total + summary.workoutCount, 0)
+  const pelvicCount = [...summaries.values()].reduce((total, summary) => total + summary.pelvicFloorSessionCount, 0)
+  const calorieDays = [...summaries.values()].filter((summary) => summary.calories !== undefined)
+  const targetDays = calorieDays.filter((summary) => summary.nutritionTarget?.calories !== undefined)
+  const averageCalories = calorieDays.length ? calorieDays.reduce((total, summary) => total + (summary.calories ?? 0), 0) / calorieDays.length : 0
+  const achievedDays = targetDays.filter((summary) => (summary.calories ?? 0) <= summary.nutritionTarget!.calories!).length
+  const nutritionSummary = targetDays.length ? `${achievedDays} / ${targetDays.length}` : formatNumber(averageCalories)
+  const nutritionLabel = targetDays.length ? '热量目标内' : '平均 kcal'
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `<section class="calendar-overview-head"><button class="icon-btn quiet calendar-prev" id="calendar-prev" aria-label="上个月">${icon('chevron', 20)}</button><div><strong>${calendarYear}年 ${calendarMonth + 1}月</strong><button class="text-btn" id="calendar-today">回到今天</button></div><button class="icon-btn quiet" id="calendar-next" aria-label="下个月">${icon('chevron', 20)}</button></section><div id="calendar-host"></div><section class="calendar-legend" aria-label="日历标记说明"><span><i class="legend-calories"></i>热量</span><span><i class="legend-workout"></i>训练</span><span><i class="legend-weight"></i>体重</span></section><section class="calendar-month-summary"><div><strong>${recordedDays}</strong><span>有记录天数</span></div><div><strong>${workoutDays}</strong><span>训练天数</span></div><div><strong>${formatNumber(totalCalories)}</strong><span>本月 kcal</span></div></section>`
+  view.innerHTML = `<section class="calendar-overview-head"><button class="icon-btn quiet calendar-prev" id="calendar-prev" aria-label="上个月">${icon('chevron', 20)}</button><div><strong>${calendarYear}年 ${calendarMonth + 1}月</strong><button class="text-btn" id="calendar-today">回到今天</button></div><button class="icon-btn quiet" id="calendar-next" aria-label="下个月">${icon('chevron', 20)}</button></section><div id="calendar-host"></div><section class="calendar-legend" aria-label="日历标记说明"><span><i class="nutrition-marker">N</i>营养</span><span><i class="workout-marker">S</i>力量</span><span><i class="pelvic-marker">P</i>盆底肌</span><span><i class="weight-marker">W</i>体重</span></section><section class="calendar-month-summary"><div><strong>${recordedDays}</strong><span>有记录天数</span></div><div><strong>${workoutCount}</strong><span>力量训练</span></div><div><strong>${pelvicCount}</strong><span>盆底肌训练</span></div><div><strong>${nutritionSummary}</strong><span>${nutritionLabel}</span></div></section>`
   const host = view.querySelector<HTMLElement>('#calendar-host')!
   host.append(renderMonthCalendar({
     year: calendarYear,
@@ -298,10 +329,23 @@ async function handleCalendarDateClick(date: string, summary?: CalendarDaySummar
 }
 
 function showCalendarDaySheet(date: string, summary?: CalendarDaySummary): void {
-  const calories = summary?.calories === undefined ? '未记录' : `${formatNumber(summary.calories)} kcal`
+  const target = summary?.nutritionTarget
+  const nutritionRow = (label: string, actual: number | undefined, goal: number | undefined, unit: string) => {
+    if (actual === undefined && goal === undefined) return ''
+    const value = goal === undefined ? `${formatNumber(actual ?? 0)} ${unit}` : `${formatNumber(actual ?? 0)} / ${formatNumber(goal)} ${unit}`
+    const width = goal === undefined ? 0 : goal === 0 ? ((actual ?? 0) > 0 ? 100 : 0) : Math.min(100, Math.max(0, ((actual ?? 0) / goal) * 100))
+    return `<div class="calendar-nutrition-row"><span>${label}</span><strong>${value}</strong>${goal === undefined ? '' : `<i class="nutrition-progress"><b style="width:${width}%"></b></i>`}</div>`
+  }
+  const nutrition = [
+    nutritionRow('Calories', summary?.calories, target?.calories, 'kcal'),
+    nutritionRow('Protein', summary?.protein, target?.protein, 'g'),
+    nutritionRow('Carbs', summary?.carbs, target?.carbs, 'g'),
+    nutritionRow('Fat', summary?.fat, target?.fat, 'g'),
+  ].join('') || '<p class="muted">未记录饮食或营养目标</p>'
   const workout = summary?.hasWorkout ? `${summary.workoutCount} 次 · ${summary.setCount} 组` : '未训练'
+  const pelvic = summary?.pelvicFloorSessionCount ? `${summary.pelvicFloorSessionCount} 次 · ${summary.pelvicFloorContractions} 次收缩 · ${summary.pelvicFloorSeconds} 秒` : '未训练'
   const weight = summary?.weightKg === undefined ? '未记录' : `${formatNumber(summary.weightKg)} kg`
-  const dialog = openModal(formatHeaderDate(date), `<div class="calendar-day-sheet"><div><span>饮食热量</span><strong>${calories}</strong></div><div><span>训练</span><strong>${workout}</strong></div><div><span>体重</span><strong>${weight}</strong></div></div><div class="calendar-day-actions"><button id="calendar-day-food">${icon('utensils', 18)} 饮食</button><button id="calendar-day-workout">${icon('dumbbell', 18)} 训练</button><button id="calendar-day-weight">${icon('scale', 18)} 体重</button></div>`)
+  const dialog = openModal(formatHeaderDate(date), `<div class="calendar-day-sheet"><section><h3>Nutrition</h3>${nutrition}</section><div><span>力量训练</span><strong>${workout}</strong></div><div><span>盆底肌训练</span><strong>${pelvic}</strong></div><div><span>体重</span><strong>${weight}</strong></div></div><div class="calendar-day-actions"><button id="calendar-day-food">${icon('utensils', 18)} 饮食</button><button id="calendar-day-workout">${icon('dumbbell', 18)} 训练</button><button id="calendar-day-weight">${icon('scale', 18)} 体重</button></div>`)
   dialog.querySelector('#calendar-day-food')?.addEventListener('click', () => { dialog.close(); showCalendar = false; activeTab = 'food'; foodDate = date; void render().catch(fail) })
   dialog.querySelector('#calendar-day-workout')?.addEventListener('click', () => { dialog.close(); showCalendar = false; activeTab = 'workout'; workoutDate = date; currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = false; void render().catch(fail) })
   dialog.querySelector('#calendar-day-weight')?.addEventListener('click', () => {
@@ -310,22 +354,33 @@ function showCalendarDaySheet(date: string, summary?: CalendarDaySummary): void 
   })
 }
 
+function nutritionMetricHtml(label: string, actual: number, target: number | undefined, unit: string): string {
+  const value = target === undefined ? `${formatNumber(actual)}${unit}` : `${formatNumber(actual)} / ${formatNumber(target)}${unit}`
+  const width = target === undefined ? 0 : target === 0 ? (actual > 0 ? 100 : 0) : Math.min(100, Math.max(0, (actual / target) * 100))
+  return `<span class="nutrition-metric"><span><b>${label}</b>${value}</span>${target === undefined ? '' : `<i class="nutrition-progress" aria-hidden="true"><b style="width:${width}%"></b></i>`}</span>`
+}
+
 async function renderFoodPage(): Promise<void> {
-  const logs = await db.foodLogs.where('date').equals(foodDate).sortBy('createdAt')
+  const [logs, target] = await Promise.all([
+    db.foodLogs.where('date').equals(foodDate).sortBy('createdAt'),
+    db.nutritionTargets.where('date').equals(foodDate).first(),
+  ])
   const totals = logs.reduce((sum, log) => ({
     calories: sum.calories + log.totalCalories,
     protein: sum.protein + (log.totalProtein ?? 0), carbs: sum.carbs + (log.totalCarbs ?? 0), fat: sum.fat + (log.totalFat ?? 0),
   }), { calories: 0, protein: 0, carbs: 0, fat: 0 })
-  const hasMacros = logs.some((log) => log.totalProtein !== undefined || log.totalCarbs !== undefined || log.totalFat !== undefined)
+  const hasMacros = logs.some((log) => log.totalProtein !== undefined || log.totalCarbs !== undefined || log.totalFat !== undefined) || Boolean(target)
+  const isToday = foodDate === getLocalDateString()
   const view = document.querySelector<HTMLElement>('#view')!
   view.innerHTML = `
     <section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>记录日期</span><input id="food-date" type="date" value="${foodDate}" aria-label="饮食记录日期"></label><div class="context-actions"><button class="text-btn" id="use-diet-template">使用模板</button><button class="text-btn" id="food-library">食物库 ${icon('chevron', 16)}</button></div></section>
-    <section class="nutrition-hero" aria-label="今日营养汇总"><div class="hero-number"><strong>${formatNumber(totals.calories)}</strong><span>kcal</span></div><div class="macros ${hasMacros ? '' : 'is-empty'}"><span><b>P</b>${formatNumber(totals.protein)}g</span><span><b>C</b>${formatNumber(totals.carbs)}g</span><span><b>F</b>${formatNumber(totals.fat)}g</span></div></section>
-    <section class="section-head"><div><h2>今日饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '还没有记录'}</span></div><div class="section-actions">${logs.length ? '<button class="text-btn" id="save-day-diet-template">保存为模板</button>' : ''}<button class="icon-btn add-button" id="add-food-log" aria-label="添加食物">${icon('plus')}</button></div></section>
+    <section class="nutrition-hero" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><div class="hero-number"><strong>${formatNumber(totals.calories)}${target?.calories === undefined ? '' : ` / ${formatNumber(target.calories)}`}</strong><span>kcal</span></div><button class="text-btn" id="edit-nutrition-target">${target ? '编辑目标' : '设置目标'}</button></div>${target?.calories === undefined ? '' : `<i class="nutrition-progress hero-progress" aria-hidden="true"><b style="width:${target.calories === 0 ? (totals.calories > 0 ? 100 : 0) : Math.min(100, totals.calories / target.calories * 100)}%"></b></i>`}<div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('P', totals.protein, target?.protein, 'g')}${nutritionMetricHtml('C', totals.carbs, target?.carbs, 'g')}${nutritionMetricHtml('F', totals.fat, target?.fat, 'g')}</div></section>
+    <section class="section-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '还没有记录'}</span></div><div class="section-actions">${logs.length ? '<button class="text-btn" id="save-day-diet-template">保存为模板</button>' : ''}<button class="icon-btn add-button" id="add-food-log" aria-label="添加食物">${icon('plus')}</button></div></section>
     <div class="food-list">${logs.length ? logs.map((log) => `<article class="food-row"><button class="food-row-main" data-edit-log="${log.id}" aria-label="编辑 ${esc(log.foodName)}"><span><strong>${esc(log.foodName)}</strong><small>${log.brand ? `${esc(log.brand)} · ` : ''}${formatNumber(log.grams)} g</small></span><span class="food-kcal"><strong>${formatNumber(log.totalCalories)}</strong><small>kcal</small></span></button><button class="icon-btn row-delete" data-delete-log="${log.id}" aria-label="删除 ${esc(log.foodName)}">${icon('trash', 17)}</button></article>`).join('') : `<div class="empty minimal"><div class="empty-icon">${icon('utensils', 25)}</div><h3>今天还没有记录饮食</h3><p>添加第一份食物，营养汇总会自动更新。</p><button class="primary" id="empty-add-food">${icon('plus', 18)} 添加第一份食物</button></div>`}</div>`
   view.querySelector<HTMLInputElement>('#food-date')?.addEventListener('change', (event) => { foodDate = (event.target as HTMLInputElement).value; void render() })
   view.querySelector('#food-library')?.addEventListener('click', () => void showFoodLibrary())
   view.querySelector('#use-diet-template')?.addEventListener('click', () => void showDietTemplatePicker())
+  view.querySelector('#edit-nutrition-target')?.addEventListener('click', () => showNutritionTargetForm(foodDate, target))
   view.querySelector('#save-day-diet-template')?.addEventListener('click', () => void saveDayAsDietTemplate(logs))
   view.querySelector('#add-food-log')?.addEventListener('click', () => void showAddFoodLog())
   view.querySelector('#empty-add-food')?.addEventListener('click', () => void showAddFoodLog())
@@ -341,6 +396,36 @@ async function renderFoodPage(): Promise<void> {
       event.preventDefault(); try { await updateFoodLogGrams(log.id, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'grams')); dialog.close(); toast('已保存'); await renderFoodPage() } catch (error) { fail(error) }
     })
   }))
+}
+
+function nutritionGoalFields(goal?: NutritionGoal): string {
+  return `<fieldset class="nutrition-goal-fields"><legend>营养目标（均为可选）</legend><label>目标热量<input name="goalCalories" type="number" inputmode="decimal" min="0" step="1" value="${goal?.calories ?? ''}" placeholder="2200"><span>kcal</span></label><label>蛋白质<input name="goalProtein" type="number" inputmode="decimal" min="0" step="0.1" value="${goal?.protein ?? ''}" placeholder="160"><span>g</span></label><label>碳水<input name="goalCarbs" type="number" inputmode="decimal" min="0" step="0.1" value="${goal?.carbs ?? ''}" placeholder="250"><span>g</span></label><label>脂肪<input name="goalFat" type="number" inputmode="decimal" min="0" step="0.1" value="${goal?.fat ?? ''}" placeholder="70"><span>g</span></label></fieldset>`
+}
+
+function nutritionGoalFromForm(data: FormData): NutritionGoal | undefined {
+  return normalizeNutritionGoal({
+    calories: valueOf(data, 'goalCalories') as unknown as number,
+    protein: valueOf(data, 'goalProtein') as unknown as number,
+    carbs: valueOf(data, 'goalCarbs') as unknown as number,
+    fat: valueOf(data, 'goalFat') as unknown as number,
+  })
+}
+
+function showNutritionTargetForm(date: string, target?: NutritionTarget): void {
+  const dialog = openModal(target ? '编辑当日目标' : '设置当日目标', `<form id="nutrition-target-form" class="form"><p class="muted">${formatHeaderDate(date)}</p>${nutritionGoalFields(target)}<button class="primary" type="submit">保存目标</button>${target ? '<button class="danger-button" type="button" id="delete-nutrition-target">删除目标</button>' : ''}</form>`)
+  dialog.querySelector<HTMLFormElement>('#nutrition-target-form')?.addEventListener('submit', async (event) => {
+    event.preventDefault()
+    try {
+      const goal = nutritionGoalFromForm(new FormData(event.currentTarget as HTMLFormElement))
+      if (!goal) throw new Error('请至少填写一项营养目标')
+      await saveNutritionTarget(date, goal)
+      dialog.close(); toast('营养目标已保存'); await renderFoodPage()
+    } catch (error) { fail(error) }
+  })
+  dialog.querySelector('#delete-nutrition-target')?.addEventListener('click', async () => {
+    if (!await confirmAction('删除当日营养目标？', '饮食记录不会被删除。')) return
+    try { await deleteNutritionTarget(date); dialog.close(); toast('营养目标已删除'); await renderFoodPage() } catch (error) { fail(error) }
+  })
 }
 
 async function showAddFoodLog(): Promise<void> {
@@ -457,6 +542,7 @@ function showImportPreview(preview: ImportPreview, existing: Food[]): void {
 }
 
 async function renderWorkoutPage(): Promise<void> {
+  if (pelvicTimerState && pelvicTimerState.status !== 'completed') { renderPelvicFloorTimer(); return }
   if (showWorkoutHistory) { await renderWorkoutHistory(); return }
   if (workoutEditorOpen) {
     if (!currentWorkout) currentWorkout = await findOpenWorkout(workoutDate)
@@ -464,13 +550,20 @@ async function renderWorkoutPage(): Promise<void> {
     workoutEditorOpen = false
   }
   const openWorkout = await findOpenWorkout(workoutDate)
-  const todayWorkouts = await db.workouts.where('date').equals(workoutDate).toArray()
+  const [todayWorkouts, pelvicSessions] = await Promise.all([
+    db.workouts.where('date').equals(workoutDate).toArray(),
+    db.pelvicFloorSessions.where('date').equals(workoutDate).toArray(),
+  ])
+  const pelvicContractions = pelvicSessions.reduce((total, session) => total + session.completedRepetitions, 0)
+  const pelvicSeconds = pelvicSessions.reduce((total, session) => total + pelvicFloorSessionDurationSeconds(session), 0)
   const recentWorkouts = (await db.workouts.toArray()).filter((item) => item.finishedAt).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt)).slice(0, 4)
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `<section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>训练日期</span><input id="workout-date" type="date" value="${workoutDate}" aria-label="训练日期"></label><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section><div class="empty workout-empty minimal"><div class="empty-icon">${icon('dumbbell', 27)}</div><h2>${openWorkout ? '训练还在进行中' : todayWorkouts.length ? '这一天的训练已完成' : '今天还没有训练'}</h2><p>${openWorkout ? '上次输入已自动保存，可以随时继续。' : '可从模板开始，也可以创建空白训练。'}</p><button class="primary start-button" id="start-workout">${openWorkout ? icon('activity', 18) + ' 继续训练' : icon('plus', 18) + ' 开始训练'}</button></div><section class="section-head"><div><h2>最近训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 17)}</button>`).join('')}</div>`
+  view.innerHTML = `<section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>训练日期</span><input id="workout-date" type="date" value="${workoutDate}" aria-label="训练日期"></label><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section><div class="empty workout-empty minimal"><div class="empty-icon">${icon('dumbbell', 27)}</div><h2>${openWorkout ? '训练还在进行中' : todayWorkouts.length ? '这一天的训练已完成' : '今天还没有力量训练'}</h2><p>${openWorkout ? '上次输入已自动保存，可以随时继续。' : '可从模板开始，也可以创建空白训练。'}</p><button class="primary start-button" id="start-workout">${openWorkout ? icon('activity', 18) + ' 继续训练' : icon('plus', 18) + ' 开始力量训练'}</button></div><section class="pelvic-floor-card"><div><span class="eyebrow">Pelvic Floor · Kegel</span><h2>盆底肌训练</h2><p>盆底肌收缩与放松训练</p></div><div class="pelvic-daily-summary"><strong>${pelvicSessions.length} 次</strong><span>${pelvicContractions} 次收缩 · ${pelvicSeconds} 秒</span></div><div class="pelvic-card-actions"><button class="secondary" id="start-pelvic-floor">${icon('activity', 18)} 开始训练</button><button class="text-btn" id="pelvic-floor-history">历史</button></div></section><section class="section-head"><div><h2>最近力量训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 17)}</button>`).join('')}</div>`
   view.querySelector<HTMLInputElement>('#workout-date')?.addEventListener('change', (event) => { workoutDate = (event.target as HTMLInputElement).value; currentWorkout = undefined; workoutEditorOpen = false; void render().catch(fail) })
   view.querySelector('#exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
   view.querySelector('#workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
+  view.querySelector('#start-pelvic-floor')?.addEventListener('click', () => showPelvicFloorSetup())
+  view.querySelector('#pelvic-floor-history')?.addEventListener('click', () => void showPelvicFloorHistory())
   view.querySelector('#start-workout')?.addEventListener('click', async () => {
     try {
       if (openWorkout) { currentWorkout = openWorkout; workoutEditorOpen = true; await renderWorkoutPage(); return }
@@ -479,6 +572,133 @@ async function renderWorkoutPage(): Promise<void> {
   })
   view.querySelector('#history-workout')?.addEventListener('click', () => { showWorkoutHistory = true; void renderWorkoutPage().catch(fail) })
   view.querySelectorAll<HTMLButtonElement>('[data-workout]').forEach((button) => button.addEventListener('click', async () => { try { currentWorkout = await db.workouts.get(button.dataset.workout!); workoutEditorOpen = true; await renderWorkoutPage() } catch (error) { fail(error) } }))
+}
+
+async function initializePelvicAudio(): Promise<void> {
+  try {
+    const AudioContextConstructor = window.AudioContext ?? (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+    if (!AudioContextConstructor) return
+    pelvicAudioContext ??= new AudioContextConstructor()
+    await pelvicAudioContext.resume()
+  } catch { pelvicAudioContext = undefined }
+}
+
+function playPelvicCue(phase: 'contract' | 'relax'): void {
+  const context = pelvicAudioContext
+  if (!context || context.state !== 'running') return
+  const oscillator = context.createOscillator()
+  const gain = context.createGain()
+  oscillator.frequency.value = phase === 'contract' ? 660 : 440
+  gain.gain.setValueAtTime(0.0001, context.currentTime)
+  gain.gain.exponentialRampToValueAtTime(0.08, context.currentTime + 0.01)
+  gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.12)
+  oscillator.connect(gain).connect(context.destination)
+  oscillator.start(); oscillator.stop(context.currentTime + 0.13)
+}
+
+async function requestPelvicWakeLock(): Promise<void> {
+  try {
+    const api = (navigator as Navigator & { wakeLock?: { request: (type: 'screen') => Promise<{ release: () => Promise<void> }> } }).wakeLock
+    if (api && !pelvicWakeLock) pelvicWakeLock = await api.request('screen')
+  } catch { pelvicWakeLock = undefined }
+}
+
+async function releasePelvicWakeLock(): Promise<void> {
+  const lock = pelvicWakeLock
+  pelvicWakeLock = undefined
+  try { await lock?.release() } catch { /* Wake Lock is optional. */ }
+}
+
+function showPelvicFloorSetup(): void {
+  const dialog = openModal('盆底肌训练', `<form id="pelvic-floor-setup" class="form"><div class="pelvic-setup-grid"><label>收缩时间<input name="contract" type="number" inputmode="numeric" min="1" max="60" step="1" value="3" required><span>秒</span></label><label>放松时间<input name="relax" type="number" inputmode="numeric" min="1" max="60" step="1" value="3" required><span>秒</span></label><label>重复次数<input name="repetitions" type="number" inputmode="numeric" min="1" max="100" step="1" value="10" required><span>次</span></label></div><div class="pelvic-guidance"><p>收缩盆底肌并保持正常呼吸。</p><p>不要同时强力夹紧臀部、大腿或腹部，每次放松阶段充分放松。</p><p>不要把中断排尿作为日常训练方式。</p><p>如有疼痛或明显不适，请停止并咨询专业人员。</p></div><button class="primary" type="submit">开始计时</button></form>`)
+  dialog.querySelector<HTMLFormElement>('#pelvic-floor-setup')?.addEventListener('submit', async (event) => {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget as HTMLFormElement)
+    try {
+      const ready = createPelvicFloorTimer({ contractSeconds: Number(valueOf(data, 'contract')), relaxSeconds: Number(valueOf(data, 'relax')), repetitions: Number(valueOf(data, 'repetitions')) })
+      await initializePelvicAudio()
+      pelvicTimerState = startPelvicFloorTimer(ready, Date.now())
+      pelvicTimerDate = workoutDate
+      pelvicSessionSaving = false
+      dialog.close()
+      playPelvicCue('contract')
+      await requestPelvicWakeLock()
+      renderPelvicFloorTimer()
+    } catch (error) { fail(error) }
+  })
+}
+
+function renderPelvicFloorTimer(): void {
+  const state = pelvicTimerState
+  if (!state) return
+  document.body.classList.add('immersive')
+  window.clearInterval(pelvicTimerInterval)
+  const view = document.querySelector<HTMLElement>('#view')!
+  view.innerHTML = `<section class="pelvic-timer-screen"><header><span>盆底肌训练</span><small>${formatHeaderDate(pelvicTimerDate)}</small></header><div class="pelvic-countdown" id="pelvic-countdown"><strong id="pelvic-remaining">${getPelvicFloorRemainingSeconds(state, Date.now())}</strong><span>秒</span></div><h2 id="pelvic-phase">${state.status === 'paused' ? '已暂停' : state.status === 'contract' ? '收缩' : '放松'}</h2><p id="pelvic-repetition">${Math.min(state.completedRepetitions + 1, state.repetitions)} / ${state.repetitions}</p><div class="pelvic-timer-actions"><button class="primary" id="pelvic-pause">${state.status === 'paused' ? '继续' : '暂停'}</button><button class="danger-button" id="pelvic-finish">结束训练</button></div><p class="pelvic-breathing-cue">保持自然呼吸；放松阶段充分放松。</p></section>`
+  view.querySelector('#pelvic-pause')?.addEventListener('click', async () => {
+    if (!pelvicTimerState) return
+    if (pelvicTimerState.status === 'paused') {
+      pelvicTimerState = resumePelvicFloorTimer(pelvicTimerState, Date.now())
+      await initializePelvicAudio(); playPelvicCue(pelvicTimerState.activePhase ?? 'contract'); await requestPelvicWakeLock()
+    } else {
+      pelvicTimerState = pausePelvicFloorTimer(pelvicTimerState, Date.now())
+      await releasePelvicWakeLock()
+    }
+    renderPelvicFloorTimer()
+  })
+  view.querySelector('#pelvic-finish')?.addEventListener('click', async () => {
+    if (!pelvicTimerState || !await confirmAction('结束盆底肌训练？', '将保存当前已完成的训练进度。', '结束并保存')) return
+    pelvicTimerState = finishPelvicFloorTimer(pelvicTimerState, Date.now())
+    await completePelvicFloorTimer()
+  })
+  pelvicTimerInterval = window.setInterval(tickPelvicFloorTimer, 200)
+  paintPelvicFloorTimer()
+}
+
+function paintPelvicFloorTimer(): void {
+  const state = pelvicTimerState
+  if (!state) return
+  const now = Date.now()
+  const remaining = getPelvicFloorRemainingSeconds(state, now)
+  const duration = state.activePhase === 'relax' ? state.relaxSeconds : state.contractSeconds
+  const progress = Math.min(1, Math.max(0, 1 - remaining / duration))
+  const countdown = document.querySelector<HTMLElement>('#pelvic-countdown')
+  countdown?.style.setProperty('--timer-progress', `${progress * 360}deg`)
+  countdown?.classList.toggle('is-relax', state.activePhase === 'relax')
+  const remainingElement = document.querySelector('#pelvic-remaining'); if (remainingElement) remainingElement.textContent = String(remaining)
+  const phaseElement = document.querySelector('#pelvic-phase'); if (phaseElement) phaseElement.textContent = state.status === 'paused' ? '已暂停' : state.status === 'contract' ? '收缩' : '放松'
+  const repetition = document.querySelector('#pelvic-repetition'); if (repetition) repetition.textContent = `${Math.min(state.completedRepetitions + 1, state.repetitions)} / ${state.repetitions}`
+}
+
+function tickPelvicFloorTimer(): void {
+  const state = pelvicTimerState
+  if (!state || state.status === 'paused') return
+  const previousPhase = state.activePhase
+  pelvicTimerState = advancePelvicFloorTimer(state, Date.now())
+  if (pelvicTimerState.status === 'completed') { void completePelvicFloorTimer(); return }
+  if (pelvicTimerState.activePhase !== previousPhase && pelvicTimerState.activePhase) playPelvicCue(pelvicTimerState.activePhase)
+  paintPelvicFloorTimer()
+}
+
+async function completePelvicFloorTimer(): Promise<void> {
+  const state = pelvicTimerState
+  if (!state || state.status !== 'completed' || pelvicSessionSaving) return
+  pelvicSessionSaving = true
+  window.clearInterval(pelvicTimerInterval)
+  await releasePelvicWakeLock()
+  try {
+    await savePelvicFloorSession(sessionFromPelvicFloorTimer(state, pelvicTimerDate))
+    pelvicTimerState = undefined
+    pelvicSessionSaving = false
+    document.body.classList.remove('immersive')
+    toast('盆底肌训练已保存')
+    await render()
+  } catch (error) { pelvicSessionSaving = false; fail(error) }
+}
+
+async function showPelvicFloorHistory(): Promise<void> {
+  const sessions = (await db.pelvicFloorSessions.toArray()).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt))
+  openModal('盆底肌训练历史', `<div class="pelvic-history">${sessions.length ? sessions.map((session) => `<article><div><strong>${formatShortDate(session.date)}</strong><span>${session.completedRepetitions} / ${session.repetitions} 次收缩</span></div><small>${pelvicFloorSessionDurationSeconds(session)} 秒 · 收缩 ${session.phases.find((phase) => phase.type === 'contract')?.durationSeconds ?? 0}s / 放松 ${session.phases.find((phase) => phase.type === 'relax')?.durationSeconds ?? 0}s</small></article>`).join('') : '<p class="muted padded">还没有盆底肌训练记录</p>'}</div>`, true)
 }
 
 function renderWorkoutEditor(workout: Workout): void {
@@ -772,13 +992,22 @@ async function dietTemplateCardHtml(template: DietTemplate): Promise<string> {
   const resolved = await resolveDietTemplateFoods(template)
   const calories = resolved.reduce((sum, value) => sum + calculateNutrition(value.food, value.item.grams).calories, 0)
   const names = template.items.slice(0, 4).map((item) => esc(item.foodName)).join(' · ')
-  return `<article class="template-card"><div><h3>${esc(template.name)}</h3><p>${names || '暂无食物'}</p><small>${template.items.length} 项 · ${formatNumber(calories)} kcal</small></div><button class="primary compact-button" data-apply-diet-template="${template.id}">添加</button></article>`
+  const goal = template.nutritionGoal?.calories === undefined ? '' : ` · 目标 ${formatNumber(template.nutritionGoal.calories)} kcal`
+  return `<article class="template-card"><div><h3>${esc(template.name)}</h3><p>${names || '暂无食物'}</p><small>${template.items.length} 项 · ${formatNumber(calories)} kcal${goal}</small></div><button class="primary compact-button" data-apply-diet-template="${template.id}">添加</button></article>`
 }
 
 async function applySelectedDietTemplate(template: DietTemplate, dialog?: HTMLDialogElement): Promise<void> {
   try {
     const resolved = await resolveDietTemplateFoods(template)
-    await applyDietTemplate(template, foodDate); dialog?.close()
+    try {
+      await applyDietTemplate(template, foodDate)
+    } catch (error) {
+      if (!(error instanceof NutritionTargetConflictError)) throw error
+      const choice = await chooseNutritionTargetConflict()
+      if (!choice) return
+      await applyDietTemplate(template, foodDate, db, choice === 'replace' ? { replaceNutritionTarget: true } : { preserveNutritionTarget: true })
+    }
+    dialog?.close()
     const missing = resolved.filter((item) => item.missing).length
     toast(missing ? `已添加 ${template.items.length} 项，${missing} 项使用模板快照` : `已添加 ${template.items.length} 项`)
     await renderFoodPage()
@@ -792,7 +1021,8 @@ async function showDietTemplateManager(query = ''): Promise<void> {
     const resolved = await resolveDietTemplateFoods(template)
     const kcal = resolved.reduce((sum, value) => sum + calculateNutrition(value.food, value.item.grams).calories, 0)
     const missing = resolved.filter((item) => item.missing).length
-    summaries.set(template.id, `${template.items.length} 项 · ${formatNumber(kcal)} kcal${missing ? ` · ${missing} 项使用快照` : ''}`)
+    const goal = template.nutritionGoal?.calories === undefined ? '' : ` · 目标 ${formatNumber(template.nutritionGoal.calories)} kcal`
+    summaries.set(template.id, `${template.items.length} 项 · ${formatNumber(kcal)} kcal${goal}${missing ? ` · ${missing} 项使用快照` : ''}`)
   }))
   const dialog = openModal('饮食模板', `<div class="toolbar"><label class="search-field">${icon('search', 19)}<input id="diet-template-search" type="search" value="${esc(query)}" placeholder="搜索模板"></label><button class="icon-btn add-button" id="new-diet-template" aria-label="新建饮食模板">${icon('plus')}</button></div><div class="template-manager-list"></div>`, true)
   const draw = (value: string) => {
@@ -812,16 +1042,16 @@ function bindDietTemplateManagerActions(dialog: HTMLDialogElement, templates: Di
 }
 
 async function showDietTemplateEditor(source?: DietTemplate): Promise<void> {
-  const draft = source ? structuredClone(source) : { id: crypto.randomUUID(), name: '', items: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+  const draft: DietTemplate = source ? structuredClone(source) : { id: crypto.randomUUID(), name: '', items: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
   const resolved = await resolveDietTemplateFoods(draft)
   const missingIds = new Set(resolved.filter((item) => item.missing).map((item) => item.item.id))
   const dialog = openModal(source?.createdAt ? '编辑饮食模板' : '新建饮食模板', '<div id="diet-template-editor"></div>', true)
   const syncText = () => {
     const form = dialog.querySelector<HTMLFormElement>('#diet-template-form'); if (!form) return
-    const data = new FormData(form); draft.name = valueOf(data, 'name'); draft.description = valueOf(data, 'description').trim() || undefined
+    const data = new FormData(form); draft.name = valueOf(data, 'name'); draft.description = valueOf(data, 'description').trim() || undefined; draft.nutritionGoal = nutritionGoalFromForm(data)
   }
   const draw = () => {
-    dialog.querySelector('#diet-template-editor')!.innerHTML = `<form id="diet-template-form" class="form template-editor"><label>模板名称 *<input name="name" value="${esc(draft.name)}" placeholder="训练日早餐" required></label><label>说明<textarea name="description" rows="2" placeholder="可选">${esc(draft.description)}</textarea></label><div class="template-editor-items">${draft.items.map((item, index) => `<article class="diet-template-item" data-diet-template-item="${item.id}"><div><strong>${esc(item.foodName)}</strong>${item.brand ? `<small>${esc(item.brand)}</small>` : ''}${missingIds.has(item.id) ? '<small class="warning-text">食物已删除，将使用营养快照</small>' : ''}</div><label><input data-diet-grams type="number" inputmode="decimal" min="0.1" step="0.1" value="${item.grams}"><span>g</span></label><div class="reorder-actions"><button type="button" data-diet-move="${item.id}" data-direction="-1" ${index === 0 ? 'disabled' : ''}>↑</button><button type="button" data-diet-move="${item.id}" data-direction="1" ${index === draft.items.length - 1 ? 'disabled' : ''}>↓</button><button type="button" class="icon-btn quiet danger" data-remove-diet-item="${item.id}">${icon('trash', 17)}</button></div></article>`).join('') || '<p class="muted padded">还没有食物</p>'}</div><button type="button" class="secondary" id="add-diet-template-food">${icon('plus', 18)} 添加食物</button><button class="primary" type="submit">保存模板</button></form>`
+    dialog.querySelector('#diet-template-editor')!.innerHTML = `<form id="diet-template-form" class="form template-editor"><label>模板名称 *<input name="name" value="${esc(draft.name)}" placeholder="训练日早餐" required></label><label>说明<textarea name="description" rows="2" placeholder="可选">${esc(draft.description)}</textarea></label>${nutritionGoalFields(draft.nutritionGoal)}<div class="template-editor-items">${draft.items.map((item, index) => `<article class="diet-template-item" data-diet-template-item="${item.id}"><div><strong>${esc(item.foodName)}</strong>${item.brand ? `<small>${esc(item.brand)}</small>` : ''}${missingIds.has(item.id) ? '<small class="warning-text">食物已删除，将使用营养快照</small>' : ''}</div><label><input data-diet-grams type="number" inputmode="decimal" min="0.1" step="0.1" value="${item.grams}"><span>g</span></label><div class="reorder-actions"><button type="button" data-diet-move="${item.id}" data-direction="-1" ${index === 0 ? 'disabled' : ''}>↑</button><button type="button" data-diet-move="${item.id}" data-direction="1" ${index === draft.items.length - 1 ? 'disabled' : ''}>↓</button><button type="button" class="icon-btn quiet danger" data-remove-diet-item="${item.id}">${icon('trash', 17)}</button></div></article>`).join('') || '<p class="muted padded">还没有食物</p>'}</div><button type="button" class="secondary" id="add-diet-template-food">${icon('plus', 18)} 添加食物</button><button class="primary" type="submit">保存模板</button></form>`
     bind()
   }
   const bind = () => {
@@ -846,10 +1076,11 @@ async function showDietTemplateFoodPicker(draft: DietTemplate): Promise<void> {
   draw(); dialog.querySelector<HTMLInputElement>('#diet-template-food-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
 }
 
-function saveDayAsDietTemplate(logs: FoodLog[]): void {
+async function saveDayAsDietTemplate(logs: FoodLog[]): Promise<void> {
+  const target = await db.nutritionTargets.where('date').equals(foodDate).first()
   const suggested = defaultTemplateName(foodDate, '饮食')
   const dialog = openModal('保存当天为饮食模板', `<form id="save-day-diet-template-form" class="form"><label>模板名称<input name="name" value="${esc(suggested)}" required></label><p class="muted">保存当前 ${logs.length} 项记录，之后修改模板不会影响今天的饮食记录。</p><button class="primary" type="submit">保存模板</button></form>`)
-  dialog.querySelector<HTMLFormElement>('#save-day-diet-template-form')?.addEventListener('submit', async (event) => { event.preventDefault(); try { await db.dietTemplates.add(dietTemplateFromLogs(logs, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'name'))); dialog.close(); toast('已保存为饮食模板') } catch (error) { fail(error) } })
+  dialog.querySelector<HTMLFormElement>('#save-day-diet-template-form')?.addEventListener('submit', async (event) => { event.preventDefault(); try { await db.dietTemplates.add(dietTemplateFromLogs(logs, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'name'), target)); dialog.close(); toast(target ? '已保存饮食与营养目标模板' : '已保存为饮食模板') } catch (error) { fail(error) } })
 }
 
 async function renderWeightPage(): Promise<void> {
@@ -902,8 +1133,8 @@ async function showSettings(): Promise<void> {
   fileInput.addEventListener('change', async () => { const file = fileInput.files?.[0]; if (!file) return; try { const backup = validateBackup(JSON.parse(await file.text())); dialog.close(); showRestorePreview(backup) } catch (error) { fail(error) } })
 }
 
-function showRestorePreview(backup: BackupDataV2): void {
-  const counts = [{ label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }, { label: '训练模板', count: backup.data.workoutTemplates.length }, { label: '饮食模板', count: backup.data.dietTemplates.length }]
+function showRestorePreview(backup: BackupDataV3): void {
+  const counts = [{ label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '力量训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }, { label: '训练模板', count: backup.data.workoutTemplates.length }, { label: '饮食模板', count: backup.data.dietTemplates.length }, { label: '营养目标', count: backup.data.nutritionTargets.length }, { label: '盆底肌训练', count: backup.data.pelvicFloorSessions.length }]
   const dialog = openModal('确认恢复备份', `<div class="restore-counts">${counts.map((item) => `<p><span>${item.label}</span><strong>${item.count}</strong></p>`).join('')}</div><div class="warning">恢复将清除当前所有数据，并替换为该备份。</div><button class="danger-button full-btn" id="confirm-restore">继续恢复</button>`)
   dialog.querySelector('#confirm-restore')?.addEventListener('click', async () => { if (!await confirmAction('覆盖当前全部数据？', '恢复会清除当前数据并替换为备份内容，此操作无法撤销。', '恢复备份')) return; try { await restoreBackup(backup); dialog.close(); currentWorkout = undefined; workoutEditorOpen = false; toast('恢复完成'); await render() } catch (error) { fail(error) } })
 }
@@ -912,6 +1143,11 @@ async function start(): Promise<void> {
   setupMobileViewport()
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden' && workoutEditorOpen && currentWorkout) void flushWorkoutAutosave(currentWorkout).catch(fail)
+    if (document.visibilityState === 'hidden' && pelvicTimerState) void releasePelvicWakeLock()
+    if (document.visibilityState === 'visible' && pelvicTimerState) {
+      tickPelvicFloorTimer()
+      if (pelvicTimerState.status !== 'paused' && pelvicTimerState.status !== 'completed') void requestPelvicWakeLock()
+    }
   })
   try { await db.open(); await render() } catch (error) { app.innerHTML = `<div class="fatal"><h1>无法打开 FitLog Lite</h1><p>${esc(error instanceof Error ? error.message : '请刷新后重试')}</p></div>` }
 }

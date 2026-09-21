@@ -1,0 +1,237 @@
+import 'fake-indexeddb/auto'
+import Dexie from 'dexie'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { FitLogDatabase } from '../src/db/database'
+import type { BackupDataV1, BackupDataV2, BackupDataV3, DietTemplate, Food, PelvicFloorSession } from '../src/db/types'
+import { exportBackup, restoreBackup, validateBackup } from '../src/services/backupService'
+import {
+  NutritionTargetConflictError, applyDietTemplate, dietTemplateItemFromFood, normalizeDietTemplate,
+} from '../src/services/templateService'
+import {
+  advancePelvicFloorTimer, createPelvicFloorTimer, finishPelvicFloorTimer, getPelvicFloorRemainingSeconds,
+  pausePelvicFloorTimer, resumePelvicFloorTimer, startPelvicFloorTimer,
+} from '../src/services/pelvicFloorTimer'
+import { loadMonthSummaries } from '../src/ui/calendarPage'
+import { getLocalDateString } from '../src/utils/date'
+
+const databases: FitLogDatabase[] = []
+const now = '2026-09-21T08:00:00.000Z'
+
+function newDatabase(name = `fitlog-phase3-${crypto.randomUUID()}`): FitLogDatabase {
+  const database = new FitLogDatabase(name)
+  databases.push(database)
+  return database
+}
+
+function food(): Food {
+  return { id: 'food-1', name: '燕麦', referenceGrams: 100, calories: 380, protein: 13, carbs: 68, fat: 7, createdAt: now, updatedAt: now }
+}
+
+function template(goal = true): DietTemplate {
+  return {
+    id: 'diet-template-1', name: '早餐', items: [dietTemplateItemFromFood(food(), 50)],
+    nutritionGoal: goal ? { calories: 2200, protein: 160 } : undefined,
+    createdAt: now, updatedAt: now,
+  }
+}
+
+function v1Backup(): BackupDataV1 {
+  return { app: 'FitLog Lite', schemaVersion: 1, exportedAt: now, data: { foods: [food()], foodLogs: [], exercises: [], workouts: [], weights: [] } }
+}
+
+function v2Backup(): BackupDataV2 {
+  return { ...v1Backup(), schemaVersion: 2, data: { ...v1Backup().data, workoutTemplates: [], dietTemplates: [template(false)] } }
+}
+
+function session(): PelvicFloorSession {
+  return {
+    id: 'pelvic-1', date: '2026-09-21', startedAt: now, finishedAt: '2026-09-21T08:01:00.000Z',
+    phases: [{ type: 'contract', durationSeconds: 3 }, { type: 'relax', durationSeconds: 3 }],
+    repetitions: 10, completedRepetitions: 10, createdAt: now, updatedAt: now,
+  }
+}
+
+function v3Backup(): BackupDataV3 {
+  return {
+    ...v2Backup(), schemaVersion: 3,
+    data: {
+      ...v2Backup().data,
+      dietTemplates: [template()],
+      nutritionTargets: [{ id: 'target-1', date: '2026-09-21', calories: 2200, protein: 160, createdAt: now, updatedAt: now }],
+      pelvicFloorSessions: [session()],
+    },
+  }
+}
+
+afterEach(async () => {
+  vi.restoreAllMocks()
+  for (const database of databases.splice(0)) {
+    database.close()
+    await database.delete()
+  }
+})
+
+describe('Dexie V3 migration', () => {
+  it('从 V2 升级时保留旧数据并创建两个新 stores', async () => {
+    const name = `fitlog-v2-to-v3-${crypto.randomUUID()}`
+    const legacy = new Dexie(name)
+    legacy.version(2).stores({
+      foods: 'id, name, brand, [name+brand], createdAt', foodLogs: 'id, date, foodId, createdAt',
+      exercises: 'id, name, createdAt', workouts: 'id, date, finishedAt, createdAt', weights: 'id, &date, createdAt',
+      workoutTemplates: 'id, name, createdAt, updatedAt, lastUsedAt', dietTemplates: 'id, name, createdAt, updatedAt, lastUsedAt',
+    })
+    await legacy.open()
+    await legacy.table('foods').add(food())
+    await legacy.table('foodLogs').add({ id: 'log-1', date: '2026-09-21', foodName: '燕麦', grams: 50, referenceGrams: 100, caloriesPerReference: 380, totalCalories: 190, createdAt: now, updatedAt: now })
+    await legacy.table('exercises').add({ id: 'exercise-1', name: '深蹲', createdAt: now, updatedAt: now })
+    await legacy.table('workouts').add({ id: 'workout-1', date: '2026-09-21', startedAt: now, finishedAt: now, exercises: [], createdAt: now, updatedAt: now })
+    await legacy.table('weights').add({ id: 'weight-1', date: '2026-09-21', weightKg: 72, createdAt: now, updatedAt: now })
+    await legacy.table('workoutTemplates').add({ id: 'workout-template-1', name: '腿部', exercises: [], createdAt: now, updatedAt: now })
+    await legacy.table('dietTemplates').add(template(false))
+    legacy.close()
+
+    const database = newDatabase(name)
+    await database.open()
+    expect(await Promise.all([
+      database.foods.count(), database.foodLogs.count(), database.exercises.count(), database.workouts.count(),
+      database.weights.count(), database.workoutTemplates.count(), database.dietTemplates.count(),
+    ])).toEqual([1, 1, 1, 1, 1, 1, 1])
+    expect(await Promise.all([database.nutritionTargets.count(), database.pelvicFloorSessions.count()])).toEqual([0, 0])
+  })
+})
+
+describe('DietTemplate nutrition goals', () => {
+  it('没有 nutritionGoal 的旧模板仍然有效', () => {
+    expect(normalizeDietTemplate(template(false)).nutritionGoal).toBeUndefined()
+  })
+
+  it('允许部分目标并拒绝负数，全部为空等价于无目标', () => {
+    expect(normalizeDietTemplate({ ...template(false), nutritionGoal: { protein: 160 } }).nutritionGoal).toEqual({ calories: undefined, protein: 160, carbs: undefined, fat: undefined })
+    expect(normalizeDietTemplate({ ...template(false), nutritionGoal: {} }).nutritionGoal).toBeUndefined()
+    expect(() => normalizeDietTemplate({ ...template(false), nutritionGoal: { calories: -1 } })).toThrow('目标热量')
+  })
+
+  it('应用模板在同一事务创建 FoodLog、NutritionTarget 并更新 lastUsedAt', async () => {
+    const database = newDatabase(); await database.foods.add(food()); await database.dietTemplates.add(template())
+    await applyDietTemplate(template(), '2026-09-21', database)
+    expect(await database.foodLogs.count()).toBe(1)
+    expect(await database.nutritionTargets.where('date').equals('2026-09-21').first()).toMatchObject({ calories: 2200, protein: 160, sourceTemplateId: 'diet-template-1' })
+    expect((await database.dietTemplates.get('diet-template-1'))?.lastUsedAt).toBeTruthy()
+  })
+
+  it('已有目标不会静默覆盖，明确 replace 后才更新', async () => {
+    const database = newDatabase(); await database.dietTemplates.add(template())
+    await database.nutritionTargets.add({ id: 'existing', date: '2026-09-21', calories: 1800, createdAt: now, updatedAt: now })
+    await expect(applyDietTemplate(template(), '2026-09-21', database)).rejects.toBeInstanceOf(NutritionTargetConflictError)
+    expect(await database.foodLogs.count()).toBe(0)
+    expect((await database.nutritionTargets.get('existing'))?.calories).toBe(1800)
+    await applyDietTemplate(template(), '2026-09-21', database, { replaceNutritionTarget: true })
+    expect((await database.nutritionTargets.get('existing'))?.calories).toBe(2200)
+  })
+
+  it('明确 preserve 时添加 FoodLog 并保留原目标', async () => {
+    const database = newDatabase(); await database.dietTemplates.add(template())
+    await database.nutritionTargets.add({ id: 'existing', date: '2026-09-21', calories: 1800, createdAt: now, updatedAt: now })
+    await applyDietTemplate(template(), '2026-09-21', database, { preserveNutritionTarget: true })
+    expect(await database.foodLogs.count()).toBe(1)
+    expect((await database.nutritionTargets.get('existing'))?.calories).toBe(1800)
+  })
+
+  it('NutritionTarget 写入失败时 FoodLogs 和 lastUsedAt 一起 rollback', async () => {
+    const database = newDatabase(); await database.dietTemplates.add(template())
+    vi.spyOn(database.nutritionTargets, 'put').mockRejectedValueOnce(new Error('目标写入失败'))
+    await expect(applyDietTemplate(template(), '2026-09-21', database)).rejects.toThrow('目标写入失败')
+    expect(await database.foodLogs.count()).toBe(0)
+    expect((await database.dietTemplates.get('diet-template-1'))?.lastUsedAt).toBeUndefined()
+  })
+})
+
+describe('Backup V3', () => {
+  it('导出并恢复两个新 stores', async () => {
+    const source = newDatabase(); await source.nutritionTargets.add(v3Backup().data.nutritionTargets[0]!); await source.pelvicFloorSessions.add(session())
+    const backup = await exportBackup(source)
+    expect(backup.schemaVersion).toBe(3)
+    expect(backup.data.nutritionTargets).toHaveLength(1)
+    expect(backup.data.pelvicFloorSessions).toHaveLength(1)
+    const target = newDatabase(); await restoreBackup(backup, target)
+    expect(await Promise.all([target.nutritionTargets.count(), target.pelvicFloorSessions.count()])).toEqual([1, 1])
+  })
+
+  it.each([['V1', v1Backup()], ['V2', v2Backup()]])('Restore %s 时新 stores 为空', async (_label, backup) => {
+    const database = newDatabase(); await database.nutritionTargets.add(v3Backup().data.nutritionTargets[0]!); await database.pelvicFloorSessions.add(session())
+    await restoreBackup(backup, database)
+    expect(await Promise.all([database.nutritionTargets.count(), database.pelvicFloorSessions.count()])).toEqual([0, 0])
+  })
+
+  it('Restore V3 完整保留新数据', async () => {
+    const database = newDatabase(); await restoreBackup(v3Backup(), database)
+    expect(await database.nutritionTargets.get('target-1')).toMatchObject({ calories: 2200 })
+    expect(await database.pelvicFloorSessions.get('pelvic-1')).toMatchObject({ completedRepetitions: 10 })
+  })
+
+  it('非法 NutritionTarget 与 PelvicFloorSession 在 clear 前被拒绝', async () => {
+    const database = newDatabase(); await database.foods.add(food())
+    const invalidTarget = v3Backup(); invalidTarget.data.nutritionTargets[0]!.calories = -1
+    await expect(restoreBackup(invalidTarget, database)).rejects.toThrow('营养目标第 1 项')
+    expect(await database.foods.count()).toBe(1)
+    const invalidSession = v3Backup(); invalidSession.data.pelvicFloorSessions[0]!.phases[0]!.durationSeconds = 0
+    await expect(restoreBackup(invalidSession, database)).rejects.toThrow('盆底肌训练第 1 项')
+    expect(await database.foods.count()).toBe(1)
+  })
+
+  it('新 store 写入失败时九个 stores 一起 rollback', async () => {
+    const database = newDatabase(); await database.foods.add(food())
+    vi.spyOn(database.pelvicFloorSessions, 'bulkAdd').mockRejectedValueOnce(new Error('训练写入失败'))
+    await expect(restoreBackup(v3Backup(), database)).rejects.toThrow('训练写入失败')
+    expect(await database.foods.get('food-1')).toBeTruthy()
+    expect(await database.nutritionTargets.count()).toBe(0)
+  })
+
+  it('拒绝重复 NutritionTarget date', () => {
+    const backup = v3Backup(); backup.data.nutritionTargets.push({ ...backup.data.nutritionTargets[0]!, id: 'target-2' })
+    expect(() => validateBackup(backup)).toThrow('date 重复')
+  })
+})
+
+describe('Pelvic floor timer pure state', () => {
+  const config = { contractSeconds: 3, relaxSeconds: 3, repetitions: 2 }
+
+  it('contract → relax → next repetition → completed', () => {
+    const started = startPelvicFloorTimer(createPelvicFloorTimer(config), 1000)
+    const relax = advancePelvicFloorTimer(started, 4000)
+    expect(relax).toMatchObject({ status: 'relax', completedRepetitions: 0 })
+    const next = advancePelvicFloorTimer(relax, 7000)
+    expect(next).toMatchObject({ status: 'contract', completedRepetitions: 1 })
+    expect(advancePelvicFloorTimer(next, 13000)).toMatchObject({ status: 'completed', completedRepetitions: 2, finishedAtMs: 13000 })
+  })
+
+  it('pause / resume 保留剩余时间', () => {
+    const started = startPelvicFloorTimer(createPelvicFloorTimer(config), 1000)
+    const paused = pausePelvicFloorTimer(started, 2000)
+    expect(paused).toMatchObject({ status: 'paused', activePhase: 'contract', pausedRemainingMs: 2000 })
+    const resumed = resumePelvicFloorTimer(paused, 10000)
+    expect(resumed).toMatchObject({ status: 'contract', deadlineMs: 12000 })
+    expect(getPelvicFloorRemainingSeconds(resumed, 10500)).toBe(2)
+  })
+
+  it('finish 保存当前完成次数', () => {
+    const running = advancePelvicFloorTimer(startPelvicFloorTimer(createPelvicFloorTimer(config), 0), 6500)
+    expect(finishPelvicFloorTimer(running, 7000)).toMatchObject({ status: 'completed', completedRepetitions: 1, finishedAtMs: 7000 })
+  })
+
+  it('deadline correction 一次跨过多个阶段，覆盖后台 elapsed time', () => {
+    const started = startPelvicFloorTimer(createPelvicFloorTimer({ ...config, repetitions: 10 }), 0)
+    expect(advancePelvicFloorTimer(started, 18_500)).toMatchObject({ status: 'contract', completedRepetitions: 3, deadlineMs: 21_000 })
+  })
+})
+
+describe('Calendar V3 aggregation', () => {
+  it('聚合 NutritionTarget 和 PelvicFloorSession，并保持本地日期行为', async () => {
+    const database = newDatabase()
+    await database.nutritionTargets.add(v3Backup().data.nutritionTargets[0]!)
+    await database.pelvicFloorSessions.add(session())
+    const summary = (await loadMonthSummaries(2026, 8, database)).get('2026-09-21')
+    expect(summary).toMatchObject({ nutritionTarget: { calories: 2200 }, pelvicFloorSessionCount: 1, pelvicFloorContractions: 10, pelvicFloorSeconds: 60 })
+    expect(getLocalDateString(new Date(2026, 8, 21, 0, 5))).toBe('2026-09-21')
+  })
+})

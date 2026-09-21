@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { DietTemplate, Exercise, Food, FoodLog, WeightLog, Workout, WorkoutTemplate } from './types'
+import type { DietTemplate, Exercise, Food, FoodLog, NutritionTarget, PelvicFloorSession, WeightLog, Workout, WorkoutTemplate } from './types'
 
 export const STARTER_EXERCISE_NAMES = ['杠铃卧推', '深蹲', '硬拉', '引体向上', '哑铃弯举', '杠铃划船', '哑铃侧平举'] as const
 
@@ -11,6 +11,8 @@ export class FitLogDatabase extends Dexie {
   weights!: EntityTable<WeightLog, 'id'>
   workoutTemplates!: EntityTable<WorkoutTemplate, 'id'>
   dietTemplates!: EntityTable<DietTemplate, 'id'>
+  nutritionTargets!: EntityTable<NutritionTarget, 'id'>
+  pelvicFloorSessions!: EntityTable<PelvicFloorSession, 'id'>
 
   constructor(name = 'fitlog-lite-db') {
     super(name)
@@ -29,6 +31,17 @@ export class FitLogDatabase extends Dexie {
       weights: 'id, &date, createdAt',
       workoutTemplates: 'id, name, createdAt, updatedAt, lastUsedAt',
       dietTemplates: 'id, name, createdAt, updatedAt, lastUsedAt',
+    })
+    this.version(3).stores({
+      foods: 'id, name, brand, [name+brand], createdAt',
+      foodLogs: 'id, date, foodId, createdAt',
+      exercises: 'id, name, createdAt',
+      workouts: 'id, date, finishedAt, createdAt',
+      weights: 'id, &date, createdAt',
+      workoutTemplates: 'id, name, createdAt, updatedAt, lastUsedAt',
+      dietTemplates: 'id, name, createdAt, updatedAt, lastUsedAt',
+      nutritionTargets: 'id, &date, sourceTemplateId, createdAt',
+      pelvicFloorSessions: 'id, date, startedAt, finishedAt, createdAt',
     })
     this.on('populate', () => {
       const now = new Date().toISOString()

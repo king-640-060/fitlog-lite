@@ -1,10 +1,11 @@
 import type {
-  DietTemplate, DietTemplateFallback, DietTemplateItem, Food, FoodLog, Workout, WorkoutTemplate,
+  DietTemplate, DietTemplateFallback, DietTemplateItem, Food, FoodLog, NutritionGoal, Workout, WorkoutTemplate,
   WorkoutTemplateExercise, WorkoutTemplateSet,
 } from '../db/types'
 import { db, type FitLogDatabase } from '../db/database'
 import { createFoodLogSnapshot } from '../utils/nutrition'
 import { finiteNumber, optionalNumber, requiredText } from '../utils/validation'
+import { createNutritionTarget, normalizeNutritionGoal } from './nutritionTargetService'
 
 function optionalText(value: unknown): string | undefined {
   return String(value ?? '').trim() || undefined
@@ -119,6 +120,7 @@ export function normalizeDietTemplate(template: Partial<DietTemplate>): DietTemp
   return {
     id: template.id ?? crypto.randomUUID(), name: requiredText(template.name, '模板名称'),
     description: optionalText(template.description), items: template.items.map(cloneDietItem),
+    nutritionGoal: normalizeNutritionGoal(template.nutritionGoal),
     createdAt: template.createdAt ?? now, updatedAt: now, lastUsedAt: template.lastUsedAt,
   }
 }
@@ -137,9 +139,10 @@ export function dietTemplateItemFromFood(food: Food, grams: number): DietTemplat
   }
 }
 
-export function dietTemplateFromLogs(logs: FoodLog[], name: string): DietTemplate {
+export function dietTemplateFromLogs(logs: FoodLog[], name: string, nutritionGoal?: NutritionGoal): DietTemplate {
   return normalizeDietTemplate({
     name,
+    nutritionGoal,
     items: logs.map((log) => ({
       id: crypto.randomUUID(), foodId: log.foodId, foodName: log.foodName, brand: log.brand, grams: log.grams,
       fallback: { referenceGrams: log.referenceGrams, calories: log.caloriesPerReference, protein: log.proteinPerReference, carbs: log.carbsPerReference, fat: log.fatPerReference },
@@ -151,6 +154,7 @@ export function duplicateDietTemplate(template: DietTemplate): DietTemplate {
   const now = new Date().toISOString()
   return {
     ...template, id: crypto.randomUUID(), name: `${template.name} 副本`, createdAt: now, updatedAt: now, lastUsedAt: undefined,
+    nutritionGoal: template.nutritionGoal ? { ...template.nutritionGoal } : undefined,
     items: template.items.map((item) => ({ ...item, id: crypto.randomUUID(), fallback: { ...item.fallback } })),
   }
 }
@@ -171,7 +175,19 @@ export async function resolveDietTemplateFoods(template: DietTemplate, database:
   })
 }
 
-export async function applyDietTemplate(template: DietTemplate, date: string, database: FitLogDatabase = db): Promise<FoodLog[]> {
+export class NutritionTargetConflictError extends Error {
+  constructor() {
+    super('这一天已经有营养目标')
+    this.name = 'NutritionTargetConflictError'
+  }
+}
+
+export async function applyDietTemplate(
+  template: DietTemplate,
+  date: string,
+  database: FitLogDatabase = db,
+  options: { replaceNutritionTarget?: boolean, preserveNutritionTarget?: boolean } = {},
+): Promise<FoodLog[]> {
   const resolved = await resolveDietTemplateFoods(template, database)
   const logs = resolved.map(({ item, food, missing }) => {
     const log = createFoodLogSnapshot(food, item.grams, date)
@@ -179,9 +195,17 @@ export async function applyDietTemplate(template: DietTemplate, date: string, da
     return log
   })
   const now = new Date().toISOString()
-  await database.transaction('rw', [database.foodLogs, database.dietTemplates], async () => {
+  await database.transaction('rw', [database.foodLogs, database.dietTemplates, database.nutritionTargets], async () => {
+    const existingTarget = template.nutritionGoal
+      ? await database.nutritionTargets.where('date').equals(date).first()
+      : undefined
+    if (existingTarget && !options.replaceNutritionTarget && !options.preserveNutritionTarget) throw new NutritionTargetConflictError()
     await database.foodLogs.bulkAdd(logs)
     await database.dietTemplates.update(template.id, { lastUsedAt: now })
+    if (template.nutritionGoal && !(existingTarget && options.preserveNutritionTarget)) {
+      const target = createNutritionTarget(date, template.nutritionGoal, existingTarget, template.id)
+      await database.nutritionTargets.put(target)
+    }
   })
   return logs
 }
