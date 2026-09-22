@@ -122,7 +122,7 @@ export function getCalendarDayAccessibleLabel(date: string, summary?: CalendarDa
     nutritionLabel(summary.carbs, target?.carbs, '克碳水'),
     nutritionLabel(summary.fat, target?.fat, '克脂肪'),
     summary.hasWorkout ? `${summary.workoutCount} 次力量训练，${summary.setCount} 组` : undefined,
-    summary.pelvicFloorSessionCount ? `${summary.pelvicFloorSessionCount} 次盆底肌训练，${summary.pelvicFloorContractions} 次收缩` : undefined,
+    summary.pelvicFloorSessionCount ? `${summary.pelvicFloorSessionCount} 次凯格尔训练，${summary.pelvicFloorContractions} 次收缩` : undefined,
     summary.weightKg === undefined ? undefined : `体重 ${formatCompactNumber(summary.weightKg)} 千克`,
   ].filter(Boolean)
   return `${label}，${details.join('，') || '无记录'}`

@@ -11,6 +11,7 @@ import {
   advancePelvicFloorTimer, createPelvicFloorTimer, finishPelvicFloorTimer, getPelvicFloorRemainingSeconds,
   pausePelvicFloorTimer, resumePelvicFloorTimer, startPelvicFloorTimer,
 } from '../src/services/pelvicFloorTimer'
+import { deletePelvicFloorSession } from '../src/services/pelvicFloorService'
 import { loadMonthSummaries } from '../src/ui/calendarPage'
 import { getLocalDateString } from '../src/utils/date'
 
@@ -175,7 +176,7 @@ describe('Backup V3', () => {
     await expect(restoreBackup(invalidTarget, database)).rejects.toThrow('营养目标第 1 项')
     expect(await database.foods.count()).toBe(1)
     const invalidSession = v3Backup(); invalidSession.data.pelvicFloorSessions[0]!.phases[0]!.durationSeconds = 0
-    await expect(restoreBackup(invalidSession, database)).rejects.toThrow('盆底肌训练第 1 项')
+    await expect(restoreBackup(invalidSession, database)).rejects.toThrow('凯格尔训练第 1 项')
     expect(await database.foods.count()).toBe(1)
   })
 
@@ -222,6 +223,27 @@ describe('Pelvic floor timer pure state', () => {
   it('deadline correction 一次跨过多个阶段，覆盖后台 elapsed time', () => {
     const started = startPelvicFloorTimer(createPelvicFloorTimer({ ...config, repetitions: 10 }), 0)
     expect(advancePelvicFloorTimer(started, 18_500)).toMatchObject({ status: 'contract', completedRepetitions: 3, deadlineMs: 21_000 })
+  })
+})
+
+describe('Kegel session deletion', () => {
+  it('按唯一 ID 删除指定记录，保留其他记录并刷新聚合结果', async () => {
+    const database = newDatabase()
+    const target = session()
+    const untouched = {
+      ...session(), id: 'pelvic-2', startedAt: '2026-09-21T09:00:00.000Z', finishedAt: '2026-09-21T09:00:30.000Z',
+    }
+    await database.pelvicFloorSessions.bulkAdd([target, untouched])
+
+    await deletePelvicFloorSession(target.id, database)
+
+    expect(await database.pelvicFloorSessions.get(target.id)).toBeUndefined()
+    expect(await database.pelvicFloorSessions.get(untouched.id)).toMatchObject({ id: untouched.id })
+    expect(await database.pelvicFloorSessions.where('date').equals(target.date).count()).toBe(1)
+    expect((await loadMonthSummaries(2026, 8, database)).get(target.date)).toMatchObject({ pelvicFloorSessionCount: 1, pelvicFloorContractions: 10, pelvicFloorSeconds: 30 })
+
+    await expect(deletePelvicFloorSession('missing-session', database)).resolves.toBeUndefined()
+    expect(await database.pelvicFloorSessions.count()).toBe(1)
   })
 })
 

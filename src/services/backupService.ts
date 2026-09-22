@@ -5,7 +5,7 @@ type UnknownRecord = Record<string, unknown>
 
 const storeLabels = {
   foods: '食物', foodLogs: '饮食记录', exercises: '动作', workouts: '训练记录', weights: '体重记录',
-  workoutTemplates: '训练模板', dietTemplates: '饮食模板', nutritionTargets: '营养目标', pelvicFloorSessions: '盆底肌训练',
+  workoutTemplates: '训练模板', dietTemplates: '饮食模板', nutritionTargets: '营养目标', pelvicFloorSessions: '凯格尔训练',
 } as const
 
 function objectValue(value: unknown, location: string): UnknownRecord {
@@ -231,7 +231,7 @@ function validateNutritionTarget(record: UnknownRecord, index: number): string {
 }
 
 function validatePelvicFloorSession(record: UnknownRecord, index: number): void {
-  const location = `盆底肌训练第 ${index + 1} 项`
+  const location = `凯格尔训练第 ${index + 1} 项`
   dateString(record.date, `${location} date`)
   timestamp(record.startedAt, `${location} startedAt`)
   timestamp(record.finishedAt, `${location} finishedAt`)

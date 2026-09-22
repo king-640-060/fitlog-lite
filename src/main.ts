@@ -8,7 +8,7 @@ import { logFood, saveFood, updateFoodLogGrams, validateFoodInput } from './serv
 import { buildImportPreview, parseFoodCsv, parseFoodJson, type ImportPreview } from './services/importService'
 import { upsertWeight } from './services/weightService'
 import { deleteNutritionTarget, normalizeNutritionGoal, saveNutritionTarget } from './services/nutritionTargetService'
-import { pelvicFloorSessionDurationSeconds, savePelvicFloorSession, sessionFromPelvicFloorTimer } from './services/pelvicFloorService'
+import { deletePelvicFloorSession, pelvicFloorSessionDurationSeconds, savePelvicFloorSession, sessionFromPelvicFloorTimer } from './services/pelvicFloorService'
 import {
   advancePelvicFloorTimer, createPelvicFloorTimer, finishPelvicFloorTimer, getPelvicFloorRemainingSeconds,
   pausePelvicFloorTimer, resumePelvicFloorTimer, startPelvicFloorTimer, type PelvicFloorTimerState,
@@ -109,72 +109,26 @@ function setupMobileViewport(): void {
   if (!viewport) return
 
   type EditableControl = HTMLInputElement | HTMLTextAreaElement
-  let focusedControl: EditableControl | undefined
-  let visibilityFrame: number | undefined
-
   const isEditableControl = (value: Element | null): value is EditableControl => (
     value instanceof HTMLInputElement || value instanceof HTMLTextAreaElement
   )
 
-  const keepFocusedControlVisible = (target: EditableControl): void => {
-    if (!target.isConnected || document.activeElement !== target) return
-    const rect = target.getBoundingClientRect()
-    const topPadding = 16
-    const bottomPadding = 20
-    const visibleTop = viewport.offsetTop + topPadding
-    const visibleBottom = viewport.offsetTop + viewport.height - bottomPadding
-    let scrollDelta = 0
-    if (rect.bottom > visibleBottom) scrollDelta = rect.bottom - visibleBottom
-    else if (rect.top < visibleTop) scrollDelta = rect.top - visibleTop
-    if (Math.abs(scrollDelta) < 1) return
-
-    const modalBody = target.closest<HTMLElement>('.modal-body')
-    if (modalBody) modalBody.scrollBy({ top: scrollDelta, behavior: 'auto' })
-    else window.scrollBy({ top: scrollDelta, behavior: 'auto' })
-  }
-
-  const scheduleVisibilityCheck = (): void => {
-    if (!focusedControl) return
-    if (visibilityFrame !== undefined) window.cancelAnimationFrame(visibilityFrame)
-    let previousViewport = ''
-    let stableFrames = 0
-    const waitForStableViewport = () => {
-      const currentViewport = `${viewport.height}:${viewport.offsetTop}:${viewport.offsetLeft}:${viewport.scale}`
-      stableFrames = currentViewport === previousViewport ? stableFrames + 1 : 0
-      previousViewport = currentViewport
-      if (stableFrames < 2) {
-        visibilityFrame = window.requestAnimationFrame(waitForStableViewport)
-        return
-      }
-      visibilityFrame = undefined
-      if (focusedControl) keepFocusedControlVisible(focusedControl)
-    }
-    visibilityFrame = window.requestAnimationFrame(waitForStableViewport)
-  }
-
   const update = () => {
     const keyboardOpen = isEditableControl(document.activeElement) && viewport.height < window.innerHeight - 120
-    const bottomInset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
+    const keyboardOverlap = keyboardOpen ? Math.max(0, window.innerHeight - viewport.height) : 0
     document.body.classList.toggle('keyboard-open', keyboardOpen)
     document.documentElement.style.setProperty('--visual-viewport-height', `${viewport.height}px`)
-    document.documentElement.style.setProperty('--visual-viewport-offset-top', `${viewport.offsetTop}px`)
-    document.documentElement.style.setProperty('--visual-viewport-bottom-inset', `${bottomInset}px`)
-    if (focusedControl) scheduleVisibilityCheck()
+    document.documentElement.style.setProperty('--keyboard-overlap', `${keyboardOverlap}px`)
   }
   viewport.addEventListener('resize', update)
-  viewport.addEventListener('scroll', update)
   document.addEventListener('focusin', (event) => {
     const target = event.target instanceof Element ? event.target : null
     if (!isEditableControl(target)) return
-    focusedControl = target
     update()
   })
   document.addEventListener('focusout', () => {
     window.requestAnimationFrame(() => {
       if (isEditableControl(document.activeElement)) return
-      focusedControl = undefined
-      if (visibilityFrame !== undefined) window.cancelAnimationFrame(visibilityFrame)
-      visibilityFrame = undefined
       update()
     })
   })
@@ -262,7 +216,7 @@ async function render(): Promise<void> {
   const subtitle = activeTab === 'today' ? `${formatHeaderDate(today).replace('今天 · ', '')} · 今天也继续保持` : activeTab === 'food' ? formatHeaderDate(foodDate) : activeTab === 'workout' ? formatHeaderDate(workoutDate) : activeTab === 'progress' ? '看见每一次积累' : '管理你的记录与应用'
   app.innerHTML = `
     <div class="app-frame">
-      <header class="topbar"><div><h1>${title}</h1><p class="header-date">${subtitle}</p></div><span class="brand-mark" aria-hidden="true">${icon('leaf', 22)}</span></header>
+      <header class="topbar"><div><h1>${title}</h1><p class="header-date">${subtitle}</p></div>${activeTab === 'today' ? `<span class="brand-mark" aria-hidden="true">${icon('leaf', 22)}</span>` : activeTab === 'food' || activeTab === 'progress' ? `<span class="brand-mark subtle" aria-hidden="true">${icon('leaf', 19)}</span>` : ''}</header>
       <main id="view" aria-live="polite"></main>
       <nav class="bottom-nav" aria-label="主导航">
         <button data-tab="today" class="${activeTab === 'today' ? 'active' : ''}" aria-current="${activeTab === 'today' ? 'page' : 'false'}">${icon('home', 21)}<span>今日</span></button>
@@ -321,8 +275,8 @@ async function renderTodayPage(): Promise<void> {
   view.innerHTML = `
     <section class="today-card nutrition-today-card"><div class="card-heading"><div><span class="card-icon nutrition-icon">${icon('utensils', 19)}</span><h2>今日饮食</h2></div><button class="text-btn" id="today-food-details">查看详情 ${icon('chevron', 15)}</button></div><div class="today-calorie"><strong>${formatNumber(totals.calories)}</strong><span>/ ${target?.calories === undefined ? '未设目标' : `${formatNumber(target.calories)} kcal`}</span><b>${target?.calories === undefined ? '' : `${Math.round(calorieProgress)}%`}</b></div>${target?.calories === undefined ? '' : `<i class="nutrition-progress today-progress"><b style="width:${calorieProgress}%"></b></i>`}<div class="today-macros"><div class="protein"><span>蛋白质</span><strong>${formatNumber(totals.protein)}${target?.protein === undefined ? 'g' : ` / ${formatNumber(target.protein)}g`}</strong></div><div class="carbs"><span>碳水</span><strong>${formatNumber(totals.carbs)}${target?.carbs === undefined ? 'g' : ` / ${formatNumber(target.carbs)}g`}</strong></div><div class="fat"><span>脂肪</span><strong>${formatNumber(totals.fat)}${target?.fat === undefined ? 'g' : ` / ${formatNumber(target.fat)}g`}</strong></div></div></section>
     <section class="today-card workout-today-card"><div class="card-heading"><div><span class="card-icon workout-icon">${icon('dumbbell', 19)}</span><h2>今日训练</h2></div></div><div class="today-card-copy"><strong>${openWorkout ? '训练正在进行' : finishedWorkouts.length ? '今天的训练已完成' : '今天还没有训练'}</strong><span>${openWorkout ? `${openWorkout.exercises.length} 个动作 · 输入已自动保存` : finishedWorkouts.length ? `${finishedWorkouts.length} 次训练 · ${finishedWorkouts.reduce((sum, workout) => sum + workout.exercises.length, 0)} 个动作` : '从模板开始，或创建空白训练'}</span></div><button class="primary full-btn" id="today-workout">${openWorkout ? '继续训练' : '开始训练'}</button></section>
-    <section class="today-card weight-today-card"><div class="card-heading"><div><span class="card-icon weight-icon">${icon('scale', 19)}</span><h2>体重趋势</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 15)}</button></div>${latestWeight ? `<div class="weight-today-value"><strong>${formatNumber(latestWeight.weightKg)}</strong><span>kg</span><small>${weightDelta === undefined ? '记录更多数据后显示变化' : `${weightDelta > 0 ? '↑' : weightDelta < 0 ? '↓' : '—'} ${formatNumber(Math.abs(weightDelta))} kg · 近 30 天`}</small></div>${miniTrendSvg(recentWeights.map((item) => item.weightKg))}` : '<div class="today-card-copy"><strong>暂无体重记录</strong><span>记录第一次体重，开始观察趋势</span></div><button class="secondary full-btn" id="today-record-weight">记录体重</button>'}</section>
-    <section class="today-card pelvic-today-card"><div class="card-heading"><div><span class="card-icon pelvic-icon">${icon('leaf', 19)}</span><h2>盆底训练</h2></div></div><div class="today-card-copy"><strong>${pelvicSessions.length ? `今天已完成 ${pelvicSessions.length} 次` : '今日尚未完成'}</strong><span>${pelvicSessions.length ? `累计 ${pelvicSeconds} 秒` : '约 5–10 分钟 · 保持自然呼吸'}</span></div><button class="secondary full-btn" id="today-pelvic">开始训练</button></section>`
+    <section class="today-card weight-today-card"><div class="card-heading"><div><span class="card-icon weight-icon">${icon('scale', 19)}</span><h2>体重趋势</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 15)}</button></div>${latestWeight ? `<div class="weight-today-value"><strong>${formatNumber(latestWeight.weightKg)}</strong><span>kg</span><small>${weightDelta === undefined ? '记录更多数据后显示变化' : `${weightDelta > 0 ? '↑' : weightDelta < 0 ? '↓' : '—'} ${formatNumber(Math.abs(weightDelta))} kg · 近 30 天`}</small></div>${recentWeights.length > 1 ? miniTrendSvg(recentWeights.map((item) => item.weightKg)) : ''}` : '<div class="today-card-copy"><strong>暂无体重记录</strong><span>记录第一次体重，开始观察趋势</span></div><button class="secondary full-btn" id="today-record-weight">记录体重</button>'}</section>
+    <section class="today-card pelvic-today-card"><div class="card-heading"><div><span class="card-icon pelvic-icon">${icon('leaf', 19)}</span><h2>凯格尔训练</h2></div></div><div class="today-card-copy"><strong>${pelvicSessions.length ? `今天已完成 ${pelvicSessions.length} 次` : '今日尚未完成'}</strong><span>${pelvicSessions.length ? `累计 ${pelvicSeconds} 秒` : '约 5–10 分钟 · 保持自然呼吸'}</span></div><button class="secondary full-btn" id="today-pelvic">开始训练</button></section>`
   view.querySelector('#today-food-details')?.addEventListener('click', () => { activeTab = 'food'; foodDate = today; void render().catch(fail) })
   view.querySelector('#today-workout')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = openWorkout; workoutEditorOpen = Boolean(openWorkout); void render().catch(fail) })
   view.querySelector('#today-weight-details')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; void render().catch(fail) })
@@ -354,7 +308,7 @@ async function renderProgressPage(): Promise<void> {
   const foodDays = monthValues.filter((summary) => summary.calories !== undefined).length
   const pelvicSessions = monthValues.reduce((total, summary) => total + summary.pelvicFloorSessionCount, 0)
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `${progressTabsHtml()}<section class="progress-hero today-card"><div class="card-heading"><div><span class="card-icon weight-icon">${icon('trend', 19)}</span><h2>体重趋势</h2></div><button class="text-btn" data-open-trend>查看详情 ${icon('chevron', 15)}</button></div>${latest ? `<div class="weight-today-value"><strong>${formatNumber(latest.weightKg)}</strong><span>kg</span><small>最近记录 · ${formatShortDate(latest.date)}</small></div>${miniTrendSvg(weights.slice(0, 12).reverse().map((item) => item.weightKg))}` : '<div class="today-card-copy"><strong>暂无体重记录</strong><span>记录后将在这里显示趋势</span></div>'}</section><section><div class="section-head"><div><h2>本月概览</h2><span>${now.getMonth() + 1} 月的记录</span></div></div><div class="stat-grid"><article><span class="stat-icon workout-icon">${icon('dumbbell', 18)}</span><strong>${workouts}</strong><small>力量训练</small></article><article><span class="stat-icon nutrition-icon">${icon('utensils', 18)}</span><strong>${foodDays}</strong><small>饮食记录天数</small></article><article><span class="stat-icon pelvic-icon">${icon('leaf', 18)}</span><strong>${pelvicSessions}</strong><small>盆底训练</small></article><article><span class="stat-icon weight-icon">${icon('scale', 18)}</span><strong>${monthWeights.length}</strong><small>体重记录</small></article></div></section>`
+  view.innerHTML = `${progressTabsHtml()}<section class="progress-hero today-card"><div class="card-heading"><div><span class="card-icon weight-icon">${icon('trend', 19)}</span><h2>体重趋势</h2></div><button class="text-btn" data-open-trend>查看详情 ${icon('chevron', 15)}</button></div>${latest ? `<div class="weight-today-value"><strong>${formatNumber(latest.weightKg)}</strong><span>kg</span><small>最近记录 · ${formatShortDate(latest.date)}</small></div>${weights.length > 1 ? miniTrendSvg(weights.slice(0, 12).reverse().map((item) => item.weightKg)) : ''}` : '<div class="today-card-copy"><strong>暂无体重记录</strong><span>记录后将在这里显示趋势</span></div>'}</section><section><div class="section-head"><div><h2>本月概览</h2><span>${now.getMonth() + 1} 月的记录</span></div></div><div class="stat-grid"><article><span class="stat-icon workout-icon">${icon('dumbbell', 18)}</span><strong>${workouts}</strong><small>力量训练</small></article><article><span class="stat-icon nutrition-icon">${icon('utensils', 18)}</span><strong>${foodDays}</strong><small>饮食记录天数</small></article><article><span class="stat-icon pelvic-icon">${icon('leaf', 18)}</span><strong>${pelvicSessions}</strong><small>凯格尔训练</small></article><article><span class="stat-icon weight-icon">${icon('scale', 18)}</span><strong>${monthWeights.length}</strong><small>体重记录</small></article></div></section>`
   bindProgressTabs(view)
   view.querySelector('[data-open-trend]')?.addEventListener('click', () => { progressView = 'trend'; void render().catch(fail) })
 }
@@ -362,19 +316,19 @@ async function renderProgressPage(): Promise<void> {
 async function renderMorePage(): Promise<void> {
   const view = document.querySelector<HTMLElement>('#view')!
   const row = (id: string, iconName: IconName, title: string, detail: string) => `<button id="${id}"><span class="setting-icon">${icon(iconName, 18)}</span><span><strong>${title}</strong><small>${detail}</small></span>${icon('chevron', 17)}</button>`
-  view.innerHTML = `<section class="settings-section"><h3>数据管理</h3><div class="settings-group">${row('more-food-library', 'utensils', '食物库', '管理食物与营养数据')}${row('more-exercise-library', 'dumbbell', '动作库', '管理力量训练动作')}${row('more-workout-templates', 'activity', '训练模板', '快速创建常用训练')}${row('more-diet-templates', 'archive', '饮食模板', '保存常用食物组合')}</div></section><section class="settings-section"><h3>训练</h3><div class="settings-group">${row('more-pelvic', 'leaf', '盆底训练', '开始计时或查看历史')}</div></section><section class="settings-section"><h3>数据</h3><div class="settings-group">${row('more-import', 'upload', '导入数据', '从表格或数据文件导入食物')}${row('more-backup', 'download', '备份与恢复', '导出或恢复完整本地数据')}</div></section><section class="settings-section"><h3>应用</h3><div class="settings-group">${row('more-about', 'info', '应用信息', 'FitLog Lite · 本地优先')}</div></section><div class="data-safety"><div class="setting-icon">${icon('archive', 18)}</div><div><strong>你的数据只保存在当前设备</strong><p>清除浏览器数据或更换设备前，请先导出完整备份。</p></div></div>`
+  view.innerHTML = `<section class="settings-section"><h3>数据管理</h3><div class="settings-group">${row('more-food-library', 'utensils', '食物库', '管理食物与营养数据')}${row('more-exercise-library', 'dumbbell', '动作库', '管理力量训练动作')}${row('more-workout-templates', 'activity', '训练模板', '快速创建常用训练')}${row('more-diet-templates', 'archive', '饮食模板', '保存常用食物组合')}</div></section><section class="settings-section"><h3>训练</h3><div class="settings-group">${row('more-pelvic', 'leaf', '凯格尔训练', '开始计时或查看历史')}</div></section><section class="settings-section"><h3>数据</h3><div class="settings-group">${row('more-import', 'upload', '导入数据', '从表格或数据文件导入食物')}${row('more-backup', 'download', '备份与恢复', '导出或恢复完整本地数据')}</div></section><section class="settings-section"><h3>应用</h3><div class="settings-group">${row('more-about', 'info', '应用信息', 'FitLog Lite · 本地优先')}</div></section><div class="data-safety"><div class="setting-icon">${icon('archive', 18)}</div><div><strong>你的数据只保存在当前设备</strong><p>清除浏览器数据或更换设备前，请先导出完整备份。</p></div></div>`
   view.querySelector('#more-food-library')?.addEventListener('click', () => void showFoodLibrary())
   view.querySelector('#more-exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
   view.querySelector('#more-workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
   view.querySelector('#more-diet-templates')?.addEventListener('click', () => void showDietTemplateManager())
   view.querySelector('#more-pelvic')?.addEventListener('click', () => {
-    const dialog = openModal('盆底训练', `<div class="action-stack"><button class="primary" id="more-start-pelvic">开始训练</button><button class="secondary" id="more-pelvic-history">查看历史记录</button></div>`)
+    const dialog = openModal('凯格尔训练', `<div class="action-stack"><button class="primary" id="more-start-pelvic">开始训练</button><button class="secondary" id="more-pelvic-history">查看训练记录</button></div>`)
     dialog.querySelector('#more-start-pelvic')?.addEventListener('click', () => { dialog.close(); workoutDate = getLocalDateString(); showPelvicFloorSetup() })
     dialog.querySelector('#more-pelvic-history')?.addEventListener('click', () => { dialog.close(); void showPelvicFloorHistory() })
   })
   view.querySelector('#more-import')?.addEventListener('click', () => void showFoodLibrary())
   view.querySelector('#more-backup')?.addEventListener('click', () => void showSettings().catch(fail))
-  view.querySelector('#more-about')?.addEventListener('click', () => { openModal('应用信息', `<div class="about-card"><span class="brand-mark large">${icon('leaf', 30)}</span><h2>FitLog Lite</h2><p>一款轻盈、安静的本地个人健康记录工具。</p><small>饮食 · 力量训练 · 体重 · 盆底训练</small></div>`) })
+  view.querySelector('#more-about')?.addEventListener('click', () => { openModal('应用信息', `<div class="about-card"><span class="brand-mark large">${icon('leaf', 30)}</span><h2>FitLog Lite</h2><p>一款轻盈、安静的本地个人健康记录工具。</p><small>饮食 · 力量训练 · 体重 · 凯格尔训练</small></div>`) })
 }
 
 async function renderCalendarOverview(withProgressTabs = false): Promise<void> {
@@ -389,7 +343,7 @@ async function renderCalendarOverview(withProgressTabs = false): Promise<void> {
   const nutritionSummary = targetDays.length ? `${achievedDays} / ${targetDays.length}` : formatNumber(averageCalories)
   const nutritionLabel = targetDays.length ? '热量目标内' : '平均 kcal'
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `${withProgressTabs ? progressTabsHtml() : ''}<section class="calendar-overview-head"><button class="icon-btn quiet calendar-prev" id="calendar-prev" aria-label="上个月">${icon('chevron', 20)}</button><div><strong>${calendarYear}年 ${calendarMonth + 1}月</strong><button class="text-btn" id="calendar-today">回到今天</button></div><button class="icon-btn quiet" id="calendar-next" aria-label="下个月">${icon('chevron', 20)}</button></section><div id="calendar-host"></div><section class="calendar-legend" aria-label="日历标记说明"><span><i class="nutrition-marker">${icon('utensils', 10)}</i>饮食</span><span><i class="workout-marker">${icon('dumbbell', 10)}</i>力量</span><span><i class="pelvic-marker">${icon('leaf', 10)}</i>盆底</span><span><i class="weight-marker">${icon('scale', 10)}</i>体重</span></section><section class="calendar-month-summary"><div><strong>${recordedDays}</strong><span>有记录天数</span></div><div><strong>${workoutCount}</strong><span>力量训练</span></div><div><strong>${pelvicCount}</strong><span>盆底训练</span></div><div><strong>${nutritionSummary}</strong><span>${nutritionLabel}</span></div></section>`
+  view.innerHTML = `${withProgressTabs ? progressTabsHtml() : ''}<section class="calendar-overview-head"><button class="icon-btn quiet calendar-prev" id="calendar-prev" aria-label="上个月">${icon('chevron', 20)}</button><div><strong>${calendarYear}年 ${calendarMonth + 1}月</strong><button class="text-btn" id="calendar-today">回到今天</button></div><button class="icon-btn quiet" id="calendar-next" aria-label="下个月">${icon('chevron', 20)}</button></section><div id="calendar-host"></div><section class="calendar-legend" aria-label="日历标记说明"><span><i class="nutrition-marker">${icon('utensils', 10)}</i>饮食</span><span><i class="workout-marker">${icon('dumbbell', 10)}</i>力量</span><span><i class="pelvic-marker">${icon('leaf', 10)}</i>凯格尔</span><span><i class="weight-marker">${icon('scale', 10)}</i>体重</span></section><section class="calendar-month-summary"><div><strong>${recordedDays}</strong><span>有记录天数</span></div><div><strong>${workoutCount}</strong><span>力量训练</span></div><div><strong>${pelvicCount}</strong><span>凯格尔训练</span></div><div><strong>${nutritionSummary}</strong><span>${nutritionLabel}</span></div></section>`
   if (withProgressTabs) bindProgressTabs(view)
   const host = view.querySelector<HTMLElement>('#calendar-host')!
   host.append(renderMonthCalendar({
@@ -448,7 +402,7 @@ function showCalendarDaySheet(date: string, summary?: CalendarDaySummary): void 
   const workout = summary?.hasWorkout ? `${summary.workoutCount} 次 · ${summary.setCount} 组` : '未训练'
   const pelvic = summary?.pelvicFloorSessionCount ? `${summary.pelvicFloorSessionCount} 次 · ${summary.pelvicFloorContractions} 次收缩 · ${summary.pelvicFloorSeconds} 秒` : '未训练'
   const weight = summary?.weightKg === undefined ? '未记录' : `${formatNumber(summary.weightKg)} kg`
-  const dialog = openModal(formatHeaderDate(date), `<div class="calendar-day-sheet"><section><h3>饮食</h3>${nutrition}</section><div><span>力量训练</span><strong>${workout}</strong></div><div><span>盆底训练</span><strong>${pelvic}</strong></div><div><span>体重</span><strong>${weight}</strong></div></div><div class="calendar-day-actions"><button id="calendar-day-food">${icon('utensils', 18)} 饮食</button><button id="calendar-day-workout">${icon('dumbbell', 18)} 训练</button><button id="calendar-day-weight">${icon('scale', 18)} 体重</button></div>`)
+  const dialog = openModal(formatHeaderDate(date), `<div class="calendar-day-sheet"><section><h3>饮食</h3>${nutrition}</section><div><span>力量训练</span><strong>${workout}</strong></div><div><span>凯格尔训练</span><strong>${pelvic}</strong></div><div><span>体重</span><strong>${weight}</strong></div></div><div class="calendar-day-actions"><button id="calendar-day-food">${icon('utensils', 18)} 饮食</button><button id="calendar-day-workout">${icon('dumbbell', 18)} 训练</button><button id="calendar-day-weight">${icon('scale', 18)} 体重</button></div>`)
   dialog.querySelector('#calendar-day-food')?.addEventListener('click', () => { dialog.close(); activeTab = 'food'; foodDate = date; void render().catch(fail) })
   dialog.querySelector('#calendar-day-workout')?.addEventListener('click', () => { dialog.close(); activeTab = 'workout'; workoutDate = date; currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = false; void render().catch(fail) })
   dialog.querySelector('#calendar-day-weight')?.addEventListener('click', () => {
@@ -460,7 +414,7 @@ function showCalendarDaySheet(date: string, summary?: CalendarDaySummary): void 
 function nutritionMetricHtml(label: string, actual: number, target: number | undefined, unit: string): string {
   const value = target === undefined ? `${formatNumber(actual)}${unit}` : `${formatNumber(actual)} / ${formatNumber(target)}${unit}`
   const width = target === undefined ? 0 : target === 0 ? (actual > 0 ? 100 : 0) : Math.min(100, Math.max(0, (actual / target) * 100))
-  return `<span class="nutrition-metric"><span><b>${label}</b>${value}</span>${target === undefined ? '' : `<i class="nutrition-progress" aria-hidden="true"><b style="width:${width}%"></b></i>`}</span>`
+  return `<span class="nutrition-metric"><b>${label}</b><span class="macro-value">${value}</span>${target === undefined ? '' : `<i class="nutrition-progress" aria-hidden="true"><b style="width:${width}%"></b></i>`}</span>`
 }
 
 async function renderFoodPage(): Promise<void> {
@@ -477,9 +431,9 @@ async function renderFoodPage(): Promise<void> {
   const view = document.querySelector<HTMLElement>('#view')!
   view.innerHTML = `
     <section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>记录日期</span><input id="food-date" type="date" value="${foodDate}" aria-label="饮食记录日期"></label><div class="context-actions"><button class="text-btn" id="use-diet-template">使用模板</button><button class="text-btn" id="food-library">食物库 ${icon('chevron', 16)}</button></div></section>
-    <section class="nutrition-hero" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><div><span class="hero-label">热量</span><div class="hero-number"><strong>${formatNumber(totals.calories)}${target?.calories === undefined ? '' : ` / ${formatNumber(target.calories)}`}</strong><span>kcal</span></div></div><button class="text-btn" id="edit-nutrition-target">${target ? '编辑目标' : '设置目标'}</button></div>${target?.calories === undefined ? '' : `<i class="nutrition-progress hero-progress" aria-hidden="true"><b style="width:${target.calories === 0 ? (totals.calories > 0 ? 100 : 0) : Math.min(100, totals.calories / target.calories * 100)}%"></b></i>`}<div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('蛋白质', totals.protein, target?.protein, 'g')}${nutritionMetricHtml('碳水', totals.carbs, target?.carbs, 'g')}${nutritionMetricHtml('脂肪', totals.fat, target?.fat, 'g')}</div></section>
+    <section class="nutrition-hero" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><div><span class="hero-label">热量</span><div class="hero-number"><strong>${formatNumber(totals.calories)}</strong>${target?.calories === undefined ? '' : `<span>/ ${formatNumber(target.calories)}</span>`}<small>kcal</small></div></div><button class="text-btn" id="edit-nutrition-target">${target ? '编辑目标' : '设置目标'}</button></div>${target?.calories === undefined ? '' : `<i class="nutrition-progress hero-progress" aria-hidden="true"><b style="width:${target.calories === 0 ? (totals.calories > 0 ? 100 : 0) : Math.min(100, totals.calories / target.calories * 100)}%"></b></i>`}<div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('蛋白质', totals.protein, target?.protein, 'g')}${nutritionMetricHtml('碳水', totals.carbs, target?.carbs, 'g')}${nutritionMetricHtml('脂肪', totals.fat, target?.fat, 'g')}</div></section>
     <section class="section-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '还没有记录'}</span></div><div class="section-actions">${logs.length ? '<button class="text-btn" id="save-day-diet-template">保存为模板</button>' : ''}<button class="icon-btn add-button" id="add-food-log" aria-label="添加食物">${icon('plus')}</button></div></section>
-    <div class="food-list">${logs.length ? logs.map((log) => `<article class="food-row"><button class="food-row-main" data-edit-log="${log.id}" aria-label="编辑 ${esc(log.foodName)}"><span><strong>${esc(log.foodName)}</strong><small>${log.brand ? `${esc(log.brand)} · ` : ''}${formatNumber(log.grams)} g</small></span><span class="food-kcal"><strong>${formatNumber(log.totalCalories)}</strong><small>kcal</small></span></button><button class="icon-btn row-delete" data-delete-log="${log.id}" aria-label="删除 ${esc(log.foodName)}">${icon('trash', 17)}</button></article>`).join('') : `<div class="empty minimal"><div class="empty-icon">${icon('utensils', 25)}</div><h3>今天还没有记录饮食</h3><p>添加第一份食物，营养汇总会自动更新。</p><button class="primary" id="empty-add-food">${icon('plus', 18)} 添加第一份食物</button></div>`}</div>`
+    <div class="food-list">${logs.length ? logs.map((log) => `<article class="food-row"><button class="food-row-main" data-edit-log="${log.id}" aria-label="编辑 ${esc(log.foodName)}"><span><strong>${esc(log.foodName)}</strong><small>${log.brand ? `${esc(log.brand)} · ` : ''}${formatNumber(log.grams)} g</small></span><span class="food-kcal"><strong>${formatNumber(log.totalCalories)} <small>kcal</small></strong></span></button><details class="row-menu"><summary aria-label="${esc(log.foodName)}更多操作">···</summary><div><button data-delete-log="${log.id}">删除记录</button></div></details></article>`).join('') : `<div class="empty minimal"><div class="empty-icon">${icon('utensils', 25)}</div><h3>今天还没有记录饮食</h3><p>添加第一份食物，营养汇总会自动更新。</p><button class="primary" id="empty-add-food">${icon('plus', 18)} 添加第一份食物</button></div>`}</div>`
   view.querySelector<HTMLInputElement>('#food-date')?.addEventListener('change', (event) => { foodDate = (event.target as HTMLInputElement).value; void render() })
   view.querySelector('#food-library')?.addEventListener('click', () => void showFoodLibrary())
   view.querySelector('#use-diet-template')?.addEventListener('click', () => void showDietTemplatePicker())
@@ -488,6 +442,7 @@ async function renderFoodPage(): Promise<void> {
   view.querySelector('#add-food-log')?.addEventListener('click', () => void showAddFoodLog())
   view.querySelector('#empty-add-food')?.addEventListener('click', () => void showAddFoodLog())
   view.querySelectorAll<HTMLButtonElement>('[data-delete-log]').forEach((button) => button.addEventListener('click', async () => {
+    button.closest('details')?.removeAttribute('open')
     if (!await confirmAction('删除饮食记录？', '删除后无法撤销，但不会影响食物库。')) return
     try { await db.foodLogs.delete(button.dataset.deleteLog!); toast('已删除'); await renderFoodPage() } catch (error) { fail(error) }
   }))
@@ -661,7 +616,7 @@ async function renderWorkoutPage(): Promise<void> {
   const pelvicSeconds = pelvicSessions.reduce((total, session) => total + pelvicFloorSessionDurationSeconds(session), 0)
   const recentWorkouts = (await db.workouts.toArray()).filter((item) => item.finishedAt).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt)).slice(0, 4)
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `<section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>训练日期</span><input id="workout-date" type="date" value="${workoutDate}" aria-label="训练日期"></label><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section><div class="empty workout-empty minimal"><div class="empty-icon">${icon('dumbbell', 27)}</div><h2>${openWorkout ? '训练还在进行中' : todayWorkouts.length ? '这一天的训练已完成' : '今天还没有力量训练'}</h2><p>${openWorkout ? '上次输入已自动保存，可以随时继续。' : '可从模板开始，也可以创建空白训练。'}</p><button class="primary start-button" id="start-workout">${openWorkout ? icon('activity', 18) + ' 继续训练' : icon('plus', 18) + ' 开始力量训练'}</button></div><section class="pelvic-floor-card"><div><span class="eyebrow">轻柔练习</span><h2>盆底训练</h2><p>盆底肌收缩与放松训练</p></div><div class="pelvic-daily-summary"><strong>${pelvicSessions.length} 次</strong><span>${pelvicContractions} 次收缩 · ${pelvicSeconds} 秒</span></div><div class="pelvic-card-actions"><button class="secondary" id="start-pelvic-floor">${icon('leaf', 18)} 开始训练</button><button class="text-btn" id="pelvic-floor-history">历史记录</button></div></section><section class="section-head"><div><h2>最近力量训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 17)}</button>`).join('')}</div>`
+  view.innerHTML = `<section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>训练日期</span><input id="workout-date" type="date" value="${workoutDate}" aria-label="训练日期"></label><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section><div class="empty workout-empty minimal"><div class="empty-icon">${icon('dumbbell', 27)}</div><h2>${openWorkout ? '训练还在进行中' : todayWorkouts.length ? '这一天的训练已完成' : '今天还没有力量训练'}</h2><p>${openWorkout ? '上次输入已自动保存，可以随时继续。' : '可从模板开始，也可以创建空白训练。'}</p><button class="primary start-button" id="start-workout">${openWorkout ? icon('activity', 18) + ' 继续训练' : icon('plus', 18) + ' 开始力量训练'}</button></div><section class="pelvic-floor-card"><div><span class="eyebrow">轻柔练习</span><h2>凯格尔训练</h2><p>收缩与放松练习</p></div><div class="pelvic-daily-summary"><strong>${pelvicSessions.length} 次</strong><span>${pelvicContractions} 次收缩 · ${pelvicSeconds} 秒</span></div><div class="pelvic-card-actions"><button class="secondary" id="start-pelvic-floor">${icon('leaf', 18)} 开始训练</button><button class="text-btn" id="pelvic-floor-history">训练记录</button></div></section><section class="section-head"><div><h2>最近力量训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 17)}</button>`).join('')}</div>`
   view.querySelector<HTMLInputElement>('#workout-date')?.addEventListener('change', (event) => { workoutDate = (event.target as HTMLInputElement).value; currentWorkout = undefined; workoutEditorOpen = false; void render().catch(fail) })
   view.querySelector('#exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
   view.querySelector('#workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
@@ -713,7 +668,7 @@ async function releasePelvicWakeLock(): Promise<void> {
 }
 
 function showPelvicFloorSetup(): void {
-  const dialog = openModal('盆底肌训练', `<form id="pelvic-floor-setup" class="form"><div class="pelvic-setup-grid"><label>收缩时间<input name="contract" type="number" inputmode="numeric" min="1" max="60" step="1" value="3" required><span>秒</span></label><label>放松时间<input name="relax" type="number" inputmode="numeric" min="1" max="60" step="1" value="3" required><span>秒</span></label><label>重复次数<input name="repetitions" type="number" inputmode="numeric" min="1" max="100" step="1" value="10" required><span>次</span></label></div><div class="pelvic-guidance"><p>收缩盆底肌并保持正常呼吸。</p><p>不要同时强力夹紧臀部、大腿或腹部，每次放松阶段充分放松。</p><p>不要把中断排尿作为日常训练方式。</p><p>如有疼痛或明显不适，请停止并咨询专业人员。</p></div><button class="primary" type="submit">开始计时</button></form>`)
+  const dialog = openModal('凯格尔训练', `<form id="pelvic-floor-setup" class="form"><div class="pelvic-setup-grid"><label>收缩时间<input name="contract" type="number" inputmode="numeric" min="1" max="60" step="1" value="3" required><span>秒</span></label><label>放松时间<input name="relax" type="number" inputmode="numeric" min="1" max="60" step="1" value="3" required><span>秒</span></label><label>重复次数<input name="repetitions" type="number" inputmode="numeric" min="1" max="100" step="1" value="10" required><span>次</span></label></div><div class="pelvic-guidance"><p>收缩盆底肌并保持正常呼吸。</p><p>不要同时强力夹紧臀部、大腿或腹部，每次放松阶段充分放松。</p><p>不要把中断排尿作为日常训练方式。</p><p>如有疼痛或明显不适，请停止并咨询专业人员。</p></div><button class="primary" type="submit">开始计时</button></form>`)
   dialog.querySelector<HTMLFormElement>('#pelvic-floor-setup')?.addEventListener('submit', async (event) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget as HTMLFormElement)
@@ -737,7 +692,7 @@ function renderPelvicFloorTimer(): void {
   document.body.classList.add('immersive')
   window.clearInterval(pelvicTimerInterval)
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `<section class="pelvic-timer-screen"><header><span>盆底肌训练</span><small>${formatHeaderDate(pelvicTimerDate)}</small></header><div class="pelvic-countdown" id="pelvic-countdown"><strong id="pelvic-remaining">${getPelvicFloorRemainingSeconds(state, Date.now())}</strong><span>秒</span></div><h2 id="pelvic-phase">${state.status === 'paused' ? '已暂停' : state.status === 'contract' ? '收缩' : '放松'}</h2><p id="pelvic-repetition">${Math.min(state.completedRepetitions + 1, state.repetitions)} / ${state.repetitions}</p><div class="pelvic-timer-actions"><button class="primary" id="pelvic-pause">${state.status === 'paused' ? '继续' : '暂停'}</button><button class="danger-button" id="pelvic-finish">结束训练</button></div><p class="pelvic-breathing-cue">保持自然呼吸；放松阶段充分放松。</p></section>`
+  view.innerHTML = `<section class="pelvic-timer-screen"><header><span>凯格尔训练</span><small>${formatHeaderDate(pelvicTimerDate)}</small></header><div class="pelvic-countdown" id="pelvic-countdown"><strong id="pelvic-remaining">${getPelvicFloorRemainingSeconds(state, Date.now())}</strong><span>秒</span></div><h2 id="pelvic-phase">${state.status === 'paused' ? '已暂停' : state.status === 'contract' ? '收缩' : '放松'}</h2><p id="pelvic-repetition">${Math.min(state.completedRepetitions + 1, state.repetitions)} / ${state.repetitions}</p><div class="pelvic-timer-actions"><button class="primary" id="pelvic-pause">${state.status === 'paused' ? '继续' : '暂停'}</button><button class="danger-button" id="pelvic-finish">结束训练</button></div><p class="pelvic-breathing-cue">保持自然呼吸；放松阶段充分放松。</p></section>`
   view.querySelector('#pelvic-pause')?.addEventListener('click', async () => {
     if (!pelvicTimerState) return
     if (pelvicTimerState.status === 'paused') {
@@ -750,7 +705,7 @@ function renderPelvicFloorTimer(): void {
     renderPelvicFloorTimer()
   })
   view.querySelector('#pelvic-finish')?.addEventListener('click', async () => {
-    if (!pelvicTimerState || !await confirmAction('结束盆底肌训练？', '将保存当前已完成的训练进度。', '结束并保存')) return
+    if (!pelvicTimerState || !await confirmAction('结束凯格尔训练？', '将保存当前已完成的训练进度。', '结束并保存')) return
     pelvicTimerState = finishPelvicFloorTimer(pelvicTimerState, Date.now())
     await completePelvicFloorTimer()
   })
@@ -794,14 +749,25 @@ async function completePelvicFloorTimer(): Promise<void> {
     pelvicTimerState = undefined
     pelvicSessionSaving = false
     document.body.classList.remove('immersive')
-    toast('盆底肌训练已保存')
+    toast('凯格尔训练已保存')
     await render()
   } catch (error) { pelvicSessionSaving = false; fail(error) }
 }
 
 async function showPelvicFloorHistory(): Promise<void> {
   const sessions = (await db.pelvicFloorSessions.toArray()).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt))
-  openModal('盆底肌训练历史', `<div class="pelvic-history">${sessions.length ? sessions.map((session) => `<article><div><strong>${formatShortDate(session.date)}</strong><span>${session.completedRepetitions} / ${session.repetitions} 次收缩</span></div><small>${pelvicFloorSessionDurationSeconds(session)} 秒 · 收缩 ${session.phases.find((phase) => phase.type === 'contract')?.durationSeconds ?? 0}s / 放松 ${session.phases.find((phase) => phase.type === 'relax')?.durationSeconds ?? 0}s</small></article>`).join('') : '<p class="muted padded">还没有盆底肌训练记录</p>'}</div>`, true)
+  const dialog = openModal('凯格尔训练记录', `<div class="pelvic-history">${sessions.length ? sessions.map((session) => `<article><div class="pelvic-history-main"><div><strong>${formatShortDate(session.date)}</strong><span>${session.completedRepetitions} / ${session.repetitions} 次收缩</span></div><small>${pelvicFloorSessionDurationSeconds(session)} 秒 · 收缩 ${session.phases.find((phase) => phase.type === 'contract')?.durationSeconds ?? 0}s / 放松 ${session.phases.find((phase) => phase.type === 'relax')?.durationSeconds ?? 0}s</small></div><details class="row-menu"><summary aria-label="${formatShortDate(session.date)}更多操作">···</summary><div><button data-delete-pelvic-session="${session.id}">删除记录</button></div></details></article>`).join('') : '<p class="muted padded">还没有凯格尔训练记录</p>'}</div>`, true)
+  dialog.querySelectorAll<HTMLButtonElement>('[data-delete-pelvic-session]').forEach((button) => button.addEventListener('click', async () => {
+    button.closest('details')?.removeAttribute('open')
+    if (!await confirmAction('删除这条训练记录？', '删除后无法恢复。', '删除')) return
+    try {
+      await deletePelvicFloorSession(button.dataset.deletePelvicSession!)
+      dialog.close()
+      toast('训练记录已删除')
+      await render()
+      await showPelvicFloorHistory()
+    } catch (error) { fail(error) }
+  }))
 }
 
 function renderWorkoutEditor(workout: Workout): void {
@@ -809,13 +775,13 @@ function renderWorkoutEditor(workout: Workout): void {
   window.clearInterval(workoutClockTimer)
   document.body.classList.add('immersive')
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `<header class="active-workout-head"><button class="icon-btn quiet" id="exit-workout" aria-label="返回训练首页">${icon('x')}</button><div><strong>${completed ? '训练详情' : '训练中'}</strong><span id="workout-clock">${formatElapsed(workout.startedAt, workout.finishedAt)}</span></div>${completed ? '<span class="head-spacer"></span>' : '<button class="finish-text" id="finish-workout">完成</button>'}</header><section class="workout-meta"><span>${formatHeaderDate(workout.date)}</span><span id="autosave-state">${completed ? '可编辑' : '已自动保存'}</span></section><div id="workout-exercises">${workout.exercises.length ? workout.exercises.map(workoutExerciseHtml).join('') : `<div class="empty compact minimal"><div class="empty-icon">${icon('dumbbell', 24)}</div><h3>还没有动作</h3><p>添加第一个动作开始记录。</p></div>`}</div><button id="add-exercise" class="secondary full-btn">${icon('plus', 18)} 添加动作</button><label class="note-field">训练备注<textarea id="workout-note" rows="2" placeholder="可选">${esc(workout.note)}</textarea></label><div class="action-stack">${completed ? '<button id="save-workout-template" class="secondary">保存为模板</button><button id="back-history" class="primary">返回历史</button><button id="delete-workout" class="danger-button">删除训练</button>' : '<button id="history-workout">查看历史训练</button>'}</div>`
+  view.innerHTML = `<header class="active-workout-head"><button class="icon-btn quiet" id="exit-workout" aria-label="返回训练首页">${icon('x')}</button><div><strong>${completed ? '训练详情' : '训练中'}</strong><span id="workout-clock">${formatElapsed(workout.startedAt, workout.finishedAt)}</span></div>${completed ? '<span class="head-spacer"></span>' : '<button class="finish-text" id="finish-workout">完成</button>'}</header><section class="workout-meta"><span>${formatHeaderDate(workout.date)}</span><span id="autosave-state">${completed ? '可编辑' : '已自动保存'}</span></section><div id="workout-exercises">${workout.exercises.length ? workout.exercises.map(workoutExerciseHtml).join('') : `<div class="empty compact minimal"><div class="empty-icon">${icon('dumbbell', 24)}</div><h3>还没有动作</h3><p>添加第一个动作开始记录。</p></div>`}</div><button id="add-exercise" class="secondary full-btn">${icon('plus', 18)} 添加动作</button><label class="note-field">训练备注<textarea id="workout-note" rows="2" placeholder="可选">${esc(workout.note)}</textarea></label><div class="action-stack workout-actions">${completed ? '<button id="save-workout-template" class="secondary">保存为模板</button><button id="back-history" class="quiet-action">返回历史</button><button id="delete-workout" class="danger-button">删除训练</button>' : '<button id="history-workout">查看历史训练</button>'}</div>`
   if (!completed) workoutClockTimer = window.setInterval(() => { const clock = document.querySelector('#workout-clock'); if (clock) clock.textContent = formatElapsed(workout.startedAt) }, 1000)
   bindWorkoutEditor(workout)
 }
 
 function workoutExerciseHtml(exercise: WorkoutExercise): string {
-  return `<article class="exercise-card" data-workout-exercise="${exercise.id}"><div class="exercise-head"><h3>${esc(exercise.exerciseName)}</h3><button class="icon-btn quiet danger" data-remove-exercise="${exercise.id}" aria-label="移除 ${esc(exercise.exerciseName)}">${icon('trash', 17)}</button></div><div class="sets"><div class="set-header"><span>组</span><span>重量 <small>kg</small></span><span>次数</span><span>强度</span><span></span></div>${exercise.sets.map((set, index) => `<div class="set-row" data-set="${set.id}"><span>${index + 1}</span><input aria-label="第${index + 1}组重量" data-field="weightKg" type="number" inputmode="decimal" min="0" step="0.5" value="${set.weightKg ?? ''}" placeholder="—"><input aria-label="第${index + 1}组次数" data-field="reps" type="number" inputmode="numeric" min="1" step="1" value="${set.reps || ''}" placeholder="—"><input aria-label="第${index + 1}组强度" data-field="rpe" type="number" inputmode="decimal" min="1" max="10" step="0.5" value="${set.rpe ?? ''}" placeholder="—"><button aria-label="删除第${index + 1}组" class="icon-btn quiet danger" data-remove-set="${set.id}">${icon('x', 17)}</button><input class="set-note" aria-label="第${index + 1}组备注" data-field="note" placeholder="本组备注（可选）" value="${esc(set.note)}"></div>`).join('')}</div><button class="text-btn add-set" data-add-set="${exercise.id}">${icon('plus', 17)} 添加一组</button></article>`
+  return `<article class="exercise-card" data-workout-exercise="${exercise.id}"><div class="exercise-head"><h3>${esc(exercise.exerciseName)}</h3><button class="icon-btn quiet danger" data-remove-exercise="${exercise.id}" aria-label="移除 ${esc(exercise.exerciseName)}">${icon('trash', 17)}</button></div><div class="sets"><div class="set-header"><span>组</span><span>重量 <small>kg</small></span><span>次数</span><span></span></div>${exercise.sets.map((set, index) => `<div class="set-row" data-set="${set.id}"><span>${index + 1}</span><input aria-label="第${index + 1}组重量" data-field="weightKg" type="number" inputmode="decimal" min="0" step="0.5" value="${set.weightKg ?? ''}" placeholder="—"><input aria-label="第${index + 1}组次数" data-field="reps" type="number" inputmode="numeric" min="1" step="1" value="${set.reps || ''}" placeholder="—"><button aria-label="删除第${index + 1}组" class="icon-btn quiet danger" data-remove-set="${set.id}">${icon('x', 17)}</button><input class="set-note" aria-label="第${index + 1}组备注" data-field="note" placeholder="本组备注（可选）" value="${esc(set.note)}"></div>`).join('')}</div><button class="text-btn add-set" data-add-set="${exercise.id}">${icon('plus', 17)} 添加一组</button></article>`
 }
 
 function workoutSetSummary(set: WorkoutSet): string {
@@ -852,7 +818,6 @@ function bindWorkoutEditor(workout: Workout): void {
     if (field === 'note') set.note = input.value.trim() || undefined
     else if (field === 'reps') set.reps = input.value === '' ? 0 : Number(input.value)
     else if (field === 'weightKg') set.weightKg = input.value === '' ? undefined : Number(input.value)
-    else if (field === 'rpe') set.rpe = input.value === '' ? undefined : Number(input.value)
     scheduleWorkoutSave(workout)
   }))
   view.querySelector('#finish-workout')?.addEventListener('click', async () => {
@@ -1024,7 +989,6 @@ async function showWorkoutTemplateEditor(source?: WorkoutTemplate): Promise<void
       if (!set) return
       if (input.dataset.templateSet === 'reps') set.reps = input.value === '' ? 0 : Number(input.value)
       if (input.dataset.templateSet === 'weightKg') set.weightKg = input.value === '' ? undefined : Number(input.value)
-      if (input.dataset.templateSet === 'rpe') set.rpe = input.value === '' ? undefined : Number(input.value)
       if (input.dataset.templateSet === 'note') set.note = input.value.trim() || undefined
     }))
     form.querySelectorAll<HTMLTextAreaElement>('[data-template-exercise-note]').forEach((input) => input.addEventListener('input', () => {
@@ -1032,7 +996,7 @@ async function showWorkoutTemplateEditor(source?: WorkoutTemplate): Promise<void
     }))
     form.querySelectorAll<HTMLButtonElement>('[data-template-add-set]').forEach((button) => button.addEventListener('click', () => {
       syncText(); const exercise = draft.exercises.find((item) => item.id === button.dataset.templateAddSet)!
-      const previous = exercise.sets.at(-1); exercise.sets.push({ id: crypto.randomUUID(), weightKg: previous?.weightKg, reps: previous?.reps ?? 10, rpe: previous?.rpe }); draw()
+      const previous = exercise.sets.at(-1); exercise.sets.push({ id: crypto.randomUUID(), weightKg: previous?.weightKg, reps: previous?.reps ?? 10 }); draw()
     }))
     form.querySelectorAll<HTMLButtonElement>('[data-template-remove-set]').forEach((button) => button.addEventListener('click', () => {
       syncText(); const exercise = draft.exercises.find((item) => item.id === button.closest<HTMLElement>('[data-template-exercise]')?.dataset.templateExercise)!
@@ -1054,7 +1018,7 @@ async function showWorkoutTemplateEditor(source?: WorkoutTemplate): Promise<void
 }
 
 function workoutTemplateExerciseEditorHtml(exercise: WorkoutTemplateExercise, index: number, count: number, missing: boolean): string {
-  return `<article class="exercise-card template-exercise" data-template-exercise="${exercise.id}"><div class="exercise-head"><div><h3>${esc(exercise.exerciseName)}</h3>${missing ? '<small class="warning-text">动作已删除，将使用名称快照</small>' : ''}</div><div class="reorder-actions"><button type="button" data-template-move="${exercise.id}" data-direction="-1" ${index === 0 ? 'disabled' : ''} aria-label="上移">↑</button><button type="button" data-template-move="${exercise.id}" data-direction="1" ${index === count - 1 ? 'disabled' : ''} aria-label="下移">↓</button><button type="button" class="icon-btn quiet danger" data-template-remove-exercise="${exercise.id}" aria-label="删除动作">${icon('trash', 17)}</button></div></div><div class="sets"><div class="set-header"><span>组</span><span>重量 <small>kg</small></span><span>次数</span><span>强度</span><span></span></div>${exercise.sets.map((set, setIndex) => `<div class="set-row" data-template-set-row="${set.id}"><span>${setIndex + 1}</span><input data-template-set="weightKg" type="number" inputmode="decimal" min="0" step="0.5" value="${set.weightKg ?? ''}" placeholder="—"><input data-template-set="reps" type="number" inputmode="numeric" min="1" step="1" value="${set.reps || ''}" placeholder="—"><input data-template-set="rpe" type="number" inputmode="decimal" min="1" max="10" step="0.5" value="${set.rpe ?? ''}" placeholder="—"><button type="button" class="icon-btn quiet danger" data-template-remove-set="${set.id}">${icon('x', 17)}</button><input class="set-note" data-template-set="note" value="${esc(set.note)}" placeholder="本组备注（可选）"></div>`).join('')}</div><button type="button" class="text-btn add-set" data-template-add-set="${exercise.id}">${icon('plus', 17)} 添加一组</button><label class="compact-label">动作备注<textarea data-template-exercise-note="${exercise.id}" rows="2" placeholder="可选">${esc(exercise.note)}</textarea></label></article>`
+  return `<article class="exercise-card template-exercise" data-template-exercise="${exercise.id}"><div class="exercise-head"><div><h3>${esc(exercise.exerciseName)}</h3>${missing ? '<small class="warning-text">动作已删除，将使用名称快照</small>' : ''}</div><div class="reorder-actions"><button type="button" data-template-move="${exercise.id}" data-direction="-1" ${index === 0 ? 'disabled' : ''} aria-label="上移">↑</button><button type="button" data-template-move="${exercise.id}" data-direction="1" ${index === count - 1 ? 'disabled' : ''} aria-label="下移">↓</button><button type="button" class="icon-btn quiet danger" data-template-remove-exercise="${exercise.id}" aria-label="删除动作">${icon('trash', 17)}</button></div></div><div class="sets"><div class="set-header"><span>组</span><span>重量 <small>kg</small></span><span>次数</span><span></span></div>${exercise.sets.map((set, setIndex) => `<div class="set-row" data-template-set-row="${set.id}"><span>${setIndex + 1}</span><input data-template-set="weightKg" type="number" inputmode="decimal" min="0" step="0.5" value="${set.weightKg ?? ''}" placeholder="—"><input data-template-set="reps" type="number" inputmode="numeric" min="1" step="1" value="${set.reps || ''}" placeholder="—"><button type="button" class="icon-btn quiet danger" data-template-remove-set="${set.id}" aria-label="删除第${setIndex + 1}组">${icon('x', 17)}</button><input class="set-note" data-template-set="note" value="${esc(set.note)}" placeholder="本组备注（可选）"></div>`).join('')}</div><button type="button" class="text-btn add-set" data-template-add-set="${exercise.id}">${icon('plus', 17)} 添加一组</button><label class="compact-label">动作备注<textarea data-template-exercise-note="${exercise.id}" rows="2" placeholder="可选">${esc(exercise.note)}</textarea></label></article>`
 }
 
 async function showWorkoutTemplateExercisePicker(draft: WorkoutTemplate): Promise<void> {
@@ -1203,20 +1167,19 @@ async function renderWeightPage(withProgressTabs = false): Promise<void> {
   const view = document.querySelector<HTMLElement>('#view')!
   const heroLabel = isToday ? heroWeight === latest && !selectedWeight ? '最新体重' : '今日体重' : `${formatShortDate(weightDate)} 体重`
   const changeText = isToday && heroWeight ? `<span class="weight-change">${delta === undefined ? '记录更多数据后显示 30 天变化' : `${delta > 0 ? '+' : ''}${formatNumber(delta)} kg · 30天`}</span>` : ''
-  view.innerHTML = `${withProgressTabs ? progressTabsHtml() : ''}<section class="weight-hero"><p>${heroWeight ? heroLabel : '体重记录'}</p>${heroWeight ? `<div class="hero-number"><strong>${formatNumber(heroWeight.weightKg)}</strong><span>kg</span></div>${changeText}` : `<div class="empty-inline">这一天还没有体重记录</div>`}<button class="primary record-weight" id="record-weight">${icon(selectedWeight ? 'edit' : 'plus', 18)} ${selectedWeight ? '修改体重' : '记录体重'}</button></section><section class="chart-card"><div class="section-head"><div><h2>体重趋势</h2><span>${weightRange === 'all' ? '全部记录' : `最近 ${weightRange} 天`}</span></div></div>${chartWeights.length ? '<div class="chart-wrap"><canvas id="weight-chart"></canvas></div>' : `<div class="empty compact minimal"><div class="empty-icon">${icon('activity', 23)}</div><p>记录体重后会显示趋势图。</p></div>`}<div class="segmented" aria-label="体重图表范围"><button data-range="30" class="${weightRange === '30' ? 'active' : ''}">30天</button><button data-range="90" class="${weightRange === '90' ? 'active' : ''}">90天</button><button data-range="all" class="${weightRange === 'all' ? 'active' : ''}">全部</button></div></section><section class="section-head"><div><h2>历史记录</h2><span>${weights.length} 条</span></div></section><div class="weight-list">${weights.map((item) => `<article class="weight-row"><button data-edit-weight="${item.id}"><span>${formatShortDate(item.date)}</span><strong>${formatNumber(item.weightKg)} <small>kg</small></strong></button><button class="icon-btn row-delete" data-delete-weight="${item.id}" aria-label="删除 ${formatShortDate(item.date)} 的体重">${icon('trash', 17)}</button></article>`).join('') || `<div class="empty minimal"><div class="empty-icon">${icon('scale', 24)}</div><h3>还没有体重记录</h3><p>记录第一次体重，开始观察长期趋势。</p></div>`}</div>`
+  view.innerHTML = `${withProgressTabs ? progressTabsHtml() : ''}<section class="weight-hero"><p>${heroWeight ? heroLabel : '体重记录'}</p>${heroWeight ? `<div class="hero-number"><strong>${formatNumber(heroWeight.weightKg)}</strong><span>kg</span></div>${changeText}` : `<div class="empty-inline">这一天还没有体重记录</div>`}<button class="primary record-weight" id="record-weight">${icon(selectedWeight ? 'edit' : 'plus', 18)} ${selectedWeight ? '修改体重' : '记录体重'}</button></section><section class="chart-card"><div class="section-head"><div><h2>体重趋势</h2><span>${weightRange === 'all' ? '全部记录' : `最近 ${weightRange} 天`}</span></div></div>${chartWeights.length > 1 ? '<div class="chart-wrap"><canvas id="weight-chart"></canvas></div>' : `<div class="trend-placeholder"><span class="empty-icon">${icon('activity', 23)}</span><p>${chartWeights.length === 1 ? '再记录一次体重后即可查看趋势' : '记录体重后会显示趋势图'}</p></div>`}<div class="segmented" aria-label="体重图表范围"><button data-range="30" class="${weightRange === '30' ? 'active' : ''}">30天</button><button data-range="90" class="${weightRange === '90' ? 'active' : ''}">90天</button><button data-range="all" class="${weightRange === 'all' ? 'active' : ''}">全部</button></div></section><section class="section-head"><div><h2>历史记录</h2><span>${weights.length} 条</span></div></section><div class="weight-list">${weights.map((item) => `<article class="weight-row"><button data-edit-weight="${item.id}"><span>${formatShortDate(item.date)}</span><strong>${formatNumber(item.weightKg)} <small>kg</small></strong></button><button class="icon-btn row-delete" data-delete-weight="${item.id}" aria-label="删除 ${formatShortDate(item.date)} 的体重">${icon('trash', 17)}</button></article>`).join('') || `<div class="empty minimal"><div class="empty-icon">${icon('scale', 24)}</div><h3>还没有体重记录</h3><p>记录第一次体重，开始观察长期趋势。</p></div>`}</div>`
   if (withProgressTabs) bindProgressTabs(view)
   view.querySelector('#record-weight')?.addEventListener('click', () => showWeightForm(weightDate, selectedWeight?.weightKg))
   view.querySelectorAll<HTMLButtonElement>('[data-range]').forEach((button) => button.addEventListener('click', () => { weightRange = button.dataset.range as typeof weightRange; void render().catch(fail) }))
   view.querySelectorAll<HTMLButtonElement>('[data-delete-weight]').forEach((button) => button.addEventListener('click', async () => { if (!await confirmAction('删除体重记录？', '删除后无法撤销。')) return; try { await db.weights.delete(button.dataset.deleteWeight!); toast('已删除'); await render() } catch (error) { fail(error) } }))
   view.querySelectorAll<HTMLButtonElement>('[data-edit-weight]').forEach((button) => button.addEventListener('click', () => { const item = weights.find((weight) => weight.id === button.dataset.editWeight)!; showWeightForm(item.date, item.weightKg) }))
-  if (chartWeights.length) {
+  if (chartWeights.length > 1) {
     const canvas = view.querySelector<HTMLCanvasElement>('#weight-chart')!
     const styles = getComputedStyle(document.documentElement)
     const accent = styles.getPropertyValue('--accent').trim()
     const muted = styles.getPropertyValue('--text-secondary').trim()
     const grid = styles.getPropertyValue('--divider').trim()
-    const singlePoint = chartWeights.length === 1
-    weightChart = new Chart(canvas, { type: 'line', data: { labels: chartWeights.map((item) => formatShortDate(item.date)), datasets: [{ data: chartWeights.map((item) => item.weightKg), borderColor: accent, backgroundColor: 'transparent', fill: false, tension: 0.3, borderWidth: 2.3, pointRadius: singlePoint ? 4 : 0, pointHoverRadius: singlePoint ? 5 : 4, pointBackgroundColor: accent }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: 180 }, interaction: { intersect: false, mode: 'index' }, plugins: { legend: { display: false }, tooltip: { displayColors: false } }, scales: { x: { grid: { display: false }, border: { display: false }, ticks: { color: muted, maxTicksLimit: 5 } }, y: { border: { display: false }, ticks: { color: muted, callback: (value) => `${value}kg`, maxTicksLimit: 5 }, grid: { color: grid } } } } })
+    weightChart = new Chart(canvas, { type: 'line', data: { labels: chartWeights.map((item) => formatShortDate(item.date)), datasets: [{ data: chartWeights.map((item) => item.weightKg), borderColor: accent, backgroundColor: 'transparent', fill: false, tension: 0.3, borderWidth: 2.3, pointRadius: 0, pointHoverRadius: 4, pointBackgroundColor: accent }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: 180 }, interaction: { intersect: false, mode: 'index' }, plugins: { legend: { display: false }, tooltip: { displayColors: false } }, scales: { x: { grid: { display: false }, border: { display: false }, ticks: { color: muted, maxTicksLimit: 5 } }, y: { border: { display: false }, ticks: { color: muted, callback: (value) => `${value}kg`, maxTicksLimit: 5 }, grid: { color: grid } } } } })
   }
 }
 
@@ -1238,13 +1201,19 @@ async function showSettings(): Promise<void> {
 }
 
 function showRestorePreview(backup: BackupDataV3): void {
-  const counts = [{ label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '力量训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }, { label: '训练模板', count: backup.data.workoutTemplates.length }, { label: '饮食模板', count: backup.data.dietTemplates.length }, { label: '营养目标', count: backup.data.nutritionTargets.length }, { label: '盆底肌训练', count: backup.data.pelvicFloorSessions.length }]
+  const counts = [{ label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '力量训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }, { label: '训练模板', count: backup.data.workoutTemplates.length }, { label: '饮食模板', count: backup.data.dietTemplates.length }, { label: '营养目标', count: backup.data.nutritionTargets.length }, { label: '凯格尔训练', count: backup.data.pelvicFloorSessions.length }]
   const dialog = openModal('确认恢复备份', `<div class="restore-counts">${counts.map((item) => `<p><span>${item.label}</span><strong>${item.count}</strong></p>`).join('')}</div><div class="warning">恢复将清除当前所有数据，并替换为该备份。</div><button class="danger-button full-btn" id="confirm-restore">继续恢复</button>`)
   dialog.querySelector('#confirm-restore')?.addEventListener('click', async () => { if (!await confirmAction('覆盖当前全部数据？', '恢复会清除当前数据并替换为备份内容，此操作无法撤销。', '恢复备份')) return; try { await restoreBackup(backup); dialog.close(); currentWorkout = undefined; workoutEditorOpen = false; toast('恢复完成'); await render() } catch (error) { fail(error) } })
 }
 
 async function start(): Promise<void> {
   setupMobileViewport()
+  document.addEventListener('click', (event) => {
+    const target = event.target instanceof Element ? event.target : null
+    document.querySelectorAll<HTMLDetailsElement>('details.row-menu[open]').forEach((menu) => {
+      if (!target || !menu.contains(target)) menu.removeAttribute('open')
+    })
+  })
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden' && workoutEditorOpen && currentWorkout) void flushWorkoutAutosave(currentWorkout).catch(fail)
     if (document.visibilityState === 'hidden' && pelvicTimerState) void releasePelvicWakeLock()

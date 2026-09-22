@@ -21,6 +21,10 @@ export async function savePelvicFloorSession(session: PelvicFloorSession, databa
   await database.pelvicFloorSessions.add(session)
 }
 
+export async function deletePelvicFloorSession(id: string, database: FitLogDatabase = db): Promise<void> {
+  await database.pelvicFloorSessions.delete(id)
+}
+
 export function pelvicFloorSessionDurationSeconds(session: PelvicFloorSession): number {
   return Math.max(0, Math.round((new Date(session.finishedAt).getTime() - new Date(session.startedAt).getTime()) / 1000))
 }
