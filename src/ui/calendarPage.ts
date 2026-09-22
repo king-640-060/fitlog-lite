@@ -181,14 +181,14 @@ export function renderMonthCalendar({ year, month, selectedDate, summaries, onDa
     } else if (summary?.calories !== undefined || summary?.nutritionTarget) {
       const marker = document.createElement('i')
       marker.className = 'calendar-marker nutrition-marker'
-      marker.textContent = 'N'
+      marker.textContent = '饮'
       details.append(marker)
     }
     const markers = document.createElement('span')
     markers.className = 'calendar-markers'
-    if (summary?.hasWorkout) markers.innerHTML += '<i class="calendar-marker workout-marker">S</i>'
-    if (summary?.pelvicFloorSessionCount) markers.innerHTML += '<i class="calendar-marker pelvic-marker">P</i>'
-    if (summary?.weightKg !== undefined) markers.innerHTML += '<i class="calendar-marker weight-marker">W</i>'
+    if (summary?.hasWorkout) markers.innerHTML += '<i class="calendar-marker workout-marker">力</i>'
+    if (summary?.pelvicFloorSessionCount) markers.innerHTML += '<i class="calendar-marker pelvic-marker">盆</i>'
+    if (summary?.weightKg !== undefined) markers.innerHTML += '<i class="calendar-marker weight-marker">重</i>'
     if (markers.childElementCount) details.append(markers)
     button.append(details)
     button.addEventListener('click', () => onDateClick(gridDay.date))
