@@ -8,7 +8,7 @@ import {
   NutritionTargetConflictError, applyDietTemplate, dietTemplateItemFromFood, normalizeDietTemplate,
 } from '../src/services/templateService'
 import {
-  advancePelvicFloorTimer, createPelvicFloorTimer, finishPelvicFloorTimer, getPelvicFloorRemainingSeconds,
+  advancePelvicFloorTimer, createPelvicFloorTimer, finishPelvicFloorTimer, getPelvicFloorPhaseProgress, getPelvicFloorRemainingSeconds,
   pausePelvicFloorTimer, resumePelvicFloorTimer, startPelvicFloorTimer,
 } from '../src/services/pelvicFloorTimer'
 import { deletePelvicFloorSession } from '../src/services/pelvicFloorService'
@@ -213,6 +213,8 @@ describe('Pelvic floor timer pure state', () => {
     const resumed = resumePelvicFloorTimer(paused, 10000)
     expect(resumed).toMatchObject({ status: 'contract', deadlineMs: 12000 })
     expect(getPelvicFloorRemainingSeconds(resumed, 10500)).toBe(2)
+    expect(getPelvicFloorPhaseProgress(paused, 10000)).toBeCloseTo(1 / 3)
+    expect(getPelvicFloorPhaseProgress(resumed, 10500)).toBeCloseTo(0.5)
   })
 
   it('finish 保存当前完成次数', () => {

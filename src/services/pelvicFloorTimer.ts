@@ -81,3 +81,12 @@ export function getPelvicFloorRemainingSeconds(state: PelvicFloorTimerState, now
   if (state.status === 'ready') return state.contractSeconds
   return 0
 }
+
+export function getPelvicFloorPhaseProgress(state: PelvicFloorTimerState, nowMs: number): number {
+  const durationMs = (state.activePhase === 'relax' ? state.relaxSeconds : state.contractSeconds) * 1000
+  if (!durationMs || !state.activePhase) return 0
+  const remainingMs = state.status === 'paused'
+    ? state.pausedRemainingMs ?? durationMs
+    : state.deadlineMs === undefined ? durationMs : Math.max(0, state.deadlineMs - nowMs)
+  return Math.max(0, Math.min(1, 1 - remainingMs / durationMs))
+}

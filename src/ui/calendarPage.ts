@@ -5,6 +5,7 @@ import { getLocalDateString } from '../utils/date'
 
 export interface CalendarDaySummary {
   date: string
+  foodLogCount: number
   calories?: number
   protein?: number
   carbs?: number
@@ -70,7 +71,7 @@ export async function loadMonthSummaries(year: number, month: number, database: 
     const existing = summaries.get(date)
     if (existing) return existing
     const summary: CalendarDaySummary = {
-      date, hasWorkout: false, workoutCount: 0, setCount: 0,
+      date, foodLogCount: 0, hasWorkout: false, workoutCount: 0, setCount: 0,
       pelvicFloorSessionCount: 0, pelvicFloorContractions: 0, pelvicFloorSeconds: 0,
     }
     summaries.set(date, summary)
@@ -79,6 +80,7 @@ export async function loadMonthSummaries(year: number, month: number, database: 
 
   for (const log of foodLogs) {
     const summary = ensure(log.date)
+    summary.foodLogCount += 1
     summary.calories = (summary.calories ?? 0) + log.totalCalories
     if (log.totalProtein !== undefined) summary.protein = (summary.protein ?? 0) + log.totalProtein
     if (log.totalCarbs !== undefined) summary.carbs = (summary.carbs ?? 0) + log.totalCarbs
@@ -100,6 +102,10 @@ export async function loadMonthSummaries(year: number, month: number, database: 
   for (const weight of weights) ensure(weight.date).weightKg = weight.weightKg
 
   return summaries
+}
+
+export function hasDayRecords(summary?: CalendarDaySummary): boolean {
+  return Boolean(summary && (summary.foodLogCount > 0 || summary.workoutCount > 0 || summary.pelvicFloorSessionCount > 0 || summary.weightKg !== undefined))
 }
 
 function formatCompactNumber(value: number): string {
@@ -125,7 +131,8 @@ export function getCalendarDayAccessibleLabel(date: string, summary?: CalendarDa
     summary.pelvicFloorSessionCount ? `${summary.pelvicFloorSessionCount} 次凯格尔训练，${summary.pelvicFloorContractions} 次收缩` : undefined,
     summary.weightKg === undefined ? undefined : `体重 ${formatCompactNumber(summary.weightKg)} 千克`,
   ].filter(Boolean)
-  return `${label}，${details.join('，') || '无记录'}`
+  if (hasDayRecords(summary)) return `${label}，${details.join('，')}`
+  return `${label}，${details.length ? `${details.join('，')}，` : ''}无记录`
 }
 
 function calorieProgress(summary: CalendarDaySummary): number | undefined {
@@ -172,13 +179,13 @@ export function renderMonthCalendar({ year, month, selectedDate, summaries, onDa
     const details = document.createElement('span')
     details.className = 'calendar-day-details'
     details.setAttribute('aria-hidden', 'true')
-    const progress = summary ? calorieProgress(summary) : undefined
+    const progress = summary?.foodLogCount ? calorieProgress(summary) : undefined
     if (progress !== undefined) {
       const track = document.createElement('i')
       track.className = 'calendar-nutrition-progress'
       track.style.setProperty('--progress', `${progress}%`)
       details.append(track)
-    } else if (summary?.calories !== undefined || summary?.nutritionTarget) {
+    } else if (summary?.foodLogCount) {
       const marker = document.createElement('i')
       marker.className = 'calendar-marker nutrition-marker'
       marker.textContent = '饮'

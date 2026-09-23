@@ -4,13 +4,15 @@ import { registerSW } from 'virtual:pwa-register'
 import { db } from './db/database'
 import type { BackupDataV3, DietTemplate, Exercise, Food, FoodLog, NutritionGoal, NutritionTarget, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
 import { exportBackup, restoreBackup, validateBackup } from './services/backupService'
+import { clearDayRecords } from './services/dayRecordsService'
 import { logFood, saveFood, updateFoodLogGrams, validateFoodInput } from './services/foodService'
 import { buildImportPreview, parseFoodCsv, parseFoodJson, type ImportPreview } from './services/importService'
 import { upsertWeight } from './services/weightService'
 import { deleteNutritionTarget, normalizeNutritionGoal, saveNutritionTarget } from './services/nutritionTargetService'
 import { deletePelvicFloorSession, pelvicFloorSessionDurationSeconds, savePelvicFloorSession, sessionFromPelvicFloorTimer } from './services/pelvicFloorService'
+import { extendRestTimer, getRestRemainingMs, pauseRestTimer, resumeRestTimer, startRestTimer, type RestTimerState } from './services/restTimer'
 import {
-  advancePelvicFloorTimer, createPelvicFloorTimer, finishPelvicFloorTimer, getPelvicFloorRemainingSeconds,
+  advancePelvicFloorTimer, createPelvicFloorTimer, finishPelvicFloorTimer, getPelvicFloorPhaseProgress, getPelvicFloorRemainingSeconds,
   pausePelvicFloorTimer, resumePelvicFloorTimer, startPelvicFloorTimer, type PelvicFloorTimerState,
 } from './services/pelvicFloorTimer'
 import { createWorkout, findOpenWorkout, finishWorkout, normalizeWorkoutForSave, saveExercise, saveWorkout, WorkoutAutosaveController } from './services/workoutService'
@@ -19,7 +21,8 @@ import {
   resolveDietTemplateFoods, saveDietTemplate, saveWorkoutTemplate,
   sortTemplates, startWorkoutFromTemplate, workoutTemplateFromWorkout,
 } from './services/templateService'
-import { loadMonthSummaries, renderMonthCalendar, type CalendarDaySummary } from './ui/calendarPage'
+import { hasDayRecords, loadMonthSummaries, renderMonthCalendar, type CalendarDaySummary } from './ui/calendarPage'
+import { getGoalProgress } from './ui/progressRing'
 import { formatShortDate, getLocalDateString } from './utils/date'
 import { calculateNutrition, formatNumber } from './utils/nutrition'
 
@@ -42,6 +45,10 @@ let showWorkoutHistory = false
 let weightRange: '30' | '90' | 'all' = '30'
 let weightChart: Chart | undefined
 let workoutClockTimer: number | undefined
+let workoutRestState: RestTimerState | undefined
+let workoutRestWorkoutId: string | undefined
+let workoutRestInterval: number | undefined
+let justFinishedWorkout: Workout | undefined
 let pelvicTimerState: PelvicFloorTimerState | undefined
 let pelvicTimerDate = getLocalDateString()
 let pelvicTimerInterval: number | undefined
@@ -208,7 +215,9 @@ function chooseNutritionTargetConflict(): Promise<'preserve' | 'replace' | undef
 
 async function render(): Promise<void> {
   weightChart?.destroy()
+  weightChart = undefined
   window.clearInterval(workoutClockTimer)
+  clearWorkoutRestTimer()
   document.body.classList.remove('immersive')
   const today = getLocalDateString()
   const hour = new Date().getHours()
@@ -263,7 +272,6 @@ async function renderTodayPage(): Promise<void> {
     carbs: sum.carbs + (log.totalCarbs ?? 0),
     fat: sum.fat + (log.totalFat ?? 0),
   }), { calories: 0, protein: 0, carbs: 0, fat: 0 })
-  const calorieProgress = target?.calories === undefined ? 0 : target.calories === 0 ? (totals.calories > 0 ? 100 : 0) : Math.min(100, totals.calories / target.calories * 100)
   const openWorkout = workouts.find((workout) => !workout.finishedAt)
   const finishedWorkouts = workouts.filter((workout) => workout.finishedAt)
   const latestWeight = weights[0]
@@ -273,10 +281,11 @@ async function renderTodayPage(): Promise<void> {
   const pelvicSeconds = pelvicSessions.reduce((total, session) => total + pelvicFloorSessionDurationSeconds(session), 0)
   const view = document.querySelector<HTMLElement>('#view')!
   view.innerHTML = `
-    <section class="today-card nutrition-today-card"><div class="card-heading"><div><span class="card-icon nutrition-icon">${icon('utensils', 19)}</span><h2>今日饮食</h2></div><button class="text-btn" id="today-food-details">查看详情 ${icon('chevron', 15)}</button></div><div class="today-calorie"><strong>${formatNumber(totals.calories)}</strong><span>/ ${target?.calories === undefined ? '未设目标' : `${formatNumber(target.calories)} kcal`}</span><b>${target?.calories === undefined ? '' : `${Math.round(calorieProgress)}%`}</b></div>${target?.calories === undefined ? '' : `<i class="nutrition-progress today-progress"><b style="width:${calorieProgress}%"></b></i>`}<div class="today-macros"><div class="protein"><span>蛋白质</span><strong>${formatNumber(totals.protein)}${target?.protein === undefined ? 'g' : ` / ${formatNumber(target.protein)}g`}</strong></div><div class="carbs"><span>碳水</span><strong>${formatNumber(totals.carbs)}${target?.carbs === undefined ? 'g' : ` / ${formatNumber(target.carbs)}g`}</strong></div><div class="fat"><span>脂肪</span><strong>${formatNumber(totals.fat)}${target?.fat === undefined ? 'g' : ` / ${formatNumber(target.fat)}g`}</strong></div></div></section>
-    <section class="today-card workout-today-card"><div class="card-heading"><div><span class="card-icon workout-icon">${icon('dumbbell', 19)}</span><h2>今日训练</h2></div></div><div class="today-card-copy"><strong>${openWorkout ? '训练正在进行' : finishedWorkouts.length ? '今天的训练已完成' : '今天还没有训练'}</strong><span>${openWorkout ? `${openWorkout.exercises.length} 个动作 · 输入已自动保存` : finishedWorkouts.length ? `${finishedWorkouts.length} 次训练 · ${finishedWorkouts.reduce((sum, workout) => sum + workout.exercises.length, 0)} 个动作` : '从模板开始，或创建空白训练'}</span></div><button class="primary full-btn" id="today-workout">${openWorkout ? '继续训练' : '开始训练'}</button></section>
+    <section class="today-card nutrition-today-card"><div class="card-heading"><div><span class="card-icon nutrition-icon">${icon('utensils', 19)}</span><h2>今日饮食</h2></div><button class="text-btn" id="today-food-details">查看详情 ${icon('chevron', 15)}</button></div><div class="today-calorie-layout">${ringSvgHtml(totals.calories, target?.calories, 'tiny')}<div class="today-calorie-copy"><strong>${formatNumber(totals.calories)} <small>kcal</small></strong><span>${target?.calories === undefined ? '尚未设置目标' : `目标 ${formatNumber(target.calories)} kcal · ${goalStatusText(totals.calories, target.calories, 'kcal')}`}</span></div></div><div class="today-macros"><div class="protein"><span>蛋白质</span><strong>${formatNumber(totals.protein)}${target?.protein === undefined ? 'g' : ` / ${formatNumber(target.protein)}g`}</strong></div><div class="carbs"><span>碳水</span><strong>${formatNumber(totals.carbs)}${target?.carbs === undefined ? 'g' : ` / ${formatNumber(target.carbs)}g`}</strong></div><div class="fat"><span>脂肪</span><strong>${formatNumber(totals.fat)}${target?.fat === undefined ? 'g' : ` / ${formatNumber(target.fat)}g`}</strong></div></div></section>
+    <section class="today-card workout-today-card"><div class="card-heading"><div><span class="card-icon workout-icon">${icon('dumbbell', 19)}</span><h2>今日训练</h2></div></div><div class="today-workout-status">${workouts.length ? ringSvgHtml(finishedWorkouts.length, workouts.length, 'tiny') : ''}<div class="today-card-copy"><strong>${openWorkout ? '训练正在进行' : finishedWorkouts.length ? '今天的训练已完成' : '今天还没有训练'}</strong><span>${workouts.length ? `${finishedWorkouts.length} / ${workouts.length} 次训练已完成 · ${workouts.reduce((sum, item) => sum + item.exercises.length, 0)} 个动作` : '从模板开始，或创建空白训练'}</span></div></div><button class="primary full-btn" id="today-workout">${openWorkout ? '继续训练' : '开始训练'}</button></section>
     <section class="today-card weight-today-card"><div class="card-heading"><div><span class="card-icon weight-icon">${icon('scale', 19)}</span><h2>体重趋势</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 15)}</button></div>${latestWeight ? `<div class="weight-today-value"><strong>${formatNumber(latestWeight.weightKg)}</strong><span>kg</span><small>${weightDelta === undefined ? '记录更多数据后显示变化' : `${weightDelta > 0 ? '↑' : weightDelta < 0 ? '↓' : '—'} ${formatNumber(Math.abs(weightDelta))} kg · 近 30 天`}</small></div>${recentWeights.length > 1 ? miniTrendSvg(recentWeights.map((item) => item.weightKg)) : ''}` : '<div class="today-card-copy"><strong>暂无体重记录</strong><span>记录第一次体重，开始观察趋势</span></div><button class="secondary full-btn" id="today-record-weight">记录体重</button>'}</section>
     <section class="today-card pelvic-today-card"><div class="card-heading"><div><span class="card-icon pelvic-icon">${icon('leaf', 19)}</span><h2>凯格尔训练</h2></div></div><div class="today-card-copy"><strong>${pelvicSessions.length ? `今天已完成 ${pelvicSessions.length} 次` : '今日尚未完成'}</strong><span>${pelvicSessions.length ? `累计 ${pelvicSeconds} 秒` : '约 5–10 分钟 · 保持自然呼吸'}</span></div><button class="secondary full-btn" id="today-pelvic">开始训练</button></section>`
+  animateNutritionRings(view)
   view.querySelector('#today-food-details')?.addEventListener('click', () => { activeTab = 'food'; foodDate = today; void render().catch(fail) })
   view.querySelector('#today-workout')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = openWorkout; workoutEditorOpen = Boolean(openWorkout); void render().catch(fail) })
   view.querySelector('#today-weight-details')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; void render().catch(fail) })
@@ -305,10 +314,11 @@ async function renderProgressPage(): Promise<void> {
   const latest = weights[0]
   const monthWeights = monthValues.filter((summary) => summary.weightKg !== undefined)
   const workouts = monthValues.reduce((total, summary) => total + summary.workoutCount, 0)
-  const foodDays = monthValues.filter((summary) => summary.calories !== undefined).length
+  const foodDays = monthValues.filter((summary) => summary.foodLogCount > 0).length
   const pelvicSessions = monthValues.reduce((total, summary) => total + summary.pelvicFloorSessionCount, 0)
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `${progressTabsHtml()}<section class="progress-hero today-card"><div class="card-heading"><div><span class="card-icon weight-icon">${icon('trend', 19)}</span><h2>体重趋势</h2></div><button class="text-btn" data-open-trend>查看详情 ${icon('chevron', 15)}</button></div>${latest ? `<div class="weight-today-value"><strong>${formatNumber(latest.weightKg)}</strong><span>kg</span><small>最近记录 · ${formatShortDate(latest.date)}</small></div>${weights.length > 1 ? miniTrendSvg(weights.slice(0, 12).reverse().map((item) => item.weightKg)) : ''}` : '<div class="today-card-copy"><strong>暂无体重记录</strong><span>记录后将在这里显示趋势</span></div>'}</section><section><div class="section-head"><div><h2>本月概览</h2><span>${now.getMonth() + 1} 月的记录</span></div></div><div class="stat-grid"><article><span class="stat-icon workout-icon">${icon('dumbbell', 18)}</span><strong>${workouts}</strong><small>力量训练</small></article><article><span class="stat-icon nutrition-icon">${icon('utensils', 18)}</span><strong>${foodDays}</strong><small>饮食记录天数</small></article><article><span class="stat-icon pelvic-icon">${icon('leaf', 18)}</span><strong>${pelvicSessions}</strong><small>凯格尔训练</small></article><article><span class="stat-icon weight-icon">${icon('scale', 18)}</span><strong>${monthWeights.length}</strong><small>体重记录</small></article></div></section>`
+  view.innerHTML = `${progressTabsHtml()}<section class="progress-hero today-card"><div class="card-heading"><div><span class="card-icon weight-icon">${icon('trend', 19)}</span><h2>体重趋势</h2></div><button class="text-btn" data-open-trend>查看详情 ${icon('chevron', 15)}</button></div>${latest ? `<div class="weight-today-value"><strong>${formatNumber(latest.weightKg)}</strong><span>kg</span><small>最近记录 · ${formatShortDate(latest.date)}</small></div>${weights.length > 1 ? miniTrendSvg(weights.slice(0, 12).reverse().map((item) => item.weightKg)) : ''}` : '<div class="today-card-copy"><strong>暂无体重记录</strong><span>记录后将在这里显示趋势</span></div>'}</section><section><div class="section-head"><div><h2>本月概览</h2><span>${now.getMonth() + 1} 月的记录</span></div></div><div class="stat-grid"><article><span class="stat-icon workout-icon">${icon('dumbbell', 18)}</span><strong data-count-integer data-count-from="0" data-count-to="${workouts}">0</strong><small>力量训练</small></article><article><span class="stat-icon nutrition-icon">${icon('utensils', 18)}</span><strong data-count-integer data-count-from="0" data-count-to="${foodDays}">0</strong><small>饮食记录天数</small></article><article><span class="stat-icon pelvic-icon">${icon('leaf', 18)}</span><strong data-count-integer data-count-from="0" data-count-to="${pelvicSessions}">0</strong><small>凯格尔训练</small></article><article><span class="stat-icon weight-icon">${icon('scale', 18)}</span><strong data-count-integer data-count-from="0" data-count-to="${monthWeights.length}">0</strong><small>体重记录</small></article></div></section>`
+  animateNutritionNumber(view, 420)
   bindProgressTabs(view)
   view.querySelector('[data-open-trend]')?.addEventListener('click', () => { progressView = 'trend'; void render().catch(fail) })
 }
@@ -333,10 +343,10 @@ async function renderMorePage(): Promise<void> {
 
 async function renderCalendarOverview(withProgressTabs = false): Promise<void> {
   const summaries = await loadMonthSummaries(calendarYear, calendarMonth)
-  const recordedDays = [...summaries.values()].length
+  const recordedDays = [...summaries.values()].filter(hasDayRecords).length
   const workoutCount = [...summaries.values()].reduce((total, summary) => total + summary.workoutCount, 0)
   const pelvicCount = [...summaries.values()].reduce((total, summary) => total + summary.pelvicFloorSessionCount, 0)
-  const calorieDays = [...summaries.values()].filter((summary) => summary.calories !== undefined)
+  const calorieDays = [...summaries.values()].filter((summary) => summary.foodLogCount > 0)
   const targetDays = calorieDays.filter((summary) => summary.nutritionTarget?.calories !== undefined)
   const averageCalories = calorieDays.length ? calorieDays.reduce((total, summary) => total + (summary.calories ?? 0), 0) / calorieDays.length : 0
   const achievedDays = targetDays.filter((summary) => (summary.calories ?? 0) <= summary.nutritionTarget!.calories!).length
@@ -402,19 +412,82 @@ function showCalendarDaySheet(date: string, summary?: CalendarDaySummary): void 
   const workout = summary?.hasWorkout ? `${summary.workoutCount} 次 · ${summary.setCount} 组` : '未训练'
   const pelvic = summary?.pelvicFloorSessionCount ? `${summary.pelvicFloorSessionCount} 次 · ${summary.pelvicFloorContractions} 次收缩 · ${summary.pelvicFloorSeconds} 秒` : '未训练'
   const weight = summary?.weightKg === undefined ? '未记录' : `${formatNumber(summary.weightKg)} kg`
-  const dialog = openModal(formatHeaderDate(date), `<div class="calendar-day-sheet"><section><h3>饮食</h3>${nutrition}</section><div><span>力量训练</span><strong>${workout}</strong></div><div><span>凯格尔训练</span><strong>${pelvic}</strong></div><div><span>体重</span><strong>${weight}</strong></div></div><div class="calendar-day-actions"><button id="calendar-day-food">${icon('utensils', 18)} 饮食</button><button id="calendar-day-workout">${icon('dumbbell', 18)} 训练</button><button id="calendar-day-weight">${icon('scale', 18)} 体重</button></div>`)
+  const canClear = hasDayRecords(summary) || Boolean(target)
+  const dialog = openModal(formatHeaderDate(date), `<div class="calendar-day-sheet"><section><h3>饮食</h3>${nutrition}</section><div><span>力量训练</span><strong>${workout}</strong></div><div><span>凯格尔训练</span><strong>${pelvic}</strong></div><div><span>体重</span><strong>${weight}</strong></div></div><div class="calendar-day-actions"><button id="calendar-day-food">${icon('utensils', 18)} 饮食</button><button id="calendar-day-workout">${icon('dumbbell', 18)} 训练</button><button id="calendar-day-weight">${icon('scale', 18)} 体重</button></div>${canClear ? '<div class="calendar-day-danger"><button id="calendar-clear-day" class="danger-button">清空当天记录</button></div>' : ''}`)
   dialog.querySelector('#calendar-day-food')?.addEventListener('click', () => { dialog.close(); activeTab = 'food'; foodDate = date; void render().catch(fail) })
   dialog.querySelector('#calendar-day-workout')?.addEventListener('click', () => { dialog.close(); activeTab = 'workout'; workoutDate = date; currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = false; void render().catch(fail) })
   dialog.querySelector('#calendar-day-weight')?.addEventListener('click', () => {
     dialog.close(); activeTab = 'progress'; progressView = 'trend'; weightDate = date
     void render().then(() => showWeightForm(date, summary?.weightKg)).catch(fail)
   })
+  dialog.querySelector('#calendar-clear-day')?.addEventListener('click', async () => {
+    const day = new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric' }).format(new Date(`${date}T12:00:00`))
+    if (!await confirmAction(`清空 ${day} 的所有记录？`, '将删除当天的饮食记录、营养目标、力量训练、凯格尔训练和体重记录。删除后无法恢复。', '清空当天记录')) return
+    try {
+      await clearDayRecords(date)
+      dialog.close()
+      toast('当天记录已清空')
+      await render()
+    } catch (error) { fail(error) }
+  })
 }
 
-function nutritionMetricHtml(label: string, actual: number, target: number | undefined, unit: string): string {
-  const value = target === undefined ? `${formatNumber(actual)}${unit}` : `${formatNumber(actual)} / ${formatNumber(target)}${unit}`
-  const width = target === undefined ? 0 : target === 0 ? (actual > 0 ? 100 : 0) : Math.min(100, Math.max(0, (actual / target) * 100))
-  return `<span class="nutrition-metric"><b>${label}</b><span class="macro-value">${value}</span>${target === undefined ? '' : `<i class="nutrition-progress" aria-hidden="true"><b style="width:${width}%"></b></i>`}</span>`
+interface PreviousRingValue { actual: number; goal?: number }
+
+function ringSvgHtml(actual: number, goal: number | undefined, size: 'large' | 'small' | 'tiny', previous?: PreviousRingValue): string {
+  const progress = getGoalProgress(actual, goal)
+  const before = previous ? getGoalProgress(previous.actual, previous.goal) : getGoalProgress(0, goal)
+  const mainLength = 2 * Math.PI * 40
+  const outerLength = 2 * Math.PI * 49
+  const mainStart = mainLength * (1 - before.main)
+  const outerStart = outerLength * (1 - before.outer)
+  const crossed = previous && before.main < 1 && progress.main === 1 ? ' goal-crossed' : ''
+  return `<svg class="goal-ring ${size} ${progress.state}${crossed}" viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-track" cx="60" cy="60" r="40"/><circle class="ring-main" cx="60" cy="60" r="40" stroke-dasharray="${mainLength}" stroke-dashoffset="${mainStart}" data-final-offset="${mainLength * (1 - progress.main)}"/><circle class="ring-outer-track" cx="60" cy="60" r="49"/><circle class="ring-outer" cx="60" cy="60" r="49" stroke-dasharray="${outerLength}" stroke-dashoffset="${outerStart}" data-final-offset="${outerLength * (1 - progress.outer)}"/></svg>`
+}
+
+function goalStatusText(actual: number, goal: number | undefined, unit: string): string {
+  const progress = getGoalProgress(actual, goal)
+  if (progress.state === 'unset') return '尚未设置目标'
+  if (progress.state === 'zero') return '目标为 0'
+  if (progress.state === 'reached') return '已达目标'
+  if (progress.state === 'above') return `高于目标 ${formatNumber(progress.excess)} ${unit}`
+  return `${Math.round(progress.main * 100)}%`
+}
+
+function nutritionMetricHtml(key: string, label: string, actual: number, target: number | undefined, previous?: PreviousRingValue): string {
+  const progress = getGoalProgress(actual, target)
+  const amount = target === undefined ? `${formatNumber(actual)}g` : `${formatNumber(actual)} / ${formatNumber(target)}g`
+  const status = progress.state === 'above' ? `<small class="metric-excess">+${formatNumber(progress.excess)}g</small>` : progress.state === 'reached' ? '<small>已达目标</small>' : progress.state === 'unset' ? '<small>未设目标</small>' : ''
+  return `<span class="nutrition-metric ${key}" data-progress-key="${key}" data-actual="${actual}" ${target === undefined ? '' : `data-goal="${target}"`} aria-label="${label} ${amount} ${goalStatusText(actual, target, 'g')}"><b>${label}</b>${ringSvgHtml(actual, target, 'small', previous)}<span class="macro-value" aria-hidden="true"><span data-count-from="${previous?.actual ?? 0}" data-count-to="${actual}">${formatNumber(previous?.actual ?? 0)}</span>${target === undefined ? 'g' : ` / ${formatNumber(target)}g`}</span>${status}</span>`
+}
+
+function animateNutritionRings(root: HTMLElement): void {
+  const rings = root.querySelectorAll<SVGCircleElement>('[data-final-offset]')
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const applyFinal = () => rings.forEach((ring) => ring.style.strokeDashoffset = ring.dataset.finalOffset ?? '')
+  if (reduced) applyFinal()
+  else window.requestAnimationFrame(() => { if (root.isConnected) applyFinal() })
+}
+
+function animateNutritionNumber(root: HTMLElement, durationOverride?: number): void {
+  const numbers = [...root.querySelectorAll<HTMLElement>('[data-count-to]')]
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const start = performance.now()
+  const duration = durationOverride ?? (numbers.some((element) => Number(element.dataset.countFrom) > 0) ? 300 : 550)
+  const paint = (now: number) => {
+    if (!root.isConnected) return
+    const elapsed = Math.min(1, (now - start) / duration)
+    const eased = 1 - (1 - elapsed) ** 3
+    numbers.forEach((element) => {
+      const from = Number(element.dataset.countFrom)
+      const to = Number(element.dataset.countTo)
+      const value = from + (to - from) * eased
+      element.textContent = element.hasAttribute('data-count-integer') ? String(Math.round(value)) : formatNumber(value)
+    })
+    if (elapsed < 1) window.requestAnimationFrame(paint)
+  }
+  if (reduced) numbers.forEach((element) => { element.textContent = element.hasAttribute('data-count-integer') ? element.dataset.countTo ?? '0' : formatNumber(Number(element.dataset.countTo)) })
+  else window.requestAnimationFrame(paint)
 }
 
 async function renderFoodPage(): Promise<void> {
@@ -429,11 +502,20 @@ async function renderFoodPage(): Promise<void> {
   const hasMacros = logs.some((log) => log.totalProtein !== undefined || log.totalCarbs !== undefined || log.totalFat !== undefined) || Boolean(target)
   const isToday = foodDate === getLocalDateString()
   const view = document.querySelector<HTMLElement>('#view')!
+  const previous = new Map<string, PreviousRingValue>()
+  view.querySelectorAll<HTMLElement>('[data-progress-key]').forEach((element) => {
+    if (element.closest<HTMLElement>('[data-food-date]')?.dataset.foodDate !== foodDate) return
+    previous.set(element.dataset.progressKey!, { actual: Number(element.dataset.actual), goal: element.dataset.goal === undefined ? undefined : Number(element.dataset.goal) })
+  })
+  const calorieTarget = target?.calories
+  const calorieAmount = calorieTarget === undefined ? `${formatNumber(totals.calories)} kcal` : `${formatNumber(totals.calories)} / ${formatNumber(calorieTarget)} kcal`
   view.innerHTML = `
     <section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>记录日期</span><input id="food-date" type="date" value="${foodDate}" aria-label="饮食记录日期"></label><div class="context-actions"><button class="text-btn" id="use-diet-template">使用模板</button><button class="text-btn" id="food-library">食物库 ${icon('chevron', 16)}</button></div></section>
-    <section class="nutrition-hero" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><div><span class="hero-label">热量</span><div class="hero-number"><strong>${formatNumber(totals.calories)}</strong>${target?.calories === undefined ? '' : `<span>/ ${formatNumber(target.calories)}</span>`}<small>kcal</small></div></div><button class="text-btn" id="edit-nutrition-target">${target ? '编辑目标' : '设置目标'}</button></div>${target?.calories === undefined ? '' : `<i class="nutrition-progress hero-progress" aria-hidden="true"><b style="width:${target.calories === 0 ? (totals.calories > 0 ? 100 : 0) : Math.min(100, totals.calories / target.calories * 100)}%"></b></i>`}<div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('蛋白质', totals.protein, target?.protein, 'g')}${nutritionMetricHtml('碳水', totals.carbs, target?.carbs, 'g')}${nutritionMetricHtml('脂肪', totals.fat, target?.fat, 'g')}</div></section>
+    <section class="nutrition-hero" data-food-date="${foodDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" id="edit-nutrition-target">${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="calorie-gauge" data-progress-key="calories" data-actual="${totals.calories}" ${calorieTarget === undefined ? '' : `data-goal="${calorieTarget}"`} aria-label="热量 ${calorieAmount} ${goalStatusText(totals.calories, calorieTarget, 'kcal')}">${ringSvgHtml(totals.calories, calorieTarget, 'large', previous.get('calories'))}<div class="calorie-gauge-center"><strong data-count-from="${previous.get('calories')?.actual ?? 0}" data-count-to="${totals.calories}">${formatNumber(previous.get('calories')?.actual ?? 0)}</strong><small>kcal</small></div></div><div class="calorie-gauge-caption">${calorieTarget === undefined ? '' : `<strong>${formatNumber(totals.calories)} / ${formatNumber(calorieTarget)} kcal</strong>`}<span class="${getGoalProgress(totals.calories, calorieTarget).state === 'above' ? 'metric-excess' : ''}">${goalStatusText(totals.calories, calorieTarget, 'kcal')}</span></div><div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div></section>
     <section class="section-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '还没有记录'}</span></div><div class="section-actions">${logs.length ? '<button class="text-btn" id="save-day-diet-template">保存为模板</button>' : ''}<button class="icon-btn add-button" id="add-food-log" aria-label="添加食物">${icon('plus')}</button></div></section>
     <div class="food-list">${logs.length ? logs.map((log) => `<article class="food-row"><button class="food-row-main" data-edit-log="${log.id}" aria-label="编辑 ${esc(log.foodName)}"><span><strong>${esc(log.foodName)}</strong><small>${log.brand ? `${esc(log.brand)} · ` : ''}${formatNumber(log.grams)} g</small></span><span class="food-kcal"><strong>${formatNumber(log.totalCalories)} <small>kcal</small></strong></span></button><details class="row-menu"><summary aria-label="${esc(log.foodName)}更多操作">···</summary><div><button data-delete-log="${log.id}">删除记录</button></div></details></article>`).join('') : `<div class="empty minimal"><div class="empty-icon">${icon('utensils', 25)}</div><h3>今天还没有记录饮食</h3><p>添加第一份食物，营养汇总会自动更新。</p><button class="primary" id="empty-add-food">${icon('plus', 18)} 添加第一份食物</button></div>`}</div>`
+  animateNutritionRings(view)
+  animateNutritionNumber(view)
   view.querySelector<HTMLInputElement>('#food-date')?.addEventListener('change', (event) => { foodDate = (event.target as HTMLInputElement).value; void render() })
   view.querySelector('#food-library')?.addEventListener('click', () => void showFoodLibrary())
   view.querySelector('#use-diet-template')?.addEventListener('click', () => void showDietTemplatePicker())
@@ -692,7 +774,7 @@ function renderPelvicFloorTimer(): void {
   document.body.classList.add('immersive')
   window.clearInterval(pelvicTimerInterval)
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `<section class="pelvic-timer-screen"><header><span>凯格尔训练</span><small>${formatHeaderDate(pelvicTimerDate)}</small></header><div class="pelvic-countdown" id="pelvic-countdown"><strong id="pelvic-remaining">${getPelvicFloorRemainingSeconds(state, Date.now())}</strong><span>秒</span></div><h2 id="pelvic-phase">${state.status === 'paused' ? '已暂停' : state.status === 'contract' ? '收缩' : '放松'}</h2><p id="pelvic-repetition">${Math.min(state.completedRepetitions + 1, state.repetitions)} / ${state.repetitions}</p><div class="pelvic-timer-actions"><button class="primary" id="pelvic-pause">${state.status === 'paused' ? '继续' : '暂停'}</button><button class="danger-button" id="pelvic-finish">结束训练</button></div><p class="pelvic-breathing-cue">保持自然呼吸；放松阶段充分放松。</p></section>`
+  view.innerHTML = `<section class="pelvic-timer-screen"><header><span>凯格尔训练</span><small>${formatHeaderDate(pelvicTimerDate)}</small></header><div class="pelvic-countdown" id="pelvic-countdown" role="timer"><span id="pelvic-phase">${state.activePhase === 'relax' ? '放松' : '收缩'}</span><strong id="pelvic-remaining">${getPelvicFloorRemainingSeconds(state, Date.now())}</strong><span>秒</span></div><h2 id="pelvic-status">${state.status === 'paused' ? '已暂停' : '保持自然呼吸'}</h2><p id="pelvic-repetition">${Math.min(state.completedRepetitions + 1, state.repetitions)} / ${state.repetitions} 次</p><div class="pelvic-timer-actions"><button class="primary" id="pelvic-pause">${state.status === 'paused' ? '继续' : '暂停'}</button><button class="danger-button" id="pelvic-finish">结束训练</button></div><p class="pelvic-breathing-cue">收缩阶段轻柔保持；放松阶段充分放松。</p></section>`
   view.querySelector('#pelvic-pause')?.addEventListener('click', async () => {
     if (!pelvicTimerState) return
     if (pelvicTimerState.status === 'paused') {
@@ -706,6 +788,8 @@ function renderPelvicFloorTimer(): void {
   })
   view.querySelector('#pelvic-finish')?.addEventListener('click', async () => {
     if (!pelvicTimerState || !await confirmAction('结束凯格尔训练？', '将保存当前已完成的训练进度。', '结束并保存')) return
+    // The timer can finish and save while the confirmation dialog is open.
+    if (!pelvicTimerState || pelvicSessionSaving) return
     pelvicTimerState = finishPelvicFloorTimer(pelvicTimerState, Date.now())
     await completePelvicFloorTimer()
   })
@@ -718,14 +802,17 @@ function paintPelvicFloorTimer(): void {
   if (!state) return
   const now = Date.now()
   const remaining = getPelvicFloorRemainingSeconds(state, now)
-  const duration = state.activePhase === 'relax' ? state.relaxSeconds : state.contractSeconds
-  const progress = Math.min(1, Math.max(0, 1 - remaining / duration))
+  const progress = getPelvicFloorPhaseProgress(state, now)
   const countdown = document.querySelector<HTMLElement>('#pelvic-countdown')
   countdown?.style.setProperty('--timer-progress', `${progress * 360}deg`)
+  countdown?.style.setProperty('--phase-scale', `${state.activePhase === 'relax' ? 0.84 + progress * 0.16 : 1 - progress * 0.16}`)
   countdown?.classList.toggle('is-relax', state.activePhase === 'relax')
+  countdown?.classList.toggle('is-paused', state.status === 'paused')
+  countdown?.setAttribute('aria-label', `${state.activePhase === 'relax' ? '放松' : '收缩'}，剩余 ${remaining} 秒${state.status === 'paused' ? '，已暂停' : ''}`)
   const remainingElement = document.querySelector('#pelvic-remaining'); if (remainingElement) remainingElement.textContent = String(remaining)
-  const phaseElement = document.querySelector('#pelvic-phase'); if (phaseElement) phaseElement.textContent = state.status === 'paused' ? '已暂停' : state.status === 'contract' ? '收缩' : '放松'
-  const repetition = document.querySelector('#pelvic-repetition'); if (repetition) repetition.textContent = `${Math.min(state.completedRepetitions + 1, state.repetitions)} / ${state.repetitions}`
+  const phaseElement = document.querySelector('#pelvic-phase'); if (phaseElement) phaseElement.textContent = state.activePhase === 'relax' ? '放松' : '收缩'
+  const statusElement = document.querySelector('#pelvic-status'); if (statusElement) statusElement.textContent = state.status === 'paused' ? '已暂停' : '保持自然呼吸'
+  const repetition = document.querySelector('#pelvic-repetition'); if (repetition) repetition.textContent = `${Math.min(state.completedRepetitions + 1, state.repetitions)} / ${state.repetitions} 次`
 }
 
 function tickPelvicFloorTimer(): void {
@@ -775,9 +862,59 @@ function renderWorkoutEditor(workout: Workout): void {
   window.clearInterval(workoutClockTimer)
   document.body.classList.add('immersive')
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `<header class="active-workout-head"><button class="icon-btn quiet" id="exit-workout" aria-label="返回训练首页">${icon('x')}</button><div><strong>${completed ? '训练详情' : '训练中'}</strong><span id="workout-clock">${formatElapsed(workout.startedAt, workout.finishedAt)}</span></div>${completed ? '<span class="head-spacer"></span>' : '<button class="finish-text" id="finish-workout">完成</button>'}</header><section class="workout-meta"><span>${formatHeaderDate(workout.date)}</span><span id="autosave-state">${completed ? '可编辑' : '已自动保存'}</span></section><div id="workout-exercises">${workout.exercises.length ? workout.exercises.map(workoutExerciseHtml).join('') : `<div class="empty compact minimal"><div class="empty-icon">${icon('dumbbell', 24)}</div><h3>还没有动作</h3><p>添加第一个动作开始记录。</p></div>`}</div><button id="add-exercise" class="secondary full-btn">${icon('plus', 18)} 添加动作</button><label class="note-field">训练备注<textarea id="workout-note" rows="2" placeholder="可选">${esc(workout.note)}</textarea></label><div class="action-stack workout-actions">${completed ? '<button id="save-workout-template" class="secondary">保存为模板</button><button id="back-history" class="quiet-action">返回历史</button><button id="delete-workout" class="danger-button">删除训练</button>' : '<button id="history-workout">查看历史训练</button>'}</div>`
+  view.innerHTML = `<header class="active-workout-head"><button class="icon-btn quiet" id="exit-workout" aria-label="返回训练首页">${icon('x')}</button><div><strong>${completed ? '训练详情' : '训练中'}</strong><span id="workout-clock">${formatElapsed(workout.startedAt, workout.finishedAt)}</span></div>${completed ? '<span class="head-spacer"></span>' : '<button class="finish-text" id="finish-workout">完成</button>'}</header><section class="workout-meta"><span>${formatHeaderDate(workout.date)}</span><span id="autosave-state">${completed ? '可编辑' : '已自动保存'}</span></section>${completed ? '' : '<div id="workout-rest-slot"></div>'}<div id="workout-exercises">${workout.exercises.length ? workout.exercises.map(workoutExerciseHtml).join('') : `<div class="empty compact minimal"><div class="empty-icon">${icon('dumbbell', 24)}</div><h3>还没有动作</h3><p>添加第一个动作开始记录。</p></div>`}</div><button id="add-exercise" class="secondary full-btn">${icon('plus', 18)} 添加动作</button><label class="note-field">训练备注<textarea id="workout-note" rows="2" placeholder="可选">${esc(workout.note)}</textarea></label><div class="action-stack workout-actions">${completed ? '<button id="save-workout-template" class="secondary">保存为模板</button><button id="back-history" class="quiet-action">返回历史</button><button id="delete-workout" class="danger-button">删除训练</button>' : '<button id="history-workout">查看历史训练</button>'}</div>`
   if (!completed) workoutClockTimer = window.setInterval(() => { const clock = document.querySelector('#workout-clock'); if (clock) clock.textContent = formatElapsed(workout.startedAt) }, 1000)
+  if (!completed) renderWorkoutRestControls(workout)
   bindWorkoutEditor(workout)
+}
+
+function clearWorkoutRestTimer(): void {
+  window.clearInterval(workoutRestInterval)
+  workoutRestInterval = undefined
+  workoutRestState = undefined
+  workoutRestWorkoutId = undefined
+}
+
+function formatRestTime(milliseconds: number): string {
+  const seconds = Math.ceil(milliseconds / 1000)
+  return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`
+}
+
+function paintWorkoutRestTimer(): void {
+  const state = workoutRestState
+  const ring = document.querySelector<HTMLElement>('#workout-rest-countdown')
+  if (!state || !ring) return
+  const remaining = getRestRemainingMs(state, Date.now())
+  if (remaining <= 0) {
+    clearWorkoutRestTimer()
+    ring.closest<HTMLElement>('#workout-rest-slot')!.innerHTML = '<button class="quiet-action full-btn" id="start-workout-rest">开始休息计时 · 60秒</button>'
+    document.querySelector('#start-workout-rest')?.addEventListener('click', () => { workoutRestState = startRestTimer(Date.now()); workoutRestWorkoutId = currentWorkout?.id; if (currentWorkout) renderWorkoutRestControls(currentWorkout) })
+    toast('休息结束')
+    return
+  }
+  ring.style.setProperty('--rest-remaining-angle', `${360 * remaining / state.durationMs}deg`)
+  ring.setAttribute('aria-label', `休息剩余 ${formatRestTime(remaining)}${state.status === 'paused' ? '，已暂停' : ''}`)
+  const number = ring.querySelector('#workout-rest-remaining')
+  if (number) number.textContent = formatRestTime(remaining)
+}
+
+function renderWorkoutRestControls(workout: Workout): void {
+  const slot = document.querySelector<HTMLElement>('#workout-rest-slot')
+  if (!slot) return
+  window.clearInterval(workoutRestInterval)
+  if (workoutRestWorkoutId !== workout.id) { workoutRestState = undefined; workoutRestWorkoutId = undefined }
+  const state = workoutRestState
+  if (!state) {
+    slot.innerHTML = '<button class="quiet-action full-btn" id="start-workout-rest">开始休息计时 · 60秒</button>'
+    slot.querySelector('#start-workout-rest')?.addEventListener('click', () => { workoutRestState = startRestTimer(Date.now()); workoutRestWorkoutId = workout.id; renderWorkoutRestControls(workout) })
+    return
+  }
+  slot.innerHTML = `<section class="workout-rest-panel"><div class="workout-rest-ring" id="workout-rest-countdown" role="timer"><span>休息</span><strong id="workout-rest-remaining">${formatRestTime(getRestRemainingMs(state, Date.now()))}</strong></div><div class="workout-rest-actions"><button id="workout-rest-toggle">${state.status === 'paused' ? '继续' : '暂停'}</button><button id="workout-rest-extend">+30 秒</button><button id="workout-rest-skip">跳过</button></div></section>`
+  slot.querySelector('#workout-rest-toggle')?.addEventListener('click', () => { workoutRestState = state.status === 'paused' ? resumeRestTimer(state, Date.now()) : pauseRestTimer(state, Date.now()); renderWorkoutRestControls(workout) })
+  slot.querySelector('#workout-rest-extend')?.addEventListener('click', () => { workoutRestState = extendRestTimer(state, Date.now()); renderWorkoutRestControls(workout) })
+  slot.querySelector('#workout-rest-skip')?.addEventListener('click', () => { clearWorkoutRestTimer(); renderWorkoutRestControls(workout) })
+  paintWorkoutRestTimer()
+  if (state.status === 'running') workoutRestInterval = window.setInterval(paintWorkoutRestTimer, 250)
 }
 
 function workoutExerciseHtml(exercise: WorkoutExercise): string {
@@ -826,14 +963,17 @@ function bindWorkoutEditor(workout: Workout): void {
       const normalized = normalizeWorkoutForSave(workout)
       if (!normalized.exercises.length) throw new Error('请至少添加一个动作')
       if (!await confirmAction('完成本次训练？', '完成后仍可从历史训练中查看和编辑。', '完成训练', false)) return
-      await finishWorkout(workout); workoutAutosave.cancel(); currentWorkout = undefined; showWorkoutHistory = true; toast('训练已完成'); await renderWorkoutPage()
+      const finished = await finishWorkout(workout)
+      clearWorkoutRestTimer()
+      justFinishedWorkout = finished
+      workoutAutosave.cancel(); currentWorkout = undefined; showWorkoutHistory = true; toast('训练已完成'); await renderWorkoutPage()
     } catch (error) { fail(error) }
   })
   view.querySelector('#history-workout')?.addEventListener('click', async () => {
-    try { await flushWorkoutAutosave(workout); showWorkoutHistory = true; currentWorkout = undefined; workoutEditorOpen = false; await renderWorkoutPage() } catch (error) { fail(error) }
+    try { await flushWorkoutAutosave(workout); clearWorkoutRestTimer(); showWorkoutHistory = true; currentWorkout = undefined; workoutEditorOpen = false; await renderWorkoutPage() } catch (error) { fail(error) }
   })
   view.querySelector('#back-history')?.addEventListener('click', async () => {
-    try { await flushWorkoutAutosave(workout); currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = true; await renderWorkoutPage() } catch (error) { fail(error) }
+    try { await flushWorkoutAutosave(workout); clearWorkoutRestTimer(); currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = true; await renderWorkoutPage() } catch (error) { fail(error) }
   })
   view.querySelector('#save-workout-template')?.addEventListener('click', () => void saveWorkoutAsTemplate(workout))
   view.querySelector('#delete-workout')?.addEventListener('click', async () => {
@@ -880,7 +1020,10 @@ async function renderWorkoutHistory(): Promise<void> {
   document.body.classList.remove('immersive')
   const workouts = (await db.workouts.toArray()).filter((item) => item.finishedAt).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt))
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `<div class="section-head history-head"><div><h2>历史训练</h2><span>${workouts.length} 次训练</span></div><button class="text-btn" id="close-history">返回</button></div><div class="history-list">${workouts.length ? workouts.map((workout) => `<button class="history-card" data-workout="${workout.id}"><div class="history-card-title"><strong>${formatShortDate(workout.date)}</strong><span>${workout.exercises.length} 个动作 · ${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span></div><div class="history-details">${workout.exercises.map((item) => `<div><strong>${esc(item.exerciseName)}</strong><small>${item.sets.map(workoutSetSummary).join(' · ') || '暂无组数'}</small></div>`).join('')}</div>${icon('chevron', 17)}</button>`).join('') : `<div class="empty minimal"><div class="empty-icon">${icon('activity', 24)}</div><h3>还没有训练历史</h3></div>`}</div>`
+  const completedFeedback = justFinishedWorkout && workouts.some((item) => item.id === justFinishedWorkout?.id)
+    ? `<div class="workout-complete-banner" role="status">${icon('check', 20)}<span><strong>本次训练已完成</strong><small>${justFinishedWorkout.exercises.length} 个动作 · ${justFinishedWorkout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组已记录</small></span></div>` : ''
+  justFinishedWorkout = undefined
+  view.innerHTML = `${completedFeedback}<div class="section-head history-head"><div><h2>历史训练</h2><span>${workouts.length} 次训练</span></div><button class="text-btn" id="close-history">返回</button></div><div class="history-list">${workouts.length ? workouts.map((workout) => `<button class="history-card" data-workout="${workout.id}"><div class="history-card-title"><strong>${formatShortDate(workout.date)}</strong><span>${workout.exercises.length} 个动作 · ${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span></div><div class="history-details">${workout.exercises.map((item) => `<div><strong>${esc(item.exerciseName)}</strong><small>${item.sets.map(workoutSetSummary).join(' · ') || '暂无组数'}</small></div>`).join('')}</div>${icon('chevron', 17)}</button>`).join('') : `<div class="empty minimal"><div class="empty-icon">${icon('activity', 24)}</div><h3>还没有训练历史</h3></div>`}</div>`
   view.querySelector('#close-history')?.addEventListener('click', () => { showWorkoutHistory = false; void renderWorkoutPage().catch(fail) })
   view.querySelectorAll<HTMLButtonElement>('[data-workout]').forEach((button) => button.addEventListener('click', async () => { try { currentWorkout = await db.workouts.get(button.dataset.workout!); workoutEditorOpen = true; showWorkoutHistory = false; await renderWorkoutPage() } catch (error) { fail(error) } }))
 }
@@ -1157,9 +1300,8 @@ async function renderWeightPage(withProgressTabs = false): Promise<void> {
   const latest = weights[0]
   const isToday = weightDate === today
   const heroWeight = isToday ? selectedWeight ?? latest : selectedWeight
-  const cutoffDays = weightRange === 'all' ? Number.POSITIVE_INFINITY : Number(weightRange)
-  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - cutoffDays + 1)
-  const cutoffString = getLocalDateString(cutoff)
+  const cutoff = new Date(); if (weightRange !== 'all') cutoff.setDate(cutoff.getDate() - Number(weightRange) + 1)
+  const cutoffString = weightRange === 'all' ? '' : getLocalDateString(cutoff)
   const chartWeights = weights.filter((item) => weightRange === 'all' || item.date >= cutoffString).reverse()
   const monthCutoff = new Date(); monthCutoff.setDate(monthCutoff.getDate() - 29)
   const monthWeights = weights.filter((item) => item.date >= getLocalDateString(monthCutoff))
@@ -1170,7 +1312,19 @@ async function renderWeightPage(withProgressTabs = false): Promise<void> {
   view.innerHTML = `${withProgressTabs ? progressTabsHtml() : ''}<section class="weight-hero"><p>${heroWeight ? heroLabel : '体重记录'}</p>${heroWeight ? `<div class="hero-number"><strong>${formatNumber(heroWeight.weightKg)}</strong><span>kg</span></div>${changeText}` : `<div class="empty-inline">这一天还没有体重记录</div>`}<button class="primary record-weight" id="record-weight">${icon(selectedWeight ? 'edit' : 'plus', 18)} ${selectedWeight ? '修改体重' : '记录体重'}</button></section><section class="chart-card"><div class="section-head"><div><h2>体重趋势</h2><span>${weightRange === 'all' ? '全部记录' : `最近 ${weightRange} 天`}</span></div></div>${chartWeights.length > 1 ? '<div class="chart-wrap"><canvas id="weight-chart"></canvas></div>' : `<div class="trend-placeholder"><span class="empty-icon">${icon('activity', 23)}</span><p>${chartWeights.length === 1 ? '再记录一次体重后即可查看趋势' : '记录体重后会显示趋势图'}</p></div>`}<div class="segmented" aria-label="体重图表范围"><button data-range="30" class="${weightRange === '30' ? 'active' : ''}">30天</button><button data-range="90" class="${weightRange === '90' ? 'active' : ''}">90天</button><button data-range="all" class="${weightRange === 'all' ? 'active' : ''}">全部</button></div></section><section class="section-head"><div><h2>历史记录</h2><span>${weights.length} 条</span></div></section><div class="weight-list">${weights.map((item) => `<article class="weight-row"><button data-edit-weight="${item.id}"><span>${formatShortDate(item.date)}</span><strong>${formatNumber(item.weightKg)} <small>kg</small></strong></button><button class="icon-btn row-delete" data-delete-weight="${item.id}" aria-label="删除 ${formatShortDate(item.date)} 的体重">${icon('trash', 17)}</button></article>`).join('') || `<div class="empty minimal"><div class="empty-icon">${icon('scale', 24)}</div><h3>还没有体重记录</h3><p>记录第一次体重，开始观察长期趋势。</p></div>`}</div>`
   if (withProgressTabs) bindProgressTabs(view)
   view.querySelector('#record-weight')?.addEventListener('click', () => showWeightForm(weightDate, selectedWeight?.weightKg))
-  view.querySelectorAll<HTMLButtonElement>('[data-range]').forEach((button) => button.addEventListener('click', () => { weightRange = button.dataset.range as typeof weightRange; void render().catch(fail) }))
+  view.querySelectorAll<HTMLButtonElement>('[data-range]').forEach((button) => button.addEventListener('click', () => {
+    weightRange = button.dataset.range as typeof weightRange
+    const nextCutoff = new Date()
+    if (weightRange !== 'all') nextCutoff.setDate(nextCutoff.getDate() - Number(weightRange) + 1)
+    const nextStart = weightRange === 'all' ? '' : getLocalDateString(nextCutoff)
+    const nextWeights = weights.filter((item) => item.date >= nextStart).reverse()
+    if (!weightChart || nextWeights.length < 2) { weightChart?.destroy(); weightChart = undefined; void renderWeightPage(withProgressTabs).catch(fail); return }
+    weightChart.data.labels = nextWeights.map((item) => formatShortDate(item.date))
+    weightChart.data.datasets[0]!.data = nextWeights.map((item) => item.weightKg)
+    weightChart.update()
+    view.querySelector('.chart-card .section-head span')!.textContent = weightRange === 'all' ? '全部记录' : `最近 ${weightRange} 天`
+    view.querySelectorAll<HTMLButtonElement>('[data-range]').forEach((item) => item.classList.toggle('active', item.dataset.range === weightRange))
+  }))
   view.querySelectorAll<HTMLButtonElement>('[data-delete-weight]').forEach((button) => button.addEventListener('click', async () => { if (!await confirmAction('删除体重记录？', '删除后无法撤销。')) return; try { await db.weights.delete(button.dataset.deleteWeight!); toast('已删除'); await render() } catch (error) { fail(error) } }))
   view.querySelectorAll<HTMLButtonElement>('[data-edit-weight]').forEach((button) => button.addEventListener('click', () => { const item = weights.find((weight) => weight.id === button.dataset.editWeight)!; showWeightForm(item.date, item.weightKg) }))
   if (chartWeights.length > 1) {
@@ -1179,7 +1333,7 @@ async function renderWeightPage(withProgressTabs = false): Promise<void> {
     const accent = styles.getPropertyValue('--accent').trim()
     const muted = styles.getPropertyValue('--text-secondary').trim()
     const grid = styles.getPropertyValue('--divider').trim()
-    weightChart = new Chart(canvas, { type: 'line', data: { labels: chartWeights.map((item) => formatShortDate(item.date)), datasets: [{ data: chartWeights.map((item) => item.weightKg), borderColor: accent, backgroundColor: 'transparent', fill: false, tension: 0.3, borderWidth: 2.3, pointRadius: 0, pointHoverRadius: 4, pointBackgroundColor: accent }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: 180 }, interaction: { intersect: false, mode: 'index' }, plugins: { legend: { display: false }, tooltip: { displayColors: false } }, scales: { x: { grid: { display: false }, border: { display: false }, ticks: { color: muted, maxTicksLimit: 5 } }, y: { border: { display: false }, ticks: { color: muted, callback: (value) => `${value}kg`, maxTicksLimit: 5 }, grid: { color: grid } } } } })
+    weightChart = new Chart(canvas, { type: 'line', data: { labels: chartWeights.map((item) => formatShortDate(item.date)), datasets: [{ data: chartWeights.map((item) => item.weightKg), borderColor: accent, backgroundColor: 'transparent', fill: false, tension: 0.3, borderWidth: 2.3, pointRadius: 0, pointHoverRadius: 4, pointBackgroundColor: accent }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 350 }, interaction: { intersect: false, mode: 'index' }, plugins: { legend: { display: false }, tooltip: { displayColors: false } }, scales: { x: { grid: { display: false }, border: { display: false }, ticks: { color: muted, maxTicksLimit: 5 } }, y: { border: { display: false }, ticks: { color: muted, callback: (value) => `${value}kg`, maxTicksLimit: 5 }, grid: { color: grid } } } } })
   }
 }
 

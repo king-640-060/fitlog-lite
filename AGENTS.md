@@ -19,6 +19,8 @@ At the beginning of every new task:
 3. Read `docs/CHAT_HANDOFF.md` only when architecture, historical decisions, or older implementation context is required.
 4. Inspect only the source and test files relevant to the requested task.
 
+For UI or interaction work, read `docs/UI_INTERACTION_SPEC.md` before modifying the interface. Keep it current when a durable interaction rule changes.
+
 Resolve conflicts in this order:
 
 ```text
