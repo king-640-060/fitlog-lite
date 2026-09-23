@@ -1,5 +1,6 @@
 import type { BackupData, BackupDataV3 } from '../db/types'
 import { db, type FitLogDatabase } from '../db/database'
+import { isMealType } from '../utils/foodMeals'
 
 type UnknownRecord = Record<string, unknown>
 
@@ -89,6 +90,7 @@ function validateFood(record: UnknownRecord, index: number): void {
 function validateFoodLog(record: UnknownRecord, index: number): void {
   const location = `饮食记录第 ${index + 1} 项`
   dateString(record.date, `${location} date`)
+  if (record.meal !== undefined && !isMealType(record.meal)) throw new Error(`${location} meal：餐次不合法`)
   optionalString(record.foodId, `${location} foodId`)
   nonEmptyString(record.foodName, `${location} foodName`)
   optionalString(record.brand, `${location} brand`)

@@ -28,6 +28,13 @@ Do not use human training illustrations, anatomical diagrams, food photography, 
 - Workout and Weight are secondary cards. Keep the Workout start action solid green but compact, and Weight entry soft green; neither empty state should reserve chart space or imply recorded data.
 - Kegel is a shorter tertiary habit card with a lighter action. Preserve all existing routes and business meaning while varying visual weight.
 
+## Food day and meal hierarchy
+
+- The Food page uses a compact title/date/day-switch header, followed immediately by the calorie and three-nutrient summary. Food library and a small tools menu remain reachable without crowding the first screen.
+- Breakfast, lunch, dinner, and snack are the four persistent meal choices. Entry from a meal writes that exact choice. Historical FoodLogs without `meal` stay unclassified; never infer a meal from timestamps or the food name.
+- Show “未分类” only when records actually lack a meal. Editing a record may explicitly assign or clear its meal. Recompute each meal's nutrients from its FoodLog snapshots, not stored subtotals.
+- The four meal sections use light separators, compact empty guidance, and an expandable record list. Preserve editing and deletion for every FoodLog, including unclassified and long lists.
+
 ## Motion and performance
 
 - Buttons press in about 100–140 ms; state changes take 150–220 ms; sheets take 220–280 ms; number counts take 300–500 ms. Keep motion finite, lightweight, and secondary to responsiveness.

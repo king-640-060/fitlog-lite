@@ -1,6 +1,7 @@
-import type { Food, FoodLog } from '../db/types'
-import { db } from '../db/database'
+import type { Food, FoodLog, MealType } from '../db/types'
+import { db, type FitLogDatabase } from '../db/database'
 import { createFoodLogSnapshot } from '../utils/nutrition'
+import { isMealType } from '../utils/foodMeals'
 import { finiteNumber, optionalNumber, requiredText } from '../utils/validation'
 
 export type FoodInput = Pick<Food, 'name' | 'brand' | 'referenceGrams' | 'calories' | 'protein' | 'carbs' | 'fat'>
@@ -26,20 +27,22 @@ export async function saveFood(input: Partial<FoodInput>, id?: string): Promise<
   return food
 }
 
-export async function logFood(food: Food, gramsValue: unknown, date: string): Promise<FoodLog> {
+export async function logFood(food: Food, gramsValue: unknown, date: string, meal?: MealType, database: FitLogDatabase = db): Promise<FoodLog> {
+  if (meal !== undefined && !isMealType(meal)) throw new Error('餐次不合法')
   const grams = finiteNumber(gramsValue, '克数', 0.000001)
-  const log = createFoodLogSnapshot(food, grams, date)
-  await db.foodLogs.add(log)
+  const log = createFoodLogSnapshot(food, grams, date, meal)
+  await database.foodLogs.add(log)
   return log
 }
 
-export async function updateFoodLogGrams(id: string, gramsValue: unknown): Promise<void> {
-  const log = await db.foodLogs.get(id)
+export async function updateFoodLogDetails(id: string, gramsValue: unknown, meal?: MealType, database: FitLogDatabase = db): Promise<void> {
+  if (meal !== undefined && !isMealType(meal)) throw new Error('餐次不合法')
+  const log = await database.foodLogs.get(id)
   if (!log) throw new Error('找不到该饮食记录')
   const grams = finiteNumber(gramsValue, '克数', 0.000001)
   const ratio = grams / log.referenceGrams
-  await db.foodLogs.update(id, {
-    grams,
+  await database.foodLogs.update(id, {
+    grams, meal,
     totalCalories: log.caloriesPerReference * ratio,
     totalProtein: log.proteinPerReference === undefined ? undefined : log.proteinPerReference * ratio,
     totalCarbs: log.carbsPerReference === undefined ? undefined : log.carbsPerReference * ratio,

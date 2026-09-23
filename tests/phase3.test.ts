@@ -116,6 +116,7 @@ describe('DietTemplate nutrition goals', () => {
     const database = newDatabase(); await database.foods.add(food()); await database.dietTemplates.add(template())
     await applyDietTemplate(template(), '2026-09-21', database)
     expect(await database.foodLogs.count()).toBe(1)
+    expect((await database.foodLogs.toCollection().first())?.meal).toBeUndefined()
     expect(await database.nutritionTargets.where('date').equals('2026-09-21').first()).toMatchObject({ calories: 2200, protein: 160, sourceTemplateId: 'diet-template-1' })
     expect((await database.dietTemplates.get('diet-template-1'))?.lastUsedAt).toBeTruthy()
   })

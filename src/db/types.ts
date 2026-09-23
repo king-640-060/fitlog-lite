@@ -11,9 +11,12 @@ export interface Food {
   updatedAt: string
 }
 
+export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack'
+
 export interface FoodLog {
   id: string
   date: string
+  meal?: MealType
   foodId?: string
   foodName: string
   brand?: string

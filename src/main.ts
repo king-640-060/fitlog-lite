@@ -2,10 +2,10 @@ import './styles/main.css'
 import { Chart, registerables } from 'chart.js'
 import { registerSW } from 'virtual:pwa-register'
 import { db } from './db/database'
-import type { BackupDataV3, DietTemplate, Exercise, Food, FoodLog, NutritionGoal, NutritionTarget, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
+import type { BackupDataV3, DietTemplate, Exercise, Food, FoodLog, MealType, NutritionGoal, NutritionTarget, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
 import { exportBackup, restoreBackup, validateBackup } from './services/backupService'
 import { clearDayRecords } from './services/dayRecordsService'
-import { logFood, saveFood, updateFoodLogGrams, validateFoodInput } from './services/foodService'
+import { logFood, saveFood, updateFoodLogDetails, validateFoodInput } from './services/foodService'
 import { buildImportPreview, parseFoodCsv, parseFoodJson, type ImportPreview } from './services/importService'
 import { upsertWeight } from './services/weightService'
 import { deleteNutritionTarget, normalizeNutritionGoal, saveNutritionTarget } from './services/nutritionTargetService'
@@ -23,6 +23,7 @@ import {
 } from './services/templateService'
 import { hasDayRecords, loadMonthSummaries, renderMonthCalendar, type CalendarDaySummary } from './ui/calendarPage'
 import { getGoalProgress } from './ui/progressRing'
+import { groupFoodLogs, isMealType, mealNames, mealTypes, type FoodMealGroup } from './utils/foodMeals'
 import { formatShortDate, getLocalDateString } from './utils/date'
 import { calculateNutrition, formatNumber } from './utils/nutrition'
 
@@ -37,6 +38,7 @@ let calendarSelectedDate = getLocalDateString()
 let calendarYear = new Date().getFullYear()
 let calendarMonth = new Date().getMonth()
 let foodDate = getLocalDateString()
+let foodMenuEvents: AbortController | undefined
 let workoutDate = getLocalDateString()
 let weightDate = getLocalDateString()
 let currentWorkout: Workout | undefined
@@ -94,6 +96,11 @@ function formatHeaderDate(dateString: string): string {
   const monthDay = new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric' }).format(date)
   const weekday = new Intl.DateTimeFormat('zh-CN', { weekday: 'long' }).format(date)
   return `${prefix}${monthDay} · ${weekday}`
+}
+
+function shiftLocalDate(dateString: string, days: number): string {
+  const [year, month, day] = dateString.split('-').map(Number)
+  return getLocalDateString(new Date(year!, month! - 1, day! + days, 12))
 }
 
 function formatElapsed(startedAt: string, finishedAt?: string): string {
@@ -214,6 +221,7 @@ function chooseNutritionTargetConflict(): Promise<'preserve' | 'replace' | undef
 }
 
 async function render(): Promise<void> {
+  foodMenuEvents?.abort()
   weightChart?.destroy()
   weightChart = undefined
   window.clearInterval(workoutClockTimer)
@@ -225,7 +233,7 @@ async function render(): Promise<void> {
   const subtitle = activeTab === 'today' ? `${formatHeaderDate(today).replace('今天 · ', '')} · 今天也继续保持` : activeTab === 'food' ? formatHeaderDate(foodDate) : activeTab === 'workout' ? formatHeaderDate(workoutDate) : activeTab === 'progress' ? '看见每一次积累' : '管理你的记录与应用'
   app.innerHTML = `
     <div class="app-frame">
-      <header class="topbar${activeTab === 'today' ? ' today-topbar' : ''}"><div><h1>${title}</h1><p class="header-date">${subtitle}</p></div>${activeTab === 'today' ? `<span class="brand-mark today-brand" aria-hidden="true">${icon('leaf', 19)}</span>` : activeTab === 'food' || activeTab === 'progress' ? `<span class="brand-mark subtle" aria-hidden="true">${icon('leaf', 19)}</span>` : ''}</header>
+      <header class="topbar${activeTab === 'today' ? ' today-topbar' : activeTab === 'food' ? ' food-topbar' : ''}"><div><h1>${title}</h1><p class="header-date">${subtitle}</p></div>${activeTab === 'food' ? `<div class="food-header-actions"><button class="food-library-link" id="food-library">食物库</button><details class="food-tools-menu"><summary aria-label="饮食更多操作" title="更多操作">${icon('more', 20)}</summary><div class="food-tools-panel"><button id="use-diet-template">使用模板</button><label class="food-menu-date">选择日期<input id="food-date" type="date" value="${foodDate}" aria-label="选择饮食记录日期"></label><button id="save-day-diet-template" hidden>保存为模板</button></div></details></div>` : activeTab === 'today' ? `<span class="brand-mark today-brand" aria-hidden="true">${icon('leaf', 19)}</span>` : activeTab === 'progress' ? `<span class="brand-mark subtle" aria-hidden="true">${icon('leaf', 19)}</span>` : ''}</header>
       <main id="view" class="${activeTab === 'today' ? 'today-dashboard' : ''}" aria-live="polite"></main>
       <nav class="bottom-nav" aria-label="主导航">
         <button data-tab="today" class="${activeTab === 'today' ? 'active' : ''}" aria-current="${activeTab === 'today' ? 'page' : 'false'}">${icon('home', 21)}<span>今日</span></button>
@@ -239,6 +247,17 @@ async function render(): Promise<void> {
     activeTab = button.dataset.tab as Tab
     void render().catch(fail)
   }))
+  if (activeTab === 'food') {
+    const menu = app.querySelector<HTMLDetailsElement>('.food-tools-menu')!
+    foodMenuEvents = new AbortController()
+    const signal = foodMenuEvents.signal
+    document.addEventListener('pointerdown', (event) => {
+      if (event.target instanceof Node && !menu.contains(event.target)) menu.open = false
+    }, { signal })
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && menu.open) { menu.open = false; menu.querySelector('summary')?.focus() }
+    }, { signal })
+  }
   if (activeTab === 'today') await renderTodayPage()
   if (activeTab === 'food') await renderFoodPage()
   if (activeTab === 'workout') await renderWorkoutPage()
@@ -490,6 +509,26 @@ function animateNutritionNumber(root: HTMLElement, durationOverride?: number): v
   else window.requestAnimationFrame(paint)
 }
 
+function foodLogRowHtml(log: FoodLog): string {
+  return `<article class="food-row"><button class="food-row-main" data-edit-log="${esc(log.id)}" aria-label="编辑 ${esc(log.foodName)}"><span><strong>${esc(log.foodName)}</strong><small>${log.brand ? `${esc(log.brand)} · ` : ''}${formatNumber(log.grams)} g</small></span><span class="food-kcal"><strong>${formatNumber(log.totalCalories)} <small>kcal</small></strong></span></button><details class="row-menu"><summary aria-label="${esc(log.foodName)}更多操作">···</summary><div><button data-delete-log="${esc(log.id)}">删除记录</button></div></details></article>`
+}
+
+function foodMealSectionHtml(group: FoodMealGroup, isToday: boolean): string {
+  const meal = group.meal
+  const key = meal ?? 'unclassified'
+  const count = group.logs.length
+  const macro = `蛋白质 ${formatNumber(group.protein)}g · 碳水 ${formatNumber(group.carbs)}g · 脂肪 ${formatNumber(group.fat)}g`
+  const preview = count
+    ? `${group.logs.slice(0, 3).map((log) => esc(log.foodName)).join(' · ')}${count > 3 ? ` · 另有 ${count - 3} 项` : ''}`
+    : `${isToday ? '今天' : '这天'}还没有记录${group.name}`
+  return `<section class="food-meal ${count ? 'has-logs' : 'is-empty'}" data-meal-section="${key}">
+    <div class="food-meal-head"><button class="food-meal-summary" ${count ? `data-toggle-meal="${key}" aria-expanded="false"` : meal ? `data-add-meal="${meal}"` : ''} ${count || meal ? '' : 'disabled'} aria-label="${count ? `查看${group.name} ${count} 项记录` : `记录${group.name}`}"><span class="meal-symbol ${key}" aria-hidden="true"></span><span class="meal-title"><strong>${group.name}</strong>${count ? `<small>${count} 项 · ${formatNumber(group.calories)} kcal</small>` : ''}</span></button>${meal ? `<button class="meal-record" data-add-meal="${meal}">记录 ${icon('chevron', 15)}</button>` : '<span class="meal-unclassified-note">待整理</span>'}</div>
+    ${count ? `<p class="meal-macros">${macro}</p>` : ''}
+    <p class="meal-preview">${preview}</p>
+    ${count ? `<div class="meal-log-list" hidden>${group.logs.map(foodLogRowHtml).join('')}</div>` : ''}
+  </section>`
+}
+
 async function renderFoodPage(): Promise<void> {
   const [logs, target] = await Promise.all([
     db.foodLogs.where('date').equals(foodDate).sortBy('createdAt'),
@@ -509,20 +548,25 @@ async function renderFoodPage(): Promise<void> {
   })
   const calorieTarget = target?.calories
   const calorieAmount = calorieTarget === undefined ? `${formatNumber(totals.calories)} kcal` : `${formatNumber(totals.calories)} / ${formatNumber(calorieTarget)} kcal`
+  const groups = groupFoodLogs(logs)
   view.innerHTML = `
-    <section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>记录日期</span><input id="food-date" type="date" value="${foodDate}" aria-label="饮食记录日期"></label><div class="context-actions"><button class="text-btn" id="use-diet-template">使用模板</button><button class="text-btn" id="food-library">食物库 ${icon('chevron', 16)}</button></div></section>
-    <section class="nutrition-hero" data-food-date="${foodDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" id="edit-nutrition-target">${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="calorie-gauge" data-progress-key="calories" data-actual="${totals.calories}" ${calorieTarget === undefined ? '' : `data-goal="${calorieTarget}"`} aria-label="热量 ${calorieAmount} ${goalStatusText(totals.calories, calorieTarget, 'kcal')}">${ringSvgHtml(totals.calories, calorieTarget, 'large', previous.get('calories'))}<div class="calorie-gauge-center"><strong data-count-from="${previous.get('calories')?.actual ?? 0}" data-count-to="${totals.calories}">${formatNumber(previous.get('calories')?.actual ?? 0)}</strong><small>kcal</small></div></div><div class="calorie-gauge-caption">${calorieTarget === undefined ? '' : `<strong>${formatNumber(totals.calories)} / ${formatNumber(calorieTarget)} kcal</strong>`}<span class="${getGoalProgress(totals.calories, calorieTarget).state === 'above' ? 'metric-excess' : ''}">${goalStatusText(totals.calories, calorieTarget, 'kcal')}</span></div><div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div></section>
-    <section class="section-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '还没有记录'}</span></div><div class="section-actions">${logs.length ? '<button class="text-btn" id="save-day-diet-template">保存为模板</button>' : ''}<button class="icon-btn add-button" id="add-food-log" aria-label="添加食物">${icon('plus')}</button></div></section>
-    <div class="food-list">${logs.length ? logs.map((log) => `<article class="food-row"><button class="food-row-main" data-edit-log="${log.id}" aria-label="编辑 ${esc(log.foodName)}"><span><strong>${esc(log.foodName)}</strong><small>${log.brand ? `${esc(log.brand)} · ` : ''}${formatNumber(log.grams)} g</small></span><span class="food-kcal"><strong>${formatNumber(log.totalCalories)} <small>kcal</small></strong></span></button><details class="row-menu"><summary aria-label="${esc(log.foodName)}更多操作">···</summary><div><button data-delete-log="${log.id}">删除记录</button></div></details></article>`).join('') : `<div class="empty minimal"><div class="empty-icon">${icon('utensils', 25)}</div><h3>今天还没有记录饮食</h3><p>添加第一份食物，营养汇总会自动更新。</p><button class="primary" id="empty-add-food">${icon('plus', 18)} 添加第一份食物</button></div>`}</div>`
+    <div class="food-date-switch" aria-label="饮食记录日期切换"><button data-food-day="-1" aria-label="前一天">‹</button><button data-food-today aria-label="返回今天">今天</button><button data-food-day="1" aria-label="后一天">›</button></div>
+    <section class="nutrition-hero food-nutrition-hero" data-food-date="${foodDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" id="edit-nutrition-target">${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="food-calorie-row"><div class="calorie-gauge" data-progress-key="calories" data-actual="${totals.calories}" ${calorieTarget === undefined ? '' : `data-goal="${calorieTarget}"`} aria-label="热量 ${calorieAmount} ${goalStatusText(totals.calories, calorieTarget, 'kcal')}">${ringSvgHtml(totals.calories, calorieTarget, 'large', previous.get('calories'))}<div class="calorie-gauge-center"><strong data-count-from="${previous.get('calories')?.actual ?? 0}" data-count-to="${totals.calories}">${formatNumber(previous.get('calories')?.actual ?? 0)}</strong><small>kcal</small></div></div><div class="calorie-gauge-caption"><span>当日摄入</span>${calorieTarget === undefined ? '<strong>按自己的节奏记录</strong>' : `<strong>目标 ${formatNumber(calorieTarget)} kcal</strong>`}<span class="${getGoalProgress(totals.calories, calorieTarget).state === 'above' ? 'metric-excess' : ''}">${goalStatusText(totals.calories, calorieTarget, 'kcal')}</span></div></div><div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div></section>
+    <section class="food-meals-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '按餐次记录，更清楚'}</span></div></section>
+    <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday)).join('')}</div>`
   animateNutritionRings(view)
   animateNutritionNumber(view)
-  view.querySelector<HTMLInputElement>('#food-date')?.addEventListener('change', (event) => { foodDate = (event.target as HTMLInputElement).value; void render() })
-  view.querySelector('#food-library')?.addEventListener('click', () => void showFoodLibrary())
-  view.querySelector('#use-diet-template')?.addEventListener('click', () => void showDietTemplatePicker())
+  app.querySelector<HTMLInputElement>('#food-date')?.addEventListener('change', (event) => { const date = (event.target as HTMLInputElement).value; if (date) { foodDate = date; void render().catch(fail) } })
+  app.querySelector('#food-library')?.addEventListener('click', () => void showFoodLibrary())
+  app.querySelector('#use-diet-template')?.addEventListener('click', () => { app.querySelector<HTMLDetailsElement>('.food-tools-menu')!.open = false; void showDietTemplatePicker() })
   view.querySelector('#edit-nutrition-target')?.addEventListener('click', () => showNutritionTargetForm(foodDate, target))
-  view.querySelector('#save-day-diet-template')?.addEventListener('click', () => void saveDayAsDietTemplate(logs))
-  view.querySelector('#add-food-log')?.addEventListener('click', () => void showAddFoodLog())
-  view.querySelector('#empty-add-food')?.addEventListener('click', () => void showAddFoodLog())
+  const saveTemplate = app.querySelector<HTMLButtonElement>('#save-day-diet-template')
+  if (saveTemplate) saveTemplate.hidden = !logs.length
+  saveTemplate?.addEventListener('click', () => { app.querySelector<HTMLDetailsElement>('.food-tools-menu')!.open = false; void saveDayAsDietTemplate(logs) })
+  view.querySelectorAll<HTMLButtonElement>('[data-food-day]').forEach((button) => button.addEventListener('click', () => { foodDate = shiftLocalDate(foodDate, Number(button.dataset.foodDay)); void render().catch(fail) }))
+  view.querySelector('[data-food-today]')?.addEventListener('click', () => { foodDate = getLocalDateString(); void render().catch(fail) })
+  view.querySelectorAll<HTMLButtonElement>('[data-add-meal]').forEach((button) => button.addEventListener('click', () => { const meal = button.dataset.addMeal; if (isMealType(meal)) void showAddFoodLog(meal) }))
+  view.querySelectorAll<HTMLButtonElement>('[data-toggle-meal]').forEach((button) => button.addEventListener('click', () => { const list = button.closest('.food-meal')?.querySelector<HTMLElement>('.meal-log-list'); if (!list) return; list.hidden = !list.hidden; button.setAttribute('aria-expanded', String(!list.hidden)) }))
   view.querySelectorAll<HTMLButtonElement>('[data-delete-log]').forEach((button) => button.addEventListener('click', async () => {
     button.closest('details')?.removeAttribute('open')
     if (!await confirmAction('删除饮食记录？', '删除后无法撤销，但不会影响食物库。')) return
@@ -531,9 +575,9 @@ async function renderFoodPage(): Promise<void> {
   view.querySelectorAll<HTMLButtonElement>('[data-edit-log]').forEach((button) => button.addEventListener('click', async () => {
     const log = await db.foodLogs.get(button.dataset.editLog!)
     if (!log) return
-    const dialog = openModal('编辑克数', `<form id="edit-log-form" class="form"><label>实际重量<input name="grams" type="number" inputmode="decimal" min="0.1" step="0.1" value="${log.grams}" required><span>g</span></label><button class="primary" type="submit">保存</button></form>`)
+    const dialog = openModal('编辑饮食记录', `<form id="edit-log-form" class="form"><label>实际重量<input name="grams" type="number" inputmode="decimal" min="0.1" step="0.1" value="${log.grams}" required><span>g</span></label><label>餐次<select name="meal"><option value="">未分类</option>${mealTypes.map((meal) => `<option value="${meal}" ${log.meal === meal ? 'selected' : ''}>${mealNames[meal]}</option>`).join('')}</select></label><button class="primary" type="submit">保存</button></form>`)
     dialog.querySelector<HTMLFormElement>('#edit-log-form')?.addEventListener('submit', async (event) => {
-      event.preventDefault(); try { await updateFoodLogGrams(log.id, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'grams')); dialog.close(); toast('已保存'); await renderFoodPage() } catch (error) { fail(error) }
+      event.preventDefault(); try { const data = new FormData(event.currentTarget as HTMLFormElement); const meal = valueOf(data, 'meal'); await updateFoodLogDetails(log.id, valueOf(data, 'grams'), isMealType(meal) ? meal : undefined); dialog.close(); toast('已保存'); await renderFoodPage() } catch (error) { fail(error) }
     })
   }))
 }
@@ -568,9 +612,9 @@ function showNutritionTargetForm(date: string, target?: NutritionTarget): void {
   })
 }
 
-async function showAddFoodLog(): Promise<void> {
+async function showAddFoodLog(meal: MealType): Promise<void> {
   const foods = await db.foods.orderBy('name').toArray()
-  const dialog = openModal('添加食物', foods.length ? `<div class="form"><label class="search-field"><span class="sr-only">搜索食物</span>${icon('search', 19)}<input id="food-search" type="search" placeholder="搜索食物或品牌" autocomplete="off"></label><div id="food-results" class="picker-list"></div><button class="sheet-link" id="create-food-from-picker">${icon('plus', 18)} 新建食物</button></div>` : `<div class="empty compact minimal"><div class="empty-icon">${icon('archive', 24)}</div><h3>食物库还是空的</h3><p>先创建一种食物。</p><button class="primary" id="create-first-food">${icon('plus', 18)} 新建食物</button></div>`, true)
+  const dialog = openModal(`记录${mealNames[meal]}`, foods.length ? `<div class="form"><label class="search-field"><span class="sr-only">搜索食物</span>${icon('search', 19)}<input id="food-search" type="search" placeholder="搜索食物或品牌" autocomplete="off"></label><div id="food-results" class="picker-list"></div><button class="sheet-link" id="create-food-from-picker">${icon('plus', 18)} 新建食物</button></div>` : `<div class="empty compact minimal"><div class="empty-icon">${icon('archive', 24)}</div><h3>食物库还是空的</h3><p>先创建一种食物。</p><button class="primary" id="create-first-food">${icon('plus', 18)} 新建食物</button></div>`, true)
   if (!foods.length) {
     dialog.querySelector('#create-first-food')?.addEventListener('click', () => { dialog.close(); void showFoodForm() })
     return
@@ -583,7 +627,7 @@ async function showAddFoodLog(): Promise<void> {
     results.innerHTML = matches.map((food) => `<button class="picker-item" data-food="${food.id}"><span><strong>${esc(food.name)}</strong>${food.brand ? `<small>${esc(food.brand)}</small>` : ''}</span><em>${formatNumber(food.calories)} kcal / ${formatNumber(food.referenceGrams)}g</em></button>`).join('') || '<p class="muted">没有匹配的食物</p>'
     results.querySelectorAll<HTMLButtonElement>('[data-food]').forEach((button) => button.addEventListener('click', () => {
       const food = foods.find((item) => item.id === button.dataset.food)!
-      dialog.querySelector('.modal-head h2')!.textContent = food.name
+      dialog.querySelector('.modal-head h2')!.textContent = `记录${mealNames[meal]} · ${food.name}`
       dialog.querySelector('.modal-body')!.innerHTML = `<form id="log-food-form" class="form quantity-form"><div class="selected-food"><span>每 ${formatNumber(food.referenceGrams)}g</span><strong>${formatNumber(food.calories)} kcal</strong></div><label class="quantity-label">吃了多少？<span class="quantity-input"><input name="grams" id="grams" type="number" inputmode="decimal" min="0.1" step="0.1" placeholder="230" required autofocus><b>g</b></span></label><div class="preview-number"><span>预计热量</span><strong id="kcal-preview">— kcal</strong></div><button class="primary" type="submit">添加</button></form>`
       const input = dialog.querySelector<HTMLInputElement>('#grams')!
       input.addEventListener('input', () => {
@@ -591,7 +635,7 @@ async function showAddFoodLog(): Promise<void> {
         dialog.querySelector('#kcal-preview')!.textContent = Number.isFinite(grams) && grams > 0 ? `${formatNumber(calculateNutrition(food, grams).calories)} kcal` : '— kcal'
       })
       dialog.querySelector<HTMLFormElement>('#log-food-form')?.addEventListener('submit', async (event) => {
-        event.preventDefault(); try { await logFood(food, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'grams'), foodDate); dialog.close(); toast('已保存'); await renderFoodPage() } catch (error) { fail(error) }
+        event.preventDefault(); try { await logFood(food, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'grams'), foodDate, meal); dialog.close(); toast('已保存'); await renderFoodPage() } catch (error) { fail(error) }
       })
     }))
   }
