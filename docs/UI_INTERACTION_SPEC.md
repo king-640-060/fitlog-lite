@@ -22,6 +22,12 @@ Do not use human training illustrations, anatomical diagrams, food photography, 
 - Today's screen uses small rings; the Food screen may use a prominent calorie ring and three smaller nutrient rings. All ring values must be readable as text and exposed to assistive technology.
 - Animate first appearance once: main ring about 500–650 ms, small rings about 400–550 ms. On data changes, progress and numbers may move over 250–350 ms without flashing or rebuilding the whole view. A first crossing of 100% may receive a single subtle 1.02 scale pulse.
 
+## Today dashboard hierarchy
+
+- Today's Food card is the primary dashboard card: a clear left-ring/right-number structure and compact, aligned nutrient tiles. An unset goal remains a gentle text prompt.
+- Workout and Weight are secondary cards. Keep the Workout start action solid green but compact, and Weight entry soft green; neither empty state should reserve chart space or imply recorded data.
+- Kegel is a shorter tertiary habit card with a lighter action. Preserve all existing routes and business meaning while varying visual weight.
+
 ## Motion and performance
 
 - Buttons press in about 100–140 ms; state changes take 150–220 ms; sheets take 220–280 ms; number counts take 300–500 ms. Keep motion finite, lightweight, and secondary to responsiveness.
