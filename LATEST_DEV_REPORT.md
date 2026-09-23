@@ -1,143 +1,85 @@
 # FitLog Lite — Latest Development Report
 
-This document records the latest verified production application state. It is not a development history log.
+This is the latest verified production application snapshot, not a development history. Sync `main` and inspect current code before trusting any recorded SHA. A later documentation-only commit can advance `main` without changing the application baseline.
 
-Always sync Git before starting work. Documentation-only commits may be newer than the application-changing baseline recorded here without changing application behavior.
-
-## Current Git State
+## Current Git and Production State
 
 ```text
-Current branch: main
-START_COMMIT: dd73a132f169b83f428b326f880ddc9ad3567997
-END_COMMIT: 85af24ec9dac57e29095c459175eedcab51313ff
-END_COMMIT message: feat: refine mobile UI and kegel history
-Current application baseline commit: 85af24ec9dac57e29095c459175eedcab51313ff
-Working tree at application verification: clean
-Remote main at application verification: synchronized
-Next START_COMMIT: sync main and record its current HEAD
-```
-
-## Current Project State
-
-```text
-Database version: Dexie V3
-Backup schema version: V3
-Restore compatibility: V1 / V2 / V3
-Stores: 9
-Typecheck status: PASS
-Tests: 73 passed / 4 files
-Build status: PASS
-Production commit: 85af24ec9dac57e29095c459175eedcab51313ff
-GitHub Actions status: completed / success
+Branch: main
+START_COMMIT: 4aec0c45813e193d2894f7cfb4c8d273817a98e9
+END_COMMIT / current application baseline: 5e3aa9ec158934e79a581f3e917525158946a68c
+END_COMMIT message: feat: unify record-day semantics and refine activity UI
 Production URL: https://king-640-060.github.io/fitlog-lite/
+GitHub Actions: https://github.com/king-640-060/fitlog-lite/actions/runs/35832309394
+Workflow conclusion: completed / success
 ```
 
-Current stores:
+## Data and Compatibility
 
 ```text
-foods
-foodLogs
-exercises
-workouts
-weights
-workoutTemplates
-dietTemplates
-nutritionTargets
-pelvicFloorSessions
+Database: Dexie V3, 9 stores; no schema change this round
+Backup schema: V3; unchanged
+Restore compatibility: V1 / V2 / V3; unchanged
+Local business date: device-local YYYY-MM-DD; unchanged
 ```
 
-## Latest UI and Stability Round
+Stores remain `foods`, `foodLogs`, `exercises`, `workouts`, `weights`, `workoutTemplates`, `dietTemplates`, `nutritionTargets`, and `pelvicFloorSessions`. FoodLog snapshots, Workout historical snapshots, and Template deep-clone semantics were not changed.
 
-- Removed the user-facing strength/RPE column and inputs from Workout and Workout Template editors while retaining existing persisted fields for historical and Backup compatibility.
-- Rebalanced Workout set rows around set number, weight, reps, note, and a visually subdued delete control.
-- Changed all user-facing Pelvic Floor training names to 凯格尔训练 without renaming internal stores, entities, types, services, or Backup fields.
-- Added unique-ID-based deletion for individual Kegel history records with a subdued more menu and destructive confirmation.
-- Simplified the global VisualViewport strategy: removed competing viewport-scroll listeners and programmatic focus scrolling; VisualViewport now reports keyboard state/overlap while stable scroll containers and native focus behavior keep inputs available.
-- Refined Today, Food, Workout Detail, Progress, More, Bottom Navigation, empty states, and narrow-screen spacing for iPhone viewports.
-- Food macros now use stacked label/value/progress layout, calorie units no longer compete with the target action, and FoodLog deletion is moved into a more menu.
-- A single weight record now uses a compact summary instead of reserving an empty chart; Trend shows a clear second-record prompt until two points exist.
-- Bottom Navigation uses a 57px navigation body at the tested browser viewport with 48px tab targets; Safe Area remains a separate bottom inset.
-- No database schema, entity schema, Backup schema, Restore compatibility, local-date rule, FoodLog snapshot, Workout history, or Template deep-clone semantics changed.
+## Latest Round
 
-## Implemented Major Features
+- Unified “有记录的一天”: at least one FoodLog, Workout, Kegel/PelvicFloorSession, or WeightLog. A NutritionTarget alone is a configuration, not a recorded day. A zero-calorie FoodLog still counts. Progress Overview, Calendar markers, month statistics, and date detail use the same runtime semantics.
+- Added “清空当天记录” in Calendar date detail with destructive confirmation. One Dexie read-write transaction deletes the selected business date from `foodLogs`, `workouts`, `pelvicFloorSessions`, `weights`, and `nutritionTargets`; unrelated dates and libraries/templates remain untouched. The UI re-queries IndexedDB after success.
+- Food now has a large calorie ring and three small nutrient rings. Above-goal values keep the main ring full and use a capped, thin coral outer ring plus exact, neutral text. Today uses compact rings and a Workout completion ratio based only on existing Workout records.
+- Added an in-memory circular Workout rest timer with pause, resume, +30 seconds, and skip; no persisted set-completion field or invented completion state. Finishing a Workout shows restrained completion feedback.
+- Kegel contraction/relaxation ring and inner-area motion derive from the existing timer state, freeze on pause, and resume from that state. The current timer model has contraction and relaxation phases, not a separate hold phase. Fixed the case where the timer finishes while an end-confirmation dialog is open.
+- Progress statistics count up once; the existing Chart.js trend animates on first display and range changes. Fewer than two weight records still show a truthful empty state.
+- Added `docs/UI_INTERACTION_SPEC.md` as the required UI/interaction reference, with an entry rule in `AGENTS.md`. Reduced motion, Chinese UI, iPhone Safe Area, VisualViewport, keyboard, Bottom Sheet, and accessibility rules are documented.
 
-- Food library and FoodLog nutrition snapshots.
-- Food CSV/JSON import.
-- Diet Templates.
-- Daily Nutrition Targets for calories, protein, carbs, and fat.
-- Strength Workouts, history, editing, and autosave.
-- Workout Templates.
-- Exercise starter seed only on first database population.
-- Kegel timed sessions, pause/resume, history, per-record deletion, audio cues, and optional Wake Lock.
-- Weight logging and Chart.js trends.
-- Calendar nutrition, strength, Kegel, and weight aggregation.
-- Backup V3 export and V1/V2/V3 Restore.
-- Transactional restore with validation before clear and rollback on failure.
-- iPhone input sizing, VisualViewport keyboard state, stable Bottom Sheet scrolling, and Safe Area layout.
-- Installable standalone PWA with Workbox offline application shell.
-
-## Verification Snapshot
-
-Automated Verification:
+## Automated Verification
 
 ```text
 npm run typecheck: PASS
-npm test: PASS — 73 tests / 4 files
+npm test: PASS — 85 tests / 7 files
 npm run build: PASS
-PWA generateSW: PASS — 17 precache entries / 498.49 KiB
+PWA generateSW: PASS — 17 precache entries / 511.82 KiB
 git diff --check: PASS
 ```
 
-Production Verification:
+New tests cover target-only and zero-calorie record-day semantics, each other record type, five-store date clearing, preservation of other dates, transaction rollback, reaggregation, goal-ring boundaries, rest-timer state, and Kegel phase progress.
+
+## Production Verification
 
 ```text
-GitHub Actions run: https://github.com/king-640-060/fitlog-lite/actions/runs/35713687055
-Workflow status: completed
-Workflow conclusion: success
-Production HTTP: 200
-Published application bundle: PASS — contains 凯格尔训练记录, 删除记录, deletion confirmation, and the single-weight trend prompt
-Production manifest theme/background: #f7f8f4 / #f7f8f4
-Production service worker HTTP: 200
+GitHub Actions run 35832309394: completed / success
+Production HTML: HTTP 200
+Production main JS bundle: HTTP 200; contains 清空当天记录, 高于目标, 休息结束, 凯格尔训练已保存, 本月概览
+Production CSS: referenced by the published HTML
+Production Manifest: HTTP 200
+Production Service Worker: HTTP 200
 ```
 
-Local Browser Visual Verification:
+The Codex in-app browser timed out loading the Production URL, so an interactive Production browser session was **not** verified. The successful workflow and HTTP/published-bundle checks above must not be interpreted as real-device verification.
 
-```text
-Application boot: PASS
-Today, Food, Workout detail, Progress overview/trend, More, and Kegel history: PASS
-375×812, 390×844, 393×852, and 430×932 responsive width checks: PASS
-No horizontal overflow in the tested Today, Food, Workout detail, Progress, or More views
-Bottom Navigation body: 57px; tab target: 48px at tested emulated viewports
-Workout weight/reps inputs: PASS — strength/RPE UI absent
-Food and Kegel more menus: PASS
-Browser console errors: none observed
-```
+## Local Browser Visual Verification
 
-## Known Confirmed Issues
+- Local Vite app at a 390 × 844 viewport: Today, Food, Workout, Progress, Calendar, More, Workout rest timer, Kegel phase/pause controls, and Calendar clear confirmation were inspected.
+- Food with an independently created local test record showed 2350 / 2200 kcal, the capped coral excess ring, neutral “高于目标 150 kcal”, and nutrient excess values. The test origin is separate from the existing local app data. Calendar clear confirmation was inspected but not used to delete that browser's records.
+- Today, Food, Workout, Progress, and More showed no horizontal overflow at 390 px; Today was additionally checked at 375, 393, and 430 px.
+- These are emulated browser checks, not a real iPhone. An earlier local Kegel confirmation race was detected in console logs and fixed before the published commit; automated checks passed afterward.
 
-No confirmed code, test, build, deployment, or emulated-viewport defects were present at the latest verification.
+## Confirmed Issues and Manual Device Verification
 
-The items below are verification gaps, not confirmed defects.
+No remaining code, test, build, or deployment defect was confirmed. The Production browser timeout is a verification limitation, not evidence of a product defect.
 
-## Manual Device Verification Pending
+Still pending on an actual iPhone:
 
-- Real iPhone Safari keyboard checks across Food creation/editing, Workout weight/reps/notes, Weight entry, Exercise entry, and template-name inputs.
-- Verify Bottom Sheet header stability and minimal native focus scrolling while switching fields on real iPhone hardware.
-- Add to Home Screen standalone launch, icon, Bottom Navigation Safe Area, and Home Indicator spacing.
-- Kegel record deletion end-to-end on a disposable real-device record, including Today, Progress, and Calendar refresh.
-- Kegel timer foreground/background and lock-screen behavior.
-- Audio cues on real hardware and under iOS audio/silent-mode conditions.
-- Wake Lock availability and graceful fallback on the target iPhone/iOS version.
-- Offline cold launch, local write operations, and JSON export.
+- Food unset, below, exact, above, and far-above goals; add/delete transitions; keyboard and horizontal fit.
+- Workout weight/reps entry, rest timer, and completion feedback.
+- Kegel contract/relax transitions, pause/resume, foreground/background, audio, and optional Wake Lock. The model does not support a distinct hold phase.
+- Progress 30/90/all trend transitions with at least two real weight records.
+- Calendar clear confirmation and post-clear refresh on disposable device data.
+- Bottom Sheet keyboard stability, Bottom Navigation Safe Area, standalone PWA launch, and offline use.
 
 ## ChatGPT Baseline
 
-FitLog Lite is a production, local-first iPhone PWA on Dexie V3 with Backup V3 and V1/V2/V3 Restore compatibility. The current production application baseline is `85af24e`. Round 2 removes strength/RPE from user-facing Workout and Template inputs without deleting legacy fields, standardizes the visible name 凯格尔训练, adds unique-ID Kegel history deletion with confirmation, simplifies global VisualViewport handling to avoid competing focus scrolling, and tightens the five-tab Chinese UI for 375–430px iPhone viewports. Start the next task by reading `AGENTS.md`, syncing `main`, recording the actual HEAD, and then using this report as the verified snapshot.
-
-## Context Rules
-
-- Read `AGENTS.md` before using this report.
-- Current code overrides this report if they conflict.
-- Read `docs/CHAT_HANDOFF.md` only for deeper historical and architectural context.
-- Do not recreate an implemented feature without inspecting the current implementation.
-- The next task must sync `main` and record its current HEAD as `START_COMMIT`.
+FitLog Lite is a production local-first iPhone PWA using Vanilla TypeScript, Dexie V3, Backup V3, and V1/V2/V3 Restore. The current application baseline is `5e3aa9e`. UI now includes large/small nutrition rings with capped neutral over-goal feedback, compact Today status, ephemeral Workout rest and completion feedback, Kegel timer-synchronized phase motion, and restrained Progress animation. Calendar can atomically clear one business date. A recorded day requires actual FoodLog, Workout, Kegel, or Weight data; NutritionTarget alone does not count. For future UI work, read `docs/UI_INTERACTION_SPEC.md` after `AGENTS.md` and this report. Always sync `main` and record a fresh START_COMMIT.
