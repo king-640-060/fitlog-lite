@@ -6,7 +6,7 @@ import { validateBackup } from '../src/services/backupService'
 import { buildImportPreview, parseFoodCsv } from '../src/services/importService'
 import { upsertWeight } from '../src/services/weightService'
 import { getMonthGridDays, loadMonthSummaries } from '../src/ui/calendarPage'
-import { getLocalDateString } from '../src/utils/date'
+import { getFoodQuickDates, getLocalDateString, shiftLocalDate } from '../src/utils/date'
 import { calculateNutrition, createFoodLogSnapshot } from '../src/utils/nutrition'
 
 const databases: FitLogDatabase[] = []
@@ -27,6 +27,13 @@ describe('日期', () => {
   it('通过本地年月日生成业务日期，不经过 UTC', () => {
     const localMidnight = new Date(2026, 8, 16, 0, 5)
     expect(getLocalDateString(localMidnight)).toBe('2026-09-16')
+  })
+
+  it('昨天、今天、明天固定相对于设备本地今天，跨月和跨年正确', () => {
+    expect(getFoodQuickDates(new Date(2026, 8, 1, 0, 5))).toEqual({ yesterday: '2026-08-31', today: '2026-09-01', tomorrow: '2026-09-02' })
+    expect(getFoodQuickDates(new Date(2026, 11, 31, 23, 55))).toEqual({ yesterday: '2026-12-30', today: '2026-12-31', tomorrow: '2027-01-01' })
+    expect(getFoodQuickDates(new Date(2027, 0, 1, 0, 5))).toEqual({ yesterday: '2026-12-31', today: '2027-01-01', tomorrow: '2027-01-02' })
+    expect(shiftLocalDate('2024-03-01', -1)).toBe('2024-02-29')
   })
 
   it('生成周一开始的固定 6 周月历网格', () => {

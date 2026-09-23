@@ -30,7 +30,7 @@ Do not use human training illustrations, anatomical diagrams, food photography, 
 
 ## Food day and meal hierarchy
 
-- The Food page uses a compact title/date/day-switch header, followed immediately by the calorie and three-nutrient summary. Food library and a small tools menu remain reachable without crowding the first screen.
+- The Food page uses a compact title and three fixed, local-today-relative date choices: yesterday, today, and tomorrow, each showing month/day. An arbitrary date selected from the tools menu keeps its real date visible near the control, with none of the three choices falsely selected. The calorie and three-nutrient summary follows immediately. Food library and a small tools menu remain reachable without crowding the first screen.
 - Breakfast, lunch, dinner, and snack are the four persistent meal choices. Entry from a meal writes that exact choice. Historical FoodLogs without `meal` stay unclassified; never infer a meal from timestamps or the food name.
 - Show “未分类” only when records actually lack a meal. Editing a record may explicitly assign or clear its meal. Recompute each meal's nutrients from its FoodLog snapshots, not stored subtotals.
 - The four meal sections use light separators, compact empty guidance, and an expandable record list. Preserve editing and deletion for every FoodLog, including unclassified and long lists.
