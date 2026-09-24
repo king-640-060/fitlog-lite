@@ -6,61 +6,61 @@ This is the latest verified production application snapshot. Sync `main` and ins
 
 ```text
 Branch: main
-START_COMMIT: 83136d5a84e69fe37105e959717c01beb87cd2b3
-Application commit: 9fbe5626a9dc715e3ebfaf1976b43f0812036151
-Application commit message: Add multi-phase pelvic floor training
+START_COMMIT: 12c064269288d53088f10b24bb339d1feb7c9166
+Application commit: d47bc8cbc129633efb182cf20d2cf5f40390d511
+Application commit message: Add cardio training and calendar indicators
 Production URL: https://king-640-060.github.io/fitlog-lite/
-GitHub Actions run: 35950383610
+GitHub Actions run: 35952312210
 Workflow conclusion: completed / success
 ```
 
-## Latest Round — Pelvic Floor Training
+## Latest Round — Training Categories and Cardio
 
-Pelvic floor training was upgraded from fixed contract/relax cycles to a data-driven multi-phase routine engine. The first presets are 慢速耐力, 快速收缩, and 混合训练. The engine tracks exercise, set, repetition, phase, rest kind, and absolute deadline. Delayed callbacks advance across as many boundaries as elapsed time requires. Pause retains the exact remaining milliseconds and resume establishes a new deadline.
+The Training page now presents two primary categories: 无氧训练 for existing strength Workouts and 有氧训练 for stair-machine records. Existing Workout, Exercise, set, history, template, autosave, and rest timer semantics are unchanged. A CardioSession independently stores the selected local business date, duration in minutes, a unitless speed number, an optional note, and timestamps. The Training page supports create, edit, delete with confirmation, a compact same-day list, and simple all-date history.
 
-The immersive timer now uses an SVG progress ring and a `requestAnimationFrame` visual loop. The loop reads timer state and `Date.now()`; it does not advance training time. Phase, remaining seconds, exercise, and repetition text update only when values change. Reduced Motion removes the breathing scale while keeping progress and text. The timer DOM stays in place through phase changes.
-
-New sessions optionally save a routine snapshot and retain the existing `phases`, `repetitions`, and `completedRepetitions` summary fields. Historical contract/relax-only sessions remain valid and appear as “基础训练”; no historical routine is inferred. Workout-day and calendar counts remain derived from saved sessions. No unrelated data store or database name changed.
+Today shows anaerobic and cardio separately. Calendar aggregation includes cardio count and minutes. Month cells show recorded food calories and small strength/cardio category markers with restrained colors; speed and duration stay in the day detail and cardio history. The day detail lists food, anaerobic training, cardio, pelvic floor training, and weight separately. Clearing a day includes cardio in the same transaction and in the confirmation text. Progress recent activity was not extended to cardio in this round; it remains derived from its existing sources, with no new Activity store.
 
 ## Data and Compatibility
 
 ```text
-Database: Dexie V4, 9 stores; no migration or index change
-Backup export schema: V3
-Restore compatibility: V1 / V2 / V3
+Database: Dexie V5, 10 stores
+Migration: explicit V4 → V5; adds cardioSessions indexed by id, date, createdAt; no historical backfill or change to the nine existing stores
+Database name: fitlog-lite-db; unchanged
+Backup export schema: V4, includes cardioSessions
+Restore compatibility: V1 / V2 / V3 / V4; older backups normalize missing cardioSessions to []
 Local business date: device-local YYYY-MM-DD; unchanged
 ```
 
-V3 backup validation accepts the expanded phase types and validates optional routine snapshots before Restore clears any store. Legacy V3 session records without a routine still export and restore unchanged.
+V4 backup validation checks cardio IDs, dates, positive duration and speed, optional note, and timestamps before any store is cleared. Restore remains one transaction across all ten stores. Legacy Workout and pelvic floor history are not reclassified or inferred.
 
 ## Automated Verification
 
 ```text
 npm run typecheck: PASS
-npm test: PASS — 112 tests / 9 files
+npm test: PASS — 128 tests / 10 files
 npm run build: PASS
-PWA generateSW: PASS — 17 precache entries / 533.53 KiB
+PWA generateSW: PASS — 17 precache entries / 541.20 KiB
 git diff --check: PASS
 ```
 
-New regression coverage checks phase order, repetition and set transitions, exercise rest and progression, deadline catch-up, completion once, exact pause/resume progress, independence from animation frame counts, legacy V3 backup round-trip, new routine snapshot round-trip, and invalid nested phase rejection before data clearing.
+New coverage checks cardio create/read/update/delete, invalid values and dates, V4 → V5 preservation of all nine prior stores, Food + Workout + Cardio aggregation, cardio-only recorded days, all-date clearing and rollback, Backup V4 round-trip, Restore V1/V2/V3/V4, and validation before clearing.
 
 ## Production Verification
 
 ```text
-GitHub Actions run 35950383610: completed / success for 9fbe5626a9dc715e3ebfaf1976b43f0812036151
+GitHub Actions run 35952312210: completed / success for d47bc8cbc129633efb182cf20d2cf5f40390d511
 Production HTML: HTTP 200
-Production HTML-referenced JavaScript: HTTP 200, contains the three mode names and SVG timer implementation
+Production HTML-referenced JavaScript: HTTP 200, contains cardioSessions and calendar-calories implementation
 Production HTML-referenced CSS: HTTP 200, hash matches local build
-Production browser: three modes visible; slow routine starts at 收紧; no page errors or horizontal overflow at 390 × 844
+Production browser at 390 × 844: both training categories visible; a stair-machine record saves and displays duration/speed; no page errors or horizontal overflow
 ```
 
-Local browser simulation also checked 375 × 812, 390 × 844, and 430 × 932. All three modes started and automatically completed with exactly one saved session each. Slow phase labels advanced 收紧 → 保持 → 释放 → 放松. Quick phase labels advanced 收紧 → 放松. Mixed mode progressed through action rest to the second exercise. The ring and remaining seconds froze on pause, resumed from the same position, and the same timer DOM node remained across phase changes. Reduced Motion retained progress and completion. Manual finish confirmation saved one session. These are browser simulations, not real-device tests.
+Local browser simulation checked 375 × 812, 390 × 844, and 430 × 932. Stair-machine create/edit/delete and multiple-record history worked. Today showed both training categories. A date with Food, Workout, and Cardio showed calories plus strength/cardio markers in the month cell and full duration/speed in the day detail. No horizontal overflow or page errors were seen. The existing strength start control still opened its template/start sheet. These are browser simulations, not real-device tests.
 
 ## Confirmed Issues and Manual Device Verification
 
-No remaining code, test, build, or deployment defect was confirmed. **Manual Device Verification: Pending.** Real iPhone Safari, standalone PWA, Safe Area, lock-screen behavior, audio cues, and offline behavior still require device checks. The browser viewport checks above do not substitute for those checks.
+No remaining code, test, build, or deployment defect was confirmed. **Manual Device Verification: Pending.** Real iPhone Safari, standalone PWA, keyboard behavior, Safe Area, and offline checks still require device verification. Browser viewport checks do not substitute for those checks.
 
 ## ChatGPT Baseline
 
-FitLog Lite is a production local-first iPhone PWA using Vanilla TypeScript, Dexie V4, Backup V3, and V1/V2/V3 Restore. The current application baseline is `9fbe562`. Pelvic floor training has three built-in data-driven routines, a deadline-based multi-phase engine, an SVG ring rendered with RAF, exact pause/resume progress, and optional routine snapshots on new sessions. Historical contract/relax-only records remain valid and appear as 基础训练. Other features, stores, and data semantics are unchanged. Read `AGENTS.md`, this report, and `docs/UI_INTERACTION_SPEC.md` before further UI work; sync `main` and record a fresh START_COMMIT.
+FitLog Lite is a local-first iPhone PWA using Vanilla TypeScript, Dexie V5 with 10 stores, Backup V4, and V1/V2/V3/V4 Restore. The current application baseline is `d47bc8c`. Existing Workout remains strength/anaerobic training with unchanged history semantics. Stair-machine CardioSession is independent and records local date, duration, unitless speed, and optional note. Training and Today show anaerobic and cardio separately. Calendar month cells show compact food calories and category indicators; day detail shows cardio speed and duration. Pelvic floor training remains the deadline-based multi-phase implementation from the prior round. Read `AGENTS.md`, this report, and `docs/UI_INTERACTION_SPEC.md` before further UI work; sync `main` and record a fresh START_COMMIT.
