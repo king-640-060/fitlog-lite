@@ -473,28 +473,31 @@ fieldset { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--borde
 .calendar-weekdays, .calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
 .calendar-weekdays { padding: 0 1px 7px; }
 .calendar-weekdays span { color: var(--text-secondary); font-size: .68rem; font-weight: 650; text-align: center; }
-.calendar-grid { gap: 4px 2px; }
-.calendar-day { display: flex; min-width: 0; min-height: 68px; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 3px; overflow: hidden; padding: 5px 3px 4px; border: 1px solid transparent; border-radius: 12px; background: transparent; text-align: center; }
+.calendar-grid { gap: 3px 2px; }
+.calendar-day { display: flex; min-width: 0; height: 74px; flex-direction: column; align-items: center; justify-content: flex-start; gap: 2px; overflow: hidden; padding: 3px 0 2px; border: 1px solid transparent; border-radius: 12px; background: transparent; text-align: center; }
 .calendar-day.outside-month { opacity: .32; }
-.calendar-day.selected { border-color: color-mix(in srgb, var(--accent) 38%, transparent); background: var(--accent-soft); }
-.calendar-day-number { display: grid; width: 23px; height: 23px; margin: 0 auto; place-items: center; border-radius: 50%; font-size: .76rem; font-weight: 700; }
-.calendar-day.today .calendar-day-number { background: var(--accent); color: #fff; }
-.calendar-day-details { display: grid; min-width: 0; gap: 3px; }
-.calendar-calories { overflow: hidden; color: var(--accent-strong); font-size: .48rem; font-weight: 700; letter-spacing: -.03em; white-space: nowrap; }
-.calendar-nutrition-progress { position: relative; display: block; width: 100%; height: 3px; overflow: hidden; border-radius: 99px; background: var(--border); }
+.calendar-day-number { position: relative; display: grid; width: 36px; height: 36px; flex: 0 0 36px; place-items: center; border-radius: 50%; color: var(--text-primary); font-size: .82rem; font-weight: 700; }
+.calendar-day.selected .calendar-day-number { background: var(--accent); color: #fff; }
+.calendar-day.today:not(.selected) .calendar-day-number { color: var(--accent-strong); }
+.calendar-day.today .calendar-day-number::after { position: absolute; bottom: 3px; left: 50%; width: 4px; height: 4px; transform: translateX(-50%); border-radius: 50%; background: var(--accent); content: ''; }
+.calendar-day.today.selected .calendar-day-number::after { background: #fff; }
+.calendar-day-details { display: flex; min-width: 0; min-height: 25px; flex-direction: column; align-items: center; gap: 2px; }
+.calendar-calories { max-width: 100%; overflow: hidden; color: var(--accent-strong); font-size: .48rem; font-weight: 700; letter-spacing: -.03em; white-space: nowrap; }
+.calendar-nutrition-progress { position: relative; display: block; width: 75%; height: 3px; flex: 0 0 3px; overflow: hidden; border-radius: 99px; background: var(--border); }
 .calendar-nutrition-progress::after { position: absolute; inset: 0 auto 0 0; width: var(--progress); border-radius: inherit; background: var(--accent); content: ""; }
-.calendar-markers { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1px; }
-.calendar-marker { display: grid; width: 13px; height: 13px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--surface-soft); color: var(--text-secondary); font-size: .46rem; font-style: normal; font-weight: 800; line-height: 1; }
-.nutrition-marker { color: var(--accent-strong); }
-.workout-marker { background: #e7f0ee; color: #426d67; }
-.cardio-marker { background: #fbf2df; color: #946e2c; }
-.calendar-marker.workout-marker, .calendar-marker.cardio-marker { width: 17px; height: 14px; border-radius: 5px; font-size: .43rem; }
-.pelvic-marker { background: color-mix(in srgb, var(--info) 15%, transparent); color: var(--info); }
-.weight-marker { border: 1px solid color-mix(in srgb, var(--text-secondary) 28%, transparent); background: transparent; color: var(--text-secondary); }
-.calendar-legend { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px; color: var(--text-secondary); font-size: .7rem; }
-.calendar-legend span { display: flex; align-items: center; gap: 5px; }
-.calendar-legend i { display: grid; width: 14px; height: 14px; place-items: center; border-radius: 50%; font-size: .48rem; font-style: normal; font-weight: 800; }
-.calendar-legend .cardio-marker { width: 20px; border-radius: 5px; font-size: .45rem; }
+.calendar-markers { order: -1; display: flex; width: 100%; height: 10px; flex: 0 0 10px; align-items: center; justify-content: center; gap: 1px; white-space: nowrap; }
+.calendar-marker { display: grid; width: 7px; height: 10px; flex: 0 0 7px; place-items: center; color: var(--calendar-color); }
+.calendar-marker .icon { width: 8px; height: 8px; stroke-width: 2.3; }
+.calendar-marker-overflow { color: var(--text-secondary); font-size: .52rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.calendar-category-food { --calendar-color: var(--accent-strong); --calendar-bg: var(--accent-soft); }
+.calendar-category-strength { --calendar-color: #426d67; --calendar-bg: #e7f0ee; }
+.calendar-category-cardio { --calendar-color: #946e2c; --calendar-bg: #fbf2df; }
+.calendar-category-pelvic { --calendar-color: var(--info); --calendar-bg: #e9f0eb; }
+.calendar-category-weight { --calendar-color: #5f7480; --calendar-bg: #eaf0f2; }
+.calendar-legend { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 15px; color: var(--text-secondary); font-size: .7rem; }
+.calendar-legend-item { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.calendar-legend-icon { display: grid; width: 22px; height: 22px; flex: 0 0 22px; place-items: center; border-radius: 8px; background: var(--calendar-bg); color: var(--calendar-color); }
+.calendar-legend-icon .icon { width: 14px; height: 14px; stroke-width: 1.8; }
 .calendar-month-summary { display: grid; grid-template-columns: repeat(4, 1fr); overflow: hidden; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
 .calendar-month-summary > div { display: grid; gap: 4px; padding: 14px 8px; border-right: 1px solid var(--divider); text-align: center; }
 .calendar-month-summary > div:last-child { border-right: 0; }
@@ -725,8 +728,7 @@ body.keyboard-open .modal-body { scroll-padding-bottom: calc(28px + var(--keyboa
 }
 @media (max-width: 370px) {
   .app-frame { padding-inline: 14px; }
-  .calendar-day { min-height: 68px; padding-inline: 1px; }
-  .calendar-day-details small { font-size: .5rem; }
+  .calendar-calories { font-size: .46rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; }

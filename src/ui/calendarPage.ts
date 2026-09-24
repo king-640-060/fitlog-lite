@@ -2,6 +2,7 @@ import { db, type FitLogDatabase } from '../db/database'
 import type { NutritionTarget } from '../db/types'
 import { pelvicFloorSessionDurationSeconds } from '../services/pelvicFloorService'
 import { getLocalDateString } from '../utils/date'
+import { icon, type IconName } from './icons'
 
 export interface CalendarDaySummary {
   date: string
@@ -116,6 +117,36 @@ export function hasDayRecords(summary?: CalendarDaySummary): boolean {
   return Boolean(summary && (summary.foodLogCount > 0 || summary.workoutCount > 0 || summary.cardioCount > 0 || summary.pelvicFloorSessionCount > 0 || summary.weightKg !== undefined))
 }
 
+export const calendarCategories = ['food', 'strength', 'cardio', 'pelvic', 'weight'] as const
+export type CalendarCategory = typeof calendarCategories[number]
+export const calendarCategoryLabels: Record<CalendarCategory, string> = {
+  food: '饮食', strength: '力量训练', cardio: '有氧训练', pelvic: '凯格尔训练', weight: '体重',
+}
+export const calendarLegendLabels: Record<CalendarCategory, string> = {
+  food: '饮食', strength: '力量', cardio: '有氧', pelvic: '凯格尔', weight: '体重',
+}
+export const calendarCategoryIcons: Record<CalendarCategory, IconName> = {
+  food: 'utensils', strength: 'dumbbell', cardio: 'stairs', pelvic: 'leaf', weight: 'scale',
+}
+
+export function getCalendarRecordCategories(summary?: CalendarDaySummary): CalendarCategory[] {
+  if (!summary) return []
+  return calendarCategories.filter((category) => {
+    switch (category) {
+      case 'food': return summary.foodLogCount > 0
+      case 'strength': return summary.hasWorkout
+      case 'cardio': return summary.cardioCount > 0
+      case 'pelvic': return summary.pelvicFloorSessionCount > 0
+      case 'weight': return summary.weightKg !== undefined
+    }
+  })
+}
+
+export function getCalendarVisibleMarkers(summary?: CalendarDaySummary): { visible: CalendarCategory[]; hiddenCount: number } {
+  const categories = getCalendarRecordCategories(summary)
+  return { visible: categories.slice(0, 4), hiddenCount: Math.max(0, categories.length - 4) }
+}
+
 function formatCompactNumber(value: number): string {
   return new Intl.NumberFormat('zh-CN', { maximumFractionDigits: 1 }).format(value)
 }
@@ -126,9 +157,10 @@ function nutritionLabel(actual: number | undefined, target: number | undefined, 
   return `${formatCompactNumber(actual ?? 0)} / ${formatCompactNumber(target)} ${unit}`
 }
 
-export function getCalendarDayAccessibleLabel(date: string, summary?: CalendarDaySummary): string {
+export function getCalendarDayAccessibleLabel(date: string, summary?: CalendarDaySummary, state: { selected?: boolean; today?: boolean } = {}): string {
   const label = new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' }).format(new Date(`${date}T12:00:00`))
-  if (!summary) return `${label}，无记录`
+  const stateLabel = `${state.selected ? '，已选中' : ''}${state.today ? '，今天' : ''}`
+  if (!summary) return `${label}${stateLabel}，无记录`
   const target = summary.nutritionTarget
   const details = [
     nutritionLabel(summary.calories, target?.calories, '千卡'),
@@ -140,8 +172,11 @@ export function getCalendarDayAccessibleLabel(date: string, summary?: CalendarDa
     summary.pelvicFloorSessionCount ? `${summary.pelvicFloorSessionCount} 次凯格尔训练，${summary.pelvicFloorContractions} 次收缩` : undefined,
     summary.weightKg === undefined ? undefined : `体重 ${formatCompactNumber(summary.weightKg)} 千克`,
   ].filter(Boolean)
-  if (hasDayRecords(summary)) return `${label}，${details.join('，')}`
-  return `${label}，${details.length ? `${details.join('，')}，` : ''}无记录`
+  if (hasDayRecords(summary)) {
+    const categories = getCalendarRecordCategories(summary).map((category) => calendarCategoryLabels[category]).join('、')
+    return `${label}${stateLabel}，有${categories}记录，${details.join('，')}`
+  }
+  return `${label}${stateLabel}，${details.length ? `${details.join('，')}，` : ''}无记录`
 }
 
 function calorieProgress(summary: CalendarDaySummary): number | undefined {
@@ -177,7 +212,7 @@ export function renderMonthCalendar({ year, month, selectedDate, summaries, onDa
     button.className = ['calendar-day', gridDay.isCurrentMonth ? '' : 'outside-month', gridDay.date === today ? 'today' : '', gridDay.date === selectedDate ? 'selected' : ''].filter(Boolean).join(' ')
     button.dataset.date = gridDay.date
     button.setAttribute('role', 'gridcell')
-    button.setAttribute('aria-label', getCalendarDayAccessibleLabel(gridDay.date, summary))
+    button.setAttribute('aria-label', getCalendarDayAccessibleLabel(gridDay.date, summary, { selected: gridDay.date === selectedDate, today: gridDay.date === today }))
     if (gridDay.date === selectedDate) button.setAttribute('aria-selected', 'true')
 
     const dayNumber = document.createElement('span')
@@ -203,11 +238,20 @@ export function renderMonthCalendar({ year, month, selectedDate, summaries, onDa
     }
     const markers = document.createElement('span')
     markers.className = 'calendar-markers'
-    if (summary?.hasWorkout) markers.innerHTML += '<i class="calendar-marker workout-marker">力量</i>'
-    if (summary?.cardioCount) markers.innerHTML += '<i class="calendar-marker cardio-marker">有氧</i>'
-    if (summary?.pelvicFloorSessionCount) markers.innerHTML += '<i class="calendar-marker pelvic-marker">盆</i>'
-    if (summary?.weightKg !== undefined) markers.innerHTML += '<i class="calendar-marker weight-marker">重</i>'
-    if (markers.childElementCount) details.append(markers)
+    const markerData = getCalendarVisibleMarkers(summary)
+    for (const category of markerData.visible) {
+      const marker = document.createElement('span')
+      marker.className = `calendar-marker calendar-category-${category}`
+      marker.innerHTML = icon(calendarCategoryIcons[category], 8)
+      markers.append(marker)
+    }
+    if (markerData.hiddenCount) {
+      const overflow = document.createElement('span')
+      overflow.className = 'calendar-marker-overflow'
+      overflow.textContent = `+${markerData.hiddenCount}`
+      markers.append(overflow)
+    }
+    details.append(markers)
     button.append(details)
     button.addEventListener('click', () => onDateClick(gridDay.date))
     grid.append(button)
