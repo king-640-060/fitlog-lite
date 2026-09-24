@@ -542,9 +542,9 @@ async function navigateFoodDate(direction: -1 | 1, dragged = 0): Promise<void> {
   const nextDate = shiftLocalDate(oldDate, direction)
   try {
     foodDate = nextDate
-    await renderFoodPage()
+    await renderFoodPage({ skipNeighbors: true })
     if (activeTab !== 'food' || !view.isConnected || foodDate !== nextDate) return
-    const incoming = view.querySelector<HTMLElement>('.food-pager-page')!
+    const incoming = view.querySelector<HTMLElement>('.food-pager-page:not(.food-pager-preview)')!
     app.querySelector<HTMLInputElement>('#food-date')!.value = nextDate
     outgoing.setAttribute('aria-hidden', 'true')
     outgoing.style.pointerEvents = 'none'
@@ -556,12 +556,13 @@ async function navigateFoodDate(direction: -1 | 1, dragged = 0): Promise<void> {
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       const timing: KeyframeAnimationOptions = { duration: 260, easing: 'cubic-bezier(.22, .75, .25, 1)', fill: 'both' }
       const leaving = outgoing.animate([{ transform: `translateX(${dragged}px)` }, { transform: `translateX(${-direction * 100}%)` }], timing)
-      const entering = incoming.animate([{ transform: `translateX(${direction * 100}%)` }, { transform: 'translateX(0)' }], timing)
+      const entering = incoming.animate([{ transform: `translateX(calc(${direction * 100}% + ${dragged}px))` }, { transform: 'translateX(0)' }], timing)
       await Promise.all([leaving.finished, entering.finished])
     }
     outgoing.remove()
     view.inert = false
     if (restoreFocus) incoming.querySelector<HTMLButtonElement>('.food-date-switch [aria-current="date"]')?.focus({ preventScroll: true })
+    try { await prepareFoodPreviews(view, nextDate) } catch (error) { fail(error) }
   } catch (error) {
     foodDate = oldDate
     outgoing.style.cssText = ''
@@ -607,6 +608,13 @@ function bindFoodPager(view: HTMLElement): void {
     suppressClick = true
     gesture.dragged = Math.max(-view.clientWidth, Math.min(view.clientWidth, dx))
     gesture.page.style.transform = `translateX(${gesture.dragged}px)`
+    const dragged = gesture.dragged
+    view.querySelectorAll<HTMLElement>('.food-pager-preview').forEach((preview) => {
+      const side = Number(preview.dataset.foodPagerSide)
+      preview.style.transform = side === (dragged < 0 ? 1 : -1)
+        ? `translateX(calc(${side * 100}% + ${dragged}px))`
+        : ''
+    })
   }, { signal })
   const finish = (event: PointerEvent) => {
     if (!gesture || gesture.pointerId !== event.pointerId) return
@@ -620,8 +628,16 @@ function bindFoodPager(view: HTMLElement): void {
       void navigateFoodDate(direction, dx)
     } else {
       const page = current.page
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) page.style.transform = ''
-      else void page.animate([{ transform: `translateX(${dx}px)` }, { transform: 'translateX(0)' }], { duration: 220, easing: 'ease-out' }).finished.finally(() => { page.style.transform = '' })
+      const preview = view.querySelector<HTMLElement>(`.food-pager-preview[data-food-pager-side="${dx < 0 ? 1 : -1}"]`)
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        page.style.transform = ''
+        if (preview) preview.style.transform = ''
+      } else {
+        const timing: KeyframeAnimationOptions = { duration: 220, easing: 'ease-out' }
+        const returning = [page.animate([{ transform: `translateX(${dx}px)` }, { transform: 'translateX(0)' }], timing).finished]
+        if (preview) returning.push(preview.animate([{ transform: `translateX(calc(${Number(preview.dataset.foodPagerSide) * 100}% + ${dx}px))` }, { transform: `translateX(${Number(preview.dataset.foodPagerSide) * 100}%)` }], timing).finished)
+        void Promise.all(returning).finally(() => { page.style.transform = ''; if (preview) preview.style.transform = '' })
+      }
     }
   }
   view.addEventListener('pointerup', finish, { signal })
@@ -634,41 +650,64 @@ function bindFoodPager(view: HTMLElement): void {
   }, { signal, capture: true })
 }
 
-async function renderFoodPage(): Promise<void> {
-  const requestedDate = foodDate
-  const view = document.querySelector<HTMLElement>('#view')!
+async function prepareFoodPreviews(view: HTMLElement, selectedDate: string): Promise<void> {
+  const sides = [-1, 1] as const
+  const previews = await Promise.all(sides.map(async (side) => {
+    const host = document.createElement('div')
+    await renderFoodPage({ date: shiftLocalDate(selectedDate, side), host, preview: true })
+    const page = host.firstElementChild as HTMLElement
+    page.classList.add('food-pager-preview')
+    page.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'))
+    page.dataset.foodPagerSide = String(side)
+    page.setAttribute('aria-hidden', 'true')
+    page.inert = true
+    return page
+  }))
+  if (!view.isConnected || activeTab !== 'food' || foodDate !== selectedDate) return
+  view.querySelectorAll('.food-pager-preview').forEach((preview) => preview.remove())
+  view.append(...previews)
+}
+
+async function renderFoodPage(options?: { date?: string; host?: HTMLElement; preview?: boolean; skipNeighbors?: boolean }): Promise<void> {
+  const requestedDate = options?.date ?? foodDate
+  const view = options?.host ?? document.querySelector<HTMLElement>('#view')!
   const [logs, target] = await Promise.all([
     db.foodLogs.where('date').equals(requestedDate).sortBy('createdAt'),
     db.nutritionTargets.where('date').equals(requestedDate).first(),
   ])
-  if (activeTab !== 'food' || foodDate !== requestedDate || !view.isConnected) return
+  if (!options?.preview && (activeTab !== 'food' || foodDate !== requestedDate || !view.isConnected)) return
   const totals = logs.reduce((sum, log) => ({
     calories: sum.calories + log.totalCalories,
     protein: sum.protein + (log.totalProtein ?? 0), carbs: sum.carbs + (log.totalCarbs ?? 0), fat: sum.fat + (log.totalFat ?? 0),
   }), { calories: 0, protein: 0, carbs: 0, fat: 0 })
   const hasMacros = logs.some((log) => log.totalProtein !== undefined || log.totalCarbs !== undefined || log.totalFat !== undefined) || Boolean(target)
-  const pagerDates = foodPagerDates(foodDate)
-  const isToday = foodDate === getLocalDateString()
+  const pagerDates = foodPagerDates(requestedDate)
+  const isToday = requestedDate === getLocalDateString()
   const quickButton = (date: string): string => {
-    const selected = foodDate === date
+    const selected = requestedDate === date
     const label = foodPagerLabel(date)
     const day = `${Number(date.slice(5, 7))}月${Number(date.slice(8, 10))}日`
     return `<button data-food-quick-date="${date}" aria-pressed="${selected}" ${selected ? 'aria-current="date"' : ''} aria-label="${label}，${date}，${selected ? '当前选中' : '切换日期'}"><strong>${label}</strong><small>${day}</small></button>`
   }
   const previous = new Map<string, PreviousRingValue>()
   view.querySelectorAll<HTMLElement>('[data-progress-key]').forEach((element) => {
-    if (element.closest<HTMLElement>('[data-food-date]')?.dataset.foodDate !== foodDate) return
+    if (element.closest<HTMLElement>('[data-food-date]')?.dataset.foodDate !== requestedDate) return
     previous.set(element.dataset.progressKey!, { actual: Number(element.dataset.actual), goal: element.dataset.goal === undefined ? undefined : Number(element.dataset.goal) })
   })
   const calorieTarget = target?.calories
   const calorieAmount = calorieTarget === undefined ? `${formatNumber(totals.calories)} kcal` : `${formatNumber(totals.calories)} / ${formatNumber(calorieTarget)} kcal`
   const groups = groupFoodLogs(logs)
-  view.classList.add('food-pager-viewport')
+  if (!options?.preview) view.classList.add('food-pager-viewport')
   view.innerHTML = `<div class="food-pager-page">
     <div class="food-date-switch" role="group" aria-label="切换饮食记录日期">${pagerDates.map(quickButton).join('')}</div>
-    <section class="nutrition-hero food-nutrition-hero" data-food-date="${foodDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" id="edit-nutrition-target">${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="food-calorie-row"><div class="calorie-gauge" data-progress-key="calories" data-actual="${totals.calories}" ${calorieTarget === undefined ? '' : `data-goal="${calorieTarget}"`} aria-label="热量 ${calorieAmount} ${goalStatusText(totals.calories, calorieTarget, 'kcal')}">${ringSvgHtml(totals.calories, calorieTarget, 'large', previous.get('calories'))}<div class="calorie-gauge-center"><strong data-count-from="${previous.get('calories')?.actual ?? 0}" data-count-to="${totals.calories}">${formatNumber(previous.get('calories')?.actual ?? 0)}</strong><small>kcal</small></div></div><div class="calorie-gauge-caption"><span>当日摄入</span>${calorieTarget === undefined ? '<strong>按自己的节奏记录</strong>' : `<strong>目标 ${formatNumber(calorieTarget)} kcal</strong>`}<span class="${getGoalProgress(totals.calories, calorieTarget).state === 'above' ? 'metric-excess' : ''}">${goalStatusText(totals.calories, calorieTarget, 'kcal')}</span></div></div><div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div></section>
+    <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" id="edit-nutrition-target">${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="food-calorie-row"><div class="calorie-gauge" data-progress-key="calories" data-actual="${totals.calories}" ${calorieTarget === undefined ? '' : `data-goal="${calorieTarget}"`} aria-label="热量 ${calorieAmount} ${goalStatusText(totals.calories, calorieTarget, 'kcal')}">${ringSvgHtml(totals.calories, calorieTarget, 'large', previous.get('calories'))}<div class="calorie-gauge-center"><strong data-count-from="${previous.get('calories')?.actual ?? 0}" data-count-to="${totals.calories}">${formatNumber(previous.get('calories')?.actual ?? 0)}</strong><small>kcal</small></div></div><div class="calorie-gauge-caption"><span>当日摄入</span>${calorieTarget === undefined ? '<strong>按自己的节奏记录</strong>' : `<strong>目标 ${formatNumber(calorieTarget)} kcal</strong>`}<span class="${getGoalProgress(totals.calories, calorieTarget).state === 'above' ? 'metric-excess' : ''}">${goalStatusText(totals.calories, calorieTarget, 'kcal')}</span></div></div><div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div></section>
     <section class="food-meals-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '按餐次记录，更清楚'}</span></div></section>
     <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday)).join('')}</div></div>`
+  if (options?.preview) {
+    view.querySelectorAll<SVGCircleElement>('[data-final-offset]').forEach((ring) => { ring.style.strokeDashoffset = ring.dataset.finalOffset ?? '' })
+    view.querySelectorAll<HTMLElement>('[data-count-to]').forEach((number) => { number.textContent = formatNumber(Number(number.dataset.countTo)) })
+    return
+  }
   bindFoodPager(view)
   animateNutritionRings(view)
   animateNutritionNumber(view)
@@ -701,6 +740,7 @@ async function renderFoodPage(): Promise<void> {
       event.preventDefault(); try { const data = new FormData(event.currentTarget as HTMLFormElement); const meal = valueOf(data, 'meal'); await updateFoodLogDetails(log.id, valueOf(data, 'grams'), isMealType(meal) ? meal : undefined); dialog.close(); toast('已保存'); await renderFoodPage() } catch (error) { fail(error) }
     })
   }))
+  if (!options?.skipNeighbors) await prepareFoodPreviews(view, requestedDate)
 }
 
 function nutritionGoalFields(goal?: NutritionGoal): string {

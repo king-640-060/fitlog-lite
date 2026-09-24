@@ -111,6 +111,9 @@ h3 { margin-bottom: 5px; font-size: 1rem; }
 .date-control input { position: absolute; inset: 0; min-height: 42px; opacity: 0; cursor: pointer; }
 .food-pager-viewport { position: relative; overflow: hidden; }
 .food-pager-page { display: flex; flex-direction: column; gap: 12px; min-width: 0; touch-action: pan-y; }
+.food-pager-preview { position: absolute; top: 0; left: 0; width: 100%; pointer-events: none; }
+.food-pager-preview[data-food-pager-side="-1"] { transform: translateX(-100%); }
+.food-pager-preview[data-food-pager-side="1"] { transform: translateX(100%); }
 .food-date-switch { display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; gap: 2px; min-height: 48px; margin-top: 1px; padding: 2px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); }
 .food-date-switch button { display: grid; min-width: 0; min-height: 44px; align-content: center; justify-items: center; gap: 1px; border: 0; border-radius: 10px; padding: 2px 5px; background: transparent; color: var(--text-secondary); }
 .food-date-switch button strong { font-size: .82rem; font-weight: 700; line-height: 1.2; }
