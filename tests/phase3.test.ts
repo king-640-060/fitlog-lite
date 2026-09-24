@@ -9,9 +9,9 @@ import {
 } from '../src/services/templateService'
 import {
   advancePelvicFloorTimer, createPelvicFloorTimer, finishPelvicFloorTimer, getPelvicFloorPhaseProgress, getPelvicFloorRemainingSeconds,
-  pausePelvicFloorTimer, resumePelvicFloorTimer, startPelvicFloorTimer,
+  pausePelvicFloorTimer, resumePelvicFloorTimer, startPelvicFloorTimer, pelvicFloorRoutines,
 } from '../src/services/pelvicFloorTimer'
-import { deletePelvicFloorSession } from '../src/services/pelvicFloorService'
+import { deletePelvicFloorSession, sessionFromPelvicFloorTimer } from '../src/services/pelvicFloorService'
 import { loadMonthSummaries } from '../src/ui/calendarPage'
 import { getLocalDateString } from '../src/utils/date'
 
@@ -201,9 +201,9 @@ describe('Pelvic floor timer pure state', () => {
   it('contract → relax → next repetition → completed', () => {
     const started = startPelvicFloorTimer(createPelvicFloorTimer(config), 1000)
     const relax = advancePelvicFloorTimer(started, 4000)
-    expect(relax).toMatchObject({ status: 'relax', completedRepetitions: 0 })
+    expect(relax).toMatchObject({ status: 'running', activePhase: 'relax', completedRepetitions: 0 })
     const next = advancePelvicFloorTimer(relax, 7000)
-    expect(next).toMatchObject({ status: 'contract', completedRepetitions: 1 })
+    expect(next).toMatchObject({ status: 'running', activePhase: 'contract', completedRepetitions: 1 })
     expect(advancePelvicFloorTimer(next, 13000)).toMatchObject({ status: 'completed', completedRepetitions: 2, finishedAtMs: 13000 })
   })
 
@@ -212,7 +212,7 @@ describe('Pelvic floor timer pure state', () => {
     const paused = pausePelvicFloorTimer(started, 2000)
     expect(paused).toMatchObject({ status: 'paused', activePhase: 'contract', pausedRemainingMs: 2000 })
     const resumed = resumePelvicFloorTimer(paused, 10000)
-    expect(resumed).toMatchObject({ status: 'contract', deadlineMs: 12000 })
+    expect(resumed).toMatchObject({ status: 'running', activePhase: 'contract', deadlineMs: 12000 })
     expect(getPelvicFloorRemainingSeconds(resumed, 10500)).toBe(2)
     expect(getPelvicFloorPhaseProgress(paused, 10000)).toBeCloseTo(1 / 3)
     expect(getPelvicFloorPhaseProgress(resumed, 10500)).toBeCloseTo(0.5)
@@ -225,7 +225,76 @@ describe('Pelvic floor timer pure state', () => {
 
   it('deadline correction 一次跨过多个阶段，覆盖后台 elapsed time', () => {
     const started = startPelvicFloorTimer(createPelvicFloorTimer({ ...config, repetitions: 10 }), 0)
-    expect(advancePelvicFloorTimer(started, 18_500)).toMatchObject({ status: 'contract', completedRepetitions: 3, deadlineMs: 21_000 })
+    expect(advancePelvicFloorTimer(started, 18_500)).toMatchObject({ status: 'running', activePhase: 'contract', completedRepetitions: 3, deadlineMs: 21_000 })
+  })
+
+  it('慢速耐力按 contract → hold → release → relax 推进并重复', () => {
+    const started = startPelvicFloorTimer(createPelvicFloorTimer(pelvicFloorRoutines[0]!), 0)
+    expect(started).toMatchObject({ activePhase: 'contract', phaseIndex: 0, deadlineMs: 2000 })
+    expect(advancePelvicFloorTimer(started, 2000)).toMatchObject({ activePhase: 'hold', phaseIndex: 1, deadlineMs: 7000 })
+    expect(advancePelvicFloorTimer(started, 7000)).toMatchObject({ activePhase: 'release', phaseIndex: 2, deadlineMs: 9000 })
+    expect(advancePelvicFloorTimer(started, 9000)).toMatchObject({ activePhase: 'relax', phaseIndex: 3, deadlineMs: 14000 })
+    expect(advancePelvicFloorTimer(started, 14000)).toMatchObject({ activePhase: 'contract', phaseIndex: 0, repetitionIndex: 1, completedRepetitions: 1 })
+  })
+
+  it('跨组休息后进入下一组，延迟回调能一次追上多个阶段', () => {
+    const routine = { id: 'sets', name: '组测试', description: '', exercises: [{ id: 'a', name: '动作', repetitions: 2, sets: 2,
+      restBetweenSetsSeconds: 3, phases: [{ type: 'contract' as const, durationSeconds: 1 }, { type: 'relax' as const, durationSeconds: 1 }] }] }
+    const started = startPelvicFloorTimer(createPelvicFloorTimer(routine), 0)
+    expect(advancePelvicFloorTimer(started, 4000)).toMatchObject({ activePhase: 'rest', restKind: 'set', completedRepetitions: 2, deadlineMs: 7000 })
+    expect(advancePelvicFloorTimer(started, 8500)).toMatchObject({ activePhase: 'relax', setIndex: 1, repetitionIndex: 0, deadlineMs: 9000 })
+    const completed = advancePelvicFloorTimer(started, 15000)
+    expect(completed).toMatchObject({ status: 'completed', completedRepetitions: 4, finishedAtMs: 11000 })
+    expect(advancePelvicFloorTimer(completed, 20000)).toBe(completed)
+  })
+
+  it('混合训练从慢速动作经休息进入快速动作并完成', () => {
+    const started = startPelvicFloorTimer(createPelvicFloorTimer(pelvicFloorRoutines[2]!), 0)
+    expect(advancePelvicFloorTimer(started, 140000)).toMatchObject({ activePhase: 'rest', restKind: 'exercise', exerciseIndex: 0, completedRepetitions: 10 })
+    expect(advancePelvicFloorTimer(started, 151000)).toMatchObject({ activePhase: 'relax', exerciseIndex: 1, repetitionIndex: 0, deadlineMs: 152000 })
+    expect(advancePelvicFloorTimer(started, 200000)).toMatchObject({ status: 'completed', completedRepetitions: 22, finishedAtMs: 174000 })
+  })
+
+  it('暂停时进度精确冻结，恢复后由 deadline 决定状态，与绘制次数无关', () => {
+    const started = startPelvicFloorTimer(createPelvicFloorTimer(pelvicFloorRoutines[0]!), 0)
+    const paused = pausePelvicFloorTimer(started, 750)
+    expect(getPelvicFloorPhaseProgress(paused, 100000)).toBeCloseTo(0.375)
+    expect(getPelvicFloorRemainingSeconds(paused, 100000)).toBe(2)
+    const resumed = resumePelvicFloorTimer(paused, 100000)
+    expect(resumed.deadlineMs).toBe(101250)
+    expect(getPelvicFloorPhaseProgress(resumed, 100000)).toBeCloseTo(0.375)
+    expect(advancePelvicFloorTimer(resumed, 101250)).toMatchObject({ activePhase: 'hold', deadlineMs: 106250 })
+  })
+})
+
+describe('Pelvic floor backup compatibility', () => {
+  it('旧 contract/relax V3 记录仍能导出、恢复且不被推断为新模式', async () => {
+    const source = newDatabase(); await source.pelvicFloorSessions.add(session())
+    const backup = await exportBackup(source)
+    expect(backup.data.pelvicFloorSessions[0]?.routine).toBeUndefined()
+    const target = newDatabase(); await restoreBackup(backup, target)
+    expect(await target.pelvicFloorSessions.get('pelvic-1')).toMatchObject({ phases: [{ type: 'contract' }, { type: 'relax' }] })
+    expect((await target.pelvicFloorSessions.get('pelvic-1'))?.routine).toBeUndefined()
+  })
+
+  it('新混合训练快照通过 V3 backup 验证并往返恢复', async () => {
+    const state = advancePelvicFloorTimer(startPelvicFloorTimer(createPelvicFloorTimer(pelvicFloorRoutines[2]!), 0), 174000)
+    const source = newDatabase(); await source.pelvicFloorSessions.add(sessionFromPelvicFloorTimer(state, '2026-09-21'))
+    const backup = await exportBackup(source)
+    expect(backup.schemaVersion).toBe(3)
+    expect(backup.data.pelvicFloorSessions[0]?.routine?.name).toBe('混合训练')
+    const target = newDatabase(); await restoreBackup(backup, target)
+    expect((await target.pelvicFloorSessions.toArray())[0]?.routine?.exercises).toHaveLength(2)
+  })
+
+  it('新训练快照里的无效阶段在清空旧数据前被拒绝', async () => {
+    const database = newDatabase(); await database.foods.add(food())
+    const state = advancePelvicFloorTimer(startPelvicFloorTimer(createPelvicFloorTimer(pelvicFloorRoutines[2]!), 0), 174000)
+    const backup = v3Backup()
+    backup.data.pelvicFloorSessions = [sessionFromPelvicFloorTimer(state, '2026-09-21')]
+    backup.data.pelvicFloorSessions[0]!.routine!.exercises[1]!.phases[0]!.type = 'invalid' as 'contract'
+    await expect(restoreBackup(backup, database)).rejects.toThrow('无效阶段')
+    expect(await database.foods.count()).toBe(1)
   })
 })
 

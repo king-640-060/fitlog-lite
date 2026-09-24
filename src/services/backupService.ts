@@ -242,12 +242,35 @@ function validatePelvicFloorSession(record: UnknownRecord, index: number): void 
   const completed = finite(record.completedRepetitions, `${location} completedRepetitions`, 0, true)
   if (completed > Number(record.repetitions)) throw new Error(`${location}：completedRepetitions 不能大于 repetitions`)
   if (!Array.isArray(record.phases) || !record.phases.length) throw new Error(`${location} phases：必须是非空 array`)
-  record.phases.forEach((phaseValue, phaseIndex) => {
-    const phaseLocation = `${location}，第 ${phaseIndex + 1} 个阶段`
+  const validatePhases = (phases: unknown[], prefix: string): void => phases.forEach((phaseValue, phaseIndex) => {
+    const phaseLocation = `${prefix}，第 ${phaseIndex + 1} 个阶段`
     const phase = objectValue(phaseValue, phaseLocation)
-    if (phase.type !== 'contract' && phase.type !== 'relax') throw new Error(`${phaseLocation} type：必须是 contract 或 relax`)
+    if (!['prepare', 'contract', 'hold', 'release', 'relax', 'rest'].includes(String(phase.type))) throw new Error(`${phaseLocation} type：无效阶段`)
     finite(phase.durationSeconds, `${phaseLocation} durationSeconds`, 1, true)
   })
+  validatePhases(record.phases, location)
+  if (record.routine !== undefined) {
+    const routine = objectValue(record.routine, `${location} routine`)
+    nonEmptyString(routine.id, `${location} routine id`)
+    nonEmptyString(routine.name, `${location} routine name`)
+    if (typeof routine.description !== 'string') throw new Error(`${location} routine description：必须是 string`)
+    if (!Array.isArray(routine.exercises) || !routine.exercises.length) throw new Error(`${location} routine exercises：必须是非空 array`)
+    let totalRepetitions = 0
+    routine.exercises.forEach((value, exerciseIndex) => {
+      const prefix = `${location}，动作 ${exerciseIndex + 1}`
+      const exercise = objectValue(value, prefix)
+      nonEmptyString(exercise.id, `${prefix} id`)
+      nonEmptyString(exercise.name, `${prefix} name`)
+      const repetitions = finite(exercise.repetitions, `${prefix} repetitions`, 1, true)
+      const sets = exercise.sets === undefined ? 1 : finite(exercise.sets, `${prefix} sets`, 1, true)
+      if (exercise.restBetweenSetsSeconds !== undefined) finite(exercise.restBetweenSetsSeconds, `${prefix} restBetweenSetsSeconds`, 1, true)
+      if (exercise.restAfterSeconds !== undefined) finite(exercise.restAfterSeconds, `${prefix} restAfterSeconds`, 1, true)
+      if (!Array.isArray(exercise.phases) || !exercise.phases.length) throw new Error(`${prefix} phases：必须是非空 array`)
+      validatePhases(exercise.phases, prefix)
+      totalRepetitions += repetitions * sets
+    })
+    if (totalRepetitions !== record.repetitions) throw new Error(`${location} routine repetitions：与总次数不一致`)
+  }
   validateTimestamps(record, location)
 }
 

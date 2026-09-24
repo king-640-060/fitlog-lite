@@ -13,7 +13,7 @@ import { deletePelvicFloorSession, pelvicFloorSessionDurationSeconds, savePelvic
 import { extendRestTimer, getRestRemainingMs, pauseRestTimer, resumeRestTimer, startRestTimer, type RestTimerState } from './services/restTimer'
 import {
   advancePelvicFloorTimer, createPelvicFloorTimer, finishPelvicFloorTimer, getPelvicFloorPhaseProgress, getPelvicFloorRemainingSeconds,
-  pausePelvicFloorTimer, resumePelvicFloorTimer, startPelvicFloorTimer, type PelvicFloorTimerState,
+  pausePelvicFloorTimer, resumePelvicFloorTimer, startPelvicFloorTimer, pelvicFloorRoutines, type PelvicFloorTimerState,
 } from './services/pelvicFloorTimer'
 import { createWorkout, findOpenWorkout, finishWorkout, normalizeWorkoutForSave, saveExercise, saveWorkout, WorkoutAutosaveController } from './services/workoutService'
 import {
@@ -55,6 +55,9 @@ let justFinishedWorkout: Workout | undefined
 let pelvicTimerState: PelvicFloorTimerState | undefined
 let pelvicTimerDate = getLocalDateString()
 let pelvicTimerInterval: number | undefined
+let pelvicTimerAnimationFrame: number | undefined
+let pelvicTimerElements: { ring: SVGCircleElement; breathing: HTMLElement; countdown: HTMLElement; remaining: HTMLElement; phase: HTMLElement; status: HTMLElement; repetition: HTMLElement; exercise: HTMLElement; pause: HTMLButtonElement } | undefined
+let pelvicTimerPainted = { remaining: '', phase: '', status: '', repetition: '', exercise: '', aria: '', pause: '' }
 let pelvicSessionSaving = false
 let pelvicAudioContext: AudioContext | undefined
 let pelvicWakeLock: { release: () => Promise<void> } | undefined
@@ -440,7 +443,7 @@ function showCalendarDaySheet(date: string, summary?: CalendarDaySummary): void 
     nutritionRow('脂肪', summary?.fat, target?.fat, 'g'),
   ].join('') || '<p class="muted">未记录饮食或营养目标</p>'
   const workout = summary?.hasWorkout ? `${summary.workoutCount} 次 · ${summary.setCount} 组` : '未训练'
-  const pelvic = summary?.pelvicFloorSessionCount ? `${summary.pelvicFloorSessionCount} 次 · ${summary.pelvicFloorContractions} 次收缩 · ${summary.pelvicFloorSeconds} 秒` : '未训练'
+  const pelvic = summary?.pelvicFloorSessionCount ? `${summary.pelvicFloorSessionCount} 次 · ${summary.pelvicFloorSeconds} 秒` : '未训练'
   const weight = summary?.weightKg === undefined ? '未记录' : `${formatNumber(summary.weightKg)} kg`
   const canClear = hasDayRecords(summary) || Boolean(target)
   const dialog = openModal(formatHeaderDate(date), `<div class="calendar-day-sheet"><section><h3>饮食</h3>${nutrition}</section><div><span>力量训练</span><strong>${workout}</strong></div><div><span>凯格尔训练</span><strong>${pelvic}</strong></div><div><span>体重</span><strong>${weight}</strong></div></div><div class="calendar-day-actions"><button id="calendar-day-food">${icon('utensils', 18)} 饮食</button><button id="calendar-day-workout">${icon('dumbbell', 18)} 训练</button><button id="calendar-day-weight">${icon('scale', 18)} 体重</button></div>${canClear ? '<div class="calendar-day-danger"><button id="calendar-clear-day" class="danger-button">清空当天记录</button></div>' : ''}`)
@@ -753,11 +756,10 @@ async function renderWorkoutPage(): Promise<void> {
     db.workouts.where('date').equals(workoutDate).toArray(),
     db.pelvicFloorSessions.where('date').equals(workoutDate).toArray(),
   ])
-  const pelvicContractions = pelvicSessions.reduce((total, session) => total + session.completedRepetitions, 0)
   const pelvicSeconds = pelvicSessions.reduce((total, session) => total + pelvicFloorSessionDurationSeconds(session), 0)
   const recentWorkouts = (await db.workouts.toArray()).filter((item) => item.finishedAt).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt)).slice(0, 4)
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `<section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>训练日期</span><input id="workout-date" type="date" value="${workoutDate}" aria-label="训练日期"></label><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section><div class="empty workout-empty minimal"><div class="empty-icon">${icon('dumbbell', 27)}</div><h2>${openWorkout ? '训练还在进行中' : todayWorkouts.length ? '这一天的训练已完成' : '今天还没有力量训练'}</h2><p>${openWorkout ? '上次输入已自动保存，可以随时继续。' : '可从模板开始，也可以创建空白训练。'}</p><button class="primary start-button" id="start-workout">${openWorkout ? icon('activity', 18) + ' 继续训练' : icon('plus', 18) + ' 开始力量训练'}</button></div><section class="pelvic-floor-card"><div><span class="eyebrow">轻柔练习</span><h2>凯格尔训练</h2><p>收缩与放松练习</p></div><div class="pelvic-daily-summary"><strong>${pelvicSessions.length} 次</strong><span>${pelvicContractions} 次收缩 · ${pelvicSeconds} 秒</span></div><div class="pelvic-card-actions"><button class="secondary" id="start-pelvic-floor">${icon('leaf', 18)} 开始训练</button><button class="text-btn" id="pelvic-floor-history">训练记录</button></div></section><section class="section-head"><div><h2>最近力量训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 17)}</button>`).join('')}</div>`
+  view.innerHTML = `<section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>训练日期</span><input id="workout-date" type="date" value="${workoutDate}" aria-label="训练日期"></label><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section><div class="empty workout-empty minimal"><div class="empty-icon">${icon('dumbbell', 27)}</div><h2>${openWorkout ? '训练还在进行中' : todayWorkouts.length ? '这一天的训练已完成' : '今天还没有力量训练'}</h2><p>${openWorkout ? '上次输入已自动保存，可以随时继续。' : '可从模板开始，也可以创建空白训练。'}</p><button class="primary start-button" id="start-workout">${openWorkout ? icon('activity', 18) + ' 继续训练' : icon('plus', 18) + ' 开始力量训练'}</button></div><section class="pelvic-floor-card"><div><span class="eyebrow">轻柔练习</span><h2>凯格尔训练</h2><p>收缩与放松练习</p></div><div class="pelvic-daily-summary"><strong>${pelvicSessions.length} 次</strong><span>累计 ${pelvicSeconds} 秒</span></div><div class="pelvic-card-actions"><button class="secondary" id="start-pelvic-floor">${icon('leaf', 18)} 开始训练</button><button class="text-btn" id="pelvic-floor-history">训练记录</button></div></section><section class="section-head"><div><h2>最近力量训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 17)}</button>`).join('')}</div>`
   view.querySelector<HTMLInputElement>('#workout-date')?.addEventListener('change', (event) => { workoutDate = (event.target as HTMLInputElement).value; currentWorkout = undefined; workoutEditorOpen = false; void render().catch(fail) })
   view.querySelector('#exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
   view.querySelector('#workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
@@ -808,79 +810,130 @@ async function releasePelvicWakeLock(): Promise<void> {
   try { await lock?.release() } catch { /* Wake Lock is optional. */ }
 }
 
+const pelvicPhaseLabels: Record<string, string> = { prepare: '准备', contract: '收紧', hold: '保持', release: '释放', relax: '放松', rest: '休息' }
+
 function showPelvicFloorSetup(): void {
-  const dialog = openModal('凯格尔训练', `<form id="pelvic-floor-setup" class="form"><div class="pelvic-setup-grid"><label>收缩时间<input name="contract" type="number" inputmode="numeric" min="1" max="60" step="1" value="3" required><span>秒</span></label><label>放松时间<input name="relax" type="number" inputmode="numeric" min="1" max="60" step="1" value="3" required><span>秒</span></label><label>重复次数<input name="repetitions" type="number" inputmode="numeric" min="1" max="100" step="1" value="10" required><span>次</span></label></div><div class="pelvic-guidance"><p>收缩盆底肌并保持正常呼吸。</p><p>不要同时强力夹紧臀部、大腿或腹部，每次放松阶段充分放松。</p><p>不要把中断排尿作为日常训练方式。</p><p>如有疼痛或明显不适，请停止并咨询专业人员。</p></div><button class="primary" type="submit">开始计时</button></form>`)
+  const dialog = openModal('凯格尔训练', `<form id="pelvic-floor-setup" class="form"><p class="muted">选择训练模式</p><div class="pelvic-mode-list">${pelvicFloorRoutines.map((routine, index) => `<label class="pelvic-mode"><input type="radio" name="routine" value="${routine.id}" ${index === 0 ? 'checked' : ''}><span><strong>${routine.name}</strong><small>${routine.description}</small></span></label>`).join('')}</div><div class="pelvic-guidance"><p>练习时保持自然呼吸，每次放松阶段充分放松。</p><p>如有疼痛或明显不适，请停止并咨询专业人员。</p></div><button class="primary" type="submit">开始训练</button></form>`)
   dialog.querySelector<HTMLFormElement>('#pelvic-floor-setup')?.addEventListener('submit', async (event) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget as HTMLFormElement)
     try {
-      const ready = createPelvicFloorTimer({ contractSeconds: Number(valueOf(data, 'contract')), relaxSeconds: Number(valueOf(data, 'relax')), repetitions: Number(valueOf(data, 'repetitions')) })
+      const routine = pelvicFloorRoutines.find((item) => item.id === valueOf(data, 'routine'))
+      if (!routine) throw new Error('请选择训练模式')
+      const ready = createPelvicFloorTimer(routine)
       await initializePelvicAudio()
       pelvicTimerState = startPelvicFloorTimer(ready, Date.now())
       pelvicTimerDate = workoutDate
       pelvicSessionSaving = false
       dialog.close()
-      playPelvicCue('contract')
+      if (pelvicTimerState.activePhase === 'contract') playPelvicCue('contract')
       await requestPelvicWakeLock()
       renderPelvicFloorTimer()
     } catch (error) { fail(error) }
   })
 }
 
+function stopPelvicTimerVisuals(): void {
+  window.clearInterval(pelvicTimerInterval)
+  if (pelvicTimerAnimationFrame !== undefined) window.cancelAnimationFrame(pelvicTimerAnimationFrame)
+  pelvicTimerAnimationFrame = undefined
+}
+
+function startPelvicTimerVisuals(): void {
+  if (!pelvicTimerState || pelvicTimerState.status !== 'running' || pelvicTimerAnimationFrame !== undefined) return
+  const frame = () => {
+    pelvicTimerAnimationFrame = undefined
+    if (!pelvicTimerState || pelvicTimerState.status !== 'running') return
+    paintPelvicFloorTimer()
+    pelvicTimerAnimationFrame = window.requestAnimationFrame(frame)
+  }
+  pelvicTimerAnimationFrame = window.requestAnimationFrame(frame)
+}
+
 function renderPelvicFloorTimer(): void {
   const state = pelvicTimerState
   if (!state) return
   document.body.classList.add('immersive')
-  window.clearInterval(pelvicTimerInterval)
+  stopPelvicTimerVisuals()
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `<section class="pelvic-timer-screen"><header><span>凯格尔训练</span><small>${formatHeaderDate(pelvicTimerDate)}</small></header><div class="pelvic-countdown" id="pelvic-countdown" role="timer"><span id="pelvic-phase">${state.activePhase === 'relax' ? '放松' : '收缩'}</span><strong id="pelvic-remaining">${getPelvicFloorRemainingSeconds(state, Date.now())}</strong><span>秒</span></div><h2 id="pelvic-status">${state.status === 'paused' ? '已暂停' : '保持自然呼吸'}</h2><p id="pelvic-repetition">${Math.min(state.completedRepetitions + 1, state.repetitions)} / ${state.repetitions} 次</p><div class="pelvic-timer-actions"><button class="primary" id="pelvic-pause">${state.status === 'paused' ? '继续' : '暂停'}</button><button class="danger-button" id="pelvic-finish">结束训练</button></div><p class="pelvic-breathing-cue">收缩阶段轻柔保持；放松阶段充分放松。</p></section>`
-  view.querySelector('#pelvic-pause')?.addEventListener('click', async () => {
+  view.innerHTML = `<section class="pelvic-timer-screen"><header><span>凯格尔训练</span><small>${formatHeaderDate(pelvicTimerDate)}</small></header><h2>${esc(state.routine.name)}</h2><p id="pelvic-exercise"></p><div class="pelvic-countdown" id="pelvic-countdown" role="timer"><svg class="pelvic-ring" viewBox="0 0 120 120" aria-hidden="true"><circle class="pelvic-ring-track" cx="60" cy="60" r="54"/><circle class="pelvic-ring-progress" id="pelvic-ring-progress" cx="60" cy="60" r="54"/></svg><div class="pelvic-breathing" id="pelvic-breathing"></div><div class="pelvic-countdown-copy"><span id="pelvic-phase"></span><strong id="pelvic-remaining"></strong><span>秒</span></div></div><p id="pelvic-repetition"></p><p id="pelvic-status"></p><div class="pelvic-timer-actions"><button class="primary" id="pelvic-pause">暂停</button><button class="danger-button" id="pelvic-finish">结束训练</button></div><p class="pelvic-breathing-cue">保持自然呼吸，按提示轻柔练习。</p></section>`
+  pelvicTimerElements = {
+    ring: view.querySelector<SVGCircleElement>('#pelvic-ring-progress')!, breathing: view.querySelector<HTMLElement>('#pelvic-breathing')!,
+    countdown: view.querySelector<HTMLElement>('#pelvic-countdown')!, remaining: view.querySelector<HTMLElement>('#pelvic-remaining')!,
+    phase: view.querySelector<HTMLElement>('#pelvic-phase')!, status: view.querySelector<HTMLElement>('#pelvic-status')!,
+    repetition: view.querySelector<HTMLElement>('#pelvic-repetition')!, exercise: view.querySelector<HTMLElement>('#pelvic-exercise')!,
+    pause: view.querySelector<HTMLButtonElement>('#pelvic-pause')!,
+  }
+  pelvicTimerPainted = { remaining: '', phase: '', status: '', repetition: '', exercise: '', aria: '', pause: '' }
+  pelvicTimerElements.ring.style.strokeDasharray = String(2 * Math.PI * 54)
+  pelvicTimerElements.pause.addEventListener('click', async () => {
     if (!pelvicTimerState) return
     if (pelvicTimerState.status === 'paused') {
       pelvicTimerState = resumePelvicFloorTimer(pelvicTimerState, Date.now())
-      await initializePelvicAudio(); playPelvicCue(pelvicTimerState.activePhase ?? 'contract'); await requestPelvicWakeLock()
+      await initializePelvicAudio()
+      await requestPelvicWakeLock()
+      pelvicTimerInterval = window.setInterval(tickPelvicFloorTimer, 200)
+      startPelvicTimerVisuals()
     } else {
       pelvicTimerState = pausePelvicFloorTimer(pelvicTimerState, Date.now())
+      stopPelvicTimerVisuals()
       await releasePelvicWakeLock()
+      if (pelvicTimerState.status === 'completed') { await completePelvicFloorTimer(); return }
     }
-    renderPelvicFloorTimer()
+    paintPelvicFloorTimer()
   })
   view.querySelector('#pelvic-finish')?.addEventListener('click', async () => {
     if (!pelvicTimerState || !await confirmAction('结束凯格尔训练？', '将保存当前已完成的训练进度。', '结束并保存')) return
-    // The timer can finish and save while the confirmation dialog is open.
     if (!pelvicTimerState || pelvicSessionSaving) return
     pelvicTimerState = finishPelvicFloorTimer(pelvicTimerState, Date.now())
     await completePelvicFloorTimer()
   })
-  pelvicTimerInterval = window.setInterval(tickPelvicFloorTimer, 200)
+  if (state.status === 'running') {
+    pelvicTimerInterval = window.setInterval(tickPelvicFloorTimer, 200)
+    startPelvicTimerVisuals()
+  }
   paintPelvicFloorTimer()
 }
 
 function paintPelvicFloorTimer(): void {
   const state = pelvicTimerState
-  if (!state) return
+  const elements = pelvicTimerElements
+  if (!state || !elements) return
   const now = Date.now()
-  const remaining = getPelvicFloorRemainingSeconds(state, now)
+  const remaining = String(getPelvicFloorRemainingSeconds(state, now))
   const progress = getPelvicFloorPhaseProgress(state, now)
-  const countdown = document.querySelector<HTMLElement>('#pelvic-countdown')
-  countdown?.style.setProperty('--timer-progress', `${progress * 360}deg`)
-  countdown?.style.setProperty('--phase-scale', `${state.activePhase === 'relax' ? 0.84 + progress * 0.16 : 1 - progress * 0.16}`)
-  countdown?.classList.toggle('is-relax', state.activePhase === 'relax')
-  countdown?.classList.toggle('is-paused', state.status === 'paused')
-  countdown?.setAttribute('aria-label', `${state.activePhase === 'relax' ? '放松' : '收缩'}，剩余 ${remaining} 秒${state.status === 'paused' ? '，已暂停' : ''}`)
-  const remainingElement = document.querySelector('#pelvic-remaining'); if (remainingElement) remainingElement.textContent = String(remaining)
-  const phaseElement = document.querySelector('#pelvic-phase'); if (phaseElement) phaseElement.textContent = state.activePhase === 'relax' ? '放松' : '收缩'
-  const statusElement = document.querySelector('#pelvic-status'); if (statusElement) statusElement.textContent = state.status === 'paused' ? '已暂停' : '保持自然呼吸'
-  const repetition = document.querySelector('#pelvic-repetition'); if (repetition) repetition.textContent = `${Math.min(state.completedRepetitions + 1, state.repetitions)} / ${state.repetitions} 次`
+  const circumference = 2 * Math.PI * 54
+  elements.ring.style.strokeDashoffset = String(circumference * (1 - progress))
+  const phase = state.activePhase ?? 'rest'
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const scale = phase === 'contract' ? 1 - progress * 0.16 : phase === 'hold' ? 0.84 : phase === 'release' ? 0.84 + progress * 0.16 : 1
+  elements.breathing.style.transform = `scale(${reduced ? 1 : scale})`
+  elements.countdown.classList.toggle('is-soft', phase === 'release' || phase === 'relax' || phase === 'rest')
+  const exercise = state.routine.exercises[state.exerciseIndex]!
+  const exerciseText = `${exercise.name} · 动作 ${state.exerciseIndex + 1} / ${state.routine.exercises.length}`
+  const repetitionText = state.restKind === 'exercise' ? '准备下一动作' : `第 ${state.repetitionIndex + 1} / ${exercise.repetitions} 次${(exercise.sets ?? 1) > 1 ? ` · 第 ${state.setIndex + 1} / ${exercise.sets} 组` : ''}`
+  const phaseText = pelvicPhaseLabels[phase]
+  const statusText = state.status === 'paused' ? '已暂停' : phase === 'hold' ? '保持自然呼吸' : phase === 'relax' || phase === 'rest' ? '充分放松' : '保持自然呼吸'
+  const aria = `${phaseText}，剩余 ${remaining} 秒${state.status === 'paused' ? '，已暂停' : ''}`
+  if (pelvicTimerPainted.remaining !== remaining) { elements.remaining.textContent = remaining; pelvicTimerPainted.remaining = remaining }
+  if (pelvicTimerPainted.phase !== phaseText) { elements.phase.textContent = phaseText; pelvicTimerPainted.phase = phaseText }
+  if (pelvicTimerPainted.status !== statusText) { elements.status.textContent = statusText; pelvicTimerPainted.status = statusText }
+  if (pelvicTimerPainted.repetition !== repetitionText) { elements.repetition.textContent = repetitionText; pelvicTimerPainted.repetition = repetitionText }
+  if (pelvicTimerPainted.exercise !== exerciseText) { elements.exercise.textContent = exerciseText; pelvicTimerPainted.exercise = exerciseText }
+  if (pelvicTimerPainted.aria !== aria) { elements.countdown.setAttribute('aria-label', aria); pelvicTimerPainted.aria = aria }
+  const pauseText = state.status === 'paused' ? '继续' : '暂停'
+  if (pelvicTimerPainted.pause !== pauseText) { elements.pause.textContent = pauseText; pelvicTimerPainted.pause = pauseText }
 }
 
 function tickPelvicFloorTimer(): void {
   const state = pelvicTimerState
-  if (!state || state.status === 'paused') return
-  const previousPhase = state.activePhase
+  if (!state || state.status !== 'running') return
   pelvicTimerState = advancePelvicFloorTimer(state, Date.now())
   if (pelvicTimerState.status === 'completed') { void completePelvicFloorTimer(); return }
-  if (pelvicTimerState.activePhase !== previousPhase && pelvicTimerState.activePhase) playPelvicCue(pelvicTimerState.activePhase)
+  if (pelvicTimerState.activePhase !== state.activePhase || pelvicTimerState.exerciseIndex !== state.exerciseIndex) {
+    if (pelvicTimerState.activePhase === 'contract') playPelvicCue('contract')
+    else if (pelvicTimerState.activePhase === 'relax' || pelvicTimerState.activePhase === 'rest') playPelvicCue('relax')
+  }
   paintPelvicFloorTimer()
 }
 
@@ -888,11 +941,12 @@ async function completePelvicFloorTimer(): Promise<void> {
   const state = pelvicTimerState
   if (!state || state.status !== 'completed' || pelvicSessionSaving) return
   pelvicSessionSaving = true
-  window.clearInterval(pelvicTimerInterval)
+  stopPelvicTimerVisuals()
   await releasePelvicWakeLock()
   try {
     await savePelvicFloorSession(sessionFromPelvicFloorTimer(state, pelvicTimerDate))
     pelvicTimerState = undefined
+    pelvicTimerElements = undefined
     pelvicSessionSaving = false
     document.body.classList.remove('immersive')
     toast('凯格尔训练已保存')
@@ -902,7 +956,7 @@ async function completePelvicFloorTimer(): Promise<void> {
 
 async function showPelvicFloorHistory(): Promise<void> {
   const sessions = (await db.pelvicFloorSessions.toArray()).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt))
-  const dialog = openModal('凯格尔训练记录', `<div class="pelvic-history">${sessions.length ? sessions.map((session) => `<article><div class="pelvic-history-main"><div><strong>${formatShortDate(session.date)}</strong><span>${session.completedRepetitions} / ${session.repetitions} 次收缩</span></div><small>${pelvicFloorSessionDurationSeconds(session)} 秒 · 收缩 ${session.phases.find((phase) => phase.type === 'contract')?.durationSeconds ?? 0}s / 放松 ${session.phases.find((phase) => phase.type === 'relax')?.durationSeconds ?? 0}s</small></div><details class="row-menu"><summary aria-label="${formatShortDate(session.date)}更多操作">···</summary><div><button data-delete-pelvic-session="${session.id}">删除记录</button></div></details></article>`).join('') : '<p class="muted padded">还没有凯格尔训练记录</p>'}</div>`, true)
+  const dialog = openModal('凯格尔训练记录', `<div class="pelvic-history">${sessions.length ? sessions.map((session) => `<article><div class="pelvic-history-main"><div><strong>${formatShortDate(session.date)}</strong><span>${esc(session.routine?.name ?? '基础训练')}</span></div><small>${session.completedRepetitions >= session.repetitions ? '完成训练' : '已结束'} · ${session.completedRepetitions} / ${session.repetitions} 次 · ${pelvicFloorSessionDurationSeconds(session)} 秒</small></div><details class="row-menu"><summary aria-label="${formatShortDate(session.date)}更多操作">···</summary><div><button data-delete-pelvic-session="${session.id}">删除记录</button></div></details></article>`).join('') : '<p class="muted padded">还没有凯格尔训练记录</p>'}</div>`, true)
   dialog.querySelectorAll<HTMLButtonElement>('[data-delete-pelvic-session]').forEach((button) => button.addEventListener('click', async () => {
     button.closest('details')?.removeAttribute('open')
     if (!await confirmAction('删除这条训练记录？', '删除后无法恢复。', '删除')) return

@@ -146,7 +146,7 @@ export interface NutritionTarget extends NutritionGoal {
 }
 
 export interface PelvicFloorPhase {
-  type: 'contract' | 'relax'
+  type: 'prepare' | 'contract' | 'hold' | 'release' | 'relax' | 'rest'
   durationSeconds: number
 }
 
@@ -158,6 +158,12 @@ export interface PelvicFloorSession {
   phases: PelvicFloorPhase[]
   repetitions: number
   completedRepetitions: number
+  routine?: {
+    id: string
+    name: string
+    description: string
+    exercises: { id: string; name: string; phases: PelvicFloorPhase[]; repetitions: number; sets?: number; restBetweenSetsSeconds?: number; restAfterSeconds?: number }[]
+  }
   createdAt: string
   updatedAt: string
 }

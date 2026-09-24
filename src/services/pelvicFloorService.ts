@@ -8,11 +8,9 @@ export function sessionFromPelvicFloorTimer(state: PelvicFloorTimerState, date: 
   return {
     id: crypto.randomUUID(), date,
     startedAt: new Date(state.startedAtMs).toISOString(), finishedAt: new Date(state.finishedAtMs).toISOString(),
-    phases: [
-      { type: 'contract', durationSeconds: state.contractSeconds },
-      { type: 'relax', durationSeconds: state.relaxSeconds },
-    ],
+    phases: structuredClone(state.routine.exercises[0]!.phases),
     repetitions: state.repetitions, completedRepetitions: state.completedRepetitions,
+    routine: structuredClone(state.routine),
     createdAt: now, updatedAt: now,
   }
 }

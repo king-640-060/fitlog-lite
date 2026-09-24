@@ -247,25 +247,30 @@ h3 { margin-bottom: 5px; font-size: 1rem; }
 .pelvic-daily-summary span { color: var(--text-secondary); font-size: .78rem; text-align: right; }
 .pelvic-card-actions { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; }
 .pelvic-card-actions .secondary { min-height: 48px; }
-.pelvic-setup-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
-.pelvic-setup-grid label { position: relative; display: grid; gap: 6px; color: var(--text-secondary); font-size: .78rem; font-weight: 650; }
-.pelvic-setup-grid input { padding-right: 38px; }
-.pelvic-setup-grid label span { position: absolute; right: 10px; bottom: 14px; font-size: .72rem; }
+.pelvic-mode-list { display: grid; gap: 9px; }
+.pelvic-mode { display: flex; align-items: center; gap: 12px; min-height: 66px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); cursor: pointer; }
+.pelvic-mode:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.pelvic-mode input { width: 20px; height: 20px; flex: 0 0 auto; accent-color: var(--accent); }
+.pelvic-mode span { display: grid; gap: 3px; }
+.pelvic-mode small { color: var(--text-secondary); font-size: .78rem; }
 .pelvic-guidance { display: grid; gap: 7px; padding: 13px 14px; border-radius: 15px; background: var(--surface-soft); }
 .pelvic-guidance p { margin: 0; color: var(--text-secondary); font-size: .78rem; line-height: 1.5; }
 .pelvic-timer-screen { display: grid; min-height: calc(100dvh - 110px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); align-content: center; justify-items: center; gap: 14px; text-align: center; }
 .pelvic-timer-screen header { display: grid; gap: 3px; margin-bottom: 8px; }
 .pelvic-timer-screen header span { font-size: 1.08rem; font-weight: 750; }
 .pelvic-timer-screen header small, .pelvic-breathing-cue { color: var(--text-secondary); }
-.pelvic-countdown { --timer-progress: 0deg; --phase-scale: 1; position: relative; display: grid; width: min(58vw, 238px); aspect-ratio: 1; place-content: center; border-radius: 50%; background: radial-gradient(circle, var(--bg) 67%, transparent 68%), conic-gradient(var(--accent) var(--timer-progress), var(--border) 0); color: var(--accent-strong); }
-.pelvic-countdown::before { position: absolute; inset: 19%; border-radius: 50%; background: var(--accent-soft); content: ''; transform: scale(var(--phase-scale)); transition: transform 220ms linear; }
-.pelvic-countdown.is-relax { background: radial-gradient(circle, var(--bg) 67%, transparent 68%), conic-gradient(var(--info) var(--timer-progress), var(--border) 0); color: var(--info); }
-.pelvic-countdown.is-relax::before { background: color-mix(in srgb, var(--accent-soft) 54%, var(--surface)); }
-.pelvic-countdown.is-paused::before { transition: none; }
-.pelvic-countdown > * { position: relative; z-index: 1; }
-.pelvic-countdown #pelvic-phase { margin: 0 0 7px; color: inherit; font-size: 1rem; font-weight: 700; }
+.pelvic-countdown { position: relative; display: grid; width: min(58vw, 238px); aspect-ratio: 1; place-items: center; color: var(--accent-strong); }
+.pelvic-ring { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
+.pelvic-ring circle { fill: none; stroke-width: 5; }
+.pelvic-ring-track { stroke: var(--border); }
+.pelvic-ring-progress { stroke: var(--accent); stroke-linecap: round; }
+.pelvic-countdown.is-soft .pelvic-ring-progress { stroke: var(--info); }
+.pelvic-breathing { position: absolute; inset: 19%; border-radius: 50%; background: var(--accent-soft); will-change: transform; }
+.pelvic-countdown.is-soft .pelvic-breathing { background: color-mix(in srgb, var(--accent-soft) 54%, var(--surface)); }
+.pelvic-countdown-copy { position: relative; z-index: 1; display: grid; place-items: center; }
+.pelvic-countdown #pelvic-phase { margin: 0 0 7px; font-size: 1rem; font-weight: 700; }
 .pelvic-countdown strong { font-size: clamp(4rem, 20vw, 6rem); line-height: .9; letter-spacing: -.06em; }
-.pelvic-countdown span:last-child { margin-top: 8px; color: var(--text-secondary); font-size: .8rem; }
+.pelvic-countdown-copy span:last-child { margin-top: 8px; color: var(--text-secondary); font-size: .8rem; }
 .pelvic-timer-screen > h2 { font-size: 1.6rem; }
 .pelvic-timer-screen > p { margin: 0; }
 .pelvic-timer-actions { display: grid; width: min(100%, 330px); grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 9px; }

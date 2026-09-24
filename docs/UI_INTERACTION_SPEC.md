@@ -49,3 +49,11 @@ Do not use human training illustrations, anatomical diagrams, food photography, 
 - VisualViewport reports usable height and keyboard overlap. Let stable scroll containers and native focus scrolling position fields; avoid competing programmatic focus scrolling.
 - Bottom Sheets have a stable header and their own scrollable content; keep confirmation controls reachable above the keyboard and Safe Area.
 - Timers derive visual progress from their existing clock or state machine. Pause stops the visual state at the matching point, and resume continues from that point. Do not create an independent animation clock that can drift from the recorded state.
+
+## Pelvic floor training
+
+- Pelvic floor training uses a data-driven multi-phase timer. Each routine contains exercises, repetitions, optional sets, and ordered phases; the engine advances through that sequence.
+- Timer state derives from absolute deadlines. Delayed callbacks must catch up across phases, repetitions, sets, and exercises.
+- `requestAnimationFrame` only renders visual progress and is never the source of time. The SVG ring, breathing scale, and text reflect the current timer state and `Date.now()`.
+- Pause freezes the exact current phase position; resume continues from that position. Reduced Motion may remove breathing scale but must keep phase, remaining time, progress, and completion visible.
+- Historical contract/relax-only sessions remain valid and must never be inferred into newer routine types. Display them as “基础训练”.
