@@ -2,14 +2,14 @@ import { db, type FitLogDatabase } from '../db/database'
 import type { PelvicFloorSession } from '../db/types'
 import type { PelvicFloorTimerState } from './pelvicFloorTimer'
 
-export function sessionFromPelvicFloorTimer(state: PelvicFloorTimerState, date: string): PelvicFloorSession {
+export function sessionFromPelvicFloorTimer(state: PelvicFloorTimerState, date: string, completionType: 'completed' | 'manual'): PelvicFloorSession {
   if (state.startedAtMs === undefined || state.finishedAtMs === undefined) throw new Error('训练尚未结束')
   const now = new Date().toISOString()
   return {
     id: crypto.randomUUID(), date,
     startedAt: new Date(state.startedAtMs).toISOString(), finishedAt: new Date(state.finishedAtMs).toISOString(),
     phases: structuredClone(state.routine.exercises[0]!.phases),
-    repetitions: state.repetitions, completedRepetitions: state.completedRepetitions,
+    repetitions: state.repetitions, completedRepetitions: state.completedRepetitions, completionType,
     routine: structuredClone(state.routine),
     createdAt: now, updatedAt: now,
   }

@@ -11,6 +11,7 @@ import { buildImportPreview, parseFoodCsv, parseFoodJson, type ImportPreview } f
 import { upsertWeight } from './services/weightService'
 import { deleteNutritionTarget, normalizeNutritionGoal, saveNutritionTarget } from './services/nutritionTargetService'
 import { deletePelvicFloorSession, pelvicFloorSessionDurationSeconds, savePelvicFloorSession, sessionFromPelvicFloorTimer } from './services/pelvicFloorService'
+import { getPelvicFloorPlanProgress, pelvicFloorPlanLevelFromId, pelvicFloorPlanLevels, pelvicFloorPlanRoutineId, type PelvicFloorPlanLevel, type PelvicFloorPlanProgress } from './services/pelvicFloorPlan'
 import { extendRestTimer, getRestRemainingMs, pauseRestTimer, resumeRestTimer, startRestTimer, type RestTimerState } from './services/restTimer'
 import {
   advancePelvicFloorTimer, createPelvicFloorTimer, finishPelvicFloorTimer, getPelvicFloorPhaseProgress, getPelvicFloorRemainingSeconds, getPelvicFloorRoutineDurationSeconds,
@@ -63,10 +64,25 @@ let pelvicSessionSaving = false
 let pelvicAudioContext: AudioContext | undefined
 let pelvicWakeLock: { release: () => Promise<void> } | undefined
 const LAST_BACKUP_KEY = 'fitlog-last-backup-at'
+const PELVIC_PLAN_LEVEL_KEY = 'fitlog-pelvic-plan-level'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 const esc = (value: unknown): string => String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]!)
 const valueOf = (form: FormData, key: string): string => String(form.get(key) ?? '')
+
+function selectedPelvicPlanLevel(progress: PelvicFloorPlanProgress): PelvicFloorPlanLevel {
+  const preference = localStorage.getItem(PELVIC_PLAN_LEVEL_KEY)
+  return pelvicFloorPlanLevels.find((level) => level === preference && progress.unlockedLevels.includes(level)) ?? progress.currentLevel
+}
+
+function pelvicPlanRoutine(level: PelvicFloorPlanLevel): PelvicFloorRoutine {
+  return pelvicFloorRoutines.find((routine) => routine.id === pelvicFloorPlanRoutineId(level))!
+}
+
+function pelvicRoutineMinutes(routine: PelvicFloorRoutine): string {
+  const seconds = getPelvicFloorRoutineDurationSeconds(routine)
+  return `约 ${seconds % 60 === 30 ? seconds / 60 : Math.ceil(seconds / 60)} 分钟`
+}
 
 type IconName = 'home' | 'settings' | 'utensils' | 'dumbbell' | 'scale' | 'plus' | 'x' | 'search' | 'archive' | 'check' | 'trash' | 'edit' | 'download' | 'upload' | 'chevron' | 'calendar' | 'activity' | 'trend' | 'more' | 'leaf' | 'info' | 'sunrise' | 'sun' | 'moon' | 'snack'
 
@@ -282,13 +298,14 @@ function miniTrendSvg(values: number[]): string {
 
 async function renderTodayPage(): Promise<void> {
   const today = getLocalDateString()
-  const [logs, target, workouts, cardioSessions, pelvicSessions, weights] = await Promise.all([
+  const [logs, target, workouts, cardioSessions, pelvicSessions, weights, allPelvicSessions] = await Promise.all([
     db.foodLogs.where('date').equals(today).toArray(),
     db.nutritionTargets.where('date').equals(today).first(),
     db.workouts.where('date').equals(today).toArray(),
     getCardioSessionsByDate(today),
     db.pelvicFloorSessions.where('date').equals(today).toArray(),
     db.weights.orderBy('date').reverse().toArray(),
+    db.pelvicFloorSessions.toArray(),
   ])
   const totals = logs.reduce((sum, log) => ({
     calories: sum.calories + log.totalCalories,
@@ -305,19 +322,19 @@ async function renderTodayPage(): Promise<void> {
   const recentWeights = weights.filter((item) => item.date >= getLocalDateString(cutoff)).reverse()
   const weightDelta = latestWeight && recentWeights.length > 1 ? latestWeight.weightKg - recentWeights[0]!.weightKg : undefined
   const pelvicSeconds = pelvicSessions.reduce((total, session) => total + pelvicFloorSessionDurationSeconds(session), 0)
-  const standardPelvicDurationMinutes = Math.ceil(getPelvicFloorRoutineDurationSeconds(pelvicFloorRoutines.find((item) => item.id === 'standard')!) / 60)
+  const dailyPlanRoutine = pelvicPlanRoutine(selectedPelvicPlanLevel(getPelvicFloorPlanProgress(allPelvicSessions)))
   const view = document.querySelector<HTMLElement>('#view')!
   view.innerHTML = `
     <section class="today-card nutrition-today-card"><div class="card-heading"><div><span class="card-icon nutrition-icon">${icon('utensils', 19)}</span><h2>今日饮食</h2></div><button class="text-btn" id="today-food-details">查看详情 ${icon('chevron', 15)}</button></div><div class="today-calorie-layout">${ringSvgHtml(totals.calories, target?.calories, 'tiny')}<div class="today-calorie-copy"><strong>${formatNumber(totals.calories)} <small>kcal</small></strong><span class="today-goal-note${target?.calories === undefined ? ' is-unset' : ''}">${target?.calories === undefined ? '尚未设置目标' : `目标 ${formatNumber(target.calories)} kcal · ${goalStatusText(totals.calories, target.calories, 'kcal')}`}</span></div></div><div class="today-macros"><div class="protein"><span>蛋白质</span><strong>${formatNumber(totals.protein)}${target?.protein === undefined ? 'g' : ` / ${formatNumber(target.protein)}g`}</strong></div><div class="carbs"><span>碳水</span><strong>${formatNumber(totals.carbs)}${target?.carbs === undefined ? 'g' : ` / ${formatNumber(target.carbs)}g`}</strong></div><div class="fat"><span>脂肪</span><strong>${formatNumber(totals.fat)}${target?.fat === undefined ? 'g' : ` / ${formatNumber(target.fat)}g`}</strong></div></div></section>
     <section class="today-card workout-today-card"><div class="card-heading"><div><span class="card-icon workout-icon">${icon('dumbbell', 19)}</span><h2>今日训练</h2></div></div><div class="today-training-row"><strong>无氧</strong><span>${openWorkout ? '力量训练进行中' : finishedWorkouts.length ? `力量训练 · ${finishedWorkouts.length} 次 · ${strengthSets} 组` : '今天还没有力量训练'}</span></div><div class="today-training-row"><strong>有氧</strong><span>${cardioSessions.length === 1 ? `楼梯机 · ${formatNumber(cardioMinutes)} 分钟 · 速度 ${formatNumber(cardioSessions[0]!.speed)}` : cardioSessions.length ? `楼梯机 · ${cardioSessions.length} 次 · 共 ${formatNumber(cardioMinutes)} 分钟` : '今天还没有有氧训练'}</span></div><button class="primary full-btn" id="today-workout">${openWorkout ? '继续力量训练' : '查看训练'}</button></section>
     <section class="today-card weight-today-card"><div class="card-heading"><div><span class="card-icon weight-icon">${icon('scale', 19)}</span><h2>体重趋势</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 15)}</button></div>${latestWeight ? `<div class="weight-today-value"><strong>${formatNumber(latestWeight.weightKg)}</strong><span>kg</span><small>${weightDelta === undefined ? '记录更多数据后显示变化' : `${weightDelta > 0 ? '↑' : weightDelta < 0 ? '↓' : '—'} ${formatNumber(Math.abs(weightDelta))} kg · 近 30 天`}</small></div>${recentWeights.length > 1 ? miniTrendSvg(recentWeights.map((item) => item.weightKg)) : ''}` : '<div class="today-weight-empty"><div class="today-card-copy"><strong>暂无体重记录</strong><span>记录第一次体重，开始观察趋势</span></div><button class="secondary" id="today-record-weight">记录体重</button></div>'}</section>
-    <section class="today-card pelvic-today-card"><div class="today-habit-copy"><div class="card-heading"><div><span class="card-icon pelvic-icon">${icon('leaf', 19)}</span><h2>凯格尔训练</h2></div></div><div class="today-card-copy"><strong>${pelvicSessions.length ? `今天已完成 ${pelvicSessions.length} 次` : '今日尚未完成'}</strong><span>${pelvicSessions.length ? `累计 ${pelvicSeconds} 秒` : `标准训练约 ${standardPelvicDurationMinutes} 分钟 · 保持自然呼吸`}</span></div></div><button class="secondary" id="today-pelvic">开始训练</button></section>`
+    <section class="today-card pelvic-today-card"><div class="today-habit-copy"><div class="card-heading"><div><span class="card-icon pelvic-icon">${icon('leaf', 19)}</span><h2>凯格尔训练</h2></div></div><div class="today-card-copy"><strong>${pelvicSessions.length ? `今天已完成 ${pelvicSessions.length} 次` : '今日尚未完成'}</strong><span>${pelvicSessions.length ? `累计 ${pelvicSeconds} 秒` : `${dailyPlanRoutine.name} · ${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</span></div></div><button class="secondary" id="today-pelvic">开始训练</button></section>`
   animateNutritionRings(view)
   view.querySelector('#today-food-details')?.addEventListener('click', () => { activeTab = 'food'; foodDate = today; void render().catch(fail) })
   view.querySelector('#today-workout')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = openWorkout; workoutEditorOpen = Boolean(openWorkout); void render().catch(fail) })
   view.querySelector('#today-weight-details')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; void render().catch(fail) })
   view.querySelector('#today-record-weight')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; weightDate = today; void render().then(() => showWeightForm(today)).catch(fail) })
-  view.querySelector('#today-pelvic')?.addEventListener('click', () => { workoutDate = today; showPelvicFloorSetup() })
+  view.querySelector('#today-pelvic')?.addEventListener('click', () => { workoutDate = today; void showPelvicFloorSetup().catch(fail) })
 }
 
 function progressTabsHtml(): string {
@@ -371,7 +388,7 @@ async function renderMorePage(): Promise<void> {
   view.querySelector('#more-diet-templates')?.addEventListener('click', () => void showDietTemplateManager())
   view.querySelector('#more-pelvic')?.addEventListener('click', () => {
     const dialog = openModal('凯格尔训练', `<div class="action-stack"><button class="primary" id="more-start-pelvic">开始训练</button><button class="secondary" id="more-pelvic-history">查看训练记录</button></div>`)
-    dialog.querySelector('#more-start-pelvic')?.addEventListener('click', () => { dialog.close(); workoutDate = getLocalDateString(); showPelvicFloorSetup() })
+    dialog.querySelector('#more-start-pelvic')?.addEventListener('click', () => { dialog.close(); workoutDate = getLocalDateString(); void showPelvicFloorSetup().catch(fail) })
     dialog.querySelector('#more-pelvic-history')?.addEventListener('click', () => { dialog.close(); void showPelvicFloorHistory() })
   })
   view.querySelector('#more-import')?.addEventListener('click', () => void showFoodLibrary())
@@ -763,26 +780,27 @@ async function renderWorkoutPage(): Promise<void> {
     workoutEditorOpen = false
   }
   const openWorkout = await findOpenWorkout(workoutDate)
-  const [todayWorkouts, cardioSessions, pelvicSessions] = await Promise.all([
+  const [todayWorkouts, cardioSessions, pelvicSessions, allPelvicSessions] = await Promise.all([
     db.workouts.where('date').equals(workoutDate).toArray(),
     getCardioSessionsByDate(workoutDate),
     db.pelvicFloorSessions.where('date').equals(workoutDate).toArray(),
+    db.pelvicFloorSessions.toArray(),
   ])
   const pelvicSeconds = pelvicSessions.reduce((total, session) => total + pelvicFloorSessionDurationSeconds(session), 0)
   const strengthSets = todayWorkouts.reduce((total, workout) => total + workout.exercises.reduce((sum, exercise) => sum + exercise.sets.length, 0), 0)
   const cardioMinutes = cardioSessions.reduce((total, session) => total + session.durationMinutes, 0)
   const latestCardio = [...cardioSessions].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]
-  const standardRoutine = pelvicFloorRoutines.find((item) => item.id === 'standard')!
+  const dailyPlanRoutine = pelvicPlanRoutine(selectedPelvicPlanLevel(getPelvicFloorPlanProgress(allPelvicSessions)))
   const recentWorkouts = (await db.workouts.toArray()).filter((item) => item.finishedAt).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt)).slice(0, 4)
   const view = document.querySelector<HTMLElement>('#view')!
   view.innerHTML = `<section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>训练日期</span><input id="workout-date" type="date" value="${workoutDate}" aria-label="训练日期"></label><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section>
     <section class="training-category"><h2 class="training-category-label">无氧训练</h2><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('dumbbell', 20)}</span><div><h3>力量训练</h3><p>记录动作与组数</p></div></div><p class="training-card-summary">${openWorkout ? '训练进行中' : todayWorkouts.length ? `今日 ${todayWorkouts.length} 次 · ${strengthSets} 组` : '今天还没有力量训练'}</p><button class="primary training-card-action" id="start-workout">${openWorkout ? '继续训练' : '开始力量训练'}</button></div></section>
     <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">有氧训练</h2><button class="text-btn" id="cardio-history">历史记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('activity', 20)}</span><div><h3>楼梯机</h3><p>记录训练时间与速度</p></div></div>${cardioSessions.length ? `<div class="training-card-summary"><span>${cardioSessions.length === 1 ? '今日 1 次' : `今日 ${cardioSessions.length} 次`}</span><strong>${formatNumber(cardioMinutes)} <small>分钟</small></strong><span>${cardioSessions.length === 1 ? `速度 ${formatNumber(cardioSessions[0]!.speed)}` : `最近速度 ${formatNumber(latestCardio!.speed)}`}</span></div>` : '<p class="training-card-summary">今天还没有有氧训练</p>'}<button class="primary training-card-action" id="add-cardio">${cardioSessions.length ? '再记一次' : '记录训练'}</button>${latestCardio ? `<button class="training-card-link" data-cardio-id="${latestCardio.id}">最近：${formatNumber(latestCardio.durationMinutes)} 分钟 · 速度 ${formatNumber(latestCardio.speed)} ${icon('chevron', 15)}</button>` : ''}</div></section>
-    <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">凯格尔训练</h2><button class="text-btn" id="pelvic-floor-history">训练记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('leaf', 20)}</span><div><h3>今日训练 · 标准训练</h3><p>耐力保持与快速脉冲</p></div></div><p class="training-card-summary">${pelvicSessions.length ? `今日已完成 ${pelvicSessions.length} 次 · 累计 ${pelvicSeconds} 秒` : `约 ${Math.ceil(getPelvicFloorRoutineDurationSeconds(standardRoutine) / 60)} 分钟 · 适合日常练习`}</p><button class="primary training-card-action" id="start-pelvic-floor">开始训练</button></div></section><section class="section-head"><div><h2>最近力量训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 17)}</button>`).join('')}</div>`
+    <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">凯格尔训练</h2><button class="text-btn" id="pelvic-floor-history">训练记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('leaf', 20)}</span><div><h3>今日训练 · ${dailyPlanRoutine.name}</h3><p>渐进计划 · 耐力控制与快速脉冲</p></div></div><p class="training-card-summary">${pelvicSessions.length ? `今日已完成 ${pelvicSessions.length} 次 · 累计 ${pelvicSeconds} 秒` : `${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</p><button class="primary training-card-action" id="start-pelvic-floor">开始训练</button></div></section><section class="section-head"><div><h2>最近力量训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 17)}</button>`).join('')}</div>`
   view.querySelector<HTMLInputElement>('#workout-date')?.addEventListener('change', (event) => { workoutDate = (event.target as HTMLInputElement).value; currentWorkout = undefined; workoutEditorOpen = false; void render().catch(fail) })
   view.querySelector('#exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
   view.querySelector('#workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
-  view.querySelector('#start-pelvic-floor')?.addEventListener('click', () => showPelvicFloorSetup())
+  view.querySelector('#start-pelvic-floor')?.addEventListener('click', () => void showPelvicFloorSetup().catch(fail))
   view.querySelector('#pelvic-floor-history')?.addEventListener('click', () => void showPelvicFloorHistory())
   view.querySelector('#add-cardio')?.addEventListener('click', () => showCardioForm())
   view.querySelector('#cardio-history')?.addEventListener('click', () => void showCardioHistory())
@@ -865,29 +883,52 @@ async function releasePelvicWakeLock(): Promise<void> {
 
 const pelvicPhaseLabels: Record<string, string> = { prepare: '准备', contract: '收紧', hold: '保持', release: '释放', relax: '放松', rest: '休息' }
 
-function showPelvicFloorSetup(): void {
-  const standard = pelvicFloorRoutines.find((item) => item.id === 'standard')!
+async function showPelvicFloorSetup(): Promise<void> {
+  const progress = getPelvicFloorPlanProgress(await db.pelvicFloorSessions.toArray())
+  let selectedLevel = selectedPelvicPlanLevel(progress)
   const specialty = ['foundation', 'endurance', 'pulse', 'combined'].map((id) => pelvicFloorRoutines.find((item) => item.id === id)!)
-  const duration = (routine: PelvicFloorRoutine) => `约 ${Math.ceil(getPelvicFloorRoutineDurationSeconds(routine) / 60)} 分钟`
-  const dialog = openModal('凯格尔训练', `<div class="pelvic-setup"><h3 class="pelvic-setup-heading">今日训练</h3><div class="pelvic-featured"><div class="pelvic-featured-top"><strong>${standard.name}</strong><span>${duration(standard)}</span></div><p>耐力保持 → 快速脉冲 → 放松</p><small>完整训练 · 适合日常练习</small><button class="primary" data-pelvic-routine="${standard.id}" aria-label="开始${standard.name}，${duration(standard)}">开始训练</button></div><h3 class="pelvic-setup-heading">专项训练</h3><div class="pelvic-specialty-grid">${specialty.map((routine) => `<button class="pelvic-specialty" data-pelvic-routine="${routine.id}" aria-label="开始${routine.name}，${routine.description}，${duration(routine)}"><strong>${routine.name}</strong><span>${routine.description}</span><small>${duration(routine)}</small></button>`).join('')}</div><details class="pelvic-safety"><summary>保持自然呼吸，充分放松 ${icon('chevron', 14)}</summary><p>练习时保持自然呼吸，每次放松阶段充分放松。如有疼痛或明显不适，请停止并咨询专业人员。</p></details></div>`)
+  const dialog = openModal('凯格尔训练', '')
   let starting = false
-  dialog.querySelectorAll<HTMLButtonElement>('[data-pelvic-routine]').forEach((button) => button.addEventListener('click', async () => {
-    if (starting) return
-    starting = true
-    try {
-      const routine = pelvicFloorRoutines.find((item) => item.id === button.dataset.pelvicRoutine)
-      if (!routine) throw new Error('训练方案不可用')
-      const ready = createPelvicFloorTimer(routine)
-      await initializePelvicAudio()
-      pelvicTimerState = startPelvicFloorTimer(ready, Date.now())
-      pelvicTimerDate = workoutDate
-      pelvicSessionSaving = false
-      dialog.close()
-      if (pelvicTimerState.activePhase === 'contract') playPelvicCue('contract')
-      await requestPelvicWakeLock()
-      renderPelvicFloorTimer()
-    } catch (error) { starting = false; fail(error) }
-  }))
+  const renderChoices = () => {
+    const routine = pelvicPlanRoutine(selectedLevel)
+    const endurance = routine.exercises[0]!
+    const pulse = routine.exercises[1]!
+    const levelIndex = pelvicFloorPlanLevels.indexOf(selectedLevel)
+    const nextLevel = pelvicFloorPlanLevels[levelIndex + 1]
+    const nextUnlocked = nextLevel && progress.unlockedLevels.includes(nextLevel)
+    const stageDays = selectedLevel === 'foundation' ? progress.foundationDays : selectedLevel === 'standard' ? progress.standardDays : progress.advancedDays
+    const milestone = selectedLevel === 'foundation' ? `${Math.min(progress.foundationDays, 7)} / 7 个基础训练日` : selectedLevel === 'standard' ? `${Math.min(progress.foundationDays, 7) + Math.min(progress.standardDays, 7)} / 14 个训练日` : `累计 ${progress.totalDays} 个训练日`
+    dialog.querySelector('.modal-body')!.innerHTML = `<div class="pelvic-setup"><h3 class="pelvic-setup-heading">今日训练</h3><div class="pelvic-featured"><div class="pelvic-featured-top"><strong>渐进计划 · ${routine.name}</strong><span>${pelvicRoutineMinutes(routine)}</span></div><p>耐力控制 → 休息 → 快速脉冲</p><div class="pelvic-plan-composition"><span>耐力控制 <strong>${endurance.repetitions} 次</strong></span><span>快速脉冲 <strong>${pulse.repetitions} 次</strong></span></div><small>已完成 ${milestone}${selectedLevel === 'advanced' ? '' : ` · 本阶段 ${stageDays} 天`}</small><button class="primary" data-pelvic-routine="${routine.id}" aria-label="开始今日训练，${routine.name}，${pelvicRoutineMinutes(routine)}">开始今日训练</button></div><div class="pelvic-plan-head"><h3 class="pelvic-setup-heading">训练进度</h3><span>${progress.nextUnlock ? `距解锁${pelvicPlanRoutine(progress.nextUnlock.level).name}还有 ${progress.nextUnlock.remainingDays} 天` : '全部阶段已解锁'}</span></div><div class="pelvic-stage-list" role="list" aria-label="渐进计划阶段">${pelvicFloorPlanLevels.map((level) => { const stage = pelvicPlanRoutine(level); const unlocked = progress.unlockedLevels.includes(level); const active = level === selectedLevel; return unlocked ? `<button class="pelvic-stage${active ? ' is-current' : ''}" data-plan-level="${level}" aria-label="${stage.name}，${active ? '当前阶段' : '已解锁'}，${pelvicRoutineMinutes(stage)}" aria-pressed="${active}"><span class="pelvic-stage-dot" aria-hidden="true"></span><strong>${stage.name.replace('阶段', '')}</strong><small>${active ? '当前' : '可选择'}</small></button>` : `<span class="pelvic-stage is-locked" role="listitem" aria-label="${stage.name}，未解锁"><span class="pelvic-stage-dot" aria-hidden="true"></span><strong>${stage.name.replace('阶段', '')}</strong><small>未解锁</small></span>` }).join('')}</div>${nextUnlocked ? `<div class="pelvic-unlock-choice"><strong>${pelvicPlanRoutine(nextLevel).name}已解锁</strong><p>可以继续当前阶段，或开始下一阶段。</p><div><button class="secondary" data-keep-level>继续${routine.name.replace('阶段', '')}</button><button class="primary" data-plan-level="${nextLevel}">升级到${pelvicPlanRoutine(nextLevel).name.replace('阶段', '')}</button></div></div>` : ''}<details class="pelvic-plan-details"><summary>查看${routine.name}详情 ${icon('chevron', 14)}</summary><div><p><strong>耐力控制 · ${endurance.repetitions} 次</strong><span>收紧 → 保持 → 释放 → 放松</span></p><p><strong>休息 · ${endurance.restAfterSeconds} 秒</strong></p><p><strong>快速脉冲 · ${pulse.repetitions} 次</strong><span>收紧 → 放松</span></p><small>训练重点：保持自然呼吸，每次收缩后充分放松。</small></div></details><h3 class="pelvic-setup-heading">专项训练</h3><div class="pelvic-specialty-grid">${specialty.map((item) => `<button class="pelvic-specialty" data-pelvic-routine="${item.id}" aria-label="开始${item.name}，${item.description}，${pelvicRoutineMinutes(item)}"><strong>${item.name}</strong><span>${item.description}</span><small>${pelvicRoutineMinutes(item)}</small></button>`).join('')}</div><details class="pelvic-safety"><summary>保持自然呼吸，充分放松 ${icon('chevron', 14)}</summary><p>练习时保持自然呼吸，每次放松阶段充分放松。如有疼痛或明显不适，请停止并咨询专业人员。</p></details></div>`
+    dialog.querySelectorAll<HTMLButtonElement>('[data-plan-level]').forEach((button) => button.addEventListener('click', () => {
+      const level = button.dataset.planLevel as PelvicFloorPlanLevel
+      if (!progress.unlockedLevels.includes(level)) return
+      selectedLevel = level
+      localStorage.setItem(PELVIC_PLAN_LEVEL_KEY, level)
+      renderChoices()
+    }))
+    dialog.querySelector('[data-keep-level]')?.addEventListener('click', () => {
+      localStorage.setItem(PELVIC_PLAN_LEVEL_KEY, selectedLevel)
+      dialog.querySelector('.pelvic-unlock-choice')?.remove()
+    })
+    dialog.querySelectorAll<HTMLButtonElement>('[data-pelvic-routine]').forEach((button) => button.addEventListener('click', async () => {
+      if (starting) return
+      starting = true
+      try {
+        const selectedRoutine = pelvicFloorRoutines.find((item) => item.id === button.dataset.pelvicRoutine)
+        if (!selectedRoutine) throw new Error('训练方案不可用')
+        const ready = createPelvicFloorTimer(selectedRoutine)
+        await initializePelvicAudio()
+        pelvicTimerState = startPelvicFloorTimer(ready, Date.now())
+        pelvicTimerDate = workoutDate
+        pelvicSessionSaving = false
+        dialog.close()
+        if (pelvicTimerState.activePhase === 'contract') playPelvicCue('contract')
+        await requestPelvicWakeLock()
+        renderPelvicFloorTimer()
+      } catch (error) { starting = false; fail(error) }
+    }))
+  }
+  renderChoices()
 }
 
 function stopPelvicTimerVisuals(): void {
@@ -943,7 +984,7 @@ function renderPelvicFloorTimer(): void {
     if (!pelvicTimerState || !await confirmAction('结束凯格尔训练？', '将保存当前已完成的训练进度。', '结束并保存')) return
     if (!pelvicTimerState || pelvicSessionSaving) return
     pelvicTimerState = finishPelvicFloorTimer(pelvicTimerState, Date.now())
-    await completePelvicFloorTimer()
+    await completePelvicFloorTimer('manual')
   })
   if (state.status === 'running') {
     pelvicTimerInterval = window.setInterval(tickPelvicFloorTimer, 200)
@@ -994,26 +1035,47 @@ function tickPelvicFloorTimer(): void {
   paintPelvicFloorTimer()
 }
 
-async function completePelvicFloorTimer(): Promise<void> {
+async function completePelvicFloorTimer(completionType: 'completed' | 'manual' = 'completed'): Promise<void> {
   const state = pelvicTimerState
   if (!state || state.status !== 'completed' || pelvicSessionSaving) return
   pelvicSessionSaving = true
   stopPelvicTimerVisuals()
   await releasePelvicWakeLock()
   try {
-    await savePelvicFloorSession(sessionFromPelvicFloorTimer(state, pelvicTimerDate))
+    const session = sessionFromPelvicFloorTimer(state, pelvicTimerDate, completionType)
+    const isPlanCompletion = completionType === 'completed' && pelvicFloorPlanLevelFromId(session.routine?.id) !== undefined
+    const previousSessions = isPlanCompletion ? await db.pelvicFloorSessions.toArray() : []
+    const previousProgress = getPelvicFloorPlanProgress(previousSessions)
+    await savePelvicFloorSession(session)
+    if (isPlanCompletion) localStorage.removeItem(PELVIC_PLAN_LEVEL_KEY)
+    const updatedProgress = isPlanCompletion ? getPelvicFloorPlanProgress([...previousSessions, session]) : previousProgress
+    const unlocked = updatedProgress.unlockedLevels.find((level) => !previousProgress.unlockedLevels.includes(level))
     pelvicTimerState = undefined
     pelvicTimerElements = undefined
     pelvicSessionSaving = false
     document.body.classList.remove('immersive')
-    toast('凯格尔训练已保存')
     await render()
+    if (unlocked) {
+      const next = pelvicPlanRoutine(unlocked)
+      const dialog = openModal('训练完成', `<div class="pelvic-completion"><p>今天完成了${esc(state.routine.name)}训练。</p><strong>下一阶段已解锁</strong><span>${next.name} · ${pelvicRoutineMinutes(next)}</span><p>可以继续当前阶段，或在下次训练前选择新阶段。</p><button class="primary" data-completion-done>完成</button></div>`)
+      dialog.querySelector('[data-completion-done]')?.addEventListener('click', () => dialog.close())
+    } else toast(completionType === 'manual' ? '训练进度已保存' : '凯格尔训练已完成')
   } catch (error) { pelvicSessionSaving = false; fail(error) }
 }
 
 async function showPelvicFloorHistory(): Promise<void> {
   const sessions = (await db.pelvicFloorSessions.toArray()).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt))
-  const dialog = openModal('凯格尔训练记录', `<div class="pelvic-history">${sessions.length ? sessions.map((session) => `<article><div class="pelvic-history-main"><div><strong>${formatShortDate(session.date)}</strong><span>${esc(session.routine?.name ?? '基础训练')}</span></div><small>${session.completedRepetitions >= session.repetitions ? '完成训练' : '已结束'} · ${session.completedRepetitions} / ${session.repetitions} 次 · ${pelvicFloorSessionDurationSeconds(session)} 秒</small></div><details class="row-menu"><summary aria-label="${formatShortDate(session.date)}更多操作">···</summary><div><button data-delete-pelvic-session="${session.id}">删除记录</button></div></details></article>`).join('') : '<p class="muted padded">还没有凯格尔训练记录</p>'}</div>`, true)
+  const rows = sessions.map((session) => {
+    const plan = pelvicFloorPlanLevelFromId(session.routine?.id)
+    const specialty = ['foundation', 'endurance', 'pulse', 'combined'].includes(session.routine?.id ?? '')
+    const completed = session.completionType === 'completed' || (session.completionType === undefined && session.completedRepetitions >= session.repetitions)
+    const seconds = pelvicFloorSessionDurationSeconds(session)
+    const detail = plan
+      ? `${completed ? '今日训练完成' : '已结束'} · ${Math.floor(seconds / 60)}分${String(seconds % 60).padStart(2, '0')}秒`
+      : `${completed ? '完成训练' : '已结束'} · ${session.completedRepetitions} / ${session.repetitions} 次 · ${seconds} 秒`
+    return `<article><div class="pelvic-history-main"><div><strong>${formatShortDate(session.date)}</strong><span>${plan ? '今日训练 · ' : specialty ? '专项训练 · ' : ''}${esc(session.routine?.name ?? '基础训练')}</span></div><small>${detail}</small></div><details class="row-menu"><summary aria-label="${formatShortDate(session.date)}更多操作">···</summary><div><button data-delete-pelvic-session="${session.id}">删除记录</button></div></details></article>`
+  })
+  const dialog = openModal('凯格尔训练记录', `<div class="pelvic-history">${rows.length ? rows.join('') : '<p class="muted padded">还没有凯格尔训练记录</p>'}</div>`, true)
   dialog.querySelectorAll<HTMLButtonElement>('[data-delete-pelvic-session]').forEach((button) => button.addEventListener('click', async () => {
     button.closest('details')?.removeAttribute('open')
     if (!await confirmAction('删除这条训练记录？', '删除后无法恢复。', '删除')) return

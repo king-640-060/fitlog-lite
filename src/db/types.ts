@@ -168,6 +168,7 @@ export interface PelvicFloorSession {
   phases: PelvicFloorPhase[]
   repetitions: number
   completedRepetitions: number
+  completionType?: 'completed' | 'manual'
   routine?: {
     id: string
     name: string

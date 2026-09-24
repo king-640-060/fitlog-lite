@@ -241,6 +241,7 @@ function validatePelvicFloorSession(record: UnknownRecord, index: number): void 
   finite(record.repetitions, `${location} repetitions`, 1, true)
   const completed = finite(record.completedRepetitions, `${location} completedRepetitions`, 0, true)
   if (completed > Number(record.repetitions)) throw new Error(`${location}：completedRepetitions 不能大于 repetitions`)
+  if (record.completionType !== undefined && record.completionType !== 'completed' && record.completionType !== 'manual') throw new Error(`${location} completionType：无效完成类型`)
   if (!Array.isArray(record.phases) || !record.phases.length) throw new Error(`${location} phases：必须是非空 array`)
   const validatePhases = (phases: unknown[], prefix: string): void => phases.forEach((phaseValue, phaseIndex) => {
     const phaseLocation = `${prefix}，第 ${phaseIndex + 1} 个阶段`

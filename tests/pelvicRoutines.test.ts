@@ -7,10 +7,13 @@ import {
 describe('pelvic floor routine presets', () => {
   const expected = [
     ['standard', '标准训练', 160],
-    ['foundation', '基础控制', 120],
-    ['endurance', '耐力保持', 180],
-    ['pulse', '快速脉冲', 50],
-    ['combined', '综合训练', 230],
+    ['foundation', '基础控制', 150],
+    ['endurance', '耐力保持', 240],
+    ['pulse', '快速脉冲', 60],
+    ['combined', '综合训练', 300],
+    ['plan-foundation', '基础阶段', 163],
+    ['plan-standard', '标准阶段', 235],
+    ['plan-advanced', '进阶阶段', 300],
   ] as const
 
   it.each(expected)('%s keeps valid phases, displays its derived duration, and completes with the existing timer', (id, name, seconds) => {

@@ -48,32 +48,59 @@ export const pelvicFloorRoutines: PelvicFloorRoutine[] = [
     ] },
   ] },
   { id: 'foundation', name: '基础控制', description: '完整收紧与放松', exercises: [
-    { id: 'foundation', name: '基础控制', repetitions: 12, phases: [
+    { id: 'foundation', name: '基础控制', repetitions: 15, phases: [
       { type: 'contract', durationSeconds: 2 }, { type: 'hold', durationSeconds: 2 },
       { type: 'release', durationSeconds: 2 }, { type: 'relax', durationSeconds: 4 },
     ] },
   ] },
   { id: 'endurance', name: '耐力保持', description: '持续保持控制', exercises: [
     { id: 'endurance', name: '耐力保持', repetitions: 12, phases: [
-      { type: 'contract', durationSeconds: 2 }, { type: 'hold', durationSeconds: 6 },
-      { type: 'release', durationSeconds: 2 }, { type: 'relax', durationSeconds: 5 },
+      { type: 'contract', durationSeconds: 2 }, { type: 'hold', durationSeconds: 8 },
+      { type: 'release', durationSeconds: 2 }, { type: 'relax', durationSeconds: 8 },
     ] },
   ] },
   { id: 'pulse', name: '快速脉冲', description: '快速收放练习', exercises: [
-    { id: 'pulse', name: '快速脉冲', repetitions: 25, phases: [
+    { id: 'pulse', name: '快速脉冲', repetitions: 30, phases: [
       { type: 'contract', durationSeconds: 1 }, { type: 'relax', durationSeconds: 1 },
     ] },
   ] },
   { id: 'combined', name: '综合训练', description: '多节奏组合', exercises: [
-    { id: 'foundation', name: '基础控制', repetitions: 8, restAfterSeconds: 10, phases: [
+    { id: 'foundation', name: '基础控制', repetitions: 8, restAfterSeconds: 15, phases: [
       { type: 'contract', durationSeconds: 2 }, { type: 'hold', durationSeconds: 2 },
       { type: 'release', durationSeconds: 2 }, { type: 'relax', durationSeconds: 4 },
     ] },
-    { id: 'endurance', name: '耐力保持', repetitions: 6, restAfterSeconds: 10, phases: [
-      { type: 'contract', durationSeconds: 2 }, { type: 'hold', durationSeconds: 6 },
-      { type: 'release', durationSeconds: 2 }, { type: 'relax', durationSeconds: 5 },
+    { id: 'endurance', name: '耐力保持', repetitions: 8, restAfterSeconds: 15, phases: [
+      { type: 'contract', durationSeconds: 2 }, { type: 'hold', durationSeconds: 8 },
+      { type: 'release', durationSeconds: 2 }, { type: 'relax', durationSeconds: 8 },
     ] },
-    { id: 'pulse', name: '快速脉冲', repetitions: 20, phases: [
+    { id: 'pulse', name: '快速脉冲', repetitions: 15, phases: [
+      { type: 'contract', durationSeconds: 1 }, { type: 'relax', durationSeconds: 1 },
+    ] },
+  ] },
+  { id: 'plan-foundation', name: '基础阶段', description: '渐进计划 · 基础阶段', exercises: [
+    { id: 'endurance-control', name: '耐力控制', repetitions: 8, restAfterSeconds: 15, phases: [
+      { type: 'contract', durationSeconds: 2 }, { type: 'hold', durationSeconds: 5 },
+      { type: 'release', durationSeconds: 2 }, { type: 'relax', durationSeconds: 7 },
+    ] },
+    { id: 'quick-pulse', name: '快速脉冲', repetitions: 10, phases: [
+      { type: 'contract', durationSeconds: 1 }, { type: 'relax', durationSeconds: 1 },
+    ] },
+  ] },
+  { id: 'plan-standard', name: '标准阶段', description: '渐进计划 · 标准阶段', exercises: [
+    { id: 'endurance-control', name: '耐力控制', repetitions: 10, restAfterSeconds: 15, phases: [
+      { type: 'contract', durationSeconds: 2 }, { type: 'hold', durationSeconds: 8 },
+      { type: 'release', durationSeconds: 2 }, { type: 'relax', durationSeconds: 8 },
+    ] },
+    { id: 'quick-pulse', name: '快速脉冲', repetitions: 10, phases: [
+      { type: 'contract', durationSeconds: 1 }, { type: 'relax', durationSeconds: 1 },
+    ] },
+  ] },
+  { id: 'plan-advanced', name: '进阶阶段', description: '渐进计划 · 进阶阶段', exercises: [
+    { id: 'endurance-control', name: '耐力控制', repetitions: 10, restAfterSeconds: 20, phases: [
+      { type: 'contract', durationSeconds: 2 }, { type: 'hold', durationSeconds: 10 },
+      { type: 'release', durationSeconds: 2 }, { type: 'relax', durationSeconds: 10 },
+    ] },
+    { id: 'quick-pulse', name: '快速脉冲', repetitions: 20, phases: [
       { type: 'contract', durationSeconds: 1 }, { type: 'relax', durationSeconds: 1 },
     ] },
   ] },

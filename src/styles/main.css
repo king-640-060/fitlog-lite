@@ -282,6 +282,37 @@ h3 { margin-bottom: 5px; font-size: 1rem; }
 .pelvic-featured p, .pelvic-featured small { margin: 0; font-size: .79rem; }
 .pelvic-featured small { color: var(--text-secondary); }
 .pelvic-featured .primary { width: 100%; min-height: 48px; margin-top: 5px; border-radius: 14px; }
+.pelvic-plan-composition { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.pelvic-plan-composition span { display: flex; justify-content: space-between; gap: 4px; padding: 8px 9px; border-radius: 10px; background: var(--surface); color: var(--text-secondary); font-size: .73rem; white-space: nowrap; }
+.pelvic-plan-composition strong { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.pelvic-plan-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pelvic-plan-head > span { color: var(--text-secondary); font-size: .7rem; font-variant-numeric: tabular-nums; text-align: right; }
+.pelvic-stage-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+.pelvic-stage { display: grid; min-width: 0; min-height: 67px; place-items: center; align-content: center; gap: 3px; padding: 6px 4px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); color: var(--text-primary); text-align: center; }
+.pelvic-stage.is-current { border-color: var(--accent); background: var(--accent-soft); }
+.pelvic-stage.is-locked { color: var(--text-secondary); background: var(--surface-soft); }
+.pelvic-stage-dot { width: 8px; height: 8px; border: 2px solid var(--accent); border-radius: 50%; background: var(--surface); }
+.pelvic-stage.is-current .pelvic-stage-dot { background: var(--accent); }
+.pelvic-stage.is-locked .pelvic-stage-dot { border-color: var(--text-tertiary); }
+.pelvic-stage strong { font-size: .8rem; }
+.pelvic-stage small { color: var(--text-secondary); font-size: .68rem; }
+.pelvic-unlock-choice { display: grid; gap: 6px; padding: 12px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-soft); }
+.pelvic-unlock-choice strong { font-size: .84rem; }
+.pelvic-unlock-choice p { margin: 0; color: var(--text-secondary); font-size: .75rem; }
+.pelvic-unlock-choice > div { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 3px; }
+.pelvic-unlock-choice button { min-height: 42px; padding: 6px; border-radius: 11px; font-size: .78rem; }
+.pelvic-plan-details { color: var(--text-secondary); font-size: .76rem; }
+.pelvic-plan-details summary { display: flex; min-height: 40px; align-items: center; justify-content: space-between; cursor: pointer; list-style: none; }
+.pelvic-plan-details summary::-webkit-details-marker { display: none; }
+.pelvic-plan-details > div { display: grid; gap: 7px; padding: 8px 11px; border-radius: 12px; background: var(--surface-soft); }
+.pelvic-plan-details p { display: grid; gap: 2px; margin: 0; }
+.pelvic-plan-details p strong { color: var(--text-primary); font-size: .78rem; }
+.pelvic-plan-details small { line-height: 1.45; }
+.pelvic-completion { display: grid; gap: 10px; }
+.pelvic-completion p { margin: 0; color: var(--text-secondary); font-size: .84rem; line-height: 1.45; }
+.pelvic-completion strong { color: var(--accent-strong); font-size: 1rem; }
+.pelvic-completion span { font-variant-numeric: tabular-nums; }
+.pelvic-completion .primary { width: 100%; margin-top: 7px; }
 .pelvic-specialty-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
 .pelvic-specialty { display: grid; min-width: 0; min-height: 103px; align-content: start; gap: 6px; padding: 13px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); text-align: left; }
 .pelvic-specialty:hover, .pelvic-specialty:focus-visible { border-color: var(--accent); background: var(--accent-soft); }

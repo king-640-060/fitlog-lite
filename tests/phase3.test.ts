@@ -268,6 +268,20 @@ describe('Pelvic floor timer pure state', () => {
 })
 
 describe('Pelvic floor backup compatibility', () => {
+  it('V4 可选完成类型往返保留，非法值在清空数据前被拒绝', async () => {
+    const routine = pelvicFloorRoutines.find((item) => item.id === 'plan-foundation')!
+    const state = advancePelvicFloorTimer(startPelvicFloorTimer(createPelvicFloorTimer(routine), 0), 163000)
+    const source = newDatabase()
+    await source.pelvicFloorSessions.add(sessionFromPelvicFloorTimer(state, '2026-09-21', 'completed'))
+    const backup = await exportBackup(source)
+    const target = newDatabase()
+    await restoreBackup(backup, target)
+    expect((await target.pelvicFloorSessions.toArray())[0]).toMatchObject({ completionType: 'completed', routine: { id: 'plan-foundation' } })
+    backup.data.pelvicFloorSessions[0]!.completionType = 'invalid' as 'completed'
+    await expect(restoreBackup(backup, target)).rejects.toThrow('completionType')
+    expect(await target.pelvicFloorSessions.count()).toBe(1)
+  })
+
   it('旧 contract/relax V3 记录仍能导出、恢复且不被推断为新模式', async () => {
     const source = newDatabase(); await source.pelvicFloorSessions.add(session())
     const backup = await exportBackup(source)
@@ -279,7 +293,7 @@ describe('Pelvic floor backup compatibility', () => {
 
   it('新混合训练快照通过 V3 backup 验证并往返恢复', async () => {
     const state = advancePelvicFloorTimer(startPelvicFloorTimer(createPelvicFloorTimer(pelvicFloorRoutines[2]!), 0), 174000)
-    const source = newDatabase(); await source.pelvicFloorSessions.add(sessionFromPelvicFloorTimer(state, '2026-09-21'))
+    const source = newDatabase(); await source.pelvicFloorSessions.add(sessionFromPelvicFloorTimer(state, '2026-09-21', 'completed'))
     const backup = await exportBackup(source)
     expect(backup.schemaVersion).toBe(4)
     expect(backup.data.pelvicFloorSessions[0]?.routine?.name).toBe('混合训练')
@@ -291,7 +305,7 @@ describe('Pelvic floor backup compatibility', () => {
     const database = newDatabase(); await database.foods.add(food())
     const state = advancePelvicFloorTimer(startPelvicFloorTimer(createPelvicFloorTimer(pelvicFloorRoutines[2]!), 0), 174000)
     const backup = v3Backup()
-    backup.data.pelvicFloorSessions = [sessionFromPelvicFloorTimer(state, '2026-09-21')]
+    backup.data.pelvicFloorSessions = [sessionFromPelvicFloorTimer(state, '2026-09-21', 'completed')]
     backup.data.pelvicFloorSessions[0]!.routine!.exercises[1]!.phases[0]!.type = 'invalid' as 'contract'
     await expect(restoreBackup(backup, database)).rejects.toThrow('无效阶段')
     expect(await database.foods.count()).toBe(1)

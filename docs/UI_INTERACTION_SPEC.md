@@ -54,6 +54,10 @@ Do not use human training illustrations, anatomical diagrams, food photography, 
 
 - Pelvic floor training uses a data-driven multi-phase timer. Each routine contains exercises, repetitions, optional sets, and ordered phases; the engine advances through that sequence.
 - Routine selection presents one primary daily workout and four compact specialty workout buttons. A tap starts the named routine directly; do not use large radio-style option cards.
+- Pelvic-floor daily training uses a three-stage progressive plan: Foundation → Standard → Advanced. The plan is a training structure, not a medical assessment or promise of results.
+- Progression uses completed training days rather than elapsed calendar weeks. Count at most one naturally completed plan session per device-local business date; specialty routines, manually ended sessions, and legacy routine IDs do not advance the plan.
+- Seven distinct Foundation dates unlock Standard; seven further distinct Standard dates unlock Advanced. Unlocking never forces advancement. The user may select any unlocked stage, including a previous stage.
+- Session snapshots remain the source of truth for progress. An optional local preference may retain a stage selection until the next naturally completed plan session; it must not unlock a stage or rewrite history.
 - Estimated workout duration is calculated from phases, repetitions, sets, and intervening rests in the routine data. Never duplicate it as a display-only duration constant.
 - Keep the breathing and discomfort guidance available in a compact, expandable help area without crowding the primary training choices.
 - Timer state derives from absolute deadlines. Delayed callbacks must catch up across phases, repetitions, sets, and exercises.
