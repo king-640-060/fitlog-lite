@@ -6,56 +6,57 @@ This is the latest verified production application snapshot. Sync `main` and ins
 
 ```text
 Branch: main
-START_COMMIT: 12c064269288d53088f10b24bb339d1feb7c9166
-Application commit: d47bc8cbc129633efb182cf20d2cf5f40390d511
-Application commit message: Add cardio training and calendar indicators
+START_COMMIT: 611cd079f73d2045c36f076d30a920c83d14e213
+Application commit: a08ef907e3ba2e53f84b3e6f0db68a11c021ee8d
+Application commit message: Redesign pelvic floor and cardio training UI
 Production URL: https://king-640-060.github.io/fitlog-lite/
-GitHub Actions run: 35952312210
+GitHub Actions run: 35957203952
 Workflow conclusion: completed / success
 ```
 
-## Latest Round — Training Categories and Cardio
+## Latest Round — Training UI
 
-The Training page now presents two primary categories: 无氧训练 for existing strength Workouts and 有氧训练 for stair-machine records. Existing Workout, Exercise, set, history, template, autosave, and rest timer semantics are unchanged. A CardioSession independently stores the selected local business date, duration in minutes, a unitless speed number, an optional note, and timestamps. The Training page supports create, edit, delete with confirmation, a compact same-day list, and simple all-date history.
+Pelvic floor selection now has a featured daily Standard Training card with composition, calculated duration, and a direct Start action. Four compact two-column specialty buttons start Foundation/Control, Endurance, Quick Pulse, and Combined Training. The full breathing and discomfort guidance remains in expandable help. Presets are data-driven; the multi-phase, absolute-deadline timer state machine and its requestAnimationFrame rendering remain unchanged. Legacy routine names and stored snapshots are preserved for history.
 
-Today shows anaerobic and cardio separately. Calendar aggregation includes cardio count and minutes. Month cells show recorded food calories and small strength/cardio category markers with restrained colors; speed and duration stay in the day detail and cardio history. The day detail lists food, anaerobic training, cardio, pelvic floor training, and weight separately. Clearing a day includes cardio in the same transaction and in the confirmation text. Progress recent activity was not extended to cardio in this round; it remains derived from its existing sources, with no new Activity store.
+Strength, stair-machine cardio, and pelvic floor use a shared Training card hierarchy, spacing, typography, icon alignment, and primary CTA shape. The cardio card presents today's count, duration, speed, and one recent-record link. The cardio form aligns all labels and fields on one grid, centers the minute suffix, and groups Save/Delete actions. Cardio history uses stable date and numeric columns; an empty history offers a direct Record action. Today strength/cardio rows share label and value positions and use tabular numerals. The data model and cardio CRUD behavior remain unchanged.
 
 ## Data and Compatibility
 
 ```text
-Database: Dexie V5, 10 stores
-Migration: explicit V4 → V5; adds cardioSessions indexed by id, date, createdAt; no historical backfill or change to the nine existing stores
+Database: Dexie V5, 10 stores; unchanged
 Database name: fitlog-lite-db; unchanged
-Backup export schema: V4, includes cardioSessions
-Restore compatibility: V1 / V2 / V3 / V4; older backups normalize missing cardioSessions to []
+Backup export schema: V4; unchanged
+Restore compatibility: V1 / V2 / V3 / V4; unchanged
 Local business date: device-local YYYY-MM-DD; unchanged
 ```
 
-V4 backup validation checks cardio IDs, dates, positive duration and speed, optional note, and timestamps before any store is cleared. Restore remains one transaction across all ten stores. Legacy Workout and pelvic floor history are not reclassified or inferred.
+No migration, new store, Backup format change, historical rewrite, strength business change, food change, or Calendar aggregation change was made.
 
 ## Automated Verification
 
 ```text
 npm run typecheck: PASS
-npm test: PASS — 128 tests / 10 files
+npm test: PASS — 135 tests / 11 files
 npm run build: PASS
-PWA generateSW: PASS — 17 precache entries / 541.20 KiB
+PWA generateSW: PASS — 17 precache entries / 547.29 KiB
 git diff --check: PASS
 ```
 
-New coverage checks cardio create/read/update/delete, invalid values and dates, V4 → V5 preservation of all nine prior stores, Food + Workout + Cardio aggregation, cardio-only recorded days, all-date clearing and rollback, Backup V4 round-trip, Restore V1/V2/V3/V4, and validation before clearing.
+New tests cover every visible pelvic floor preset's structure and calculated duration; start, pause, resume, and completion on the existing engine; set and between-exercise rest calculation; and legacy routine names. The existing cardio CRUD, validation, backup, restore, and migration tests continue to pass.
+
+## Browser Visual Verification
+
+Local Chrome simulations at 375 × 812, 390 × 844, and 430 × 932 confirmed equal widths for all three Training cards, aligned cardio form labels/inputs and minute suffix, an even 2 × 2 specialty grid, no oversized radio controls, no horizontal overflow, and no page errors. A specialty button opened the matching timer. Saving a 25-minute, speed-6.5 cardio entry updated the summary and history. Today strength/cardio labels and values shared their respective left boundaries. At a simulated 500px viewport with a focused field, the Save button remained visible and operable. These are browser simulations, not real iPhone testing.
 
 ## Production Verification
 
 ```text
-GitHub Actions run 35952312210: completed / success for d47bc8cbc129633efb182cf20d2cf5f40390d511
+GitHub Actions run 35957203952: completed / success for a08ef907e3ba2e53f84b3e6f0db68a11c021ee8d
 Production HTML: HTTP 200
-Production HTML-referenced JavaScript: HTTP 200, contains cardioSessions and calendar-calories implementation
-Production HTML-referenced CSS: HTTP 200, hash matches local build
-Production browser at 390 × 844: both training categories visible; a stair-machine record saves and displays duration/speed; no page errors or horizontal overflow
+HTML-referenced JavaScript: HTTP 200; contains the new routine and cardio UI
+HTML-referenced CSS: HTTP 200; byte-identical to the local build CSS
+Production browser at 390 × 844: 3 Training cards, featured Standard Training, 4 specialty buttons, no radio controls, no page errors or horizontal overflow
 ```
-
-Local browser simulation checked 375 × 812, 390 × 844, and 430 × 932. Stair-machine create/edit/delete and multiple-record history worked. Today showed both training categories. A date with Food, Workout, and Cardio showed calories plus strength/cardio markers in the month cell and full duration/speed in the day detail. No horizontal overflow or page errors were seen. The existing strength start control still opened its template/start sheet. These are browser simulations, not real-device tests.
 
 ## Confirmed Issues and Manual Device Verification
 
@@ -63,4 +64,4 @@ No remaining code, test, build, or deployment defect was confirmed. **Manual Dev
 
 ## ChatGPT Baseline
 
-FitLog Lite is a local-first iPhone PWA using Vanilla TypeScript, Dexie V5 with 10 stores, Backup V4, and V1/V2/V3/V4 Restore. The current application baseline is `d47bc8c`. Existing Workout remains strength/anaerobic training with unchanged history semantics. Stair-machine CardioSession is independent and records local date, duration, unitless speed, and optional note. Training and Today show anaerobic and cardio separately. Calendar month cells show compact food calories and category indicators; day detail shows cardio speed and duration. Pelvic floor training remains the deadline-based multi-phase implementation from the prior round. Read `AGENTS.md`, this report, and `docs/UI_INTERACTION_SPEC.md` before further UI work; sync `main` and record a fresh START_COMMIT.
+FitLog Lite is a local-first iPhone PWA using Vanilla TypeScript, Dexie V5 with 10 stores, Backup V4, and V1/V2/V3/V4 Restore. The current application baseline is `a08ef907e3ba2e53f84b3e6f0db68a11c021ee8d`. Training separates existing strength Workouts and stair-machine CardioSessions. The Training page shares one card hierarchy across strength, cardio, and pelvic floor. Pelvic floor selection offers Standard Training and four specialty presets; duration is derived from routine data, and the existing timer engine is unchanged. Historical pelvic floor snapshots remain immutable. Calendar retains its existing food/strength/cardio aggregation. Read `AGENTS.md`, this report, and `docs/UI_INTERACTION_SPEC.md` before further UI work; sync `main` and record a fresh START_COMMIT.
