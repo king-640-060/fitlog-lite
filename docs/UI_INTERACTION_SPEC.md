@@ -53,6 +53,9 @@ Do not use human training illustrations, anatomical diagrams, food photography, 
 ## Pelvic floor training
 
 - Pelvic floor training uses a data-driven multi-phase timer. Each routine contains exercises, repetitions, optional sets, and ordered phases; the engine advances through that sequence.
+- Routine selection presents one primary daily workout and four compact specialty workout buttons. A tap starts the named routine directly; do not use large radio-style option cards.
+- Estimated workout duration is calculated from phases, repetitions, sets, and intervening rests in the routine data. Never duplicate it as a display-only duration constant.
+- Keep the breathing and discomfort guidance available in a compact, expandable help area without crowding the primary training choices.
 - Timer state derives from absolute deadlines. Delayed callbacks must catch up across phases, repetitions, sets, and exercises.
 - `requestAnimationFrame` only renders visual progress and is never the source of time. The SVG ring, breathing scale, and text reflect the current timer state and `Date.now()`.
 - Pause freezes the exact current phase position; resume continues from that position. Reduced Motion may remove breathing scale but must keep phase, remaining time, progress, and completion visible.
@@ -61,6 +64,8 @@ Do not use human training illustrations, anatomical diagrams, food photography, 
 ## Training categories and calendar
 
 - Training has two primary categories: strength/anaerobic and cardio. Existing Workout records remain strength training; do not infer a new type for them.
+- Strength, cardio, and pelvic-floor sections share one visual hierarchy and alignment grid: consistent section labels, card padding, title and metadata spacing, and primary CTA height and shape. Their content may differ, but their primary actions should read as peers.
+- Use tabular numerals for workout duration, speed, set and repetition counts, timer values, and numeric summaries where stable alignment improves readability. Do not apply a monospace face to the whole app.
 - Cardio currently records stair-machine duration in minutes, speed as a unitless user-entered number, and an optional note. Do not estimate distance, energy, or training intensity from speed.
 - Calendar month cells use compact category indicators rather than detailed workout metrics. Show recorded food calories and restrained strength/cardio markers; never put speed, duration, or set counts in a month cell.
 - Food, anaerobic training, and cardio use restrained category colors on small text or markers. Do not color an entire day cell by category.

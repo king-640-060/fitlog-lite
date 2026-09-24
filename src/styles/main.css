@@ -237,37 +237,61 @@ h3 { margin-bottom: 5px; font-size: 1rem; }
 .empty p { max-width: 330px; margin: 0 auto; font-size: .88rem; line-height: 1.55; }
 .empty .primary { margin-top: 20px; }
 .empty-icon { display: grid; width: 50px; height: 50px; margin: 0 auto 14px; place-items: center; border-radius: 16px; background: var(--accent-soft); color: var(--accent-strong); }
-.workout-empty { padding-block: 27px 20px; }
-.workout-empty .start-button { width: min(100%, 310px); }
 .training-category { display: grid; gap: 9px; }
-.training-category-label { color: var(--text-secondary); font-size: .76rem; font-weight: 750; }
-.cardio-card { padding: 17px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); }
-.cardio-card .card-heading h2 { margin-top: 4px; }
-.cardio-card > p { margin: 0; color: var(--text-secondary); font-size: .86rem; }
-.cardio-card > .secondary { width: min(100%, 170px); min-height: 44px; }
-.cardio-record-list { display: grid; border-top: 1px solid var(--divider); }
-.cardio-record-list button, .cardio-history button { display: flex; min-height: 44px; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding: 8px 0; border: 0; border-bottom: 1px solid var(--divider); background: transparent; text-align: left; }
-.cardio-record-list button:last-child, .cardio-history button:last-child { border-bottom: 0; }
-.cardio-record-list .icon { color: var(--text-tertiary); }
+.training-category-label { margin: 0; padding-inline: 2px; color: var(--text-secondary); font-size: .76rem; font-weight: 750; }
+.training-section-head { display: flex; min-height: 36px; align-items: center; justify-content: space-between; gap: 12px; }
+.training-section-head .text-btn { min-height: 36px; font-size: .78rem; }
+.training-card { display: grid; gap: 14px; padding: 18px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); box-shadow: var(--shadow-soft); }
+.training-card-title { display: flex; min-width: 0; align-items: center; gap: 11px; }
+.training-card-title > div { display: grid; min-width: 0; gap: 3px; }
+.training-card-title h3 { margin: 0; font-size: 1.06rem; }
+.training-card-title p { margin: 0; color: var(--text-secondary); font-size: .78rem; }
+.training-card-icon { display: grid; flex: 0 0 38px; width: 38px; height: 38px; place-items: center; border-radius: 12px; background: var(--accent-soft); color: var(--accent-strong); }
+.training-card-summary { display: grid; gap: 3px; min-height: 22px; margin: 0; color: var(--text-secondary); font-size: .84rem; font-variant-numeric: tabular-nums; }
+.training-card-summary strong { color: var(--text-primary); font-size: 1.58rem; line-height: 1.2; font-weight: 750; }
+.training-card-summary strong small { color: var(--text-secondary); font-size: .78rem; font-weight: 550; }
+.training-card-action { width: 100%; min-height: 48px; border-radius: 14px; }
+.training-card-action:active, .pelvic-specialty:active { transform: scale(.99); }
+.training-card-link { display: flex; align-items: center; gap: 4px; justify-content: space-between; min-height: 28px; width: 100%; padding: 0; border: 0; background: transparent; color: var(--text-secondary); font-size: .76rem; text-align: left; font-variant-numeric: tabular-nums; }
+.cardio-form { gap: 17px; }
+.cardio-form-date { margin: 0 0 2px; color: var(--text-secondary); font-size: .82rem; }
+.cardio-form label { gap: 8px; }
+.form.cardio-form label > .cardio-input-wrap { position: relative; right: auto; bottom: auto; display: block; color: inherit; font-size: inherit; }
+.cardio-form .cardio-input-wrap input { width: 100%; padding-right: 60px; }
+.cardio-form .cardio-input-suffix { position: absolute; top: 50%; right: 16px; transform: translateY(-50%); color: var(--text-secondary); font-size: .84rem; font-weight: 550; pointer-events: none; }
+.cardio-form input, .cardio-form textarea { font-variant-numeric: tabular-nums; }
+.cardio-form-actions { display: grid; gap: 9px; margin-top: 3px; }
+.cardio-form-actions .danger-button { min-height: 44px; }
 .cardio-history { display: grid; }
-.cardio-history button { display: grid; gap: 4px; }
-.cardio-history button span, .cardio-history button small { color: var(--text-secondary); }
-.pelvic-floor-card { display: grid; gap: 14px; padding: 18px; border: 1px solid var(--border); border-radius: 22px; background: var(--surface); box-shadow: var(--shadow-soft); }
-.pelvic-floor-card .eyebrow { color: var(--info); font-size: .7rem; font-weight: 750; letter-spacing: .035em; text-transform: uppercase; }
-.pelvic-floor-card h2 { margin-top: 4px; }
-.pelvic-floor-card p { margin: 5px 0 0; color: var(--text-secondary); font-size: .82rem; }
-.pelvic-daily-summary { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 12px 13px; border-radius: 14px; background: var(--surface-soft); }
-.pelvic-daily-summary span { color: var(--text-secondary); font-size: .78rem; text-align: right; }
-.pelvic-card-actions { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; }
-.pelvic-card-actions .secondary { min-height: 48px; }
-.pelvic-mode-list { display: grid; gap: 9px; }
-.pelvic-mode { display: flex; align-items: center; gap: 12px; min-height: 66px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); cursor: pointer; }
-.pelvic-mode:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
-.pelvic-mode input { width: 20px; height: 20px; flex: 0 0 auto; accent-color: var(--accent); }
-.pelvic-mode span { display: grid; gap: 3px; }
-.pelvic-mode small { color: var(--text-secondary); font-size: .78rem; }
-.pelvic-guidance { display: grid; gap: 7px; padding: 13px 14px; border-radius: 15px; background: var(--surface-soft); }
-.pelvic-guidance p { margin: 0; color: var(--text-secondary); font-size: .78rem; line-height: 1.5; }
+.cardio-history > button { width: 100%; min-height: 68px; padding: 12px 0; border: 0; border-bottom: 1px solid var(--divider); border-radius: 0; background: transparent; text-align: left; }
+.cardio-history > button:last-child { border-bottom: 0; }
+.cardio-history-row { display: flex; justify-content: space-between; gap: 14px; align-items: center; }
+.cardio-history-row > span { display: grid; min-width: 0; gap: 4px; }
+.cardio-history-row strong { color: var(--text-primary); font-size: .88rem; font-weight: 700; }
+.cardio-history-row small { overflow: hidden; color: var(--text-secondary); font-size: .76rem; text-overflow: ellipsis; white-space: nowrap; }
+.cardio-history-value { flex: 0 0 auto; text-align: right; font-variant-numeric: tabular-nums; }
+.cardio-history-empty { display: grid; gap: 9px; padding: 24px 4px; text-align: center; }
+.cardio-history-empty p { margin: 0; color: var(--text-secondary); font-size: .82rem; }
+.cardio-history-empty .primary { margin-top: 9px; }
+.pelvic-setup { display: grid; gap: 15px; }
+.pelvic-setup-heading { margin: 0; color: var(--text-secondary); font-size: .84rem; font-weight: 750; }
+.pelvic-featured { display: grid; gap: 9px; padding: 18px; border: 1px solid var(--accent); border-radius: 19px; background: var(--accent-soft); }
+.pelvic-featured-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.pelvic-featured-top strong { font-size: 1.12rem; }
+.pelvic-featured-top span, .pelvic-specialty small { color: var(--accent-strong); font-size: .78rem; font-weight: 750; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pelvic-featured p, .pelvic-featured small { margin: 0; font-size: .79rem; }
+.pelvic-featured small { color: var(--text-secondary); }
+.pelvic-featured .primary { width: 100%; min-height: 48px; margin-top: 5px; border-radius: 14px; }
+.pelvic-specialty-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.pelvic-specialty { display: grid; min-width: 0; min-height: 103px; align-content: start; gap: 6px; padding: 13px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); text-align: left; }
+.pelvic-specialty:hover, .pelvic-specialty:focus-visible { border-color: var(--accent); background: var(--accent-soft); }
+.pelvic-specialty strong { font-size: .88rem; }
+.pelvic-specialty span { color: var(--text-secondary); font-size: .74rem; line-height: 1.3; }
+.pelvic-specialty small { margin-top: 2px; }
+.pelvic-safety { color: var(--text-secondary); font-size: .76rem; }
+.pelvic-safety summary { display: flex; min-height: 38px; align-items: center; justify-content: space-between; gap: 5px; cursor: pointer; list-style: none; }
+.pelvic-safety summary::-webkit-details-marker { display: none; }
+.pelvic-safety p { margin: 3px 0 0; line-height: 1.5; }
 .pelvic-timer-screen { display: grid; min-height: calc(100dvh - 110px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); align-content: center; justify-items: center; gap: 14px; text-align: center; }
 .pelvic-timer-screen header { display: grid; gap: 3px; margin-bottom: 8px; }
 .pelvic-timer-screen header span { font-size: 1.08rem; font-weight: 750; }
@@ -282,7 +306,7 @@ h3 { margin-bottom: 5px; font-size: 1rem; }
 .pelvic-countdown.is-soft .pelvic-breathing { background: color-mix(in srgb, var(--accent-soft) 54%, var(--surface)); }
 .pelvic-countdown-copy { position: relative; z-index: 1; display: grid; place-items: center; }
 .pelvic-countdown #pelvic-phase { margin: 0 0 7px; font-size: 1rem; font-weight: 700; }
-.pelvic-countdown strong { font-size: clamp(4rem, 20vw, 6rem); line-height: .9; letter-spacing: -.06em; }
+.pelvic-countdown strong { font-variant-numeric: tabular-nums; font-size: clamp(4rem, 20vw, 6rem); line-height: .9; letter-spacing: -.06em; }
 .pelvic-countdown-copy span:last-child { margin-top: 8px; color: var(--text-secondary); font-size: .8rem; }
 .pelvic-timer-screen > h2 { font-size: 1.6rem; }
 .pelvic-timer-screen > p { margin: 0; }
@@ -532,7 +556,7 @@ fieldset { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--borde
 .today-dashboard .workout-today-card .full-btn { min-height: 44px; border-radius: 13px; font-size: .88rem; }
 .today-training-row { display: grid; grid-template-columns: 42px minmax(0, 1fr); align-items: baseline; gap: 9px; padding: 7px 0; border-bottom: 1px solid var(--divider); }
 .today-training-row strong { color: var(--text-secondary); font-size: .78rem; }
-.today-training-row span { min-width: 0; font-size: .84rem; }
+.today-training-row span { min-width: 0; color: var(--text-secondary); font-size: .84rem; font-variant-numeric: tabular-nums; }
 .today-dashboard .workout-today-card .today-workout-status .goal-ring { width: 51px; }
 .today-dashboard .weight-today-card .weight-today-value strong { font-size: 2.2rem; }
 .today-weight-empty { display: flex; align-items: center; justify-content: space-between; gap: 9px; }

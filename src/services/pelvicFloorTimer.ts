@@ -38,7 +38,53 @@ export const pelvicFloorRoutines: PelvicFloorRoutine[] = [
       { type: 'contract', durationSeconds: 1 }, { type: 'relax', durationSeconds: 1 },
     ] },
   ] },
+  { id: 'standard', name: '标准训练', description: '耐力保持与快速脉冲，适合日常练习', exercises: [
+    { id: 'endurance', name: '耐力保持', repetitions: 8, restAfterSeconds: 10, phases: [
+      { type: 'contract', durationSeconds: 2 }, { type: 'hold', durationSeconds: 6 },
+      { type: 'release', durationSeconds: 2 }, { type: 'relax', durationSeconds: 5 },
+    ] },
+    { id: 'pulse', name: '快速脉冲', repetitions: 15, phases: [
+      { type: 'contract', durationSeconds: 1 }, { type: 'relax', durationSeconds: 1 },
+    ] },
+  ] },
+  { id: 'foundation', name: '基础控制', description: '完整收紧与放松', exercises: [
+    { id: 'foundation', name: '基础控制', repetitions: 12, phases: [
+      { type: 'contract', durationSeconds: 2 }, { type: 'hold', durationSeconds: 2 },
+      { type: 'release', durationSeconds: 2 }, { type: 'relax', durationSeconds: 4 },
+    ] },
+  ] },
+  { id: 'endurance', name: '耐力保持', description: '持续保持控制', exercises: [
+    { id: 'endurance', name: '耐力保持', repetitions: 12, phases: [
+      { type: 'contract', durationSeconds: 2 }, { type: 'hold', durationSeconds: 6 },
+      { type: 'release', durationSeconds: 2 }, { type: 'relax', durationSeconds: 5 },
+    ] },
+  ] },
+  { id: 'pulse', name: '快速脉冲', description: '快速收放练习', exercises: [
+    { id: 'pulse', name: '快速脉冲', repetitions: 25, phases: [
+      { type: 'contract', durationSeconds: 1 }, { type: 'relax', durationSeconds: 1 },
+    ] },
+  ] },
+  { id: 'combined', name: '综合训练', description: '多节奏组合', exercises: [
+    { id: 'foundation', name: '基础控制', repetitions: 8, restAfterSeconds: 10, phases: [
+      { type: 'contract', durationSeconds: 2 }, { type: 'hold', durationSeconds: 2 },
+      { type: 'release', durationSeconds: 2 }, { type: 'relax', durationSeconds: 4 },
+    ] },
+    { id: 'endurance', name: '耐力保持', repetitions: 6, restAfterSeconds: 10, phases: [
+      { type: 'contract', durationSeconds: 2 }, { type: 'hold', durationSeconds: 6 },
+      { type: 'release', durationSeconds: 2 }, { type: 'relax', durationSeconds: 5 },
+    ] },
+    { id: 'pulse', name: '快速脉冲', repetitions: 20, phases: [
+      { type: 'contract', durationSeconds: 1 }, { type: 'relax', durationSeconds: 1 },
+    ] },
+  ] },
 ]
+
+export function getPelvicFloorRoutineDurationSeconds(routine: PelvicFloorRoutine): number {
+  return routine.exercises.reduce((total, exercise, index) => total
+    + exercise.phases.reduce((seconds, phase) => seconds + phase.durationSeconds, 0) * exercise.repetitions * (exercise.sets ?? 1)
+    + Math.max(0, (exercise.sets ?? 1) - 1) * (exercise.restBetweenSetsSeconds ?? 0)
+    + (index < routine.exercises.length - 1 ? exercise.restAfterSeconds ?? 0 : 0), 0)
+}
 
 export type PelvicFloorTimerStatus = 'ready' | 'running' | 'paused' | 'completed'
 export type PelvicFloorActivePhase = PelvicFloorPhase['type']
