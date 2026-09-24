@@ -152,7 +152,7 @@ describe('Backup V3', () => {
   it('导出并恢复两个新 stores', async () => {
     const source = newDatabase(); await source.nutritionTargets.add(v3Backup().data.nutritionTargets[0]!); await source.pelvicFloorSessions.add(session())
     const backup = await exportBackup(source)
-    expect(backup.schemaVersion).toBe(3)
+    expect(backup.schemaVersion).toBe(4)
     expect(backup.data.nutritionTargets).toHaveLength(1)
     expect(backup.data.pelvicFloorSessions).toHaveLength(1)
     const target = newDatabase(); await restoreBackup(backup, target)
@@ -281,7 +281,7 @@ describe('Pelvic floor backup compatibility', () => {
     const state = advancePelvicFloorTimer(startPelvicFloorTimer(createPelvicFloorTimer(pelvicFloorRoutines[2]!), 0), 174000)
     const source = newDatabase(); await source.pelvicFloorSessions.add(sessionFromPelvicFloorTimer(state, '2026-09-21'))
     const backup = await exportBackup(source)
-    expect(backup.schemaVersion).toBe(3)
+    expect(backup.schemaVersion).toBe(4)
     expect(backup.data.pelvicFloorSessions[0]?.routine?.name).toBe('混合训练')
     const target = newDatabase(); await restoreBackup(backup, target)
     expect((await target.pelvicFloorSessions.toArray())[0]?.routine?.exercises).toHaveLength(2)

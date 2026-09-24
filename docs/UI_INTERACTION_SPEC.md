@@ -57,3 +57,11 @@ Do not use human training illustrations, anatomical diagrams, food photography, 
 - `requestAnimationFrame` only renders visual progress and is never the source of time. The SVG ring, breathing scale, and text reflect the current timer state and `Date.now()`.
 - Pause freezes the exact current phase position; resume continues from that position. Reduced Motion may remove breathing scale but must keep phase, remaining time, progress, and completion visible.
 - Historical contract/relax-only sessions remain valid and must never be inferred into newer routine types. Display them as “基础训练”.
+
+## Training categories and calendar
+
+- Training has two primary categories: strength/anaerobic and cardio. Existing Workout records remain strength training; do not infer a new type for them.
+- Cardio currently records stair-machine duration in minutes, speed as a unitless user-entered number, and an optional note. Do not estimate distance, energy, or training intensity from speed.
+- Calendar month cells use compact category indicators rather than detailed workout metrics. Show recorded food calories and restrained strength/cardio markers; never put speed, duration, or set counts in a month cell.
+- Food, anaerobic training, and cardio use restrained category colors on small text or markers. Do not color an entire day cell by category.
+- Cardio speed appears in day detail and history, not in compact calendar cells. The day detail lists food, strength, cardio, pelvic floor, and weight information separately.

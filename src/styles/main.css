@@ -239,6 +239,19 @@ h3 { margin-bottom: 5px; font-size: 1rem; }
 .empty-icon { display: grid; width: 50px; height: 50px; margin: 0 auto 14px; place-items: center; border-radius: 16px; background: var(--accent-soft); color: var(--accent-strong); }
 .workout-empty { padding-block: 27px 20px; }
 .workout-empty .start-button { width: min(100%, 310px); }
+.training-category { display: grid; gap: 9px; }
+.training-category-label { color: var(--text-secondary); font-size: .76rem; font-weight: 750; }
+.cardio-card { padding: 17px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); }
+.cardio-card .card-heading h2 { margin-top: 4px; }
+.cardio-card > p { margin: 0; color: var(--text-secondary); font-size: .86rem; }
+.cardio-card > .secondary { width: min(100%, 170px); min-height: 44px; }
+.cardio-record-list { display: grid; border-top: 1px solid var(--divider); }
+.cardio-record-list button, .cardio-history button { display: flex; min-height: 44px; align-items: center; justify-content: space-between; gap: 10px; width: 100%; padding: 8px 0; border: 0; border-bottom: 1px solid var(--divider); background: transparent; text-align: left; }
+.cardio-record-list button:last-child, .cardio-history button:last-child { border-bottom: 0; }
+.cardio-record-list .icon { color: var(--text-tertiary); }
+.cardio-history { display: grid; }
+.cardio-history button { display: grid; gap: 4px; }
+.cardio-history button span, .cardio-history button small { color: var(--text-secondary); }
 .pelvic-floor-card { display: grid; gap: 14px; padding: 18px; border: 1px solid var(--border); border-radius: 22px; background: var(--surface); box-shadow: var(--shadow-soft); }
 .pelvic-floor-card .eyebrow { color: var(--info); font-size: .7rem; font-weight: 750; letter-spacing: .035em; text-transform: uppercase; }
 .pelvic-floor-card h2 { margin-top: 4px; }
@@ -406,23 +419,27 @@ fieldset { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--borde
 .calendar-weekdays { padding: 0 1px 7px; }
 .calendar-weekdays span { color: var(--text-secondary); font-size: .68rem; font-weight: 650; text-align: center; }
 .calendar-grid { gap: 4px 2px; }
-.calendar-day { display: flex; min-width: 0; min-height: 58px; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 6px; overflow: hidden; padding: 5px 3px 4px; border: 1px solid transparent; border-radius: 12px; background: transparent; text-align: center; }
+.calendar-day { display: flex; min-width: 0; min-height: 68px; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 3px; overflow: hidden; padding: 5px 3px 4px; border: 1px solid transparent; border-radius: 12px; background: transparent; text-align: center; }
 .calendar-day.outside-month { opacity: .32; }
 .calendar-day.selected { border-color: color-mix(in srgb, var(--accent) 38%, transparent); background: var(--accent-soft); }
 .calendar-day-number { display: grid; width: 23px; height: 23px; margin: 0 auto; place-items: center; border-radius: 50%; font-size: .76rem; font-weight: 700; }
 .calendar-day.today .calendar-day-number { background: var(--accent); color: #fff; }
-.calendar-day-details { display: grid; min-width: 0; gap: 5px; }
+.calendar-day-details { display: grid; min-width: 0; gap: 3px; }
+.calendar-calories { overflow: hidden; color: var(--accent-strong); font-size: .48rem; font-weight: 700; letter-spacing: -.03em; white-space: nowrap; }
 .calendar-nutrition-progress { position: relative; display: block; width: 100%; height: 3px; overflow: hidden; border-radius: 99px; background: var(--border); }
 .calendar-nutrition-progress::after { position: absolute; inset: 0 auto 0 0; width: var(--progress); border-radius: inherit; background: var(--accent); content: ""; }
-.calendar-markers { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 3px; }
+.calendar-markers { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1px; }
 .calendar-marker { display: grid; width: 13px; height: 13px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--surface-soft); color: var(--text-secondary); font-size: .46rem; font-style: normal; font-weight: 800; line-height: 1; }
 .nutrition-marker { color: var(--accent-strong); }
-.workout-marker { background: var(--accent-soft); color: var(--accent-strong); }
+.workout-marker { background: #e7f0ee; color: #426d67; }
+.cardio-marker { background: #fbf2df; color: #946e2c; }
+.calendar-marker.workout-marker, .calendar-marker.cardio-marker { width: 17px; height: 14px; border-radius: 5px; font-size: .43rem; }
 .pelvic-marker { background: color-mix(in srgb, var(--info) 15%, transparent); color: var(--info); }
 .weight-marker { border: 1px solid color-mix(in srgb, var(--text-secondary) 28%, transparent); background: transparent; color: var(--text-secondary); }
 .calendar-legend { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px; color: var(--text-secondary); font-size: .7rem; }
 .calendar-legend span { display: flex; align-items: center; gap: 5px; }
 .calendar-legend i { display: grid; width: 14px; height: 14px; place-items: center; border-radius: 50%; font-size: .48rem; font-style: normal; font-weight: 800; }
+.calendar-legend .cardio-marker { width: 20px; border-radius: 5px; font-size: .45rem; }
 .calendar-month-summary { display: grid; grid-template-columns: repeat(4, 1fr); overflow: hidden; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
 .calendar-month-summary > div { display: grid; gap: 4px; padding: 14px 8px; border-right: 1px solid var(--divider); text-align: center; }
 .calendar-month-summary > div:last-child { border-right: 0; }
@@ -432,6 +449,7 @@ fieldset { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--borde
 .calendar-day-sheet > section { display: grid; gap: 12px; padding: 15px 14px; border-bottom: 1px solid var(--divider); }
 .calendar-day-sheet > section h3 { margin: 0; }
 .calendar-day-sheet > section > p { margin: 0; }
+.calendar-day-sheet > section > p + p { padding-top: 5px; border-top: 1px solid var(--divider); }
 .calendar-day-sheet > div { display: flex; align-items: center; justify-content: space-between; min-height: 56px; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--divider); }
 .calendar-day-sheet > div:last-child { border-bottom: 0; }
 .calendar-day-sheet span { color: var(--text-secondary); font-size: .84rem; }
@@ -512,6 +530,9 @@ fieldset { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--borde
 .today-dashboard .workout-today-card .today-card-copy { gap: 3px; }
 .today-dashboard .workout-today-card .today-card-copy strong { font-size: 1rem; }
 .today-dashboard .workout-today-card .full-btn { min-height: 44px; border-radius: 13px; font-size: .88rem; }
+.today-training-row { display: grid; grid-template-columns: 42px minmax(0, 1fr); align-items: baseline; gap: 9px; padding: 7px 0; border-bottom: 1px solid var(--divider); }
+.today-training-row strong { color: var(--text-secondary); font-size: .78rem; }
+.today-training-row span { min-width: 0; font-size: .84rem; }
 .today-dashboard .workout-today-card .today-workout-status .goal-ring { width: 51px; }
 .today-dashboard .weight-today-card .weight-today-value strong { font-size: 2.2rem; }
 .today-weight-empty { display: flex; align-items: center; justify-content: space-between; gap: 9px; }

@@ -76,6 +76,16 @@ export interface WeightLog {
   updatedAt: string
 }
 
+export interface CardioSession {
+  id: string
+  date: string
+  durationMinutes: number
+  speed: number
+  note?: string
+  createdAt: string
+  updatedAt: string
+}
+
 export interface WorkoutTemplateSet {
   id: string
   weightKg?: number
@@ -200,4 +210,11 @@ export interface BackupDataV3 extends BackupBase {
   }
 }
 
-export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3
+export interface BackupDataV4 extends BackupBase {
+  schemaVersion: 4
+  data: BackupDataV3['data'] & {
+    cardioSessions: CardioSession[]
+  }
+}
+
+export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4

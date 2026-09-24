@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { DietTemplate, Exercise, Food, FoodLog, NutritionTarget, PelvicFloorSession, WeightLog, Workout, WorkoutTemplate } from './types'
+import type { CardioSession, DietTemplate, Exercise, Food, FoodLog, NutritionTarget, PelvicFloorSession, WeightLog, Workout, WorkoutTemplate } from './types'
 
 export const STARTER_EXERCISE_NAMES = ['杠铃卧推', '深蹲', '硬拉', '引体向上', '哑铃弯举', '杠铃划船', '哑铃侧平举'] as const
 
@@ -13,6 +13,7 @@ export class FitLogDatabase extends Dexie {
   dietTemplates!: EntityTable<DietTemplate, 'id'>
   nutritionTargets!: EntityTable<NutritionTarget, 'id'>
   pelvicFloorSessions!: EntityTable<PelvicFloorSession, 'id'>
+  cardioSessions!: EntityTable<CardioSession, 'id'>
 
   constructor(name = 'fitlog-lite-db') {
     super(name)
@@ -55,6 +56,11 @@ export class FitLogDatabase extends Dexie {
       pelvicFloorSessions: 'id, date, startedAt, finishedAt, createdAt',
     }).upgrade(() => {
       // meal is optional and unindexed. Never infer it for historical FoodLogs.
+    })
+    this.version(5).stores({
+      cardioSessions: 'id, date, createdAt',
+    }).upgrade(() => {
+      // Add only the new store. Existing V4 records retain their original meaning.
     })
     this.on('populate', () => {
       const now = new Date().toISOString()
