@@ -24,10 +24,11 @@ import {
 } from './services/templateService'
 import { calendarCategories, calendarCategoryIcons, calendarLegendLabels, getCalendarDayAccessibleLabel, hasDayRecords, loadMonthSummaries, renderMonthCalendar, type CalendarDaySummary } from './ui/calendarPage'
 import { buildCalendarDayDetailRows } from './ui/dayDetail'
+import { foodPagerDates, foodPagerLabel, foodSwipeDirection } from './ui/foodPager'
 import { icon, type IconName } from './ui/icons'
 import { getGoalProgress } from './ui/progressRing'
 import { groupFoodLogs, isMealType, mealNames, mealTypes, type FoodMealGroup } from './utils/foodMeals'
-import { formatShortDate, getFoodQuickDates, getLocalDateString } from './utils/date'
+import { formatShortDate, getLocalDateString, shiftLocalDate } from './utils/date'
 import { calculateNutrition, formatNumber } from './utils/nutrition'
 import { buildRecentActivity, type RecentActivityKind } from './utils/recentActivity'
 
@@ -43,6 +44,9 @@ let calendarYear = new Date().getFullYear()
 let calendarMonth = new Date().getMonth()
 let foodDate = getLocalDateString()
 let foodMenuEvents: AbortController | undefined
+let foodHeaderEvents: AbortController | undefined
+let foodPagerEvents: AbortController | undefined
+let foodPagerBusy = false
 let workoutDate = getLocalDateString()
 let weightDate = getLocalDateString()
 let currentWorkout: Workout | undefined
@@ -204,6 +208,9 @@ function chooseNutritionTargetConflict(): Promise<'preserve' | 'replace' | undef
 
 async function render(): Promise<void> {
   foodMenuEvents?.abort()
+  foodHeaderEvents?.abort()
+  foodPagerEvents?.abort()
+  foodPagerBusy = false
   weightChart?.destroy()
   weightChart = undefined
   document.body.classList.remove('immersive')
@@ -423,8 +430,9 @@ async function showCalendarDaySheet(date: string, summary?: CalendarDaySummary):
   const target = summary?.nutritionTarget
   const rows = buildCalendarDayDetailRows(summary, workouts, cardioSessions, pelvicSessions)
   const canClear = hasDayRecords(summary) || Boolean(target)
-  const detailHtml = rows.map((row) => `<article class="day-detail-row" role="group" aria-label="${esc(row.accessibleLabel)}"><div class="day-detail-label">${esc(row.label)}</div><div class="day-detail-content"><strong class="${row.empty ? 'is-empty' : ''}">${esc(row.primary)}</strong>${row.secondary.map((detail) => `<span>${esc(detail)}</span>`).join('')}</div></article>`).join('')
+  const detailHtml = rows.map((row) => `<article class="day-detail-row" role="group" aria-label="${esc(row.accessibleLabel)}"><div class="day-detail-label"><span class="day-detail-icon calendar-category-${row.key}" aria-hidden="true">${icon(calendarCategoryIcons[row.key], 15)}</span><span>${esc(row.label)}</span></div><div class="day-detail-content"><strong class="${row.empty ? 'is-empty' : ''}">${esc(row.primary)}</strong>${row.secondary.map((detail) => `<span>${esc(detail)}</span>`).join('')}</div></article>`).join('')
   const dialog = openModal(formatHeaderDate(date), `<div class="calendar-day-sheet">${detailHtml}</div><section class="calendar-quick-record" aria-label="快捷记录"><h3>快捷记录</h3><div class="calendar-day-actions"><button id="calendar-day-food">${icon('utensils', 18)} 饮食</button><button id="calendar-day-workout">${icon('dumbbell', 18)} 训练</button><button id="calendar-day-weight">${icon('scale', 18)} 体重</button></div></section>${canClear ? '<div class="calendar-day-danger"><button id="calendar-clear-day" class="danger-button">清空当天记录</button></div>' : ''}`)
+  dialog.classList.add('calendar-detail-sheet')
   dialog.querySelector('#calendar-day-food')?.addEventListener('click', () => { dialog.close(); activeTab = 'food'; foodDate = date; void render().catch(fail) })
   dialog.querySelector('#calendar-day-workout')?.addEventListener('click', () => { dialog.close(); activeTab = 'workout'; workoutDate = date; currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = false; void render().catch(fail) })
   dialog.querySelector('#calendar-day-weight')?.addEventListener('click', () => {
@@ -522,21 +530,131 @@ function foodMealSectionHtml(group: FoodMealGroup, isToday: boolean): string {
   </section>`
 }
 
+async function navigateFoodDate(direction: -1 | 1, dragged = 0): Promise<void> {
+  if (foodPagerBusy || activeTab !== 'food' || document.querySelector('dialog[open]')) return
+  const view = app.querySelector<HTMLElement>('#view')
+  const outgoing = view?.querySelector<HTMLElement>('.food-pager-page')
+  if (!view || !outgoing) return
+  foodPagerBusy = true
+  const restoreFocus = outgoing.contains(document.activeElement)
+  view.inert = true
+  const oldDate = foodDate
+  const nextDate = shiftLocalDate(oldDate, direction)
+  try {
+    foodDate = nextDate
+    await renderFoodPage()
+    if (activeTab !== 'food' || !view.isConnected || foodDate !== nextDate) return
+    const incoming = view.querySelector<HTMLElement>('.food-pager-page')!
+    app.querySelector<HTMLInputElement>('#food-date')!.value = nextDate
+    outgoing.setAttribute('aria-hidden', 'true')
+    outgoing.style.pointerEvents = 'none'
+    outgoing.style.position = 'absolute'
+    outgoing.style.top = '0'
+    outgoing.style.left = '0'
+    outgoing.style.width = '100%'
+    view.append(outgoing)
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const timing: KeyframeAnimationOptions = { duration: 260, easing: 'cubic-bezier(.22, .75, .25, 1)', fill: 'both' }
+      const leaving = outgoing.animate([{ transform: `translateX(${dragged}px)` }, { transform: `translateX(${-direction * 100}%)` }], timing)
+      const entering = incoming.animate([{ transform: `translateX(${direction * 100}%)` }, { transform: 'translateX(0)' }], timing)
+      await Promise.all([leaving.finished, entering.finished])
+    }
+    outgoing.remove()
+    view.inert = false
+    if (restoreFocus) incoming.querySelector<HTMLButtonElement>('.food-date-switch [aria-current="date"]')?.focus({ preventScroll: true })
+  } catch (error) {
+    foodDate = oldDate
+    outgoing.style.cssText = ''
+    outgoing.removeAttribute('aria-hidden')
+    if (view.isConnected) {
+      view.replaceChildren(outgoing)
+      app.querySelector<HTMLInputElement>('#food-date')!.value = oldDate
+    }
+    fail(error)
+  } finally {
+    view.inert = false
+    foodPagerBusy = false
+  }
+}
+
+function bindFoodPager(view: HTMLElement): void {
+  foodPagerEvents?.abort()
+  foodPagerEvents = new AbortController()
+  const signal = foodPagerEvents.signal
+  let gesture: { pointerId: number; x: number; y: number; started: number; dragged: number; mode: 'pending' | 'horizontal' | 'vertical'; page: HTMLElement } | undefined
+  let suppressClick = false
+  view.addEventListener('pointerdown', (event) => {
+    if (foodPagerBusy || document.querySelector('dialog[open]') || event.pointerType === 'mouse' || !event.isPrimary) return
+    const target = event.target instanceof Element ? event.target : null
+    const page = target?.closest<HTMLElement>('.food-pager-page')
+    if (!page || target?.closest('input, textarea, select, a, [contenteditable], details, summary, [role="slider"]')) return
+    if (target?.closest('button') && !target.closest('.food-date-switch')) return
+    if (target?.closest('[data-no-food-swipe]')) return
+    for (let node: Element | null = target; node && node !== page; node = node.parentElement) {
+      if (node.scrollWidth > node.clientWidth + 4 && getComputedStyle(node).overflowX !== 'visible') return
+    }
+    gesture = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, started: event.timeStamp, dragged: 0, mode: 'pending', page }
+  }, { signal })
+  view.addEventListener('pointermove', (event) => {
+    if (!gesture || gesture.pointerId !== event.pointerId) return
+    const dx = event.clientX - gesture.x
+    const dy = event.clientY - gesture.y
+    if (gesture.mode === 'pending' && Math.max(Math.abs(dx), Math.abs(dy)) > 12) {
+      gesture.mode = Math.abs(dx) > Math.abs(dy) * 1.2 && !(gesture.x <= 24 && dx > 0) ? 'horizontal' : 'vertical'
+    }
+    if (gesture.mode !== 'horizontal') return
+    event.preventDefault()
+    suppressClick = true
+    gesture.dragged = Math.max(-view.clientWidth, Math.min(view.clientWidth, dx))
+    gesture.page.style.transform = `translateX(${gesture.dragged}px)`
+  }, { signal })
+  const finish = (event: PointerEvent) => {
+    if (!gesture || gesture.pointerId !== event.pointerId) return
+    const current = gesture
+    gesture = undefined
+    if (current.mode !== 'horizontal') return
+    window.setTimeout(() => { suppressClick = false }, 150)
+    const dx = current.dragged
+    const direction = event.type === 'pointercancel' ? 0 : foodSwipeDirection(dx, event.timeStamp - current.started, view.clientWidth)
+    if (direction && !document.querySelector('dialog[open]')) {
+      void navigateFoodDate(direction, dx)
+    } else {
+      const page = current.page
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) page.style.transform = ''
+      else void page.animate([{ transform: `translateX(${dx}px)` }, { transform: 'translateX(0)' }], { duration: 220, easing: 'ease-out' }).finished.finally(() => { page.style.transform = '' })
+    }
+  }
+  view.addEventListener('pointerup', finish, { signal })
+  view.addEventListener('pointercancel', finish, { signal })
+  view.addEventListener('click', (event) => {
+    if (!suppressClick) return
+    suppressClick = false
+    event.preventDefault()
+    event.stopImmediatePropagation()
+  }, { signal, capture: true })
+}
+
 async function renderFoodPage(): Promise<void> {
+  const requestedDate = foodDate
+  const view = document.querySelector<HTMLElement>('#view')!
   const [logs, target] = await Promise.all([
-    db.foodLogs.where('date').equals(foodDate).sortBy('createdAt'),
-    db.nutritionTargets.where('date').equals(foodDate).first(),
+    db.foodLogs.where('date').equals(requestedDate).sortBy('createdAt'),
+    db.nutritionTargets.where('date').equals(requestedDate).first(),
   ])
+  if (activeTab !== 'food' || foodDate !== requestedDate || !view.isConnected) return
   const totals = logs.reduce((sum, log) => ({
     calories: sum.calories + log.totalCalories,
     protein: sum.protein + (log.totalProtein ?? 0), carbs: sum.carbs + (log.totalCarbs ?? 0), fat: sum.fat + (log.totalFat ?? 0),
   }), { calories: 0, protein: 0, carbs: 0, fat: 0 })
   const hasMacros = logs.some((log) => log.totalProtein !== undefined || log.totalCarbs !== undefined || log.totalFat !== undefined) || Boolean(target)
-  const quickDates = getFoodQuickDates()
-  const isToday = foodDate === quickDates.today
-  const isQuickDate = Object.values(quickDates).includes(foodDate)
-  const quickButton = (label: string, date: string): string => `<button data-food-quick-date="${date}" aria-pressed="${foodDate === date}" aria-label="${label} ${date}"><strong>${label}</strong><small>${Number(date.slice(5, 7))}月${Number(date.slice(8, 10))}日</small></button>`
-  const view = document.querySelector<HTMLElement>('#view')!
+  const pagerDates = foodPagerDates(foodDate)
+  const isToday = foodDate === getLocalDateString()
+  const quickButton = (date: string): string => {
+    const selected = foodDate === date
+    const label = foodPagerLabel(date)
+    const day = `${Number(date.slice(5, 7))}月${Number(date.slice(8, 10))}日`
+    return `<button data-food-quick-date="${date}" aria-pressed="${selected}" ${selected ? 'aria-current="date"' : ''} aria-label="${label}，${date}，${selected ? '当前选中' : '切换日期'}"><strong>${label}</strong><small>${day}</small></button>`
+  }
   const previous = new Map<string, PreviousRingValue>()
   view.querySelectorAll<HTMLElement>('[data-progress-key]').forEach((element) => {
     if (element.closest<HTMLElement>('[data-food-date]')?.dataset.foodDate !== foodDate) return
@@ -545,22 +663,29 @@ async function renderFoodPage(): Promise<void> {
   const calorieTarget = target?.calories
   const calorieAmount = calorieTarget === undefined ? `${formatNumber(totals.calories)} kcal` : `${formatNumber(totals.calories)} / ${formatNumber(calorieTarget)} kcal`
   const groups = groupFoodLogs(logs)
-  view.innerHTML = `
-    <div class="food-date-switch" role="group" aria-label="快捷切换饮食记录日期">${quickButton('昨天', quickDates.yesterday)}${quickButton('今天', quickDates.today)}${quickButton('明天', quickDates.tomorrow)}</div>
-    ${isQuickDate ? '' : `<p class="food-selected-date">当前查看：${formatHeaderDate(foodDate)}</p>`}
+  view.classList.add('food-pager-viewport')
+  view.innerHTML = `<div class="food-pager-page">
+    <div class="food-date-switch" role="group" aria-label="切换饮食记录日期">${pagerDates.map(quickButton).join('')}</div>
     <section class="nutrition-hero food-nutrition-hero" data-food-date="${foodDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" id="edit-nutrition-target">${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="food-calorie-row"><div class="calorie-gauge" data-progress-key="calories" data-actual="${totals.calories}" ${calorieTarget === undefined ? '' : `data-goal="${calorieTarget}"`} aria-label="热量 ${calorieAmount} ${goalStatusText(totals.calories, calorieTarget, 'kcal')}">${ringSvgHtml(totals.calories, calorieTarget, 'large', previous.get('calories'))}<div class="calorie-gauge-center"><strong data-count-from="${previous.get('calories')?.actual ?? 0}" data-count-to="${totals.calories}">${formatNumber(previous.get('calories')?.actual ?? 0)}</strong><small>kcal</small></div></div><div class="calorie-gauge-caption"><span>当日摄入</span>${calorieTarget === undefined ? '<strong>按自己的节奏记录</strong>' : `<strong>目标 ${formatNumber(calorieTarget)} kcal</strong>`}<span class="${getGoalProgress(totals.calories, calorieTarget).state === 'above' ? 'metric-excess' : ''}">${goalStatusText(totals.calories, calorieTarget, 'kcal')}</span></div></div><div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div></section>
     <section class="food-meals-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '按餐次记录，更清楚'}</span></div></section>
-    <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday)).join('')}</div>`
+    <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday)).join('')}</div></div>`
+  bindFoodPager(view)
   animateNutritionRings(view)
   animateNutritionNumber(view)
-  app.querySelector<HTMLInputElement>('#food-date')?.addEventListener('change', (event) => { const date = (event.target as HTMLInputElement).value; if (date) { foodDate = date; void render().catch(fail) } })
-  app.querySelector('#food-library')?.addEventListener('click', () => void showFoodLibrary())
-  app.querySelector('#use-diet-template')?.addEventListener('click', () => { app.querySelector<HTMLDetailsElement>('.food-tools-menu')!.open = false; void showDietTemplatePicker() })
+  foodHeaderEvents?.abort()
+  foodHeaderEvents = new AbortController()
+  const headerSignal = foodHeaderEvents.signal
+  app.querySelector<HTMLInputElement>('#food-date')?.addEventListener('change', (event) => { const date = (event.target as HTMLInputElement).value; if (date) { foodDate = date; void renderFoodPage().catch(fail) } }, { signal: headerSignal })
+  app.querySelector('#food-library')?.addEventListener('click', () => void showFoodLibrary(), { signal: headerSignal })
+  app.querySelector('#use-diet-template')?.addEventListener('click', () => { app.querySelector<HTMLDetailsElement>('.food-tools-menu')!.open = false; void showDietTemplatePicker() }, { signal: headerSignal })
   view.querySelector('#edit-nutrition-target')?.addEventListener('click', () => showNutritionTargetForm(foodDate, target))
   const saveTemplate = app.querySelector<HTMLButtonElement>('#save-day-diet-template')
   if (saveTemplate) saveTemplate.hidden = !logs.length
-  saveTemplate?.addEventListener('click', () => { app.querySelector<HTMLDetailsElement>('.food-tools-menu')!.open = false; void saveDayAsDietTemplate(logs) })
-  view.querySelectorAll<HTMLButtonElement>('[data-food-quick-date]').forEach((button) => button.addEventListener('click', () => { foodDate = button.dataset.foodQuickDate!; void render().catch(fail) }))
+  saveTemplate?.addEventListener('click', () => { app.querySelector<HTMLDetailsElement>('.food-tools-menu')!.open = false; void saveDayAsDietTemplate(logs) }, { signal: headerSignal })
+  view.querySelectorAll<HTMLButtonElement>('[data-food-quick-date]').forEach((button) => button.addEventListener('click', () => {
+    if (foodPagerBusy || button.dataset.foodQuickDate === foodDate) return
+    void navigateFoodDate(button.dataset.foodQuickDate! < foodDate ? -1 : 1)
+  }))
   view.querySelectorAll<HTMLButtonElement>('[data-add-meal]').forEach((button) => button.addEventListener('click', () => { const meal = button.dataset.addMeal; if (isMealType(meal)) void showAddFoodLog(meal) }))
   view.querySelectorAll<HTMLButtonElement>('[data-toggle-meal]').forEach((button) => button.addEventListener('click', () => { const list = button.closest('.food-meal')?.querySelector<HTMLElement>('.meal-log-list'); if (!list) return; list.hidden = !list.hidden; button.setAttribute('aria-expanded', String(!list.hidden)) }))
   view.querySelectorAll<HTMLButtonElement>('[data-delete-log]').forEach((button) => button.addEventListener('click', async () => {

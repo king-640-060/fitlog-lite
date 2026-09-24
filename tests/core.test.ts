@@ -6,6 +6,7 @@ import { validateBackup } from '../src/services/backupService'
 import { buildImportPreview, parseFoodCsv } from '../src/services/importService'
 import { upsertWeight } from '../src/services/weightService'
 import { getMonthGridDays, loadMonthSummaries } from '../src/ui/calendarPage'
+import { foodPagerDates, foodPagerLabel, foodSwipeDirection } from '../src/ui/foodPager'
 import { getFoodQuickDates, getLocalDateString, shiftLocalDate } from '../src/utils/date'
 import { calculateNutrition, createFoodLogSnapshot } from '../src/utils/nutrition'
 
@@ -34,6 +35,22 @@ describe('日期', () => {
     expect(getFoodQuickDates(new Date(2026, 11, 31, 23, 55))).toEqual({ yesterday: '2026-12-30', today: '2026-12-31', tomorrow: '2027-01-01' })
     expect(getFoodQuickDates(new Date(2027, 0, 1, 0, 5))).toEqual({ yesterday: '2026-12-31', today: '2027-01-01', tomorrow: '2027-01-02' })
     expect(shiftLocalDate('2024-03-01', -1)).toBe('2024-02-29')
+  })
+
+  it('饮食日期导航相对选中日期移动，并正确跨月跨年', () => {
+    expect(foodPagerDates('2026-09-01')).toEqual(['2026-08-31', '2026-09-01', '2026-09-02'])
+    expect(foodPagerDates('2026-12-31')).toEqual(['2026-12-30', '2026-12-31', '2027-01-01'])
+    expect(foodPagerDates('2027-01-01')).toEqual(['2026-12-31', '2027-01-01', '2027-01-02'])
+    expect(foodPagerLabel('2026-09-23', '2026-09-24')).toBe('昨天')
+    expect(foodPagerLabel('2026-09-24', '2026-09-24')).toBe('今天')
+    expect(foodPagerLabel('2026-09-25', '2026-09-24')).toBe('明天')
+  })
+
+  it('饮食滑动达到距离或速度阈值才翻页', () => {
+    expect(foodSwipeDirection(-90, 400, 375)).toBe(1)
+    expect(foodSwipeDirection(90, 400, 375)).toBe(-1)
+    expect(foodSwipeDirection(-36, 50, 375)).toBe(1)
+    expect(foodSwipeDirection(30, 400, 375)).toBe(0)
   })
 
   it('生成周一开始的固定 6 周月历网格', () => {
