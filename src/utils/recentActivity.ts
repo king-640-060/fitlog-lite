@@ -34,7 +34,7 @@ export function buildRecentActivity(
   for (const workout of records.workouts) {
     if (workout.date > today || !workout.finishedAt) continue
     activities.push({ id: workout.id, date: workout.date, kind: 'workout', title: '完成力量训练',
-      detail: `${workout.exercises.length} 个动作`, timestamp: workout.finishedAt })
+      detail: `${workout.exercises.length} 个动作 · ${workout.exercises.reduce((total, exercise) => total + exercise.sets.length, 0)} 组`, timestamp: workout.finishedAt })
   }
   const pelvicByDate = new Map<string, { count: number; timestamp: string }>()
   for (const session of records.pelvicFloorSessions) {

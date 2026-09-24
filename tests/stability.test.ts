@@ -67,6 +67,17 @@ describe('Workout 稳定保存', () => {
     expect((await database.workouts.get(value.id))?.exercises[0]?.sets.map((set) => set.reps)).toEqual([10, 9])
   })
 
+  it('编辑旧训练的重量和次数不会删除 RPE 或生命周期时间', async () => {
+    const database = newDatabase()
+    const value = workout([{ id: 'set-1', weightKg: 80, reps: 8, rpe: 9 }])
+    await database.workouts.add(value)
+    const loaded = (await database.workouts.get(value.id))!
+    loaded.exercises[0]!.sets[0]!.weightKg = 82.5
+    loaded.exercises[0]!.sets[0]!.reps = 9
+    await saveWorkout(loaded, database)
+    expect(await database.workouts.get(value.id)).toMatchObject({ startedAt: now, exercises: [{ sets: [{ weightKg: 82.5, reps: 9, rpe: 9 }] }] })
+  })
+
   it('完全空白的新组不会保存为 reps 0', async () => {
     const database = newDatabase()
     const value = workout([{ id: 'blank-set', reps: 0 }])
@@ -127,6 +138,7 @@ describe('Backup 深度验证与恢复', () => {
     expect(await database.foodLogs.count()).toBe(1)
     expect(await database.exercises.count()).toBe(1)
     expect(await database.workouts.count()).toBe(1)
+    expect((await database.workouts.get('workout-1'))?.exercises[0]?.sets[0]?.rpe).toBe(8)
     expect(await database.weights.count()).toBe(1)
   })
 

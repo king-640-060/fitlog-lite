@@ -22,6 +22,7 @@ describe('最近活动', () => {
     const result = buildRecentActivity({ foodLogs: [food('a', '2026-09-23', 100), food('b', '2026-09-23', 200)], workouts: [workout], pelvicFloorSessions: [pelvic], weights: [weight] }, '2026-09-23')
     expect(result.map((item) => item.kind)).toEqual(['food', 'workout', 'pelvic', 'weight'])
     expect(result[0]).toMatchObject({ date: '2026-09-23', detail: '2 项 · 300 kcal' })
+    expect(result[1]).toMatchObject({ kind: 'workout', detail: '1 个动作 · 0 组' })
   })
 
   it('不把未来记录或未完成训练展示为已完成活动', () => {

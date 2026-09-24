@@ -169,6 +169,7 @@ describe('Workout Templates', () => {
     expect(generated.exercises[0]!.exerciseName).toBe('卧推（最新）')
     expect(generated.exercises[0]!.id).not.toBe(template.exercises[0]!.id)
     expect(generated.exercises[0]!.sets[0]!.id).not.toBe(template.exercises[0]!.sets[0]!.id)
+    expect(generated.exercises[0]!.sets[0]!.rpe).toBe(8)
     generated.exercises[0]!.sets[0]!.weightKg = 82.5
     await database.workouts.put(generated)
     expect((await database.workoutTemplates.get(template.id))!.exercises[0]!.sets[0]!.weightKg).toBe(80)
@@ -266,6 +267,10 @@ describe('Backup template compatibility', () => {
     expect(backup.data.dietTemplates).toHaveLength(1)
     const target = newDatabase(); await restoreBackup(backup, target)
     expect(await Promise.all([target.workoutTemplates.count(), target.dietTemplates.count()])).toEqual([1, 1])
+    const restoredTemplate = (await target.workoutTemplates.get('workout-template-1'))!
+    expect(restoredTemplate.exercises[0]!.sets[0]!.rpe).toBe(8)
+    const launched = await startWorkoutFromTemplate(restoredTemplate, '2026-09-17', target)
+    expect(launched.exercises[0]!.sets[0]!.rpe).toBe(8)
   })
 
   it('拒绝 malformed WorkoutTemplate 与 DietTemplate', () => {

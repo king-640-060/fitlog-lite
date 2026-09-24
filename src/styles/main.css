@@ -414,24 +414,17 @@ fieldset { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--borde
 .history-row small { overflow: hidden; color: var(--text-secondary); text-overflow: ellipsis; white-space: nowrap; }
 .history-count { color: var(--text-secondary); font-size: .82rem; }
 .active-workout-head { position: fixed; z-index: 24; top: 0; left: 50%; width: min(100%, 640px); transform: translateX(-50%); display: grid; grid-template-columns: 48px 1fr 48px; align-items: center; margin: 0; padding: calc(10px + env(safe-area-inset-top)) 16px 10px; border-bottom: 1px solid var(--divider); background: var(--bg); }
-.active-workout-head > div { display: grid; gap: 2px; text-align: center; }
-.active-workout-head > div span { color: var(--text-secondary); font-size: .78rem; }
+.active-workout-head > strong { text-align: center; font-size: 1rem; }
 .head-spacer { width: 48px; }
 .finish-text { min-height: 38px; border: 0; padding: 0; background: transparent; color: var(--accent-strong); font-weight: 750; }
 .workout-meta { display: flex; align-items: center; justify-content: space-between; color: var(--text-secondary); font-size: .78rem; }
 .workout-meta span:last-child { color: var(--accent-strong); }
-.workout-rest-panel { display: flex; align-items: center; gap: 14px; padding: 12px 15px; border: 1px solid var(--border); border-radius: 19px; background: var(--surface); }
-.workout-rest-ring { --rest-remaining-angle: 360deg; display: grid; width: 94px; min-width: 94px; aspect-ratio: 1; align-content: center; justify-items: center; border-radius: 50%; background: radial-gradient(circle, var(--surface) 65%, transparent 66%), conic-gradient(var(--accent) var(--rest-remaining-angle), var(--border) 0); color: var(--accent-strong); }
-.workout-rest-ring > span { font-size: .72rem; }
-.workout-rest-ring strong { font-size: 1.35rem; line-height: 1.2; }
-.workout-rest-actions { display: grid; flex: 1; min-width: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
-.workout-rest-actions button { min-height: 44px; padding: 0 4px; color: var(--accent-strong); font-size: .75rem; }
-#start-workout-rest { min-height: 44px; color: var(--text-secondary); }
 .workout-complete-banner { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--accent-soft); border-radius: 17px; background: var(--accent-soft); color: var(--accent-strong); animation: complete-in 200ms ease-out both; }
 .workout-complete-banner span { display: grid; gap: 3px; }
 .workout-complete-banner small { color: var(--text-secondary); }
 @keyframes complete-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 #workout-exercises { display: grid; gap: 13px; }
+#workout-exercises .empty #add-exercise { width: 100%; margin-top: 14px; }
 .exercise-card { overflow: hidden; border: 1px solid var(--border); border-radius: 22px; background: var(--surface); box-shadow: var(--shadow-soft); }
 .exercise-head { display: flex; align-items: center; justify-content: space-between; padding: 15px 13px 9px 17px; }
 .exercise-head h3 { margin: 0; font-size: 1.07rem; }
@@ -503,19 +496,18 @@ fieldset { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--borde
 .calendar-month-summary > div:last-child { border-right: 0; }
 .calendar-month-summary strong { font-size: 1.08rem; }
 .calendar-month-summary span { color: var(--text-secondary); font-size: .68rem; }
-.calendar-day-sheet { display: grid; overflow: hidden; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
-.calendar-day-sheet > section { display: grid; gap: 12px; padding: 15px 14px; border-bottom: 1px solid var(--divider); }
-.calendar-day-sheet > section h3 { margin: 0; }
-.calendar-day-sheet > section > p { margin: 0; }
-.calendar-day-sheet > section > p + p { padding-top: 5px; border-top: 1px solid var(--divider); }
-.calendar-day-sheet > div { display: flex; align-items: center; justify-content: space-between; min-height: 56px; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--divider); }
-.calendar-day-sheet > div:last-child { border-bottom: 0; }
-.calendar-day-sheet span { color: var(--text-secondary); font-size: .84rem; }
-.calendar-day-sheet strong { text-align: right; }
-.calendar-nutrition-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 5px 12px; }
-.calendar-nutrition-row .nutrition-progress { grid-column: 1 / -1; }
-.calendar-day-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
-.calendar-day-actions button { display: flex; min-width: 0; align-items: center; justify-content: center; gap: 6px; padding-inline: 7px; background: var(--surface-soft); color: var(--accent-strong); font-size: .82rem; font-weight: 700; }
+.calendar-day-sheet { overflow: hidden; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
+.day-detail-row { display: grid; grid-template-columns: 88px minmax(0, 1fr); align-items: center; gap: 12px; min-height: 76px; padding: 13px 15px; }
+.day-detail-row + .day-detail-row { border-top: 1px solid color-mix(in srgb, var(--divider) 60%, transparent); }
+.day-detail-label { color: var(--text-primary); font-size: .94rem; font-weight: 650; }
+.day-detail-content { display: grid; min-width: 0; gap: 4px; }
+.day-detail-content strong { color: var(--text-primary); font-size: 1.05rem; font-weight: 650; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.day-detail-content strong.is-empty { color: var(--text-secondary); font-size: .95rem; font-weight: 500; }
+.day-detail-content span { color: var(--text-secondary); font-size: .8rem; line-height: 1.35; word-break: keep-all; overflow-wrap: normal; }
+.calendar-quick-record { margin-top: 17px; }
+.calendar-quick-record h3 { margin: 0 0 9px; color: var(--text-secondary); font-size: .79rem; font-weight: 650; }
+.calendar-day-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.calendar-day-actions button { display: flex; min-width: 0; min-height: 44px; align-items: center; justify-content: center; gap: 6px; padding-inline: 7px; border-radius: 13px; background: var(--surface-soft); color: var(--accent-strong); font-size: .82rem; font-weight: 700; }
 .calendar-day-danger { display: flex; justify-content: center; margin-top: 18px; padding-top: 13px; border-top: 1px solid var(--divider); }
 .calendar-day-danger .danger-button { min-height: 44px; border-color: transparent; background: transparent; color: var(--text-tertiary); }
 .calendar-day-danger .danger-button:hover, .calendar-day-danger .danger-button:focus-visible { color: var(--danger); }
