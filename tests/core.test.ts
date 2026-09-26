@@ -6,7 +6,7 @@ import { validateBackup } from '../src/services/backupService'
 import { buildImportPreview, parseFoodCsv } from '../src/services/importService'
 import { upsertWeight } from '../src/services/weightService'
 import { getMonthGridDays, loadMonthSummaries } from '../src/ui/calendarPage'
-import { foodPagerLabel, foodRailDates, foodRailFocus, foodRailNeedsRecenter, isCurrentFoodRender, shouldCommitFoodDate } from '../src/ui/foodPager'
+import { foodPagerLabel, foodRailDates, foodRailFocus, foodRailNeedsRecenter, isCurrentFoodRender, shouldCommitFoodDate, shouldShowFoodTodayShortcut } from '../src/ui/foodPager'
 import { getFoodQuickDates, getLocalDateString, shiftLocalDate } from '../src/utils/date'
 import { calculateNutrition, createFoodLogSnapshot } from '../src/utils/nutrition'
 
@@ -57,6 +57,13 @@ describe('日期', () => {
     expect(foodRailNeedsRecenter(2, 15)).toBe(true)
     expect(foodRailNeedsRecenter(12, 15)).toBe(true)
     expect(foodRailNeedsRecenter(-1, 15)).toBe(true)
+  })
+
+  it('饮食回到今天入口在任意非本地今天的日期显示', () => {
+    expect(shouldShowFoodTodayShortcut('2026-09-26', '2026-09-26')).toBe(false)
+    expect(shouldShowFoodTodayShortcut('2026-09-25', '2026-09-26')).toBe(true)
+    expect(shouldShowFoodTodayShortcut('2026-09-27', '2026-09-26')).toBe(true)
+    expect(shouldShowFoodTodayShortcut('2026-08-26', '2026-09-26')).toBe(true)
   })
 
   it('饮食日期轨道的中心焦点随距离连续衰减并限定在零到一', () => {

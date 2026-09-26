@@ -24,7 +24,7 @@ import {
 } from './services/templateService'
 import { calendarCategories, calendarCategoryIcons, calendarLegendLabels, getCalendarDayAccessibleLabel, hasDayRecords, loadMonthSummaries, renderMonthCalendar, type CalendarDaySummary } from './ui/calendarPage'
 import { buildCalendarDayDetailRows } from './ui/dayDetail'
-import { foodPagerLabel, foodRailDates, foodRailFocus, foodRailNeedsRecenter, isCurrentFoodRender, shouldCommitFoodDate } from './ui/foodPager'
+import { foodPagerLabel, foodRailDates, foodRailFocus, foodRailNeedsRecenter, isCurrentFoodRender, shouldCommitFoodDate, shouldShowFoodTodayShortcut } from './ui/foodPager'
 import { icon, type IconName } from './ui/icons'
 import { getGoalProgress } from './ui/progressRing'
 import { groupFoodLogs, isMealType, mealNames, mealTypes, type FoodMealGroup } from './utils/foodMeals'
@@ -220,7 +220,7 @@ async function render(): Promise<void> {
   const subtitle = activeTab === 'today' ? `${formatHeaderDate(today).replace('今天 · ', '')} · 今天也继续保持` : activeTab === 'workout' ? formatHeaderDate(workoutDate) : activeTab === 'progress' ? '看见每一次积累' : '管理你的记录与应用'
   app.innerHTML = `
     <div class="app-frame">
-      <header class="topbar${activeTab === 'today' ? ' today-topbar' : activeTab === 'food' ? ' food-topbar' : ''}"><div><h1>${title}</h1>${activeTab === 'food' ? '' : `<p class="header-date">${subtitle}</p>`}</div>${activeTab === 'food' ? `<div class="food-header-actions"><button class="food-library-link" id="food-library">食物库</button><details class="food-tools-menu"><summary aria-label="饮食更多操作" title="更多操作">${icon('more', 20)}</summary><div class="food-tools-panel"><button id="use-diet-template">使用模板</button><label class="food-menu-date">选择日期<input id="food-date" type="date" value="${foodDate}" aria-label="选择饮食记录日期"></label><button id="save-day-diet-template" hidden>保存为模板</button></div></details></div>` : activeTab === 'today' ? `<span class="brand-mark today-brand" aria-hidden="true">${icon('leaf', 19)}</span>` : activeTab === 'progress' ? `<span class="brand-mark subtle" aria-hidden="true">${icon('leaf', 19)}</span>` : ''}</header>
+      <header class="topbar${activeTab === 'today' ? ' today-topbar' : activeTab === 'food' ? ' food-topbar' : ''}"><div><h1>${title}</h1>${activeTab === 'food' ? '' : `<p class="header-date">${subtitle}</p>`}</div>${activeTab === 'food' ? `<div class="food-header-actions"><button class="food-today-shortcut" id="food-return-today" type="button" aria-label="回到今天" hidden>回到今天</button><button class="food-library-link" id="food-library">食物库</button><details class="food-tools-menu"><summary aria-label="饮食更多操作" title="更多操作">${icon('more', 20)}</summary><div class="food-tools-panel"><button id="use-diet-template">使用模板</button><label class="food-menu-date">选择日期<input id="food-date" type="date" value="${foodDate}" aria-label="选择饮食记录日期"></label><button id="save-day-diet-template" hidden>保存为模板</button></div></details></div>` : activeTab === 'today' ? `<span class="brand-mark today-brand" aria-hidden="true">${icon('leaf', 19)}</span>` : activeTab === 'progress' ? `<span class="brand-mark subtle" aria-hidden="true">${icon('leaf', 19)}</span>` : ''}</header>
       <main id="view" class="${activeTab === 'today' ? 'today-dashboard' : ''}" aria-live="polite"></main>
       <nav class="bottom-nav" aria-label="主导航">
         <button data-tab="today" class="${activeTab === 'today' ? 'active' : ''}" aria-current="${activeTab === 'today' ? 'page' : 'false'}">${icon('home', 21)}<span>今日</span></button>
@@ -238,6 +238,7 @@ async function render(): Promise<void> {
     const menu = app.querySelector<HTMLDetailsElement>('.food-tools-menu')!
     foodMenuEvents = new AbortController()
     const signal = foodMenuEvents.signal
+    app.querySelector('#food-return-today')?.addEventListener('click', returnFoodToToday, { signal })
     document.addEventListener('pointerdown', (event) => {
       if (event.target instanceof Node && !menu.contains(event.target)) menu.open = false
     }, { signal })
@@ -585,15 +586,40 @@ function updateFoodRail(rail: HTMLElement, selectedDate: string, forceWindow = f
   }
 }
 
+function updateFoodTodayShortcut(): void {
+  const shortcut = app.querySelector<HTMLButtonElement>('#food-return-today')
+  if (shortcut) shortcut.hidden = !shouldShowFoodTodayShortcut(foodDate)
+}
+
 function commitFoodDate(date: string, forceWindow = false): void {
-  if (!shouldCommitFoodDate(date, foodDate) && !forceWindow) return
+  if (!shouldCommitFoodDate(date, foodDate) && !forceWindow) { updateFoodTodayShortcut(); return }
   const changed = date !== foodDate
   foodDate = date
+  updateFoodTodayShortcut()
   const rail = app.querySelector<HTMLElement>('.food-date-rail')
   if (rail) updateFoodRail(rail, date, forceWindow)
   const picker = app.querySelector<HTMLInputElement>('#food-date')
   if (picker) picker.value = date
   if (changed) void renderFoodPage().catch(fail)
+}
+
+function returnFoodToToday(): void {
+  const today = getLocalDateString()
+  if (foodDate === today) { updateFoodTodayShortcut(); return }
+  const oldRail = app.querySelector<HTMLElement>('.food-date-rail')
+  if (oldRail) {
+    foodRailEvents?.abort()
+    const rail = document.createElement('div')
+    rail.className = 'food-date-rail'
+    rail.setAttribute('role', 'group')
+    rail.setAttribute('aria-label', '切换饮食记录日期')
+    rail.innerHTML = '<div class="food-date-rail-track"></div>'
+    oldRail.replaceWith(rail)
+    rail.closest<HTMLElement>('.food-date-rail-shell')!.dataset.state = 'idle'
+    updateFoodRail(rail, today, true)
+    bindFoodRail(rail)
+  }
+  commitFoodDate(today)
 }
 
 function bindFoodRail(rail: HTMLElement): void {
@@ -714,6 +740,7 @@ function bindFoodRail(rail: HTMLElement): void {
 }
 
 async function renderFoodPage(): Promise<void> {
+  updateFoodTodayShortcut()
   const requestedDate = foodDate
   const requestVersion = ++foodContentVersion
   const view = document.querySelector<HTMLElement>('#view')!

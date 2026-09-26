@@ -23,6 +23,10 @@ export function shouldCommitFoodDate(nextDate: string, selectedDate: string): bo
   return Boolean(nextDate) && nextDate !== selectedDate
 }
 
+export function shouldShowFoodTodayShortcut(selectedDate: string, today = getLocalDateString()): boolean {
+  return selectedDate !== today
+}
+
 export function isCurrentFoodRender(requestVersion: number, currentVersion: number, requestedDate: string, selectedDate: string): boolean {
   return requestVersion === currentVersion && requestedDate === selectedDate
 }
