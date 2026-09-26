@@ -24,11 +24,11 @@ import {
 } from './services/templateService'
 import { calendarCategories, calendarCategoryIcons, calendarLegendLabels, getCalendarDayAccessibleLabel, hasDayRecords, loadMonthSummaries, renderMonthCalendar, type CalendarDaySummary } from './ui/calendarPage'
 import { buildCalendarDayDetailRows } from './ui/dayDetail'
-import { foodGestureProgress, foodPagerDates, foodPagerLabel, foodSwipeDirection, foodVisualOffset } from './ui/foodPager'
+import { foodPagerLabel, foodRailDates, foodRailNeedsRecenter, isCurrentFoodRender, shouldCommitFoodDate } from './ui/foodPager'
 import { icon, type IconName } from './ui/icons'
 import { getGoalProgress } from './ui/progressRing'
 import { groupFoodLogs, isMealType, mealNames, mealTypes, type FoodMealGroup } from './utils/foodMeals'
-import { formatShortDate, getLocalDateString, shiftLocalDate } from './utils/date'
+import { formatShortDate, getLocalDateString } from './utils/date'
 import { calculateNutrition, formatNumber } from './utils/nutrition'
 import { buildRecentActivity, type RecentActivityKind } from './utils/recentActivity'
 
@@ -45,10 +45,8 @@ let calendarMonth = new Date().getMonth()
 let foodDate = getLocalDateString()
 let foodMenuEvents: AbortController | undefined
 let foodHeaderEvents: AbortController | undefined
-let foodPagerEvents: AbortController | undefined
-let foodPagerBusy = false
-const foodSlotData = new WeakMap<HTMLElement, { logs: FoodLog[]; target?: NutritionTarget }>()
-let foodMotionAnimations: Animation[] = []
+let foodRailEvents: AbortController | undefined
+let foodContentVersion = 0
 let workoutDate = getLocalDateString()
 let weightDate = getLocalDateString()
 let currentWorkout: Workout | undefined
@@ -211,8 +209,8 @@ function chooseNutritionTargetConflict(): Promise<'preserve' | 'replace' | undef
 async function render(): Promise<void> {
   foodMenuEvents?.abort()
   foodHeaderEvents?.abort()
-  foodPagerEvents?.abort()
-  foodPagerBusy = false
+  foodRailEvents?.abort()
+  foodContentVersion += 1
   weightChart?.destroy()
   weightChart = undefined
   document.body.classList.remove('immersive')
@@ -532,260 +530,115 @@ function foodMealSectionHtml(group: FoodMealGroup, isToday: boolean): string {
   </section>`
 }
 
-type FoodDirection = -1 | 1
-
-interface FoodGesture {
-  pointerId: number
-  startX: number
-  startY: number
-  startedAt: number
-  rawDx: number
-  width: number
-  mode: 'pending' | 'horizontal' | 'vertical'
-  rafId?: number
+function foodRailItemHtml(date: string): string {
+  const label = foodPagerLabel(date)
+  const day = Number(date.slice(8, 10))
+  const month = Number(date.slice(5, 7))
+  return '<button class="food-date-item" type="button" data-food-date="' + date + '" aria-label="' + label + '，' + month + '月' + day + '日"><strong>' + label + '</strong><small>' + month + '月' + day + '日</small></button>'
 }
 
-function foodRailButtonHtml(): string {
-  return '<button class="food-date-slot"><span class="food-date-slot-text"><strong></strong><small></small></span></button>'
+function centerFoodRail(rail: HTMLElement, date: string, behavior: ScrollBehavior = 'auto', preservePageScroll = false): void {
+  const item = Array.from(rail.querySelectorAll<HTMLButtonElement>('.food-date-item')).find((button) => button.dataset.foodDate === date)
+  if (!item) return
+  if (preservePageScroll) {
+    const railRect = rail.getBoundingClientRect()
+    const itemRect = item.getBoundingClientRect()
+    rail.scrollTo({ left: rail.scrollLeft + itemRect.left + itemRect.width / 2 - railRect.left - railRect.width / 2, behavior: 'auto' })
+  } else {
+    item.scrollIntoView({ behavior, inline: 'center', block: 'nearest' })
+  }
 }
 
-function updateFoodRail(rail: HTMLElement, selectedDate: string): void {
-  foodPagerDates(selectedDate).forEach((date, index) => {
-    const button = rail.querySelectorAll<HTMLButtonElement>('.food-date-slot')[index]!
-    const label = foodPagerLabel(date)
-    button.dataset.foodQuickDate = date
-    button.setAttribute('aria-label', `${label}，${date}，${index === 1 ? '当前选中' : '切换日期'}`)
-    button.setAttribute('aria-pressed', String(index === 1))
-    if (index === 1) button.setAttribute('aria-current', 'date')
-    else button.removeAttribute('aria-current')
-    button.querySelector('strong')!.textContent = label
-    button.querySelector('small')!.textContent = `${Number(date.slice(5, 7))}月${Number(date.slice(8, 10))}日`
+function updateFoodRail(rail: HTMLElement, selectedDate: string, forceWindow = false): void {
+  const track = rail.querySelector<HTMLElement>('.food-date-rail-track')!
+  let items = Array.from(track.querySelectorAll<HTMLButtonElement>('.food-date-item'))
+  const index = items.findIndex((item) => item.dataset.foodDate === selectedDate)
+  const rebuild = forceWindow || foodRailNeedsRecenter(index, items.length)
+  if (rebuild) {
+    const focusedDate = items.find((item) => item === document.activeElement)?.dataset.foodDate
+    track.innerHTML = foodRailDates(selectedDate).map(foodRailItemHtml).join('')
+    items = Array.from(track.querySelectorAll<HTMLButtonElement>('.food-date-item'))
+    if (focusedDate) items.find((item) => item.dataset.foodDate === focusedDate)?.focus({ preventScroll: true })
+  }
+  items.forEach((item) => {
+    const selected = item.dataset.foodDate === selectedDate
+    if (selected) item.setAttribute('aria-current', 'date')
+    else item.removeAttribute('aria-current')
   })
+  if (rebuild) centerFoodRail(rail, selectedDate, 'auto', true)
 }
 
-function foodSlot(stage: HTMLElement, side: -1 | 0 | 1): HTMLElement | null {
-  return stage.querySelector<HTMLElement>(side === 0 ? '.food-content-slot.is-current' : `.food-content-slot[data-food-pager-side="${side}"]`)
+function commitFoodDate(date: string, forceWindow = false): void {
+  if (!shouldCommitFoodDate(date, foodDate) && !forceWindow) return
+  const changed = date !== foodDate
+  foodDate = date
+  const rail = app.querySelector<HTMLElement>('.food-date-rail')
+  if (rail) updateFoodRail(rail, date, forceWindow)
+  const picker = app.querySelector<HTMLInputElement>('#food-date')
+  if (picker) picker.value = date
+  if (changed) void renderFoodPage().catch(fail)
 }
 
-function cancelFoodMotion(): void {
-  foodMotionAnimations.forEach((animation) => animation.cancel())
-  foodMotionAnimations = []
-}
-
-function resetFoodMotion(view: HTMLElement): void {
-  view.querySelectorAll<HTMLElement>('.food-content-slot, .food-date-slot-text').forEach((element) => {
-    element.style.transform = ''
-    element.style.opacity = ''
-    element.style.visibility = ''
-    element.style.willChange = ''
-  })
-}
-
-function paintFoodGesture(view: HTMLElement, rawDx: number, width: number): void {
-  const stage = view.querySelector<HTMLElement>('.food-content-stage')!
-  const current = foodSlot(stage, 0)!
-  const side: FoodDirection = rawDx < 0 ? 1 : -1
-  const incoming = foodSlot(stage, side)
-  const other = foodSlot(stage, side === 1 ? -1 : 1)
-  const progress = foodGestureProgress(rawDx, width)
-  const offset = foodVisualOffset(rawDx)
-  current.style.willChange = 'transform, opacity'
-  current.style.transform = `translate3d(${offset}px, 0, 0) scale(${1 - progress * .005})`
-  current.style.opacity = String(1 - progress * .14)
-  if (other) { other.style.visibility = ''; other.style.opacity = ''; other.style.transform = '' }
-  if (incoming) {
-    incoming.style.visibility = 'visible'
-    incoming.style.willChange = 'transform, opacity'
-    incoming.style.transform = `translate3d(${side * 24 + offset}px, 0, 0) scale(${.995 + progress * .005})`
-    incoming.style.opacity = String(.72 + progress * .28)
+function bindFoodRail(rail: HTMLElement): void {
+  foodRailEvents?.abort()
+  foodRailEvents = new AbortController()
+  const signal = foodRailEvents.signal
+  const items = () => Array.from(rail.querySelectorAll<HTMLButtonElement>('.food-date-item'))
+  const settle = () => {
+    if (!rail.isConnected || activeTab !== 'food') return
+    const center = rail.getBoundingClientRect().left + rail.clientWidth / 2
+    let nearest: HTMLButtonElement | undefined
+    let distance = Number.POSITIVE_INFINITY
+    for (const item of items()) {
+      const rect = item.getBoundingClientRect()
+      const nextDistance = Math.abs(rect.left + rect.width / 2 - center)
+      if (nextDistance < distance) { nearest = item; distance = nextDistance }
+    }
+    if (nearest?.dataset.foodDate) commitFoodDate(nearest.dataset.foodDate)
   }
-  const labels = view.querySelectorAll<HTMLElement>('.food-date-slot-text')
-  labels[1]!.style.transform = `translateX(${-side * progress * 8}px)`
-  labels[1]!.style.opacity = String(1 - progress * .45)
-  labels[side === 1 ? 2 : 0]!.style.transform = `translateX(${-side * progress * 6}px)`
-  labels[side === 1 ? 2 : 0]!.style.opacity = String(.7 + progress * .3)
-}
-
-async function settleFoodDate(direction: FoodDirection, source: 'tap' | 'swipe'): Promise<void> {
-  if (foodPagerBusy || activeTab !== 'food' || document.querySelector('dialog[open]')) return
-  const view = app.querySelector<HTMLElement>('#view')!
-  const stage = view.querySelector<HTMLElement>('.food-content-stage')!
-  const rail = view.querySelector<HTMLElement>('.food-date-rail')!
-  const outgoing = foodSlot(stage, 0)!
-  const oldDate = foodDate
-  const nextDate = shiftLocalDate(oldDate, direction)
-  foodPagerBusy = true
-  try {
-    let incoming = foodSlot(stage, direction)
-    if (!incoming) {
-      await prepareFoodPreviews(view, oldDate)
-      incoming = foodSlot(stage, direction)
-    }
-    if (!incoming || !view.isConnected || foodDate !== oldDate) return
-    const restoreFocus = rail.contains(document.activeElement)
-    const oldScroll = window.scrollY
-    const oldHeight = outgoing.offsetHeight
-    stage.style.minHeight = `${oldHeight}px`
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      const timing: KeyframeAnimationOptions = { duration: 200, easing: 'cubic-bezier(.2, .75, .25, 1)', fill: 'both' }
-      const startCurrent = outgoing.style.transform || 'translate3d(0, 0, 0) scale(1)'
-      const startIncoming = incoming.style.transform || `translate3d(${direction * 24}px, 0, 0) scale(.995)`
-      incoming.style.visibility = 'visible'
-      const centerLabel = rail.querySelectorAll<HTMLElement>('.food-date-slot-text')[1]!
-      const neighborLabel = rail.querySelectorAll<HTMLElement>('.food-date-slot-text')[direction === 1 ? 2 : 0]!
-      cancelFoodMotion()
-      foodMotionAnimations = [
-        outgoing.animate([{ transform: startCurrent, opacity: outgoing.style.opacity || 1 }, { transform: `translate3d(${-direction * 24}px, 0, 0) scale(.995)`, opacity: 0 }], timing),
-        incoming.animate([{ transform: startIncoming, opacity: incoming.style.opacity || 0 }, { transform: 'translate3d(0, 0, 0) scale(1)', opacity: 1 }], timing),
-        centerLabel.animate([{ transform: centerLabel.style.transform || 'translateX(0)', opacity: centerLabel.style.opacity || 1 }, { transform: `translateX(${-direction * 8}px)`, opacity: .5 }], { ...timing, duration: 180 }),
-        neighborLabel.animate([{ transform: neighborLabel.style.transform || 'translateX(0)', opacity: neighborLabel.style.opacity || .7 }, { transform: `translateX(${-direction * 6}px)`, opacity: 1 }], { ...timing, duration: 180 }),
-      ]
-      await Promise.all(foodMotionAnimations.map((animation) => animation.finished))
-    }
-    if (!view.isConnected || foodDate !== oldDate) return
-    foodDate = nextDate
-    stage.querySelectorAll<HTMLElement>('.food-content-slot').forEach((slot) => {
-      if (slot !== outgoing && slot !== incoming) slot.remove()
-    })
-    outgoing.className = `food-content-slot ${direction === 1 ? 'is-prev' : 'is-next'}`
-    outgoing.dataset.foodPagerSide = String(-direction)
-    outgoing.setAttribute('aria-hidden', 'true')
-    outgoing.inert = true
-    incoming.className = 'food-content-slot is-current'
-    delete incoming.dataset.foodPagerSide
-    incoming.removeAttribute('aria-hidden')
-    incoming.inert = false
-    updateFoodRail(rail, nextDate)
-    app.querySelector<HTMLInputElement>('#food-date')!.value = nextDate
-    bindFoodSlot(incoming)
-    bindFoodHeader(foodSlotData.get(incoming)!.logs)
-    cancelFoodMotion()
-    resetFoodMotion(view)
-    stage.style.minHeight = ''
-    if (restoreFocus || source === 'tap') rail.querySelector<HTMLButtonElement>('[aria-current="date"]')?.focus({ preventScroll: true })
-    window.scrollTo(0, Math.min(oldScroll, Math.max(0, document.documentElement.scrollHeight - window.innerHeight)))
-    try { await prepareFoodPreviews(view, nextDate) } catch (error) { fail(error) }
-  } catch (error) {
-    if (view.isConnected && activeTab === 'food' && foodDate === oldDate) fail(error)
-  } finally {
-    cancelFoodMotion()
-    resetFoodMotion(view)
-    stage.style.minHeight = ''
-    foodPagerBusy = false
+  if ('onscrollend' in document.createElement('div')) {
+    rail.addEventListener('scrollend', settle, { signal })
+  } else {
+    let timer: number | undefined
+    rail.addEventListener('scroll', () => {
+      window.clearTimeout(timer)
+      timer = window.setTimeout(settle, 100)
+    }, { signal })
+    signal.addEventListener('abort', () => window.clearTimeout(timer), { once: true })
   }
-}
-
-function bindFoodPager(view: HTMLElement): void {
-  foodPagerEvents?.abort()
-  foodPagerEvents = new AbortController()
-  const signal = foodPagerEvents.signal
-  let gesture: FoodGesture | undefined
-  let suppressClick = false
-  let reboundVersion = 0
-  view.addEventListener('pointerdown', (event) => {
-    if (foodPagerBusy || document.querySelector('dialog[open]') || event.pointerType === 'mouse' || !event.isPrimary) return
-    const target = event.target instanceof Element ? event.target : null
-    const area = target?.closest<HTMLElement>('.food-date-rail, .food-content-slot.is-current')
-    if (!area || target?.closest('input, textarea, select, a, [contenteditable], details, summary, [role="slider"]')) return
-    if (target?.closest('button') && !target.closest('.food-date-rail')) return
-    if (target?.closest('[data-no-food-swipe]')) return
-    for (let node: Element | null = target; node && node !== area; node = node.parentElement) {
-      if (node.scrollWidth > node.clientWidth + 4 && getComputedStyle(node).overflowX !== 'visible') return
-    }
-    reboundVersion += 1
-    cancelFoodMotion()
-    resetFoodMotion(view)
-    gesture = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, startedAt: event.timeStamp, rawDx: 0, width: view.clientWidth, mode: 'pending' }
+  rail.addEventListener('click', (event) => {
+    const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('.food-date-item') : null
+    if (!button || !rail.contains(button)) return
+    centerFoodRail(rail, button.dataset.foodDate!, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth')
+    const railCenter = rail.getBoundingClientRect().left + rail.clientWidth / 2
+    const buttonCenter = button.getBoundingClientRect().left + button.offsetWidth / 2
+    if (Math.abs(railCenter - buttonCenter) < 2) settle()
   }, { signal })
-  view.addEventListener('pointermove', (event) => {
-    if (!gesture || gesture.pointerId !== event.pointerId) return
-    const dx = event.clientX - gesture.startX
-    const dy = event.clientY - gesture.startY
-    if (gesture.mode === 'pending' && Math.max(Math.abs(dx), Math.abs(dy)) > 12) {
-      gesture.mode = Math.abs(dx) > Math.abs(dy) * 1.2 && !(gesture.startX <= 24 && dx > 0) ? 'horizontal' : 'vertical'
-    }
-    if (gesture.mode !== 'horizontal') return
+  rail.addEventListener('keydown', (event) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+    const focused = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('.food-date-item') : null
+    if (!focused) return
+    const buttons = items()
+    const next = buttons[buttons.indexOf(focused) + (event.key === 'ArrowLeft' ? -1 : 1)]
+    if (!next) return
     event.preventDefault()
-    suppressClick = true
-    gesture.rawDx = dx
-    if (gesture.rafId === undefined) {
-      const current = gesture
-      gesture.rafId = window.requestAnimationFrame(() => {
-        current.rafId = undefined
-        if (gesture === current) paintFoodGesture(view, current.rawDx, current.width)
-      })
-    }
+    next.focus({ preventScroll: true })
+    centerFoodRail(rail, next.dataset.foodDate!, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth')
   }, { signal })
-  const finish = (event: PointerEvent) => {
-    if (!gesture || gesture.pointerId !== event.pointerId) return
-    const current = gesture
-    gesture = undefined
-    if (current.rafId !== undefined) window.cancelAnimationFrame(current.rafId)
-    if (current.mode !== 'horizontal') return
-    window.setTimeout(() => { suppressClick = false }, 150)
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) paintFoodGesture(view, current.rawDx, current.width)
-    const direction = event.type === 'pointercancel' ? 0 : foodSwipeDirection(current.rawDx, event.timeStamp - current.startedAt, current.width)
-    if (direction && !document.querySelector('dialog[open]')) {
-      void settleFoodDate(direction, 'swipe')
-      return
-    }
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { resetFoodMotion(view); return }
-    const stage = view.querySelector<HTMLElement>('.food-content-stage')!
-    const outgoing = foodSlot(stage, 0)!
-    const side: FoodDirection = current.rawDx < 0 ? 1 : -1
-    const incoming = foodSlot(stage, side)
-    const centerLabel = view.querySelectorAll<HTMLElement>('.food-date-slot-text')[1]!
-    const neighborLabel = view.querySelectorAll<HTMLElement>('.food-date-slot-text')[side === 1 ? 2 : 0]!
-    const timing: KeyframeAnimationOptions = { duration: 160, easing: 'cubic-bezier(.2, .75, .25, 1)', fill: 'both' }
-    cancelFoodMotion()
-    foodMotionAnimations = [outgoing.animate([{ transform: outgoing.style.transform, opacity: outgoing.style.opacity }, { transform: 'translate3d(0, 0, 0) scale(1)', opacity: 1 }], timing), centerLabel.animate([{ transform: centerLabel.style.transform, opacity: centerLabel.style.opacity }, { transform: 'translateX(0)', opacity: 1 }], timing), neighborLabel.animate([{ transform: neighborLabel.style.transform, opacity: neighborLabel.style.opacity }, { transform: 'translateX(0)', opacity: .7 }], timing)]
-    if (incoming) foodMotionAnimations.push(incoming.animate([{ transform: incoming.style.transform, opacity: incoming.style.opacity }, { transform: `translate3d(${side * 24}px, 0, 0) scale(.995)`, opacity: 0 }], timing))
-    const version = reboundVersion
-    void Promise.all(foodMotionAnimations.map((animation) => animation.finished)).catch(() => {}).finally(() => {
-      if (version === reboundVersion) { cancelFoodMotion(); resetFoodMotion(view) }
-    })
-  }
-  view.addEventListener('pointerup', finish, { signal })
-  view.addEventListener('pointercancel', finish, { signal })
-  view.addEventListener('click', (event) => {
-    if (!suppressClick) return
-    suppressClick = false
-    event.preventDefault()
-    event.stopImmediatePropagation()
-  }, { signal, capture: true })
-  view.querySelector<HTMLElement>('.food-date-rail')!.addEventListener('click', (event) => {
-    const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('[data-food-quick-date]') : null
-    if (!button || foodPagerBusy || button.dataset.foodQuickDate === foodDate) return
-    void settleFoodDate(button.dataset.foodQuickDate! < foodDate ? -1 : 1, 'tap')
-  }, { signal })
-  signal.addEventListener('abort', () => { if (gesture?.rafId !== undefined) window.cancelAnimationFrame(gesture.rafId); cancelFoodMotion() }, { once: true })
+  const resizeObserver = new ResizeObserver(() => centerFoodRail(rail, foodDate, 'auto', true))
+  resizeObserver.observe(rail)
+  signal.addEventListener('abort', () => resizeObserver.disconnect(), { once: true })
 }
 
-async function prepareFoodPreviews(view: HTMLElement, selectedDate: string): Promise<void> {
-  const stage = view.querySelector<HTMLElement>('.food-content-stage')!
-  const missing = ([-1, 1] as const).filter((side) => !stage.querySelector(`.food-content-slot[data-food-date="${shiftLocalDate(selectedDate, side)}"]`))
-  const previews = await Promise.all(missing.map(async (side) => {
-    const host = document.createElement('div')
-    await renderFoodPage({ date: shiftLocalDate(selectedDate, side), host, preview: true })
-    const slot = host.firstElementChild as HTMLElement
-    slot.classList.add(side === -1 ? 'is-prev' : 'is-next')
-    slot.dataset.foodPagerSide = String(side)
-    slot.setAttribute('aria-hidden', 'true')
-    slot.inert = true
-    return slot
-  }))
-  if (!view.isConnected || activeTab !== 'food' || foodDate !== selectedDate) return
-  stage.append(...previews.filter((slot) => !stage.querySelector(`.food-content-slot[data-food-date="${slot.dataset.foodDate}"]`)))
-}
-
-async function renderFoodPage(options?: { date?: string; host?: HTMLElement; preview?: boolean }): Promise<void> {
-  const requestedDate = options?.date ?? foodDate
-  const view = options?.host ?? document.querySelector<HTMLElement>('#view')!
+async function renderFoodPage(): Promise<void> {
+  const requestedDate = foodDate
+  const requestVersion = ++foodContentVersion
+  const view = document.querySelector<HTMLElement>('#view')!
   const [logs, target] = await Promise.all([
     db.foodLogs.where('date').equals(requestedDate).sortBy('createdAt'),
     db.nutritionTargets.where('date').equals(requestedDate).first(),
   ])
-  if (!options?.preview && (activeTab !== 'food' || foodDate !== requestedDate || !view.isConnected)) return
+  if (activeTab !== 'food' || !view.isConnected || !isCurrentFoodRender(requestVersion, foodContentVersion, requestedDate, foodDate)) return
   const totals = logs.reduce((sum, log) => ({
     calories: sum.calories + log.totalCalories,
     protein: sum.protein + (log.totalProtein ?? 0), carbs: sum.carbs + (log.totalCarbs ?? 0), fat: sum.fat + (log.totalFat ?? 0),
@@ -800,50 +653,40 @@ async function renderFoodPage(options?: { date?: string; host?: HTMLElement; pre
   const calorieTarget = target?.calories
   const calorieAmount = calorieTarget === undefined ? `${formatNumber(totals.calories)} kcal` : `${formatNumber(totals.calories)} / ${formatNumber(calorieTarget)} kcal`
   const groups = groupFoodLogs(logs)
-  const slotHtml = `<div class="food-content-slot${options?.preview ? '' : ' is-current'}" data-food-date="${requestedDate}">
+  const slotHtml = `<div class="food-content-body" data-food-date="${requestedDate}">
     <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="food-calorie-row"><div class="calorie-gauge" data-progress-key="calories" data-actual="${totals.calories}" ${calorieTarget === undefined ? '' : `data-goal="${calorieTarget}"`} aria-label="热量 ${calorieAmount} ${goalStatusText(totals.calories, calorieTarget, 'kcal')}">${ringSvgHtml(totals.calories, calorieTarget, 'large', previous.get('calories'))}<div class="calorie-gauge-center"><strong data-count-from="${previous.get('calories')?.actual ?? 0}" data-count-to="${totals.calories}">${formatNumber(previous.get('calories')?.actual ?? 0)}</strong><small>kcal</small></div></div><div class="calorie-gauge-caption"><span>当日摄入</span>${calorieTarget === undefined ? '<strong>按自己的节奏记录</strong>' : `<strong>目标 ${formatNumber(calorieTarget)} kcal</strong>`}<span class="${getGoalProgress(totals.calories, calorieTarget).state === 'above' ? 'metric-excess' : ''}">${goalStatusText(totals.calories, calorieTarget, 'kcal')}</span></div></div><div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div></section>
     <section class="food-meals-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '按餐次记录，更清楚'}</span></div></section>
     <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday)).join('')}</div></div>`
-  if (options?.preview) {
-    view.innerHTML = slotHtml
-    foodSlotData.set(view.firstElementChild as HTMLElement, { logs, target })
-    view.querySelectorAll<SVGCircleElement>('[data-final-offset]').forEach((ring) => { ring.style.strokeDashoffset = ring.dataset.finalOffset ?? '' })
-    view.querySelectorAll<HTMLElement>('[data-count-to]').forEach((number) => { number.textContent = formatNumber(Number(number.dataset.countTo)) })
-    return
-  }
   let rail = view.querySelector<HTMLElement>('.food-date-rail')
-  let stage = view.querySelector<HTMLElement>('.food-content-stage')
+  let content = view.querySelector<HTMLElement>('.food-content')
   const firstAppearance = !rail
-  const previousDate = view.dataset.foodPagerDate
-  if (!rail || !stage) {
-    view.classList.add('food-pager-viewport')
-    view.innerHTML = `<div class="food-date-rail" role="group" aria-label="切换饮食记录日期">${foodRailButtonHtml().repeat(3)}</div><div class="food-content-stage"></div>`
+  const previousDate = view.dataset.foodContentDate
+  if (!rail || !content) {
+    view.innerHTML = '<div class="food-date-rail-shell"><div class="food-date-selection" aria-hidden="true"></div><div class="food-date-rail" role="group" aria-label="切换饮食记录日期"><div class="food-date-rail-track"></div></div></div><div class="food-content"></div>'
     rail = view.querySelector<HTMLElement>('.food-date-rail')!
-    stage = view.querySelector<HTMLElement>('.food-content-stage')!
-    bindFoodPager(view)
+    content = view.querySelector<HTMLElement>('.food-content')!
+    updateFoodRail(rail, requestedDate, true)
+    bindFoodRail(rail)
   }
-  stage.innerHTML = slotHtml
-  view.dataset.foodPagerDate = requestedDate
-  const slot = stage.firstElementChild as HTMLElement
-  foodSlotData.set(slot, { logs, target })
-  updateFoodRail(rail, requestedDate)
+  content.innerHTML = slotHtml
+  view.dataset.foodContentDate = requestedDate
+  const body = content.firstElementChild as HTMLElement
   if (firstAppearance || previousDate === requestedDate) {
-    animateNutritionRings(slot)
-    animateNutritionNumber(slot)
+    animateNutritionRings(body)
+    animateNutritionNumber(body)
   } else {
-    slot.querySelectorAll<SVGCircleElement>('[data-final-offset]').forEach((ring) => { ring.style.strokeDashoffset = ring.dataset.finalOffset ?? '' })
-    slot.querySelectorAll<HTMLElement>('[data-count-to]').forEach((number) => { number.textContent = formatNumber(Number(number.dataset.countTo)) })
+    body.querySelectorAll<SVGCircleElement>('[data-final-offset]').forEach((ring) => { ring.style.strokeDashoffset = ring.dataset.finalOffset ?? '' })
+    body.querySelectorAll<HTMLElement>('[data-count-to]').forEach((number) => { number.textContent = formatNumber(Number(number.dataset.countTo)) })
   }
-  bindFoodSlot(slot)
+  bindFoodContent(body, target)
   bindFoodHeader(logs)
-  await prepareFoodPreviews(view, requestedDate)
 }
 
 function bindFoodHeader(logs: FoodLog[]): void {
   foodHeaderEvents?.abort()
   foodHeaderEvents = new AbortController()
   const headerSignal = foodHeaderEvents.signal
-  app.querySelector<HTMLInputElement>('#food-date')?.addEventListener('change', (event) => { const date = (event.target as HTMLInputElement).value; if (date) { cancelFoodMotion(); foodDate = date; void renderFoodPage().catch(fail) } }, { signal: headerSignal })
+  app.querySelector<HTMLInputElement>('#food-date')?.addEventListener('change', (event) => { const date = (event.target as HTMLInputElement).value; if (date) commitFoodDate(date, true) }, { signal: headerSignal })
   app.querySelector('#food-library')?.addEventListener('click', () => void showFoodLibrary(), { signal: headerSignal })
   app.querySelector('#use-diet-template')?.addEventListener('click', () => { app.querySelector<HTMLDetailsElement>('.food-tools-menu')!.open = false; void showDietTemplatePicker() }, { signal: headerSignal })
   const saveTemplate = app.querySelector<HTMLButtonElement>('#save-day-diet-template')
@@ -851,10 +694,7 @@ function bindFoodHeader(logs: FoodLog[]): void {
   saveTemplate?.addEventListener('click', () => { app.querySelector<HTMLDetailsElement>('.food-tools-menu')!.open = false; void saveDayAsDietTemplate(logs) }, { signal: headerSignal })
 }
 
-function bindFoodSlot(slot: HTMLElement): void {
-  if (slot.dataset.foodBound === 'true') return
-  slot.dataset.foodBound = 'true'
-  const { target } = foodSlotData.get(slot)!
+function bindFoodContent(slot: HTMLElement, target?: NutritionTarget): void {
   slot.querySelector('[data-edit-nutrition-target]')?.addEventListener('click', () => showNutritionTargetForm(foodDate, target))
   slot.querySelectorAll<HTMLButtonElement>('[data-add-meal]').forEach((button) => button.addEventListener('click', () => { const meal = button.dataset.addMeal; if (isMealType(meal)) void showAddFoodLog(meal) }))
   slot.querySelectorAll<HTMLButtonElement>('[data-toggle-meal]').forEach((button) => button.addEventListener('click', () => { const list = button.closest('.food-meal')?.querySelector<HTMLElement>('.meal-log-list'); if (!list) return; list.hidden = !list.hidden; button.setAttribute('aria-expanded', String(!list.hidden)) }))

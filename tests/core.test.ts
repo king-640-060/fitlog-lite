@@ -6,7 +6,7 @@ import { validateBackup } from '../src/services/backupService'
 import { buildImportPreview, parseFoodCsv } from '../src/services/importService'
 import { upsertWeight } from '../src/services/weightService'
 import { getMonthGridDays, loadMonthSummaries } from '../src/ui/calendarPage'
-import { foodGestureProgress, foodPagerDates, foodPagerLabel, foodSwipeDirection, foodVisualOffset } from '../src/ui/foodPager'
+import { foodPagerLabel, foodRailDates, foodRailNeedsRecenter, isCurrentFoodRender, shouldCommitFoodDate } from '../src/ui/foodPager'
 import { getFoodQuickDates, getLocalDateString, shiftLocalDate } from '../src/utils/date'
 import { calculateNutrition, createFoodLogSnapshot } from '../src/utils/nutrition'
 
@@ -37,29 +37,32 @@ describe('日期', () => {
     expect(shiftLocalDate('2024-03-01', -1)).toBe('2024-02-29')
   })
 
-  it('饮食日期导航相对选中日期移动，并正确跨月跨年', () => {
-    expect(foodPagerDates('2026-09-01')).toEqual(['2026-08-31', '2026-09-01', '2026-09-02'])
-    expect(foodPagerDates('2026-12-31')).toEqual(['2026-12-30', '2026-12-31', '2027-01-01'])
-    expect(foodPagerDates('2027-01-01')).toEqual(['2026-12-31', '2027-01-01', '2027-01-02'])
+  it('饮食日期轨道准备前后七天，并正确跨月跨年', () => {
+    expect(foodRailDates('2026-09-01')).toHaveLength(15)
+    expect(foodRailDates('2026-09-01')[6]).toBe('2026-08-31')
+    expect(foodRailDates('2026-09-01')[7]).toBe('2026-09-01')
+    expect(foodRailDates('2026-09-01')[8]).toBe('2026-09-02')
+    expect(foodRailDates('2026-12-31')[8]).toBe('2027-01-01')
+    expect(foodRailDates('2027-01-01')[6]).toBe('2026-12-31')
     expect(foodPagerLabel('2026-09-23', '2026-09-24')).toBe('昨天')
     expect(foodPagerLabel('2026-09-24', '2026-09-24')).toBe('今天')
     expect(foodPagerLabel('2026-09-25', '2026-09-24')).toBe('明天')
+    expect(foodPagerLabel('2026-09-26', '2026-09-24')).toBe('周六')
   })
 
-  it('饮食滑动达到距离或速度阈值才翻页', () => {
-    expect(foodSwipeDirection(-90, 400, 375)).toBe(1)
-    expect(foodSwipeDirection(90, 400, 375)).toBe(-1)
-    expect(foodSwipeDirection(-36, 50, 375)).toBe(1)
-    expect(foodSwipeDirection(30, 400, 375)).toBe(0)
+  it('饮食日期只在变化后提交，并在窗口边缘或远距离跳转时重建轨道', () => {
+    expect(shouldCommitFoodDate('2026-09-25', '2026-09-24')).toBe(true)
+    expect(shouldCommitFoodDate('2026-09-24', '2026-09-24')).toBe(false)
+    expect(foodRailNeedsRecenter(7, 15)).toBe(false)
+    expect(foodRailNeedsRecenter(2, 15)).toBe(true)
+    expect(foodRailNeedsRecenter(12, 15)).toBe(true)
+    expect(foodRailNeedsRecenter(-1, 15)).toBe(true)
   })
 
-  it('饮食拖动的视觉位移有阻尼和上限，判定进度仍基于真实距离', () => {
-    expect(foodVisualOffset(100)).toBe(16)
-    expect(foodVisualOffset(-100)).toBe(-16)
-    expect(foodVisualOffset(300)).toBe(28)
-    expect(foodVisualOffset(-300)).toBe(-28)
-    expect(foodGestureProgress(0, 390)).toBe(0)
-    expect(foodGestureProgress(-110, 390)).toBe(1)
+  it('饮食异步结果仅允许最新请求及当前日期更新内容', () => {
+    expect(isCurrentFoodRender(3, 3, '2026-09-26', '2026-09-26')).toBe(true)
+    expect(isCurrentFoodRender(2, 3, '2026-09-25', '2026-09-26')).toBe(false)
+    expect(isCurrentFoodRender(3, 3, '2026-09-25', '2026-09-26')).toBe(false)
   })
 
   it('生成周一开始的固定 6 周月历网格', () => {
