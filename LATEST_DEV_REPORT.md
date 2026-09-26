@@ -1,24 +1,24 @@
 # FitLog Lite — Latest Development Report
 
-This is the latest verified production application snapshot. Sync `main` before trusting a recorded SHA. This report may be committed after the verified application commit.
+This is the latest verified production application snapshot. Sync `main` before trusting a recorded SHA. This report is committed after the verified application commit.
 
 ## Current Git and Production State
 
 - Branch: main
-- START_COMMIT: `a9e654a9174177f415cf9bfb438e31373fe422bb`
-- END_COMMIT (verified application): `8b3eb5abcf59e2929bc76b172db8780adc901583`
-- Application commit message: `Show adjacent food dates during swipe drag`
+- START_COMMIT: `480e2c5203ff7aea901261fc481f77ee94f22c8b`
+- END_COMMIT (verified application): `a364f3f7b81270e0411adb52b1c99a81b86a89b4`
+- Application commit message: `Refactor food date pager motion`
 - Production URL: https://king-640-060.github.io/fitlog-lite/
-- GitHub Actions run: [36011555450](https://github.com/king-640-060/fitlog-lite/actions/runs/36011555450)
-- Workflow conclusion: completed / success
+- GitHub Actions run: [36229027914](https://github.com/king-640-060/fitlog-lite/actions/runs/36229027914)
+- Workflow conclusion: completed / success; typecheck, tests, build, artifact upload, and Pages deployment passed
 
-## Calendar Day Detail Visual Refinement
+## Food Pager Motion Refinement
 
-The existing five-row grouped summary now uses the same category icons and restrained semantic tints as the Calendar legend: utensils, dumbbell, stairs, leaf, and scale. Empty rows are 68 px high; the grouped border and dividers are lighter, the 44 px close control is quieter, and the three soft quick actions remain Food, Training, and Weight. Row data, empty-state wording, accessible labels, and Calendar month markers and aggregation are unchanged.
+The Food date rail is now a stable three-slot control outside the content stage. Its selected center position stays fixed while labels and accessible current-date state update. The stage reuses the selected neighboring content slot, recycles the outgoing slot, and prepares the newly adjacent date. Neighbor data is loaded ahead of gestures and inactive content remains `aria-hidden` and inert.
 
-## Food Date Pager
+The full-width page translation, one-to-one finger tracking, and duplicated page-level date navigation were removed. Pointer movement is batched with `requestAnimationFrame`. A 0.16 damping factor limits visual displacement to 28 px while the original distance and velocity still determine swipe completion. Content settles over 200 ms with a small transform, opacity, and subtle scale; canceled gestures return over 160 ms. Rail labels move and fade slightly without moving the rail or selected background. Taps and swipes use the same commit path. A distant date-picker jump updates directly. Reduced-motion mode changes dates without the choreography.
 
-The Food page shows previous date / selected date / next date relative to the selected date. Today-relative labels appear when applicable; arbitrary dates show their weekday and month/day. Users can tap adjacent dates or swipe across the top pager and non-interactive body. This follow-up corrected a gap in the initial implementation: the actual previous and next date pages are now prepared offscreen, and the neighboring page follows the finger during a drag instead of exposing blank space. The neighboring preview has its own FoodLogs and nutrition target, remains inert and hidden from assistive technology until selected, and is refreshed after each date change. A completed transition moves both pages over 260 ms; a short gesture returns both pages to rest. Reduced-motion users get an immediate change. Vertical scrolling, controls, horizontal scroll areas, open dialogs, and the left-edge right-swipe area remain protected. The date picker remains for distant jumps. Stale asynchronous date responses are ignored.
+The Food information hierarchy, food records, nutrition targets, and date semantics are unchanged. The shell, bottom navigation, Date Rail, and content stage are stable during adjacent-date transitions. New date rings and numbers display their values without replaying first-appearance animations.
 
 ## Data and Compatibility
 
@@ -26,33 +26,31 @@ The Food page shows previous date / selected date / next date relative to the se
 - Database name: `fitlog-lite-db`; unchanged
 - Backup export schema: V4; unchanged
 - Restore compatibility: V1 / V2 / V3 / V4; unchanged
-- Food data model, Nutrition Target semantics, and local business-date convention: unchanged
+- FoodLog snapshots, Nutrition Target semantics, and device-local business dates: unchanged
 
 ## Automated Verification
 
 - `npm run typecheck`: PASS
-- `npm test`: PASS — 152 tests / 13 files
+- `npm test`: PASS — 153 tests / 13 files
 - `npm run build`: PASS
-- PWA generateSW: PASS — 17 precache entries / 561.45 KiB
+- PWA generateSW: PASS — 17 precache entries / 565.46 KiB (local build)
 - `git diff --check`: PASS
 
-New tests cover relative pager dates across month and year boundaries and swipe distance and velocity thresholds. Existing Calendar detail and compatibility tests remain green.
+The added pure-logic test covers visual damping direction and clamp, and gesture progress. Existing tests continue to cover date boundaries and swipe distance, velocity, and cancellation thresholds.
 
 ## Browser Visual and Interaction Verification
 
-Local Chrome mobile simulations at 375 × 812, 390 × 844, and 430 × 932 showed five category icons, 68 px empty rows, a 44 px close target, and no horizontal overflow. A populated day with long nutrition and target details retained row hierarchy without overflow. Native Chrome touch events confirmed that the current and adjacent pages move together during a drag at all three widths; repeated forward and backward gestures rebuilt the correct two previews. With 200 kcal on the current day and 300 kcal on the next, the next day's 300 kcal appeared in the dragged preview before release and became the center page after release. A vertical gesture, short horizontal gesture, left-edge right-swipe, and open dialog did not change the date. An adjacent tap and the date picker still worked. No page errors or duplicate element IDs occurred. These were browser simulations, not real iPhone tests.
+Fresh local Chrome mobile contexts at 375 × 812, 390 × 844, and 430 × 932 used native touch events. Short left and right drags displaced content 4.8 px and returned without changing the date or leaving transforms. Full drags displaced it 19.2 px, while the rail and selected center position stayed fixed. Two forward swipes, a reverse swipe, a neighboring-date tap, and a distant date-picker jump produced the expected dates; no horizontal overflow or page errors occurred. A separate 100/200/300 kcal sample confirmed correct current and adjacent FoodLog values before, during, and after a date change, with inactive slots hidden from assistive technology. These records existed only in an isolated browser context.
 
-## GitHub Actions
-
-Run [36011555450](https://github.com/king-640-060/fitlog-lite/actions/runs/36011555450) completed successfully for `8b3eb5abcf59e2929bc76b172db8780adc901583`. Typecheck, tests, build, artifact upload, and Pages deployment passed.
+At 390 × 844, a vertical touch scrolled the page without changing the date; a left-edge right swipe and an open dialog blocked date navigation. Reduced-motion mode changed the date without leaving a transform. These checks are browser simulations, not physical iPhone tests.
 
 ## Production Verification
 
-Production at https://king-640-060.github.io/fitlog-lite/ served the new application asset and passed Chrome touch checks at 375 × 812, 390 × 844, and 430 × 932. During a drag, the adjacent preview moved alongside the current page at each width, without a blank gap, page error, or overflow. Two successive forward swipes advanced 2026-09-24 → 25 → 26 and restored both previews. In an isolated production browser context, sample FoodLogs showed 200 kcal on the current page and 300 kcal on the next page both during the drag and after the next page became selected. The earlier Calendar visual, quick-action, gesture-protection, and date-picker production checks remain valid; no Calendar code changed in this follow-up. Browser sample records did not affect user data.
+Production at https://king-640-060.github.io/fitlog-lite/ served the new Food pager and passed the same 375 × 812, 390 × 844, and 430 × 932 touch sequence: restrained drag motion, stable rail and center position, gentle cancellation, consecutive forward and reverse navigation, adjacent tap, distant picker jump, no residual transforms, no overflow, and no page errors. At 390 × 844, vertical scrolling, left-edge protection, dialog blocking, and reduced-motion switching also passed. The application commit deployed by Actions was `a364f3f7b81270e0411adb52b1c99a81b86a89b4`.
 
 ## Manual Device Verification
 
-Pending: real iPhone Safari and standalone PWA checks for native touch feel, Safari back-edge behavior, Safe Area, and offline mode. Browser viewport simulation does not replace a physical-device check.
+Pending: real iPhone Safari and standalone PWA checks for native touch feel, frame pacing, Safari back-edge behavior, Safe Area, bottom-navigation stability, and offline mode. Browser viewport simulation does not replace a physical-device check.
 
 ## Known Remaining Issues
 
@@ -60,4 +58,4 @@ No code, test, build, browser, or deployment defect was confirmed.
 
 ## ChatGPT Baseline
 
-FitLog Lite is a local-first iPhone PWA using Vanilla TypeScript, Dexie V5 with 10 stores, Backup V4, and V1/V2/V3/V4 Restore. The verified application commit is `8b3eb5abcf59e2929bc76b172db8780adc901583`. Calendar day detail is a five-row icon-led grouped summary. Food uses a relative three-slot date pager: the current and actual adjacent date pages move together during touch drag, with tap, swipe protection, and a retained date picker. Strength logging is timer-free and keeps legacy timestamps/RPE compatibility. Read `AGENTS.md`, this report, and `docs/UI_INTERACTION_SPEC.md` before further UI work; sync `main` and record a fresh START_COMMIT.
+FitLog Lite is a local-first iPhone PWA using Vanilla TypeScript, Dexie V5 with 10 stores, Backup V4, and V1/V2/V3/V4 Restore. The verified application commit is `a364f3f7b81270e0411adb52b1c99a81b86a89b4`. Food uses a stable three-slot Date Rail and content stage, damped gesture motion, 200 ms micro-transitions, preloaded inert neighbors, and a retained date picker. Calendar day detail uses a five-row icon-led grouped summary. Strength logging is timer-free and keeps legacy timestamps/RPE compatibility. Read `AGENTS.md`, this report, and `docs/UI_INTERACTION_SPEC.md` before further UI work; sync `main` and record a fresh START_COMMIT.
