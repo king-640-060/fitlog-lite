@@ -6,7 +6,7 @@ import { validateBackup } from '../src/services/backupService'
 import { buildImportPreview, parseFoodCsv } from '../src/services/importService'
 import { upsertWeight } from '../src/services/weightService'
 import { getMonthGridDays, loadMonthSummaries } from '../src/ui/calendarPage'
-import { foodPagerDates, foodPagerLabel, foodSwipeDirection } from '../src/ui/foodPager'
+import { foodGestureProgress, foodPagerDates, foodPagerLabel, foodSwipeDirection, foodVisualOffset } from '../src/ui/foodPager'
 import { getFoodQuickDates, getLocalDateString, shiftLocalDate } from '../src/utils/date'
 import { calculateNutrition, createFoodLogSnapshot } from '../src/utils/nutrition'
 
@@ -51,6 +51,15 @@ describe('日期', () => {
     expect(foodSwipeDirection(90, 400, 375)).toBe(-1)
     expect(foodSwipeDirection(-36, 50, 375)).toBe(1)
     expect(foodSwipeDirection(30, 400, 375)).toBe(0)
+  })
+
+  it('饮食拖动的视觉位移有阻尼和上限，判定进度仍基于真实距离', () => {
+    expect(foodVisualOffset(100)).toBe(16)
+    expect(foodVisualOffset(-100)).toBe(-16)
+    expect(foodVisualOffset(300)).toBe(28)
+    expect(foodVisualOffset(-300)).toBe(-28)
+    expect(foodGestureProgress(0, 390)).toBe(0)
+    expect(foodGestureProgress(-110, 390)).toBe(1)
   })
 
   it('生成周一开始的固定 6 周月历网格', () => {

@@ -17,3 +17,11 @@ export function foodSwipeDirection(dx: number, elapsedMs: number, width: number)
   }
   return 0
 }
+
+export function foodVisualOffset(dx: number): number {
+  return Math.max(-28, Math.min(28, dx * 0.16))
+}
+
+export function foodGestureProgress(dx: number, width: number): number {
+  return Math.min(1, Math.abs(dx) / Math.max(1, width * 0.28))
+}
