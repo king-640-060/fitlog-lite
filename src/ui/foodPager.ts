@@ -15,6 +15,10 @@ export function foodRailNeedsRecenter(index: number, length: number): boolean {
   return index < 0 || index <= 2 || index >= length - 3
 }
 
+export function foodRailFocus(distance: number, influenceRadius: number): number {
+  return Math.max(0, Math.min(1, 1 - Math.abs(distance) / Math.max(1, influenceRadius)))
+}
+
 export function shouldCommitFoodDate(nextDate: string, selectedDate: string): boolean {
   return Boolean(nextDate) && nextDate !== selectedDate
 }

@@ -6,7 +6,7 @@ import { validateBackup } from '../src/services/backupService'
 import { buildImportPreview, parseFoodCsv } from '../src/services/importService'
 import { upsertWeight } from '../src/services/weightService'
 import { getMonthGridDays, loadMonthSummaries } from '../src/ui/calendarPage'
-import { foodPagerLabel, foodRailDates, foodRailNeedsRecenter, isCurrentFoodRender, shouldCommitFoodDate } from '../src/ui/foodPager'
+import { foodPagerLabel, foodRailDates, foodRailFocus, foodRailNeedsRecenter, isCurrentFoodRender, shouldCommitFoodDate } from '../src/ui/foodPager'
 import { getFoodQuickDates, getLocalDateString, shiftLocalDate } from '../src/utils/date'
 import { calculateNutrition, createFoodLogSnapshot } from '../src/utils/nutrition'
 
@@ -57,6 +57,14 @@ describe('日期', () => {
     expect(foodRailNeedsRecenter(2, 15)).toBe(true)
     expect(foodRailNeedsRecenter(12, 15)).toBe(true)
     expect(foodRailNeedsRecenter(-1, 15)).toBe(true)
+  })
+
+  it('饮食日期轨道的中心焦点随距离连续衰减并限定在零到一', () => {
+    expect(foodRailFocus(0, 200)).toBe(1)
+    expect(foodRailFocus(100, 200)).toBe(.5)
+    expect(foodRailFocus(-100, 200)).toBe(.5)
+    expect(foodRailFocus(200, 200)).toBe(0)
+    expect(foodRailFocus(500, 200)).toBe(0)
   })
 
   it('饮食异步结果仅允许最新请求及当前日期更新内容', () => {

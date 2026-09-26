@@ -24,7 +24,7 @@ import {
 } from './services/templateService'
 import { calendarCategories, calendarCategoryIcons, calendarLegendLabels, getCalendarDayAccessibleLabel, hasDayRecords, loadMonthSummaries, renderMonthCalendar, type CalendarDaySummary } from './ui/calendarPage'
 import { buildCalendarDayDetailRows } from './ui/dayDetail'
-import { foodPagerLabel, foodRailDates, foodRailNeedsRecenter, isCurrentFoodRender, shouldCommitFoodDate } from './ui/foodPager'
+import { foodPagerLabel, foodRailDates, foodRailFocus, foodRailNeedsRecenter, isCurrentFoodRender, shouldCommitFoodDate } from './ui/foodPager'
 import { icon, type IconName } from './ui/icons'
 import { getGoalProgress } from './ui/progressRing'
 import { groupFoodLogs, isMealType, mealNames, mealTypes, type FoodMealGroup } from './utils/foodMeals'
@@ -530,11 +530,25 @@ function foodMealSectionHtml(group: FoodMealGroup, isToday: boolean): string {
   </section>`
 }
 
+const FOOD_RAIL_WINDOW_RADIUS = 15
+const FOOD_RAIL_FOCUS_RADIUS_RATIO = .55
+
 function foodRailItemHtml(date: string): string {
   const label = foodPagerLabel(date)
   const day = Number(date.slice(8, 10))
   const month = Number(date.slice(5, 7))
-  return '<button class="food-date-item" type="button" data-food-date="' + date + '" aria-label="' + label + '，' + month + '月' + day + '日"><strong>' + label + '</strong><small>' + month + '月' + day + '日</small></button>'
+  return '<button class="food-date-item" type="button" data-food-date="' + date + '" aria-label="' + label + '，' + month + '月' + day + '日"><span class="food-date-item-content"><strong>' + label + '</strong><small>' + month + '月' + day + '日</small></span></button>'
+}
+
+function paintFoodRailFocus(rail: HTMLElement): void {
+  const railRect = rail.getBoundingClientRect()
+  const center = railRect.left + railRect.width / 2
+  const radius = railRect.width * FOOD_RAIL_FOCUS_RADIUS_RATIO
+  const focusValues = Array.from(rail.querySelectorAll<HTMLButtonElement>('.food-date-item'), (item) => {
+    const rect = item.getBoundingClientRect()
+    return [item, foodRailFocus(rect.left + rect.width / 2 - center, radius)] as const
+  })
+  focusValues.forEach(([item, focus]) => item.style.setProperty('--rail-focus', String(focus)))
 }
 
 function centerFoodRail(rail: HTMLElement, date: string, behavior: ScrollBehavior = 'auto', preservePageScroll = false): void {
@@ -556,7 +570,7 @@ function updateFoodRail(rail: HTMLElement, selectedDate: string, forceWindow = f
   const rebuild = forceWindow || foodRailNeedsRecenter(index, items.length)
   if (rebuild) {
     const focusedDate = items.find((item) => item === document.activeElement)?.dataset.foodDate
-    track.innerHTML = foodRailDates(selectedDate).map(foodRailItemHtml).join('')
+    track.innerHTML = foodRailDates(selectedDate, FOOD_RAIL_WINDOW_RADIUS).map(foodRailItemHtml).join('')
     items = Array.from(track.querySelectorAll<HTMLButtonElement>('.food-date-item'))
     if (focusedDate) items.find((item) => item.dataset.foodDate === focusedDate)?.focus({ preventScroll: true })
   }
@@ -565,7 +579,10 @@ function updateFoodRail(rail: HTMLElement, selectedDate: string, forceWindow = f
     if (selected) item.setAttribute('aria-current', 'date')
     else item.removeAttribute('aria-current')
   })
-  if (rebuild) centerFoodRail(rail, selectedDate, 'auto', true)
+  if (rebuild) {
+    centerFoodRail(rail, selectedDate, 'auto', true)
+    paintFoodRailFocus(rail)
+  }
 }
 
 function commitFoodDate(date: string, forceWindow = false): void {
@@ -583,7 +600,25 @@ function bindFoodRail(rail: HTMLElement): void {
   foodRailEvents?.abort()
   foodRailEvents = new AbortController()
   const signal = foodRailEvents.signal
+  const shell = rail.closest<HTMLElement>('.food-date-rail-shell')!
   const items = () => Array.from(rail.querySelectorAll<HTMLButtonElement>('.food-date-item'))
+  const supportsScrollEnd = 'onscrollend' in document.createElement('div')
+  let focusFrame: number | undefined
+  let settleTimer: number | undefined
+  let touchActive = false
+  let touchStartX = 0
+  let touchStartY = 0
+  let pointerId: number | undefined
+  let pointerStartX = 0
+  let pointerStartY = 0
+  const state = (value: 'idle' | 'pressed' | 'dragging' | 'settling') => { shell.dataset.state = value }
+  const scheduleFocus = () => {
+    if (focusFrame !== undefined) return
+    focusFrame = window.requestAnimationFrame(() => {
+      focusFrame = undefined
+      if (rail.isConnected) paintFoodRailFocus(rail)
+    })
+  }
   const settle = () => {
     if (!rail.isConnected || activeTab !== 'food') return
     const center = rail.getBoundingClientRect().left + rail.clientWidth / 2
@@ -595,20 +630,63 @@ function bindFoodRail(rail: HTMLElement): void {
       if (nextDistance < distance) { nearest = item; distance = nextDistance }
     }
     if (nearest?.dataset.foodDate) commitFoodDate(nearest.dataset.foodDate)
+    state('idle')
+    scheduleFocus()
   }
-  if ('onscrollend' in document.createElement('div')) {
-    rail.addEventListener('scrollend', settle, { signal })
-  } else {
-    let timer: number | undefined
-    rail.addEventListener('scroll', () => {
-      window.clearTimeout(timer)
-      timer = window.setTimeout(settle, 100)
-    }, { signal })
-    signal.addEventListener('abort', () => window.clearTimeout(timer), { once: true })
+  rail.addEventListener('scroll', () => {
+    state(touchActive || pointerId !== undefined ? 'dragging' : 'settling')
+    scheduleFocus()
+    if (!supportsScrollEnd) {
+      window.clearTimeout(settleTimer)
+      settleTimer = window.setTimeout(settle, 100)
+    }
+  }, { signal })
+  if (supportsScrollEnd) rail.addEventListener('scrollend', settle, { signal })
+  rail.addEventListener('touchstart', (event) => {
+    const touch = event.touches[0]
+    if (!touch) return
+    touchActive = true
+    touchStartX = touch.clientX
+    touchStartY = touch.clientY
+    state('pressed')
+  }, { signal, passive: true })
+  rail.addEventListener('touchmove', (event) => {
+    const touch = event.touches[0]
+    if (!touchActive || !touch) return
+    const dx = touch.clientX - touchStartX
+    const dy = touch.clientY - touchStartY
+    if (Math.abs(dx) > 5 && Math.abs(dx) > Math.abs(dy)) state('dragging')
+  }, { signal, passive: true })
+  const finishTouch = () => {
+    touchActive = false
+    state(shell.dataset.state === 'dragging' ? 'settling' : 'idle')
   }
+  rail.addEventListener('touchend', finishTouch, { signal, passive: true })
+  rail.addEventListener('touchcancel', finishTouch, { signal, passive: true })
+  rail.addEventListener('pointerdown', (event) => {
+    if (event.pointerType === 'touch' || event.button !== 0) return
+    pointerId = event.pointerId
+    pointerStartX = event.clientX
+    pointerStartY = event.clientY
+    state('pressed')
+  }, { signal })
+  rail.addEventListener('pointermove', (event) => {
+    if (pointerId !== event.pointerId) return
+    const dx = event.clientX - pointerStartX
+    const dy = event.clientY - pointerStartY
+    if (Math.abs(dx) > 5 && Math.abs(dx) > Math.abs(dy)) state('dragging')
+  }, { signal })
+  const finishPointer = (event: PointerEvent) => {
+    if (pointerId !== event.pointerId) return
+    pointerId = undefined
+    state(shell.dataset.state === 'dragging' ? 'settling' : 'idle')
+  }
+  rail.addEventListener('pointerup', finishPointer, { signal })
+  rail.addEventListener('pointercancel', finishPointer, { signal })
   rail.addEventListener('click', (event) => {
     const button = event.target instanceof Element ? event.target.closest<HTMLButtonElement>('.food-date-item') : null
     if (!button || !rail.contains(button)) return
+    state('settling')
     centerFoodRail(rail, button.dataset.foodDate!, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth')
     const railCenter = rail.getBoundingClientRect().left + rail.clientWidth / 2
     const buttonCenter = button.getBoundingClientRect().left + button.offsetWidth / 2
@@ -623,11 +701,16 @@ function bindFoodRail(rail: HTMLElement): void {
     if (!next) return
     event.preventDefault()
     next.focus({ preventScroll: true })
+    state('settling')
     centerFoodRail(rail, next.dataset.foodDate!, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth')
   }, { signal })
-  const resizeObserver = new ResizeObserver(() => centerFoodRail(rail, foodDate, 'auto', true))
+  const resizeObserver = new ResizeObserver(() => { centerFoodRail(rail, foodDate, 'auto', true); scheduleFocus() })
   resizeObserver.observe(rail)
-  signal.addEventListener('abort', () => resizeObserver.disconnect(), { once: true })
+  signal.addEventListener('abort', () => {
+    resizeObserver.disconnect()
+    if (focusFrame !== undefined) window.cancelAnimationFrame(focusFrame)
+    window.clearTimeout(settleTimer)
+  }, { once: true })
 }
 
 async function renderFoodPage(): Promise<void> {
