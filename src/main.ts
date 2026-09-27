@@ -2,13 +2,14 @@ import './styles/main.css'
 import { Chart, registerables } from 'chart.js'
 import { registerSW } from 'virtual:pwa-register'
 import { db } from './db/database'
-import type { CardioActivityType, CardioSession, DietTemplate, Exercise, Food, FoodLog, MealType, NutritionGoal, NutritionTarget, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
+import type { CardioActivityType, CardioSession, DietTemplate, Exercise, Food, FoodLog, Habit, HabitCheckIn, MealType, NutritionGoal, NutritionTarget, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
 import { exportBackup, restoreBackup, validateBackup, type ValidatedBackup } from './services/backupService'
 import { clearDayRecords } from './services/dayRecordsService'
 import { deleteCardioSession, getCardioSessionsByDate, saveCardioSession, updateCardioSession } from './services/cardioService'
 import { logFood, saveFood, updateFoodLogDetails, validateFoodInput } from './services/foodService'
 import { buildImportPreview, parseFoodCsv, parseFoodJson, type ImportPreview } from './services/importService'
 import { upsertWeight } from './services/weightService'
+import { createHabit, deleteUnusedHabit, getActiveHabits, getHabitCheckInsByDate, reorderHabits, setHabitActive, toggleHabitCheckIn, updateHabit } from './services/habitService'
 import { deleteNutritionTarget, normalizeNutritionGoal, saveNutritionTarget } from './services/nutritionTargetService'
 import { deletePelvicFloorSession, pelvicFloorSessionDurationSeconds, savePelvicFloorSession, sessionFromPelvicFloorTimer } from './services/pelvicFloorService'
 import { getPelvicFloorPlanProgress, pelvicFloorPlanLevelFromId, pelvicFloorPlanLevels, pelvicFloorPlanRoutineId, type PelvicFloorPlanLevel, type PelvicFloorPlanProgress } from './services/pelvicFloorPlan'
@@ -255,9 +256,99 @@ function miniTrendSvg(values: number[]): string {
   return `<svg class="mini-trend" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="近期体重趋势"><polyline points="${points}"/></svg>`
 }
 
+const habitWeekdayLabels = ['一', '二', '三', '四', '五', '六', '日']
+const habitToggleQueue = new Map<string, Promise<void>>()
+
+function habitPlanText(habit: Habit): string {
+  const days = habit.weekdays?.map((day) => `周${habitWeekdayLabels[day - 1]}`).join(' · ')
+  return [days, habit.targetPerWeek ? `周目标 ${habit.targetPerWeek} 次` : ''].filter(Boolean).join(' · ') || '自由打卡'
+}
+
+function todayHabitCardHtml(habits: Habit[], checkIns: HabitCheckIn[]): string {
+  const checked = new Set(checkIns.map((item) => item.habitId))
+  const count = habits.filter((habit) => checked.has(habit.id)).length
+  return `<section class="today-card today-habits-card" id="today-habits"><div class="card-heading"><div><span class="card-icon habit-icon">${icon('check', 19)}</span><h2>今日习惯</h2></div><button class="text-btn" id="today-habits-manage">管理 ${icon('chevron', 15)}</button></div>${habits.length ? `<div class="today-habit-list">${habits.map((habit) => `<button class="today-habit-row" type="button" data-habit-toggle="${esc(habit.id)}" aria-pressed="${checked.has(habit.id)}"><span class="habit-check-mark" aria-hidden="true">${checked.has(habit.id) ? '✓' : '○'}</span><span class="habit-row-name">${esc(habit.name)}</span>${habit.weekdays?.includes(((new Date().getDay() + 6) % 7) + 1) ? '<small>计划</small>' : ''}</button>`).join('')}</div><p class="today-habit-summary" id="today-habit-summary">${count} / ${habits.length} 已打卡</p>` : '<div class="today-habit-empty"><strong>还没有习惯</strong><span>创建一个轻量习惯，完成时点一下即可。</span><button class="text-btn" id="today-habit-create">创建习惯</button></div>'}</section>`
+}
+
+function bindTodayHabitCard(root: ParentNode, date: string): void {
+  root.querySelector('#today-habits-manage')?.addEventListener('click', () => void showHabitManager())
+  root.querySelector('#today-habit-create')?.addEventListener('click', () => void showHabitManager(true))
+  root.querySelectorAll<HTMLButtonElement>('[data-habit-toggle]').forEach((button) => button.addEventListener('click', () => {
+    const id = button.dataset.habitToggle!
+    const previous = habitToggleQueue.get(id) ?? Promise.resolve()
+    const next = previous.catch(() => {}).then(async () => {
+      const checked = await toggleHabitCheckIn(id, date)
+      if (!button.isConnected) return
+      button.setAttribute('aria-pressed', String(checked))
+      button.querySelector('.habit-check-mark')!.textContent = checked ? '✓' : '○'
+      const card = button.closest('#today-habits')!
+      const total = card.querySelectorAll('[data-habit-toggle]').length
+      const count = card.querySelectorAll('[data-habit-toggle][aria-pressed="true"]').length
+      card.querySelector('#today-habit-summary')!.textContent = `${count} / ${total} 已打卡`
+    }).catch(fail)
+    habitToggleQueue.set(id, next)
+    void next.finally(() => { if (habitToggleQueue.get(id) === next) habitToggleQueue.delete(id) })
+  }))
+}
+
+async function refreshTodayHabitCard(): Promise<void> {
+  if (activeTab !== 'today') return
+  const old = document.querySelector('#today-habits')
+  if (!old) return
+  const date = getLocalDateString()
+  const [habits, checkIns] = await Promise.all([getActiveHabits(), getHabitCheckInsByDate(date)])
+  if (!old.isConnected) return
+  const wrapper = document.createElement('div')
+  wrapper.innerHTML = todayHabitCardHtml(habits, checkIns)
+  const card = wrapper.firstElementChild!
+  old.replaceWith(card)
+  bindTodayHabitCard(card, date)
+}
+
+async function showHabitManager(openCreate = false): Promise<void> {
+  const dialog = openModal('习惯管理', '<div id="habit-manager-body"></div>')
+  const body = dialog.querySelector<HTMLElement>('#habit-manager-body')!
+  const manager = async () => {
+    const all = await db.habits.orderBy('sortOrder').toArray()
+    const active = all.filter((habit) => habit.active)
+    const inactive = all.filter((habit) => !habit.active)
+    const row = (habit: Habit, index: number, list: Habit[]) => `<article class="habit-manager-row"><div><strong>${esc(habit.name)}</strong><small>${esc(habitPlanText(habit))}${habit.active ? '' : ' · 已停用'}</small></div><div class="habit-manager-actions">${habit.active ? `<button data-habit-move="${esc(habit.id)}" data-direction="-1" aria-label="上移 ${esc(habit.name)}" ${index === 0 ? 'disabled' : ''}>↑</button><button data-habit-move="${esc(habit.id)}" data-direction="1" aria-label="下移 ${esc(habit.name)}" ${index === list.length - 1 ? 'disabled' : ''}>↓</button>` : ''}<button data-habit-edit="${esc(habit.id)}" aria-label="编辑 ${esc(habit.name)}">编辑</button></div></article>`
+    body.innerHTML = `<button class="primary full-btn" id="habit-new">+ 新建习惯</button><div class="habit-manager-list">${active.length ? active.map((habit, index) => row(habit, index, active)).join('') : '<p class="muted padded">还没有启用的习惯</p>'}</div>${inactive.length ? `<h3>已停用</h3><div class="habit-manager-list">${inactive.map((habit, index) => row(habit, index, inactive)).join('')}</div>` : ''}`
+    body.querySelector('#habit-new')?.addEventListener('click', () => form())
+    body.querySelectorAll<HTMLButtonElement>('[data-habit-edit]').forEach((button) => button.addEventListener('click', () => form(all.find((habit) => habit.id === button.dataset.habitEdit))))
+    body.querySelectorAll<HTMLButtonElement>('[data-habit-move]').forEach((button) => button.addEventListener('click', async () => {
+      const index = active.findIndex((habit) => habit.id === button.dataset.habitMove)
+      const next = index + Number(button.dataset.direction)
+      if (index < 0 || next < 0 || next >= active.length) return
+      const ids = active.map((habit) => habit.id); [ids[index], ids[next]] = [ids[next]!, ids[index]!]
+      try { await reorderHabits(ids); await manager(); await refreshTodayHabitCard() } catch (error) { fail(error) }
+    }))
+  }
+  const form = (habit?: Habit) => {
+    body.innerHTML = `<form id="habit-form" class="form"><label>名称<input name="name" maxlength="40" required value="${esc(habit?.name ?? '')}" placeholder="例如：肩颈拉伸"></label><label>说明（可选）<textarea name="note" rows="2">${esc(habit?.note ?? '')}</textarea></label><fieldset class="habit-weekdays"><legend>计划日（可选）</legend><div>${habitWeekdayLabels.map((label, index) => `<label><input type="checkbox" name="weekday" value="${index + 1}" ${habit?.weekdays?.includes(index + 1) ? 'checked' : ''}><span>${label}</span></label>`).join('')}</div></fieldset><label>周目标（可选）<select name="targetPerWeek"><option value="">不设置</option>${Array.from({ length: 7 }, (_, index) => `<option value="${index + 1}" ${habit?.targetPerWeek === index + 1 ? 'selected' : ''}>${index + 1} 次</option>`).join('')}</select></label><p class="muted">计划仅用于提示和回顾，不限制其他日期打卡。</p><button class="primary full-btn" type="submit">保存习惯</button><button type="button" id="habit-form-back">返回习惯管理</button></form>${habit ? `<div class="habit-form-utility"><button id="habit-active-toggle">${habit.active ? '停用习惯' : '重新启用'}</button><button id="habit-delete" class="danger">删除未打卡习惯</button></div>` : ''}`
+    body.querySelector('#habit-form-back')?.addEventListener('click', () => void manager())
+    body.querySelector<HTMLFormElement>('#habit-form')?.addEventListener('submit', async (event) => {
+      event.preventDefault()
+      const values = new FormData(event.currentTarget as HTMLFormElement)
+      const input = { name: valueOf(values, 'name'), note: valueOf(values, 'note'), weekdays: values.getAll('weekday').map(Number), targetPerWeek: optionalNumber(values, 'targetPerWeek') }
+      try { if (habit) await updateHabit(habit.id, input); else await createHabit(input); await manager(); await refreshTodayHabitCard() } catch (error) { fail(error) }
+    })
+    body.querySelector('#habit-active-toggle')?.addEventListener('click', async () => {
+      if (!habit) return
+      try { await setHabitActive(habit.id, !habit.active); await manager(); await refreshTodayHabitCard() } catch (error) { fail(error) }
+    })
+    body.querySelector('#habit-delete')?.addEventListener('click', async () => {
+      if (!habit || !await confirmAction(`删除 ${habit.name}？`, '仅未打卡的习惯可以删除。已有打卡历史的习惯请停用。', '删除习惯')) return
+      try { await deleteUnusedHabit(habit.id); await manager(); await refreshTodayHabitCard() } catch (error) { fail(error) }
+    })
+  }
+  if (openCreate) form()
+  else await manager()
+}
+
 async function renderTodayPage(): Promise<void> {
   const today = getLocalDateString()
-  const [logs, target, workouts, cardioSessions, pelvicSessions, weights, allPelvicSessions] = await Promise.all([
+  const [logs, target, workouts, cardioSessions, pelvicSessions, weights, allPelvicSessions, habits, habitCheckIns] = await Promise.all([
     db.foodLogs.where('date').equals(today).toArray(),
     db.nutritionTargets.where('date').equals(today).first(),
     db.workouts.where('date').equals(today).toArray(),
@@ -265,6 +356,8 @@ async function renderTodayPage(): Promise<void> {
     db.pelvicFloorSessions.where('date').equals(today).toArray(),
     db.weights.orderBy('date').reverse().toArray(),
     db.pelvicFloorSessions.toArray(),
+    getActiveHabits(),
+    getHabitCheckInsByDate(today),
   ])
   const totals = logs.reduce((sum, log) => ({
     calories: sum.calories + log.totalCalories,
@@ -287,13 +380,15 @@ async function renderTodayPage(): Promise<void> {
     <section class="today-card nutrition-today-card"><div class="card-heading"><div><span class="card-icon nutrition-icon">${icon('utensils', 19)}</span><h2>今日饮食</h2></div><button class="text-btn" id="today-food-details">查看详情 ${icon('chevron', 15)}</button></div><div class="today-calorie-layout">${ringSvgHtml(totals.calories, target?.calories, 'tiny')}<div class="today-calorie-copy"><strong>${formatNumber(totals.calories)} <small>kcal</small></strong><span class="today-goal-note${target?.calories === undefined ? ' is-unset' : ''}">${target?.calories === undefined ? '尚未设置目标' : `目标 ${formatNumber(target.calories)} kcal · ${goalStatusText(totals.calories, target.calories, 'kcal')}`}</span></div></div><div class="today-macros"><div class="protein"><span>蛋白质</span><strong>${formatNumber(totals.protein)}${target?.protein === undefined ? 'g' : ` / ${formatNumber(target.protein)}g`}</strong></div><div class="carbs"><span>碳水</span><strong>${formatNumber(totals.carbs)}${target?.carbs === undefined ? 'g' : ` / ${formatNumber(target.carbs)}g`}</strong></div><div class="fat"><span>脂肪</span><strong>${formatNumber(totals.fat)}${target?.fat === undefined ? 'g' : ` / ${formatNumber(target.fat)}g`}</strong></div></div></section>
     <section class="today-card workout-today-card"><div class="card-heading"><div><span class="card-icon workout-icon">${icon('dumbbell', 19)}</span><h2>今日训练</h2></div></div><div class="today-training-row"><strong>无氧</strong><span>${workouts.length ? `力量训练 · ${strengthExercises} 个动作 · ${strengthSets} 组${openWorkout ? ' · 记录中' : ''}` : '今天还没有力量训练'}</span></div><div class="today-training-row"><strong>有氧</strong><span>${cardioSessions.length === 1 ? `${getCardioActivityLabel(cardioSessions[0]!)} · ${formatNumber(cardioMinutes)} 分钟 · ${formatCardioMetrics(cardioSessions[0]!).join(' · ')}` : cardioSessions.length ? `有氧训练 · ${cardioSessions.length} 次 · 共 ${formatNumber(cardioMinutes)} 分钟` : '今天还没有有氧训练'}</span></div><button class="primary full-btn" id="today-workout">${openWorkout ? '继续力量训练' : '查看训练'}</button></section>
     <section class="today-card weight-today-card"><div class="card-heading"><div><span class="card-icon weight-icon">${icon('scale', 19)}</span><h2>体重趋势</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 15)}</button></div>${latestWeight ? `<div class="weight-today-value"><strong>${formatNumber(latestWeight.weightKg)}</strong><span>kg</span><small>${weightDelta === undefined ? '记录更多数据后显示变化' : `${weightDelta > 0 ? '↑' : weightDelta < 0 ? '↓' : '—'} ${formatNumber(Math.abs(weightDelta))} kg · 近 30 天`}</small></div>${recentWeights.length > 1 ? miniTrendSvg(recentWeights.map((item) => item.weightKg)) : ''}` : '<div class="today-weight-empty"><div class="today-card-copy"><strong>暂无体重记录</strong><span>记录第一次体重，开始观察趋势</span></div><button class="secondary" id="today-record-weight">记录体重</button></div>'}</section>
-    <section class="today-card pelvic-today-card"><div class="today-habit-copy"><div class="card-heading"><div><span class="card-icon pelvic-icon">${icon('leaf', 19)}</span><h2>凯格尔训练</h2></div></div><div class="today-card-copy"><strong>${pelvicSessions.length ? `今天已完成 ${pelvicSessions.length} 次` : '今日尚未完成'}</strong><span>${pelvicSessions.length ? `累计 ${pelvicSeconds} 秒` : `${dailyPlanRoutine.name} · ${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</span></div></div><button class="secondary" id="today-pelvic">开始训练</button></section>`
+    <section class="today-card pelvic-today-card"><div class="today-habit-copy"><div class="card-heading"><div><span class="card-icon pelvic-icon">${icon('leaf', 19)}</span><h2>凯格尔训练</h2></div></div><div class="today-card-copy"><strong>${pelvicSessions.length ? `今天已完成 ${pelvicSessions.length} 次` : '今日尚未完成'}</strong><span>${pelvicSessions.length ? `累计 ${pelvicSeconds} 秒` : `${dailyPlanRoutine.name} · ${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</span></div></div><button class="secondary" id="today-pelvic">开始训练</button></section>
+    ${todayHabitCardHtml(habits, habitCheckIns)}`
   animateNutritionRings(view)
   view.querySelector('#today-food-details')?.addEventListener('click', () => { activeTab = 'food'; foodDate = today; void render().catch(fail) })
   view.querySelector('#today-workout')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = openWorkout; workoutEditorOpen = Boolean(openWorkout); void render().catch(fail) })
   view.querySelector('#today-weight-details')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; void render().catch(fail) })
   view.querySelector('#today-record-weight')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; weightDate = today; void render().then(() => showWeightForm(today)).catch(fail) })
   view.querySelector('#today-pelvic')?.addEventListener('click', () => { workoutDate = today; void showPelvicFloorSetup().catch(fail) })
+  bindTodayHabitCard(view, today)
 }
 
 function progressTabsHtml(): string {
@@ -340,11 +435,12 @@ async function renderProgressPage(): Promise<void> {
 async function renderMorePage(): Promise<void> {
   const view = document.querySelector<HTMLElement>('#view')!
   const row = (id: string, iconName: IconName, title: string, detail: string) => `<button id="${id}"><span class="setting-icon">${icon(iconName, 18)}</span><span><strong>${title}</strong><small>${detail}</small></span>${icon('chevron', 17)}</button>`
-  view.innerHTML = `<section class="settings-section"><h3>数据管理</h3><div class="settings-group">${row('more-food-library', 'utensils', '食物库', '管理食物与营养数据')}${row('more-exercise-library', 'dumbbell', '动作库', '管理力量训练动作')}${row('more-workout-templates', 'activity', '训练模板', '快速创建常用训练')}${row('more-diet-templates', 'archive', '饮食模板', '保存常用食物组合')}</div></section><section class="settings-section"><h3>训练</h3><div class="settings-group">${row('more-pelvic', 'leaf', '凯格尔训练', '开始计时或查看历史')}</div></section><section class="settings-section"><h3>数据</h3><div class="settings-group">${row('more-import', 'upload', '导入数据', '从表格或数据文件导入食物')}${row('more-backup', 'download', '备份与恢复', '导出或恢复完整本地数据')}</div></section><section class="settings-section"><h3>应用</h3><div class="settings-group">${row('more-about', 'info', '应用信息', 'FitLog Lite · 本地优先')}</div></section><div class="data-safety"><div class="setting-icon">${icon('archive', 18)}</div><div><strong>你的数据只保存在当前设备</strong><p>清除浏览器数据或更换设备前，请先导出完整备份。</p></div></div>`
+  view.innerHTML = `<section class="settings-section"><h3>数据管理</h3><div class="settings-group">${row('more-food-library', 'utensils', '食物库', '管理食物与营养数据')}${row('more-exercise-library', 'dumbbell', '动作库', '管理力量训练动作')}${row('more-workout-templates', 'activity', '训练模板', '快速创建常用训练')}${row('more-diet-templates', 'archive', '饮食模板', '保存常用食物组合')}${row('more-habits', 'leaf', '习惯', '创建、排序与停用打卡习惯')}</div></section><section class="settings-section"><h3>训练</h3><div class="settings-group">${row('more-pelvic', 'leaf', '凯格尔训练', '开始计时或查看历史')}</div></section><section class="settings-section"><h3>数据</h3><div class="settings-group">${row('more-import', 'upload', '导入数据', '从表格或数据文件导入食物')}${row('more-backup', 'download', '备份与恢复', '导出或恢复完整本地数据')}</div></section><section class="settings-section"><h3>应用</h3><div class="settings-group">${row('more-about', 'info', '应用信息', 'FitLog Lite · 本地优先')}</div></section><div class="data-safety"><div class="setting-icon">${icon('archive', 18)}</div><div><strong>你的数据只保存在当前设备</strong><p>清除浏览器数据或更换设备前，请先导出完整备份。</p></div></div>`
   view.querySelector('#more-food-library')?.addEventListener('click', () => void showFoodLibrary())
   view.querySelector('#more-exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
   view.querySelector('#more-workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
   view.querySelector('#more-diet-templates')?.addEventListener('click', () => void showDietTemplateManager())
+  view.querySelector('#more-habits')?.addEventListener('click', () => void showHabitManager())
   view.querySelector('#more-pelvic')?.addEventListener('click', () => {
     const dialog = openModal('凯格尔训练', `<div class="action-stack"><button class="primary" id="more-start-pelvic">开始训练</button><button class="secondary" id="more-pelvic-history">查看训练记录</button></div>`)
     dialog.querySelector('#more-start-pelvic')?.addEventListener('click', () => { dialog.close(); workoutDate = getLocalDateString(); void showPelvicFloorSetup().catch(fail) })
@@ -433,7 +529,7 @@ async function showCalendarDaySheet(date: string, summary?: CalendarDaySummary):
   })
   dialog.querySelector('#calendar-clear-day')?.addEventListener('click', async () => {
     const day = new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric' }).format(new Date(`${date}T12:00:00`))
-    if (!await confirmAction(`清空 ${day} 的所有记录？`, '将删除当天的饮食记录、营养目标、无氧训练、有氧训练、凯格尔训练和体重记录。删除后无法恢复。', '清空当天记录')) return
+    if (!await confirmAction(`清空 ${day} 的所有记录？`, '将删除当天的饮食记录、营养目标、无氧训练、有氧训练、凯格尔训练和体重记录。习惯打卡不会受影响。删除后无法恢复。', '清空当天记录')) return
     try {
       await clearDayRecords(date)
       dialog.close()
@@ -1743,7 +1839,7 @@ async function showSettings(): Promise<void> {
 }
 
 function showRestorePreview(backup: ValidatedBackup): void {
-  const counts = [{ label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '力量训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }, { label: '训练模板', count: backup.data.workoutTemplates.length }, { label: '饮食模板', count: backup.data.dietTemplates.length }, { label: '营养目标', count: backup.data.nutritionTargets.length }, { label: '凯格尔训练', count: backup.data.pelvicFloorSessions.length }, { label: '有氧训练', count: backup.data.cardioSessions.length }]
+  const counts = [{ label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '力量训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }, { label: '训练模板', count: backup.data.workoutTemplates.length }, { label: '饮食模板', count: backup.data.dietTemplates.length }, { label: '营养目标', count: backup.data.nutritionTargets.length }, { label: '凯格尔训练', count: backup.data.pelvicFloorSessions.length }, { label: '有氧训练', count: backup.data.cardioSessions.length }, { label: '习惯', count: backup.data.habits.length }, { label: '习惯打卡', count: backup.data.habitCheckIns.length }]
   const dialog = openModal('确认恢复备份', `<div class="restore-counts">${counts.map((item) => `<p><span>${item.label}</span><strong>${item.count}</strong></p>`).join('')}</div><div class="warning">恢复将清除当前所有数据，并替换为该备份。</div><button class="danger-button full-btn" id="confirm-restore">继续恢复</button>`)
   dialog.querySelector('#confirm-restore')?.addEventListener('click', async () => { if (!await confirmAction('覆盖当前全部数据？', '恢复会清除当前数据并替换为备份内容，此操作无法撤销。', '恢复备份')) return; try { await restoreBackup(backup); dialog.close(); currentWorkout = undefined; workoutEditorOpen = false; toast('恢复完成'); await render() } catch (error) { fail(error) } })
 }

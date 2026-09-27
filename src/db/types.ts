@@ -76,6 +76,27 @@ export interface WeightLog {
   updatedAt: string
 }
 
+export interface Habit {
+  id: string
+  name: string
+  note?: string
+  weekdays?: number[]
+  targetPerWeek?: number
+  active: boolean
+  sortOrder: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface HabitCheckIn {
+  id: string
+  habitId: string
+  date: string
+  completedAt: string
+  createdAt: string
+  updatedAt: string
+}
+
 export type CardioActivityType = 'stair_climber' | 'treadmill'
 
 export interface CardioSession {
@@ -233,4 +254,12 @@ export interface BackupDataV5 extends BackupBase {
   }
 }
 
-export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5
+export interface BackupDataV6 extends BackupBase {
+  schemaVersion: 6
+  data: BackupDataV5['data'] & {
+    habits: Habit[]
+    habitCheckIns: HabitCheckIn[]
+  }
+}
+
+export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6

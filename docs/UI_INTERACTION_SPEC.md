@@ -27,6 +27,7 @@ Do not use human training illustrations, anatomical diagrams, food photography, 
 - Today's Food card is the primary dashboard card: a clear left-ring/right-number structure and compact, aligned nutrient tiles. An unset goal remains a gentle text prompt.
 - Workout and Weight are secondary cards. Keep the Workout start action solid green but compact, and Weight entry soft green; neither empty state should reserve chart space or imply recorded data.
 - Kegel is a shorter tertiary habit card with a lighter action. Preserve all existing routes and business meaning while varying visual weight.
+- Habit is an independent data domain without a bottom tab. Users create their own habit definitions; schedules and weekly targets are optional guidance and never prevent a check-in on any day. Each active habit may be checked in once per device-local business date, with a second tap undoing that check-in. Today owns quick check-in and More owns management. Do not use streaks, badges, failure, or punitive missed-day language. Reports derive history from saved check-ins.
 
 ## Food day and meal hierarchy
 
