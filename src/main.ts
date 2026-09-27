@@ -10,6 +10,7 @@ import { logFood, saveFood, updateFoodLogDetails, validateFoodInput } from './se
 import { buildImportPreview, parseFoodCsv, parseFoodJson, type ImportPreview } from './services/importService'
 import { upsertWeight } from './services/weightService'
 import { createHabit, deleteUnusedHabit, getActiveHabits, getHabitCheckInsByDate, reorderHabits, setHabitActive, toggleHabitCheckIn, updateHabit } from './services/habitService'
+import { loadReport } from './services/reportService'
 import { deleteNutritionTarget, normalizeNutritionGoal, saveNutritionTarget } from './services/nutritionTargetService'
 import { deletePelvicFloorSession, pelvicFloorSessionDurationSeconds, savePelvicFloorSession, sessionFromPelvicFloorTimer } from './services/pelvicFloorService'
 import { getPelvicFloorPlanProgress, pelvicFloorPlanLevelFromId, pelvicFloorPlanLevels, pelvicFloorPlanRoutineId, type PelvicFloorPlanLevel, type PelvicFloorPlanProgress } from './services/pelvicFloorPlan'
@@ -33,12 +34,13 @@ import { formatShortDate, getLocalDateString } from './utils/date'
 import { calculateNutrition, formatNumber } from './utils/nutrition'
 import { buildRecentActivity, type RecentActivityKind } from './utils/recentActivity'
 import { cardioActivityDefinitions, formatCardioMetrics, getCardioActivityLabel, getCardioActivityType } from './utils/cardio'
+import { getReportRange, shiftReportPeriod, type ReportMode, type ReportResult } from './utils/reporting'
 
 Chart.register(...registerables)
 registerSW({ immediate: true })
 
 type Tab = 'today' | 'food' | 'workout' | 'progress' | 'more'
-type ProgressView = 'overview' | 'trend' | 'calendar'
+type ProgressView = 'overview' | 'trend' | 'calendar' | 'reports'
 let activeTab: Tab = 'today'
 let progressView: ProgressView = 'overview'
 let calendarSelectedDate = getLocalDateString()
@@ -55,6 +57,9 @@ let workoutEditorOpen = false
 let showWorkoutHistory = false
 let weightRange: '30' | '90' | 'all' = '30'
 let weightChart: Chart | undefined
+let reportWeightChart: Chart | undefined
+let reportMode: ReportMode = 'week'
+let reportAnchorDate = getLocalDateString()
 let justFinishedWorkout: Workout | undefined
 let pelvicTimerState: PelvicFloorTimerState | undefined
 let pelvicTimerDate = getLocalDateString()
@@ -217,6 +222,8 @@ async function render(): Promise<void> {
   foodContentVersion += 1
   weightChart?.destroy()
   weightChart = undefined
+  reportWeightChart?.destroy()
+  reportWeightChart = undefined
   document.body.classList.remove('immersive')
   const today = getLocalDateString()
   const hour = new Date().getHours()
@@ -392,7 +399,7 @@ async function renderTodayPage(): Promise<void> {
 }
 
 function progressTabsHtml(): string {
-  return `<div class="page-tabs" role="tablist" aria-label="进度视图"><button role="tab" data-progress-view="overview" class="${progressView === 'overview' ? 'active' : ''}" aria-selected="${progressView === 'overview'}">概览</button><button role="tab" data-progress-view="trend" class="${progressView === 'trend' ? 'active' : ''}" aria-selected="${progressView === 'trend'}">趋势</button><button role="tab" data-progress-view="calendar" class="${progressView === 'calendar' ? 'active' : ''}" aria-selected="${progressView === 'calendar'}">日历</button></div>`
+  return `<div class="page-tabs" role="tablist" aria-label="进度视图"><button role="tab" data-progress-view="overview" class="${progressView === 'overview' ? 'active' : ''}" aria-selected="${progressView === 'overview'}">概览</button><button role="tab" data-progress-view="trend" class="${progressView === 'trend' ? 'active' : ''}" aria-selected="${progressView === 'trend'}">趋势</button><button role="tab" data-progress-view="calendar" class="${progressView === 'calendar' ? 'active' : ''}" aria-selected="${progressView === 'calendar'}">日历</button><button role="tab" data-progress-view="reports" class="${progressView === 'reports' ? 'active' : ''}" aria-selected="${progressView === 'reports'}">报告</button></div>`
 }
 
 function bindProgressTabs(root: ParentNode = document): void {
@@ -403,6 +410,7 @@ function bindProgressTabs(root: ParentNode = document): void {
 }
 
 async function renderProgressPage(): Promise<void> {
+  if (progressView === 'reports') { await renderReportsPage(); return }
   if (progressView === 'trend') { await renderWeightPage(true); return }
   if (progressView === 'calendar') { await renderCalendarOverview(true); return }
   const now = new Date()
@@ -430,6 +438,94 @@ async function renderProgressPage(): Promise<void> {
   animateNutritionNumber(view, 420)
   bindProgressTabs(view)
   view.querySelector('[data-open-trend]')?.addEventListener('click', () => { progressView = 'trend'; void render().catch(fail) })
+}
+
+function reportDateLabel(date: string): string {
+  return `${Number(date.slice(5, 7))}月${Number(date.slice(8))}日`
+}
+
+function reportPeriodLabel(report: ReportResult): string {
+  if (reportMode === 'month') return `${report.range.start.slice(0, 4)}年${Number(report.range.start.slice(5, 7))}月`
+  return `${reportDateLabel(report.range.start)}–${reportDateLabel(report.range.end)}`
+}
+
+function reportTrainingHtml(report: ReportResult): string {
+  const buckets = reportMode === 'week'
+    ? report.training.map((day, index) => ({ label: habitWeekdayLabels[index]!, days: [day] }))
+    : report.buckets.map((bucket) => ({ label: bucket.label, days: report.training.filter((day) => day.date >= bucket.start && day.date <= bucket.end) }))
+  const rows = [
+    { label: '力量', key: 'strengthSets' as const, unit: '组', className: 'strength' },
+    { label: '有氧', key: 'cardioMinutes' as const, unit: '分钟', className: 'cardio' },
+    { label: '凯格尔', key: 'pelvicMinutes' as const, unit: '分钟', className: 'pelvic' },
+  ]
+  const charts = rows.map((row) => {
+    const values = buckets.map((bucket) => bucket.days.reduce((sum, day) => sum + day[row.key], 0))
+    const maximum = Math.max(...values, 1)
+    return `<div class="report-training-row ${row.className}" role="group" aria-label="${row.label}训练节奏"><strong>${row.label}</strong><div class="report-training-cells">${buckets.map((bucket, index) => `<div class="report-training-cell ${bucket.days.every((day) => report.days.find((item) => item.date === day.date)?.future) ? 'future' : ''}" aria-label="${esc(bucket.label)}，${row.label} ${formatNumber(values[index]!)} ${row.unit}${bucket.days.every((day) => report.days.find((item) => item.date === day.date)?.future) ? '，未来日期' : ''}"><span class="report-training-bar" style="height:${values[index] ? Math.max(4, values[index]! / maximum * 46) : 2}px"></span><small>${esc(bucket.label)}</small></div>`).join('')}</div></div>`
+  }).join('')
+  const summary = report.summary
+  return `<section class="report-section"><h2>训练节奏</h2><div class="report-training-grid">${charts}</div><p class="report-note">力量训练 ${summary.strengthSessions} 次 · ${summary.strengthSets} 组；有氧训练 ${summary.cardioSessions} 次 · ${formatNumber(summary.cardioMinutes)} 分钟（楼梯机 ${summary.stairSessions} 次、跑步机 ${summary.treadmillSessions} 次）；凯格尔 ${summary.pelvicSessions} 次 · ${formatNumber(summary.pelvicMinutes)} 分钟。</p></section>`
+}
+
+function reportHabitsHtml(report: ReportResult): string {
+  if (!report.habits.length) return ''
+  const rows = report.habits.map(({ habit, dates, count }) => {
+    const trailing = reportMode === 'week' && habit.targetPerWeek ? `${count} / ${habit.targetPerWeek}` : reportMode === 'week' ? `${count} 次` : `本月 ${count} 次`
+    const visualization = reportMode === 'week'
+      ? `<div class="report-habit-days">${report.days.map(({ date, future }, index) => {
+        const done = dates.has(date), planned = habit.weekdays?.includes(index + 1)
+        return `<span class="report-habit-day ${done ? 'done' : ''} ${planned ? 'planned' : ''} ${future ? 'future' : ''}" aria-label="星期${habitWeekdayLabels[index]}，${reportDateLabel(date)}，${future ? '未来日期' : done ? '已打卡' : '未打卡'}">${done ? '✓' : '○'}</span>`
+      }).join('')}</div>`
+      : `<div class="report-habit-weeks">${report.buckets.map((bucket) => {
+        const completed = [...dates].filter((date) => date >= bucket.start && date <= bucket.end).length
+        const elapsed = report.days.filter((day) => day.date >= bucket.start && day.date <= bucket.end && !day.future).length
+        return `<div><small>${esc(bucket.label)}</small><span class="report-habit-week-track"><i style="width:${elapsed ? completed / elapsed * 100 : 0}%"></i></span><strong>${completed}</strong></div>`
+      }).join('')}</div>`
+    return `<article class="report-habit-row"><div class="report-habit-name"><strong>${esc(habit.name)}</strong><span>${trailing}</span></div>${visualization}${reportMode === 'month' && habit.targetPerWeek ? `<small class="report-note">周目标 ${habit.targetPerWeek} 次</small>` : ''}</article>`
+  }).join('')
+  return `<section class="report-section"><h2>习惯打卡</h2>${reportMode === 'week' ? `<div class="report-habit-week-head">${habitWeekdayLabels.map((label) => `<small>${label}</small>`).join('')}</div>` : ''}<div class="report-habit-list">${rows}</div></section>`
+}
+
+function reportWeightHtml(report: ReportResult): string {
+  const weights = report.weights
+  if (!weights.length) return `<section class="report-section"><h2>体重</h2><p class="report-note">暂无体重记录</p></section>`
+  if (weights.length === 1) return `<section class="report-section"><h2>体重</h2><div class="report-weight-single"><i></i><strong>${formatNumber(weights[0]!.weightKg)} kg</strong><span>${reportDateLabel(weights[0]!.date)} · 本期记录 1 次</span></div></section>`
+  const delta = weights.at(-1)!.weightKg - weights[0]!.weightKg
+  return `<section class="report-section"><h2>体重</h2><div class="report-weight-chart"><canvas id="report-weight-chart" role="img" aria-label="体重趋势，${formatNumber(weights[0]!.weightKg)} 到 ${formatNumber(weights.at(-1)!.weightKg)} 千克"></canvas></div><p class="report-note">${formatNumber(weights[0]!.weightKg)} → ${formatNumber(weights.at(-1)!.weightKg)} kg · ${delta > 0 ? '+' : ''}${formatNumber(delta)} kg</p></section>`
+}
+
+function reportNutritionHtml(report: ReportResult): string {
+  const labels = { calories: ['热量', 'kcal'], protein: ['蛋白质', 'g'], carbs: ['碳水', 'g'], fat: ['脂肪', 'g'] } as const
+  const rows = (Object.keys(labels) as (keyof typeof labels)[]).map((key) => {
+    const metric = report.nutrition[key], [label, unit] = labels[key]
+    if (metric.actual === undefined) return `<div class="report-nutrition-row"><strong>${label}</strong><span class="report-note">暂无记录</span></div>`
+    const paired = metric.target !== undefined && metric.target > 0
+    const amount = `${formatNumber(metric.actual)}${paired ? ` / ${formatNumber(metric.target!)}` : ''} ${unit}`
+    const detail = paired ? `同日记录与目标 ${metric.matchedDays} 天` : `记录日平均 · ${metric.recordedDays} 天`
+    return `<div class="report-nutrition-row ${key}"><div><strong>${label}</strong><span>${amount}</span></div><div class="report-nutrition-track" role="img" aria-label="${label} ${amount}，${detail}"><i style="width:${paired ? Math.min(100, metric.actual / metric.target! * 100) : 100}%"></i></div><small>${detail}</small></div>`
+  }).join('')
+  return `<section class="report-section"><h2>饮食记录</h2><div class="report-nutrition-list">${rows}</div></section>`
+}
+
+async function renderReportsPage(): Promise<void> {
+  const today = getLocalDateString()
+  const report = await loadReport(reportMode, reportAnchorDate, today)
+  if (activeTab !== 'progress' || progressView !== 'reports') return
+  const current = getReportRange(reportMode, today)
+  const isCurrent = report.range.start === current.start
+  const view = document.querySelector<HTMLElement>('#view')!
+  view.innerHTML = `${progressTabsHtml()}<div class="report-page"><div class="report-mode" role="group" aria-label="报告周期"><button data-report-mode="week" class="${reportMode === 'week' ? 'active' : ''}" aria-pressed="${reportMode === 'week'}">周报</button><button data-report-mode="month" class="${reportMode === 'month' ? 'active' : ''}" aria-pressed="${reportMode === 'month'}">月报</button></div><div class="report-period"><button id="report-previous" aria-label="${reportMode === 'week' ? '上一周' : '上个月'}">‹</button><strong>${reportPeriodLabel(report)}</strong><button id="report-next" aria-label="${reportMode === 'week' ? '下一周' : '下个月'}" ${isCurrent ? 'disabled' : ''}>›</button></div>${isCurrent ? '' : `<button class="report-return" id="report-return">回到本${reportMode === 'week' ? '周' : '月'}</button>`}${report.empty ? '<div class="report-empty">这段时间还没有记录。</div>' : `<div class="report-summary-grid"><div><strong>${report.summary.trainingDays}</strong><span>训练天数</span></div><div><strong>${formatNumber(report.summary.cardioMinutes)}</strong><span>有氧分钟</span></div><div><strong>${report.summary.foodDays}</strong><span>饮食记录天数</span></div><div><strong>${report.summary.habitCheckIns}</strong><span>习惯打卡次数</span></div></div>${reportTrainingHtml(report)}${reportWeightHtml(report)}${reportNutritionHtml(report)}`} ${reportHabitsHtml(report)}${report.empty ? '' : `<section class="report-section"><h2>本期摘要</h2><p class="report-note">${esc(report.text)}</p></section>`}</div>`
+  bindProgressTabs(view)
+  view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach((button) => button.addEventListener('click', () => { reportMode = button.dataset.reportMode as ReportMode; void render().catch(fail) }))
+  view.querySelector('#report-previous')?.addEventListener('click', () => { reportAnchorDate = shiftReportPeriod(reportMode, reportAnchorDate, -1); void render().catch(fail) })
+  view.querySelector('#report-next')?.addEventListener('click', () => { if (isCurrent) return; reportAnchorDate = shiftReportPeriod(reportMode, reportAnchorDate, 1); void render().catch(fail) })
+  view.querySelector('#report-return')?.addEventListener('click', () => { reportAnchorDate = today; void render().catch(fail) })
+  const canvas = view.querySelector<HTMLCanvasElement>('#report-weight-chart')
+  if (canvas) {
+    const style = getComputedStyle(document.documentElement)
+    const color = style.getPropertyValue('--text-secondary').trim() || '#73818b'
+    reportWeightChart = new Chart(canvas, { type: 'line', data: { labels: report.weights.map((item) => reportDateLabel(item.date)), datasets: [{ data: report.weights.map((item) => item.weightKg), borderColor: '#728e9f', backgroundColor: 'transparent', borderWidth: 2, tension: .18, pointRadius: 3, pointHoverRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, animation: { duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 250 }, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color, maxTicksLimit: 5 } }, y: { grid: { color: '#edf0ed' }, ticks: { color, maxTicksLimit: 4 } } } } })
+  }
 }
 
 async function renderMorePage(): Promise<void> {

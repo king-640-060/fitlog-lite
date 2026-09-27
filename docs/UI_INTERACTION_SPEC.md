@@ -28,6 +28,7 @@ Do not use human training illustrations, anatomical diagrams, food photography, 
 - Workout and Weight are secondary cards. Keep the Workout start action solid green but compact, and Weight entry soft green; neither empty state should reserve chart space or imply recorded data.
 - Kegel is a shorter tertiary habit card with a lighter action. Preserve all existing routes and business meaning while varying visual weight.
 - Habit is an independent data domain without a bottom tab. Users create their own habit definitions; schedules and weekly targets are optional guidance and never prevent a check-in on any day. Each active habit may be checked in once per device-local business date, with a second tap undoing that check-in. Today owns quick check-in and More owns management. Do not use streaks, badges, failure, or punitive missed-day language. Reports derive history from saved check-ins.
+- Reports are derived from current business records when opened and are never persisted. Weekly periods use Monday through Sunday device-local dates; monthly periods aggregate by calendar weeks clipped to the month. Future dates in the current period are subdued and excluded from counts and averages. Weekly reports emphasize daily rhythm, while monthly reports emphasize weekly buckets and trend. Every chart has a visible text equivalent. Nutrition comparisons only pair actual values and targets from the same dates, and missing macro snapshots are unavailable rather than zero.
 
 ## Food day and meal hierarchy
 
