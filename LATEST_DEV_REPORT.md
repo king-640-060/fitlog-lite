@@ -1,60 +1,65 @@
 # FitLog Lite — Latest Development Report
 
-This is the latest verified production application snapshot. Sync `main` before trusting a recorded SHA. The report commit follows the two separate application commits.
+This is the latest verified production application snapshot. Sync `main` before trusting a recorded SHA. The report commit follows the three separate application commits.
 
 ## Current Git and Production State
 
 - Branch: `main`
-- START_COMMIT: `a4d1f6eaf57c76b2a9c3bf27bd38ac1be6de4a3d`
-- CARDIO_COMMIT: `b15b70e03d22e45dfc6004364ffb08e79ef801fb` — `Add typed cardio sessions`
-- FOOD_UI_COMMIT: `9e1312f7fcea72ac61888b2ab6565d25aefbab3f` — `Refine food action hierarchy`
-- END_COMMIT (verified application): `9e1312f7fcea72ac61888b2ab6565d25aefbab3f`
+- START_COMMIT: `a4c34c6066dd7ef0c33a51b80e58336a3d810bbd`
+- HABIT_COMMIT: `bbdcd58a72de6ea68082387161384889c59bfde2` — `Add flexible habit check-ins`
+- REPORTS_COMMIT: `b41f1e91adcfdbe9a80786764637a89e632f1120` — `Add weekly and monthly reports`
+- TODAY_UI_COMMIT: `28193cebca7e11c72f548396de0e2396af1aeb04` — `Unify Today activity cards`
+- END_COMMIT (verified application): `28193cebca7e11c72f548396de0e2396af1aeb04`
 - Report commit: separate documentation commit immediately after `END_COMMIT`
 - Production URL: https://king-640-060.github.io/fitlog-lite/
-- Application Actions run: [36307199905](https://github.com/king-640-060/fitlog-lite/actions/runs/36307199905) — completed / success; typecheck, tests, build, artifact upload, and Pages deployment passed
+- Application Actions run: [36309636472](https://github.com/king-640-060/fitlog-lite/actions/runs/36309636472) — completed / success; typecheck, tests, build, artifact upload, and Pages deployment passed
 
-## Typed Cardio Sessions
+## Flexible Habit Check-ins
 
-New cardio records explicitly select `stair_climber` (楼梯机) or `treadmill` (跑步机). Existing records without `activityType` continue to mean stair climber. Both require a positive duration. Stair climber requires a positive speed and stores no incline. Treadmill accepts speed, incline, or both; speed must be positive when present, incline must be finite and nonnegative, and at least one metric is required. Treadmill speed displays as km/h and incline as percent. Switching type in the same sheet preserves unsubmitted fields; saving normalizes fields for the selected type. History, workout summaries, Today, and Calendar day detail show the appropriate type and metrics. The Calendar month category remains a single `cardio` category.
+Habits are user-created, independent records with optional notes, ISO weekdays, and a 1–7 weekly target. No starter habits, bottom tab, reminder, streak, or missed-day penalty was added. More opens a manager for creation, editing, accessible up/down ordering, stopping, restarting, and deletion of habits with no check-ins. Stopping retains history. Today lists every active habit, including outside planned weekdays, and supports one-tap check-in and undo. A unique `[habitId+date]` index enforces one check-in per habit and device-local day. Toggling updates only the habit card and preserves the rest of Today and its scroll position.
 
-## Food Action Hierarchy
+## Weekly and Monthly Visual Reports
 
-“使用模板” and “食物库” are visible quiet actions in the Food topbar. “选择日期” and the conditional “回到今天” are grouped directly above the Date Rail. “保存为模板” appears in the selected day's meal heading only when that day has FoodLogs. The three-dot menu and its listeners/styles are removed. Template, library, and date actions retain their existing behavior. The native Date Rail scroll, snap, feedback, settlement, old-event protection, and horizontally static Food body remain intact. `docs/UI_INTERACTION_SPEC.md` records both durable feature rules.
+Progress now has a fourth “报告” view with weekly and monthly modes, historical navigation, and a current-period shortcut. Local weeks run Monday–Sunday; months split into calendar-week buckets clipped to the month. Current-period future days are subdued and excluded from aggregates. Reports read indexed business-date ranges and derive results from current FoodLogs, NutritionTargets, Workouts, CardioSessions, PelvicFloorSessions, Weights, Habits, and HabitCheckIns; no report store was added. Weekly habit matrices and daily training rows become monthly week-bucket views. Training series scale independently. Weight uses the existing Chart.js only for two or more points, with a single-point state otherwise; the chart is destroyed on page changes. Nutrition bars compare actuals and targets only on matching dates, and missing macro snapshots remain unavailable rather than zero. Four compact summary values and a deterministic factual paragraph accompany the charts.
 
-## Data and Compatibility
+## Today Compact Activity Cards
 
-- Database: Dexie V5, 10 stores; no migration or index change
-- Database name: `fitlog-lite-db`
-- Backup export schema: **V5**, with all 10 stores unchanged; old cardio records are explicitly typed as stair climber in the export without changing stored records
-- Restore compatibility: **V1 / V2 / V3 / V4 / V5**; V4 cardio retains its required-speed validation, V5 validates typed cardio; validation completes before the restore transaction
-- FoodLog snapshots, Nutrition Target conflict handling, and device-local business dates remain unchanged
+Weight is titled “体重”; trend is a secondary destination. The card has a recording/update action on both empty and recorded days and no Today sparkline. “较上次” compares today's weight with the latest earlier record, excluding future records. Kegel now has a top-level “训练记录” entry, matching layout, accurate accumulated duration text, and “再练一次” after completion. Its timer, progression, and saved session semantics were not changed. The Habit header uses the same domain and secondary-entry pattern.
+
+## Calendar and Data Compatibility
+
+- Calendar retains five categories and five day-detail rows; habits add no marker or day-detail row. “清空当天记录” explicitly excludes HabitCheckIns, and its transaction leaves them intact.
+- Database: **Dexie V6, 12 stores**, name `fitlog-lite-db`; the original 10 stores and their data remain unchanged through migration.
+- Backup export: **V6**, containing all 12 stores and preserving typed-cardio export normalization.
+- Restore: **V1 / V2 / V3 / V4 / V5 / V6**. V1–V5 normalize absent habits and check-ins to empty arrays. V6 validates habit fields, unique IDs and habit/date pairs, valid dates and timestamps, and references to existing habits before the 12-store restore transaction clears data.
+- `docs/UI_INTERACTION_SPEC.md` records the durable Habit, Reports, and Today rules.
 
 ## Automated Verification
 
 - `npm run typecheck`: PASS
-- `npm test`: PASS — **169 tests / 13 files**
-- `npm run build`: PASS — PWA generateSW **17 precache entries / 567.46 KiB** (local `/` base)
-- Pages-path build (`GITHUB_REPOSITORY=king-640-060/fitlog-lite npm run build`): PASS — **17 entries / 567.56 KiB**
-- `git diff --check`: PASS for both application commits
+- `npm test`: PASS — **191 tests / 16 files**
+- `npm run build`: PASS — main JS **503.03 kB**, PWA generateSW **17 precache entries / 594.53 KiB** (local `/` base)
+- Pages-path build (`GITHUB_REPOSITORY=king-640-060/fitlog-lite npm run build`): PASS — main JS **503.08 kB**, **17 entries / 594.64 KiB**
+- `git diff --check`: PASS
 
-Tests cover legacy cardio interpretation, stair and treadmill validation, type changes, metric formatting, Calendar detail aggregation, V1–V5 restore, V5 export and round trip, and existing Food date helpers.
+Tests cover the V5→V6 migration, habit validation and toggle semantics, V1–V6 restore, duplicate/orphan rejection, indexed report loading, local week/month boundaries, future exclusion, nutrition pairing, training/weight/habit aggregation, and Today Weight/Kegel states. Vite reports an advisory that the minified main JS exceeds 500 kB; the build and deployment succeed.
 
 ## Browser QA
 
-Fresh Chrome mobile contexts at **375 × 812, 390 × 844, and 430 × 932** exercised old stair records; new stair, treadmill speed-only, incline-only, and combined records; old-record editing and type switching; history, Today summary, Calendar detail, and deletion. Numeric input text was 16 px. Food checks covered topbar actions, the date helper row, direct picker jump, return to Today and delayed old-rail event, saving a nonempty day as a template, hidden save action on an empty day, native rail touch scrolling and settlement, and a static Food body. Calendar day detail navigation into Food also passed at 320 and 390 px. No page errors or horizontal overflow were observed. Visual review at 390 px confirmed the quiet Food action layout.
+Fresh local Chrome mobile contexts at **375 × 812, 390 × 844, and 430 × 932**, with an additional 320 px layout check, exercised habit creation, planned days, weekly targets, edit, reorder, stop/restart, unused deletion, rapid toggles, and undo; Today Weight/Kegel empty and recorded states; report modes, current/previous periods, cross-month weeks, February, cross-year navigation, empty states, habit matrices, training rows, Weight Chart.js, and Nutrition bars. Calendar clear-day confirmation explicitly excluded habits; after clearing a WeightLog, the HabitCheckIn remained. No page errors or horizontal overflow were observed. The browser QA uses isolated data and is not a physical-device test.
 
 ## Production Verification
 
-Actions deployed application commit `9e1312f7fcea72ac61888b2ab6565d25aefbab3f`. The production HTML references `index-CHGt4ai5.js` and `index-nXrO5YXp.css`; both downloaded production assets match the Pages-path local build byte for byte by SHA-256. Fresh production Chrome mobile contexts at 375, 390, and 430 px repeated typed-cardio creation, legacy editing, history and Today checks, plus Food date, template, touch, and stale-rail checks. Production Calendar-to-Food navigation passed at 320 and 390 px. No page errors or horizontal overflow were observed.
+Actions deployed `END_COMMIT` successfully. Production HTML references `index-2LETSyfU.js` and `index-CJkgxkKK.css`; downloaded copies match the Pages-path local build byte for byte by SHA-256. Fresh production Chrome mobile contexts at 375, 390, and 430 px created and checked in a custom habit, displayed weekly and monthly history, opened More habit management, and exported a V6 backup containing the habit and check-in. The two Today activity cards and four Progress tabs were present, with no page errors or horizontal overflow.
 
 ## Manual Device Verification
 
-**Pending:** real iPhone Safari and standalone PWA. Check the cardio type control, numeric keyboard and Done/submit, km/h and % labels, sheet spacing, Food topbar and date-picker touch targets, Date Rail feel, Return to Today, and Safe Area. Chrome mobile simulation does not establish physical-device behavior.
+**Pending:** real iPhone Safari and standalone PWA. Verify 44 px habit rows, weekday controls and keyboard, report-tab width and matrix readability, Chart.js rendering, Today action alignment, Safe Area, Bottom Nav, and offline behavior. Chrome mobile simulation cannot confirm physical-device touch feel.
 
 ## Known Issues
 
-No code, test, build, browser, or deployment defect was confirmed. Physical iPhone verification remains pending.
+Vite emits a nonblocking advisory for the 503.08 kB Pages-path main JS bundle, slightly above its 500 kB warning threshold. No functional code, test, browser, or deployment defect was confirmed. Physical iPhone verification remains pending.
 
 ## ChatGPT Baseline
 
-FitLog Lite is a local-first iPhone PWA built with Vanilla TypeScript and Dexie V5 (10 stores). The verified application commit is `9e1312f7fcea72ac61888b2ab6565d25aefbab3f`; its preceding independent cardio commit is `b15b70e03d22e45dfc6004364ffb08e79ef801fb`. Backup export is V5 and Restore accepts V1–V5. Cardio supports stair climber and treadmill, while missing legacy activity types mean stair climber. Food has top-level template/library actions, a date helper row above the native Date Rail, and contextual Save as Template. The Food body has no horizontal date gesture. Calendar still aggregates all cardio types into one category. Read `AGENTS.md`, this report, and `docs/UI_INTERACTION_SPEC.md` before further UI work; sync `main` and record a fresh START_COMMIT.
+FitLog Lite is a local-first iPhone PWA built with Vanilla TypeScript, Dexie V6 (12 stores), Backup V6, and Restore V1–V6. The verified application commit is `28193cebca7e11c72f548396de0e2396af1aeb04`. Today supports quick custom-habit check-in and matching compact Weight/Kegel cards; More manages habits; Progress Reports derive weekly/monthly visualizations from current records without storing reports. Calendar remains at five categories, and clear-day does not delete HabitCheckIns. Read `AGENTS.md`, this report, and `docs/UI_INTERACTION_SPEC.md` before further UI work; sync `main` and record a fresh START_COMMIT.
