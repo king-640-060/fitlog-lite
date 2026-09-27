@@ -2,8 +2,8 @@ import './styles/main.css'
 import { Chart, registerables } from 'chart.js'
 import { registerSW } from 'virtual:pwa-register'
 import { db } from './db/database'
-import type { BackupDataV4, CardioSession, DietTemplate, Exercise, Food, FoodLog, MealType, NutritionGoal, NutritionTarget, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
-import { exportBackup, restoreBackup, validateBackup } from './services/backupService'
+import type { CardioActivityType, CardioSession, DietTemplate, Exercise, Food, FoodLog, MealType, NutritionGoal, NutritionTarget, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
+import { exportBackup, restoreBackup, validateBackup, type ValidatedBackup } from './services/backupService'
 import { clearDayRecords } from './services/dayRecordsService'
 import { deleteCardioSession, getCardioSessionsByDate, saveCardioSession, updateCardioSession } from './services/cardioService'
 import { logFood, saveFood, updateFoodLogDetails, validateFoodInput } from './services/foodService'
@@ -31,6 +31,7 @@ import { groupFoodLogs, isMealType, mealNames, mealTypes, type FoodMealGroup } f
 import { formatShortDate, getLocalDateString } from './utils/date'
 import { calculateNutrition, formatNumber } from './utils/nutrition'
 import { buildRecentActivity, type RecentActivityKind } from './utils/recentActivity'
+import { cardioActivityDefinitions, formatCardioMetrics, getCardioActivityLabel, getCardioActivityType } from './utils/cardio'
 
 Chart.register(...registerables)
 registerSW({ immediate: true })
@@ -70,6 +71,10 @@ const PELVIC_PLAN_LEVEL_KEY = 'fitlog-pelvic-plan-level'
 const app = document.querySelector<HTMLDivElement>('#app')!
 const esc = (value: unknown): string => String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]!)
 const valueOf = (form: FormData, key: string): string => String(form.get(key) ?? '')
+const optionalNumber = (form: FormData, key: string): number | undefined => {
+  const value = valueOf(form, key).trim()
+  return value ? Number(value) : undefined
+}
 
 function selectedPelvicPlanLevel(progress: PelvicFloorPlanProgress): PelvicFloorPlanLevel {
   const preference = localStorage.getItem(PELVIC_PLAN_LEVEL_KEY)
@@ -294,7 +299,7 @@ async function renderTodayPage(): Promise<void> {
   const view = document.querySelector<HTMLElement>('#view')!
   view.innerHTML = `
     <section class="today-card nutrition-today-card"><div class="card-heading"><div><span class="card-icon nutrition-icon">${icon('utensils', 19)}</span><h2>今日饮食</h2></div><button class="text-btn" id="today-food-details">查看详情 ${icon('chevron', 15)}</button></div><div class="today-calorie-layout">${ringSvgHtml(totals.calories, target?.calories, 'tiny')}<div class="today-calorie-copy"><strong>${formatNumber(totals.calories)} <small>kcal</small></strong><span class="today-goal-note${target?.calories === undefined ? ' is-unset' : ''}">${target?.calories === undefined ? '尚未设置目标' : `目标 ${formatNumber(target.calories)} kcal · ${goalStatusText(totals.calories, target.calories, 'kcal')}`}</span></div></div><div class="today-macros"><div class="protein"><span>蛋白质</span><strong>${formatNumber(totals.protein)}${target?.protein === undefined ? 'g' : ` / ${formatNumber(target.protein)}g`}</strong></div><div class="carbs"><span>碳水</span><strong>${formatNumber(totals.carbs)}${target?.carbs === undefined ? 'g' : ` / ${formatNumber(target.carbs)}g`}</strong></div><div class="fat"><span>脂肪</span><strong>${formatNumber(totals.fat)}${target?.fat === undefined ? 'g' : ` / ${formatNumber(target.fat)}g`}</strong></div></div></section>
-    <section class="today-card workout-today-card"><div class="card-heading"><div><span class="card-icon workout-icon">${icon('dumbbell', 19)}</span><h2>今日训练</h2></div></div><div class="today-training-row"><strong>无氧</strong><span>${workouts.length ? `力量训练 · ${strengthExercises} 个动作 · ${strengthSets} 组${openWorkout ? ' · 记录中' : ''}` : '今天还没有力量训练'}</span></div><div class="today-training-row"><strong>有氧</strong><span>${cardioSessions.length === 1 ? `楼梯机 · ${formatNumber(cardioMinutes)} 分钟 · 速度 ${formatNumber(cardioSessions[0]!.speed)}` : cardioSessions.length ? `楼梯机 · ${cardioSessions.length} 次 · 共 ${formatNumber(cardioMinutes)} 分钟` : '今天还没有有氧训练'}</span></div><button class="primary full-btn" id="today-workout">${openWorkout ? '继续力量训练' : '查看训练'}</button></section>
+    <section class="today-card workout-today-card"><div class="card-heading"><div><span class="card-icon workout-icon">${icon('dumbbell', 19)}</span><h2>今日训练</h2></div></div><div class="today-training-row"><strong>无氧</strong><span>${workouts.length ? `力量训练 · ${strengthExercises} 个动作 · ${strengthSets} 组${openWorkout ? ' · 记录中' : ''}` : '今天还没有力量训练'}</span></div><div class="today-training-row"><strong>有氧</strong><span>${cardioSessions.length === 1 ? `${getCardioActivityLabel(cardioSessions[0]!)} · ${formatNumber(cardioMinutes)} 分钟 · ${formatCardioMetrics(cardioSessions[0]!).join(' · ')}` : cardioSessions.length ? `有氧训练 · ${cardioSessions.length} 次 · 共 ${formatNumber(cardioMinutes)} 分钟` : '今天还没有有氧训练'}</span></div><button class="primary full-btn" id="today-workout">${openWorkout ? '继续力量训练' : '查看训练'}</button></section>
     <section class="today-card weight-today-card"><div class="card-heading"><div><span class="card-icon weight-icon">${icon('scale', 19)}</span><h2>体重趋势</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 15)}</button></div>${latestWeight ? `<div class="weight-today-value"><strong>${formatNumber(latestWeight.weightKg)}</strong><span>kg</span><small>${weightDelta === undefined ? '记录更多数据后显示变化' : `${weightDelta > 0 ? '↑' : weightDelta < 0 ? '↓' : '—'} ${formatNumber(Math.abs(weightDelta))} kg · 近 30 天`}</small></div>${recentWeights.length > 1 ? miniTrendSvg(recentWeights.map((item) => item.weightKg)) : ''}` : '<div class="today-weight-empty"><div class="today-card-copy"><strong>暂无体重记录</strong><span>记录第一次体重，开始观察趋势</span></div><button class="secondary" id="today-record-weight">记录体重</button></div>'}</section>
     <section class="today-card pelvic-today-card"><div class="today-habit-copy"><div class="card-heading"><div><span class="card-icon pelvic-icon">${icon('leaf', 19)}</span><h2>凯格尔训练</h2></div></div><div class="today-card-copy"><strong>${pelvicSessions.length ? `今天已完成 ${pelvicSessions.length} 次` : '今日尚未完成'}</strong><span>${pelvicSessions.length ? `累计 ${pelvicSeconds} 秒` : `${dailyPlanRoutine.name} · ${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</span></div></div><button class="secondary" id="today-pelvic">开始训练</button></section>`
   animateNutritionRings(view)
@@ -991,7 +996,7 @@ async function renderWorkoutPage(): Promise<void> {
   const view = document.querySelector<HTMLElement>('#view')!
   view.innerHTML = `<section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>训练日期</span><input id="workout-date" type="date" value="${workoutDate}" aria-label="训练日期"></label><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section>
     <section class="training-category"><h2 class="training-category-label">无氧训练</h2><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('dumbbell', 20)}</span><div><h3>力量训练</h3><p>记录动作与组数</p></div></div><p class="training-card-summary">${openWorkout ? `正在记录 · ${strengthExercises} 个动作 · ${strengthSets} 组` : todayWorkouts.length ? `今日 ${strengthExercises} 个动作 · ${strengthSets} 组` : '今天还没有力量训练'}</p><button class="primary training-card-action" id="start-workout">${openWorkout ? '继续训练' : '开始力量训练'}</button></div></section>
-    <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">有氧训练</h2><button class="text-btn" id="cardio-history">历史记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('activity', 20)}</span><div><h3>楼梯机</h3><p>记录训练时间与速度</p></div></div>${cardioSessions.length ? `<div class="training-card-summary"><span>${cardioSessions.length === 1 ? '今日 1 次' : `今日 ${cardioSessions.length} 次`}</span><strong>${formatNumber(cardioMinutes)} <small>分钟</small></strong><span>${cardioSessions.length === 1 ? `速度 ${formatNumber(cardioSessions[0]!.speed)}` : `最近速度 ${formatNumber(latestCardio!.speed)}`}</span></div>` : '<p class="training-card-summary">今天还没有有氧训练</p>'}<button class="primary training-card-action" id="add-cardio">${cardioSessions.length ? '再记一次' : '记录训练'}</button>${latestCardio ? `<button class="training-card-link" data-cardio-id="${latestCardio.id}">最近：${formatNumber(latestCardio.durationMinutes)} 分钟 · 速度 ${formatNumber(latestCardio.speed)} ${icon('chevron', 15)}</button>` : ''}</div></section>
+    <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">有氧训练</h2><button class="text-btn" id="cardio-history">历史记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('activity', 20)}</span><div><h3>有氧记录</h3><p>楼梯机 · 跑步机</p></div></div>${cardioSessions.length ? `<div class="training-card-summary"><span>${cardioSessions.length === 1 ? '今日 1 次' : `今日 ${cardioSessions.length} 次`}</span><strong>${formatNumber(cardioMinutes)} <small>分钟</small></strong><span>${cardioSessions.length === 1 ? `${getCardioActivityLabel(cardioSessions[0]!)} · ${formatCardioMetrics(cardioSessions[0]!).join(' · ')}` : `最近：${getCardioActivityLabel(latestCardio!)}`}</span></div>` : '<p class="training-card-summary">今天还没有有氧训练</p>'}<button class="primary training-card-action" id="add-cardio">${cardioSessions.length ? '再记一次' : '记录训练'}</button>${latestCardio ? `<button class="training-card-link" data-cardio-id="${latestCardio.id}">最近：${getCardioActivityLabel(latestCardio)} · ${formatNumber(latestCardio.durationMinutes)} 分钟 ${icon('chevron', 15)}</button>` : ''}</div></section>
     <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">凯格尔训练</h2><button class="text-btn" id="pelvic-floor-history">训练记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('leaf', 20)}</span><div><h3>今日训练 · ${dailyPlanRoutine.name}</h3><p>渐进计划 · 耐力控制与快速脉冲</p></div></div><p class="training-card-summary">${pelvicSessions.length ? `今日已完成 ${pelvicSessions.length} 次 · 累计 ${pelvicSeconds} 秒` : `${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</p><button class="primary training-card-action" id="start-pelvic-floor">开始训练</button></div></section><section class="section-head"><div><h2>最近力量训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 17)}</button>`).join('')}</div>`
   view.querySelector<HTMLInputElement>('#workout-date')?.addEventListener('change', (event) => { workoutDate = (event.target as HTMLInputElement).value; currentWorkout = undefined; workoutEditorOpen = false; void render().catch(fail) })
   view.querySelector('#exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
@@ -1013,28 +1018,49 @@ async function renderWorkoutPage(): Promise<void> {
 
 function showCardioForm(session?: CardioSession): void {
   const date = session?.date ?? workoutDate
-  const dialog = openModal(session ? '编辑楼梯机' : '记录楼梯机', `<form id="cardio-form" class="form cardio-form"><p class="cardio-form-date">${formatHeaderDate(date)} · 楼梯机</p><label>时间<span class="cardio-input-wrap"><input name="duration" type="number" inputmode="decimal" min="0.01" step="any" value="${session?.durationMinutes ?? ''}" placeholder="25" required><span class="cardio-input-suffix">分钟</span></span></label><label>速度<input name="speed" type="number" inputmode="decimal" min="0.01" step="any" value="${session?.speed ?? ''}" placeholder="6.5" required></label><label>备注<textarea name="note" rows="2" placeholder="可选">${esc(session?.note)}</textarea></label><div class="cardio-form-actions"><button class="primary" type="submit">${session ? '保存修改' : '保存记录'}</button>${session ? '<button class="danger-button" type="button" id="delete-cardio">删除记录</button>' : ''}</div></form>`)
-  dialog.querySelector<HTMLFormElement>('#cardio-form')?.addEventListener('submit', async (event) => {
+  const selectedType = session ? getCardioActivityType(session) : 'stair_climber'
+  const dialog = openModal(session ? '编辑有氧训练' : '记录有氧训练', `<form id="cardio-form" class="form cardio-form"><p class="cardio-form-date">${formatHeaderDate(date)}</p><div class="cardio-type-group" role="group" aria-label="训练类型"><span>训练类型</span><div class="cardio-type-options">${(Object.keys(cardioActivityDefinitions) as CardioActivityType[]).map((type) => `<button type="button" data-cardio-type="${type}" aria-pressed="${selectedType === type}">${cardioActivityDefinitions[type].label}</button>`).join('')}</div></div><input type="hidden" name="activityType" value="${selectedType}"><label>时间<span class="cardio-input-wrap"><input name="duration" type="number" inputmode="decimal" min="0.01" step="any" value="${session?.durationMinutes ?? ''}" placeholder="25" required><span class="cardio-input-suffix">分钟</span></span></label><label>速度<span class="cardio-input-wrap"><input name="speed" type="number" inputmode="decimal" min="0.01" step="any" value="${session?.speed ?? ''}" placeholder="6.5"><span class="cardio-input-suffix" data-cardio-speed-unit>km/h</span></span></label><label data-cardio-incline>坡度<span class="cardio-input-wrap"><input name="inclinePercent" type="number" inputmode="decimal" min="0" step="any" value="${session?.inclinePercent ?? ''}" placeholder="8"><span class="cardio-input-suffix">%</span></span></label><label>备注<textarea name="note" rows="2" placeholder="可选">${esc(session?.note)}</textarea></label><div class="cardio-form-actions"><button class="primary" type="submit">${session ? '保存修改' : '保存记录'}</button>${session ? '<button class="danger-button" type="button" id="delete-cardio">删除记录</button>' : ''}</div></form>`)
+  const formElement = dialog.querySelector<HTMLFormElement>('#cardio-form')!
+  const syncType = () => {
+    const type = formElement.querySelector<HTMLInputElement>('[name="activityType"]')!.value
+    const treadmill = type === 'treadmill'
+    formElement.querySelector<HTMLInputElement>('[name="speed"]')!.required = !treadmill
+    const inclineField = formElement.querySelector<HTMLElement>('[data-cardio-incline]')!
+    inclineField.hidden = !treadmill
+    inclineField.querySelector('input')!.disabled = !treadmill
+    formElement.querySelector<HTMLElement>('[data-cardio-speed-unit]')!.hidden = !treadmill
+    formElement.querySelectorAll<HTMLButtonElement>('[data-cardio-type]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.cardioType === type)))
+  }
+  formElement.querySelectorAll<HTMLButtonElement>('[data-cardio-type]').forEach((button) => button.addEventListener('click', () => {
+    formElement.querySelector<HTMLInputElement>('[name="activityType"]')!.value = button.dataset.cardioType!
+    syncType()
+  }))
+  syncType()
+  formElement.addEventListener('submit', async (event) => {
     event.preventDefault()
     const form = new FormData(event.currentTarget as HTMLFormElement)
-    const input = { date, durationMinutes: Number(valueOf(form, 'duration')), speed: Number(valueOf(form, 'speed')), note: valueOf(form, 'note') }
+    const input = { date, activityType: valueOf(form, 'activityType') as CardioActivityType, durationMinutes: Number(valueOf(form, 'duration')), speed: optionalNumber(form, 'speed'), inclinePercent: optionalNumber(form, 'inclinePercent'), note: valueOf(form, 'note') }
     try {
       if (session) await updateCardioSession(session.id, input)
       else await saveCardioSession(input)
-      dialog.close(); toast('楼梯机记录已保存'); await renderWorkoutPage()
+      dialog.close(); toast('有氧训练记录已保存'); await renderWorkoutPage()
     } catch (error) { fail(error) }
   })
   dialog.querySelector('#delete-cardio')?.addEventListener('click', async () => {
     if (!session) return
     dialog.close()
-    if (!await confirmAction('删除这条楼梯机记录？', '删除后无法恢复。', '删除')) return
-    try { await deleteCardioSession(session.id); toast('楼梯机记录已删除'); await renderWorkoutPage() } catch (error) { fail(error) }
+    if (!await confirmAction('删除这条有氧训练记录？', '删除后无法恢复。', '删除')) return
+    try { await deleteCardioSession(session.id); toast('有氧训练记录已删除'); await renderWorkoutPage() } catch (error) { fail(error) }
   })
 }
 
 async function showCardioHistory(): Promise<void> {
   const sessions = (await db.cardioSessions.toArray()).sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt))
-  const dialog = openModal('楼梯机历史', `<div class="cardio-history">${sessions.length ? sessions.map((session) => `<button data-history-cardio="${session.id}" aria-label="编辑 ${formatShortDate(session.date)} 楼梯机，${formatNumber(session.durationMinutes)} 分钟，速度 ${formatNumber(session.speed)}"><span class="cardio-history-row"><span><strong>${formatShortDate(session.date)}</strong><small>楼梯机${session.note ? ` · ${esc(session.note)}` : ''}</small></span><span class="cardio-history-value"><strong>${formatNumber(session.durationMinutes)} <small>分钟</small></strong><small>速度 ${formatNumber(session.speed)}</small></span></span></button>`).join('') : '<div class="cardio-history-empty"><strong>还没有有氧训练记录</strong><p>记录一次楼梯机的时间和速度</p><button class="primary" id="history-add-cardio">记录训练</button></div>'}</div>`, true)
+  const dialog = openModal('有氧训练历史', `<div class="cardio-history">${sessions.length ? sessions.map((session) => {
+    const label = getCardioActivityLabel(session)
+    const metrics = formatCardioMetrics(session).join(' · ')
+    return `<button data-history-cardio="${session.id}" aria-label="编辑 ${formatShortDate(session.date)} ${label}，${formatNumber(session.durationMinutes)} 分钟${metrics ? `，${metrics}` : ''}"><span class="cardio-history-row"><span><strong>${formatShortDate(session.date)}</strong><small>${label}${session.note ? ` · ${esc(session.note)}` : ''}</small></span><span class="cardio-history-value"><strong>${formatNumber(session.durationMinutes)} <small>分钟</small></strong><small>${metrics}</small></span></span></button>`
+  }).join('') : '<div class="cardio-history-empty"><strong>还没有有氧训练记录</strong><p>记录楼梯机或跑步机的训练</p><button class="primary" id="history-add-cardio">记录训练</button></div>'}</div>`, true)
   dialog.querySelector('#history-add-cardio')?.addEventListener('click', () => { dialog.close(); showCardioForm() })
   dialog.querySelectorAll<HTMLButtonElement>('[data-history-cardio]').forEach((button) => button.addEventListener('click', () => {
     const session = sessions.find((item) => item.id === button.dataset.historyCardio)
@@ -1730,7 +1756,7 @@ async function showSettings(): Promise<void> {
   fileInput.addEventListener('change', async () => { const file = fileInput.files?.[0]; if (!file) return; try { const backup = validateBackup(JSON.parse(await file.text())); dialog.close(); showRestorePreview(backup) } catch (error) { fail(error) } })
 }
 
-function showRestorePreview(backup: BackupDataV4): void {
+function showRestorePreview(backup: ValidatedBackup): void {
   const counts = [{ label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '力量训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }, { label: '训练模板', count: backup.data.workoutTemplates.length }, { label: '饮食模板', count: backup.data.dietTemplates.length }, { label: '营养目标', count: backup.data.nutritionTargets.length }, { label: '凯格尔训练', count: backup.data.pelvicFloorSessions.length }, { label: '有氧训练', count: backup.data.cardioSessions.length }]
   const dialog = openModal('确认恢复备份', `<div class="restore-counts">${counts.map((item) => `<p><span>${item.label}</span><strong>${item.count}</strong></p>`).join('')}</div><div class="warning">恢复将清除当前所有数据，并替换为该备份。</div><button class="danger-button full-btn" id="confirm-restore">继续恢复</button>`)
   dialog.querySelector('#confirm-restore')?.addEventListener('click', async () => { if (!await confirmAction('覆盖当前全部数据？', '恢复会清除当前数据并替换为备份内容，此操作无法撤销。', '恢复备份')) return; try { await restoreBackup(backup); dialog.close(); currentWorkout = undefined; workoutEditorOpen = false; toast('恢复完成'); await render() } catch (error) { fail(error) } })

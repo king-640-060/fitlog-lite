@@ -1,6 +1,7 @@
 import type { CardioSession, PelvicFloorSession, Workout } from '../db/types'
 import { pelvicFloorSessionDurationSeconds } from '../services/pelvicFloorService'
 import { formatNumber } from '../utils/nutrition'
+import { formatCardioMetrics, getCardioActivityLabel } from '../utils/cardio'
 import type { CalendarDaySummary } from './calendarPage'
 
 export interface CalendarDayDetailRow {
@@ -65,7 +66,7 @@ export function buildCalendarDayDetailRows(
   const cardio = cardioSessions.length === 0
     ? row('cardio', '有氧训练', '未训练', [], true)
     : cardioSessions.length === 1
-      ? row('cardio', '有氧训练', `${formatNumber(cardioSessions[0]!.durationMinutes)} 分钟`, [`速度 ${formatNumber(cardioSessions[0]!.speed)}`])
+      ? row('cardio', '有氧训练', `${getCardioActivityLabel(cardioSessions[0]!)} · ${formatNumber(cardioSessions[0]!.durationMinutes)} 分钟`, formatCardioMetrics(cardioSessions[0]!))
       : row('cardio', '有氧训练', `${cardioSessions.length} 次`, [`共 ${formatNumber(cardioSessions.reduce((total, session) => total + session.durationMinutes, 0))} 分钟`])
 
   const pelvicSeconds = pelvicSessions.reduce((total, session) => total + pelvicFloorSessionDurationSeconds(session), 0)

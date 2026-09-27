@@ -1,6 +1,7 @@
-import type { BackupData, BackupDataV4 } from '../db/types'
+import type { BackupData, BackupDataV3, BackupDataV5, CardioSession } from '../db/types'
 import { db, type FitLogDatabase } from '../db/database'
 import { isMealType } from '../utils/foodMeals'
+import { getCardioActivityType } from '../utils/cardio'
 
 type UnknownRecord = Record<string, unknown>
 
@@ -275,7 +276,7 @@ function validatePelvicFloorSession(record: UnknownRecord, index: number): void 
   validateTimestamps(record, location)
 }
 
-function validateCardioSession(record: UnknownRecord, index: number): void {
+function validateLegacyCardioSession(record: UnknownRecord, index: number): void {
   const location = `有氧训练第 ${index + 1} 项`
   dateString(record.date, `${location} date`)
   finite(record.durationMinutes, `${location} durationMinutes`, Number.EPSILON)
@@ -284,12 +285,36 @@ function validateCardioSession(record: UnknownRecord, index: number): void {
   validateTimestamps(record, location)
 }
 
-export function validateBackup(value: unknown): BackupDataV4 {
+function validateTypedCardioSession(record: UnknownRecord, index: number): void {
+  const location = `有氧训练第 ${index + 1} 项`
+  dateString(record.date, `${location} date`)
+  finite(record.durationMinutes, `${location} durationMinutes`, Number.EPSILON)
+  if (record.activityType !== 'stair_climber' && record.activityType !== 'treadmill') throw new Error(`${location} activityType：训练类型不合法`)
+  if (record.activityType === 'stair_climber') {
+    finite(record.speed, `${location} speed`, Number.EPSILON)
+    if (record.inclinePercent !== undefined) throw new Error(`${location} inclinePercent：楼梯机不支持坡度`)
+  } else {
+    optionalFinite(record.speed, `${location} speed`, Number.EPSILON)
+    optionalFinite(record.inclinePercent, `${location} inclinePercent`, 0)
+    if (record.speed === undefined && record.inclinePercent === undefined) throw new Error(`${location}：跑步机请至少填写速度或坡度`)
+  }
+  optionalString(record.note, `${location} note`)
+  validateTimestamps(record, location)
+}
+
+export interface ValidatedBackup {
+  app: 'FitLog Lite'
+  schemaVersion: 5
+  exportedAt: string
+  data: BackupDataV3['data'] & { cardioSessions: CardioSession[] }
+}
+
+export function validateBackup(value: unknown): ValidatedBackup {
   if (!value || typeof value !== 'object') throw new Error('备份文件格式不正确')
   const backup = value as Partial<BackupData>
-  if (backup.app !== 'FitLog Lite' || (backup.schemaVersion !== 1 && backup.schemaVersion !== 2 && backup.schemaVersion !== 3 && backup.schemaVersion !== 4)) throw new Error('不是兼容的 FitLog Lite 备份')
+  if (backup.app !== 'FitLog Lite' || (backup.schemaVersion !== 1 && backup.schemaVersion !== 2 && backup.schemaVersion !== 3 && backup.schemaVersion !== 4 && backup.schemaVersion !== 5)) throw new Error('不是兼容的 FitLog Lite 备份')
   if (!backup.data || typeof backup.data !== 'object' || Array.isArray(backup.data)) throw new Error('备份 data 必须是 object')
-  const data = backup.data as Partial<BackupDataV4['data']>
+  const data = backup.data as Partial<BackupDataV5['data']>
   timestamp(backup.exportedAt, '备份 exportedAt')
   const keys = ['foods', 'foodLogs', 'exercises', 'workouts', 'weights'] as const
   for (const key of keys) if (!Array.isArray(backup.data[key])) throw new Error(`备份缺少 ${key} 数据`)
@@ -297,7 +322,7 @@ export function validateBackup(value: unknown): BackupDataV4 {
   const dietTemplates = backup.schemaVersion >= 2 ? data.dietTemplates : []
   const nutritionTargets = backup.schemaVersion >= 3 ? data.nutritionTargets : []
   const pelvicFloorSessions = backup.schemaVersion >= 3 ? data.pelvicFloorSessions : []
-  const cardioSessions = backup.schemaVersion === 4 ? data.cardioSessions : []
+  const cardioSessions = backup.schemaVersion >= 4 ? data.cardioSessions : []
   if (!Array.isArray(workoutTemplates)) throw new Error('备份缺少 workoutTemplates 数据')
   if (!Array.isArray(dietTemplates)) throw new Error('备份缺少 dietTemplates 数据')
   if (!Array.isArray(nutritionTargets)) throw new Error('备份缺少 nutritionTargets 数据')
@@ -325,26 +350,28 @@ export function validateBackup(value: unknown): BackupDataV4 {
     nutritionTargetDates.add(date)
   })
   const checkedPelvicFloorSessions = validateIds(pelvicFloorSessions, 'pelvicFloorSessions'); checkedPelvicFloorSessions.forEach(validatePelvicFloorSession)
-  const checkedCardioSessions = validateIds(cardioSessions, 'cardioSessions'); checkedCardioSessions.forEach(validateCardioSession)
+  const checkedCardioSessions = validateIds(cardioSessions, 'cardioSessions')
+  checkedCardioSessions.forEach(backup.schemaVersion === 5 ? validateTypedCardioSession : validateLegacyCardioSession)
   return {
-    app: 'FitLog Lite', schemaVersion: 4, exportedAt: backup.exportedAt!,
+    app: 'FitLog Lite', schemaVersion: 5, exportedAt: backup.exportedAt!,
     data: {
       foods: backup.data.foods, foodLogs: backup.data.foodLogs, exercises: backup.data.exercises,
       workouts: backup.data.workouts, weights: backup.data.weights,
       workoutTemplates, dietTemplates,
       nutritionTargets, pelvicFloorSessions, cardioSessions,
     },
-  } as BackupDataV4
+  } as ValidatedBackup
 }
 
-export async function exportBackup(database: FitLogDatabase = db): Promise<BackupDataV4> {
+export async function exportBackup(database: FitLogDatabase = db): Promise<BackupDataV5> {
   return {
-    app: 'FitLog Lite', schemaVersion: 4, exportedAt: new Date().toISOString(),
+    app: 'FitLog Lite', schemaVersion: 5, exportedAt: new Date().toISOString(),
     data: {
       foods: await database.foods.toArray(), foodLogs: await database.foodLogs.toArray(), exercises: await database.exercises.toArray(),
       workouts: await database.workouts.toArray(), weights: await database.weights.toArray(),
       workoutTemplates: await database.workoutTemplates.toArray(), dietTemplates: await database.dietTemplates.toArray(),
-      nutritionTargets: await database.nutritionTargets.toArray(), pelvicFloorSessions: await database.pelvicFloorSessions.toArray(), cardioSessions: await database.cardioSessions.toArray(),
+      nutritionTargets: await database.nutritionTargets.toArray(), pelvicFloorSessions: await database.pelvicFloorSessions.toArray(),
+      cardioSessions: (await database.cardioSessions.toArray()).map((session) => ({ ...session, activityType: getCardioActivityType(session) })),
     },
   }
 }

@@ -76,14 +76,22 @@ export interface WeightLog {
   updatedAt: string
 }
 
+export type CardioActivityType = 'stair_climber' | 'treadmill'
+
 export interface CardioSession {
   id: string
   date: string
+  activityType?: CardioActivityType
   durationMinutes: number
-  speed: number
+  speed?: number
+  inclinePercent?: number
   note?: string
   createdAt: string
   updatedAt: string
+}
+
+export interface LegacyCardioSessionV4 extends Omit<CardioSession, 'activityType' | 'speed' | 'inclinePercent'> {
+  speed: number
 }
 
 export interface WorkoutTemplateSet {
@@ -214,8 +222,15 @@ export interface BackupDataV3 extends BackupBase {
 export interface BackupDataV4 extends BackupBase {
   schemaVersion: 4
   data: BackupDataV3['data'] & {
-    cardioSessions: CardioSession[]
+    cardioSessions: LegacyCardioSessionV4[]
   }
 }
 
-export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4
+export interface BackupDataV5 extends BackupBase {
+  schemaVersion: 5
+  data: BackupDataV3['data'] & {
+    cardioSessions: (CardioSession & { activityType: CardioActivityType })[]
+  }
+}
+
+export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5

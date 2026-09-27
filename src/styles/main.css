@@ -271,6 +271,11 @@ h3 { margin-bottom: 5px; font-size: 1rem; }
 .training-card-link { display: flex; align-items: center; gap: 4px; justify-content: space-between; min-height: 28px; width: 100%; padding: 0; border: 0; background: transparent; color: var(--text-secondary); font-size: .76rem; text-align: left; font-variant-numeric: tabular-nums; }
 .cardio-form { gap: 17px; }
 .cardio-form-date { margin: 0 0 2px; color: var(--text-secondary); font-size: .82rem; }
+.cardio-type-group { display: grid; gap: 8px; color: var(--text-secondary); font-size: .84rem; font-weight: 650; }
+.cardio-type-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 14px; background: var(--surface-soft); }
+.cardio-type-options button { min-height: 44px; border: 0; border-radius: 10px; background: transparent; color: var(--text-secondary); font-size: .9rem; font-weight: 650; }
+.cardio-type-options button[aria-pressed="true"] { background: var(--surface); color: var(--accent-strong); box-shadow: var(--shadow-soft); }
+.cardio-form [hidden] { display: none !important; }
 .cardio-form label { gap: 8px; }
 .form.cardio-form label > .cardio-input-wrap { position: relative; right: auto; bottom: auto; display: block; color: inherit; font-size: inherit; }
 .cardio-form .cardio-input-wrap input { width: 100%; padding-right: 60px; }
