@@ -608,54 +608,15 @@ fieldset { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--borde
 .today-training-row strong { color: var(--text-secondary); font-size: .78rem; }
 .today-training-row span { min-width: 0; color: var(--text-secondary); font-size: .84rem; font-variant-numeric: tabular-nums; }
 .today-dashboard .workout-today-card .today-workout-status .goal-ring { width: 51px; }
-.today-dashboard .weight-today-card .weight-today-value strong { font-size: 2.2rem; }
-.today-weight-empty { display: flex; align-items: center; justify-content: space-between; gap: 9px; }
-.today-weight-empty .today-card-copy { min-width: 0; gap: 3px; }
-.today-weight-empty .today-card-copy strong { font-size: .97rem; }
-.today-weight-empty .today-card-copy span { font-size: .76rem; line-height: 1.35; }
-.today-weight-empty .secondary { flex: 0 0 auto; min-height: 44px; padding: 0 11px; border-radius: 12px; font-size: .78rem; }
-.today-dashboard .pelvic-today-card { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 14px; border-color: #dfe9df; background: color-mix(in srgb, var(--surface-soft) 22%, var(--surface)); box-shadow: 0 2px 9px rgba(38, 70, 51, .025); }
-.today-habit-copy { display: grid; min-width: 0; gap: 4px; }
-.today-habit-copy .card-heading > div { gap: 8px; }
-.today-habit-copy .card-icon { width: 28px; height: 28px; border-radius: 9px; }
-.today-habit-copy .card-heading h2 { font-size: .98rem; }
-.today-habit-copy .today-card-copy { gap: 1px; padding-left: 36px; }
-.today-habit-copy .today-card-copy strong { font-size: .82rem; font-weight: 650; }
-.today-habit-copy .today-card-copy span { font-size: .7rem; line-height: 1.3; }
-.today-dashboard .pelvic-today-card .today-card-copy strong { color: var(--text-primary); }
-.today-dashboard .pelvic-today-card .today-card-copy span { color: var(--text-secondary); }
+.today-dashboard .today-activity-card { display: grid; gap: 8px; min-height: 118px; padding: 12px 14px; border-color: var(--border); background: var(--surface); box-shadow: 0 3px 14px rgba(38, 70, 51, .035); }
+.today-activity-head .card-icon { width: 31px; height: 31px; border-radius: 10px; }
+.today-activity-head .text-btn { min-height: 44px; }
+.today-activity-body { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+.today-activity-copy { display: grid; min-width: 0; gap: 3px; }
+.today-activity-status { color: var(--text-primary); font-size: .97rem; font-weight: 700; }
+.today-activity-meta { color: var(--text-secondary); font-size: .75rem; line-height: 1.35; }
+.today-dashboard .today-activity-action { min-height: 44px; padding: 0 11px; border: 0; border-radius: 12px; background: var(--accent-soft); color: var(--accent-strong); font-size: .78rem; font-weight: 700; white-space: nowrap; }
 .today-dashboard .pelvic-today-card .pelvic-icon { background: #ecefe1; color: #727e48; }
-.today-dashboard .pelvic-today-card .secondary { flex: 0 0 auto; min-height: 44px; padding: 0 11px; border: 1px solid #dce9d9; border-radius: 12px; background: #e8f2e5; color: var(--accent-strong); font-size: .78rem; }
-.habit-icon { background: #e9f2e8; color: var(--accent-strong); }
-.today-habits-card { gap: 8px; padding: 12px 14px; }
-.today-habit-list { display: grid; gap: 5px; }
-.today-habit-row { display: flex; width: 100%; min-height: 44px; align-items: center; gap: 9px; border: 0; border-radius: 12px; padding: 6px 9px; background: var(--surface-soft); text-align: left; font-size: .87rem; transition: transform 120ms ease, background-color 150ms ease; }
-.today-habit-row:active { transform: scale(.98); }
-.today-habit-row[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-strong); }
-.habit-check-mark { width: 18px; color: var(--accent-strong); font-size: 1.1rem; text-align: center; }
-.habit-row-name { flex: 1; min-width: 0; }
-.today-habit-row small { color: var(--text-tertiary); font-size: .72rem; }
-.today-habit-summary { margin: 2px 0 0; color: var(--text-secondary); font-size: .76rem; }
-.today-habit-empty { display: grid; gap: 4px; color: var(--text-secondary); font-size: .82rem; }
-.today-habit-empty strong { color: var(--text-primary); }
-.today-habit-empty .text-btn { width: fit-content; }
-.habit-manager-list { overflow: hidden; margin: 12px 0; border: 1px solid var(--border); border-radius: 15px; }
-.habit-manager-row { display: grid; gap: 5px; padding: 10px 12px; border-bottom: 1px solid var(--divider); }
-.habit-manager-row:last-child { border-bottom: 0; }
-.habit-manager-row > div:first-child { display: grid; gap: 3px; }
-.habit-manager-row small { color: var(--text-secondary); font-size: .76rem; }
-.habit-manager-actions { display: flex; gap: 6px; }
-.habit-manager-actions button { min-width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--accent-strong); font-size: .8rem; }
-.habit-weekdays { min-width: 0; margin: 0; border: 0; padding: 0; }
-.habit-weekdays legend { margin-bottom: 8px; }
-.habit-weekdays > div { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
-.habit-weekdays label { position: relative; display: grid; min-width: 0; height: 44px; place-items: center; }
-.habit-weekdays input { position: absolute; inset: 0; width: 100%; min-height: 44px; opacity: 0; }
-.habit-weekdays span { display: grid; width: 100%; height: 44px; place-items: center; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-soft); font-size: .82rem; }
-.habit-weekdays input:checked + span { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-strong); }
-.habit-weekdays input:focus-visible + span { outline: 3px solid var(--accent-soft); }
-.habit-form-utility { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; }
-.habit-form-utility button { min-height: 44px; border: 0; background: transparent; color: var(--accent-strong); font-size: .82rem; }
 .card-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .card-heading > div { display: flex; min-width: 0; align-items: center; gap: 10px; }
 .card-heading h2 { font-size: 1.06rem; }

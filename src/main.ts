@@ -35,6 +35,7 @@ import { calculateNutrition, formatNumber } from './utils/nutrition'
 import { buildRecentActivity, type RecentActivityKind } from './utils/recentActivity'
 import { cardioActivityDefinitions, formatCardioMetrics, getCardioActivityLabel, getCardioActivityType } from './utils/cardio'
 import { getReportRange, shiftReportPeriod, type ReportMode, type ReportResult } from './utils/reporting'
+import { getTodayPelvicState, getTodayWeightState } from './utils/todayActivity'
 
 Chart.register(...registerables)
 registerSW({ immediate: true })
@@ -361,7 +362,7 @@ async function renderTodayPage(): Promise<void> {
     db.workouts.where('date').equals(today).toArray(),
     getCardioSessionsByDate(today),
     db.pelvicFloorSessions.where('date').equals(today).toArray(),
-    db.weights.orderBy('date').reverse().toArray(),
+    db.weights.where('date').belowOrEqual(today).reverse().limit(2).toArray(),
     db.pelvicFloorSessions.toArray(),
     getActiveHabits(),
     getHabitCheckInsByDate(today),
@@ -376,25 +377,23 @@ async function renderTodayPage(): Promise<void> {
   const strengthExercises = workouts.reduce((total, workout) => total + workout.exercises.length, 0)
   const strengthSets = workouts.reduce((total, workout) => total + workout.exercises.reduce((sum, exercise) => sum + exercise.sets.length, 0), 0)
   const cardioMinutes = cardioSessions.reduce((total, session) => total + session.durationMinutes, 0)
-  const latestWeight = weights[0]
-  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 29)
-  const recentWeights = weights.filter((item) => item.date >= getLocalDateString(cutoff)).reverse()
-  const weightDelta = latestWeight && recentWeights.length > 1 ? latestWeight.weightKg - recentWeights[0]!.weightKg : undefined
-  const pelvicSeconds = pelvicSessions.reduce((total, session) => total + pelvicFloorSessionDurationSeconds(session), 0)
+  const weightState = getTodayWeightState(weights, today)
   const dailyPlanRoutine = pelvicPlanRoutine(selectedPelvicPlanLevel(getPelvicFloorPlanProgress(allPelvicSessions)))
+  const pelvicState = getTodayPelvicState(pelvicSessions, dailyPlanRoutine.name, pelvicRoutineMinutes(dailyPlanRoutine))
   const view = document.querySelector<HTMLElement>('#view')!
   view.innerHTML = `
     <section class="today-card nutrition-today-card"><div class="card-heading"><div><span class="card-icon nutrition-icon">${icon('utensils', 19)}</span><h2>今日饮食</h2></div><button class="text-btn" id="today-food-details">查看详情 ${icon('chevron', 15)}</button></div><div class="today-calorie-layout">${ringSvgHtml(totals.calories, target?.calories, 'tiny')}<div class="today-calorie-copy"><strong>${formatNumber(totals.calories)} <small>kcal</small></strong><span class="today-goal-note${target?.calories === undefined ? ' is-unset' : ''}">${target?.calories === undefined ? '尚未设置目标' : `目标 ${formatNumber(target.calories)} kcal · ${goalStatusText(totals.calories, target.calories, 'kcal')}`}</span></div></div><div class="today-macros"><div class="protein"><span>蛋白质</span><strong>${formatNumber(totals.protein)}${target?.protein === undefined ? 'g' : ` / ${formatNumber(target.protein)}g`}</strong></div><div class="carbs"><span>碳水</span><strong>${formatNumber(totals.carbs)}${target?.carbs === undefined ? 'g' : ` / ${formatNumber(target.carbs)}g`}</strong></div><div class="fat"><span>脂肪</span><strong>${formatNumber(totals.fat)}${target?.fat === undefined ? 'g' : ` / ${formatNumber(target.fat)}g`}</strong></div></div></section>
     <section class="today-card workout-today-card"><div class="card-heading"><div><span class="card-icon workout-icon">${icon('dumbbell', 19)}</span><h2>今日训练</h2></div></div><div class="today-training-row"><strong>无氧</strong><span>${workouts.length ? `力量训练 · ${strengthExercises} 个动作 · ${strengthSets} 组${openWorkout ? ' · 记录中' : ''}` : '今天还没有力量训练'}</span></div><div class="today-training-row"><strong>有氧</strong><span>${cardioSessions.length === 1 ? `${getCardioActivityLabel(cardioSessions[0]!)} · ${formatNumber(cardioMinutes)} 分钟 · ${formatCardioMetrics(cardioSessions[0]!).join(' · ')}` : cardioSessions.length ? `有氧训练 · ${cardioSessions.length} 次 · 共 ${formatNumber(cardioMinutes)} 分钟` : '今天还没有有氧训练'}</span></div><button class="primary full-btn" id="today-workout">${openWorkout ? '继续力量训练' : '查看训练'}</button></section>
-    <section class="today-card weight-today-card"><div class="card-heading"><div><span class="card-icon weight-icon">${icon('scale', 19)}</span><h2>体重趋势</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 15)}</button></div>${latestWeight ? `<div class="weight-today-value"><strong>${formatNumber(latestWeight.weightKg)}</strong><span>kg</span><small>${weightDelta === undefined ? '记录更多数据后显示变化' : `${weightDelta > 0 ? '↑' : weightDelta < 0 ? '↓' : '—'} ${formatNumber(Math.abs(weightDelta))} kg · 近 30 天`}</small></div>${recentWeights.length > 1 ? miniTrendSvg(recentWeights.map((item) => item.weightKg)) : ''}` : '<div class="today-weight-empty"><div class="today-card-copy"><strong>暂无体重记录</strong><span>记录第一次体重，开始观察趋势</span></div><button class="secondary" id="today-record-weight">记录体重</button></div>'}</section>
-    <section class="today-card pelvic-today-card"><div class="today-habit-copy"><div class="card-heading"><div><span class="card-icon pelvic-icon">${icon('leaf', 19)}</span><h2>凯格尔训练</h2></div></div><div class="today-card-copy"><strong>${pelvicSessions.length ? `今天已完成 ${pelvicSessions.length} 次` : '今日尚未完成'}</strong><span>${pelvicSessions.length ? `累计 ${pelvicSeconds} 秒` : `${dailyPlanRoutine.name} · ${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</span></div></div><button class="secondary" id="today-pelvic">开始训练</button></section>
+    <section class="today-card today-activity-card weight-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon weight-icon">${icon('scale', 19)}</span><h2>体重</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 15)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(weightState.status)}</strong><span class="today-activity-meta">${esc(weightState.meta)}</span></div><button class="secondary today-activity-action" id="today-record-weight">${esc(weightState.action)}</button></div></section>
+    <section class="today-card today-activity-card pelvic-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon pelvic-icon">${icon('leaf', 19)}</span><h2>凯格尔训练</h2></div><button class="text-btn" id="today-pelvic-history">训练记录 ${icon('chevron', 15)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(pelvicState.status)}</strong><span class="today-activity-meta">${esc(pelvicState.meta)}</span></div><button class="secondary today-activity-action" id="today-pelvic">${esc(pelvicState.action)}</button></div></section>
     ${todayHabitCardHtml(habits, habitCheckIns)}`
   animateNutritionRings(view)
   view.querySelector('#today-food-details')?.addEventListener('click', () => { activeTab = 'food'; foodDate = today; void render().catch(fail) })
   view.querySelector('#today-workout')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = openWorkout; workoutEditorOpen = Boolean(openWorkout); void render().catch(fail) })
   view.querySelector('#today-weight-details')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; void render().catch(fail) })
-  view.querySelector('#today-record-weight')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; weightDate = today; void render().then(() => showWeightForm(today)).catch(fail) })
+  view.querySelector('#today-record-weight')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; weightDate = today; void render().then(() => showWeightForm(today, weights.find((item) => item.date === today)?.weightKg)).catch(fail) })
   view.querySelector('#today-pelvic')?.addEventListener('click', () => { workoutDate = today; void showPelvicFloorSetup().catch(fail) })
+  view.querySelector('#today-pelvic-history')?.addEventListener('click', () => void showPelvicFloorHistory())
   bindTodayHabitCard(view, today)
 }
 
@@ -625,7 +624,7 @@ async function showCalendarDaySheet(date: string, summary?: CalendarDaySummary):
   })
   dialog.querySelector('#calendar-clear-day')?.addEventListener('click', async () => {
     const day = new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric' }).format(new Date(`${date}T12:00:00`))
-    if (!await confirmAction(`清空 ${day} 的所有记录？`, '将删除当天的饮食记录、营养目标、无氧训练、有氧训练、凯格尔训练和体重记录。习惯打卡不会受影响。删除后无法恢复。', '清空当天记录')) return
+    if (!await confirmAction(`清空 ${day} 的饮食、训练和体重记录？`, '将删除当天的饮食记录、营养目标、无氧训练、有氧训练、凯格尔训练和体重记录。习惯打卡不会受影响。删除后无法恢复。', '清空当天记录')) return
     try {
       await clearDayRecords(date)
       dialog.close()
