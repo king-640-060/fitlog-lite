@@ -77,20 +77,15 @@ h3 { margin-bottom: 5px; font-size: 1rem; }
 .food-topbar { align-items: center; min-height: 69px; padding-bottom: 7px; }
 .food-topbar h1 { font-size: 1.82rem; }
 .food-header-actions { display: flex; height: 44px; align-items: center; gap: 2px; }
+.food-page-action { display: inline-flex; height: 44px; min-height: 44px; align-items: center; justify-content: center; border: 0; padding: 0 7px; background: transparent; color: var(--accent-strong); font-size: .83rem; font-weight: 700; white-space: nowrap; }
+.food-date-navigation { display: grid; min-width: 0; }
+.food-date-helper { display: flex; min-height: 44px; align-items: center; justify-content: space-between; gap: 10px; padding: 0 2px; }
+.food-date-jump { position: relative; display: inline-flex; min-height: 44px; align-items: center; gap: 5px; padding: 0 4px; color: var(--text-secondary); font-size: .82rem; font-weight: 600; cursor: pointer; }
+.food-date-jump input { position: absolute; inset: 0; width: 100%; min-height: 44px; opacity: 0; cursor: pointer; font-size: 16px; }
+.food-date-jump:focus-within { outline: 3px solid var(--accent-soft); outline-offset: 1px; border-radius: 9px; }
 .food-today-shortcut { display: inline-flex; height: 44px; min-height: 44px; align-items: center; justify-content: center; border: 0; padding: 0 5px; background: transparent; color: var(--accent-strong); font-size: .82rem; font-weight: 650; white-space: nowrap; }
 .food-today-shortcut[hidden] { display: none; }
 .food-today-shortcut:active { opacity: .62; transform: scale(.98); }
-.food-library-link { display: flex; height: 44px; min-height: 44px; align-items: center; justify-content: center; border: 0; padding: 0 7px; background: transparent; color: var(--accent-strong); font-size: .83rem; font-weight: 700; }
-.food-tools-menu { position: relative; z-index: 25; height: 44px; margin: 0; }
-.food-tools-menu > summary { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 12px; color: var(--text-secondary); cursor: pointer; list-style: none; }
-.food-tools-menu > summary::-webkit-details-marker { display: none; }
-.food-tools-menu[open] > summary { background: var(--accent-soft); color: var(--accent-strong); }
-.food-tools-panel { position: absolute; top: 45px; right: 0; width: 160px; padding: 5px; border: 1px solid var(--border); border-radius: 15px; background: var(--surface); box-shadow: var(--shadow-float); }
-.food-tools-panel button, .food-menu-date { display: flex; width: 100%; min-height: 44px; align-items: center; border: 0; border-radius: 10px; padding: 0 12px; background: transparent; color: var(--text-primary); font-size: .85rem; font-weight: 550; text-align: left; cursor: pointer; }
-.food-tools-panel button:active, .food-menu-date:active { background: var(--surface-soft); }
-.food-tools-panel button[hidden] { display: none; }
-.food-menu-date { position: relative; overflow: hidden; }
-.food-menu-date input { position: absolute; inset: 0; width: 100%; min-height: 44px; opacity: 0; cursor: pointer; }
 #view { display: flex; flex-direction: column; gap: 12px; animation: page-in 180ms ease both; }
 @keyframes page-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 .bottom-nav { position: fixed; z-index: 20; left: 50%; bottom: 0; width: min(100%, 640px); transform: translateX(-50%); display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; padding: 4px 8px calc(4px + env(safe-area-inset-bottom)); border: 1px solid var(--border); border-bottom: 0; border-radius: 20px 20px 0 0; background: var(--surface); box-shadow: 0 -3px 16px rgba(38, 70, 51, .045); }
@@ -113,6 +108,7 @@ h3 { margin-bottom: 5px; font-size: 1rem; }
 .date-control { position: relative; display: flex; align-items: center; gap: 8px; min-height: 42px; padding: 0 12px; border-radius: 14px; background: var(--surface-soft); color: var(--text-secondary); font-size: .82rem; }
 .date-control input { position: absolute; inset: 0; min-height: 42px; opacity: 0; cursor: pointer; }
 .food-date-rail-shell { --food-date-item-width: clamp(104px, 28vw, 118px); position: relative; margin: 1px 0 12px; }
+.food-date-navigation .food-date-rail-shell { min-width: 0; margin: 0; }
 .food-date-rail-shell::before { content: ''; position: absolute; right: 7%; bottom: 2px; left: 7%; height: 1px; background: linear-gradient(90deg, transparent, var(--border) 22%, var(--border) 78%, transparent); opacity: .65; pointer-events: none; transition: opacity 140ms ease-out; }
 .food-date-rail-shell::after { content: ''; position: absolute; z-index: 2; bottom: 1px; left: calc(50% - 7px); width: 14px; height: 2px; border-radius: 2px; background: var(--accent); opacity: .55; pointer-events: none; }
 .food-date-selection { position: absolute; inset: 1px auto 4px 50%; width: var(--food-date-item-width); transform: translateX(-50%); border-radius: 14px; background: color-mix(in srgb, var(--accent-soft) 68%, transparent); opacity: .62; pointer-events: none; transition: opacity 140ms ease-out; }
@@ -205,9 +201,10 @@ h3 { margin-bottom: 5px; font-size: 1rem; }
 .add-button { border-color: transparent; background: var(--accent-soft); color: var(--accent-strong); }
 .food-list, .weight-list, .history-list { overflow: hidden; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
 .food-list { overflow: visible; }
-.food-meals-head { display: flex; align-items: baseline; justify-content: space-between; padding: 3px 2px 0; }
+.food-meals-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 3px 2px 0; }
 .food-meals-head h2 { font-size: 1.08rem; }
 .food-meals-head span { display: block; margin-top: 3px; color: var(--text-tertiary); font-size: .75rem; }
+.food-save-template { flex: 0 0 auto; min-height: 44px; border: 0; padding: 0 3px; background: transparent; color: var(--accent-strong); font-size: .8rem; font-weight: 600; white-space: nowrap; }
 .food-meals { overflow: visible; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
 .food-meal { padding: 7px 12px 9px; }
 .food-meal + .food-meal { border-top: 1px solid var(--divider); }

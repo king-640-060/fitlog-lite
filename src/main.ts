@@ -44,7 +44,6 @@ let calendarSelectedDate = getLocalDateString()
 let calendarYear = new Date().getFullYear()
 let calendarMonth = new Date().getMonth()
 let foodDate = getLocalDateString()
-let foodMenuEvents: AbortController | undefined
 let foodHeaderEvents: AbortController | undefined
 let foodRailEvents: AbortController | undefined
 let foodContentVersion = 0
@@ -212,7 +211,6 @@ function chooseNutritionTargetConflict(): Promise<'preserve' | 'replace' | undef
 }
 
 async function render(): Promise<void> {
-  foodMenuEvents?.abort()
   foodHeaderEvents?.abort()
   foodRailEvents?.abort()
   foodContentVersion += 1
@@ -225,7 +223,7 @@ async function render(): Promise<void> {
   const subtitle = activeTab === 'today' ? `${formatHeaderDate(today).replace('今天 · ', '')} · 今天也继续保持` : activeTab === 'workout' ? formatHeaderDate(workoutDate) : activeTab === 'progress' ? '看见每一次积累' : '管理你的记录与应用'
   app.innerHTML = `
     <div class="app-frame">
-      <header class="topbar${activeTab === 'today' ? ' today-topbar' : activeTab === 'food' ? ' food-topbar' : ''}"><div><h1>${title}</h1>${activeTab === 'food' ? '' : `<p class="header-date">${subtitle}</p>`}</div>${activeTab === 'food' ? `<div class="food-header-actions"><button class="food-today-shortcut" id="food-return-today" type="button" aria-label="回到今天" hidden>回到今天</button><button class="food-library-link" id="food-library">食物库</button><details class="food-tools-menu"><summary aria-label="饮食更多操作" title="更多操作">${icon('more', 20)}</summary><div class="food-tools-panel"><button id="use-diet-template">使用模板</button><label class="food-menu-date">选择日期<input id="food-date" type="date" value="${foodDate}" aria-label="选择饮食记录日期"></label><button id="save-day-diet-template" hidden>保存为模板</button></div></details></div>` : activeTab === 'today' ? `<span class="brand-mark today-brand" aria-hidden="true">${icon('leaf', 19)}</span>` : activeTab === 'progress' ? `<span class="brand-mark subtle" aria-hidden="true">${icon('leaf', 19)}</span>` : ''}</header>
+      <header class="topbar${activeTab === 'today' ? ' today-topbar' : activeTab === 'food' ? ' food-topbar' : ''}"><div><h1>${title}</h1>${activeTab === 'food' ? '' : `<p class="header-date">${subtitle}</p>`}</div>${activeTab === 'food' ? '<div class="food-header-actions"><button class="food-page-action" id="use-diet-template" type="button">使用模板</button><button class="food-page-action" id="food-library" type="button">食物库</button></div>' : activeTab === 'today' ? `<span class="brand-mark today-brand" aria-hidden="true">${icon('leaf', 19)}</span>` : activeTab === 'progress' ? `<span class="brand-mark subtle" aria-hidden="true">${icon('leaf', 19)}</span>` : ''}</header>
       <main id="view" class="${activeTab === 'today' ? 'today-dashboard' : ''}" aria-live="polite"></main>
       <nav class="bottom-nav" aria-label="主导航">
         <button data-tab="today" class="${activeTab === 'today' ? 'active' : ''}" aria-current="${activeTab === 'today' ? 'page' : 'false'}">${icon('home', 21)}<span>今日</span></button>
@@ -239,18 +237,6 @@ async function render(): Promise<void> {
     activeTab = button.dataset.tab as Tab
     void render().catch(fail)
   }))
-  if (activeTab === 'food') {
-    const menu = app.querySelector<HTMLDetailsElement>('.food-tools-menu')!
-    foodMenuEvents = new AbortController()
-    const signal = foodMenuEvents.signal
-    app.querySelector('#food-return-today')?.addEventListener('click', returnFoodToToday, { signal })
-    document.addEventListener('pointerdown', (event) => {
-      if (event.target instanceof Node && !menu.contains(event.target)) menu.open = false
-    }, { signal })
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && menu.open) { menu.open = false; menu.querySelector('summary')?.focus() }
-    }, { signal })
-  }
   if (activeTab === 'today') await renderTodayPage()
   if (activeTab === 'food') await renderFoodPage()
   if (activeTab === 'workout') await renderWorkoutPage()
@@ -770,16 +756,17 @@ async function renderFoodPage(): Promise<void> {
   const groups = groupFoodLogs(logs)
   const slotHtml = `<div class="food-content-body" data-food-date="${requestedDate}">
     <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="food-calorie-row"><div class="calorie-gauge" data-progress-key="calories" data-actual="${totals.calories}" ${calorieTarget === undefined ? '' : `data-goal="${calorieTarget}"`} aria-label="热量 ${calorieAmount} ${goalStatusText(totals.calories, calorieTarget, 'kcal')}">${ringSvgHtml(totals.calories, calorieTarget, 'large', previous.get('calories'))}<div class="calorie-gauge-center"><strong data-count-from="${previous.get('calories')?.actual ?? 0}" data-count-to="${totals.calories}">${formatNumber(previous.get('calories')?.actual ?? 0)}</strong><small>kcal</small></div></div><div class="calorie-gauge-caption"><span>当日摄入</span>${calorieTarget === undefined ? '<strong>按自己的节奏记录</strong>' : `<strong>目标 ${formatNumber(calorieTarget)} kcal</strong>`}<span class="${getGoalProgress(totals.calories, calorieTarget).state === 'above' ? 'metric-excess' : ''}">${goalStatusText(totals.calories, calorieTarget, 'kcal')}</span></div></div><div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div></section>
-    <section class="food-meals-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '按餐次记录，更清楚'}</span></div></section>
+    <section class="food-meals-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '按餐次记录，更清楚'}</span></div>${logs.length ? '<button class="food-save-template" id="save-day-diet-template" type="button" aria-label="将当天饮食保存为模板">保存为模板</button>' : ''}</section>
     <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday)).join('')}</div></div>`
   let rail = view.querySelector<HTMLElement>('.food-date-rail')
   let content = view.querySelector<HTMLElement>('.food-content')
   const firstAppearance = !rail
   const previousDate = view.dataset.foodContentDate
   if (!rail || !content) {
-    view.innerHTML = '<div class="food-date-rail-shell"><div class="food-date-selection" aria-hidden="true"></div><div class="food-date-rail" role="group" aria-label="切换饮食记录日期"><div class="food-date-rail-track"></div></div></div><div class="food-content"></div>'
+    view.innerHTML = `<div class="food-date-navigation"><div class="food-date-helper"><label class="food-date-jump">${icon('calendar', 16)}<span>选择日期</span><input id="food-date" type="date" value="${requestedDate}" aria-label="选择饮食记录日期"></label><button class="food-today-shortcut" id="food-return-today" type="button" aria-label="回到今天" hidden>回到今天</button></div><div class="food-date-rail-shell"><div class="food-date-selection" aria-hidden="true"></div><div class="food-date-rail" role="group" aria-label="切换饮食记录日期"><div class="food-date-rail-track"></div></div></div></div><div class="food-content"></div>`
     rail = view.querySelector<HTMLElement>('.food-date-rail')!
     content = view.querySelector<HTMLElement>('.food-content')!
+    updateFoodTodayShortcut()
     updateFoodRail(rail, requestedDate, true)
     bindFoodRail(rail)
   }
@@ -793,23 +780,22 @@ async function renderFoodPage(): Promise<void> {
     body.querySelectorAll<SVGCircleElement>('[data-final-offset]').forEach((ring) => { ring.style.strokeDashoffset = ring.dataset.finalOffset ?? '' })
     body.querySelectorAll<HTMLElement>('[data-count-to]').forEach((number) => { number.textContent = formatNumber(Number(number.dataset.countTo)) })
   }
-  bindFoodContent(body, target)
-  bindFoodHeader(logs)
+  bindFoodContent(body, target, logs)
+  bindFoodHeader()
 }
 
-function bindFoodHeader(logs: FoodLog[]): void {
+function bindFoodHeader(): void {
   foodHeaderEvents?.abort()
   foodHeaderEvents = new AbortController()
   const headerSignal = foodHeaderEvents.signal
   app.querySelector<HTMLInputElement>('#food-date')?.addEventListener('change', (event) => { const date = (event.target as HTMLInputElement).value; if (date) commitFoodDate(date, true) }, { signal: headerSignal })
+  app.querySelector('#food-return-today')?.addEventListener('click', returnFoodToToday, { signal: headerSignal })
   app.querySelector('#food-library')?.addEventListener('click', () => void showFoodLibrary(), { signal: headerSignal })
-  app.querySelector('#use-diet-template')?.addEventListener('click', () => { app.querySelector<HTMLDetailsElement>('.food-tools-menu')!.open = false; void showDietTemplatePicker() }, { signal: headerSignal })
-  const saveTemplate = app.querySelector<HTMLButtonElement>('#save-day-diet-template')
-  if (saveTemplate) saveTemplate.hidden = !logs.length
-  saveTemplate?.addEventListener('click', () => { app.querySelector<HTMLDetailsElement>('.food-tools-menu')!.open = false; void saveDayAsDietTemplate(logs) }, { signal: headerSignal })
+  app.querySelector('#use-diet-template')?.addEventListener('click', () => void showDietTemplatePicker(), { signal: headerSignal })
 }
 
-function bindFoodContent(slot: HTMLElement, target?: NutritionTarget): void {
+function bindFoodContent(slot: HTMLElement, target: NutritionTarget | undefined, logs: FoodLog[]): void {
+  slot.querySelector('#save-day-diet-template')?.addEventListener('click', () => void saveDayAsDietTemplate(logs))
   slot.querySelector('[data-edit-nutrition-target]')?.addEventListener('click', () => showNutritionTargetForm(foodDate, target))
   slot.querySelectorAll<HTMLButtonElement>('[data-add-meal]').forEach((button) => button.addEventListener('click', () => { const meal = button.dataset.addMeal; if (isMealType(meal)) void showAddFoodLog(meal) }))
   slot.querySelectorAll<HTMLButtonElement>('[data-toggle-meal]').forEach((button) => button.addEventListener('click', () => { const list = button.closest('.food-meal')?.querySelector<HTMLElement>('.meal-log-list'); if (!list) return; list.hidden = !list.hidden; button.setAttribute('aria-expanded', String(!list.hidden)) }))
