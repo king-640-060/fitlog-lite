@@ -1,8 +1,9 @@
 import './styles/main.css'
+import './styles/plan.css'
 import { Chart, registerables } from 'chart.js'
 import { registerSW } from 'virtual:pwa-register'
 import { db } from './db/database'
-import type { CardioActivityType, CardioSession, DietTemplate, Exercise, Food, FoodLog, Habit, HabitCheckIn, MealType, NutritionGoal, NutritionTarget, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
+import type { CardioActivityType, CardioSession, DietTemplate, Exercise, Food, FoodLog, Habit, HabitCheckIn, MealType, NutritionGoal, NutritionTarget, Task, TaskTag, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
 import { exportBackup, restoreBackup, validateBackup, type ValidatedBackup } from './services/backupService'
 import { clearDayRecords } from './services/dayRecordsService'
 import { deleteCardioSession, getCardioSessionsByDate, saveCardioSession, updateCardioSession } from './services/cardioService'
@@ -10,6 +11,8 @@ import { logFood, saveFood, updateFoodLogDetails, validateFoodInput } from './se
 import { buildImportPreview, parseFoodCsv, parseFoodJson, type ImportPreview } from './services/importService'
 import { upsertWeight } from './services/weightService'
 import { createHabit, deleteUnusedHabit, getActiveHabits, getHabitCheckInsByDate, reorderHabits, setHabitActive, toggleHabitCheckIn, updateHabit } from './services/habitService'
+import { createTask, deleteTask, getInboxTasks, getTasksByDate, getUpcomingTasks, sortTasksForPlan, toggleTaskCompletion, updateTask } from './services/taskService'
+import { createTaskTag, deleteTaskTag, getTaskTags, getTaskTagUsageCount, updateTaskTag } from './services/taskTagService'
 import { loadReport } from './services/reportService'
 import { deleteNutritionTarget, normalizeNutritionGoal, saveNutritionTarget } from './services/nutritionTargetService'
 import { deletePelvicFloorSession, pelvicFloorSessionDurationSeconds, savePelvicFloorSession, sessionFromPelvicFloorTimer } from './services/pelvicFloorService'
@@ -31,7 +34,8 @@ import { icon, type IconName } from './ui/icons'
 import { habitPlanText, habitTodaySummary, habitWeekdayLabels } from './ui/habitPresentation'
 import { getGoalProgress } from './ui/progressRing'
 import { groupFoodLogs, isMealType, mealNames, mealTypes, type FoodMealGroup } from './utils/foodMeals'
-import { formatShortDate, getLocalDateString } from './utils/date'
+import { formatShortDate, getLocalDateString, shiftLocalDate } from './utils/date'
+import { findActiveHashtagQuery, normalizeTaskTagName, replaceActiveHashtagQuery, validateTaskTagName, type ActiveHashtagQuery } from './utils/taskTags'
 import { calculateNutrition, formatNumber } from './utils/nutrition'
 import { buildRecentActivity, type RecentActivityKind } from './utils/recentActivity'
 import { cardioActivityDefinitions, formatCardioMetrics, getCardioActivityLabel, getCardioActivityType } from './utils/cardio'
@@ -41,9 +45,13 @@ import { getTodayPelvicState, getTodayWeightState } from './utils/todayActivity'
 Chart.register(...registerables)
 registerSW({ immediate: true })
 
-type Tab = 'today' | 'food' | 'workout' | 'progress' | 'more'
+type Tab = 'today' | 'plan' | 'food' | 'workout' | 'progress'
 type ProgressView = 'overview' | 'trend' | 'calendar' | 'reports'
+type PlanView = 'today' | 'upcoming' | 'inbox'
 let activeTab: Tab = 'today'
+let planView: PlanView = 'today'
+let planTagFilterId: string | undefined
+let planCompletedOpen = false
 let progressView: ProgressView = 'overview'
 let calendarSelectedDate = getLocalDateString()
 let calendarYear = new Date().getFullYear()
@@ -229,29 +237,31 @@ async function render(): Promise<void> {
   document.body.classList.remove('immersive')
   const today = getLocalDateString()
   const hour = new Date().getHours()
-  const title = activeTab === 'today' ? (hour < 11 ? '早上好' : hour < 18 ? '下午好' : '晚上好') : activeTab === 'food' ? '饮食' : activeTab === 'workout' ? '训练' : activeTab === 'progress' ? '进度' : '更多'
-  const subtitle = activeTab === 'today' ? `${formatHeaderDate(today).replace('今天 · ', '')} · 今天也继续保持` : activeTab === 'workout' ? formatHeaderDate(workoutDate) : activeTab === 'progress' ? '看见每一次积累' : '管理你的记录与应用'
+  const title = activeTab === 'today' ? (hour < 11 ? '早上好' : hour < 18 ? '下午好' : '晚上好') : activeTab === 'plan' ? '计划' : activeTab === 'food' ? '饮食' : activeTab === 'workout' ? '训练' : '进度'
+  const subtitle = activeTab === 'today' ? `${formatHeaderDate(today).replace('今天 · ', '')} · 今天也继续保持` : activeTab === 'workout' ? formatHeaderDate(workoutDate) : activeTab === 'progress' ? '看见每一次积累' : ''
   app.innerHTML = `
     <div class="app-frame">
-      <header class="topbar${activeTab === 'today' ? ' today-topbar' : activeTab === 'food' ? ' food-topbar' : ''}"><div><h1>${title}</h1>${activeTab === 'food' ? '' : `<p class="header-date">${subtitle}</p>`}</div>${activeTab === 'food' ? '<div class="food-header-actions"><button class="food-page-action" id="use-diet-template" type="button">使用模板</button><button class="food-page-action" id="food-library" type="button">食物库</button></div>' : activeTab === 'today' ? `<span class="brand-mark today-brand" aria-hidden="true">${icon('leaf', 19)}</span>` : activeTab === 'progress' ? `<span class="brand-mark subtle" aria-hidden="true">${icon('leaf', 19)}</span>` : ''}</header>
+      <header class="topbar${activeTab === 'today' ? ' today-topbar' : activeTab === 'food' ? ' food-topbar' : ''}"><div><h1>${title}</h1>${subtitle ? `<p class="header-date">${subtitle}</p>` : ''}</div><div class="topbar-page-actions">${activeTab === 'food' ? '<button class="food-page-action" id="use-diet-template" type="button">使用模板</button><button class="food-page-action" id="food-library" type="button">食物库</button>' : ''}${activeTab === 'plan' ? `<button class="icon-btn quiet" id="plan-add-task" type="button" aria-label="新建任务">${icon('plus', 20)}</button>` : ''}<button class="icon-btn quiet topbar-management" id="open-management" type="button" aria-label="管理与设置">${icon('more', 21)}</button></div></header>
       <main id="view" class="${activeTab === 'today' ? 'today-dashboard' : ''}" aria-live="polite"></main>
       <nav class="bottom-nav" aria-label="主导航">
         <button data-tab="today" class="${activeTab === 'today' ? 'active' : ''}" aria-current="${activeTab === 'today' ? 'page' : 'false'}">${icon('home', 21)}<span>今日</span></button>
+        <button data-tab="plan" class="${activeTab === 'plan' ? 'active' : ''}" aria-current="${activeTab === 'plan' ? 'page' : 'false'}">${icon('calendar', 21)}<span>计划</span></button>
         <button data-tab="food" class="${activeTab === 'food' ? 'active' : ''}" aria-current="${activeTab === 'food' ? 'page' : 'false'}">${icon('utensils', 21)}<span>饮食</span></button>
         <button data-tab="workout" class="${activeTab === 'workout' ? 'active' : ''}" aria-current="${activeTab === 'workout' ? 'page' : 'false'}">${icon('dumbbell', 21)}<span>训练</span></button>
         <button data-tab="progress" class="${activeTab === 'progress' ? 'active' : ''}" aria-current="${activeTab === 'progress' ? 'page' : 'false'}">${icon('trend', 21)}<span>进度</span></button>
-        <button data-tab="more" class="${activeTab === 'more' ? 'active' : ''}" aria-current="${activeTab === 'more' ? 'page' : 'false'}">${icon('more', 21)}<span>更多</span></button>
       </nav>
     </div>`
   document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((button) => button.addEventListener('click', () => {
     activeTab = button.dataset.tab as Tab
     void render().catch(fail)
   }))
+  app.querySelector('#open-management')?.addEventListener('click', showManagementHub)
+  app.querySelector('#plan-add-task')?.addEventListener('click', () => void showTaskEditor(undefined, planView === 'today' ? today : undefined))
   if (activeTab === 'today') await renderTodayPage()
+  if (activeTab === 'plan') await renderPlanPage()
   if (activeTab === 'food') await renderFoodPage()
   if (activeTab === 'workout') await renderWorkoutPage()
   if (activeTab === 'progress') await renderProgressPage()
-  if (activeTab === 'more') await renderMorePage()
 }
 
 function miniTrendSvg(values: number[]): string {
@@ -368,9 +378,37 @@ async function showHabitManager(openCreate = false): Promise<void> {
   else await manager()
 }
 
+function todayPlanCardHtml(tasks: Task[], allTags: TaskTag[]): string {
+  const tags = new Map(allTags.map((tag) => [tag.id, tag]))
+  const ordered = sortTasksForPlan(tasks)
+  const pending = ordered.filter((task) => !task.completedAt)
+  const recentComplete = ordered.filter((task) => task.completedAt).sort((a, b) => (b.completedAt ?? '').localeCompare(a.completedAt ?? '')).slice(0, 1)
+  const visible = [...pending.slice(0, 4), ...recentComplete]
+  return `<section class="today-card today-activity-card today-plan-card" id="today-plan"><div class="card-heading today-activity-head"><div><span class="card-icon plan-icon">${icon('calendar', 19)}</span><h2>今日计划</h2></div><button class="text-btn" id="today-plan-all">查看全部 ${icon('chevron', 15)}</button></div>${visible.length ? `${taskGroupHtml(visible, tags)}${pending.length > 4 ? `<p class="today-plan-more">还有 ${pending.length - 4} 项</p>` : ''}` : '<div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">今天没有安排</strong><span class="today-activity-meta">有需要时随手记下来</span></div><button type="button" class="secondary today-activity-action" id="today-plan-add">添加任务</button></div>'}</section>`
+}
+
+function bindTodayPlanCard(root: ParentNode): void {
+  root.querySelector('#today-plan-all')?.addEventListener('click', () => { activeTab = 'plan'; planView = 'today'; void render().catch(fail) })
+  root.querySelector('#today-plan-add')?.addEventListener('click', () => void showTaskEditor(undefined, getLocalDateString()))
+  bindTaskRows(root, () => refreshTodayPlanCard())
+}
+
+async function refreshTodayPlanCard(): Promise<void> {
+  if (activeTab !== 'today') return
+  const old = document.querySelector('#today-plan')
+  if (!old) return
+  const [tasks, tags] = await Promise.all([getTasksByDate(getLocalDateString()), getTaskTags()])
+  if (!old.isConnected) return
+  const wrapper = document.createElement('div')
+  wrapper.innerHTML = todayPlanCardHtml(tasks, tags)
+  const card = wrapper.firstElementChild!
+  old.replaceWith(card)
+  bindTodayPlanCard(card)
+}
+
 async function renderTodayPage(): Promise<void> {
   const today = getLocalDateString()
-  const [logs, target, workouts, cardioSessions, pelvicSessions, weights, allPelvicSessions, habits, habitCheckIns] = await Promise.all([
+  const [logs, target, workouts, cardioSessions, pelvicSessions, weights, allPelvicSessions, habits, habitCheckIns, todayTasks, taskTags] = await Promise.all([
     db.foodLogs.where('date').equals(today).toArray(),
     db.nutritionTargets.where('date').equals(today).first(),
     db.workouts.where('date').equals(today).toArray(),
@@ -380,6 +418,8 @@ async function renderTodayPage(): Promise<void> {
     db.pelvicFloorSessions.toArray(),
     getActiveHabits(),
     getHabitCheckInsByDate(today),
+    getTasksByDate(today),
+    getTaskTags(),
   ])
   const totals = logs.reduce((sum, log) => ({
     calories: sum.calories + log.totalCalories,
@@ -396,6 +436,7 @@ async function renderTodayPage(): Promise<void> {
   const pelvicState = getTodayPelvicState(pelvicSessions, dailyPlanRoutine.name, pelvicRoutineMinutes(dailyPlanRoutine))
   const view = document.querySelector<HTMLElement>('#view')!
   view.innerHTML = `
+    ${todayPlanCardHtml(todayTasks, taskTags)}
     <section class="today-card nutrition-today-card"><div class="card-heading"><div><span class="card-icon nutrition-icon">${icon('utensils', 19)}</span><h2>今日饮食</h2></div><button class="text-btn" id="today-food-details">查看详情 ${icon('chevron', 15)}</button></div><div class="today-calorie-layout">${ringSvgHtml(totals.calories, target?.calories, 'tiny')}<div class="today-calorie-copy"><strong>${formatNumber(totals.calories)} <small>kcal</small></strong><span class="today-goal-note${target?.calories === undefined ? ' is-unset' : ''}">${target?.calories === undefined ? '尚未设置目标' : `目标 ${formatNumber(target.calories)} kcal · ${goalStatusText(totals.calories, target.calories, 'kcal')}`}</span></div></div><div class="today-macros"><div class="protein"><span>蛋白质</span><strong>${formatNumber(totals.protein)}${target?.protein === undefined ? 'g' : ` / ${formatNumber(target.protein)}g`}</strong></div><div class="carbs"><span>碳水</span><strong>${formatNumber(totals.carbs)}${target?.carbs === undefined ? 'g' : ` / ${formatNumber(target.carbs)}g`}</strong></div><div class="fat"><span>脂肪</span><strong>${formatNumber(totals.fat)}${target?.fat === undefined ? 'g' : ` / ${formatNumber(target.fat)}g`}</strong></div></div></section>
     <section class="today-card workout-today-card"><div class="card-heading"><div><span class="card-icon workout-icon">${icon('dumbbell', 19)}</span><h2>今日训练</h2></div></div><div class="today-training-row"><strong>无氧</strong><span>${workouts.length ? `力量训练 · ${strengthExercises} 个动作 · ${strengthSets} 组${openWorkout ? ' · 记录中' : ''}` : '今天还没有力量训练'}</span></div><div class="today-training-row"><strong>有氧</strong><span>${cardioSessions.length === 1 ? `${getCardioActivityLabel(cardioSessions[0]!)} · ${formatNumber(cardioMinutes)} 分钟 · ${formatCardioMetrics(cardioSessions[0]!).join(' · ')}` : cardioSessions.length ? `有氧训练 · ${cardioSessions.length} 次 · 共 ${formatNumber(cardioMinutes)} 分钟` : '今天还没有有氧训练'}</span></div><button class="primary full-btn" id="today-workout">${openWorkout ? '继续力量训练' : '查看训练'}</button></section>
     <section class="today-card today-activity-card weight-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon weight-icon">${icon('scale', 19)}</span><h2>体重</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 15)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(weightState.status)}</strong><span class="today-activity-meta">${esc(weightState.meta)}</span></div><button class="secondary today-activity-action" id="today-record-weight">${esc(weightState.action)}</button></div></section>
@@ -408,6 +449,7 @@ async function renderTodayPage(): Promise<void> {
   view.querySelector('#today-record-weight')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; weightDate = today; void render().then(() => showWeightForm(today, weights.find((item) => item.date === today)?.weightKg)).catch(fail) })
   view.querySelector('#today-pelvic')?.addEventListener('click', () => { workoutDate = today; void showPelvicFloorSetup().catch(fail) })
   view.querySelector('#today-pelvic-history')?.addEventListener('click', () => void showPelvicFloorHistory())
+  bindTodayPlanCard(view)
   bindTodayHabitCard(view, today)
 }
 
@@ -541,8 +583,195 @@ async function renderReportsPage(): Promise<void> {
   }
 }
 
-async function renderMorePage(): Promise<void> {
+const taskToggleQueue = new Map<string, Promise<void>>()
+
+function taskRowHtml(task: Task, tags: Map<string, TaskTag>): string {
+  const visibleTags = task.tagIds.map((id) => tags.get(id)).filter((tag): tag is TaskTag => Boolean(tag))
+  const time = task.startTime ? `${task.startTime}${task.endTime ? `–${task.endTime}` : ''}` : ''
+  return `<div class="plan-task-row${task.completedAt ? ' is-complete' : ''}"><button type="button" class="plan-task-check" data-task-complete="${esc(task.id)}" aria-pressed="${Boolean(task.completedAt)}" aria-label="${task.completedAt ? '撤销完成' : '完成'} ${esc(task.title)}"><span aria-hidden="true">${icon('check', 16)}</span></button><button type="button" class="plan-task-main" data-task-edit="${esc(task.id)}" aria-label="编辑 ${esc(task.title)}"><span class="plan-task-copy"><strong>${esc(task.title)}</strong>${visibleTags.length || task.note ? `<small>${visibleTags.slice(0, 2).map((tag) => `<span class="plan-tag-chip">#${esc(tag.name)}</span>`).join('')}${visibleTags.length > 2 ? `<span class="plan-tag-overflow">+${visibleTags.length - 2}</span>` : ''}${task.note ? '<span class="plan-note-meta">有备注</span>' : ''}</small>` : ''}</span>${time ? `<time>${esc(time)}</time>` : ''}${icon('chevron', 16)}</button></div>`
+}
+
+function taskGroupHtml(tasks: Task[], tags: Map<string, TaskTag>): string {
+  return `<div class="plan-task-group">${tasks.map((task) => taskRowHtml(task, tags)).join('')}</div>`
+}
+
+function bindTaskRows(root: ParentNode, afterChange: (task: Task) => Promise<void>): void {
+  root.querySelectorAll<HTMLButtonElement>('[data-task-complete]').forEach((button) => button.addEventListener('click', () => {
+    const id = button.dataset.taskComplete!
+    const previous = taskToggleQueue.get(id) ?? Promise.resolve()
+    const next = previous.catch(() => {}).then(async () => { const task = await toggleTaskCompletion(id); await afterChange(task) }).catch(fail)
+    taskToggleQueue.set(id, next)
+    void next.finally(() => { if (taskToggleQueue.get(id) === next) taskToggleQueue.delete(id) })
+  }))
+  root.querySelectorAll<HTMLButtonElement>('[data-task-edit]').forEach((button) => button.addEventListener('click', async () => {
+    try { const task = await db.tasks.get(button.dataset.taskEdit!); if (task) await showTaskEditor(task) } catch (error) { fail(error) }
+  }))
+}
+
+function planDateHeading(date: string, today: string): string {
+  const value = new Date(`${date}T12:00:00`)
+  const monthDay = new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric' }).format(value)
+  const weekday = new Intl.DateTimeFormat('zh-CN', { weekday: 'long' }).format(value)
+  const year = date.slice(0, 4) === today.slice(0, 4) ? '' : `${date.slice(0, 4)}年`
+  return `${date === shiftLocalDate(today, 1) ? '明天 · ' : ''}${year}${monthDay} · ${weekday}`
+}
+
+async function renderPlanPage(): Promise<void> {
+  const today = getLocalDateString()
+  const [tasks, allTags] = await Promise.all([
+    planView === 'today' ? getTasksByDate(today) : planView === 'upcoming' ? getUpcomingTasks(today) : getInboxTasks(),
+    getTaskTags(),
+  ])
+  if (activeTab !== 'plan') return
+  if (planTagFilterId && !allTags.some((tag) => tag.id === planTagFilterId)) planTagFilterId = undefined
+  const filtered = sortTasksForPlan(planTagFilterId ? tasks.filter((task) => task.tagIds.includes(planTagFilterId!)) : tasks)
+  const tags = new Map(allTags.map((tag) => [tag.id, tag]))
+  const currentFilter = allTags.find((tag) => tag.id === planTagFilterId)
   const view = document.querySelector<HTMLElement>('#view')!
+  let content = ''
+  if (planView === 'today' || planView === 'inbox') {
+    const pending = filtered.filter((task) => !task.completedAt)
+    const complete = filtered.filter((task) => task.completedAt)
+    if (planView === 'today') {
+      const timed = pending.filter((task) => task.startTime)
+      const untimed = pending.filter((task) => !task.startTime)
+      content = `<p class="plan-date-label">${esc(planDateHeading(today, today))}</p>${timed.length ? `<section class="plan-list-section"><h3>时间安排</h3>${taskGroupHtml(timed, tags)}</section>` : ''}${untimed.length ? `<section class="plan-list-section"><h3>待办</h3>${taskGroupHtml(untimed, tags)}</section>` : ''}`
+    } else content = `<p class="plan-date-label">未安排日期的任务</p>${pending.length ? `<section class="plan-list-section"><h3>收件箱</h3>${taskGroupHtml(pending, tags)}</section>` : ''}`
+    if (!pending.length && !complete.length) content += `<div class="plan-empty"><strong>${planView === 'today' ? '今天还没有安排' : '收件箱是空的'}</strong><span>${planView === 'today' ? '有需要时随手记下来。' : '想到的事情可以先放在这里。'}</span><button type="button" class="secondary" id="plan-empty-add">添加任务</button></div>`
+    if (complete.length) content += `<details id="plan-completed" class="plan-completed" ${planCompletedOpen ? 'open' : ''}><summary>已完成 ${complete.length} 项</summary>${taskGroupHtml(complete, tags)}</details>`
+  } else {
+    const groups = new Map<string, Task[]>()
+    for (const task of filtered) { const date = task.date!; const group = groups.get(date) ?? []; group.push(task); groups.set(date, group) }
+    content = groups.size ? [...groups].sort(([a], [b]) => a.localeCompare(b)).map(([date, group]) => `<section class="plan-list-section"><h3>${esc(planDateHeading(date, today))}</h3>${taskGroupHtml(sortTasksForPlan(group), tags)}</section>`).join('') : '<div class="plan-empty"><strong>近期没有安排</strong><span>有日期的未来任务会出现在这里。</span><button type="button" class="secondary" id="plan-empty-add">添加任务</button></div>'
+  }
+  view.innerHTML = `<div class="plan-page"><div class="plan-tabs" role="tablist" aria-label="计划视图"><button role="tab" data-plan-view="today" aria-selected="${planView === 'today'}" class="${planView === 'today' ? 'active' : ''}">今天</button><button role="tab" data-plan-view="upcoming" aria-selected="${planView === 'upcoming'}" class="${planView === 'upcoming' ? 'active' : ''}">近期</button><button role="tab" data-plan-view="inbox" aria-selected="${planView === 'inbox'}" class="${planView === 'inbox' ? 'active' : ''}">收件箱</button></div><div class="plan-filter-row"><button type="button" id="plan-tag-filter" class="plan-filter-button">${currentFilter ? `#${esc(currentFilter.name)} ×` : '# 标签'}</button></div>${content}</div>`
+  view.querySelectorAll<HTMLButtonElement>('[data-plan-view]').forEach((button) => button.addEventListener('click', () => { planView = button.dataset.planView as PlanView; void renderPlanPage().catch(fail) }))
+  view.querySelector('#plan-tag-filter')?.addEventListener('click', () => void showTaskTagFilter())
+  view.querySelector('#plan-empty-add')?.addEventListener('click', () => void showTaskEditor(undefined, planView === 'today' ? today : undefined))
+  view.querySelector<HTMLDetailsElement>('#plan-completed')?.addEventListener('toggle', (event) => { planCompletedOpen = (event.currentTarget as HTMLDetailsElement).open })
+  bindTaskRows(view, (task) => { if (task.completedAt) planCompletedOpen = true; return renderPlanPage() })
+}
+
+async function showTaskTagFilter(): Promise<void> {
+  const tags = await getTaskTags()
+  const dialog = openModal('标签', `<div class="plan-tag-picker"><button type="button" data-filter-tag="" class="${planTagFilterId ? '' : 'selected'}">全部</button>${tags.map((tag) => `<button type="button" data-filter-tag="${esc(tag.id)}" class="${planTagFilterId === tag.id ? 'selected' : ''}">#${esc(tag.name)}</button>`).join('')}<button type="button" id="plan-manage-tags" class="plan-manage-tags">管理标签 ${icon('chevron', 16)}</button></div>`)
+  dialog.querySelectorAll<HTMLButtonElement>('[data-filter-tag]').forEach((button) => button.addEventListener('click', () => { planTagFilterId = button.dataset.filterTag || undefined; dialog.close(); void renderPlanPage().catch(fail) }))
+  dialog.querySelector('#plan-manage-tags')?.addEventListener('click', () => void showTaskTagManager())
+}
+
+async function showTaskTagManager(): Promise<void> {
+  const dialog = openModal('标签管理', '<div id="task-tag-manager"></div>')
+  const body = dialog.querySelector<HTMLElement>('#task-tag-manager')!
+  const setContent = (title: string, html: string) => { dialog.querySelector('h2')!.textContent = title; body.innerHTML = html; dialog.querySelector('.modal-body')!.scrollTop = 0 }
+  const manager = async () => {
+    const tags = await getTaskTags()
+    if (!dialog.isConnected) return
+    setContent('标签管理', `<div class="task-tag-manager"><div class="task-tag-manager-toolbar"><span>${tags.length} 个标签</span><button type="button" class="text-btn" id="task-tag-new">+ 新建</button></div>${tags.length ? `<div class="task-tag-manager-list">${tags.map((tag) => `<button type="button" data-edit-tag="${esc(tag.id)}"><span>#${esc(tag.name)}</span>${icon('chevron', 16)}</button>`).join('')}</div>` : '<p class="plan-tag-empty">还没有标签。可以在任务标题中输入 # 创建。</p>'}</div>`)
+    body.querySelector('#task-tag-new')?.addEventListener('click', () => editor())
+    body.querySelectorAll<HTMLButtonElement>('[data-edit-tag]').forEach((button) => button.addEventListener('click', () => editor(tags.find((tag) => tag.id === button.dataset.editTag))))
+  }
+  const editor = (tag?: TaskTag) => {
+    setContent(tag ? '编辑标签' : '新建标签', `<form id="task-tag-form" class="task-tag-editor"><button type="button" class="plan-quiet-back" id="task-tag-back">‹ 标签管理</button><label>名称<input name="name" maxlength="24" value="${esc(tag?.name ?? '')}" placeholder="例如：旅行" required autocomplete="off"></label><p class="task-tag-preview">预览：<strong id="task-tag-preview">${tag ? `#${esc(tag.name)}` : '#'}</strong></p><button type="submit" class="primary full-btn">保存标签</button>${tag ? '<button type="button" class="plan-quiet-danger" id="task-tag-delete">删除标签</button>' : ''}</form>`)
+    body.querySelector('#task-tag-back')?.addEventListener('click', () => void manager())
+    const input = body.querySelector<HTMLInputElement>('[name="name"]')!
+    input.addEventListener('input', () => { body.querySelector('#task-tag-preview')!.textContent = `#${input.value.trim()}` })
+    body.querySelector<HTMLFormElement>('#task-tag-form')!.addEventListener('submit', async (event) => {
+      event.preventDefault()
+      try { if (tag) await updateTaskTag(tag.id, input.value); else await createTaskTag(input.value); await manager(); if (activeTab === 'plan') await renderPlanPage() } catch (error) { fail(error) }
+    })
+    body.querySelector('#task-tag-delete')?.addEventListener('click', async () => {
+      if (!tag) return
+      const count = await getTaskTagUsageCount(tag.id)
+      if (!await confirmAction(`删除 #${tag.name}？`, count ? `这个标签会从 ${count} 条任务中移除，任务本身不会被删除。` : '删除后无法恢复。', '删除标签')) return
+      try { await deleteTaskTag(tag.id); if (planTagFilterId === tag.id) planTagFilterId = undefined; await manager(); if (activeTab === 'plan') await renderPlanPage() } catch (error) { fail(error) }
+    })
+  }
+  await manager()
+}
+
+async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> {
+  const allTags = await getTaskTags()
+  const selectedTagIds = [...(task?.tagIds ?? [])]
+  const dialog = openModal(task ? '编辑任务' : '新建任务', `<form id="task-form" class="task-editor"><label class="task-title-field">任务<input name="title" maxlength="120" value="${esc(task?.title ?? '')}" placeholder="要做什么？" required autocomplete="off" aria-expanded="false" aria-controls="task-tag-suggestions"></label><div id="task-tag-suggestions" class="task-tag-suggestions" role="listbox" hidden></div><div id="task-selected-tags" class="task-selected-tags"></div><section class="task-editor-section"><h3>日期</h3><div class="task-date-choices"><button type="button" data-task-date="today">今天</button><button type="button" data-task-date="tomorrow">明天</button><button type="button" data-task-date="none">无日期</button></div><label class="task-date-field">选择日期<input type="date" name="date" value="${esc(task?.date ?? defaultDate ?? '')}"></label></section><section class="task-editor-section" id="task-time-section"><h3>时间（可选）</h3><div class="task-time-fields"><label>开始时间<input type="time" name="startTime" value="${esc(task?.startTime ?? '')}"></label><label>结束时间<input type="time" name="endTime" value="${esc(task?.endTime ?? '')}"></label></div><p class="task-inline-error" id="task-time-error" role="alert" hidden>结束时间必须晚于开始时间</p></section><label class="task-note-field">备注（可选）<textarea name="note" maxlength="2000" rows="3" placeholder="补充一点细节">${esc(task?.note ?? '')}</textarea></label><div class="task-editor-actions"><button type="submit" class="primary full-btn">保存任务</button></div>${task ? '<button type="button" class="plan-quiet-danger" id="task-delete">删除任务</button>' : ''}</form>`)
+  dialog.classList.add('task-editor-sheet')
+  const form = dialog.querySelector<HTMLFormElement>('#task-form')!
+  const title = form.querySelector<HTMLInputElement>('[name="title"]')!
+  const suggestions = form.querySelector<HTMLElement>('#task-tag-suggestions')!
+  const chips = form.querySelector<HTMLElement>('#task-selected-tags')!
+  const dateInput = form.querySelector<HTMLInputElement>('[name="date"]')!
+  const startInput = form.querySelector<HTMLInputElement>('[name="startTime"]')!
+  const endInput = form.querySelector<HTMLInputElement>('[name="endTime"]')!
+  let activeQuery: ActiveHashtagQuery | undefined
+  let composing = false
+  let pendingTagCreation: Promise<void> | undefined
+  const renderChips = () => {
+    chips.innerHTML = selectedTagIds.map((id) => { const tag = allTags.find((item) => item.id === id); return tag ? `<button type="button" data-remove-task-tag="${esc(id)}" aria-label="移除标签 ${esc(tag.name)}">#${esc(tag.name)} <span aria-hidden="true">×</span></button>` : '' }).join('')
+    chips.hidden = !selectedTagIds.length
+    chips.querySelectorAll<HTMLButtonElement>('[data-remove-task-tag]').forEach((button) => button.addEventListener('click', () => { selectedTagIds.splice(selectedTagIds.indexOf(button.dataset.removeTaskTag!), 1); renderChips(); updateSuggestions() }))
+  }
+  const applyTag = (tag: TaskTag) => {
+    if (!selectedTagIds.includes(tag.id)) selectedTagIds.push(tag.id)
+    if (activeQuery) { const replacement = replaceActiveHashtagQuery(title.value, activeQuery); title.value = replacement.text; title.focus(); title.setSelectionRange(replacement.caret, replacement.caret) }
+    activeQuery = undefined; suggestions.hidden = true; title.setAttribute('aria-expanded', 'false'); renderChips()
+  }
+  const updateSuggestions = () => {
+    activeQuery = composing ? undefined : findActiveHashtagQuery(title.value, title.selectionStart ?? title.value.length)
+    if (!activeQuery) { suggestions.hidden = true; title.setAttribute('aria-expanded', 'false'); return }
+    const normalized = normalizeTaskTagName(activeQuery.query)
+    const matches = allTags.filter((tag) => tag.normalizedName.startsWith(normalized) && !selectedTagIds.includes(tag.id))
+    const exact = allTags.some((tag) => tag.normalizedName === normalized)
+    let canCreate = false
+    if (activeQuery.query && !exact) { try { validateTaskTagName(activeQuery.query); canCreate = true } catch { /* literal hashtag text remains ordinary title */ } }
+    suggestions.innerHTML = `${matches.map((tag) => `<button type="button" role="option" data-task-tag="${esc(tag.id)}">#${esc(tag.name)}</button>`).join('')}${canCreate ? `<button type="button" role="option" id="task-create-tag">+ 创建标签「${esc(activeQuery.query)}」</button>` : ''}`
+    suggestions.hidden = !matches.length && !canCreate
+    title.setAttribute('aria-expanded', String(!suggestions.hidden))
+    suggestions.querySelectorAll<HTMLButtonElement>('[data-task-tag]').forEach((button) => button.addEventListener('click', () => { const tag = allTags.find((item) => item.id === button.dataset.taskTag); if (tag) applyTag(tag) }))
+    suggestions.querySelector('#task-create-tag')?.addEventListener('click', () => {
+      if (!activeQuery) return
+      const query = activeQuery
+      pendingTagCreation = createTaskTag(query.query).then((tag) => { allTags.push(tag); activeQuery = query; applyTag(tag) }).catch(fail)
+    })
+  }
+  title.addEventListener('compositionstart', () => { composing = true; suggestions.hidden = true; title.setAttribute('aria-expanded', 'false') })
+  title.addEventListener('compositionend', () => { composing = false; updateSuggestions() })
+  title.addEventListener('input', (event) => { if (!composing && !event.isComposing) updateSuggestions() })
+  title.addEventListener('click', updateSuggestions)
+  title.addEventListener('keyup', (event) => { if (!event.isComposing) updateSuggestions() })
+  renderChips()
+  const updateDateControls = () => {
+    const date = dateInput.value
+    form.querySelectorAll<HTMLButtonElement>('[data-task-date]').forEach((button) => { const value = button.dataset.taskDate === 'today' ? getLocalDateString() : button.dataset.taskDate === 'tomorrow' ? shiftLocalDate(getLocalDateString(), 1) : ''; button.classList.toggle('active', value === date) })
+    form.querySelector<HTMLElement>('#task-time-section')!.hidden = !date
+    if (!date) { startInput.value = ''; endInput.value = '' }
+    endInput.disabled = !startInput.value
+    if (!startInput.value) endInput.value = ''
+    const invalid = Boolean(startInput.value && endInput.value && endInput.value <= startInput.value)
+    endInput.setCustomValidity(invalid ? '结束时间必须晚于开始时间' : '')
+    form.querySelector<HTMLElement>('#task-time-error')!.hidden = !invalid
+  }
+  form.querySelectorAll<HTMLButtonElement>('[data-task-date]').forEach((button) => button.addEventListener('click', () => { dateInput.value = button.dataset.taskDate === 'today' ? getLocalDateString() : button.dataset.taskDate === 'tomorrow' ? shiftLocalDate(getLocalDateString(), 1) : ''; updateDateControls() }))
+  dateInput.addEventListener('change', updateDateControls)
+  startInput.addEventListener('change', updateDateControls)
+  endInput.addEventListener('change', updateDateControls)
+  updateDateControls()
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault()
+    if (pendingTagCreation) await pendingTagCreation
+    if (!form.reportValidity()) return
+    const values = new FormData(form)
+    const input = { title: valueOf(values, 'title'), note: valueOf(values, 'note'), date: valueOf(values, 'date') || undefined, startTime: valueOf(values, 'startTime') || undefined, endTime: valueOf(values, 'endTime') || undefined, tagIds: [...selectedTagIds] }
+    try { if (task) await updateTask(task.id, input); else await createTask(input); dialog.close(); if (activeTab === 'plan') await renderPlanPage(); else await refreshTodayPlanCard() } catch (error) { fail(error) }
+  })
+  form.querySelector('#task-delete')?.addEventListener('click', async () => {
+    if (!task || !await confirmAction('删除这个任务？', '删除后无法恢复。', '删除任务')) return
+    try { await deleteTask(task.id); dialog.close(); if (activeTab === 'plan') await renderPlanPage(); else await refreshTodayPlanCard() } catch (error) { fail(error) }
+  })
+  window.requestAnimationFrame(() => { if (dialog.isConnected) title.focus() })
+}
+
+function showManagementHub(): void {
+  const dialog = openModal('管理与设置', '<div id="management-hub"></div>')
+  const view = dialog.querySelector<HTMLElement>('#management-hub')!
   const row = (id: string, iconName: IconName, title: string, detail: string) => `<button id="${id}"><span class="setting-icon">${icon(iconName, 18)}</span><span><strong>${title}</strong><small>${detail}</small></span>${icon('chevron', 17)}</button>`
   view.innerHTML = `<section class="settings-section"><h3>数据管理</h3><div class="settings-group">${row('more-food-library', 'utensils', '食物库', '管理食物与营养数据')}${row('more-exercise-library', 'dumbbell', '动作库', '管理力量训练动作')}${row('more-workout-templates', 'activity', '训练模板', '快速创建常用训练')}${row('more-diet-templates', 'archive', '饮食模板', '保存常用食物组合')}${row('more-habits', 'leaf', '习惯', '创建、排序与停用打卡习惯')}</div></section><section class="settings-section"><h3>训练</h3><div class="settings-group">${row('more-pelvic', 'leaf', '凯格尔训练', '开始计时或查看历史')}</div></section><section class="settings-section"><h3>数据</h3><div class="settings-group">${row('more-import', 'upload', '导入数据', '从表格或数据文件导入食物')}${row('more-backup', 'download', '备份与恢复', '导出或恢复完整本地数据')}</div></section><section class="settings-section"><h3>应用</h3><div class="settings-group">${row('more-about', 'info', '应用信息', 'FitLog Lite · 本地优先')}</div></section><div class="data-safety"><div class="setting-icon">${icon('archive', 18)}</div><div><strong>你的数据只保存在当前设备</strong><p>清除浏览器数据或更换设备前，请先导出完整备份。</p></div></div>`
   view.querySelector('#more-food-library')?.addEventListener('click', () => void showFoodLibrary())
