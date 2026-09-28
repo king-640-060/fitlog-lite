@@ -37,7 +37,6 @@ import { groupFoodLogs, isMealType, mealNames, mealTypes, type FoodMealGroup } f
 import { formatShortDate, getLocalDateString, shiftLocalDate } from './utils/date'
 import { findActiveHashtagQuery, normalizeTaskTagName, replaceActiveHashtagQuery, validateTaskTagName, type ActiveHashtagQuery } from './utils/taskTags'
 import { calculateNutrition, formatNumber } from './utils/nutrition'
-import { buildRecentActivity, type RecentActivityKind } from './utils/recentActivity'
 import { cardioActivityDefinitions, formatCardioMetrics, getCardioActivityLabel, getCardioActivityType } from './utils/cardio'
 import { getReportRange, shiftReportPeriod, type ReportMode, type ReportResult } from './utils/reporting'
 import { getTodayPelvicState, getTodayWeightState } from './utils/todayActivity'
@@ -46,13 +45,13 @@ Chart.register(...registerables)
 registerSW({ immediate: true })
 
 type Tab = 'today' | 'plan' | 'food' | 'workout' | 'progress'
-type ProgressView = 'overview' | 'trend' | 'calendar' | 'reports'
+type ProgressView = 'trend' | 'calendar' | 'reports'
 type PlanView = 'today' | 'upcoming' | 'inbox'
 let activeTab: Tab = 'today'
 let planView: PlanView = 'today'
 let planTagFilterId: string | undefined
 let planCompletedOpen = false
-let progressView: ProgressView = 'overview'
+let progressView: ProgressView = 'trend'
 let calendarSelectedDate = getLocalDateString()
 let calendarYear = new Date().getFullYear()
 let calendarMonth = new Date().getMonth()
@@ -264,17 +263,6 @@ async function render(): Promise<void> {
   if (activeTab === 'progress') await renderProgressPage()
 }
 
-function miniTrendSvg(values: number[]): string {
-  if (!values.length) return ''
-  const width = 280
-  const height = 70
-  const min = Math.min(...values)
-  const max = Math.max(...values)
-  const spread = max - min || 1
-  const points = values.map((value, index) => `${values.length === 1 ? width / 2 : index / (values.length - 1) * width},${height - 8 - (value - min) / spread * (height - 16)}`).join(' ')
-  return `<svg class="mini-trend" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="近期体重趋势"><polyline points="${points}"/></svg>`
-}
-
 const habitToggleQueue = new Map<string, Promise<void>>()
 
 function todayHabitCardHtml(habits: Habit[], checkIns: HabitCheckIn[], date: string): string {
@@ -454,7 +442,7 @@ async function renderTodayPage(): Promise<void> {
 }
 
 function progressTabsHtml(): string {
-  return `<div class="page-tabs" role="tablist" aria-label="进度视图"><button role="tab" data-progress-view="overview" class="${progressView === 'overview' ? 'active' : ''}" aria-selected="${progressView === 'overview'}">概览</button><button role="tab" data-progress-view="trend" class="${progressView === 'trend' ? 'active' : ''}" aria-selected="${progressView === 'trend'}">趋势</button><button role="tab" data-progress-view="calendar" class="${progressView === 'calendar' ? 'active' : ''}" aria-selected="${progressView === 'calendar'}">日历</button><button role="tab" data-progress-view="reports" class="${progressView === 'reports' ? 'active' : ''}" aria-selected="${progressView === 'reports'}">报告</button></div>`
+  return `<div class="page-tabs" role="tablist" aria-label="进度视图"><button role="tab" data-progress-view="trend" class="${progressView === 'trend' ? 'active' : ''}" aria-selected="${progressView === 'trend'}">趋势</button><button role="tab" data-progress-view="calendar" class="${progressView === 'calendar' ? 'active' : ''}" aria-selected="${progressView === 'calendar'}">日历</button><button role="tab" data-progress-view="reports" class="${progressView === 'reports' ? 'active' : ''}" aria-selected="${progressView === 'reports'}">报告</button></div>`
 }
 
 function bindProgressTabs(root: ParentNode = document): void {
@@ -465,34 +453,9 @@ function bindProgressTabs(root: ParentNode = document): void {
 }
 
 async function renderProgressPage(): Promise<void> {
-  if (progressView === 'reports') { await renderReportsPage(); return }
   if (progressView === 'trend') { await renderWeightPage(true); return }
   if (progressView === 'calendar') { await renderCalendarOverview(true); return }
-  const now = new Date()
-  const today = getLocalDateString(now)
-  const summaries = await loadMonthSummaries(now.getFullYear(), now.getMonth())
-  const monthValues = [...summaries.values()]
-  const [weights, recentFoodLogs, recentWorkouts, recentPelvicSessions] = await Promise.all([
-    db.weights.orderBy('date').reverse().toArray(),
-    db.foodLogs.where('date').belowOrEqual(today).toArray(),
-    db.workouts.where('date').belowOrEqual(today).toArray(),
-    db.pelvicFloorSessions.where('date').belowOrEqual(today).toArray(),
-  ])
-  const latest = weights[0]
-  const monthWeights = monthValues.filter((summary) => summary.weightKg !== undefined)
-  const workouts = monthValues.reduce((total, summary) => total + summary.workoutCount, 0)
-  const foodDays = monthValues.filter((summary) => summary.foodLogCount > 0).length
-  const pelvicSessions = monthValues.reduce((total, summary) => total + summary.pelvicFloorSessionCount, 0)
-  const recent = buildRecentActivity({ foodLogs: recentFoodLogs, workouts: recentWorkouts, pelvicFloorSessions: recentPelvicSessions, weights }, today)
-  const activityIcon: Record<RecentActivityKind, IconName> = { food: 'utensils', workout: 'dumbbell', pelvic: 'leaf', weight: 'scale' }
-  const recentHtml = recent.length
-    ? `<div class="recent-activity-list">${recent.map((item) => `<article class="recent-activity-row"><span class="stat-icon ${item.kind === 'food' ? 'nutrition' : item.kind === 'pelvic' ? 'pelvic' : item.kind}-icon">${icon(activityIcon[item.kind], 17)}</span><span class="recent-activity-copy"><strong>${esc(item.title)}</strong><small>${esc(item.detail)}</small></span><time datetime="${item.date}">${formatShortDate(item.date)}</time></article>`).join('')}</div>`
-    : '<div class="recent-activity-empty">还没有最近记录，开始记录后会在这里看到变化。</div>'
-  const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `${progressTabsHtml()}<section class="progress-hero today-card"><div class="card-heading"><div><span class="card-icon weight-icon">${icon('trend', 19)}</span><h2>体重趋势</h2></div><button class="text-btn" data-open-trend>查看详情 ${icon('chevron', 15)}</button></div>${latest ? `<div class="weight-today-value"><strong>${formatNumber(latest.weightKg)}</strong><span>kg</span><small>最近记录 · ${formatShortDate(latest.date)}</small></div>${weights.length > 1 ? miniTrendSvg(weights.slice(0, 12).reverse().map((item) => item.weightKg)) : ''}` : '<div class="today-card-copy"><strong>暂无体重记录</strong><span>记录后将在这里显示趋势</span></div>'}</section><section><div class="section-head"><div><h2>本月概览</h2><span>${now.getMonth() + 1} 月的记录</span></div></div><div class="stat-grid"><article><span class="stat-icon workout-icon">${icon('dumbbell', 18)}</span><strong data-count-integer data-count-from="0" data-count-to="${workouts}">0</strong><small>力量训练</small></article><article><span class="stat-icon nutrition-icon">${icon('utensils', 18)}</span><strong data-count-integer data-count-from="0" data-count-to="${foodDays}">0</strong><small>饮食记录天数</small></article><article><span class="stat-icon pelvic-icon">${icon('leaf', 18)}</span><strong data-count-integer data-count-from="0" data-count-to="${pelvicSessions}">0</strong><small>凯格尔训练</small></article><article><span class="stat-icon weight-icon">${icon('scale', 18)}</span><strong data-count-integer data-count-from="0" data-count-to="${monthWeights.length}">0</strong><small>体重记录</small></article></div></section><section class="recent-activity-section"><div class="section-head"><div><h2>最近活动</h2><span>来自你的真实记录</span></div></div>${recentHtml}</section>`
-  animateNutritionNumber(view, 420)
-  bindProgressTabs(view)
-  view.querySelector('[data-open-trend]')?.addEventListener('click', () => { progressView = 'trend'; void render().catch(fail) })
+  await renderReportsPage()
 }
 
 function reportDateLabel(date: string): string {
@@ -789,17 +752,8 @@ function showManagementHub(): void {
 
 async function renderCalendarOverview(withProgressTabs = false): Promise<void> {
   const summaries = await loadMonthSummaries(calendarYear, calendarMonth)
-  const recordedDays = [...summaries.values()].filter(hasDayRecords).length
-  const workoutCount = [...summaries.values()].reduce((total, summary) => total + summary.workoutCount, 0)
-  const cardioCount = [...summaries.values()].reduce((total, summary) => total + summary.cardioCount, 0)
-  const calorieDays = [...summaries.values()].filter((summary) => summary.foodLogCount > 0)
-  const targetDays = calorieDays.filter((summary) => summary.nutritionTarget?.calories !== undefined)
-  const averageCalories = calorieDays.length ? calorieDays.reduce((total, summary) => total + (summary.calories ?? 0), 0) / calorieDays.length : 0
-  const achievedDays = targetDays.filter((summary) => (summary.calories ?? 0) <= summary.nutritionTarget!.calories!).length
-  const nutritionSummary = targetDays.length ? `${achievedDays} / ${targetDays.length}` : formatNumber(averageCalories)
-  const nutritionLabel = targetDays.length ? '热量目标内' : '平均 kcal'
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `${withProgressTabs ? progressTabsHtml() : ''}<section class="calendar-overview-head"><button class="icon-btn quiet calendar-prev" id="calendar-prev" aria-label="上个月">${icon('chevron', 20)}</button><div><strong>${calendarYear}年 ${calendarMonth + 1}月</strong><button class="text-btn" id="calendar-today">回到今天</button></div><button class="icon-btn quiet" id="calendar-next" aria-label="下个月">${icon('chevron', 20)}</button></section><div id="calendar-host"></div><section class="calendar-legend" aria-label="日历标记说明">${calendarCategories.map((category) => `<span class="calendar-legend-item"><i class="calendar-legend-icon calendar-category-${category}" aria-hidden="true">${icon(calendarCategoryIcons[category], 14)}</i><span>${calendarLegendLabels[category]}</span></span>`).join('')}</section><section class="calendar-month-summary"><div><strong>${recordedDays}</strong><span>有记录天数</span></div><div><strong>${workoutCount}</strong><span>力量训练</span></div><div><strong>${cardioCount}</strong><span>有氧训练</span></div><div><strong>${nutritionSummary}</strong><span>${nutritionLabel}</span></div></section>`
+  view.innerHTML = `${withProgressTabs ? progressTabsHtml() : ''}<section class="calendar-overview-head"><button class="icon-btn quiet calendar-prev" id="calendar-prev" aria-label="上个月">${icon('chevron', 20)}</button><div><strong>${calendarYear}年 ${calendarMonth + 1}月</strong><button class="text-btn" id="calendar-today">回到今天</button></div><button class="icon-btn quiet" id="calendar-next" aria-label="下个月">${icon('chevron', 20)}</button></section><div id="calendar-host"></div><section class="calendar-legend" aria-label="日历标记说明">${calendarCategories.map((category) => `<span class="calendar-legend-item"><i class="calendar-legend-icon calendar-category-${category}" aria-hidden="true">${icon(calendarCategoryIcons[category], 14)}</i><span>${calendarLegendLabels[category]}</span></span>`).join('')}</section>`
   if (withProgressTabs) bindProgressTabs(view)
   const host = view.querySelector<HTMLElement>('#calendar-host')!
   host.append(renderMonthCalendar({
