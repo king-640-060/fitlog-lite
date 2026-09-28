@@ -572,6 +572,10 @@ fieldset { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--borde
 .data-safety > div:last-child { min-width: 0; }
 .data-safety strong { display: block; font-size: .88rem; }
 .data-safety p { margin: 7px 0 0; color: var(--text-secondary); font-size: .77rem; }
+.management-local-note { display: flex; align-items: flex-start; gap: 9px; padding: 11px 6px 0; color: var(--text-secondary); }
+.management-local-note > span { flex: 0 0 auto; margin-top: 2px; }
+.management-local-note p { margin: 0; font-size: .77rem; line-height: 1.45; }
+.management-local-note strong { display: block; font-weight: 650; }
 .restore-counts { display: grid; gap: 4px; margin-bottom: 16px; }
 .restore-counts p { display: flex; justify-content: space-between; margin: 0; padding: 9px 2px; border-bottom: 1px solid var(--divider); }
 .warning { margin: 16px 0; padding: 13px; border-radius: 13px; background: var(--danger-soft); color: var(--danger); font-size: .88rem; line-height: 1.5; }
