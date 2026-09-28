@@ -1,13 +1,15 @@
-import type { BackupData, BackupDataV6 } from '../db/types'
+import type { BackupData, BackupDataV7 } from '../db/types'
 import { db, type FitLogDatabase } from '../db/database'
 import { isMealType } from '../utils/foodMeals'
 import { getCardioActivityType } from '../utils/cardio'
+import { normalizeTaskTagName, validateTaskTagName } from '../utils/taskTags'
+import { validateTaskInput } from './taskService'
 
 type UnknownRecord = Record<string, unknown>
 
 const storeLabels = {
   foods: '食物', foodLogs: '饮食记录', exercises: '动作', workouts: '训练记录', weights: '体重记录',
-  workoutTemplates: '训练模板', dietTemplates: '饮食模板', nutritionTargets: '营养目标', pelvicFloorSessions: '凯格尔训练', cardioSessions: '有氧训练', habits: '习惯', habitCheckIns: '习惯打卡',
+  workoutTemplates: '训练模板', dietTemplates: '饮食模板', nutritionTargets: '营养目标', pelvicFloorSessions: '凯格尔训练', cardioSessions: '有氧训练', habits: '习惯', habitCheckIns: '习惯打卡', tasks: '任务', taskTags: '标签',
 } as const
 
 function objectValue(value: unknown, location: string): UnknownRecord {
@@ -327,17 +329,17 @@ function validateHabitCheckIn(record: UnknownRecord, index: number): string {
 
 export interface ValidatedBackup {
   app: 'FitLog Lite'
-  schemaVersion: 6
+  schemaVersion: 7
   exportedAt: string
-  data: BackupDataV6['data']
+  data: BackupDataV7['data']
 }
 
 export function validateBackup(value: unknown): ValidatedBackup {
   if (!value || typeof value !== 'object') throw new Error('备份文件格式不正确')
   const backup = value as Partial<BackupData>
-  if (backup.app !== 'FitLog Lite' || (backup.schemaVersion !== 1 && backup.schemaVersion !== 2 && backup.schemaVersion !== 3 && backup.schemaVersion !== 4 && backup.schemaVersion !== 5 && backup.schemaVersion !== 6)) throw new Error('不是兼容的 FitLog Lite 备份')
+  if (backup.app !== 'FitLog Lite' || (backup.schemaVersion !== 1 && backup.schemaVersion !== 2 && backup.schemaVersion !== 3 && backup.schemaVersion !== 4 && backup.schemaVersion !== 5 && backup.schemaVersion !== 6 && backup.schemaVersion !== 7)) throw new Error('不是兼容的 FitLog Lite 备份')
   if (!backup.data || typeof backup.data !== 'object' || Array.isArray(backup.data)) throw new Error('备份 data 必须是 object')
-  const data = backup.data as Partial<BackupDataV6['data']>
+  const data = backup.data as Partial<BackupDataV7['data']>
   timestamp(backup.exportedAt, '备份 exportedAt')
   const keys = ['foods', 'foodLogs', 'exercises', 'workouts', 'weights'] as const
   for (const key of keys) if (!Array.isArray(backup.data[key])) throw new Error(`备份缺少 ${key} 数据`)
@@ -348,6 +350,8 @@ export function validateBackup(value: unknown): ValidatedBackup {
   const cardioSessions = backup.schemaVersion >= 4 ? data.cardioSessions : []
   const habits = backup.schemaVersion >= 6 ? data.habits : []
   const habitCheckIns = backup.schemaVersion >= 6 ? data.habitCheckIns : []
+  const tasks = backup.schemaVersion >= 7 ? data.tasks : []
+  const taskTags = backup.schemaVersion >= 7 ? data.taskTags : []
   if (!Array.isArray(workoutTemplates)) throw new Error('备份缺少 workoutTemplates 数据')
   if (!Array.isArray(dietTemplates)) throw new Error('备份缺少 dietTemplates 数据')
   if (!Array.isArray(nutritionTargets)) throw new Error('备份缺少 nutritionTargets 数据')
@@ -355,6 +359,8 @@ export function validateBackup(value: unknown): ValidatedBackup {
   if (!Array.isArray(cardioSessions)) throw new Error('备份缺少 cardioSessions 数据')
   if (!Array.isArray(habits)) throw new Error('备份缺少 habits 数据')
   if (!Array.isArray(habitCheckIns)) throw new Error('备份缺少 habitCheckIns 数据')
+  if (!Array.isArray(tasks)) throw new Error('备份缺少 tasks 数据')
+  if (!Array.isArray(taskTags)) throw new Error('备份缺少 taskTags 数据')
 
   const foods = validateIds(backup.data.foods, 'foods'); foods.forEach(validateFood)
   const foodLogs = validateIds(backup.data.foodLogs, 'foodLogs'); foodLogs.forEach(validateFoodLog)
@@ -390,20 +396,41 @@ export function validateBackup(value: unknown): ValidatedBackup {
     if (habitDates.has(key)) throw new Error(`习惯打卡第 ${index + 1} 项：habitId 和 date 重复`)
     habitDates.add(key)
   })
+  const checkedTags = validateIds(taskTags, 'taskTags')
+  const normalizedNames = new Set<string>()
+  checkedTags.forEach((record, index) => {
+    const location = `标签第 ${index + 1} 项`
+    let name: string
+    try { name = validateTaskTagName(record.name) } catch (error) { throw new Error(`${location} name：${error instanceof Error ? error.message : '不合法'}`) }
+    const normalizedName = normalizeTaskTagName(name)
+    if (record.normalizedName !== normalizedName) throw new Error(`${location} normalizedName：与名称不一致`)
+    if (normalizedNames.has(normalizedName)) throw new Error(`${location} normalizedName：重复`)
+    normalizedNames.add(normalizedName)
+    validateTimestamps(record, location)
+  })
+  const tagIds = new Set(checkedTags.map((tag) => String(tag.id)))
+  const checkedTasks = validateIds(tasks, 'tasks')
+  checkedTasks.forEach((record, index) => {
+    const location = `任务第 ${index + 1} 项`
+    try { validateTaskInput(record as unknown as Parameters<typeof validateTaskInput>[0]) } catch (error) { throw new Error(`${location}：${error instanceof Error ? error.message : '数据不合法'}`) }
+    for (const tagId of record.tagIds as string[]) if (!tagIds.has(tagId)) throw new Error(`${location} tagIds：引用了不存在的标签`)
+    if (record.completedAt !== undefined) timestamp(record.completedAt, `${location} completedAt`)
+    validateTimestamps(record, location)
+  })
   return {
-    app: 'FitLog Lite', schemaVersion: 6, exportedAt: backup.exportedAt!,
+    app: 'FitLog Lite', schemaVersion: 7, exportedAt: backup.exportedAt!,
     data: {
       foods: backup.data.foods, foodLogs: backup.data.foodLogs, exercises: backup.data.exercises,
       workouts: backup.data.workouts, weights: backup.data.weights,
       workoutTemplates, dietTemplates,
-      nutritionTargets, pelvicFloorSessions, cardioSessions, habits, habitCheckIns,
+      nutritionTargets, pelvicFloorSessions, cardioSessions, habits, habitCheckIns, tasks, taskTags,
     },
   } as ValidatedBackup
 }
 
-export async function exportBackup(database: FitLogDatabase = db): Promise<BackupDataV6> {
+export async function exportBackup(database: FitLogDatabase = db): Promise<BackupDataV7> {
   return {
-    app: 'FitLog Lite', schemaVersion: 6, exportedAt: new Date().toISOString(),
+    app: 'FitLog Lite', schemaVersion: 7, exportedAt: new Date().toISOString(),
     data: {
       foods: await database.foods.toArray(), foodLogs: await database.foodLogs.toArray(), exercises: await database.exercises.toArray(),
       workouts: await database.workouts.toArray(), weights: await database.weights.toArray(),
@@ -411,14 +438,15 @@ export async function exportBackup(database: FitLogDatabase = db): Promise<Backu
       nutritionTargets: await database.nutritionTargets.toArray(), pelvicFloorSessions: await database.pelvicFloorSessions.toArray(),
       cardioSessions: (await database.cardioSessions.toArray()).map((session) => ({ ...session, activityType: getCardioActivityType(session) })),
       habits: await database.habits.toArray(), habitCheckIns: await database.habitCheckIns.toArray(),
+      tasks: await database.tasks.toArray(), taskTags: await database.taskTags.toArray(),
     },
   }
 }
 
 export async function restoreBackup(backup: BackupData | unknown, database: FitLogDatabase = db): Promise<void> {
   const validated = validateBackup(backup)
-  await database.transaction('rw', [database.foods, database.foodLogs, database.exercises, database.workouts, database.weights, database.workoutTemplates, database.dietTemplates, database.nutritionTargets, database.pelvicFloorSessions, database.cardioSessions, database.habits, database.habitCheckIns], async () => {
-    await Promise.all([database.foods.clear(), database.foodLogs.clear(), database.exercises.clear(), database.workouts.clear(), database.weights.clear(), database.workoutTemplates.clear(), database.dietTemplates.clear(), database.nutritionTargets.clear(), database.pelvicFloorSessions.clear(), database.cardioSessions.clear(), database.habits.clear(), database.habitCheckIns.clear()])
+  await database.transaction('rw', [database.foods, database.foodLogs, database.exercises, database.workouts, database.weights, database.workoutTemplates, database.dietTemplates, database.nutritionTargets, database.pelvicFloorSessions, database.cardioSessions, database.habits, database.habitCheckIns, database.tasks, database.taskTags], async () => {
+    await Promise.all([database.foods.clear(), database.foodLogs.clear(), database.exercises.clear(), database.workouts.clear(), database.weights.clear(), database.workoutTemplates.clear(), database.dietTemplates.clear(), database.nutritionTargets.clear(), database.pelvicFloorSessions.clear(), database.cardioSessions.clear(), database.habits.clear(), database.habitCheckIns.clear(), database.tasks.clear(), database.taskTags.clear()])
     await database.foods.bulkAdd(validated.data.foods)
     await database.foodLogs.bulkAdd(validated.data.foodLogs)
     await database.exercises.bulkAdd(validated.data.exercises)
@@ -431,5 +459,7 @@ export async function restoreBackup(backup: BackupData | unknown, database: FitL
     await database.cardioSessions.bulkAdd(validated.data.cardioSessions)
     await database.habits.bulkAdd(validated.data.habits)
     await database.habitCheckIns.bulkAdd(validated.data.habitCheckIns)
+    await database.taskTags.bulkAdd(validated.data.taskTags)
+    await database.tasks.bulkAdd(validated.data.tasks)
   })
 }

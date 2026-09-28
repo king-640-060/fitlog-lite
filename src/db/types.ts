@@ -97,6 +97,27 @@ export interface HabitCheckIn {
   updatedAt: string
 }
 
+export interface TaskTag {
+  id: string
+  name: string
+  normalizedName: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Task {
+  id: string
+  title: string
+  note?: string
+  date?: string
+  startTime?: string
+  endTime?: string
+  tagIds: string[]
+  completedAt?: string
+  createdAt: string
+  updatedAt: string
+}
+
 export type CardioActivityType = 'stair_climber' | 'treadmill'
 
 export interface CardioSession {
@@ -262,4 +283,12 @@ export interface BackupDataV6 extends BackupBase {
   }
 }
 
-export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6
+export interface BackupDataV7 extends BackupBase {
+  schemaVersion: 7
+  data: BackupDataV6['data'] & {
+    taskTags: TaskTag[]
+    tasks: Task[]
+  }
+}
+
+export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6 | BackupDataV7
