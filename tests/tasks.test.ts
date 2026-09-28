@@ -69,6 +69,9 @@ describe('Task and Tag services', () => {
     expect(await db.tasks.count()).toBe(1)
     await deleteTaskTag(b.id, db)
     expect((await db.tasks.get(task.id))?.tagIds).toEqual([])
+    const unused = await createTaskTag('临时', db)
+    await deleteTaskTag(unused.id, db)
+    expect(await db.taskTags.get(unused.id)).toBeUndefined()
   })
 })
 
@@ -113,6 +116,16 @@ describe('Dexie V7 and Backup V7', () => {
     expect(await target.tasks.count()).toBe(0); expect(await target.taskTags.count()).toBe(0)
   })
 
+  it('all V1–V6 backups normalize tasks and tags to empty', async () => {
+    const db = database(); const latest = await exportBackup(db)
+    const base = ['foods', 'foodLogs', 'exercises', 'workouts', 'weights']
+    for (const version of [1, 2, 3, 4, 5, 6]) {
+      const keys = [...base, ...(version >= 2 ? ['workoutTemplates', 'dietTemplates'] : []), ...(version >= 3 ? ['nutritionTargets', 'pelvicFloorSessions'] : []), ...(version >= 4 ? ['cardioSessions'] : []), ...(version >= 6 ? ['habits', 'habitCheckIns'] : [])]
+      const old = { ...latest, schemaVersion: version, data: Object.fromEntries(Object.entries(latest.data).filter(([key]) => keys.includes(key))) }
+      expect(validateBackup(old).data).toMatchObject({ tasks: [], taskTags: [] })
+    }
+  })
+
   it('rejects orphan IDs, duplicate normalized tags, and invalid task times before clearing', async () => {
     const db = database(); const existing = await createTask({ title: '保留', tagIds: [] }, db)
     const backup = await exportBackup(db)
@@ -123,6 +136,11 @@ describe('Dexie V7 and Backup V7', () => {
     await expect(restoreBackup(backup, db)).rejects.toThrow('晚于')
     delete backup.data.tasks[0]!.startTime; delete backup.data.tasks[0]!.endTime
     const tag = await createTaskTag('Travel', db); backup.data.taskTags.push(tag, { ...tag, id: 'other', name: 'travel' })
+    await expect(restoreBackup(backup, db)).rejects.toThrow('重复')
+    backup.data.taskTags = [{ ...tag, normalizedName: 'wrong' }]
+    await expect(restoreBackup(backup, db)).rejects.toThrow('normalizedName')
+    backup.data.taskTags = [tag]
+    backup.data.tasks[0]!.tagIds = [tag.id, tag.id]
     await expect(restoreBackup(backup, db)).rejects.toThrow('重复')
     expect(await db.tasks.get(existing.id)).toBeDefined()
   })

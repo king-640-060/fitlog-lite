@@ -867,7 +867,7 @@ async function showCalendarDaySheet(date: string, summary?: CalendarDaySummary):
   })
   dialog.querySelector('#calendar-clear-day')?.addEventListener('click', async () => {
     const day = new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric' }).format(new Date(`${date}T12:00:00`))
-    if (!await confirmAction(`清空 ${day} 的饮食、训练和体重记录？`, '将删除当天的饮食记录、营养目标、无氧训练、有氧训练、凯格尔训练和体重记录。习惯打卡不会受影响。删除后无法恢复。', '清空当天记录')) return
+    if (!await confirmAction(`清空 ${day} 的饮食、训练和体重记录？`, '将删除当天的饮食记录、营养目标、无氧训练、有氧训练、凯格尔训练和体重记录。计划任务与习惯打卡不会受影响。删除后无法恢复。', '清空当天记录')) return
     try {
       await clearDayRecords(date)
       dialog.close()
@@ -2177,7 +2177,7 @@ async function showSettings(): Promise<void> {
 }
 
 function showRestorePreview(backup: ValidatedBackup): void {
-  const counts = [{ label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '力量训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }, { label: '训练模板', count: backup.data.workoutTemplates.length }, { label: '饮食模板', count: backup.data.dietTemplates.length }, { label: '营养目标', count: backup.data.nutritionTargets.length }, { label: '凯格尔训练', count: backup.data.pelvicFloorSessions.length }, { label: '有氧训练', count: backup.data.cardioSessions.length }, { label: '习惯', count: backup.data.habits.length }, { label: '习惯打卡', count: backup.data.habitCheckIns.length }]
+  const counts = [{ label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '力量训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }, { label: '训练模板', count: backup.data.workoutTemplates.length }, { label: '饮食模板', count: backup.data.dietTemplates.length }, { label: '营养目标', count: backup.data.nutritionTargets.length }, { label: '凯格尔训练', count: backup.data.pelvicFloorSessions.length }, { label: '有氧训练', count: backup.data.cardioSessions.length }, { label: '习惯', count: backup.data.habits.length }, { label: '习惯打卡', count: backup.data.habitCheckIns.length }, { label: '任务', count: backup.data.tasks.length }, { label: '标签', count: backup.data.taskTags.length }]
   const dialog = openModal('确认恢复备份', `<div class="restore-counts">${counts.map((item) => `<p><span>${item.label}</span><strong>${item.count}</strong></p>`).join('')}</div><div class="warning">恢复将清除当前所有数据，并替换为该备份。</div><button class="danger-button full-btn" id="confirm-restore">继续恢复</button>`)
   dialog.querySelector('#confirm-restore')?.addEventListener('click', async () => { if (!await confirmAction('覆盖当前全部数据？', '恢复会清除当前数据并替换为备份内容，此操作无法撤销。', '恢复备份')) return; try { await restoreBackup(backup); dialog.close(); currentWorkout = undefined; workoutEditorOpen = false; toast('恢复完成'); await render() } catch (error) { fail(error) } })
 }
