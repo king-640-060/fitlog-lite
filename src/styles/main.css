@@ -617,6 +617,15 @@ fieldset { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--borde
 .today-activity-meta { color: var(--text-secondary); font-size: .75rem; line-height: 1.35; }
 .today-dashboard .today-activity-action { min-height: 44px; padding: 0 11px; border: 0; border-radius: 12px; background: var(--accent-soft); color: var(--accent-strong); font-size: .78rem; font-weight: 700; white-space: nowrap; }
 .today-dashboard .pelvic-today-card .pelvic-icon { background: #ecefe1; color: #727e48; }
+.today-dashboard .today-habits-card .habit-icon { background: #eaf2e9; color: #54785d; }
+.today-habit-list { display: grid; border-top: 1px solid var(--divider); }
+.today-habit-row { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; align-items: center; gap: 11px; min-height: 51px; width: 100%; padding: 5px 3px; border: 0; border-bottom: 1px solid var(--divider); border-radius: 0; background: transparent; text-align: left; }
+.today-habit-row[aria-pressed="true"] { background: color-mix(in srgb, var(--accent-soft) 32%, transparent); }
+.habit-check-indicator { display: grid; width: 25px; height: 25px; place-items: center; border: 1.5px solid #b7c7ba; border-radius: 50%; color: transparent; }
+.today-habit-row[aria-pressed="true"] .habit-check-indicator { border-color: #b4d5be; background: var(--accent-soft); color: var(--accent-strong); }
+.habit-row-name { min-width: 0; font-size: .95rem; font-weight: 620; line-height: 1.35; overflow-wrap: anywhere; }
+.habit-planned-badge { color: var(--text-tertiary); font-size: .72rem; font-weight: 500; white-space: nowrap; }
+.today-habit-summary { margin: 0; color: var(--text-secondary); font-size: .76rem; }
 .card-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .card-heading > div { display: flex; min-width: 0; align-items: center; gap: 10px; }
 .card-heading h2 { font-size: 1.06rem; }

@@ -272,10 +272,15 @@ function habitPlanText(habit: Habit): string {
   return [days, habit.targetPerWeek ? `周目标 ${habit.targetPerWeek} 次` : ''].filter(Boolean).join(' · ') || '自由打卡'
 }
 
-function todayHabitCardHtml(habits: Habit[], checkIns: HabitCheckIn[]): string {
+function habitTodaySummary(count: number): string {
+  return count ? `今天已打卡 ${count} 项` : '今天还没有打卡'
+}
+
+function todayHabitCardHtml(habits: Habit[], checkIns: HabitCheckIn[], date: string): string {
   const checked = new Set(checkIns.map((item) => item.habitId))
   const count = habits.filter((habit) => checked.has(habit.id)).length
-  return `<section class="today-card today-habits-card" id="today-habits"><div class="card-heading"><div><span class="card-icon habit-icon">${icon('check', 19)}</span><h2>今日习惯</h2></div><button class="text-btn" id="today-habits-manage">管理 ${icon('chevron', 15)}</button></div>${habits.length ? `<div class="today-habit-list">${habits.map((habit) => `<button class="today-habit-row" type="button" data-habit-toggle="${esc(habit.id)}" aria-pressed="${checked.has(habit.id)}"><span class="habit-check-mark" aria-hidden="true">${checked.has(habit.id) ? '✓' : '○'}</span><span class="habit-row-name">${esc(habit.name)}</span>${habit.weekdays?.includes(((new Date().getDay() + 6) % 7) + 1) ? '<small>计划</small>' : ''}</button>`).join('')}</div><p class="today-habit-summary" id="today-habit-summary">${count} / ${habits.length} 已打卡</p>` : '<div class="today-habit-empty"><strong>还没有习惯</strong><span>创建一个轻量习惯，完成时点一下即可。</span><button class="text-btn" id="today-habit-create">创建习惯</button></div>'}</section>`
+  const weekday = ((new Date(`${date}T12:00:00`).getDay() + 6) % 7) + 1
+  return `<section class="today-card today-activity-card today-habits-card" id="today-habits"><div class="card-heading today-activity-head"><div><span class="card-icon habit-icon">${icon('check', 19)}</span><h2>习惯</h2></div><button class="text-btn" id="today-habits-manage">管理 ${icon('chevron', 15)}</button></div>${habits.length ? `<div class="today-habit-list">${habits.map((habit) => `<button class="today-habit-row" type="button" data-habit-toggle="${esc(habit.id)}" aria-pressed="${checked.has(habit.id)}"><span class="habit-check-indicator" aria-hidden="true">${icon('check', 15)}</span><span class="habit-row-name">${esc(habit.name)}</span>${habit.weekdays?.includes(weekday) ? '<small class="habit-planned-badge">计划</small>' : ''}</button>`).join('')}</div><p class="today-habit-summary" id="today-habit-summary">${habitTodaySummary(count)}</p>` : '<div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">还没有习惯</strong><span class="today-activity-meta">完成时轻触打卡即可</span></div><button class="secondary today-activity-action" id="today-habit-create">创建习惯</button></div>'}</section>`
 }
 
 function bindTodayHabitCard(root: ParentNode, date: string): void {
@@ -288,11 +293,10 @@ function bindTodayHabitCard(root: ParentNode, date: string): void {
       const checked = await toggleHabitCheckIn(id, date)
       if (!button.isConnected) return
       button.setAttribute('aria-pressed', String(checked))
-      button.querySelector('.habit-check-mark')!.textContent = checked ? '✓' : '○'
+      button.classList.toggle('is-checked', checked)
       const card = button.closest('#today-habits')!
-      const total = card.querySelectorAll('[data-habit-toggle]').length
       const count = card.querySelectorAll('[data-habit-toggle][aria-pressed="true"]').length
-      card.querySelector('#today-habit-summary')!.textContent = `${count} / ${total} 已打卡`
+      card.querySelector('#today-habit-summary')!.textContent = habitTodaySummary(count)
     }).catch(fail)
     habitToggleQueue.set(id, next)
     void next.finally(() => { if (habitToggleQueue.get(id) === next) habitToggleQueue.delete(id) })
@@ -307,7 +311,7 @@ async function refreshTodayHabitCard(): Promise<void> {
   const [habits, checkIns] = await Promise.all([getActiveHabits(), getHabitCheckInsByDate(date)])
   if (!old.isConnected) return
   const wrapper = document.createElement('div')
-  wrapper.innerHTML = todayHabitCardHtml(habits, checkIns)
+  wrapper.innerHTML = todayHabitCardHtml(habits, checkIns, date)
   const card = wrapper.firstElementChild!
   old.replaceWith(card)
   bindTodayHabitCard(card, date)
@@ -386,7 +390,7 @@ async function renderTodayPage(): Promise<void> {
     <section class="today-card workout-today-card"><div class="card-heading"><div><span class="card-icon workout-icon">${icon('dumbbell', 19)}</span><h2>今日训练</h2></div></div><div class="today-training-row"><strong>无氧</strong><span>${workouts.length ? `力量训练 · ${strengthExercises} 个动作 · ${strengthSets} 组${openWorkout ? ' · 记录中' : ''}` : '今天还没有力量训练'}</span></div><div class="today-training-row"><strong>有氧</strong><span>${cardioSessions.length === 1 ? `${getCardioActivityLabel(cardioSessions[0]!)} · ${formatNumber(cardioMinutes)} 分钟 · ${formatCardioMetrics(cardioSessions[0]!).join(' · ')}` : cardioSessions.length ? `有氧训练 · ${cardioSessions.length} 次 · 共 ${formatNumber(cardioMinutes)} 分钟` : '今天还没有有氧训练'}</span></div><button class="primary full-btn" id="today-workout">${openWorkout ? '继续力量训练' : '查看训练'}</button></section>
     <section class="today-card today-activity-card weight-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon weight-icon">${icon('scale', 19)}</span><h2>体重</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 15)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(weightState.status)}</strong><span class="today-activity-meta">${esc(weightState.meta)}</span></div><button class="secondary today-activity-action" id="today-record-weight">${esc(weightState.action)}</button></div></section>
     <section class="today-card today-activity-card pelvic-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon pelvic-icon">${icon('leaf', 19)}</span><h2>凯格尔训练</h2></div><button class="text-btn" id="today-pelvic-history">训练记录 ${icon('chevron', 15)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(pelvicState.status)}</strong><span class="today-activity-meta">${esc(pelvicState.meta)}</span></div><button class="secondary today-activity-action" id="today-pelvic">${esc(pelvicState.action)}</button></div></section>
-    ${todayHabitCardHtml(habits, habitCheckIns)}`
+    ${todayHabitCardHtml(habits, habitCheckIns, today)}`
   animateNutritionRings(view)
   view.querySelector('#today-food-details')?.addEventListener('click', () => { activeTab = 'food'; foodDate = today; void render().catch(fail) })
   view.querySelector('#today-workout')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = openWorkout; workoutEditorOpen = Boolean(openWorkout); void render().catch(fail) })
