@@ -8,6 +8,8 @@ The interface is entirely Chinese and iPhone first: 浅、柔、净、暖、绿�
 
 Do not use human training illustrations, anatomical diagrams, food photography, large illustrations, large black areas, oppressive dark styling, esports styling, hard gym styling, 3D art, complex textures, large gradients, or persistent glow.
 
+The shared page backdrop keeps the warm white base, restrained asymmetric glows, and extremely faint organic contour lines. Decoration is static, noninteractive, and lightweight; never place texture on cards, forms, charts, calendar surfaces, sheets, or controls, or reduce legibility. Avoid raster textures, animated decoration, blur filters, and repeating patterns.
+
 ## Color and status
 
 - Plant green is the main action and normal calorie/protein progress color; carbohydrates use warm yellow and fat uses soft orange.
@@ -37,6 +39,7 @@ Do not use human training illustrations, anatomical diagrams, food photography, 
 - A Task without a date belongs to Inbox. A dated Task without a start time is a day-level todo; a dated Task with a start time is a timed plan item. Completion is represented only by a reversible `completedAt` timestamp. Today shows a compact preview of at most four unfinished tasks; Plan owns the full Today, Upcoming, and Inbox workflows. Completed tasks remain reachable to undo.
 - Task tags are fully user-created and may be combined on one Task. Stored tag names omit `#`; the interface displays `#name`. Typing `#` at a token boundary in a task title finds or creates tags, and an explicitly selected token is removed from the stored title. Preserve Chinese IME composition. Tags are filters and never fixed Work/Life/Shopping lists or folders.
 - Plan's tag filter is contextual filtering, not a fourth navigation destination. It shares one context row with the current Today date, Upcoming context, or Inbox context. The default control says “标签”; reserve `#` for concrete tag names such as `#旅行`. An active filter can be changed or cleared independently.
+- Plan empty states use a compact horizontal card: primary text column and trailing secondary action, never a tall hero. Default tag filtering is a quiet text control with a 44 px touch target and no persistent form-like box; selected tags may use a soft emphasis surface.
 - The management hub separates reusable content and templates, personal management, data and backup, and application information. Food Library, Exercise Library, Workout Templates, and Diet Templates belong to content and templates; Habit management belongs to personal management. Operational actions such as starting Kegel training remain in their owning domain rather than management and settings.
 - Tasks do not enter health Reports or the existing five-category Progress Calendar. Calendar clear-day leaves both Tasks and HabitCheckIns intact.
 

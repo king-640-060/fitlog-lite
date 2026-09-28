@@ -600,12 +600,12 @@ async function renderPlanPage(): Promise<void> {
       const untimed = pending.filter((task) => !task.startTime)
       content = `${timed.length ? `<section class="plan-list-section"><h3>时间安排</h3>${taskGroupHtml(timed, tags)}</section>` : ''}${untimed.length ? `<section class="plan-list-section"><h3>待办</h3>${taskGroupHtml(untimed, tags)}</section>` : ''}`
     } else content = pending.length ? taskGroupHtml(pending, tags) : ''
-    if (!pending.length && !complete.length) content += `<div class="plan-empty"><strong>${planView === 'today' ? '今天还没有安排' : '收件箱是空的'}</strong><span>${planView === 'today' ? '有需要时随手记下来。' : '想到的事情可以先放在这里。'}</span><button type="button" class="secondary" id="plan-empty-add">添加任务</button></div>`
+    if (!pending.length && !complete.length) content += `<div class="plan-empty"><div class="plan-empty-copy"><strong>${planView === 'today' ? '今天还没有安排' : '收件箱是空的'}</strong><span>${planView === 'today' ? '有需要时随手记下来。' : '想到的事情可以先放在这里。'}</span></div><button type="button" class="secondary plan-empty-action" id="plan-empty-add">添加任务</button></div>`
     if (complete.length) content += `<details id="plan-completed" class="plan-completed" ${planCompletedOpen ? 'open' : ''}><summary>已完成 ${complete.length} 项</summary>${taskGroupHtml(complete, tags)}</details>`
   } else {
     const groups = new Map<string, Task[]>()
     for (const task of filtered) { const date = task.date!; const group = groups.get(date) ?? []; group.push(task); groups.set(date, group) }
-    content = groups.size ? [...groups].sort(([a], [b]) => a.localeCompare(b)).map(([date, group]) => `<section class="plan-list-section"><h3>${esc(planDateHeading(date, today))}</h3>${taskGroupHtml(sortTasksForPlan(group), tags)}</section>`).join('') : '<div class="plan-empty"><strong>近期没有安排</strong><span>有日期的未来任务会出现在这里。</span><button type="button" class="secondary" id="plan-empty-add">添加任务</button></div>'
+    content = groups.size ? [...groups].sort(([a], [b]) => a.localeCompare(b)).map(([date, group]) => `<section class="plan-list-section"><h3>${esc(planDateHeading(date, today))}</h3>${taskGroupHtml(sortTasksForPlan(group), tags)}</section>`).join('') : '<div class="plan-empty"><div class="plan-empty-copy"><strong>近期没有安排</strong><span>有日期的未来任务会出现在这里。</span></div><button type="button" class="secondary plan-empty-action" id="plan-empty-add">添加任务</button></div>'
   }
   const context = planView === 'today' ? planDateHeading(today, today) : planView === 'upcoming' ? '未来安排' : '未安排日期'
   const filter = `<button type="button" id="plan-tag-filter" class="plan-filter-button${currentFilter ? ' is-active' : ''}" aria-label="${currentFilter ? `当前筛选标签 ${esc(currentFilter.name)}，选择其他标签` : '筛选标签'}"><span>${currentFilter ? `#${esc(currentFilter.name)}` : '标签'}</span>${icon('chevron', 14)}</button>`

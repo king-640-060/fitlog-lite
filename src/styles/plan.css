@@ -17,12 +17,16 @@
 .plan-context-row { display: flex; min-width: 0; min-height: 44px; align-items: center; justify-content: space-between; gap: 8px; }
 .plan-context-label { min-width: 0; overflow: hidden; margin: 0; padding-left: 2px; color: var(--text-secondary); font-size: .83rem; text-overflow: ellipsis; white-space: nowrap; }
 .plan-context-actions, .plan-filter-active { display: flex; min-width: 0; flex: 0 0 auto; align-items: center; gap: 4px; }
-.plan-filter-button, .plan-filter-clear { display: inline-flex; min-width: 0; min-height: 44px; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 11px; background: var(--surface-soft); color: var(--text-secondary); }
-.plan-filter-button { gap: 5px; padding: 0 10px; font-size: .82rem; font-weight: 600; }
+.plan-filter-button, .plan-filter-clear { display: inline-flex; min-width: 0; min-height: 44px; align-items: center; justify-content: center; border: 0; border-radius: 11px; background: transparent; color: var(--text-secondary); }
+.plan-filter-button { gap: 5px; padding: 0 5px; font-size: .85rem; font-weight: 600; }
 .plan-filter-button span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.plan-filter-button .icon { flex: 0 0 auto; transform: rotate(90deg); }
-.plan-filter-button.is-active { max-width: clamp(90px, 30vw, 130px); border-color: #d5e7da; background: var(--accent-soft); color: var(--accent-strong); }
+.plan-filter-button .icon { flex: 0 0 auto; color: var(--text-tertiary); transform: rotate(90deg); }
+.plan-filter-button.is-active { max-width: clamp(90px, 30vw, 130px); padding-inline: 9px; border: 1px solid #d5e7da; background: var(--accent-soft); color: var(--accent-strong); }
 .plan-filter-clear { width: 44px; padding: 0; }
+.plan-filter-button:active, .plan-filter-button:focus-visible, .plan-filter-clear:active, .plan-filter-clear:focus-visible { background: var(--surface-soft); }
+@media (hover: hover) {
+  .plan-filter-button:hover, .plan-filter-clear:hover { background: var(--surface-soft); }
+}
 .plan-list-section { display: grid; gap: 8px; }
 .plan-list-section h3 { margin: 0 2px; color: var(--text-secondary); font-size: .8rem; font-weight: 650; }
 .plan-task-group { overflow: hidden; border: 1px solid var(--border); border-radius: 17px; background: var(--surface); }
@@ -40,10 +44,11 @@
 .plan-task-main time { flex: 0 0 auto; color: var(--text-secondary); font-size: .75rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .plan-task-main > .icon { flex: 0 0 auto; color: var(--text-tertiary); }
 .plan-task-row.is-complete .plan-task-copy strong { color: var(--text-secondary); }
-.plan-empty { display: grid; justify-items: start; gap: 7px; padding: 28px 16px; border: 1px solid var(--border); border-radius: 17px; background: var(--surface); }
-.plan-empty strong { font-size: .96rem; }
-.plan-empty span { color: var(--text-secondary); font-size: .81rem; }
-.plan-empty .secondary { margin-top: 8px; }
+.plan-empty { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 20px 15px; border: 1px solid var(--border); border-radius: 17px; background: var(--surface); }
+.plan-empty-copy { display: grid; min-width: 0; gap: 8px; }
+.plan-empty-copy strong { font-size: .96rem; font-weight: 650; line-height: 1.5; }
+.plan-empty-copy span { color: var(--text-secondary); font-size: .83rem; line-height: 1.45; }
+.plan-empty-action { min-height: 44px; padding-inline: 14px; white-space: nowrap; }
 .plan-completed { border-top: 1px solid var(--divider); }
 .plan-completed summary { min-height: 44px; padding: 12px 4px; color: var(--text-secondary); font-size: .82rem; font-weight: 650; cursor: pointer; }
 .plan-completed .plan-task-group { margin-top: 4px; }

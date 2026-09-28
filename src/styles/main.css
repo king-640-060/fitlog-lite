@@ -41,8 +41,18 @@
 
 * { box-sizing: border-box; }
 html { min-width: 320px; min-height: 100%; overflow-x: hidden; scroll-padding: 120px 0; }
-body { margin: 0; min-width: 320px; min-height: 100vh; min-height: 100dvh; overflow-x: hidden; background: var(--bg); color: var(--text-primary); }
-body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(circle at 92% 0, rgba(105, 180, 138, .1), transparent 30%); }
+body { isolation: isolate; margin: 0; min-width: 320px; min-height: 100vh; min-height: 100dvh; overflow-x: hidden; background: var(--bg); color: var(--text-primary); }
+/* One static, non-interactive backdrop; opaque content surfaces cover it. */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='620' height='820' viewBox='0 0 620 820'%3E%3Cg fill='none' stroke='%23496654' stroke-opacity='.03' stroke-width='1'%3E%3Cpath d='M680 65C410 20 530 245 345 320S245 570 680 645'/%3E%3Cpath d='M680 95C440 55 555 255 373 341S275 548 680 681'/%3E%3Cpath d='M680 129C470 92 583 268 406 368S311 544 680 719'/%3E%3Cpath d='M680 166C504 130 610 283 441 396S349 548 680 760'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(ellipse at 94% 3%, rgba(105, 180, 138, .075), transparent 42%),
+    radial-gradient(ellipse at 4% 68%, rgba(192, 174, 119, .035), transparent 48%);
+  background-size: 620px 820px, 100% 100%, 100% 100%;
+  background-position: right -125px top 25px, center, center;
+  background-repeat: no-repeat;
+}
 button, input, textarea, select { font: inherit; }
 button, input, textarea, strong, .hero-number { font-variant-numeric: tabular-nums; }
 button { min-height: 44px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 16px; background: var(--surface); color: var(--text-primary); cursor: pointer; -webkit-tap-highlight-color: transparent; transition: transform 100ms ease, background-color 160ms ease, color 160ms ease, border-color 160ms ease, opacity 160ms ease; }
