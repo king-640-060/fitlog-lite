@@ -5,54 +5,49 @@ This is the latest verified production application snapshot. Sync `main` before 
 ## Current Git and Production State
 
 - Branch: `main`
-- START_COMMIT: `4c2e501f114a6aab37a0cf47f66cfeaced3e296f`
-- DATA_COMMIT: `33eb698176b6579113669c175038c0108517b91d` — `Add task and tag data model`
-- PLAN_UI_COMMIT: `b9afd73cb13103e7db15d1a3bdf4c7fb00434345` — `Add Plan task workflow`
-- END_COMMIT (verified application): `fa14db23ca8b4579bc75d6555f79066cc8f68537` — `Integrate Plan with app boundaries`
+- START_COMMIT: `b3d33e018fa9fa1a336b298eec9a4a471787e33f`
+- UI_REFINEMENT_COMMIT / END_COMMIT (verified application): `3987bb834d47102bc8e681d6991d480cbbef1d95` — `Refine Plan filtering and management hierarchy`
+- REPORT_COMMIT: separate documentation commit after `END_COMMIT`; obtain its SHA from the latest `main` commit.
 - Production URL: https://king-640-060.github.io/fitlog-lite/
-- Application Actions run: [36378447333](https://github.com/king-640-060/fitlog-lite/actions/runs/36378447333) — completed / success; typecheck, tests, build, artifact upload, and Pages deployment passed.
+- Application Actions run: [36396343362](https://github.com/king-640-060/fitlog-lite/actions/runs/36396343362) — completed / success; typecheck, tests, build, artifact upload, and Pages deployment passed.
 
-## Plan MVP
+## Plan Filter and Management Hierarchy
 
-The bottom navigation now has five destinations: Today, Plan, Food, Workout, and Progress. A global top bar management button opens the previous More destinations without adding a sixth tab. Plan groups tasks into Today, Upcoming, and Inbox. Today separates timed tasks from untimed tasks; Upcoming groups by date; Inbox holds tasks without a date. Completion stays visible in the current view and can be undone. A tag filter works across these views.
+Plan has one context row immediately below Today / Upcoming / Inbox. It pairs the current Today date, “未来安排”, or “未安排日期” with a quiet tag filter. The default control says “标签”, and `#` appears only with a specific selected tag. An active filter has separate buttons for choosing another tag and clearing the filter. Long tag names truncate without widening the page; both buttons keep 44 px touch height. The tag picker explains how to create a tag when none exist. Task rows, completion, editor, queries, tag data, and Habit behavior are unchanged.
 
-The task editor supports a title, optional note, optional date, optional same-day start and end time, and multiple user-created tags. Typing `#` shows matching tags and can create a new tag; selecting it removes the hashtag token from the title and adds a tag chip. Tag management supports create, rename, and delete. Deleting a used tag detaches it from tasks and preserves those tasks. Names use normalized duplicate detection. The Today “今日计划” card shows at most four tasks, an overflow count, local complete/undo updates, and direct entry to Plan Today or task creation.
-
-This first phase has no lists or folders, recurrence, notifications, Plan reports, or Calendar Plan markers. Task completion does not create a health record. Calendar clear-day removes only the supported health records and leaves Plan tasks and Habit check-ins intact. `docs/UI_INTERACTION_SPEC.md` records the durable UI and boundary rules.
+The “管理与设置” sheet now groups reusable Food and Exercise libraries plus Workout and Diet templates under “内容与模板”; Habit under “个人管理”; import, backup, and a compact local-data note under “数据与备份”; and About under “应用”. The Kegel operation is no longer a management row; training and history remain reachable from Workout and Today. `docs/UI_INTERACTION_SPEC.md` records the durable IA rules.
 
 ## Data Compatibility
 
-- Database: **Dexie V7, 14 stores**; existing database name and prior 12 stores retained. New stores are `tasks` and `taskTags`.
-- Backup export: **V7**, including tasks and tags; restore preview shows both counts.
-- Restore: **V1 / V2 / V3 / V4 / V5 / V6 / V7**. Older backups initialize tasks and tags as empty arrays. V7 restore validates tag references and rejects orphan IDs or duplicate normalized names.
-- V6 → V7 migration preserves existing records in the prior 12 stores. Task and tag write paths validate titles, date/time, tag IDs, and referential integrity.
+- Database: **Dexie V7, 14 stores**, unchanged. Tasks, TaskTags, Habits, and HabitCheckIns retain their data and behavior.
+- Backup export: **V7**, unchanged.
+- Restore: **V1 / V2 / V3 / V4 / V5 / V6 / V7**, unchanged.
+- This round adds no store, field, migration, backup format, or query change.
 
 ## Automated Verification
 
 - `npm run typecheck`: PASS.
-- `npm test`: PASS — **202 tests / 18 files**. Task/tag validation, ordering, deletion, backup/restore, old-version normalization, and existing health flows passed.
-- `npm run build`: PASS — main JS **526.72 kB**, CSS **83.46 kB**, PWA generateSW **17 precache entries / 631.15 KiB** (local `/` base).
-- Pages-path build (`GITHUB_REPOSITORY=king-640-060/fitlog-lite npm run build`): PASS — main JS **526.77 kB**, CSS **83.46 kB**, **17 entries / 631.25 KiB**.
+- `npm test`: PASS — **202 tests / 18 files**.
+- `npm run build`: PASS — main JS **526.75 kB**, CSS **84.50 kB**, PWA generateSW **17 precache entries / 632.18 KiB** (local `/` base).
+- Pages-path build (`GITHUB_REPOSITORY=king-640-060/fitlog-lite npm run build`): PASS — main JS **526.80 kB**, CSS **84.50 kB**, **17 entries / 632.29 KiB**.
 - `git diff --check`: PASS.
 
 ## Browser QA
 
-Fresh local Chrome mobile contexts at **320, 375 × 812, 390 × 844, and 430 × 932** checked five-tab navigation, global management access, task editor sizing, and no horizontal overflow or page errors. UI flows covered creating dated and undated tasks, Today and Inbox, timed/untimed and cross-month/year Upcoming ordering, completion and undo, editing and validation, hashtag suggestion/filter/create, multiple tag chips, tag rename/deletion, and the Today four-task limit and overflow link. A rapid create-tag-then-save flow retained the new tag and clean title. Existing Food, Workout, Progress, Habit, Kegel, import, and backup management destinations were smoke checked.
-
-Boundary checks confirmed task completion leaves health stores untouched; Calendar clear-day leaves a task intact. UI backup export contained all 14 V7 stores, and restore preview displayed task/tag counts. Plan and Today screenshots were visually reviewed. Browser tests were desktop Chrome mobile emulation, not physical iPhone tests.
+Fresh local Chrome mobile contexts at **320 × 812, 375 × 812, 390 × 844, and 430 × 932** checked the Plan context row in all three views, no separate filter row, the no-tags picker, selected long tag truncation, 44 px controls, filter selection/change/clear, view switching with the filter retained, and no overflow or page errors. The Today context row and empty state have a 15 px gap. Five screenshots (Today default, Today filtered, Upcoming, Inbox, Management) were visually reviewed. The management sheet has exactly the four requested sections; its eight retained destinations open. Kegel setup and history open from both Workout and Today.
 
 ## Production Verification
 
-Actions deployed `END_COMMIT` successfully. Production HTML references `index-CKzDsvDO.js` and `index-K6OJBFg7.css`; downloaded copies match the Pages-path local build byte for byte by SHA-256. Fresh production Chrome mobile contexts at 320, 375, 390, and 430 px passed navigation, management, editor layout, and overflow checks. A separate fresh production UI flow passed task creation, hashtag-created tag, complete/undo, timed Upcoming edit, filter, and tag rename with no page errors.
+Actions deployed `END_COMMIT` successfully. Production HTML references `index-DEWPo58p.js` and `index-Dh3gHFZG.css`; downloaded copies match the Pages-path local build byte for byte by SHA-256. Fresh production Chrome mobile contexts at 320, 375, 390, and 430 px repeated Plan context, tag selection/change/clear, long-name and touch-target checks, management section and destination checks, and Workout/Today Kegel entry checks. No page error or horizontal overflow was observed. These are mobile browser simulations, not physical-device tests.
 
 ## Manual Device Verification
 
-**Pending:** real iPhone Safari and standalone PWA. Verify Chinese IME composition in the title and `#` autocomplete, native date/time pickers, keyboard behavior, sticky Save and sheet scrolling with Safe Area, touch targets, and offline standalone behavior. Chrome mobile simulation cannot confirm physical-device input and PWA behavior.
+**Pending:** real iPhone Safari and standalone PWA. Verify Chinese IME composition in the task title and `#` autocomplete, native date/time pickers, keyboard behavior, sticky Save and sheet scrolling with Safe Area, offline standalone behavior, and Plan context-row touch/truncation at 320–375 px. Chrome mobile simulation cannot confirm physical-device input and PWA behavior.
 
 ## Known Issues
 
-Vite emits a nonblocking advisory for the 526.77 kB Pages-path main JS bundle above its 500 kB warning threshold. No functional code, test, browser, or deployment defect was confirmed. Physical iPhone verification remains pending.
+Vite emits a nonblocking advisory for the 526.80 kB Pages-path main JS bundle above its 500 kB warning threshold. No functional code, test, browser, or deployment defect was confirmed. Physical iPhone verification remains pending.
 
 ## ChatGPT Baseline
 
-FitLog Lite is a local-first iPhone PWA built with Vanilla TypeScript, Dexie V7 (14 stores), Backup V7, and Restore V1–V7. The verified application commit is `fa14db23ca8b4579bc75d6555f79066cc8f68537`. Plan is the fifth tab and provides Today, Upcoming, Inbox, task editing, user-created tags, completion/undo, and a compact Today card. Existing health records and reports remain separate from Plan; Calendar clear-day does not delete Plan tasks or Habit check-ins. Read `AGENTS.md`, this report, and `docs/UI_INTERACTION_SPEC.md` before further UI work; sync `main` and record a fresh START_COMMIT.
+FitLog Lite is a local-first iPhone PWA built with Vanilla TypeScript, Dexie V7 (14 stores), Backup V7, and Restore V1–V7. The verified application commit is `3987bb834d47102bc8e681d6991d480cbbef1d95`. Plan is the fifth tab with Today, Upcoming, Inbox, user-created tags, and a compact Today card; its tag filter shares a context row with the active view and defaults to “标签”. Management and settings groups content/templates, personal management, data/backup, and application information. Kegel training remains in Workout and Today. Plan stays separate from health records and Calendar clear-day. Read `AGENTS.md`, this report, and `docs/UI_INTERACTION_SPEC.md` before further UI work; sync `main` and record a fresh START_COMMIT.
