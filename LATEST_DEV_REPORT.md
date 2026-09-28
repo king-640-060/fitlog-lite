@@ -5,52 +5,54 @@ This is the latest verified production application snapshot. Sync `main` before 
 ## Current Git and Production State
 
 - Branch: `main`
-- START_COMMIT: `e36aa13d05af900d08dddb706e14754c2fa17e7f`
-- TODAY_HABIT_UI_COMMIT: `74989e6e46cd5ed17ef986c0f01421bd66fc9f5b` — `Integrate habit card with Today`
-- HABIT_EDITOR_COMMIT: `2f87af107ab29ff539773368d4f89a06375e8c4e` — `Redesign habit manager and editor`
-- END_COMMIT (verified application): `2f87af107ab29ff539773368d4f89a06375e8c4e`
+- START_COMMIT: `4c2e501f114a6aab37a0cf47f66cfeaced3e296f`
+- DATA_COMMIT: `33eb698176b6579113669c175038c0108517b91d` — `Add task and tag data model`
+- PLAN_UI_COMMIT: `b9afd73cb13103e7db15d1a3bdf4c7fb00434345` — `Add Plan task workflow`
+- END_COMMIT (verified application): `fa14db23ca8b4579bc75d6555f79066cc8f68537` — `Integrate Plan with app boundaries`
 - Production URL: https://king-640-060.github.io/fitlog-lite/
-- Application Actions run: [36372792370](https://github.com/king-640-060/fitlog-lite/actions/runs/36372792370) — completed / success; typecheck, tests, build, artifact upload, and Pages deployment passed.
+- Application Actions run: [36378447333](https://github.com/king-640-060/fitlog-lite/actions/runs/36378447333) — completed / success; typecheck, tests, build, artifact upload, and Pages deployment passed.
 
-## Habit Interface
+## Plan MVP
 
-Today Habit is titled “习惯” and shares the icon surface, header, empty-state status/meta/action alignment, padding, and radius of the Weight and Kegel compact activity cards. Its empty “创建习惯” action opens the new Habit Editor directly. Active habits form a readable checklist with an accessible pressed state, a quiet planned-day label, and a neutral “今天已打卡 N 项” summary. Toggling and undo still update only the Habit card, leaving `#view` and scroll intact.
+The bottom navigation now has five destinations: Today, Plan, Food, Workout, and Progress. A global top bar management button opens the previous More destinations without adding a sixth tab. Plan groups tasks into Today, Upcoming, and Inbox. Today separates timed tasks from untimed tasks; Upcoming groups by date; Inbox holds tasks without a date. Completion stays visible in the current view and can be undone. A tag filter works across these views.
 
-Habit Manager and Habit Editor now have distinct sheet titles and states. The manager groups active and inactive habits, uses the whole row for editing, and shows 44 px move controls only in explicit reorder mode. The editor groups basic information and optional planning, provides a quiet return action, presents seven accessible weekday choices as one row at 375 px and above (two rows at 320 px), and keeps the optional weekly target as a compact row backed by the native select. Saving is the sole emphasized action. Existing habits with check-in history show a retention explanation instead of an unusable delete button; unused habits can be deleted after confirmation. Stop, restart, sorting, creation, and editing retain the existing service behavior.
+The task editor supports a title, optional note, optional date, optional same-day start and end time, and multiple user-created tags. Typing `#` shows matching tags and can create a new tag; selecting it removes the hashtag token from the title and adds a tag chip. Tag management supports create, rename, and delete. Deleting a used tag detaches it from tasks and preserves those tasks. Names use normalized duplicate detection. The Today “今日计划” card shows at most four tasks, an overflow count, local complete/undo updates, and direct entry to Plan Today or task creation.
 
-`docs/UI_INTERACTION_SPEC.md` records these durable interface rules. No Habit, Report, Calendar, Weight, Kegel, Food, or Cardio business semantics were changed.
+This first phase has no lists or folders, recurrence, notifications, Plan reports, or Calendar Plan markers. Task completion does not create a health record. Calendar clear-day removes only the supported health records and leaves Plan tasks and Habit check-ins intact. `docs/UI_INTERACTION_SPEC.md` records the durable UI and boundary rules.
 
 ## Data Compatibility
 
-- Database: **Dexie V6, 12 stores**, unchanged.
-- Backup export: **V6**, unchanged.
-- Restore: **V1 / V2 / V3 / V4 / V5 / V6**, unchanged.
-- Habit schedules and weekly targets remain optional guidance; non-planned days remain checkable. One habit/date has at most one check-in. There is no streak or missed-day penalty. Habit check-ins remain outside Calendar markers and clear-day deletion.
+- Database: **Dexie V7, 14 stores**; existing database name and prior 12 stores retained. New stores are `tasks` and `taskTags`.
+- Backup export: **V7**, including tasks and tags; restore preview shows both counts.
+- Restore: **V1 / V2 / V3 / V4 / V5 / V6 / V7**. Older backups initialize tasks and tags as empty arrays. V7 restore validates tag references and rejects orphan IDs or duplicate normalized names.
+- V6 → V7 migration preserves existing records in the prior 12 stores. Task and tag write paths validate titles, date/time, tag IDs, and referential integrity.
 
 ## Automated Verification
 
 - `npm run typecheck`: PASS.
-- `npm test`: PASS — **193 tests / 17 files**. Two added tests cover free/weekday/target plan labels and neutral Today summary text; prior Habit, Reports, Backup, Restore, and migration tests remain passing.
-- `npm run build`: PASS — main JS **505.71 kB**, PWA generateSW **17 precache entries / 603.17 KiB** (local `/` base).
-- Pages-path build (`GITHUB_REPOSITORY=king-640-060/fitlog-lite npm run build`): PASS — main JS **505.76 kB**, **17 entries / 603.27 KiB**.
+- `npm test`: PASS — **202 tests / 18 files**. Task/tag validation, ordering, deletion, backup/restore, old-version normalization, and existing health flows passed.
+- `npm run build`: PASS — main JS **526.72 kB**, CSS **83.46 kB**, PWA generateSW **17 precache entries / 631.15 KiB** (local `/` base).
+- Pages-path build (`GITHUB_REPOSITORY=king-640-060/fitlog-lite npm run build`): PASS — main JS **526.77 kB**, CSS **83.46 kB**, **17 entries / 631.25 KiB**.
 - `git diff --check`: PASS.
 
 ## Browser QA
 
-Fresh local Chrome mobile contexts at **320, 375 × 812, 390 × 844, and 430 × 932** checked the Today empty and populated cards, three created habits, planned days, weekly target, manager and editor titles, reorder mode, check-in and undo, and no horizontal overflow or page errors. At 320 px, weekdays wrap 4 + 3 with 44 px minimum targets; at 375 px and above, all seven fit on one row. A separate flow covered manager empty state, unused deletion with confirmation, history-protected deletion, stopping/restarting with history retained, rapid toggles, and `#view` identity after a check-in. Screenshots of the Today card, editor, and manager were visually reviewed.
+Fresh local Chrome mobile contexts at **320, 375 × 812, 390 × 844, and 430 × 932** checked five-tab navigation, global management access, task editor sizing, and no horizontal overflow or page errors. UI flows covered creating dated and undated tasks, Today and Inbox, timed/untimed and cross-month/year Upcoming ordering, completion and undo, editing and validation, hashtag suggestion/filter/create, multiple tag chips, tag rename/deletion, and the Today four-task limit and overflow link. A rapid create-tag-then-save flow retained the new tag and clean title. Existing Food, Workout, Progress, Habit, Kegel, import, and backup management destinations were smoke checked.
+
+Boundary checks confirmed task completion leaves health stores untouched; Calendar clear-day leaves a task intact. UI backup export contained all 14 V7 stores, and restore preview displayed task/tag counts. Plan and Today screenshots were visually reviewed. Browser tests were desktop Chrome mobile emulation, not physical iPhone tests.
 
 ## Production Verification
 
-Actions deployed `END_COMMIT` successfully. Production HTML references `index-NpULnN9P.js` and `index-BrrBfo2i.css`; downloaded copies match the Pages-path local build byte for byte by SHA-256. Fresh production Chrome mobile contexts at 320, 375, 390, and 430 px repeated Today Habit, Manager, Create/Edit, Weekdays, Target, Reorder, Toggle, and no-overflow checks without page errors. These are browser simulations, not physical-device tests.
+Actions deployed `END_COMMIT` successfully. Production HTML references `index-CKzDsvDO.js` and `index-K6OJBFg7.css`; downloaded copies match the Pages-path local build byte for byte by SHA-256. Fresh production Chrome mobile contexts at 320, 375, 390, and 430 px passed navigation, management, editor layout, and overflow checks. A separate fresh production UI flow passed task creation, hashtag-created tag, complete/undo, timed Upcoming edit, filter, and tag rename with no page errors.
 
 ## Manual Device Verification
 
-**Pending:** real iPhone Safari and standalone PWA. Verify weekday 44 px touch targets, native weekly-target picker, keyboard and textarea focus, sticky Save, sheet scrolling and Safe Area, Today Habit toggle, and PWA standalone behavior. Chrome mobile simulation cannot confirm physical-device touch and keyboard behavior.
+**Pending:** real iPhone Safari and standalone PWA. Verify Chinese IME composition in the title and `#` autocomplete, native date/time pickers, keyboard behavior, sticky Save and sheet scrolling with Safe Area, touch targets, and offline standalone behavior. Chrome mobile simulation cannot confirm physical-device input and PWA behavior.
 
 ## Known Issues
 
-Vite emits a nonblocking advisory for the 505.76 kB Pages-path main JS bundle above its 500 kB warning threshold. No functional code, test, browser, or deployment defect was confirmed. Physical iPhone verification remains pending.
+Vite emits a nonblocking advisory for the 526.77 kB Pages-path main JS bundle above its 500 kB warning threshold. No functional code, test, browser, or deployment defect was confirmed. Physical iPhone verification remains pending.
 
 ## ChatGPT Baseline
 
-FitLog Lite is a local-first iPhone PWA built with Vanilla TypeScript, Dexie V6 (12 stores), Backup V6, and Restore V1–V6. The verified application commit is `2f87af107ab29ff539773368d4f89a06375e8c4e`. Today Habit now visually matches Weight/Kegel while preserving local one-tap check-in. Habit Manager and Editor are separate sheet states with compact accessible planning controls. Reports still derive weekly/monthly results from current records; Calendar stays at five categories and clear-day does not delete HabitCheckIns. Read `AGENTS.md`, this report, and `docs/UI_INTERACTION_SPEC.md` before further UI work; sync `main` and record a fresh START_COMMIT.
+FitLog Lite is a local-first iPhone PWA built with Vanilla TypeScript, Dexie V7 (14 stores), Backup V7, and Restore V1–V7. The verified application commit is `fa14db23ca8b4579bc75d6555f79066cc8f68537`. Plan is the fifth tab and provides Today, Upcoming, Inbox, task editing, user-created tags, completion/undo, and a compact Today card. Existing health records and reports remain separate from Plan; Calendar clear-day does not delete Plan tasks or Habit check-ins. Read `AGENTS.md`, this report, and `docs/UI_INTERACTION_SPEC.md` before further UI work; sync `main` and record a fresh START_COMMIT.
