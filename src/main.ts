@@ -28,6 +28,7 @@ import { calendarCategories, calendarCategoryIcons, calendarLegendLabels, getCal
 import { buildCalendarDayDetailRows } from './ui/dayDetail'
 import { foodPagerLabel, foodRailDates, foodRailFocus, foodRailNeedsRecenter, isCurrentFoodRender, shouldCommitFoodDate, shouldShowFoodTodayShortcut } from './ui/foodPager'
 import { icon, type IconName } from './ui/icons'
+import { habitPlanText, habitTodaySummary, habitWeekdayLabels } from './ui/habitPresentation'
 import { getGoalProgress } from './ui/progressRing'
 import { groupFoodLogs, isMealType, mealNames, mealTypes, type FoodMealGroup } from './utils/foodMeals'
 import { formatShortDate, getLocalDateString } from './utils/date'
@@ -264,17 +265,7 @@ function miniTrendSvg(values: number[]): string {
   return `<svg class="mini-trend" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" role="img" aria-label="近期体重趋势"><polyline points="${points}"/></svg>`
 }
 
-const habitWeekdayLabels = ['一', '二', '三', '四', '五', '六', '日']
 const habitToggleQueue = new Map<string, Promise<void>>()
-
-function habitPlanText(habit: Habit): string {
-  const days = habit.weekdays?.map((day) => `周${habitWeekdayLabels[day - 1]}`).join(' · ')
-  return [days, habit.targetPerWeek ? `周目标 ${habit.targetPerWeek} 次` : ''].filter(Boolean).join(' · ') || '自由打卡'
-}
-
-function habitTodaySummary(count: number): string {
-  return count ? `今天已打卡 ${count} 项` : '今天还没有打卡'
-}
 
 function todayHabitCardHtml(habits: Habit[], checkIns: HabitCheckIn[], date: string): string {
   const checked = new Set(checkIns.map((item) => item.habitId))
@@ -319,15 +310,26 @@ async function refreshTodayHabitCard(): Promise<void> {
 
 async function showHabitManager(openCreate = false): Promise<void> {
   const dialog = openModal('习惯管理', '<div id="habit-manager-body"></div>')
+  dialog.classList.add('habit-sheet')
   const body = dialog.querySelector<HTMLElement>('#habit-manager-body')!
+  const scroll = dialog.querySelector<HTMLElement>('.modal-body')!
+  const setScreen = (title: string, html: string) => {
+    dialog.querySelector('h2')!.textContent = title
+    body.innerHTML = html
+    scroll.scrollTop = 0
+  }
+  let reorderMode = false
   const manager = async () => {
     const all = await db.habits.orderBy('sortOrder').toArray()
+    if (!dialog.isConnected) return
     const active = all.filter((habit) => habit.active)
     const inactive = all.filter((habit) => !habit.active)
-    const row = (habit: Habit, index: number, list: Habit[]) => `<article class="habit-manager-row"><div><strong>${esc(habit.name)}</strong><small>${esc(habitPlanText(habit))}${habit.active ? '' : ' · 已停用'}</small></div><div class="habit-manager-actions">${habit.active ? `<button data-habit-move="${esc(habit.id)}" data-direction="-1" aria-label="上移 ${esc(habit.name)}" ${index === 0 ? 'disabled' : ''}>↑</button><button data-habit-move="${esc(habit.id)}" data-direction="1" aria-label="下移 ${esc(habit.name)}" ${index === list.length - 1 ? 'disabled' : ''}>↓</button>` : ''}<button data-habit-edit="${esc(habit.id)}" aria-label="编辑 ${esc(habit.name)}">编辑</button></div></article>`
-    body.innerHTML = `<button class="primary full-btn" id="habit-new">+ 新建习惯</button><div class="habit-manager-list">${active.length ? active.map((habit, index) => row(habit, index, active)).join('') : '<p class="muted padded">还没有启用的习惯</p>'}</div>${inactive.length ? `<h3>已停用</h3><div class="habit-manager-list">${inactive.map((habit, index) => row(habit, index, inactive)).join('')}</div>` : ''}`
-    body.querySelector('#habit-new')?.addEventListener('click', () => form())
-    body.querySelectorAll<HTMLButtonElement>('[data-habit-edit]').forEach((button) => button.addEventListener('click', () => form(all.find((habit) => habit.id === button.dataset.habitEdit))))
+    const row = (habit: Habit, index: number, list: Habit[]) => `<div class="habit-manager-row${reorderMode && habit.active ? ' is-reordering' : ''}">${reorderMode && habit.active ? `<span class="habit-manager-row-main"><strong>${esc(habit.name)}</strong><small>${esc(habitPlanText(habit))}</small></span><span class="habit-reorder-actions"><button type="button" data-habit-move="${esc(habit.id)}" data-direction="-1" aria-label="上移 ${esc(habit.name)}" ${index === 0 ? 'disabled' : ''}>↑</button><button type="button" data-habit-move="${esc(habit.id)}" data-direction="1" aria-label="下移 ${esc(habit.name)}" ${index === list.length - 1 ? 'disabled' : ''}>↓</button></span>` : `<button type="button" class="habit-manager-row-main" data-habit-edit="${esc(habit.id)}" aria-label="编辑 ${esc(habit.name)}"><span><strong>${esc(habit.name)}</strong><small>${esc(habitPlanText(habit))}${habit.active ? '' : ' · 已停用'}</small></span>${icon('chevron', 17)}</button>`}</div>`
+    setScreen('习惯管理', `<div class="habit-manager"><div class="habit-manager-toolbar"><span>${reorderMode ? '调整顺序' : `已启用 ${active.length} 项`}</span><div><button type="button" class="text-btn" id="habit-reorder" ${active.length < 2 ? 'hidden' : ''}>${reorderMode ? '完成' : '调整顺序'}</button>${reorderMode ? '' : '<button type="button" class="text-btn" id="habit-new">+ 新建</button>'}</div></div>${all.length ? `<section class="habit-manager-section"><h3>习惯</h3><div class="habit-manager-group">${active.length ? active.map((habit, index) => row(habit, index, active)).join('') : '<p class="habit-manager-empty-line">还没有启用的习惯</p>'}</div></section>${inactive.length ? `<section class="habit-manager-section"><h3>已停用</h3><div class="habit-manager-group">${inactive.map((habit, index) => row(habit, index, inactive)).join('')}</div></section>` : ''}` : '<div class="habit-manager-empty"><strong>还没有习惯</strong><p>创建一个需要时轻触打卡的习惯。</p><button type="button" class="secondary" id="habit-empty-new">新建习惯</button></div>'}</div>`)
+    body.querySelector('#habit-new')?.addEventListener('click', () => void editor())
+    body.querySelector('#habit-empty-new')?.addEventListener('click', () => void editor())
+    body.querySelector('#habit-reorder')?.addEventListener('click', () => { reorderMode = !reorderMode; void manager() })
+    body.querySelectorAll<HTMLButtonElement>('[data-habit-edit]').forEach((button) => button.addEventListener('click', () => void editor(all.find((habit) => habit.id === button.dataset.habitEdit))))
     body.querySelectorAll<HTMLButtonElement>('[data-habit-move]').forEach((button) => button.addEventListener('click', async () => {
       const index = active.findIndex((habit) => habit.id === button.dataset.habitMove)
       const next = index + Number(button.dataset.direction)
@@ -336,25 +338,33 @@ async function showHabitManager(openCreate = false): Promise<void> {
       try { await reorderHabits(ids); await manager(); await refreshTodayHabitCard() } catch (error) { fail(error) }
     }))
   }
-  const form = (habit?: Habit) => {
-    body.innerHTML = `<form id="habit-form" class="form"><label>名称<input name="name" maxlength="40" required value="${esc(habit?.name ?? '')}" placeholder="例如：肩颈拉伸"></label><label>说明（可选）<textarea name="note" rows="2">${esc(habit?.note ?? '')}</textarea></label><fieldset class="habit-weekdays"><legend>计划日（可选）</legend><div>${habitWeekdayLabels.map((label, index) => `<label><input type="checkbox" name="weekday" value="${index + 1}" ${habit?.weekdays?.includes(index + 1) ? 'checked' : ''}><span>${label}</span></label>`).join('')}</div></fieldset><label>周目标（可选）<select name="targetPerWeek"><option value="">不设置</option>${Array.from({ length: 7 }, (_, index) => `<option value="${index + 1}" ${habit?.targetPerWeek === index + 1 ? 'selected' : ''}>${index + 1} 次</option>`).join('')}</select></label><p class="muted">计划仅用于提示和回顾，不限制其他日期打卡。</p><button class="primary full-btn" type="submit">保存习惯</button><button type="button" id="habit-form-back">返回习惯管理</button></form>${habit ? `<div class="habit-form-utility"><button id="habit-active-toggle">${habit.active ? '停用习惯' : '重新启用'}</button><button id="habit-delete" class="danger">删除未打卡习惯</button></div>` : ''}`
-    body.querySelector('#habit-form-back')?.addEventListener('click', () => void manager())
+  const editor = async (habit?: Habit) => {
+    const hasHistory = habit ? Boolean(await db.habitCheckIns.where('habitId').equals(habit.id).first()) : false
+    if (!dialog.isConnected) return
+    setScreen(habit ? '编辑习惯' : '新建习惯', `<form id="habit-form" class="habit-editor"><button type="button" class="habit-editor-back" id="habit-form-back">‹ 习惯管理</button><section class="habit-editor-section"><h3>基本信息</h3><div class="habit-editor-group"><label class="habit-editor-field">名称<input name="name" maxlength="40" required value="${esc(habit?.name ?? '')}" placeholder="例如：肩颈拉伸"></label><label class="habit-editor-field">说明（可选）<textarea name="note" rows="2" placeholder="可填写简短提示">${esc(habit?.note ?? '')}</textarea></label></div></section><section class="habit-editor-section"><h3>计划（可选）</h3><div class="habit-editor-group"><fieldset class="habit-weekdays"><legend>每周计划日</legend><div class="habit-weekday-grid">${habitWeekdayLabels.map((label, index) => `<label class="habit-weekday-option"><input type="checkbox" name="weekday" value="${index + 1}" aria-label="星期${label}" ${habit?.weekdays?.includes(index + 1) ? 'checked' : ''}><span aria-hidden="true">${label}</span></label>`).join('')}</div><p id="habit-free-note" class="habit-plan-note" ${habit?.weekdays?.length ? 'hidden' : ''}>不选择计划日 = 自由打卡</p></fieldset><label class="habit-target-row"><span>周目标</span><span class="habit-target-value" id="habit-target-value">${habit?.targetPerWeek ? `每周 ${habit.targetPerWeek} 次` : '不设置'}</span>${icon('chevron', 16)}<select name="targetPerWeek" aria-label="周目标"><option value="">不设置</option>${Array.from({ length: 7 }, (_, index) => `<option value="${index + 1}" ${habit?.targetPerWeek === index + 1 ? 'selected' : ''}>${index + 1} 次</option>`).join('')}</select></label><p class="habit-plan-note">计划仅用于提示和回顾，不限制其他日期打卡。</p></div></section><div class="habit-editor-actions"><button class="primary full-btn" type="submit">保存习惯</button></div>${habit ? `<section class="habit-status-section"><h3>习惯状态</h3><button type="button" id="habit-active-toggle">${habit.active ? '停用习惯' : '重新启用'}</button>${hasHistory ? '<p>已有打卡记录，停用后可保留历史。</p>' : '<button type="button" id="habit-delete" class="danger">删除习惯</button>'}</section>` : ''}</form>`)
+    body.querySelector('#habit-form-back')?.addEventListener('click', () => { reorderMode = false; void manager() })
+    const weekdays = body.querySelectorAll<HTMLInputElement>('[name="weekday"]')
+    weekdays.forEach((input) => input.addEventListener('change', () => { body.querySelector<HTMLElement>('#habit-free-note')!.hidden = [...weekdays].some((day) => day.checked) }))
+    body.querySelector<HTMLSelectElement>('[name="targetPerWeek"]')?.addEventListener('change', (event) => {
+      const value = (event.target as HTMLSelectElement).value
+      body.querySelector('#habit-target-value')!.textContent = value ? `每周 ${value} 次` : '不设置'
+    })
     body.querySelector<HTMLFormElement>('#habit-form')?.addEventListener('submit', async (event) => {
       event.preventDefault()
       const values = new FormData(event.currentTarget as HTMLFormElement)
       const input = { name: valueOf(values, 'name'), note: valueOf(values, 'note'), weekdays: values.getAll('weekday').map(Number), targetPerWeek: optionalNumber(values, 'targetPerWeek') }
-      try { if (habit) await updateHabit(habit.id, input); else await createHabit(input); await manager(); await refreshTodayHabitCard() } catch (error) { fail(error) }
+      try { if (habit) await updateHabit(habit.id, input); else await createHabit(input); reorderMode = false; await manager(); await refreshTodayHabitCard() } catch (error) { fail(error) }
     })
     body.querySelector('#habit-active-toggle')?.addEventListener('click', async () => {
       if (!habit) return
-      try { await setHabitActive(habit.id, !habit.active); await manager(); await refreshTodayHabitCard() } catch (error) { fail(error) }
+      try { await setHabitActive(habit.id, !habit.active); reorderMode = false; await manager(); await refreshTodayHabitCard() } catch (error) { fail(error) }
     })
     body.querySelector('#habit-delete')?.addEventListener('click', async () => {
-      if (!habit || !await confirmAction(`删除 ${habit.name}？`, '仅未打卡的习惯可以删除。已有打卡历史的习惯请停用。', '删除习惯')) return
-      try { await deleteUnusedHabit(habit.id); await manager(); await refreshTodayHabitCard() } catch (error) { fail(error) }
+      if (!habit || !await confirmAction('删除习惯？', '删除后无法恢复。', '删除习惯')) return
+      try { await deleteUnusedHabit(habit.id); reorderMode = false; await manager(); await refreshTodayHabitCard() } catch (error) { fail(error) }
     })
   }
-  if (openCreate) form()
+  if (openCreate) await editor()
   else await manager()
 }
 
