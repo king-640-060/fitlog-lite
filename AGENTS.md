@@ -7,7 +7,7 @@ This file is the required entry point for AI-assisted work in this existing prod
 - Product: FitLog Lite, a single-user, local-first, iPhone-first fitness log.
 - Runtime: offline-capable PWA built with Vanilla TypeScript, HTML, CSS, and Vite.
 - Persistence: Dexie over IndexedDB; hosting: GitHub Actions to GitHub Pages.
-- Product data stays on the current device unless the user exports a backup.
+- Product data stays on the current device unless the user exports a backup or explicitly uploads an encrypted GitHub recovery copy. GitHub Sync V1 is manual, never background synchronization.
 - Data reliability and historical correctness take priority over convenience.
 
 ## Production User Data Preservation Contract

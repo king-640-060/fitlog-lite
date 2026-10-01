@@ -1,0 +1,20 @@
+import { describe, expect, it, vi } from 'vitest'
+import { GitHubSyncClient, GITHUB_SYNC_PATH } from '../src/services/githubSyncService'
+import { bytesToBase64 } from '../src/services/syncCryptoService'
+const config = { owner: 'test-owner', repo: 'private-data', defaultBranch: 'main', remotePath: GITHUB_SYNC_PATH }
+const response = (body: unknown, status = 200, headers = {}) => new Response(JSON.stringify(body), { status, headers })
+const client = (...responses: Response[]) => { const fetcher = vi.fn(); for (const r of responses) fetcher.mockResolvedValueOnce(r); return { api: new GitHubSyncClient('synthetic-token-not-real', fetcher), fetcher } }
+describe('GitHub encrypted file transport', () => {
+  it('verifies private initialized repository and Contents access without writing', async () => { const { api, fetcher } = client(response({ private: true, default_branch: 'main' }), response([])); expect(await api.connect(config.owner, config.repo)).toEqual(config); expect(fetcher.mock.calls.every(([, init]) => init.method === 'GET')).toBe(true) })
+  it.each([[{ private: false }, 'Private'], [{ private: true, archived: true }, '归档'], [{ private: true }, '初始化']])('blocks unsafe repository %j', async (metadata, message) => { const { api } = client(response(metadata)); await expect(api.connect(config.owner, config.repo)).rejects.toThrow(message) })
+  it('distinguishes missing file from missing repository', async () => { const { api } = client(response({}, 404), response({}, 404)); expect(await api.getRemote(config)).toBeUndefined(); await expect(api.connect(config.owner, config.repo)).rejects.toThrow('仓库不存在') })
+  it.each([[401, {}, 'Token 无效'], [403, {}, 'Contents'], [403, { 'x-ratelimit-remaining': '0' }, '限制'], [429, {}, '限制'], [500, {}, '稍后重试']])('handles %s without exposing server response', async (status, headers, message) => { const { api } = client(response({ message: 'synthetic-secret-must-not-leak' }, status, headers)); await expect(api.getRemote(config)).rejects.toThrow(message) })
+  it('reads UTF-8 encrypted content and uses immutable blobs for large files', async () => { const text = '{"format":"test-中文"}', content = bytesToBase64(new TextEncoder().encode(text)), { api, fetcher } = client(response({ type: 'file', sha: 'abc', encoding: 'base64', content }), response({ type: 'file', sha: 'def', encoding: 'none' }), response({ encoding: 'base64', content })); expect(await api.getRemote(config)).toEqual({ sha: 'abc', text }); expect(await api.getRemote(config)).toEqual({ sha: 'def', text }); expect(fetcher.mock.calls[2]![0]).toContain('/git/blobs/def') })
+  it('first upload omits SHA; update includes current SHA, default branch and auth header', async () => {
+    const { api, fetcher } = client(response({ content: { sha: 'one' } }), response({ content: { sha: 'two' } })); await api.putRemote(config, 'encrypted-only'); await api.putRemote(config, 'encrypted-only', 'one')
+    const [url, first] = fetcher.mock.calls[0]!, second = fetcher.mock.calls[1]![1]; expect(url).not.toContain('synthetic-token'); expect(JSON.parse(first.body)).not.toHaveProperty('sha'); expect(JSON.parse(second.body)).toMatchObject({ sha: 'one', branch: 'main' }); expect(second.headers.Authorization).toBe('Bearer synthetic-token-not-real')
+  })
+  it.each([409, 422])('stops at PUT conflict %s without retry', async status => { const { api, fetcher } = client(response({}, status)); await expect(api.putRemote(config, 'encrypted-only', 'old')).rejects.toMatchObject({ code: 'conflict' }); expect(fetcher).toHaveBeenCalledTimes(1) })
+  it('binds native browser fetch to the global receiver', async () => { const fetcher = vi.fn(function () { if (this !== globalThis) throw new Error('Illegal invocation'); return Promise.resolve(response({}, 404)) }); expect(await new GitHubSyncClient('synthetic', fetcher).getRemote(config)).toBeUndefined() })
+  it('network failure is not treated as remote absence', async () => { const fetcher = vi.fn().mockRejectedValue(new Error('server-secret')); await expect(new GitHubSyncClient('synthetic', fetcher).getRemote(config)).rejects.toMatchObject({ code: 'network' }) })
+})

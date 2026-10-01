@@ -892,3 +892,18 @@ body.keyboard-open .modal-body { scroll-padding-bottom: calc(28px + var(--keyboa
 .completion-meal-picker button { min-height: 44px; padding: 0 5px; font-size: .8rem; }
 .completion-meal-picker button:active { background: var(--accent-soft); color: var(--accent-strong); }
 .completion-empty p { margin: 0 0 10px; color: var(--text-secondary); font-size: .83rem; line-height: 1.5; }
+
+/* Device-local encrypted recovery; share the existing sheet/keyboard behavior. */
+.github-sync { display: grid; gap: 16px; min-width: 0; }
+.github-sync h3 { margin: 0; font-size: 18px; }
+.sync-note, .sync-status { margin: 0; color: var(--text-secondary); font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
+.sync-status:empty { display: none; }
+.sync-status { color: var(--accent-strong); }
+.sync-details { margin: 0; padding: 14px; border-radius: 18px; background: var(--surface-soft); display: grid; gap: 12px; }
+.sync-details div { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px; font-size: 13px; }
+.sync-details dt { color: var(--text-secondary); }
+.sync-details dd { margin: 0; overflow-wrap: anywhere; }
+.github-sync input { font-size: 16px; min-width: 0; }
+.github-sync button { min-height: 44px; }
+.github-sync .restore-counts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 18px; margin-bottom: 0; font-size: 13px; }
+.github-sync .restore-counts p { gap: 8px; padding: 8px 0; }

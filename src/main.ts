@@ -1,3 +1,4 @@
+import { showGitHubSync, githubSyncDetail } from './ui/githubSync'
 import './styles/main.css'
 import './styles/plan.css'
 import { Chart, registerables } from 'chart.js'
@@ -742,7 +743,7 @@ function showManagementHub(): void {
   const dialog = openModal('管理与设置', '<div id="management-hub"></div>')
   const view = dialog.querySelector<HTMLElement>('#management-hub')!
   const row = (id: string, iconName: IconName, title: string, detail: string) => `<button id="${id}"><span class="setting-icon">${icon(iconName, 18)}</span><span><strong>${title}</strong><small>${detail}</small></span>${icon('chevron', 17)}</button>`
-  view.innerHTML = `<section class="settings-section"><h3>内容与模板</h3><div class="settings-group">${row('more-food-library', 'utensils', '食物库', '管理食物与营养数据')}${row('more-exercise-library', 'dumbbell', '动作库', '管理力量训练动作')}${row('more-workout-templates', 'activity', '训练模板', '管理常用训练组合')}${row('more-diet-templates', 'archive', '饮食模板', '管理常用饮食组合')}</div></section><section class="settings-section"><h3>个人管理</h3><div class="settings-group">${row('more-habits', 'leaf', '习惯', '创建、排序与停用打卡习惯')}</div></section><section class="settings-section"><h3>数据与备份</h3><div class="settings-group">${row('more-import', 'upload', '导入数据', '从表格或数据文件导入食物')}${row('more-backup', 'download', '备份与恢复', '导出或恢复完整本地数据')}</div><div class="management-local-note"><span aria-hidden="true">${icon('archive', 15)}</span><p><strong>本地数据</strong>数据仅保存在当前设备。清除浏览器数据或更换设备前，请先导出完整备份。</p></div></section><section class="settings-section"><h3>应用</h3><div class="settings-group">${row('more-about', 'info', '关于 FitLog Lite', 'FitLog Lite · 本地优先')}</div></section>`
+  view.innerHTML = `<section class="settings-section"><h3>内容与模板</h3><div class="settings-group">${row('more-food-library', 'utensils', '食物库', '管理食物与营养数据')}${row('more-exercise-library', 'dumbbell', '动作库', '管理力量训练动作')}${row('more-workout-templates', 'activity', '训练模板', '管理常用训练组合')}${row('more-diet-templates', 'archive', '饮食模板', '管理常用饮食组合')}</div></section><section class="settings-section"><h3>个人管理</h3><div class="settings-group">${row('more-habits', 'leaf', '习惯', '创建、排序与停用打卡习惯')}</div></section><section class="settings-section"><h3>数据与备份</h3><div class="settings-group">${row('more-import', 'upload', '导入数据', '从表格或数据文件导入食物')}${row('more-backup', 'download', '备份与恢复', '导出或恢复完整本地数据')}${row('more-github-sync', 'archive', 'GitHub 同步', esc(githubSyncDetail()))}</div><div class="management-local-note"><span aria-hidden="true">${icon('archive', 15)}</span><p><strong>本地数据</strong>日常记录保存在当前设备。清除浏览器数据或更换设备前，请先导出完整备份或手动完成 GitHub 同步。</p></div></section><section class="settings-section"><h3>应用</h3><div class="settings-group">${row('more-about', 'info', '关于 FitLog Lite', 'FitLog Lite · 本地优先')}</div></section>`
   view.querySelector('#more-food-library')?.addEventListener('click', () => void showFoodLibrary())
   view.querySelector('#more-exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
   view.querySelector('#more-workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
@@ -750,6 +751,7 @@ function showManagementHub(): void {
   view.querySelector('#more-habits')?.addEventListener('click', () => void showHabitManager())
   view.querySelector('#more-import')?.addEventListener('click', () => void showFoodLibrary())
   view.querySelector('#more-backup')?.addEventListener('click', () => void showSettings().catch(fail))
+  view.querySelector('#more-github-sync')?.addEventListener('click', () => { void flushWorkoutAutosave().then(() => showGitHubSync({ openModal, esc, toast, restored: async () => { workoutAutosave.cancel(); currentWorkout = undefined; workoutEditorOpen = false; await render() } })).catch(fail) })
   view.querySelector('#more-about')?.addEventListener('click', () => { openModal('应用信息', `<div class="about-card"><span class="brand-mark large">${icon('leaf', 30)}</span><h2>FitLog Lite</h2><p>一款轻盈、安静的本地个人健康记录工具。</p><small>饮食 · 力量训练 · 体重 · 凯格尔训练</small></div>`) })
 }
 
