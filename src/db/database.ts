@@ -1,6 +1,8 @@
 import Dexie, { type EntityTable } from 'dexie'
 import type { CardioSession, DietTemplate, Exercise, Food, FoodLog, Habit, HabitCheckIn, NutritionTarget, PelvicFloorSession, Task, TaskTag, WeightLog, Workout, WorkoutTemplate } from './types'
 
+export const PRODUCTION_DATABASE_NAME = 'fitlog-lite-db'
+
 export const STARTER_EXERCISE_NAMES = ['杠铃卧推', '深蹲', '硬拉', '引体向上', '哑铃弯举', '杠铃划船', '哑铃侧平举'] as const
 
 export class FitLogDatabase extends Dexie {
@@ -19,7 +21,7 @@ export class FitLogDatabase extends Dexie {
   tasks!: EntityTable<Task, 'id'>
   taskTags!: EntityTable<TaskTag, 'id'>
 
-  constructor(name = 'fitlog-lite-db') {
+  constructor(name = PRODUCTION_DATABASE_NAME) {
     super(name)
     this.version(1).stores({
       foods: 'id, name, brand, [name+brand], createdAt',

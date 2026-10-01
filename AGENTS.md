@@ -10,6 +10,23 @@ This file is the required entry point for AI-assisted work in this existing prod
 - Product data stays on the current device unless the user exports a backup.
 - Data reliability and historical correctness take priority over convenience.
 
+## Production User Data Preservation Contract
+
+This contract is a highest-priority release requirement, including GitHub Sync:
+
+- Normal startup and deployment must preserve business data; never reset IndexedDB.
+- `fitlog-lite-db` is the stable production persistence identity. Never rename it for convenience.
+- Never use deleteDatabase, db.delete, or clear-all as a normal upgrade or schema repair.
+- Every schema change requires an explicit Dexie migration that preserves all prior production records and historical semantics. The new app must open the previous production database without data loss.
+- Never recompute FoodLog/Workout historical snapshots from current libraries or templates during migration.
+- Preserve supported older Backup Restore formats when upgrading Backup schemas.
+- Restore must validate completely before replacing data in one transaction.
+- Keep frozen legacy production fixtures unchanged; add new fixtures for later production versions. Run preservation, reopen, populate, migration, and Backup compatibility tests before release.
+- Compatibility failures block release. “Users can re-enter data” and “clear the database” are not migration plans.
+- GitHub Sync must respect the same contract: encrypt before upload, validate before restore, explicit confirmation before replacing local or divergent remote data.
+
+User data compatibility is a release blocker, not a best-effort requirement.
+
 ## Required context loading order
 
 At the beginning of every new task:
