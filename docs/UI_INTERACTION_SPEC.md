@@ -55,6 +55,15 @@ The shared page backdrop keeps the warm white base, restrained asymmetric glows,
 - Show “未分类” only when records actually lack a meal. Editing a record may explicitly assign or clear its meal. Recompute each meal's nutrients from its FoodLog snapshots, not stored subtotals.
 - The four meal sections use light separators, compact empty guidance, and an expandable record list. Preserve editing and deletion for every FoodLog, including unclassified and long lists.
 
+## Nutrition completion
+
+- Nutrition completion belongs to the selected Food date. It derives remaining targets from existing NutritionTarget and FoodLog snapshots, while suggestions use current Food Library values. Calories and macros are independent stored values; never derive calories from macros.
+- Missing macro data is unknown, never zero. A missing snapshot excludes that target dimension from optimization; a candidate missing an active dimension is excluded from that computation. Show uncertainty in text.
+- The optimizer is local, deterministic, bounded, and requires no AI or network. Suggestions are ephemeral, may be approximate, and never become factual FoodLogs until explicitly adopted. Do not claim a perfect or globally optimal match.
+- Future-date suggestions are preview-only and cannot create factual FoodLogs. Today and past dates may be recorded after the user actually eats the suggested foods. Capture the date when opening the sheet.
+- Adoption expands a meal picker inside the same sheet and writes the whole plan atomically as ordinary FoodLog snapshots. Disable adoption during writing to prevent duplicate taps. Only saved records enter Calendar, Reports, Backup, or clear-day behavior.
+- Keep the gap strip compact below Food nutrition metrics. Use clean warm plan surfaces and restrained Fresh Green actions; preserve the calorie ring's visual priority and readable long food names at 320 px.
+
 ## Motion and performance
 
 - Buttons press in about 100–140 ms; state changes take 150–220 ms; sheets take 220–280 ms; number counts take 300–500 ms. Keep motion finite, lightweight, and secondary to responsiveness.

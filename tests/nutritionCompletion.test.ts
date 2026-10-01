@@ -106,3 +106,21 @@ describe('本地确定性营养补齐', () => {
     expect(isFutureBusinessDate('2027-01-01', '2026-12-31')).toBe(true)
   })
 })
+
+import { completionDateLabel, completionGapText } from '../src/ui/nutritionCompletion'
+describe('补齐界面文案', () => {
+  it('今天、过去、未来的标题及按钮明确', () => {
+    expect(completionDateLabel('2026-10-01', '2026-10-01')).toBe('补齐今日营养')
+    expect(completionDateLabel('2026-10-01', '2026-10-01', true)).toBe('帮我补齐')
+    expect(completionDateLabel('2026-09-30', '2026-10-01')).toBe('补齐当日营养')
+    expect(completionDateLabel('2026-10-02', '2026-10-01')).toBe('预览补齐方案')
+  })
+  it('缺口、已超、未知及达标均有文字语义', () => {
+    const f = food('unknown', 100, 20, 0, 0); delete f.fat
+    const r = getNutritionCompletionSummary({ calories: 200, protein: 10, carbs: 0, fat: 20 }, [createFoodLogSnapshot(f, 100, '2026-10-01')])
+    expect(completionGapText(r, 'calories')).toBe('还差 100 kcal')
+    expect(completionGapText(r, 'protein')).toBe('已超 10 g')
+    expect(completionGapText(r, 'carbs')).toBe('已达目标')
+    expect(completionGapText(r, 'fat')).toBe('数据不完整')
+  })
+})

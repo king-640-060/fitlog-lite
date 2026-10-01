@@ -3,6 +3,9 @@ import './styles/plan.css'
 import { Chart, registerables } from 'chart.js'
 import { registerSW } from 'virtual:pwa-register'
 import { db } from './db/database'
+import { applyNutritionCompletionPlan } from './services/nutritionCompletionService'
+import { completeNutrition, completionKeys, getNutritionCompletionSummary, isFutureBusinessDate, type NutritionCompletionSummary } from './utils/nutritionCompletion'
+import { completionDateLabel, completionGapText, completionLabels } from './ui/nutritionCompletion'
 import type { CardioActivityType, CardioSession, DietTemplate, Exercise, Food, FoodLog, Habit, HabitCheckIn, MealType, NutritionGoal, NutritionTarget, Task, TaskTag, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
 import { exportBackup, restoreBackup, validateBackup, type ValidatedBackup } from './services/backupService'
 import { clearDayRecords } from './services/dayRecordsService'
@@ -1140,8 +1143,9 @@ async function renderFoodPage(): Promise<void> {
   const calorieTarget = target?.calories
   const calorieAmount = calorieTarget === undefined ? `${formatNumber(totals.calories)} kcal` : `${formatNumber(totals.calories)} / ${formatNumber(calorieTarget)} kcal`
   const groups = groupFoodLogs(logs)
+  const completionStrip = target ? foodCompletionStripHtml(requestedDate, getNutritionCompletionSummary(target, logs)) : ''
   const slotHtml = `<div class="food-content-body" data-food-date="${requestedDate}">
-    <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="food-calorie-row"><div class="calorie-gauge" data-progress-key="calories" data-actual="${totals.calories}" ${calorieTarget === undefined ? '' : `data-goal="${calorieTarget}"`} aria-label="热量 ${calorieAmount} ${goalStatusText(totals.calories, calorieTarget, 'kcal')}">${ringSvgHtml(totals.calories, calorieTarget, 'large', previous.get('calories'))}<div class="calorie-gauge-center"><strong data-count-from="${previous.get('calories')?.actual ?? 0}" data-count-to="${totals.calories}">${formatNumber(previous.get('calories')?.actual ?? 0)}</strong><small>kcal</small></div></div><div class="calorie-gauge-caption"><span>当日摄入</span>${calorieTarget === undefined ? '<strong>按自己的节奏记录</strong>' : `<strong>目标 ${formatNumber(calorieTarget)} kcal</strong>`}<span class="${getGoalProgress(totals.calories, calorieTarget).state === 'above' ? 'metric-excess' : ''}">${goalStatusText(totals.calories, calorieTarget, 'kcal')}</span></div></div><div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div></section>
+    <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="food-calorie-row"><div class="calorie-gauge" data-progress-key="calories" data-actual="${totals.calories}" ${calorieTarget === undefined ? '' : `data-goal="${calorieTarget}"`} aria-label="热量 ${calorieAmount} ${goalStatusText(totals.calories, calorieTarget, 'kcal')}">${ringSvgHtml(totals.calories, calorieTarget, 'large', previous.get('calories'))}<div class="calorie-gauge-center"><strong data-count-from="${previous.get('calories')?.actual ?? 0}" data-count-to="${totals.calories}">${formatNumber(previous.get('calories')?.actual ?? 0)}</strong><small>kcal</small></div></div><div class="calorie-gauge-caption"><span>当日摄入</span>${calorieTarget === undefined ? '<strong>按自己的节奏记录</strong>' : `<strong>目标 ${formatNumber(calorieTarget)} kcal</strong>`}<span class="${getGoalProgress(totals.calories, calorieTarget).state === 'above' ? 'metric-excess' : ''}">${goalStatusText(totals.calories, calorieTarget, 'kcal')}</span></div></div><div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div>${completionStrip}</section>
     <section class="food-meals-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '按餐次记录，更清楚'}</span></div>${logs.length ? '<button class="food-save-template" id="save-day-diet-template" type="button" aria-label="将当天饮食保存为模板">保存为模板</button>' : ''}</section>
     <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday)).join('')}</div></div>`
   let rail = view.querySelector<HTMLElement>('.food-date-rail')
@@ -1181,6 +1185,7 @@ function bindFoodHeader(): void {
 }
 
 function bindFoodContent(slot: HTMLElement, target: NutritionTarget | undefined, logs: FoodLog[]): void {
+  slot.querySelector('#food-completion-open')?.addEventListener('click', () => void showNutritionCompletion(slot.dataset.foodDate!))
   slot.querySelector('#save-day-diet-template')?.addEventListener('click', () => void saveDayAsDietTemplate(logs))
   slot.querySelector('[data-edit-nutrition-target]')?.addEventListener('click', () => showNutritionTargetForm(foodDate, target))
   slot.querySelectorAll<HTMLButtonElement>('[data-add-meal]').forEach((button) => button.addEventListener('click', () => { const meal = button.dataset.addMeal; if (isMealType(meal)) void showAddFoodLog(meal) }))
@@ -1198,6 +1203,55 @@ function bindFoodContent(slot: HTMLElement, target: NutritionTarget | undefined,
       event.preventDefault(); try { const data = new FormData(event.currentTarget as HTMLFormElement); const meal = valueOf(data, 'meal'); await updateFoodLogDetails(log.id, valueOf(data, 'grams'), isMealType(meal) ? meal : undefined); dialog.close(); toast('已保存'); await renderFoodPage() } catch (error) { fail(error) }
     })
   }))
+}
+
+function foodCompletionStripHtml(date: string, summary: NutritionCompletionSummary): string {
+  const metrics = completionKeys.filter((key) => summary.target[key] !== undefined).map((key) => `${completionLabels[key]}${completionGapText(summary, key)}`).join(' · ')
+  return `<div class="food-completion-strip"><div class="food-completion-summary"><strong>剩余目标</strong><p>${esc(metrics)}</p>${summary.nothingToComplete ? `<span>${summary.uncertainKeys.length ? '可确定的目标暂无需要补齐的部分' : '当前没有需要补齐的目标'}</span>` : ''}</div>${summary.nothingToComplete ? '' : `<button type="button" class="secondary" id="food-completion-open">${completionDateLabel(date, getLocalDateString(), true)}</button>`}</div>`
+}
+
+async function showNutritionCompletion(date: string): Promise<void> {
+  const dialog = openModal(completionDateLabel(date, getLocalDateString()), '<p role="status" class="completion-note">正在计算方案…</p>')
+  try {
+    const [target, logs, foods] = await Promise.all([db.nutritionTargets.where('date').equals(date).first(), db.foodLogs.where('date').equals(date).toArray(), db.foods.toArray()])
+    if (!dialog.isConnected || !dialog.open) return
+    if (!target) { dialog.querySelector('.modal-body')!.innerHTML = '<p class="completion-note">请先为这个日期设置营养目标。</p>'; return }
+    const result = completeNutrition(target, logs, foods)
+    const future = isFutureBusinessDate(date)
+    const amount = (key: typeof completionKeys[number], value: number | undefined): string => value === undefined ? '数据不完整' : `${formatNumber(value)} ${key === 'calories' ? 'kcal' : 'g'}`
+    const gaps = completionKeys.filter((key) => target[key] !== undefined).map((key) => `<div><span>${completionLabels[key]}</span><strong>${completionGapText(result, key)}</strong></div>`).join('')
+    const uncertainty = result.uncertainKeys.length ? `<p class="completion-note">部分记录缺少${result.uncertainKeys.map((key) => completionLabels[key]).join('、')}数据，对应目标未参与补齐计算。</p>` : ''
+    const planHtml = result.plans.map((plan, index) => `<article class="completion-plan"><div class="completion-plan-heading"><h3>方案 ${index + 1}</h3><span>${index === 0 ? '最接近当前目标' : '另一种组合'}</span></div><ul class="completion-plan-items">${plan.items.map((item) => `<li><div><strong>${esc(item.food.name)}</strong>${item.food.brand ? `<small>${esc(item.food.brand)}</small>` : ''}</div><b>${formatNumber(item.grams)} g</b></li>`).join('')}</ul><div class="completion-plan-summary"><h4>预计补充</h4><p>${completionKeys.map((key) => `${completionLabels[key]} ${amount(key, plan.added[key])}`).join(' · ')}</p><h4>补充后预计</h4><dl>${completionKeys.filter((key) => target[key] !== undefined).map((key) => `<div><dt>${completionLabels[key]}</dt><dd>${plan.projected[key] === undefined ? '数据不完整' : `${formatNumber(plan.projected[key]!)} / ${formatNumber(target[key]!)} ${key === 'calories' ? 'kcal' : 'g'}`}</dd></div>`).join('')}</dl></div>${future ? '' : `<button type="button" class="secondary completion-adopt" data-completion-adopt="${index}" aria-label="采用方案 ${index + 1}" aria-expanded="false">采用方案</button><div class="completion-meal-picker" id="completion-meals-${index}" hidden></div>`}</article>`).join('')
+    const empty = result.nothingToComplete ? (result.uncertainKeys.length ? '可确定的目标暂无需要补齐的部分。' : '当前没有需要补齐的目标。') : foods.length === 0 || result.excludedFoodCount === foods.length ? '食物库里还没有足够的营养数据来计算方案。' : '根据现有食物，暂未找到能改善剩余目标的方案。'
+    dialog.querySelector('.modal-body')!.innerHTML = `<div class="nutrition-completion"><p class="completion-note">${formatHeaderDate(date)} · 根据你的食物库计算建议克数。</p><section aria-label="剩余目标"><h3 class="completion-section-label">剩余目标</h3><div class="completion-gap-grid">${gaps}</div></section>${uncertainty}${future ? '<p class="completion-note completion-future" role="status">这是未来日期的计划建议，到了当天实际吃下后再记录。未来日期仅预览。</p>' : ''}${result.plans.length ? `${result.plans[0]!.closeEnough ? '' : '<p class="completion-note">根据现有食物，以下方案会尽量接近目标，部分目标可能仍有差距。</p>'}${planHtml}` : `<div class="completion-empty"><p>${empty}</p>${result.nothingToComplete ? '' : '<button type="button" class="secondary" id="completion-library">打开食物库</button>'}</div>`}${result.excludedFoodCount ? `<p class="completion-note">有 ${result.excludedFoodCount} 项食物因营养数据不完整未参与计算。</p>` : ''}</div>`
+    dialog.querySelector('#completion-library')?.addEventListener('click', () => { dialog.close(); void showFoodLibrary() })
+    let applying = false
+    dialog.querySelectorAll<HTMLButtonElement>('[data-completion-adopt]').forEach((button) => button.addEventListener('click', () => {
+      if (applying) return
+      const index = Number(button.dataset.completionAdopt)
+      dialog.querySelectorAll<HTMLElement>('.completion-meal-picker').forEach((picker) => { picker.hidden = true; picker.innerHTML = '' })
+      dialog.querySelectorAll('[data-completion-adopt]').forEach((item) => item.setAttribute('aria-expanded', 'false'))
+      const picker = dialog.querySelector<HTMLElement>(`#completion-meals-${index}`)!
+      picker.hidden = false
+      button.setAttribute('aria-expanded', 'true')
+      picker.innerHTML = `<p>实际吃下后，加入哪一餐？</p><div>${[...mealTypes, ''].map((meal) => `<button type="button" data-completion-meal="${meal}">${isMealType(meal) ? mealNames[meal] : '未分类'}</button>`).join('')}</div>`
+      picker.querySelectorAll<HTMLButtonElement>('[data-completion-meal]').forEach((mealButton) => mealButton.addEventListener('click', async () => {
+        if (applying) return
+        applying = true
+        dialog.querySelectorAll<HTMLButtonElement>('[data-completion-adopt], [data-completion-meal]').forEach((item) => { item.disabled = true })
+        try {
+          const meal = mealButton.dataset.completionMeal
+          const created = await applyNutritionCompletionPlan(date, isMealType(meal) ? meal : undefined, result.plans[index]!.items)
+          dialog.close(); toast(`已添加 ${created.length} 项饮食记录`); await renderFoodPage()
+        } catch (error) {
+          applying = false
+          dialog.querySelectorAll<HTMLButtonElement>('[data-completion-adopt], [data-completion-meal]').forEach((item) => { item.disabled = false })
+          fail(error)
+        }
+      }))
+      picker.scrollIntoView({ block: 'nearest', behavior: 'auto' })
+    }))
+  } catch (error) { if (dialog.isConnected && dialog.open) dialog.querySelector('.modal-body')!.innerHTML = '<p class="completion-note">暂时无法计算方案，请关闭后重试。</p>'; fail(error) }
 }
 
 function nutritionGoalFields(goal?: NutritionGoal): string {
