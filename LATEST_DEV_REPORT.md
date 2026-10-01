@@ -1,124 +1,142 @@
 # FitLog Lite — Latest Development Report
 
-Latest verified production application snapshot. Sync main before trusting recorded SHAs. This report is a separate documentation commit after END_COMMIT.
+Latest verified production application snapshot. Sync main before trusting recorded SHAs. The report is a separate documentation commit after END_COMMIT.
 
 ## Current Git and Production State
 
-- Branch: `main`.
-- START_COMMIT: `d0dcde3372018721660af2e553d673a1d036eabd`.
-- DATA_PRESERVATION_COMMIT: `04e3860358bbcaddb707c17c0d794f70d9b2f612` — `Enforce production data preservation`.
-- GITHUB_SYNC_COMMIT / END_COMMIT: `ae616362e82344487d6dd9f7a0f2574e2584da9b` — `Add encrypted GitHub manual sync`.
-- REPORT_COMMIT / latest main HEAD: separate commit titled `Document data preservation and GitHub sync verification`; obtain its exact SHA from the latest main commit. A report cannot contain its own SHA without changing that SHA.
-- Production: https://king-640-060.github.io/fitlog-lite/.
-- Application Actions: [36857703769](https://github.com/king-640-060/fitlog-lite/actions/runs/36857703769), completed / success, including typecheck, tests, build, upload and deployment.
-- Initial tree was clean; `git pull --ff-only` succeeded with “Already up to date”. GitHub refs independently confirmed START_COMMIT. No kJ feature was present; it was not added this round. Existing nutrition completion is preserved.
-- Publishing used the existing Git Data API helper, verifying identical trees/commit SHAs and non-forced fast-forwards for the two application commits.
-
-## Data Preservation Verification
-
-**Normal app upgrades must preserve existing data.** This is now a highest-priority permanent contract in AGENTS.md: “User data compatibility is a release blocker, not a best-effort requirement.” DATA_PRESERVATION.md documents stable identity, migration/Backup policy, historical snapshots, destructive-operation allowlist and release verification.
-
-- Production DB identity remains **`fitlog-lite-db`**, now exported as `PRODUCTION_DATABASE_NAME` and locked by a regression test.
-- Destructive-data-loss audit found no automatic deleteDatabase, Dexie/db delete, startup clear-all, dynamic production DB rename, localStorage.clear, destructive upgrade, or Service Worker IndexedDB reset.
-- Full store clear remains only in existing Restore, after complete validation and inside one transaction. Clear Day and individual record deletion/check-in undo are explicit user operations. Tests delete only isolated test databases.
-- Dexie migrations add stores while preserving existing history. Populate seeds exercises only on first database creation; reopen never overwrites edited exercises or re-adds deleted defaults.
-- Frozen `tests/fixtures/legacyV7Database.ts` records the actual published V7/14-store schema. Its JSON fixture contains 15 representative records across all 14 stores, including stable ids, historical timestamps/local dates, nested sets/templates, optional missing values, relationships, and FoodLog/Workout snapshots differing from current library values. Future releases must retain this fixture and add later production fixtures.
-- Frozen V7 → current application opening: PASS, complete record comparison across every store.
-- Current database close/reopen: PASS, complete record comparison.
-- Populate-once/user-exercise preservation: PASS.
-- Backup V7 / Restore V1–V7 compatibility remains covered by the full passing suite.
-- GitHub Pages replaces static resources; Workbox cleanupOutdatedCaches cleans Cache Storage, not business IndexedDB. PWA/build/deployment configuration has no change this round.
-- **Production Upgrade Persistence Browser QA: PASS.** Before publishing, an isolated persistent Chrome profile loaded the preceding production app and saved the synthetic frozen records into all 14 stores. After deployment, the same profile loaded the new app (GitHub Sync entry verified) and all 15 records matched original ids and full values. This is actual cross-deployment browser persistence verification, separate from physical-device QA.
-
-Browser local data can still disappear if a user clears site data, deletes a profile, changes device/browser/origin, or the browser evicts storage; uninstall behavior can vary. No permanent-storage guarantee is claimed. Independent manual export and the new encrypted remote recovery copy provide recovery options. Remote recovery requires repository access, an existing backup and the data password.
-
-## Encrypted GitHub Manual Sync V1
-
-Management → Data & Backup now contains Import, independent Backup/Restore, and GitHub Sync. Setup uses single-column owner/repository/password Token inputs. Connection validates an accessible, private, non-archived repository and initialized default branch/Contents access. Public repositories are blocked. Users are instructed to create an independent data repository, initialize README, and use a fine-grained PAT for only that repository's **Contents: Read and write** permission. No extra permission is requested; actual write denial is handled at PUT without creating a test file.
-
-Only user actions make GitHub requests. No background/periodic sync, merge engine, OAuth, account service, backend, AI or cloud worker was added. The app calls GitHub REST directly with Authorization headers, the official API version `2026-03-10`, no credential query parameters, no-store cache policy, and a 20-second network timeout. Known API errors have safe fixed text; raw server response bodies are not exposed or logged. Larger Contents files are read via immutable Git blob SHA, avoiding a metadata/raw-file race and credential use on arbitrary download URLs.
-
-Transport parameters:
-
-| Item | Actual implementation |
+| Field | Verified value |
 | --- | --- |
-| Remote path | `fitlog/latest.enc.json` |
-| Branch | Repository's validated default branch |
-| Envelope | `fitlog-lite-encrypted-sync`, formatVersion **1** |
-| KDF | PBKDF2 / HMAC-SHA-256, **310000** iterations |
-| Salt | Fresh random **16 bytes** per encryption |
-| Cipher | AES-GCM, **256-bit** key |
-| IV / authentication tag | Fresh random **12-byte IV** / **128-bit tag** |
-| Implementation | Native Web Crypto; no new dependency |
-| Payload | Complete existing exportBackup(), UTF-8 encrypted before upload |
-| Payload bound | Plaintext Backup at most **20 MiB**; use manual export for larger data |
+| Branch | `main` |
+| START_COMMIT | `570351c5432fb4557adddb2df9018796eff35c38` |
+| SHARED_DATE_PICKER_COMMIT | `964c449f4dc09e2d15cafb0ebe2bacf43d41d65f` — Add shared FitLog date picker |
+| GITHUB_SYNC_SETUP_COMMIT | `4d965090eed47cfb7618410e44462bb4b99815f7` — Simplify GitHub sync setup |
+| END_COMMIT | `4d965090eed47cfb7618410e44462bb4b99815f7` |
+| REPORT_COMMIT / latest main HEAD | Separate commit titled `Document shared date picker and sync setup verification`; resolve with `git log -1 --format=%H -- LATEST_DEV_REPORT.md`. A report cannot contain its own SHA without changing that SHA. The final user report supplies the exact value. |
+| Production | https://king-640-060.github.io/fitlog-lite/ |
+| Application Actions | [36869284744](https://github.com/king-640-060/fitlog-lite/actions/runs/36869284744), completed / success |
 
-Envelope plaintext contains only protocol metadata and encrypted ciphertext, not names, nutrition, weight, counts or tasks. Identical input/password produces different envelopes through fresh salt/IV. Unsupported versions, malformed base64, invalid lengths and unexpected metadata fail safely; fixed KDF parameters prevent unbounded derivation from malicious envelope values. Wrong passwords and authenticated ciphertext tampering fail decryption. The app never claims perfect security.
+Initial tree was clean, branch main; `git pull --ff-only` succeeded with “Already up to date”. Both implementation commits were pushed through a normal Git fast-forward from START_COMMIT to END_COMMIT. This round implements shared business-date UI and preconfigured GitHub connection setup only. No kJ feature was present or added.
 
-GitHub token is stored only in device-local `fitlog-github-sync-token-v1` localStorage. Config and device/baseline metadata have separate versioned keys. None are added to business Backup. Same-origin script/browser access can read localStorage: this is the explicitly requested convenience tradeoff; scope/revoke tokens appropriately. Password and AES keys are never persisted or uploaded. Initial passwords require confirmation and at least 12 characters; an existing remote must decrypt and validate before any overwrite. A successful password may remain only in the current memory session; pagehide/disconnect clears it, with a lifecycle guard against late asynchronous caching.
+## Shared Date Picker Architecture and Scope
 
-## Sync Decisions, Conflicts and Restore Safety
+Before modification, the source audit found three user-facing native date inputs: Task, Food and Workout. After modification, **0 native business date inputs remain in src**. The regression scan covers literal date input attributes and dynamic `.type`, `setAttribute`, and object `type` construction. Its explicit exemption list is empty. Legacy Food input listeners/value writes and invisible-input CSS were removed.
 
-A pure decision helper compares SHA-256 fingerprints of business Backup.data and remote file SHAs. Canonical JSON excludes exportedAt, sorts top-level entities by id and object keys, preserves nested semantic array order, respects JSON undefined semantics, and does not mutate input. A read transaction captures all business stores consistently.
+`src/ui/datePicker.ts` supplies one `mountDatePicker(host, options)` controller with `value()`, `setValue()` and `destroy()`. It owns ephemeral selected/focused/visible-month state, markup, events, navigation and draft actions, with generic change/confirm/cancel callbacks. It has no knowledge of Food, Workout, Task or Dexie. All three integrations mount that same component rather than copying calendar markup.
 
-- Unchanged local/remote: current; identical actual content under a new envelope SHA: advance baseline without replacing either side.
-- Only local changed: upload encrypted current complete Backup.
-- Only remote changed: offer decrypted Restore preview and explicit confirmation; never silently replace local data.
-- Both changed with different content: explicit conflict UI. “Use GitHub data” previews Restore. “Keep local and upload” requires a second danger confirmation naming remote replacement scope. No automatic merge or overwrite.
-- No baseline + existing remote + untouched starter exercises: show “发现 GitHub 备份”, primary Restore, no normal upload action.
-- No baseline + meaningful local and remote data: explicit unpaired conflict choice. Default starter names alone never cause an empty new device to overwrite real remote data.
-- Remote missing after pairing: require confirmed recreation; network/API failure is never interpreted as missing.
-- Upload rechecks private/default-branch state and remote SHA, verifies the password against the existing validated remote, then captures/hashes/encrypts and PUTs with current SHA. PUT 409/422 triggers refetch then stops, never automatic retry. Local changes after inspection also stop. Failed uploads do not advance baseline.
-- Download/decrypt/JSON parse/validate/preview happen before local mutation. Preview shows encrypted backup timestamp and compact counts for all stores, explicit local replacement wording, and local export when meaningful data exists.
-- Confirmed Restore rechecks remote SHA and decrypts/validates again, checks local hash inside the same write transaction, then calls existing restoreBackup(). Crypto hashing uses Dexie.waitFor to preserve transaction lifetime. Local/remote changes after preview abort; failure preserves prior data.
-- Pending workout autosave is flushed before opening Sync; transient workout state is reset after Restore. Sheet actions are disabled during operations and service operations are serialized.
-- Disconnect removes only three transport keys, device baseline and memory password; neither local records nor the remote file is deleted.
+The original Monday-first `getMonthGridDays` algorithm was minimally extracted unchanged to `src/utils/calendarGrid.ts`; Progress Calendar imports it and retains its original re-export for compatibility. Progress history UI, aggregation and category markers were not redesigned. Time inputs are unchanged.
 
-Fresh Green surfaces and existing Sheet/VisualViewport/Safe Area behavior are reused. Inputs are 16px, actions at least 44px, long repository names wrap, and untrusted labels are escaped/errors use textContent. UI_INTERACTION_SPEC records the durable rules; GITHUB_SYNC.md documents setup, credentials, encryption, recovery and limits.
+- Monday-first, 42 dates / six rows; December↔January and outside-month selections update the visible month correctly.
+- Device-local YYYY-MM-DD, parsed at local noon; no UTC truncation. Tests check Asia/Shanghai, Pacific/Kiritimati and America/Los_Angeles date behavior.
+- Selected surface: soft fresh lime, deep green label, **38×38 px / 13 px radius**. Actual date hit areas are at least **44×48 px**, including 320 px viewport. Today independently shows a small dot and `aria-current="date"`; selection exposes `aria-selected`.
+- Grid/row/gridcell semantics, full Chinese date/weekday/Today/selected labels and one roving tab stop. Arrow keys move focus one/seven local days across months without changing selection; Enter/Space selects the focused draft.
+- Selection never commits a business date until explicit completion; cancel/dismiss leaves the caller's date unchanged. No month carousel or month animation.
 
-## Compatibility and Existing Features
+### Food
 
-- Dexie **V7 / 14 stores**; Backup **V7**; Restore **V1–V7**.
-- Encrypted Sync Envelope **V1** is a separate transport version, not a business Backup upgrade.
-- No business store, index, schema migration, dependency, package/lockfile change, or Backup format change.
-- Existing Food snapshots, local date semantics, deterministic nutrition completion, Plan/Habit, training, Calendar/Reports, templates, manual Backup and Clear Day remain. Upload/check do not mutate business stores; only explicitly confirmed Restore replaces them.
+The invisible native label/input became a real `#food-date-picker-open` button. Opening captures the current Food date. Selecting a draft leaves the underlying Date Rail and content unchanged. Completion closes the Sheet and calls the original `commitFoodDate(date, true)` only for a changed date. The Date Rail's native scroll momentum, snapping, center lens, finite window, settlement, edge recentering, stale async guard and return-Today shortcut remain intact. Nearby dates still use the rail.
+
+### Task / Plan
+
+The existing Task Sheet preserves its form DOM while a sibling date subview is visible. No second dialog is opened. A hidden date input retains FormData persistence semantics. Completion updates that input/visible label and returns to the form; cancellation or Escape in the subview returns without changing date. Title, selected hashtags, note and start/end times survive both paths. Today/Tomorrow/None remain direct choices; None retains existing time clearing and Inbox semantics. Browser checks saved a dated/time/tagged/note Task and a no-date Inbox Task and inspected their stored records.
+
+### Workout
+
+The compact `#workout-date-picker-open` button opens the shared component in a standalone Sheet. Completion sets workoutDate, resets currentWorkout/editor state and rerenders through the previous behavior. Browser checks selected a cross-year date, started an empty strength workout and confirmed that exact business date in IndexedDB. Cancellation uses the same draft-only wrapper as Food.
+
+## Touch, Focus and Motion Verification
+
+| Control/state | Actual implementation and browser observation |
+| --- | --- |
+| Trigger press | Scale `.985`, soft background, **120 ms** |
+| Trigger release | **160 ms ease-out** |
+| Date cell press | Scale `.97`, **110 ms** |
+| Selected surface transition | Background/color **170 ms ease-out** |
+| Selection geometry | **38 px**, radius **13 px** |
+| Month controls | At least **44 px**, quiet background feedback; no month animation |
+| Border width | **1 px** before/while pressing; no width jump |
+| Touch focus | `:focus-visible` false, outline style **none**, no painted persistent outline |
+| Keyboard focus | `:focus-visible` true, **2 px solid** outline; border width unchanged |
+| Reduced Motion | New transitions and pressed transforms disabled; selection/Today remain visible |
+
+A supplemental local browser check exercised Food/Task/Workout trigger press, date touch, keyboard focus and month arrows at all four widths. It observed the actual computed transforms/durations and stable borders. A non-painted default computed outline width does not represent a visible outline; outline style was verified as none for touch. No global focus suppression was added. Screenshots at 320 px and production 390/430 were inspected.
+
+## GitHub Setup UX and Compatibility
+
+New/disconnected setup preconfigures:
+
+- Owner: **`king-640-060`**.
+- Repository: **`fitlog-lite-data`**.
+- Path: **`fitlog/latest.enc.json`**.
+- Branch: repository's validated `default_branch`.
+
+The first screen displays the fixed destination and waiting status, and has **only one editable field: Personal Access Token**, password-style, 16 px, autocomplete off. Users do not enter owner/repo/branch/path. A compact “准备 GitHub” disclosure explains Private repository creation, README initialization, Only selected repositories → fitlog-lite-data, Contents: Read and write. Quiet GitHub creation/Token links contain no secrets and use noopener/noreferrer.
+
+Connection immediately checks the remote inside the same Sheet. A missing sync file shows “创建第一份加密备份” with password and confirmation, at least 12 characters. Existing backups show “发现已有 GitHub 备份” with one password field and “解锁并检查”. Subsequent upload/Restore/conflict confirmations remain explicit. The password explanation distinguishes it from GitHub credentials, says FitLog does not save it, and names its necessity for another device and the consequence of losing it.
+
+The UI helper applies defaults only when explicitly connecting from an unconnected setup. The generic transport's `connect(owner, repo, token)` is preserved. Existing saved owner/repo/default branch/baseline are never overwritten merely by opening the new interface. Unit and browser checks used `another-owner / previous-private-repo`, `legacy-branch` and a preexisting baseline; all values stayed byte-for-byte intact, status showed the saved repository, and opening produced no GitHub request. Disconnect returns to default setup while preserving local records and remote backup.
+
+404 names `king-640-060/fitlog-lite-data` and instructs creating a **Private Repository** and initializing **README**, with an additional Token-access hint. 403 retains Contents: Read and write guidance. Public, archived and uninitialized repositories remain blocked. The actual private data repository's existence/access has **not** been verified; no repository was created and no Administration permission was requested. Automated QA used synthetic tokens and mocked API responses only.
+
+## Encryption, Conflict and Data Preservation Regression
+
+Security and data handling are unchanged:
+
+- Manual Sync only; no startup/background network, periodic uploads, automatic merge or backend.
+- Token remains device-local localStorage, excluded from business Backup/remote/logs/URLs. Data password/key remains memory-only; pagehide/disconnect locking remains.
+- Envelope **V1**, PBKDF2/HMAC-SHA-256 **310000 iterations**, random **16-byte salt**, AES-GCM **256-bit key**, random **12-byte IV**, **128-bit authentication tag**. Complete versioned Backup is encrypted before upload.
+- Existing remote must decrypt and validate before replacement. Canonical hash decisions, remote SHA checks, preview races, explicit conflict/replacement/Restore confirmations, remote-missing protection and stopped/refetched PUT races are unchanged.
+- All prior crypto/hash/decision/transport/manual-sync-safety/data-preservation tests passed. The two-device mocked browser flow independently exercised encrypted full-store first upload, local-only updates, remote-only confirmed recovery, divergent conflicts, wrong-password no-mutation, SHA race without retry/baseline change, offline preservation and safe disconnect.
+
+Production persistence identity remains **`fitlog-lite-db`**. Dexie **V7 / 14 stores**, Backup **V7**, Restore **V1–V7**. No database name/schema/index/migration, Backup, dependency, package-lock, PWA or deployment configuration change.
+
+**Frozen V7 → current, reopen and populate-once preservation: PASS.** Frozen fixture files are unchanged. Historical snapshots and all 14 stores remain covered by the passing preservation suite.
+
+**Actual cross-deployment persistent-browser preservation: PASS.** An isolated persistent production Chrome profile already contained the frozen synthetic fixture (15 records across 14 stores). Immediately before publishing, all full records matched. After deployment, the same profile loaded and opened the new shared Food picker, then all ids/values in all 14 stores still matched, without clearing/reseeding the database. This is separate from fresh-profile browser QA and physical-device verification.
 
 ## Automated Verification
 
-- Typecheck: PASS.
-- Full tests: **269 / 25 files**, PASS (baseline 224 / 19).
-- New tests: 4 data preservation, 4 crypto, 3 hash, 10 decisions/fresh-install, 16 GitHub transport, 8 manual-sync safety: **45** total.
-- Coverage includes all-store frozen/reopen/populate preservation; UTF-8 round trip and plaintext leakage; wrong password/tampering/invalid envelope; canonical stability/nested order; all sync decision branches; public/archived/empty repositories; 401/403/404/409/422/rate/network responses; initial/update SHA payloads; immutable large-file reads; native browser fetch receiver; validated complete Restore; wrong-password/invalid-Backup no-mutation; local/remote preview races; failed-PUT refetch without retry/baseline change; confirmed disconnect with data preserved.
-- Local build: PASS — main JS **553.33 kB**, CSS **87.72 kB**, **17 precache entries / 661.29 KiB**.
-- Pages build: PASS — main JS **553.37 kB**, CSS **87.72 kB**, **17 entries / 661.39 KiB**.
-- `git diff --check`: PASS.
-- The existing nonblocking Vite main-bundle >500 kB warning remains. No new dependency or precache entry was introduced.
+| Check | Actual result |
+| --- | --- |
+| Typecheck | PASS |
+| Full Vitest suite | **286 tests / 28 files**, PASS; previous baseline 269 / 25 |
+| Added unit tests | 11 shared-date state/grid/ARIA/local-zone cases, 1 native-date audit, 5 setup/default/error/old-config cases |
+| Local build | PASS; main JS **559.15 kB**, CSS **90.59 kB** |
+| Pages build | PASS with GITHUB_REPOSITORY=king-640-060/fitlog-lite; main JS **559.19 kB**, CSS **90.59 kB** |
+| Precache | **17 entries**, local **669.77 KiB**, Pages **669.88 KiB** |
+| git diff --check | PASS |
+| Source native-date audit | **0**, no exemptions |
+
+The prior nonblocking Vite main-bundle >500 kB warning remains. No dependency or precache entry was added.
+
+Browser regressions are separate from Vitest: `tests/browser/sharedDatePicker.mjs` and `tests/browser/githubSyncSafety.mjs`; external runtime instructions are in `tests/browser/README.md`. No application browser automation dependency was introduced.
 
 ## Local Browser Verification
 
-Isolated mobile Chrome at **320×812, 375×812, 390×844, 430×932** used synthetic records and an intercepted/mock GitHub API, not real credentials. Each width exercised two independent devices: public-repo rejection; initial encrypted upload of all stores; decrypt/validate the mock remote; local-only upload; new starter-only device unlock; wrong password preserving local/remote/baseline; Restore preference/preview/full confirmed recovery; second-device update; remote-only confirmation; divergent conflict without PUT; explicit danger-confirmed remote replacement; concurrent PUT conflict/refetch/no retry; offline message/no business mutation; disconnect preserving local and remote data. Each pass produced five successful uploads and one stopped concurrent attempt, with no page errors or horizontal overflow.
+**320×812, 375×812, 390×844, 430×932: PASS** in isolated mobile/touch Chrome, timezone Asia/Shanghai.
 
-Browser integration exposed native fetch receiver binding, which was corrected and given a regression test. A harness launch-path correction was also needed; it was not an app defect. Visual QA led to compact two-column Restore counts. A final 390 pass after this adjustment passed; final 320 supplemental verification checks actual 44px actions and 16px input sizes. Setup, status, unlock, conflict, replacement, Restore and offline screenshots were inspected for restrained hierarchy and readable long names.
+Shared date checks: all three entries, 42 cells, >=44 px targets, no native inputs, no horizontal overflow, Food draft/cancel/commit/rail recenter/Today, cross-year month navigation and outside-month selection, keyboard draft selection, Task same form DOM and all unsaved fields/tags preserved, Today/Tomorrow/None, saved custom date, no-date Inbox, Workout stored date, Reduced Motion, no page errors. Supplemental press/focus checks passed for all modules/widths.
+
+Sync checks: old config/baseline compatibility with no opening request; disconnect defaults; Token-only new setup; expanded preparation layout; 404/403/public/archived/empty failures without saved config; automatic create/unlock password flow. At every width, the complete two-device safety flow produced five successful mock uploads and one stopped SHA-race attempt, preserved all-store backups and reported no page errors or overflow.
 
 ## Production Verification
 
-Application Actions succeeded. Production JS/CSS match the local Pages build byte for byte:
+Application Actions **36869284744** succeeded for END_COMMIT. Production assets match the local Pages build byte-for-byte:
 
-- `index-WTaZ2eZl.js`, **553379 bytes**, SHA-256 `ba2dd63d01d180b2a658196a28e3ab40ee5b284bda9cc84c94809062a930c2ee`.
-- `index-BIt_2fI4.css`, **87725 bytes**, SHA-256 `1d5edc38824970ba6e6442b49dbdca717e4ecbc58e3a90f7f9fd7b320aa32cea`.
+| Asset | Bytes | SHA-256 |
+| --- | --- | --- |
+| index-tymrJZUq.js | **559199** | `f2f0632eeaeace2a2b7cd753786c373f77e4f8d5c8a5bee58f54e002d94e08c9` |
+| index-D2PdFTAv.css | **90595** | `998050864cc128f7fb1a79bbbf79ce9601d46f8dc15a32929a12815ae95cc006` |
 
-**390×844 / 430×932** production pages passed the complete two-device sync browser flow above with mocked GitHub API requests. Management entry, setup, password unlock, state displays, conflict, Restore preview/application, offline handling and disconnect worked without page errors or overflow. Production status/screenshots were inspected. No real user Token or personal data was used, and no real private data repository was modified. Actual live PAT/private-repository integration was not exercised; tests verified the documented API contract using mocked responses.
-
-The separate actual production upgrade persistent-profile test passed with all 14 stores unchanged after the new application loaded, as described in Data Preservation Verification.
+**390×844 and 430×932: PASS** on the deployed Pages application for both browser suites. Food/Task/Workout shared pickers, draft/cancel/completion, Task unsaved fields/Inbox, cross-year dates, stored Workout date, keyboard/ARIA/Reduced Motion and management GitHub setup were checked. Production also passed the full old-config/error/setup/two-device sync flow with mocked GitHub requests. No real Token or private data repository was touched. Persistent-profile cross-deployment preservation passed separately. Screenshots of the production picker/setup were inspected.
 
 ## Manual Device Verification
 
-**Pending:** physical iPhone Safari and standalone PWA. Check setup keyboard/password-manager/native inputs, Sheet scrolling/Safe Area, network→offline→network, mobile PBKDF2 duration, post-sync state, and post-Restore rerender. Simulated Chrome is not physical iPhone verification.
+**Pending: physical iPhone Safari and standalone PWA.** Check no native picker, date taps, Task subview, Sheet height/scroll/Safe Area, keyboard focus, press feedback, Token/password keyboard, mobile crypto timing and real network sync. Simulated Chrome is not a physical iPhone pass.
 
-## Confirmed Limits and Remaining Risks
+**Pending: real PAT/private-data-repository integration.** Repository existence/access was not established. All automated GitHub QA was mocked, with synthetic data/credentials.
 
-No new confirmed application/test/browser/deployment defect remains. The existing bundle warning remains. Physical iPhone and live private-repository/PAT integration are unverified. V1 has no automatic sync, merge or history browser; the recovery copy is only as recent as the last successful manual upload. Payload limit is 20 MiB. Forgotten data passwords cannot decrypt remote recovery copies. Device-local credentials remain readable to same-origin script/browser access. Local storage can still be removed by user/browser actions, and remote access/repository availability depends on the user's GitHub configuration. These mechanisms do not imply an absolute security or permanent-data guarantee.
+No confirmed new implementation/test/browser/deployment defect remains. Existing bundle warning and manual-device/live-repository gaps remain. Encryption and local persistence do not imply absolute security or permanent storage; existing DATA_PRESERVATION and GITHUB_SYNC limits still apply.
 
 ## ChatGPT Baseline
 
-FitLog Lite: Vanilla TypeScript, local-first iPhone PWA. Verified application END_COMMIT `ae616362e82344487d6dd9f7a0f2574e2584da9b`; main includes a later report commit. Stable production DB `fitlog-lite-db`, Dexie V7/14 stores, Backup V7, Restore V1–V7. Permanent data compatibility release contract and frozen V7/all-store/reopen/populate tests now exist. Management has user-initiated encrypted GitHub recovery: Private initialized repo/default branch, path fitlog/latest.enc.json, Envelope V1/PBKDF2-SHA256 310000/AES-GCM256. PAT only device localStorage; data password memory only. Fingerprint/SHA decisions detect conflicts; fresh devices prefer Restore; validated previews/explicit confirmation precede transactional Restore; SHA races refetch and stop. No automatic merge/sync, backend, AI, dependency or business schema change. Existing nutrition completion and Fresh Green retained. Tests 269/25. Production 390/430 mocked sync and actual cross-deployment persistent-profile preservation PASS; real iPhone/live PAT integration unverified. Read AGENTS, this report, DATA_PRESERVATION, GITHUB_SYNC and UI_INTERACTION_SPEC; sync main and record a fresh START_COMMIT.
+FitLog Lite: Vanilla TS, local-first iPhone PWA. Application END_COMMIT `4d965090eed47cfb7618410e44462bb4b99815f7`; main includes the later verification report commit. Food/Task/Workout now use one draft-first shared custom Date Picker; native business-date inputs 0 with a regression guard. Monday-first 42-cell algorithm shared minimally with unchanged Progress Calendar. Task same-sheet subview preserves original form and Inbox/time semantics; Food commits distant jumps through existing Date Rail path. GitHub new setup preconfigures king-640-060/fitlog-lite-data, Token only then create/unlock data password; existing configurations stay intact. Generic transport, manual-only encrypted recovery and all conflicts/security unchanged. DB fitlog-lite-db; Dexie V7/14 stores, Backup V7, Restore V1–V7, Sync Envelope V1/PBKDF2-SHA256 310000/AES-GCM256. No business schema/dependency/kJ addition. Tests 286/28; local four-width browser and production 390/430 date/sync mock checks PASS; actual persistent-profile cross-deployment all-store preservation PASS. Actions 36869284744 success. Physical iPhone and real PAT/private-repo checks Pending. Read AGENTS, this report, UI_INTERACTION_SPEC, DATA_PRESERVATION, GITHUB_SYNC; sync main and record fresh START_COMMIT.
