@@ -4,7 +4,7 @@ Read this before changing UI or interaction code. This document holds durable pr
 
 ## Visual direction
 
-The interface is entirely Chinese and iPhone first: 浅、柔、净、暖、绿、稳. Use warm white surfaces, plant green emphasis, quiet spacing, clear numbers, and restrained feedback. Standard units such as kg, g, kcal, cm, s, and min may remain Latin. Do not show Workout, Nutrition, Progress, Set, Reps, RPE, or RIR as UI labels.
+The interface is entirely Chinese and iPhone first: 浅、柔、净、暖、绿、稳. Use warm ivory surfaces, fresh leaf emphasis, quiet spacing, clear numbers, and restrained feedback. Standard units such as kg, g, kcal, cm, s, and min may remain Latin. Do not show Workout, Nutrition, Progress, Set, Reps, RPE, or RIR as UI labels.
 
 Do not use human training illustrations, anatomical diagrams, food photography, large illustrations, large black areas, oppressive dark styling, esports styling, hard gym styling, 3D art, complex textures, large gradients, or persistent glow.
 
@@ -12,7 +12,9 @@ The shared page backdrop keeps the warm white base, restrained asymmetric glows,
 
 ## Color and status
 
-- Plant green is the main action and normal calorie/protein progress color; carbohydrates use warm yellow and fat uses soft orange.
+- Use fresh yellow-green sparingly for primary actions and compact active marks, supported by deep green ink and muted sage surfaces. Bright accents never serve as body text; lime primary surfaces use dark ink, including hover and pressed states.
+- Deep leaf green carries readable links, icons, and selected labels; muted sage and soft leaf surfaces carry secondary states. Calorie/protein rings use the darker accent-mid rather than bright lime. Keep text-action contrast at least 4.5:1 on page and card surfaces, and provide a distinct keyboard focus outline.
+- Preserve semantic category colors: carbohydrate yellow, fat orange, danger/excess coral, cardio amber, pelvic olive, and weight blue-gray. Theme updates must not collapse meal, Calendar, or Report categories into one green.
 - Muted coral indicates an amount over a goal or a destructive action. Preserve each nutrient's category color when it exceeds a goal; use coral only for the extra amount or outer ring.
 - Say what happened: “高于目标 150 kcal”, “+12 g”, or “已达目标”. Do not label a recorded value “失败”, “超标”, or “不健康”.
 - Destructive controls are visually quiet until the final confirmation. The final confirmation is distinctly dangerous and names the scope and irreversibility.
