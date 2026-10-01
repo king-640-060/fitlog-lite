@@ -1,84 +1,97 @@
 # FitLog Lite — Latest Development Report
 
-Latest verified production application snapshot. Sync `main` before trusting a recorded SHA; this report is a separate documentation commit after `END_COMMIT`.
+Latest verified production application snapshot. Sync `main` before trusting recorded SHAs. This report is a separate documentation commit after END_COMMIT.
 
 ## Current Git and Production State
 
-- Branch: `main`
-- START_COMMIT: `01cdacc97ac4bfbb237ae99c6413b0909304646b`
-- FRESH_GREEN_COMMIT / END_COMMIT: `e226259c37624fa7cf13223700fbdd56b18765b2` — `Refresh FitLog fresh green color system`
-- REPORT_COMMIT: separate commit after END_COMMIT, titled `Document fresh green palette verification`; obtain the exact SHA from the latest main commit.
-- Production: https://king-640-060.github.io/fitlog-lite/
-- Application Actions: [36839050368](https://github.com/king-640-060/fitlog-lite/actions/runs/36839050368), completed / success, including tests, build, artifact upload, and deployment.
-- Initial tree was clean. `git pull --ff-only` stalled in network transport and was stopped; the GitHub refs API independently confirmed remote main exactly matched local START_COMMIT. Publishing used the existing Git Data API helper, verifying identical tree and commit hashes and a non-forced fast-forward.
+- Branch: `main`.
+- START_COMMIT: `759758d29e167e164af5310851373bdc1039e267`.
+- NUTRITION_OPTIMIZER_COMMIT: `7556420cd7baff20156d6d71fd0911d74c0a2df3` — `Add deterministic nutrition completion optimizer`.
+- NUTRITION_COMPLETION_UI_COMMIT / END_COMMIT: `f7d7a408a456ee8abece9b30320d22817ea487fd` — `Add Food nutrition completion workflow`.
+- REPORT_COMMIT / latest main HEAD: separate commit after END_COMMIT, titled `Document nutrition completion verification`; obtain its exact SHA from `git log -1` after syncing. A report cannot contain its own commit SHA without changing that SHA.
+- Production: https://king-640-060.github.io/fitlog-lite/.
+- Application Actions: [36846286647](https://github.com/king-640-060/fitlog-lite/actions/runs/36846286647), completed / success, including typecheck, tests, build, artifact upload, and deployment.
+- Initial main tree was clean. `git pull --ff-only` stalled in network transport and was stopped; GitHub refs independently confirmed remote main matched local START_COMMIT. The existing Git Data API publishing helper verified identical trees and commit SHAs and advanced main with non-forced fast-forwards for the two application commits.
 
-## Fresh Green Color System
+## Local Deterministic Nutrition Completion
 
-The global palette moved from deeper forest/plant green to warm ivory, deep green ink, fresh yellow-green primary accents, and muted sage secondary states. Layout, DOM information architecture, interactions, and business logic are unchanged.
+Food now has a compact remaining-target strip below the calorie and macro summary. No target means no completion entry. Today uses “帮我补齐” / “补齐今日营养”; past dates use “补齐当日营养”; future dates use “预览补齐方案”. Reached targets show a light text state without suggestions. Unknown targets are qualified as unknown, rather than declared complete.
 
-| Role | Final value |
+The existing Bottom Sheet shows captured date, signed gaps, up to three different food combinations, integer suggested grams, added nutrients, and projected totals against the unchanged targets. Long food names and brands wrap. The current Sheet expands breakfast/lunch/dinner/snack/unclassified choices, with 44px touch targets. Suggestions only become factual records after the user chooses a meal following the “实际吃下后” prompt. Future dates show an explicit preview explanation and no adoption buttons; the write service independently rejects future dates.
+
+Sources and correctness:
+
+- Targets reuse the selected date's existing `NutritionTarget`; there is no separate tomorrow target or planned-meal model.
+- Actual intake uses only FoodLog `totalCalories/totalProtein/totalCarbs/totalFat` snapshots. Candidate values use current Food Library records.
+- Calories are an independent stored dimension, never calculated using macro 4/4/9.
+- Any saved log missing a target macro makes that actual and gap unknown; the corresponding target is excluded from optimization and explained in text. Empty days have known zero actuals. Explicit macro zero remains valid.
+- Foods missing an active macro are excluded and counted. Missing inactive macros remain allowed and are displayed as incomplete when appropriate, not zero.
+- Signed gaps show “还差”, “已超”, or “已达目标”. Already-over dimensions remain in the objective and penalize further increases.
+- Plans are ephemeral: every opening rereads target, snapshots, and current foods; no recommendation DB store, localStorage, backup field, report category, or Calendar marker was added.
+
+Optimizer implementation in `src/utils/nutritionCompletion.ts`:
+
+| Parameter | Actual bound |
 | --- | --- |
-| Background / surface / elevated surface | `#f5f4ec` / `#fffef8` / `#fffef9` |
-| Soft neutral surface | `#f1f3e8` |
-| Primary / secondary / tertiary text | `#223026` / `#687168` / `#97a198` |
-| Accent / hover / pressed | `#b8dc4b` / `#a8ce42` / `#98bd39` |
-| Accent ink / strong / mid / soft | `#243127` / `#5c7429` / `#7f9a34` / `#eef6d5` |
-| Muted sage info | `#7f9670` |
+| Gram step | 5g |
+| Foods per plan | At most 4 |
+| Grams per food | At most 400g |
+| Total plan grams | At most 800g |
+| Combination candidates | At most 12 |
+| Beam width | 100 |
+| Search rounds | At most 160 |
+| Returned plans | At most 3 |
 
-Primary buttons use dark ink on lime in all three states; hover is restricted to hover-capable devices. Secondary actions, navigation selection, tags, checkmarks, and form selections remain soft. Tab underlines retain the bright accent. Calorie/protein rings and generic progress bars use accent-mid. Secondary text and accent-mid were slightly deepened from the proposed starting values to improve contrast; tertiary text was not lightened. Keyboard focus uses a visible mid-green outline, including the hidden weekday/date/select controls' visible containers.
+Each eligible food is scanned at 5–400g for its best single-food score. Candidates are ranked by score, then name, then id using deterministic text ordering. Beam states add 5g, deduplicate gram vectors, and recompute totals from the vector to avoid path-dependent floating-point tie drift. Each round keeps the best 100 states. The archive retains the best portion vector per food set, with at most 793 sets for the 12-candidate/4-food limits. Alternatives use different food sets and must remain within both absolute and relative score limits; three plans are not forced.
 
-The CSS audit covered both existing style files. Generic Plan/Habit selection, checkbox, tag, icon-container, and border greens now use shared tokens or token mixes. Retained semantic exceptions include strength, cardio amber, pelvic olive, weight blue-gray, meal distinctions, carbohydrate yellow, fat orange, and coral danger/excess. The over-goal outer ring now explicitly uses the coral danger tokens, keeping the normal macro ring's own color. Inspection found the Trend weight chart previously consumed global accent while the Report weight chart already used blue-gray; Trend now uses the same `#728e9f` domain color, preventing lime weight charts. Its data and chart behavior are untouched.
+The score is normalized squared error using target scales with floors 200 kcal / 20g protein / 30g carbs / 10g fat. Undershoot weight is 1; ordinary overshoot is 1.8; additional intake in already-full/over dimensions uses weight 8. Additional food complexity costs 0.0004 per item beyond the first. Only plans improving on adding nothing are returned. `closeEnough` requires every active dimension within max(30 kcal, 2% target) or max(3g, 3% macro target). This is a bounded heuristic, not proof of a global optimum or exact feasibility. The UI discloses approximate results and never claims perfect completion.
 
-Existing organic contour geometry, opacity, layering, and static behavior are retained. Only its stroke changed to sage `#6d7950`, and its green wash to lime at 0.05 alpha; the warm wash stays unchanged. Cards, forms, calendar, and sheets stay clean. Browser theme-color and PWA theme/background colors match the ivory base. No images, dependencies, theme switcher, dark mode, or additional background were introduced. UI_INTERACTION_SPEC records the durable color roles.
+`src/services/nutritionCompletionService.ts` validates the captured local business date, meal, unique food ids, and portion bounds, then calls existing `logFood()` inside one Dexie `rw` transaction on `foodLogs`. It snapshots the displayed recommendation's food values. One failed insertion rolls back the whole plan and preserves prior records. The Sheet disables all adoption/meal buttons before writing and guards repeated clicks; errors keep the Sheet available for retry. After success, the Sheet closes, shows the record count, and refreshes Food totals. Target and template records are untouched.
 
-## Data Compatibility
+The Fresh Green system remains: clean warm ivory surfaces, deep ink, restrained secondary sage/lime states, existing shared tokens, no new hard-coded greens. Food's existing nutrition hero remains the main visual. UI_INTERACTION_SPEC records these durable interactions.
 
-- Dexie **V7, 14 stores**.
+## Data Compatibility and Scope
+
+- Dexie **V7 / 14 stores**.
 - Backup **V7**; Restore **V1–V7**.
-- Database, services, schema, migrations, package manifest, and lockfile have no diff from START_COMMIT. Task/Tag, Habit, Food, Workout, Cardio, Kegel, Weight, Calendar, Reports, Backup, and Restore semantics remain unchanged.
+- No schema migration, store, backup format, package manifest, lockfile, dependency, API, AI, backend, cloud service, or external nutrition source was added.
+- Database/types, existing Food snapshot service, NutritionTarget service, Backup/Restore, Diet Templates, Calendar, Reports, Clear Day, and training modules have no diff from START_COMMIT. Adopted records are ordinary FoodLogs consumed by the existing aggregation and cleanup flows.
 
 ## Automated Verification
 
 - Typecheck: PASS.
-- Tests: **199 / 17 files**, PASS.
-- Local build: PASS — main JS **521.43 kB**, CSS **83.62 kB**, **17 precache entries / 626.13 KiB**.
-- Pages build: PASS — main JS **521.48 kB**, CSS **83.62 kB**, **17 entries / 626.24 KiB**.
+- Full tests: **224 tests / 19 files**, PASS; baseline was 199 / 17.
+- New coverage: 20 optimizer/UI helper tests and 5 application-service tests. Includes single/two/three-food results; portion limits; deterministic repeated/reordered inputs; snapshot ownership; independent calories/non-100g references; over-fat preference; unknown logs; incomplete candidates; partial/zero targets; completed targets; impossible exact match; different food sets; 100-food bounded sanity; date/copy helpers; atomic application and failure rollback; invalid inputs; service future-date rejection.
+- Local build: PASS — main JS **530.95 kB**, CSS **86.89 kB**, **17 precache entries / 638.63 KiB**.
+- Pages build: PASS — main JS **531.00 kB**, CSS **86.89 kB**, **17 entries / 638.73 KiB**.
 - `git diff --check`: PASS.
-- Compared with prior Pages assets: JS decreased 28 bytes; CSS increased 677 bytes. No dependencies or precache entries added.
-
-Computed token contrast checks passed: primary default **8.67:1**, hover **7.50:1**, pressed **6.27:1**; strong green text on page **4.78:1**, surface **5.22:1**, and soft accent **4.71:1**. Secondary text on page/surface/soft surface is **4.59 / 5.01 / 4.51:1**. Mid-green visualization on surface is **3.16:1**. Browser-computed primary hover/pressed colors and keyboard focus were checked. These are targeted contrast checks, not a claim of a complete accessibility audit; existing tertiary/disabled/category colors retain their distinct roles.
+- Main Pages JS increased 9525 bytes and CSS increased 3273 bytes from the preceding verified production assets. No dependency or precache entry was added.
 
 ## Local Browser and Visual QA
 
-Fresh isolated Chrome mobile contexts at **320×812, 375×812, 390×844, and 430×932** passed with no page errors or horizontal overflow. Screenshots covered:
+Fresh isolated Chrome mobile contexts at **320×812, 375×812, 390×844, and 430×932** passed with no page errors or horizontal overflow, including Sheet content. Eight test foods included a long Chinese food name, complementary lean/carbohydrate/fat foods, and one missing-fat food. Existing target forms were used; test data existed only in isolated browser contexts.
 
-- Empty Today, Plan Today/Upcoming/Inbox, Food, Workout, Trend, Calendar, and task editor; Plan retains 92–112 px natural empty-card height and 44 px actions with unchanged date defaults.
-- Long active tags, persistence between Plan views, tag clearing, and creation of a tagged task.
-- Populated Today with Food, Plan preview, Weight, Kegel, checked Habit, and the primary Workout action.
-- Pending/completed Tasks and selected tags; Food with recorded macros and a calorie over-goal ring; distinct green/yellow/orange normal rings plus coral excess.
-- Workout landing, strength editor, cardio selected type, and Kegel selected plan.
-- Populated blue-gray Trend, five-category Calendar and day detail, weekly/monthly Reports with separate training/category marks.
-- Task Editor, Management Hub, Food Editor, Habit Editor and selected weekday.
+Verified target 2200 kcal / P180 / C230 / F65 against actual snapshot 1450 / P105 / C170 / F42, showing exact gaps **750 kcal / P75 / C60 / F23**. Suggestions were calculated and adopted while the browser context was offline. The selected three-food plan was shrimp 245g + olive oil 25g + rice 195g, adding **775.75 kcal / P73.5 / C58.5 / F25**, giving **2225.75 / P178.5 / C228.5 / F67**. UI rounds calorie amounts to one decimal. Three independent Dinner records matched the displayed grams/date/meal, and gaps updated immediately.
 
-Settled screenshots were visually inspected for restrained lime area, clean warm surfaces, quiet tags, semantic chart distinctions, and readable selected states. Initial QA-script retries corrected a stale management selector and used the existing strength start/exit flow; no application change was needed for those harness errors. Test records existed only in isolated browser contexts.
+Other checks passed: no-target/no-entry; all-targets-complete/no-entry; missing FoodLog fat clearly incomplete; already-over fat favors lean/carbohydrate candidates; future target and recommendations with no adoption/future logs; empty library with opener to the existing food library. A supplemental 390px pass confirmed rapid double-click only produced three new records, reopening recomputed the new gaps, and a one-food library returned one approximate plan with an explanation. Screenshots were inspected for compact hierarchy, readable projections, meal choice layout, long-name wrapping, and clean surfaces.
 
 ## Production Verification
 
 Application Actions succeeded. Production assets match the local Pages-path build byte for byte:
 
-- `index-DuPpfonN.js`, 521480 bytes: SHA-256 `c1d9143634cc5c72fe51693b5bac81399153fbebdd89375c0d0c9044643b3859`.
-- `index-C4skdpIc.css`, 83625 bytes: SHA-256 `45ef869bb8d231c11996201b2333f0212245877556de5cab321f99062f6f55dc`.
+- `index-DfZ9YjVF.js`, **531005 bytes**, SHA-256 `4c31ad60dc23a31d6c4604381c8f5f5f21c71cec6bdd87226431a77395d19f1a`.
+- `index-B2atRTLz.css`, **86898 bytes**, SHA-256 `fc0055c7c5bedd872c0773699c189277312a84480ba23a1c974819b41b0ac06f`.
 
-Fresh production contexts at **390×844 and 430×932** passed Today, all three Plan empty states and CTA dates, Food, Workout, Trend, Calendar, and task editor. Screenshots show the same fresh palette, warm surfaces, and dark primary text. No page errors or horizontal overflow; background remains noninteractive and static. These are simulated mobile-browser checks.
+Fresh production contexts at **390×844 and 430×932** passed the same core target/gap/Sheet/recommendation/Dinner application flow, including offline calculation and adoption, double-click prevention, reopening with recomputed gaps, and immediate totals refresh. All plans obeyed the food/gram bounds; the incomplete active-fat candidate was excluded. Missing-log macro, already-over fat, reached targets, future preview without factual future logs, empty library, and one-food approximate result also passed. No page errors or horizontal overflow. Settled production screenshots of plans and meal selection were visually inspected. These are simulated mobile-browser checks, not physical iPhone verification.
 
 ## Manual Device Verification
 
-**Pending:** physical iPhone Safari and standalone PWA. Check Retina bright-accent saturation; lime/dark-ink readability; whether soft accents look too yellow; texture harmony; selected-state clarity outdoors and at high brightness; Safe Area and browser/standalone background continuity; scrolling; Chinese IME, native date/time pickers, keyboard and sticky controls; offline shell; Calendar day detail. No physical-device QA is claimed.
+**Pending:** physical iPhone Safari and standalone PWA. Check 320/375-width completion Sheet; long-plan scrolling; meal-picker touch targets; Safe Area; keyboard; long food names; Fresh Green CTA saturation; offline calculation; standalone PWA adoption flow. No physical-device verification is claimed.
 
 ## Known Issues
 
-The existing nonblocking Vite warning for the main JS bundle exceeding 500 kB remains. No application, test, browser, or deployment defect was confirmed this round. Physical-device verification remains pending.
+The existing nonblocking Vite warning for the main JS bundle exceeding 500 kB remains. No new application, test, browser, or deployment defect was confirmed. Optimizer output is bounded/approximate; physical-device verification remains pending.
 
 ## ChatGPT Baseline
 
-FitLog Lite remains a Vanilla TypeScript local-first iPhone PWA with Dexie V7/14 stores, Backup V7, Restore V1–V7. Verified application: `e226259c37624fa7cf13223700fbdd56b18765b2`. Fresh Green means ivory surfaces, sparse lime primary actions with dark ink, deep leaf readable actions, muted sage secondary states, and darker green nutrition rings. Weight charts are blue-gray; other semantic colors remain distinct. Plan compact layout and static contour backdrop remain. No business/data changes. Tests: 199/17. Read AGENTS, this report, and UI_INTERACTION_SPEC; sync main and record a fresh START_COMMIT for the next task.
+FitLog Lite remains a Vanilla TypeScript local-first iPhone PWA. Dexie V7/14 stores, Backup V7, Restore V1–V7. Verified application END_COMMIT: `f7d7a408a456ee8abece9b30320d22817ea487fd`; latest main also includes a separate report commit. Food now has local deterministic Nutrition Completion using existing daily targets, historical snapshots, and current Food Library. Beam100/candidates12/5g/4foods/400g-each/800g-total/160rounds/3plans. Unknown macros stay unknown; already-over targets are penalized; approximate results are disclosed. Suggestions are ephemeral; future dates preview only; today/past adoption asks for a meal and atomically creates normal FoodLog snapshots. No AI/network/backend/dependency/schema change. Fresh Green and existing modules remain. Tests 224/19; production verified at 390/430; physical iPhone pending. Read AGENTS, this report, and UI_INTERACTION_SPEC; sync main and record a fresh START_COMMIT for the next task.
