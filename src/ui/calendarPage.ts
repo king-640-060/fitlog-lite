@@ -1,8 +1,11 @@
+import { getMonthGridDays } from '../utils/calendarGrid'
 import { db, type FitLogDatabase } from '../db/database'
 import type { NutritionTarget } from '../db/types'
 import { pelvicFloorSessionDurationSeconds } from '../services/pelvicFloorService'
 import { getLocalDateString } from '../utils/date'
 import { icon, type IconName } from './icons'
+export { getMonthGridDays } from '../utils/calendarGrid'
+export type { CalendarGridDay } from '../utils/calendarGrid'
 
 export interface CalendarDaySummary {
   date: string
@@ -23,12 +26,6 @@ export interface CalendarDaySummary {
   weightKg?: number
 }
 
-export interface CalendarGridDay {
-  date: string
-  day: number
-  isCurrentMonth: boolean
-}
-
 interface RenderMonthCalendarOptions {
   year: number
   month: number
@@ -42,22 +39,6 @@ export function getMonthBounds(year: number, month: number): { start: string; en
     start: getLocalDateString(new Date(year, month, 1)),
     end: getLocalDateString(new Date(year, month + 1, 0)),
   }
-}
-
-export function getMonthGridDays(year: number, month: number): CalendarGridDay[] {
-  const firstOfMonth = new Date(year, month, 1)
-  const mondayFirstOffset = (firstOfMonth.getDay() - 1 + 7) % 7
-  const gridStart = new Date(year, month, 1 - mondayFirstOffset)
-
-  return Array.from({ length: 42 }, (_, index) => {
-    const date = new Date(gridStart)
-    date.setDate(gridStart.getDate() + index)
-    return {
-      date: getLocalDateString(date),
-      day: date.getDate(),
-      isCurrentMonth: date.getMonth() === month && date.getFullYear() === year,
-    }
-  })
 }
 
 export async function loadMonthSummaries(year: number, month: number, database: FitLogDatabase = db): Promise<Map<string, CalendarDaySummary>> {

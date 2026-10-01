@@ -1,3 +1,4 @@
+import { mountDatePicker, datePickerLabel, type DatePickerController } from './ui/datePicker'
 import { showGitHubSync, githubSyncDetail } from './ui/githubSync'
 import './styles/main.css'
 import './styles/plan.css'
@@ -200,6 +201,16 @@ function openModal(title: string, body: string, wide = false): HTMLDialogElement
   dialog.addEventListener('close', () => dialog.remove())
   dialog.showModal()
   return dialog
+}
+
+function showBusinessDatePicker(title: string, date: string, commit: (date: string) => void): void {
+  const dialog = openModal(title, '<div id="business-date-picker"></div>')
+  const picker = mountDatePicker(dialog.querySelector<HTMLElement>('#business-date-picker')!, {
+    value: date,
+    onConfirm: selected => { dialog.close(); commit(selected!) },
+    onCancel: () => dialog.close(),
+  })
+  dialog.addEventListener('close', () => picker.destroy(), { once: true })
 }
 
 function confirmAction(title: string, message: string, confirmLabel = '确认删除', danger = true, cancelLabel = '取消'): Promise<boolean> {
@@ -662,7 +673,7 @@ async function showTaskTagManager(): Promise<void> {
 async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> {
   const allTags = await getTaskTags()
   const selectedTagIds = [...(task?.tagIds ?? [])]
-  const dialog = openModal(task ? '编辑任务' : '新建任务', `<form id="task-form" class="task-editor"><label class="task-title-field">任务<input name="title" maxlength="120" value="${esc(task?.title ?? '')}" placeholder="要做什么？" required autocomplete="off" aria-expanded="false" aria-controls="task-tag-suggestions"></label><div id="task-tag-suggestions" class="task-tag-suggestions" role="listbox" hidden></div><div id="task-selected-tags" class="task-selected-tags"></div><section class="task-editor-section"><h3>日期</h3><div class="task-date-choices"><button type="button" data-task-date="today">今天</button><button type="button" data-task-date="tomorrow">明天</button><button type="button" data-task-date="none">无日期</button></div><label class="task-date-field">选择日期<input type="date" name="date" value="${esc(task?.date ?? defaultDate ?? '')}"></label></section><section class="task-editor-section" id="task-time-section"><h3>时间（可选）</h3><div class="task-time-fields"><label>开始时间<input type="time" name="startTime" value="${esc(task?.startTime ?? '')}"></label><label>结束时间<input type="time" name="endTime" value="${esc(task?.endTime ?? '')}"></label></div><p class="task-inline-error" id="task-time-error" role="alert" hidden>结束时间必须晚于开始时间</p></section><label class="task-note-field">备注（可选）<textarea name="note" maxlength="2000" rows="3" placeholder="补充一点细节">${esc(task?.note ?? '')}</textarea></label><div class="task-editor-actions"><button type="submit" class="primary full-btn">保存任务</button></div>${task ? '<button type="button" class="plan-quiet-danger" id="task-delete">删除任务</button>' : ''}</form>`)
+  const dialog = openModal(task ? '编辑任务' : '新建任务', `<form id="task-form" class="task-editor"><label class="task-title-field">任务<input name="title" maxlength="120" value="${esc(task?.title ?? '')}" placeholder="要做什么？" required autocomplete="off" aria-expanded="false" aria-controls="task-tag-suggestions"></label><div id="task-tag-suggestions" class="task-tag-suggestions" role="listbox" hidden></div><div id="task-selected-tags" class="task-selected-tags"></div><section class="task-editor-section"><h3>日期</h3><div class="task-date-choices"><button type="button" data-task-date="today">今天</button><button type="button" data-task-date="tomorrow">明天</button><button type="button" data-task-date="none">无日期</button></div><input type="hidden" name="date" value="${esc(task?.date ?? defaultDate ?? '')}"><button type="button" id="task-date-picker-open" class="task-date-field fitlog-date-trigger">${icon('calendar', 17)}<span>选择日期</span></button></section><section class="task-editor-section" id="task-time-section"><h3>时间（可选）</h3><div class="task-time-fields"><label>开始时间<input type="time" name="startTime" value="${esc(task?.startTime ?? '')}"></label><label>结束时间<input type="time" name="endTime" value="${esc(task?.endTime ?? '')}"></label></div><p class="task-inline-error" id="task-time-error" role="alert" hidden>结束时间必须晚于开始时间</p></section><label class="task-note-field">备注（可选）<textarea name="note" maxlength="2000" rows="3" placeholder="补充一点细节">${esc(task?.note ?? '')}</textarea></label><div class="task-editor-actions"><button type="submit" class="primary full-btn">保存任务</button></div>${task ? '<button type="button" class="plan-quiet-danger" id="task-delete">删除任务</button>' : ''}</form>`)
   dialog.classList.add('task-editor-sheet')
   const form = dialog.querySelector<HTMLFormElement>('#task-form')!
   const title = form.querySelector<HTMLInputElement>('[name="title"]')!
@@ -710,6 +721,7 @@ async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> 
   renderChips()
   const updateDateControls = () => {
     const date = dateInput.value
+    form.querySelector('#task-date-picker-open span')!.textContent = date ? datePickerLabel(date) : '选择日期'
     form.querySelectorAll<HTMLButtonElement>('[data-task-date]').forEach((button) => { const value = button.dataset.taskDate === 'today' ? getLocalDateString() : button.dataset.taskDate === 'tomorrow' ? shiftLocalDate(getLocalDateString(), 1) : ''; button.classList.toggle('active', value === date) })
     form.querySelector<HTMLElement>('#task-time-section')!.hidden = !date
     if (!date) { startInput.value = ''; endInput.value = '' }
@@ -720,7 +732,27 @@ async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> 
     form.querySelector<HTMLElement>('#task-time-error')!.hidden = !invalid
   }
   form.querySelectorAll<HTMLButtonElement>('[data-task-date]').forEach((button) => button.addEventListener('click', () => { dateInput.value = button.dataset.taskDate === 'today' ? getLocalDateString() : button.dataset.taskDate === 'tomorrow' ? shiftLocalDate(getLocalDateString(), 1) : ''; updateDateControls() }))
-  dateInput.addEventListener('change', updateDateControls)
+  const pickerView = document.createElement('div')
+  pickerView.hidden = true
+  dialog.querySelector('.modal-body')!.append(pickerView)
+  const dateTrigger = form.querySelector<HTMLButtonElement>('#task-date-picker-open')!
+  let picker: DatePickerController | undefined
+  const returnToForm = () => {
+    picker?.destroy(); picker = undefined; pickerView.hidden = true; form.hidden = false
+    dialog.querySelector('h2')!.textContent = task ? '编辑任务' : '新建任务'
+    dateTrigger.focus({ preventScroll: true })
+  }
+  dateTrigger.addEventListener('click', () => {
+    form.hidden = true; pickerView.hidden = false; dialog.querySelector('h2')!.textContent = '选择任务日期'
+    dialog.querySelector('.modal-body')!.scrollTop = 0
+    picker = mountDatePicker(pickerView, {
+      value: dateInput.value || getLocalDateString(),
+      onConfirm: date => { dateInput.value = date!; updateDateControls(); returnToForm() },
+      onCancel: returnToForm,
+    })
+  })
+  dialog.addEventListener('cancel', event => { if (picker) { event.preventDefault(); returnToForm() } })
+  dialog.addEventListener('close', () => picker?.destroy(), { once: true })
   startInput.addEventListener('change', updateDateControls)
   endInput.addEventListener('change', updateDateControls)
   updateDateControls()
@@ -980,8 +1012,6 @@ function commitFoodDate(date: string, forceWindow = false): void {
   updateFoodTodayShortcut()
   const rail = app.querySelector<HTMLElement>('.food-date-rail')
   if (rail) updateFoodRail(rail, date, forceWindow)
-  const picker = app.querySelector<HTMLInputElement>('#food-date')
-  if (picker) picker.value = date
   if (changed) void renderFoodPage().catch(fail)
 }
 
@@ -1155,7 +1185,7 @@ async function renderFoodPage(): Promise<void> {
   const firstAppearance = !rail
   const previousDate = view.dataset.foodContentDate
   if (!rail || !content) {
-    view.innerHTML = `<div class="food-date-navigation"><div class="food-date-helper"><label class="food-date-jump">${icon('calendar', 16)}<span>选择日期</span><input id="food-date" type="date" value="${requestedDate}" aria-label="选择饮食记录日期"></label><button class="food-today-shortcut" id="food-return-today" type="button" aria-label="回到今天" hidden>回到今天</button></div><div class="food-date-rail-shell"><div class="food-date-selection" aria-hidden="true"></div><div class="food-date-rail" role="group" aria-label="切换饮食记录日期"><div class="food-date-rail-track"></div></div></div></div><div class="food-content"></div>`
+    view.innerHTML = `<div class="food-date-navigation"><div class="food-date-helper"><button type="button" id="food-date-picker-open" class="food-date-jump fitlog-date-trigger" aria-label="选择饮食记录日期">${icon('calendar', 16)}<span>选择日期</span></button><button class="food-today-shortcut" id="food-return-today" type="button" aria-label="回到今天" hidden>回到今天</button></div><div class="food-date-rail-shell"><div class="food-date-selection" aria-hidden="true"></div><div class="food-date-rail" role="group" aria-label="切换饮食记录日期"><div class="food-date-rail-track"></div></div></div></div><div class="food-content"></div>`
     rail = view.querySelector<HTMLElement>('.food-date-rail')!
     content = view.querySelector<HTMLElement>('.food-content')!
     updateFoodTodayShortcut()
@@ -1180,7 +1210,7 @@ function bindFoodHeader(): void {
   foodHeaderEvents?.abort()
   foodHeaderEvents = new AbortController()
   const headerSignal = foodHeaderEvents.signal
-  app.querySelector<HTMLInputElement>('#food-date')?.addEventListener('change', (event) => { const date = (event.target as HTMLInputElement).value; if (date) commitFoodDate(date, true) }, { signal: headerSignal })
+  app.querySelector('#food-date-picker-open')?.addEventListener('click', () => showBusinessDatePicker('选择饮食日期', foodDate, date => { if (date !== foodDate) commitFoodDate(date, true) }), { signal: headerSignal })
   app.querySelector('#food-return-today')?.addEventListener('click', returnFoodToToday, { signal: headerSignal })
   app.querySelector('#food-library')?.addEventListener('click', () => void showFoodLibrary(), { signal: headerSignal })
   app.querySelector('#use-diet-template')?.addEventListener('click', () => void showDietTemplatePicker(), { signal: headerSignal })
@@ -1422,11 +1452,11 @@ async function renderWorkoutPage(): Promise<void> {
   const dailyPlanRoutine = pelvicPlanRoutine(selectedPelvicPlanLevel(getPelvicFloorPlanProgress(allPelvicSessions)))
   const recentWorkouts = (await db.workouts.toArray()).filter((item) => item.finishedAt).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt)).slice(0, 4)
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `<section class="context-row"><label class="date-control">${icon('calendar', 17)}<span>训练日期</span><input id="workout-date" type="date" value="${workoutDate}" aria-label="训练日期"></label><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section>
+  view.innerHTML = `<section class="context-row"><button type="button" id="workout-date-picker-open" class="date-control fitlog-date-trigger">${icon('calendar', 17)}<span>训练日期 · ${datePickerLabel(workoutDate).split(' · ')[0]}</span></button><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section>
     <section class="training-category"><h2 class="training-category-label">无氧训练</h2><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('dumbbell', 20)}</span><div><h3>力量训练</h3><p>记录动作与组数</p></div></div><p class="training-card-summary">${openWorkout ? `正在记录 · ${strengthExercises} 个动作 · ${strengthSets} 组` : todayWorkouts.length ? `今日 ${strengthExercises} 个动作 · ${strengthSets} 组` : '今天还没有力量训练'}</p><button class="primary training-card-action" id="start-workout">${openWorkout ? '继续训练' : '开始力量训练'}</button></div></section>
     <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">有氧训练</h2><button class="text-btn" id="cardio-history">历史记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('activity', 20)}</span><div><h3>有氧记录</h3><p>楼梯机 · 跑步机</p></div></div>${cardioSessions.length ? `<div class="training-card-summary"><span>${cardioSessions.length === 1 ? '今日 1 次' : `今日 ${cardioSessions.length} 次`}</span><strong>${formatNumber(cardioMinutes)} <small>分钟</small></strong><span>${cardioSessions.length === 1 ? `${getCardioActivityLabel(cardioSessions[0]!)} · ${formatCardioMetrics(cardioSessions[0]!).join(' · ')}` : `最近：${getCardioActivityLabel(latestCardio!)}`}</span></div>` : '<p class="training-card-summary">今天还没有有氧训练</p>'}<button class="primary training-card-action" id="add-cardio">${cardioSessions.length ? '再记一次' : '记录训练'}</button>${latestCardio ? `<button class="training-card-link" data-cardio-id="${latestCardio.id}">最近：${getCardioActivityLabel(latestCardio)} · ${formatNumber(latestCardio.durationMinutes)} 分钟 ${icon('chevron', 15)}</button>` : ''}</div></section>
     <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">凯格尔训练</h2><button class="text-btn" id="pelvic-floor-history">训练记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('leaf', 20)}</span><div><h3>今日训练 · ${dailyPlanRoutine.name}</h3><p>渐进计划 · 耐力控制与快速脉冲</p></div></div><p class="training-card-summary">${pelvicSessions.length ? `今日已完成 ${pelvicSessions.length} 次 · 累计 ${pelvicSeconds} 秒` : `${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</p><button class="primary training-card-action" id="start-pelvic-floor">开始训练</button></div></section><section class="section-head"><div><h2>最近力量训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 17)}</button>`).join('')}</div>`
-  view.querySelector<HTMLInputElement>('#workout-date')?.addEventListener('change', (event) => { workoutDate = (event.target as HTMLInputElement).value; currentWorkout = undefined; workoutEditorOpen = false; void render().catch(fail) })
+  view.querySelector('#workout-date-picker-open')?.addEventListener('click', () => showBusinessDatePicker('选择训练日期', workoutDate, date => { workoutDate = date; currentWorkout = undefined; workoutEditorOpen = false; void render().catch(fail) }))
   view.querySelector('#exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
   view.querySelector('#workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
   view.querySelector('#start-pelvic-floor')?.addEventListener('click', () => void showPelvicFloorSetup().catch(fail))

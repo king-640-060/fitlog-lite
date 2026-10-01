@@ -88,7 +88,7 @@
 .task-date-choices button { min-height: 44px; padding: 0 5px; border-color: var(--border); background: var(--surface-soft); color: var(--text-secondary); font-size: .82rem; }
 .task-date-choices button.active { border-color: color-mix(in srgb, var(--accent-mid) 45%, var(--border)); background: var(--accent-soft); color: var(--accent-strong); font-weight: 700; }
 .task-date-field { position: relative; }
-.task-date-field input, .task-time-fields input { min-height: 48px; font-size: 1rem; }
+.task-time-fields input { min-height: 48px; font-size: 1rem; }
 .task-time-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
 .task-time-fields input:disabled { opacity: .5; }
 .task-inline-error { margin: 0; color: var(--danger); font-size: .76rem; }
@@ -100,3 +100,6 @@
   .food-topbar .food-page-action { padding-inline: 3px; font-size: .73rem; }
   .plan-task-main time { font-size: .69rem; }
 }
+
+.task-editor[hidden] { display: none; }
+.task-date-field { justify-content: flex-start; gap: 8px; font-size: .9rem; }
