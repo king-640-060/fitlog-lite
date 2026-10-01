@@ -1,3 +1,4 @@
+import { connectDefaultGitHubSync, githubSyncSetupHtml } from './githubSyncSetup'
 import { GitHubSyncError } from '../services/githubSyncService'
 import { GitHubManualSync, type SyncInspection } from '../services/githubManualSync'
 import { exportBackup } from '../services/backupService'
@@ -61,21 +62,31 @@ export function showGitHubSync(ui: SyncUI): void {
     screen(`<h3>${title}</h3><p class="sync-note">${conflict ? '这台设备和 GitHub 的数据不同。第一版不自动合并，请选择要保留的完整数据。' : fresh ? '这台设备尚未配对，建议恢复已有备份。' : i.action === 'upload' ? '可以上传本机修改，也可以选择恢复远程备份。' : '其它设备可能已更新备份。恢复前会显示数据预览。'}</p><button class="primary full-btn" id="sync-use-remote">${fresh ? '恢复到这台设备' : '使用 GitHub 数据'}</button>${fresh ? '' : '<button class="secondary full-btn" id="sync-use-local">保留本机并上传</button>'}<button class="secondary full-btn" id="sync-cancel">取消</button>`)
     bind('sync-use-remote', () => preview(i)); bind('sync-use-local', () => replaceRemote(i, password)); bind('sync-cancel', () => status())
   }
-  const begin = async (checkOnly: boolean) => run(async () => {
+  const prepare = async (checkOnly: boolean) => {
+    if (!connected()) return
     const remote = await sync.checkRemote()
     if (sync.unlocked && remote) { await handle(await sync.inspect(), undefined, checkOnly); return }
     const create = !remote
-    screen(`<h3>${create ? '设置数据密码' : '解锁 GitHub 备份'}</h3><p class="sync-note">${create ? '密码至少 12 个字符。' : ''}这个密码用于解密 GitHub 上的 FitLog 数据。FitLog 不保存密码，忘记后无法恢复远程备份。</p><form class="form" id="sync-password-form">${passwordFields(create)}<button class="primary" type="submit">继续</button></form><button class="secondary full-btn" id="sync-cancel">取消</button>`)
+    screen(`<h3>${create ? '创建第一份加密备份' : '发现已有 GitHub 备份'}</h3><p class="sync-note">${create ? '密码至少 12 个字符。' : ''}这是 FitLog 数据加密密码，不是 GitHub 密码。FitLog 不保存它；以后换设备恢复时仍需要这个密码。忘记后无法解密远程备份。</p><form class="form" id="sync-password-form">${passwordFields(create)}<button class="primary" type="submit">${create ? '继续' : '解锁并检查'}</button></form><button class="secondary full-btn" id="sync-cancel">取消</button>`)
     bind('sync-cancel', () => status()); root.querySelector<HTMLFormElement>('#sync-password-form')!.addEventListener('submit', event => {
       event.preventDefault(); if (busy) return
       const form = event.currentTarget as HTMLFormElement, password = (form.elements.namedItem('password') as HTMLInputElement).value, confirmation = (form.elements.namedItem('confirmation') as HTMLInputElement | null)?.value
       if (create && (password.length < 12 || password !== confirmation)) { message('密码至少 12 个字符，且两次输入必须一致'); return }
       void run(async () => { const inspection = await sync.inspect(password); await handle(inspection, password, checkOnly) })
     })
-  })
+  }
+  const begin = (checkOnly: boolean) => run(() => prepare(checkOnly))
   const setup = () => {
-    screen('<p class="sync-note">将完整数据在这台设备加密后，保存到你自己的 Private Repository。</p><form class="form" id="sync-connect-form"><label>GitHub 用户 / Owner<input name="owner" autocomplete="off" autocapitalize="none" spellcheck="false" required placeholder="你的 GitHub 用户名"></label><label>数据仓库<input name="repo" autocomplete="off" autocapitalize="none" spellcheck="false" required placeholder="fitlog-lite-data"></label><label>Personal Access Token<input name="token" type="password" autocomplete="off" required></label><button class="primary" type="submit">测试连接并启用</button></form><p class="sync-note">凭据只保存在这台设备。建议使用仅授权数据仓库 Contents 读写权限的 Fine-grained Token。</p><p class="sync-note">请创建独立的私人数据仓库并初始化 README。Token 仅选择这个仓库，Contents: Read and write，无需其它权限。数据密码不会保存；换设备恢复时需要再次输入。</p>')
-    root.querySelector<HTMLFormElement>('#sync-connect-form')!.addEventListener('submit', event => { event.preventDefault(); const f = new FormData(event.currentTarget as HTMLFormElement); void run(async () => { await sync.connect(String(f.get('owner')), String(f.get('repo')), String(f.get('token'))); status() }) })
+    screen(githubSyncSetupHtml())
+    root.querySelector<HTMLFormElement>('#sync-connect-form')!.addEventListener('submit', event => {
+      event.preventDefault()
+      const form = new FormData(event.currentTarget as HTMLFormElement)
+      void run(async () => {
+        await connectDefaultGitHubSync(sync, String(form.get('token')))
+        // Continue the explicit setup action in the same sheet, without nesting run().
+        await prepare(false)
+      })
+    })
   }
   if (sync.config) status(); else setup()
 }

@@ -1,4 +1,6 @@
 import { base64ToBytes, bytesToBase64 } from './syncCryptoService'
+export const DEFAULT_GITHUB_SYNC_OWNER = 'king-640-060'
+export const DEFAULT_GITHUB_SYNC_REPO = 'fitlog-lite-data'
 export const GITHUB_SYNC_PATH = 'fitlog/latest.enc.json'
 export interface GitHubSyncConfig { owner: string; repo: string; defaultBranch: string; remotePath: typeof GITHUB_SYNC_PATH }
 export interface RemoteSyncFile { sha: string; text: string }

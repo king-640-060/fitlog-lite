@@ -2,7 +2,19 @@
 
 IndexedDB is the working database; GitHub is a user-controlled encrypted recovery copy. All network activity is initiated by a user under Management → Data & Backup → GitHub Sync. Manual JSON Backup remains independent.
 
-Create a separate **Private** repository (for example `fitlog-lite-data`) and initialize a README. Create a fine-grained Personal Access Token with **Only selected repositories**, select only that data repo, and grant **Contents: Read and write**. No Actions, Administration, Issues, Pull Requests, Workflows or organization permission is required. Enter owner/repo/token in the app. Public, archived and uninitialized repositories are blocked. Branch comes from repository metadata; remote path is fixed to `fitlog/latest.enc.json`.
+## First connection
+
+1. In GitHub under `king-640-060`, create **Private** repository `fitlog-lite-data`.
+2. Initialize a README so the default branch exists. The app does not create repositories or request Administration permission. This release has not confirmed that the real data repository exists.
+3. Create a Fine-grained Personal Access Token: **Only selected repositories** → `fitlog-lite-data`; Repository permissions → **Contents: Read and write**. No other permission is needed.
+4. In FitLog: 管理与设置 → 数据与备份 → GitHub 同步.
+5. Paste the Token and choose **连接 GitHub**. Owner/repo are preconfigured; the user does not enter owner, repo, branch or path.
+6. The same sheet checks remote contents immediately: a missing sync file asks to create and confirm a data password of at least 12 characters; an existing backup asks for one password with **解锁并检查**. The data password is distinct from the GitHub password, never saved, and still needed on another device. Upload/Restore retains explicit confirmation.
+
+Public, archived and uninitialized repositories are blocked. A missing/inaccessible repository names `king-640-060/fitlog-lite-data` and explains Private/README preparation; GitHub may also return 404 when a Token lacks access. Branch comes from repository metadata; remote path remains `fitlog/latest.enc.json`. Setup provides quiet links to GitHub repository creation and Token settings without secrets in URLs.
+
+Existing connected devices keep their saved owner/repo/default branch and baseline. Opening the new interface never replaces them or starts network activity. Only a disconnected/new connection uses the default destination. The underlying transport remains generic for existing repositories and tests.
+
 
 The token is stored only on this device in `fitlog-github-sync-token-v1` localStorage. Config and baseline have separate versioned keys; none enter business Backup. This is a convenience tradeoff: same-origin JavaScript/browser access can read localStorage credentials. Use the minimal scoped token and revoke it in GitHub if necessary. Disconnect removes the three sync keys and memory password, not local records or remote files.
 

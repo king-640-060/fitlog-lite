@@ -931,3 +931,10 @@ body.keyboard-open .modal-body { scroll-padding-bottom: calc(28px + var(--keyboa
   .fitlog-date-trigger, .date-picker button, .date-picker-day span { transition: none; }
   .fitlog-date-trigger:active, .date-picker button:active { transform: none; }
 }
+.sync-prepare { color: var(--text-secondary); font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
+.sync-prepare summary { display: flex; align-items: center; min-height: 44px; color: var(--accent-strong); cursor: pointer; }
+.sync-prepare summary:focus-visible { outline: 2px solid var(--accent-mid); outline-offset: 2px; }
+.sync-prepare ol { padding-left: 20px; margin-block: 4px 8px; }
+.sync-prepare li + li { margin-top: 6px; }
+.sync-prepare-links { display: grid; }
+.sync-prepare-links a { display: flex; min-height: 44px; align-items: center; color: var(--accent-strong); }
