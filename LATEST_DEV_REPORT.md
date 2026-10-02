@@ -2,6 +2,10 @@
 
 Latest verified production application snapshot. Sync main before trusting recorded SHAs. The report is a separate documentation commit after END_COMMIT.
 
+## Unreleased local work — Food Packaging Vision
+
+Local implementation `6c99796f2147d20c3f7baeee234361433ff1ee67` adds the shared packaging Vision workflow and passes 367 tests / 37 files, typecheck, normal/Pages builds and four-size Vision/AI/DatePicker/Sync mock UI checks. It has **not been pushed or deployed**: the task attachment ends at section 21 / line 686 and the remaining specification has been requested but not received. Production main remains `a677eca53d2653c7764b845b365d075dced2481a`. Read [the unreleased report](docs/AI_FOOD_VISION_DEV_REPORT.md) before continuing; preserve these local commits and finish requirement review before release. The following sections describe the previous verified production snapshot.
+
 ## Git and Production State
 
 | Field | Verified value |
