@@ -15,6 +15,7 @@ export type AiMessageContent = string | AiContentPart[] | null
 export interface AiMessage { role: 'system' | 'user' | 'assistant' | 'tool'; content: AiMessageContent; tool_calls?: AiToolCall[]; tool_call_id?: string }
 export interface AiToolDefinition { type: 'function'; function: { name: string; description: string; parameters: Record<string, unknown> } }
 export interface AiUsage { inputTokens?: number; outputTokens?: number; totalTokens?: number }
+export interface AiChatStreamCallbacks { onContentDelta?: (delta: string) => void }
 export interface AiChatResponse { content: string; toolCalls: AiToolCall[]; usage?: AiUsage }
 export interface AiChatRequest { messages: AiMessage[]; tools?: AiToolDefinition[]; toolChoice?: 'auto' | { type: 'function'; function: { name: string } }; signal?: AbortSignal }
 export interface AiContext { today: string; localTime: string; timezoneOffsetMinutes: number; activeTab: string; foodDate: string; workoutDate: string; planView: string }

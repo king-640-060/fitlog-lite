@@ -41,6 +41,7 @@ describe('OpenAI-compatible browser transport', () => {
     const adapter = new OpenAICompatibleChatAdapter(profile, 'key', fetcher)
     await adapter.testConnection(); expect(await adapter.testToolCapability()).toBe('supported')
     expect(await adapter.listModels()).toHaveLength(200)
+    expect(bodies.every(body => !('stream' in body) && !('stream_options' in body))).toBe(true)
     expect(JSON.stringify(bodies)).not.toMatch(/foodLogs|workouts|backup/i)
     expect(JSON.stringify(bodies)).toContain('Reply with OK.')
     const chatOnly = new OpenAICompatibleChatAdapter(profile, 'key', async () => response({ content: 'OK' }))

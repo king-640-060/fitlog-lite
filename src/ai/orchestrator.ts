@@ -8,7 +8,7 @@ import { AiProposals, type AiProposal } from './proposals'
 import { AiNutritionPlans } from './nutritionPlans'
 import { AiToolRegistry } from './toolRegistry'
 
-export interface AiConversationItem { id: string; kind: 'user' | 'assistant' | 'activity' | 'error' | 'proposal' | 'notice'; content: string; proposalId?: string; usage?: AiUsage }
+export interface AiConversationItem { id: string; kind: 'user' | 'assistant' | 'activity' | 'error' | 'proposal' | 'notice'; content: string; proposalId?: string; usage?: AiUsage; streaming?: boolean }
 export interface AiOrchestratorOptions { profiles?: AiProfiles; database?: FitLogDatabase; context: () => AiContext; clientFactory?: (profile: AiProviderProfile, key: string, secrets: readonly string[]) => AiProviderAdapter; onCommitted?: (proposal: AiProposal) => Promise<void> | void }
 export const AI_CHAT_ONLY_MESSAGE = '当前模型可聊天，但未验证工具调用，因此暂时不能读取或修改 FitLog 数据。'
 export function addAiUsage(total: AiUsage, usage?: AiUsage): AiUsage { const result = { ...total }; if (usage) for (const key of ['inputTokens', 'outputTokens', 'totalTokens'] as const) if (usage[key] !== undefined) result[key] = (result[key] ?? 0) + usage[key]!; return result }
@@ -79,6 +79,7 @@ export class AiOrchestrator {
     if (!tools.length && captured.toolCapability !== 'supported') this.add('notice', AI_CHAT_ONLY_MESSAGE)
     const client = this.clientFactory(captured, key, secrets), loop: AiMessage[] = [{ role: 'user', content: text }], cache = new Map<string, string>()
     let toolRounds = 0
+    let live: AiConversationItem | undefined
     const aborted = () => { if (controller.signal.aborted || generation !== this.generation) throw new AiError('aborted', '已停止本次请求') }
     try {
       while (true) {
@@ -90,14 +91,24 @@ export class AiOrchestrator {
         const messages = makeMessages()
         if (JSON.stringify({ messages, tools }).length > AI_LIMITS.contextChars) throw new AiError('context_limit', '本次工具结果较多，请缩小日期范围或拆分提问')
         assertNoKnownSecrets(messages, [...secrets, ...this.profiles.knownSecrets])
-        const response = await client.chat({ messages, ...(tools.length ? { tools } : {}), signal: controller.signal })
+        live = { id: crypto.randomUUID(), kind: 'activity', content: '正在思考…' }
+        this.items.push(live); this.onChange?.()
+        const response = await client.chatStream({ messages, ...(tools.length ? { tools } : {}), signal: controller.signal }, { onContentDelta: delta => {
+          aborted()
+          if (!live || !delta) return
+          if (live.kind === 'activity') { live.kind = 'assistant'; live.content = ''; live.streaming = true }
+          live.content += delta; this.onChange?.()
+        } })
         aborted(); assertNoKnownSecrets(response, [...secrets, ...this.profiles.knownSecrets])
         this.usage = addAiUsage(this.usage, response.usage)
+        if (response.content.trim()) {
+          live.kind = 'assistant'; live.content = response.content; live.usage = response.usage; live.streaming = false
+        } else { this.items = this.items.filter(item => item !== live) }
+        live = undefined; this.onChange?.()
         if (response.toolCalls.length) {
           if (!tools.length) throw new AiError('tools_unverified', AI_CHAT_ONLY_MESSAGE)
           if (toolRounds >= AI_LIMITS.toolRounds || response.toolCalls.length > AI_LIMITS.callsPerRound) throw new AiError('tool_round_limit', '已达到本次工具调用上限，请拆分任务后继续')
           toolRounds++
-          if (response.content.trim()) this.add('assistant', response.content, { usage: response.usage })
           loop.push({ role: 'assistant', content: response.content || null, tool_calls: response.toolCalls })
           for (const call of response.toolCalls) {
             aborted()
@@ -114,13 +125,13 @@ export class AiOrchestrator {
           }
         } else {
           if (!response.content.trim()) throw new AiError('empty_response', 'AI 返回了空内容，请补充问题后再试')
-          this.add('assistant', response.content, { usage: response.usage })
           // Older tool payloads never enter later turns; retain concise natural language only.
           this.history.push({ role: 'user', content: text }, { role: 'assistant', content: response.content }); this.history = this.history.slice(-AI_LIMITS.historyMessages)
           break
         }
       }
     } catch (error) {
+      if (live) { if (live.kind === 'activity') this.items = this.items.filter(item => item !== live); else live.streaming = false }
       for (const proposal of this.proposals.all) if (!previousProposals.has(proposal.id)) this.proposals.cancel(proposal.id)
       if (generation === this.generation) this.add('error', safeAiError(error))
     } finally { if (this.controller === controller) this.controller = undefined; this.busy = false; this.onChange?.() }

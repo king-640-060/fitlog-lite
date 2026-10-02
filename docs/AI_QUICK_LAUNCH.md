@@ -2,7 +2,7 @@
 
 ## Shipped app capabilities
 
-Voice is an input method for the existing assistant. Open normal FitLog → AI 助手 → Mic, acknowledge first voice use, speak, then recognition end auto-sends final text. Normal AI entry stays text-first. No wake word, background mic, voice backend, audio attachment, new Provider/key or direct business write.
+Voice is an input method for the existing assistant. Final text now receives an incremental streamed assistant response through the same `engine.send → chatStream` path as typed and quick-launch text. Stop/close cancel it; unfinished output remains UI-only and does not enter finalized history. Probes and packaging Vision remain nonstreaming. Open normal FitLog → AI 助手 → Mic, acknowledge first voice use, speak, then recognition end auto-sends final text. Normal AI entry stays text-first. No wake word, background mic, voice backend, audio attachment, new Provider/key or direct business write.
 
 The app-side quick-launch contract is implemented. **An independent iPhone Home Screen “FitLog AI” launcher and one-tap-to-listen are Pending**, with no verified same-storage path in this environment. No physical iPhone was accessible. App-side tests do not establish launcher safety.
 

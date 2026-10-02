@@ -10,7 +10,7 @@ One profile has one Provider, Base URL and API Key. `visionModel?: string` is pr
 
 Tool verification depends on Base URL + chat model + key. Vision verification depends on Base URL + effective image model + key. A Vision-only edit preserves tool verification. With an independent image model, a chat-model edit preserves Vision verification; without one it resets both. Root/key edits reset both. Equivalent effective routes preserve verification, including an explicit image ID equal to the fallback. The assistant's configuration signature excludes Vision metadata: a Vision-only save or probe preserves an active ordinary turn, history and proposals. Chat routing/tool capability/permission changes still clear the old session.
 
-POST `{baseUrl}/chat/completions` sends `model`, `messages`, optional `tools` and `tool_choice`. The adapter normalizes `choices[0].message.content`, function `tool_calls`, and optional prompt/completion/total usage. Tool result messages use matching `tool_call_id` values. V1 does not stream, select a model automatically, or assume a vendor-specific response field.
+POST `{baseUrl}/chat/completions` sends `model`, `messages`, optional `tools` and `tool_choice`. The adapter normalizes `choices[0].message.content`, function `tool_calls`, and optional prompt/completion/total usage. Tool result messages use matching `tool_call_id` values. Ordinary assistant rounds additionally send `stream:true`; probes and packaging Vision keep the existing nonstreaming request. No model is selected automatically and no vendor-specific response field is assumed.
 
 Official references verified for this implementation:
 
@@ -18,6 +18,22 @@ Official references verified for this implementation:
 - [智谱 OpenAI compatibility](https://docs.bigmodel.cn/cn/guide/develop/openai/introduction): preset API root `https://open.bigmodel.cn/api/paas/v4`. This is an editable address preset, not a core vendor binding. Models use exact explicitly fetched IDs with a manual fallback; no hard-coded model table is maintained.
 
 Connection testing sends only `Reply with OK.`. A separate forced `fitlog_capability_probe` verifies actual tool-call output without app data. Profiles with unknown/unsupported capability can chat but receive no FitLog tools; even unsolicited calls cannot execute. A failed network/authorization probe is an error, not proof of incompatibility. GET `/models` is best effort, capped at 200 IDs; failure leaves manual model entry and the saved profile usable.
+
+## Assistant incremental streaming
+
+`AiProviderAdapter.chatStream(request, callbacks)` returns the same complete `AiChatResponse` as `chat`/`visionChat`, while `onContentDelta` publishes safe text as bytes arrive. Only ordinary assistant model rounds use this path, including final Voice transcripts and quick-launch prompts. Tools and chat continue to use `model`; Vision uses `visionModel` with fallback. Connection/tool/Vision probes, model listing and strict Food Vision extraction remain nonstreaming. No new Provider setting, SDK, `stream_options`, retry or alternate request is added.
+
+`src/ai/sse.ts` owns a pure incremental UTF-8 decoder and SSE line/event parser. It supports LF/CRLF/CR, boundaries within Chinese UTF-8, several events in one chunk, comments and multiple data lines joined with a newline. Only complete blank-line events dispatch. `[DONE]` finishes and cancels the remaining reader; normal EOF without it completes only after at least one valid delta and no truncated final data event. Malformed JSON/UTF-8/chunks reject with fixed safe errors. The cumulative raw response remains bounded at 2 MiB. HTTP200 `application/json` is normalized from the same response and emitted once; HTTP400 explicitly rejecting streaming gets fixed interface guidance. Neither case retries.
+
+Tool deltas aggregate by bounded integer index (0–15). ID/type must stay consistent when repeated, function names and arguments concatenate in order. Each argument is checked incrementally against 64 KiB. Final ID/type/name/JSON validation precedes any registry execution; incomplete or `length`/`content_filter` tool termination rejects. UI never receives tool JSON. The existing 8-round/16-call guards, matching assistant-call/tool-result ordering, per-turn duplicate-ID cache, permission enforcement and proposal confirmation remain.
+
+One thinking activity becomes one live assistant item on its first text delta. Subsequent deltas update that item; tool-only replies become local tool activity and the next model round gets its own thinking/live item. Usage accumulates only when a completed response supplies valid top-level token counts. Stop/close immediately abort; failed or stopped partial text remains visible with a safe error, but neither the partial answer nor that unfinished user turn enters finalized natural-language history. Business writes still occur only after a user confirms a validated proposal.
+
+A rolling known-secret guard holds only a suffix that could begin a saved credential. It checks that bounded suffix plus the new delta before publishing, so a credential crossing chunks cannot leak and no entire growing answer is rescanned on each token. The complete response retains final secret validation; tool parameters stay hidden. Prompts, responses, tool arguments and credentials are not logged.
+
+The assistant coalesces text paints with one `requestAnimationFrame`; busy start/end updates are immediate. The existing keyed bubble and its paragraph are reused with `textContent`, without HTML/Markdown rendering or business-page rerender. Scrolling follows only within72px of the bottom; an upward reader retains position. The streaming log/bubbles have `aria-live=off`, `aria-atomic=false`; a separate polite completion status avoids rereading a growing answer each token.
+
+Protocol framing reference: [WHATWG SSE parsing](https://html.spec.whatwg.org/multipage/server-sent-events.html#parsing-an-event-stream); transport shapes: [Chat Completions reference](https://developers.openai.com/api/reference/resources/chat).
 
 ## Device configuration and privacy
 
@@ -45,7 +61,7 @@ This browser BYOK architecture cannot conceal keys from same-origin scripts, bro
 
 - HTTPS API roots only; HTTP is allowed solely for `localhost` / `127.0.0.1` local proxies. Embedded authentication, query and fragment are rejected. Trailing slashes are normalized. Known saved credentials cannot be placed in profile labels, models, endpoint paths, questions, tool arguments/results, or outgoing conversation context.
 - Key only in the Authorization Bearer header; fetch uses `credentials: omit`, `cache: no-store`, `redirect: error`, and a bound global fetch receiver.
-- 45 second AbortController timeout; explicit Stop aborts. No automatic retries, redirect following or fallback forwarding server.
+- Nonstreaming requests retain a 45 second AbortController timeout. Assistant streaming waits at most 45 seconds for headers, then 30 seconds without bytes, with a 120 second total cap; arriving chunks renew only the stall timer. Explicit Stop aborts the fetch and cancels the pending reader. No automatic retries, redirect following or fallback forwarding server.
 - User text ≤6,000 characters; accepted response ≤2 MiB, measured while reading the stream; tool arguments ≤64 KiB; at most 16 calls per response and 8 tool rounds per user turn.
 - Last 20 natural-language history messages, with a 50,000 character serialized request-context budget including tools. Older history is removed first. A current loop that cannot fit stops with a scope-reduction message rather than sending unbounded context or dropping required call/results.
 - Each tool result ≤16,000 characters as valid JSON. Structural pruning marks `truncated: true`; never slice a JSON string into invalid syntax. The system prompt requires disclosure of truncation.

@@ -1,10 +1,12 @@
-import type { AiChatRequest, AiChatResponse, AiProviderProfile, AiToolCall, AiUsage } from '../ai/types'
+import type { AiChatRequest, AiChatResponse, AiChatStreamCallbacks, AiProviderProfile, AiToolCall, AiUsage } from '../ai/types'
+import { ChatStreamAccumulator, validateStreamCalls } from '../ai/sse'
 import { getVisionModel } from '../ai/modelRouting'
 import { AI_LIMITS, AiError, assertNoKnownSecrets, normalizeAiBaseUrl } from '../ai/security'
 import { AI_VISION_LIMITS, assertVisionDataUrl, visionDataBytes, visionImagePart, type PreparedVisionImage } from '../ai/visionImages'
 
 export interface AiProviderAdapter {
   chat(request: AiChatRequest): Promise<AiChatResponse>
+  chatStream(request: AiChatRequest, callbacks?: AiChatStreamCallbacks): Promise<AiChatResponse>
   visionChat(request: AiChatRequest): Promise<AiChatResponse>
   testConnection(signal?: AbortSignal): Promise<void>
   testToolCapability(signal?: AbortSignal): Promise<'supported' | 'unsupported'>
@@ -34,6 +36,7 @@ export function buildAiRequest(model: string, request: AiChatRequest) {
     ...(request.tools?.length ? { tools: request.tools.map(tool => ({ type: tool.type, function: { name: tool.function.name, description: tool.function.description, parameters: tool.function.parameters } })), tool_choice: request.toolChoice ?? 'auto' } : {}),
   }
 }
+const STREAM_RESPONSE = Symbol('streamResponse')
 const statusError = (status: number): AiError => {
   const messages: Record<number, string> = { 400: '请求参数无效，请检查模型名称和接口兼容性。', 401: 'API Key 无效或已过期，请检查配置', 403: '当前 API Key 没有访问权限', 404: '未找到 API 地址、模型或接口，请检查配置', 429: '请求额度或速率已达到限制，请稍后再试' }
   return new AiError(`http_${status}`, messages[status] ?? (status >= 500 ? 'AI 服务暂时不可用，请稍后再试' : 'AI 服务拒绝了请求，请检查配置'))
@@ -47,7 +50,7 @@ export class OpenAICompatibleChatAdapter implements AiProviderAdapter {
   constructor(profile: AiProviderProfile, apiKey: string, fetcher: typeof fetch = fetch, secrets: readonly string[] = [], timeoutMs: number = AI_LIMITS.timeoutMs) {
     this.profile = { ...profile, baseUrl: normalizeAiBaseUrl(profile.baseUrl) }; this.apiKey = apiKey; this.fetcher = fetcher; this.secrets = [...secrets, apiKey].filter(Boolean); this.timeoutMs = timeoutMs
   }
-  private async request(path: '/chat/completions' | '/models', body?: unknown, signal?: AbortSignal): Promise<unknown> {
+  private async request(path: '/chat/completions' | '/models', body?: unknown, signal?: AbortSignal, streaming?: AiChatStreamCallbacks): Promise<unknown> {
     if (!this.apiKey) throw new AiError('missing_key', '请先配置 API Key')
     assertNoKnownSecrets(this.profile.baseUrl + path, this.secrets)
     if (body) {
@@ -62,18 +65,26 @@ export class OpenAICompatibleChatAdapter implements AiProviderAdapter {
     const abort = () => controller.abort()
     signal?.addEventListener('abort', abort, { once: true })
     if (signal?.aborted) controller.abort()
-    const timeout = setTimeout(() => { timedOut = true; controller.abort() }, this.timeoutMs)
+    const expire = () => { timedOut = true; controller.abort() }
+    let timeout = setTimeout(expire, this.timeoutMs)
+    const hardTimeout = streaming ? setTimeout(expire, 120000) : undefined
+    const stalled = () => { if (streaming) { clearTimeout(timeout); timeout = setTimeout(expire, 30000) } }
     try {
       const response = await this.fetcher.call(globalThis, this.profile.baseUrl + path, { method: body ? 'POST' : 'GET', headers: { Authorization: `Bearer ${this.apiKey}`, 'Content-Type': 'application/json' }, ...(body ? { body: JSON.stringify(body) } : {}), credentials: 'omit', cache: 'no-store', redirect: 'error', signal: controller.signal })
+      if (controller.signal.aborted) { void response.body?.cancel(); throw new DOMException('Aborted', 'AbortError') }
+      stalled()
       if (!response.ok) {
         // Inspect a bounded error solely to distinguish an explicit image rejection.
         // Never display or log this untrusted provider text.
         const vision = (body as ReturnType<typeof buildAiRequest> | undefined)?.messages.some(message => Array.isArray(message.content) && message.content.some(part => part.type === 'image_url'))
-        if (vision && [400, 415, 422].includes(response.status) && response.body) {
+        if (((vision && [400, 415, 422].includes(response.status)) || (streaming && response.status === 400)) && response.body) {
           const reader = response.body.getReader(); let text = '', bytes = 0
+          const cancel = () => { void reader.cancel().catch(() => {}) }; controller.signal.addEventListener('abort', cancel, { once: true })
           try { while (true) { const chunk = await reader.read(); if (chunk.done) break; bytes += chunk.value.byteLength; if (bytes > 8192) break; text += new TextDecoder().decode(chunk.value) } }
-          finally { await reader.cancel(); reader.releaseLock() }
-          if (/unsupported[_ -](?:image|vision)|(?:image|vision|图片|图像).{0,80}(?:not supported|unsupported|不支持)|(?:does not support|不支持).{0,80}(?:image|vision|图片|图像)/i.test(text)) throw new AiError('vision_unsupported', '当前模型或接口明确不支持图片识别')
+          finally { controller.signal.removeEventListener('abort', cancel); await reader.cancel(); reader.releaseLock() }
+          if (controller.signal.aborted) throw new DOMException('Aborted', 'AbortError')
+          if (streaming && /(?:stream(?:ing)?).{0,80}(?:not supported|unsupported|不支持)|(?:does not support|unsupported|不支持).{0,80}stream(?:ing)?/i.test(text)) throw new AiError('stream_unsupported', '当前接口不支持流式回复，请检查模型或接口兼容性。')
+          if (vision && /unsupported[_ -](?:image|vision)|(?:image|vision|图片|图像).{0,80}(?:not supported|unsupported|不支持)|(?:does not support|不支持).{0,80}(?:image|vision|图片|图像)/i.test(text)) throw new AiError('vision_unsupported', '当前模型或接口明确不支持图片识别')
         } else await response.body?.cancel()
         throw statusError(response.status)
       }
@@ -82,32 +93,49 @@ export class OpenAICompatibleChatAdapter implements AiProviderAdapter {
       if (!response.body) throw new AiError('invalid_response', 'AI 服务返回了空响应')
       const reader = response.body.getReader(), decoder = new TextDecoder()
       let bytes = 0, text = ''
+      const accumulator = streaming && !response.headers.get('Content-Type')?.toLowerCase().includes('application/json') ? new ChatStreamAccumulator(streaming, this.secrets) : undefined
+      const cancelReader = () => { void reader.cancel().catch(() => {}) }
+      controller.signal.addEventListener('abort', cancelReader, { once: true })
       try {
         while (true) {
           const chunk = await reader.read()
+          if (controller.signal.aborted) throw new DOMException('Aborted', 'AbortError')
           if (chunk.done) break
+          stalled()
           bytes += chunk.value.byteLength
           if (bytes > AI_LIMITS.responseBytes) { await reader.cancel(); throw new AiError('response_limit', 'AI 响应过大，请缩小请求范围') }
-          text += decoder.decode(chunk.value, { stream: true })
+          if (accumulator) { accumulator.parser.push(chunk.value); if (accumulator.done) { await reader.cancel(); break } }
+          else text += decoder.decode(chunk.value, { stream: true })
         }
         text += decoder.decode()
-      } finally { reader.releaseLock() }
+      } finally { controller.signal.removeEventListener('abort', cancelReader); void reader.cancel().catch(() => {}); reader.releaseLock() }
       if (controller.signal.aborted) throw new DOMException('Aborted', 'AbortError')
+      if (accumulator) { const result = accumulator.finish(); assertNoKnownSecrets(result, this.secrets); return { [STREAM_RESPONSE]: result } }
       try { return JSON.parse(text) } catch { throw new AiError('invalid_response', 'AI 服务返回了无法识别的响应') }
     } catch (error) {
       if (error instanceof AiError) throw error
-      if (controller.signal.aborted) throw new AiError(timedOut ? 'timeout' : 'aborted', timedOut ? '请求超过 45 秒，已停止；可以稍后重新发送' : '已停止本次请求')
+      if (controller.signal.aborted) throw new AiError(timedOut ? 'timeout' : 'aborted', timedOut ? (streaming ? 'AI 回复等待过久，已停止；可以稍后重新发送' : '请求超过 45 秒，已停止；可以稍后重新发送') : '已停止本次请求')
       throw new AiError('network', '浏览器无法直接连接这个 API，可能是网络或服务端 CORS 限制。FitLog 不会自动把请求转发到其它服务器。')
-    } finally { clearTimeout(timeout); signal?.removeEventListener('abort', abort) }
+    } finally { clearTimeout(timeout); clearTimeout(hardTimeout); signal?.removeEventListener('abort', abort) }
   }
   async chat(request: AiChatRequest): Promise<AiChatResponse> {
     return this.chatWithModel(this.profile.model, request)
+  }
+  async chatStream(request: AiChatRequest, callbacks: AiChatStreamCallbacks = {}): Promise<AiChatResponse> {
+    const raw = await this.request('/chat/completions', { ...buildAiRequest(this.profile.model, request), stream: true }, request.signal, callbacks)
+    const result = raw && typeof raw === 'object' && STREAM_RESPONSE in raw ? (raw as { [STREAM_RESPONSE]: AiChatResponse })[STREAM_RESPONSE] : this.normalizeChatResponse(raw)
+    validateStreamCalls(result.toolCalls); assertNoKnownSecrets(result, this.secrets)
+    if (!(raw && typeof raw === 'object' && STREAM_RESPONSE in raw) && result.content) callbacks.onContentDelta?.(result.content)
+    return result
   }
   async visionChat(request: AiChatRequest): Promise<AiChatResponse> {
     return this.chatWithModel(getVisionModel(this.profile), request)
   }
   private async chatWithModel(model: string, request: AiChatRequest): Promise<AiChatResponse> {
-    const raw = await this.request('/chat/completions', buildAiRequest(model, request), request.signal) as { choices?: { message?: { content?: unknown; tool_calls?: unknown } }[]; usage?: Record<string, unknown> }
+    return this.normalizeChatResponse(await this.request('/chat/completions', buildAiRequest(model, request), request.signal))
+  }
+  private normalizeChatResponse(value: unknown): AiChatResponse {
+    const raw = value as { choices?: { message?: { content?: unknown; tool_calls?: unknown } }[]; usage?: Record<string, unknown> }
     const message = raw?.choices?.[0]?.message
     if (!message) throw new AiError('invalid_response', 'AI 服务返回了无法识别的响应')
     const content = typeof message.content === 'string' ? message.content : Array.isArray(message.content) ? message.content.filter(item => item?.type === 'text' && typeof item.text === 'string').map(item => item.text).join('\n') : ''
@@ -149,6 +177,7 @@ export class AiClient implements AiProviderAdapter {
   private readonly adapter: AiProviderAdapter
   constructor(profile: AiProviderProfile, key: string, secrets: readonly string[] = [], fetcher: typeof fetch = fetch) { this.adapter = new OpenAICompatibleChatAdapter(profile, key, fetcher, secrets) }
   chat(request: AiChatRequest): Promise<AiChatResponse> { return this.adapter.chat(request) }
+  chatStream(request: AiChatRequest, callbacks?: AiChatStreamCallbacks): Promise<AiChatResponse> { return this.adapter.chatStream(request, callbacks) }
   visionChat(request: AiChatRequest): Promise<AiChatResponse> { return this.adapter.visionChat(request) }
   testConnection(signal?: AbortSignal): Promise<void> { return this.adapter.testConnection(signal) }
   testToolCapability(signal?: AbortSignal): Promise<'supported' | 'unsupported'> { return this.adapter.testToolCapability(signal) }

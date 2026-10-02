@@ -14,7 +14,7 @@ class RecognitionMock implements Recognition {
 async function environment(run:(state:ReturnType<typeof aiEnvironment>,engine:AiOrchestrator,chat:ReturnType<typeof vi.fn>)=>Promise<void>){
  const env=aiEnvironment(), values=new Map<string,string>(), profiles=new AiProfiles({getItem:k=>values.get(k)||null,setItem:(k,v)=>{values.set(k,v)},removeItem:k=>{values.delete(k)}})
  const profile=profiles.save({name:'合成',baseUrl:'https://mock.invalid/v1',model:'chat',visionModel:'image'},'synthetic-voice-key');profiles.acknowledgePrivacy();profiles.setCapability(profile.id,'supported');profiles.setVisionCapability(profile.id,'unsupported')
- const chat=vi.fn(),engine=new AiOrchestrator({profiles,database:env.database,context:()=>env.context,clientFactory:()=>({chat,visionChat:vi.fn(),testConnection:vi.fn(),testToolCapability:vi.fn(),testVisionCapability:vi.fn(),listModels:vi.fn()})})
+ const chat=vi.fn(),engine=new AiOrchestrator({profiles,database:env.database,context:()=>env.context,clientFactory:()=>({chat,chatStream:chat,visionChat:vi.fn(),testConnection:vi.fn(),testToolCapability:vi.fn(),testVisionCapability:vi.fn(),listModels:vi.fn()})})
  try{await run(env,engine,chat)}finally{env.database.close();await env.database.delete()}
 }
 describe('voice and fragment reuse existing safety path',()=>{

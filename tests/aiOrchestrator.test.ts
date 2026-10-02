@@ -12,12 +12,38 @@ const setup = (supported = true) => {
   const values = new Map<string, string>(), storage = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value) }, removeItem: (key: string) => { values.delete(key) } }
   const profiles = new AiProfiles(storage), profile = profiles.save({ name: 'A', baseUrl: 'https://a.example/v1', model: 'a-model' }, 'synthetic-key-A')
   profiles.acknowledgePrivacy(); profiles.setCapability(profile.id, supported ? 'supported' : 'unsupported')
-  const chat = vi.fn(), clientFactory = vi.fn(() => ({ chat, visionChat: vi.fn(), testConnection: vi.fn(), testToolCapability: vi.fn(), testVisionCapability: vi.fn(), listModels: vi.fn() }))
+  const chat = vi.fn(), clientFactory = vi.fn(() => ({ chat, chatStream: chat, visionChat: vi.fn(), testConnection: vi.fn(), testToolCapability: vi.fn(), testVisionCapability: vi.fn(), listModels: vi.fn() }))
   const engine = new AiOrchestrator({ profiles, database: env.database, context: () => env.context, clientFactory })
   return { env, engine, chat, profiles, profile, clientFactory, storage }
 }
 afterEach(async () => { for (const env of environments.splice(0)) { env.database.close(); await env.database.delete() } })
 describe('bounded assistant orchestration', () => {
+  it('shows one live item per streamed round and executes tools only after the complete response', async () => {
+    const { engine, chat } = setup()
+    let finish!: (value: AiChatResponse) => void
+    const execute = vi.spyOn(engine.registry, 'execute')
+    chat.mockImplementationOnce((_request, callbacks) => { callbacks.onContentDelta('先查'); callbacks.onContentDelta('数据'); return new Promise(resolve => { finish = resolve }) })
+    chat.mockImplementationOnce((_request, callbacks) => { callbacks.onContentDelta('最终'); callbacks.onContentDelta('答复'); return Promise.resolve(reply('最终答复')) })
+    const sending = engine.send('查询')
+    expect(engine.busy).toBe(true); expect(engine.items.filter(i => i.kind === 'assistant')).toHaveLength(1)
+    expect(engine.items.find(i => i.kind === 'assistant')?.content).toBe('先查数据'); expect(execute).not.toHaveBeenCalled()
+    finish(reply('先查数据', [aiCall('get_current_context', {}, 'once')])); await sending
+    expect(execute).toHaveBeenCalledOnce(); expect(engine.items.filter(i => i.kind === 'assistant').map(i => i.content)).toEqual(['先查数据', '最终答复'])
+    expect(engine.items.some(i => i.streaming)).toBe(false)
+  })
+  it.each(['aborted', 'network'])('keeps partial UI but excludes an unfinished %s answer and its user turn from history', async code => {
+    const { engine, chat } = setup()
+    chat.mockImplementationOnce((_request, callbacks) => { callbacks.onContentDelta('部分回答'); return Promise.reject(new AiError(code, code === 'aborted' ? '已停止本次请求' : '网络未完成')) })
+    await engine.send('失败的一问'); expect(engine.items.find(i => i.kind === 'assistant')?.content).toBe('部分回答'); expect(engine.busy).toBe(false)
+    chat.mockResolvedValueOnce(reply('下一次完整')); await engine.send('新问题')
+    expect(JSON.stringify(chat.mock.calls[1][0].messages)).not.toMatch(/部分回答|失败的一问/)
+  })
+  it('Stop during a partial tool stream prevents any registry execution', async () => {
+    const { engine, chat } = setup(); const execute = vi.spyOn(engine.registry, 'execute')
+    chat.mockImplementationOnce((request, callbacks) => { callbacks.onContentDelta('进行中'); return new Promise((_resolve, reject) => request.signal.addEventListener('abort', () => reject(new AiError('aborted', '已停止本次请求')))) })
+    const sending = engine.send('准备工具'); engine.stop(); await sending
+    expect(execute).not.toHaveBeenCalled(); expect(engine.proposals.all).toHaveLength(0); expect(engine.items.at(-1)?.content).toContain('已停止')
+  })
   it('keeps an in-flight chat and its history when only the image model changes', async () => {
     const { engine, chat, profiles, profile, clientFactory } = setup()
     let finish!: (value: AiChatResponse) => void
