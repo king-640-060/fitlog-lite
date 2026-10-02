@@ -1,24 +1,48 @@
 import { inputModality } from './inputModality'
 export type SheetVariant = 'content' | 'form' | 'large' | 'assistant'
-export interface SheetViewport { height: number; offsetTop: number; bottomOffset: number; keyboardOverlap: number }
-export function sheetViewport(height: number, offsetTop: number, layoutHeight: number, editing: boolean): SheetViewport {
-  const bottomOffset = Math.max(0, layoutHeight - height - offsetTop)
-  return { height: Math.max(120, height), offsetTop: Math.max(0, offsetTop), bottomOffset, keyboardOverlap: editing && bottomOffset > 120 ? bottomOffset : 0 }
-}
-/** One app lifetime coordinator; sheets inherit the same viewport and have no private resize listeners. */
+export type { SheetViewport } from './sheetViewport'
+export { sheetViewport } from './sheetViewport'
+import { computeSheetViewportState, type SheetViewportState } from './sheetViewport'
+/** One app lifetime coordinator; visual movement is coalesced, and closed-keyboard geometry is stable. */
 export function setupSheetViewport(): () => void {
   const events = new AbortController(), viewport = window.visualViewport
+  let state: SheetViewportState | undefined, frame = 0, layoutResize = false, revealFocused = false
+  const editing = () => document.activeElement instanceof Element && !!document.activeElement.closest('input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=submit]):not([type=range]):not([type=file]), textarea, [contenteditable=true]')
   const update = () => {
-    const editing = document.activeElement instanceof Element && !!document.activeElement.closest('input:not([type=checkbox]):not([type=radio]), textarea, [contenteditable=true]')
+    frame = 0
     const current = window.visualViewport
-    const value = sheetViewport(current?.height ?? innerHeight, current?.offsetTop ?? 0, innerHeight, editing)
-    for (const [key, number] of Object.entries({ height: value.height, 'offset-top': value.offsetTop, 'bottom-offset': value.bottomOffset, 'keyboard-overlap': value.keyboardOverlap })) document.documentElement.style.setProperty(`--sheet-${key === 'height' ? 'viewport-height' : key}`, `${number}px`)
-    document.body.classList.toggle('keyboard-open', value.keyboardOverlap > 0)
+    const next = computeSheetViewportState(state, { height: current?.height ?? innerHeight, offsetTop: current?.offsetTop ?? 0, layoutHeight: innerHeight, layoutWidth: innerWidth, editing: editing(), layoutResize, scale: current?.scale })
+    layoutResize = false
+    for (const [key, number] of Object.entries({ height: next.viewport.height, 'offset-top': next.viewport.offsetTop, 'bottom-offset': next.viewport.bottomOffset, 'keyboard-overlap': next.viewport.keyboardOverlap })) {
+      const property = `--sheet-${key === 'height' ? 'viewport-height' : key}`, value = `${number}px`
+      if (document.documentElement.style.getPropertyValue(property) !== value) document.documentElement.style.setProperty(property, value)
+    }
+    if (state?.keyboardOpen !== next.keyboardOpen) document.body.classList.toggle('keyboard-open', next.keyboardOpen)
+    if (next.keyboardOpen && (!state?.keyboardOpen || revealFocused)) {
+      const active = document.activeElement
+      const surface = active instanceof HTMLElement ? active.closest<HTMLElement>('.sheet .modal-body') : null
+      if (surface && getComputedStyle(surface).overflowY === 'auto') {
+        const field = active!.getBoundingClientRect(), body = surface.getBoundingClientRect()
+        const bottom = Math.min(body.bottom, next.viewport.height + next.viewport.offsetTop) - 12, top = Math.max(body.top, next.viewport.offsetTop) + 12
+        // Native focus scrolling goes first; correct only residual real keyboard occlusion, within this body.
+        if (field.bottom > bottom) surface.scrollTop += field.bottom - bottom
+        else if (field.top < top) surface.scrollTop -= top - field.top
+      }
+    }
+    revealFocused = false; state = next
   }
-  viewport?.addEventListener('resize', update, { signal: events.signal }); viewport?.addEventListener('scroll', update, { signal: events.signal })
-  window.addEventListener('resize', update, { signal: events.signal })
-  document.addEventListener('focusin', update, { signal: events.signal }); document.addEventListener('focusout', () => queueMicrotask(update), { signal: events.signal })
-  update(); return () => events.abort()
+  const schedule = () => { if (!frame) frame = requestAnimationFrame(update) }
+  const visualScroll = () => { if (!state?.keyboardOpen && !editing()) return; schedule() }
+  const windowResize = () => {
+    // Mobile toolbar can resize innerHeight too. Only width/orientation establishes a new mobile baseline.
+    if (!viewport || !matchMedia('(pointer: coarse)').matches) layoutResize = true
+    schedule()
+  }
+  viewport?.addEventListener('resize', schedule, { signal: events.signal }); viewport?.addEventListener('scroll', visualScroll, { signal: events.signal })
+  window.addEventListener('resize', windowResize, { signal: events.signal })
+  window.addEventListener('orientationchange', () => { layoutResize = true; schedule() }, { signal: events.signal })
+  document.addEventListener('focusin', () => { revealFocused = true; schedule() }, { signal: events.signal }); document.addEventListener('focusout', () => queueMicrotask(schedule), { signal: events.signal })
+  update(); return () => { events.abort(); cancelAnimationFrame(frame) }
 }
 let primary: HTMLDialogElement | undefined
 let locks = 0, scrollX = 0, scrollY = 0, originalStyle = '', originalScrollBehavior = ''

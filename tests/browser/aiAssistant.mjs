@@ -90,7 +90,7 @@ for (const [width,height] of sizes) {
   assert.equal(requests.length,imeRequests)
   await close()
   await page.evaluate(() => { window.aiOriginalViewportDescriptor = Object.getOwnPropertyDescriptor(window,'visualViewport'); const viewport=Object.assign(new EventTarget(), { height:innerHeight,width:innerWidth,offsetTop:0 }); Object.defineProperty(window,'visualViewport',{configurable:true,value:viewport}) })
-  await open(); await page.evaluate(() => { visualViewport.height=innerHeight-300;visualViewport.dispatchEvent(new Event('resize'));window.dispatchEvent(new Event('resize')) })
+  await open(); await page.locator('#ai-message-input').focus(); await page.evaluate(() => { visualViewport.height=innerHeight-300;visualViewport.dispatchEvent(new Event('resize'));window.dispatchEvent(new Event('resize')) })
   await page.waitForTimeout(150)
   assert.ok(await page.locator('.ai-composer').evaluate(element=>element.getBoundingClientRect().bottom<=visualViewport.height+1))
   await page.screenshot({path:`/tmp/fitlog-ai-${prod?'prod':'local'}-${width}-keyboard-geometry.png`})

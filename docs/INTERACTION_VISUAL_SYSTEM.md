@@ -20,7 +20,11 @@ Explicit close wraps native `dialog.close`, dispatches one close notification im
 
 Initial title uses autofocus and tabindex=-1 with no outline. Forms and close buttons do not autofocus. Date subviews place focus on the same title; arrow navigation uses the date picker’s existing roving tab stop. Pointer dismissal has no residual ring; keyboard dismissal restores a connected trigger with preventScroll. Ordinary async tag completion preserves current user focus.
 
-Viewport variables are `--sheet-viewport-height`, `--sheet-offset-top`, `--sheet-bottom-offset`, `--sheet-keyboard-overlap`. Bottom offset is max(0, innerHeight − visualViewport.height − offsetTop). Editable focus plus overlap above 120px enables keyboard-open. Bottom navigation may hide; app-frame padding stays stable. No per-focus forced scroll: the browser scrolls the inner body as needed. App-owned date rail centering and an explicitly opened nutrition meal picker are the bounded scrollIntoView exceptions.
+Viewport variables are `--sheet-viewport-height`, `--sheet-offset-top`, `--sheet-bottom-offset`, `--sheet-keyboard-overlap`. The pure `src/ui/sheetViewport.ts` state machine owns a stable layout baseline. Keyboard opening needs editable focus plus at least140px occlusion; once open it persists until occlusion drops to80px or less, even when focus leaves during dismissal. Keyboard-closed height stays at the baseline, offsets/overlap are0 and `keyboard-open` is false. Toolbar-only visual resize/scroll never repositions a Sheet. Nonediting visual scroll returns early; all remaining updates coalesce into one animation frame and unchanged CSS values are not rewritten.
+
+Keyboard-open geometry uses visual height/top and actual bottom occlusion. Native focus scrolling goes first; the controller only corrects a still-obscured focused field inside its own scroll body when real keyboard mode opens or a field receives focus. No smooth keyboard scroll, repeated global focus scrolling, private listeners or fixed dismissal delay. Blur does not reset geometry while the keyboard is still visible. Mobile toolbar changes to innerHeight also leave the baseline stable; width/orientation changes refresh it, and desktop window resize refreshes height normally. User zoom does not count as a new keyboard. Voice starts without editable focus and cannot open keyboard mode.
+
+AI Assistant's modal-body remains overflow-hidden with conversation as its only main vertical scroll surface. AI Settings uses the shared modal-body for long content. Native inner scrolling/rubber-band and overscroll containment remain; no global touchmove preventDefault or body touch-action:none. Background locking and nested confirmations retain the reference count; replacement acquires the new lease before normal old-sheet cleanup, so there is no intermediate unlock. Exact original x/y scroll and body styles restore only after the last dialog closes. Date Rail centering now directly scrolls its rail, and explicit nutrition meal reveal directly scrolls its own body; neither can scroll the page through scrollIntoView.
 
 ## Visual grammar
 
@@ -42,8 +46,8 @@ Viewport variables are `--sheet-viewport-height`, `--sheet-offset-top`, `--sheet
 | Backdrop blur | Removed. RGBA overlay is static. |
 | Page/number/ring/chart entrance | Removed. Final values and offsets are present in initial DOM. No count from zero/pulse/reveal on ordinary render. |
 | Sheet / toast | Sheet200ms,16px,.85→1; toast180ms; close immediate. Reduced motion disables both. |
-| requestAnimationFrame | Food Rail lens scheduling and the actual pelvic timer remain; no nutrition counting/initial task focus loop. |
-| scrollIntoView | Native rail centering and explicit nutrition meal selection only. No automatic input scrolling. |
+| requestAnimationFrame | Food Rail lens, actual pelvic timer, coalesced assistant text paints and shared viewport updates; no nutrition counting/initial task focus loop. |
+| scrollIntoView | No calls remain. Rail/meal reveal scroll only their owned surface; shared controller corrects only residual real keyboard occlusion. |
 | VisualViewport | One app lifetime coordinator, no private AI/Vision listeners. |
 | Tap highlight / text selection | Actual controls suppress native highlight. Rail keeps its existing selection restriction; app text remains selectable. |
 
@@ -57,6 +61,6 @@ Assistant uses readable provider/model, quiet header icons, compact unverified-d
 
 ## Verification
 
-`tests/interactionSystem.test.ts` protects modality, viewport geometry and static motion/focus/hover/shared-boundary rules. `tests/browser/interactionStabilization.mjs` uses isolated synthetic contexts and mocked providers at 320×812/375×812/390×844/430×932 (production390/430). It checks title focus, pointer/keyboard outlines, input size, native cancel/subviews, confirmations, rapid lifecycle, background restore, fake keyboard viewport, settings/model/save-test/partial/errors and major Sheets/pages. Existing Assistant/Vision/DatePicker/Sync scripts remain regression gates.
+`tests/interactionSystem.test.ts` protects modality, viewport geometry and static motion/focus/hover/shared-boundary rules. `tests/browser/interactionStabilization.mjs` uses isolated synthetic contexts and mocked providers at 320×812/375×812/390×844/430×932 (production390/430). It checks title focus, pointer/keyboard outlines, input size, native cancel/subviews, confirmations, rapid lifecycle, background restore, focused fake keyboard/blur/close sequences, orientation, settings/model/save-test/partial/errors and major Sheets/pages. Every checked Sheet receives synthetic long content and20 native wheel up/down cycles plus toolbar movements; geometry and background lock must stay unchanged. This is Chromium geometry QA, not physical touch/Safari proof. Existing Assistant/Vision/DatePicker/Sync scripts remain regression gates.
 
 Physical iPhone Safari/installed PWA remain manual categories, independent of Chromium geometry emulation. Check: open Sheets without green X ring; keyboard without jump; rapid open/close without flash; settings scroll; composer/Safe Area; camera/photo-library return. Real Provider probes require the owner’s configuration and remain distinct from mock results.

@@ -114,6 +114,7 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 - AI reads use bounded registered tools with real scope enforcement. Preserve saved FoodLog/Workout facts, independent calories and unknown missing macros. Reports and nutrition completion reuse existing local services/calculators.
 - Model calls can only produce proposals. The App owns deterministic previews, explicit confirmation, repeated-ID protection, stale-source validation and atomic existing-service writes. Recheck permissions and relevant source records inside the transaction.
 - No AI destructive, arbitrary DB/HTTP, Restore/Clear/GitHub Sync, Workout factual-session or Pelvic factual-session tools. Tasks are plans, never proof of a health activity.
+- Ordinary assistant rounds use incremental streaming when compatible; a200 JSON fallback must consume that same response without retry. Probes and Food Vision extraction remain nonstreaming. Aggregate and validate complete tool calls before registry execution; partial/aborted output is UI-only, never finalized history. Protect incremental text against known credentials across chunk boundaries.
 - Bound requests, tool arguments/results, rounds and history. Abort and failures must preserve business records. Treat names/notes/tool data as untrusted data and render AI text safely as text.
 - Mock provider tests are separate from real provider compatibility and physical iPhone verification. Never use real user keys or business records in automated browser QA.
 - Food packaging Vision is one explicit workflow shared by Food Library, meal entry and the assistant. It uses the existing adapter directly, without agent tools/history. The model only transcribes visible label fields with bounded evidence; local validation and kJ/kcal conversion own all numbers. Never estimate nutrition from a dish photo, infer density or treat mL as grams. Images/extraction stay in memory and out of DB/Backup/Sync; saving an ordinary Food and optional FoodLog requires a local preview and explicit confirmation.
@@ -131,6 +132,7 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 - Touch focus must not show keyboard-style outlines; keyboard focus must remain explicit.
 - Do not use global transform-based button press feedback.
 - Do not animate ordinary rerenders as page entrances or replay nutrition counts/rings.
+- Browser toolbar/VisualViewport movement alone must not reposition Sheets. Keyboard-closed bottomOffset/overlap are0; shared editable-focus/occlusion hysteresis owns keyboard geometry and closing. Coalesce updates and fix this centrally; no private sheet listeners or global touchmove prevention. Voice must not open keyboard mode.
 - Sheets share one VisualViewport/keyboard lifecycle through `src/ui/sheetController.ts`; close normally before replacement and run consumers’ cleanup.
 - Avoid backdrop blur in mobile dialogs.
 - Do not autofocus mobile sheet forms or their close buttons; initial focus belongs to the title anchor.

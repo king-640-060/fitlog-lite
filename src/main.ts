@@ -930,13 +930,8 @@ function paintFoodRailFocus(rail: HTMLElement): void {
 function centerFoodRail(rail: HTMLElement, date: string, behavior: ScrollBehavior = 'auto', preservePageScroll = false): void {
   const item = Array.from(rail.querySelectorAll<HTMLButtonElement>('.food-date-item')).find((button) => button.dataset.foodDate === date)
   if (!item) return
-  if (preservePageScroll) {
-    const railRect = rail.getBoundingClientRect()
-    const itemRect = item.getBoundingClientRect()
-    rail.scrollTo({ left: rail.scrollLeft + itemRect.left + itemRect.width / 2 - railRect.left - railRect.width / 2, behavior: 'auto' })
-  } else {
-    item.scrollIntoView({ behavior, inline: 'center', block: 'nearest' })
-  }
+  const railRect = rail.getBoundingClientRect(), itemRect = item.getBoundingClientRect()
+  rail.scrollTo({ left: rail.scrollLeft + itemRect.left + itemRect.width / 2 - railRect.left - railRect.width / 2, behavior: preservePageScroll ? 'auto' : behavior })
 }
 
 function updateFoodRail(rail: HTMLElement, selectedDate: string, forceWindow = false): void {
@@ -1240,7 +1235,8 @@ async function showNutritionCompletion(date: string): Promise<void> {
           fail(error)
         }
       }))
-      picker.scrollIntoView({ block: 'nearest', behavior: 'auto' })
+      const surface = dialog.querySelector<HTMLElement>('.modal-body')!, bodyRect = surface.getBoundingClientRect(), pickerRect = picker.getBoundingClientRect()
+      if (pickerRect.bottom > bodyRect.bottom) surface.scrollTo({ top: surface.scrollTop + pickerRect.bottom - bodyRect.bottom, behavior: 'auto' })
     }))
   } catch (error) { if (dialog.isConnected && dialog.open) dialog.querySelector('.modal-body')!.innerHTML = '<p class="completion-note">暂时无法计算方案，请关闭后重试。</p>'; fail(error) }
 }
