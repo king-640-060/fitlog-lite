@@ -1,5 +1,5 @@
 import type { AiPermissions, AiProviderProfile, AiScope } from '../ai/types'
-import { AiError, normalizeAiBaseUrl } from '../ai/security'
+import { AiError, assertNoKnownSecrets, normalizeAiBaseUrl } from '../ai/security'
 
 export const AI_STORAGE_KEYS = { profiles: 'fitlog-ai-profiles-v1', active: 'fitlog-ai-active-profile-v1', keyPrefix: 'fitlog-ai-key-v1:', permissions: 'fitlog-ai-permissions-v1', privacy: 'fitlog-ai-privacy-ack-v1' } as const
 export const ZHIPU_BASE_URL = 'https://open.bigmodel.cn/api/paas/v4'
@@ -43,6 +43,7 @@ export class AiProfiles {
     if (!existing && profiles.length >= 20) throw new AiError('profile_limit', '最多保存 20 份 AI 配置')
     const profileId = existing?.id ?? crypto.randomUUID()
     if (!key.trim() && !this.key(profileId)) throw new AiError('missing_key', '请填写 API Key')
+    assertNoKnownSecrets({ name, baseUrl, model }, [...this.knownSecrets, key.trim(), this.key(profileId)].filter(Boolean))
     const now = new Date().toISOString()
     const unchanged = existing && existing.baseUrl === baseUrl && existing.model === model && (!key.trim() || key.trim() === this.key(profileId))
     const profile: AiProviderProfile = { id: profileId, name, baseUrl, model, protocol: 'openai-chat-completions', preset: input.preset ?? 'custom', toolCapability: unchanged ? existing.toolCapability : 'unknown', createdAt: existing?.createdAt ?? now, updatedAt: now }

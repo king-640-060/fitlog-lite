@@ -136,5 +136,16 @@ The shared page backdrop keeps the warm white base, restrained asymmetric glows,
 ## GitHub connection setup
 
 - New/disconnected setup preconfigures `king-640-060 / fitlog-lite-data`; users normally enter only their PAT, then their data password. Path is fixed and branch is automatic. Existing saved owner/repo/branch/baseline remain untouched when opening the UI. The transport stays generic.
+
+## Optional AI assistant
+
+- Each of the five topbars has a compact icon-only “AI 助手” entry before Management; never add a sixth bottom tab. Food keeps Template and Library visible and usable at 320px.
+- AI Settings belongs to Management → Application before About. It manages multiple editable provider profiles, explicit activation and confirmed deletion. Presets only populate editable addresses; model remains editable. Saved API Keys stay out of DOM values and show an empty password field with “已保存；留空则保持不变”.
+- First enablement explains exactly what leaves the device and requests a device acknowledgement. Six read scopes and write-proposal permission are independent controls. Unknown/unsupported tool capability allows chat only and explicitly says it cannot read/modify FitLog data.
+- The assistant uses the existing Sheet with nearly full VisualViewport height, Safe Area, a stable header/composer and a separate conversation scroll. Warm surfaces, soft Fresh Green user bubbles and quiet activity/usage text maintain the app hierarchy. Render AI as text, never raw HTML.
+- The 16px input autogrows only to 120px. Enter inserts a newline; Send or explicit Ctrl/Cmd+Enter outside IME composition sends. Busy requests show Stop. Closing the Sheet stops an active request. No automatic retries or fallback forwarding.
+- Every business write first appears as an App-calculated proposal with date, domain values and any replacement/new-tag information. Confirmation disables immediately and runs local permission/source validation. Keep “待确认 / 处理中 / 已完成 / 已取消 / 已失效” cards visible. A cancelled/stale card cannot commit. Chat acknowledgements never replace the confirmation button.
+- Closing/reopening keeps session chat and usage in memory; reload clears them. Clear conversation clears only AI memory, never settings, keys or business records. Configuration/permission changes clear old AI context and proposals.
+- Successful confirmation updates the relevant current view through existing rendering paths, without page reload or losing an active strength editor. AI failures leave ordinary offline recording usable.
 - The data repository must be Private and initialized with a README. Provide concise preparation steps and selected-repo Contents: Read and write guidance; do not create repositories or request Administration. Missing/inaccessible repo errors name the exact default destination and preparation steps.
 - After the user's explicit connection action, check the remote in the same sheet and show either create-password confirmation (12+ characters) or a single existing-backup password field with “解锁并检查”. Preserve all subsequent encryption, validation, confirmation, conflict, SHA race, disconnection and data-preservation rules. Opening an already connected status screen performs no network request.

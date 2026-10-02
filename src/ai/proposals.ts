@@ -43,6 +43,8 @@ export class AiProposals {
         const tables = spec.tables.map(name => this.database.table(name))
         record.view.result = await this.database.transaction('rw', tables, async () => {
           if (canonicalAiSource(await spec.readSource()) !== record.fingerprint) throw new AiError('stale_proposal', '相关数据已变化，这份建议已失效，请重新提出')
+          const latest = this.permissions()
+          if (!latest.writeProposals || spec.scopes.some(scope => !latest.read[scope])) throw new AiError('permission_denied', '权限已变化，请重新授权后提出建议')
           return spec.apply()
         })
         record.view.status = 'completed'; record.view.message = '已保存'; record.spec = undefined

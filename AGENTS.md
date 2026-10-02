@@ -105,6 +105,16 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 - Data reliability is more important than UI convenience.
 - iPhone accessibility must not be traded away to suppress zoom or keyboard behavior.
 
+## Optional FitLog AI contract
+
+- Read `docs/AI_ARCHITECTURE.md` before changing AI. Provider profiles are editable device-only transport configuration; core business semantics must not depend on a vendor or model.
+- AI credentials, configuration, chat, usage, plan handles and proposals never enter business DB stores, Backup or GitHub Sync. Keep API Keys separately stored from profile metadata and empty in edit-form values; never log credentials or raw provider errors.
+- AI reads use bounded registered tools with real scope enforcement. Preserve saved FoodLog/Workout facts, independent calories and unknown missing macros. Reports and nutrition completion reuse existing local services/calculators.
+- Model calls can only produce proposals. The App owns deterministic previews, explicit confirmation, repeated-ID protection, stale-source validation and atomic existing-service writes. Recheck permissions and relevant source records inside the transaction.
+- No AI destructive, arbitrary DB/HTTP, Restore/Clear/GitHub Sync, Workout factual-session or Pelvic factual-session tools. Tasks are plans, never proof of a health activity.
+- Bound requests, tool arguments/results, rounds and history. Abort and failures must preserve business records. Treat names/notes/tool data as untrusted data and render AI text safely as text.
+- Mock provider tests are separate from real provider compatibility and physical iPhone verification. Never use real user keys or business records in automated browser QA.
+
 ## Targeted file map
 
 - `src/main.ts`: application state, views, dialogs, event bindings, mobile viewport behavior.

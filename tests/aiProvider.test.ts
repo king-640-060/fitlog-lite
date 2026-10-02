@@ -1,10 +1,26 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { AiProviderProfile } from '../src/ai/types'
 import { AI_LIMITS } from '../src/ai/security'
-import { OpenAICompatibleChatAdapter } from '../src/services/aiProvider'
+import { buildAiRequest, OpenAICompatibleChatAdapter } from '../src/services/aiProvider'
 const profile: AiProviderProfile = { id: 'test', name: 'test', model: 'editable-model', protocol: 'openai-chat-completions', baseUrl: 'https://example.com/v1/', createdAt: '', updatedAt: '' }
 const response = (message: unknown, usage?: unknown) => new Response(JSON.stringify({ choices: [{ message }], usage }), { headers: { 'Content-Type': 'application/json' } })
 describe('OpenAI-compatible browser transport', () => {
+  it('purely builds the expected system/messages/tool protocol body without transport secrets or signals', () => {
+    const messages = [{ role: 'system' as const, content: 'FitLog 系统提示', apiKey: 'secret-extra' }, { role: 'user' as const, content: '提问' }]
+    const tools = [{ type: 'function' as const, function: { name: 'get_current_context', description: '只读', parameters: { type: 'object', properties: {}, additionalProperties: false } } }]
+    const body = buildAiRequest('editable', { messages, tools, signal: new AbortController().signal })
+    expect(body).toEqual({ model: 'editable', messages: [{ role: 'system', content: 'FitLog 系统提示' }, { role: 'user', content: '提问' }], tools, tool_choice: 'auto' })
+    expect(JSON.stringify(body)).not.toMatch(/secret-extra|apiKey|Authorization|signal/)
+  })
+  it('binds native fetch to the global browser receiver', async () => {
+    const fetcher = vi.fn(function () { if (this !== globalThis) throw new TypeError('Illegal invocation'); return Promise.resolve(response({ content: 'OK' })) })
+    await expect(new OpenAICompatibleChatAdapter(profile, 'synthetic-key', fetcher).testConnection()).resolves.toBeUndefined()
+  })
+  it('blocks credentials accidentally embedded in an API path before making a request', async () => {
+    const fetcher = vi.fn()
+    await expect(new OpenAICompatibleChatAdapter({ ...profile, baseUrl: 'https://example.com/private-secret' }, 'private-secret', fetcher).testConnection()).rejects.toMatchObject({ code: 'secret_detected' })
+    expect(fetcher).not.toHaveBeenCalled()
+  })
   it('normalizes response and keeps Bearer credentials out of the request body with safe fetch options', async () => {
     const fetcher = vi.fn(async () => response({ content: '你好', tool_calls: [{ id: 'c', type: 'function', function: { name: 'get_current_context', arguments: '{}' } }] }, { prompt_tokens: 10, completion_tokens: 3, total_tokens: 13 }))
     const result = await new OpenAICompatibleChatAdapter(profile, 'private-key', fetcher).chat({ messages: [{ role: 'user', content: '你好' }] })

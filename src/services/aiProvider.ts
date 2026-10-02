@@ -7,6 +7,14 @@ export interface AiProviderAdapter {
   testToolCapability(signal?: AbortSignal): Promise<'supported' | 'unsupported'>
   listModels(signal?: AbortSignal): Promise<string[]>
 }
+/** Pure protocol payload construction; credentials belong only to transport headers. */
+export function buildAiRequest(model: string, request: AiChatRequest) {
+  return {
+    model,
+    messages: request.messages.map(message => ({ role: message.role, content: message.content, ...(message.tool_calls ? { tool_calls: message.tool_calls.map(call => ({ id: call.id, type: call.type, function: { name: call.function.name, arguments: call.function.arguments } })) } : {}), ...(message.tool_call_id ? { tool_call_id: message.tool_call_id } : {}) })),
+    ...(request.tools?.length ? { tools: request.tools.map(tool => ({ type: tool.type, function: { name: tool.function.name, description: tool.function.description, parameters: tool.function.parameters } })), tool_choice: request.toolChoice ?? 'auto' } : {}),
+  }
+}
 const statusError = (status: number): AiError => {
   const messages: Record<number, string> = { 401: 'API Key 无效或已过期，请检查配置', 403: '当前 API Key 没有访问权限', 404: '未找到 API 地址、模型或接口，请检查配置', 429: '请求额度或速率已达到限制，请稍后再试' }
   return new AiError(`http_${status}`, messages[status] ?? (status >= 500 ? 'AI 服务暂时不可用，请稍后再试' : 'AI 服务拒绝了请求，请检查配置'))
@@ -22,6 +30,7 @@ export class OpenAICompatibleChatAdapter implements AiProviderAdapter {
   }
   private async request(path: '/chat/completions' | '/models', body?: unknown, signal?: AbortSignal): Promise<unknown> {
     if (!this.apiKey) throw new AiError('missing_key', '请先配置 API Key')
+    assertNoKnownSecrets(this.profile.baseUrl + path, this.secrets)
     if (body) assertNoKnownSecrets(body, this.secrets)
     const controller = new AbortController()
     let timedOut = false
@@ -30,7 +39,7 @@ export class OpenAICompatibleChatAdapter implements AiProviderAdapter {
     if (signal?.aborted) controller.abort()
     const timeout = setTimeout(() => { timedOut = true; controller.abort() }, this.timeoutMs)
     try {
-      const response = await this.fetcher(this.profile.baseUrl + path, { method: body ? 'POST' : 'GET', headers: { Authorization: `Bearer ${this.apiKey}`, 'Content-Type': 'application/json' }, ...(body ? { body: JSON.stringify(body) } : {}), credentials: 'omit', cache: 'no-store', redirect: 'error', signal: controller.signal })
+      const response = await this.fetcher.call(globalThis, this.profile.baseUrl + path, { method: body ? 'POST' : 'GET', headers: { Authorization: `Bearer ${this.apiKey}`, 'Content-Type': 'application/json' }, ...(body ? { body: JSON.stringify(body) } : {}), credentials: 'omit', cache: 'no-store', redirect: 'error', signal: controller.signal })
       if (!response.ok) { await response.body?.cancel(); throw statusError(response.status) }
       const declared = Number(response.headers.get('Content-Length'))
       if (declared > AI_LIMITS.responseBytes) { await response.body?.cancel(); throw new AiError('response_limit', 'AI 响应过大，请缩小请求范围') }
@@ -56,7 +65,7 @@ export class OpenAICompatibleChatAdapter implements AiProviderAdapter {
     } finally { clearTimeout(timeout); signal?.removeEventListener('abort', abort) }
   }
   async chat(request: AiChatRequest): Promise<AiChatResponse> {
-    const raw = await this.request('/chat/completions', { model: this.profile.model, messages: request.messages, ...(request.tools?.length ? { tools: request.tools, tool_choice: request.toolChoice ?? 'auto' } : {}) }, request.signal) as { choices?: { message?: { content?: unknown; tool_calls?: unknown } }[]; usage?: Record<string, unknown> }
+    const raw = await this.request('/chat/completions', buildAiRequest(this.profile.model, request), request.signal) as { choices?: { message?: { content?: unknown; tool_calls?: unknown } }[]; usage?: Record<string, unknown> }
     const message = raw?.choices?.[0]?.message
     if (!message) throw new AiError('invalid_response', 'AI 服务返回了无法识别的响应')
     const content = typeof message.content === 'string' ? message.content : Array.isArray(message.content) ? message.content.filter(item => item?.type === 'text' && typeof item.text === 'string').map(item => item.text).join('\n') : ''

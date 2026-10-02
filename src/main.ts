@@ -4,6 +4,8 @@ import './styles/main.css'
 import './styles/plan.css'
 import './styles/ai.css'
 import { showAiSettings, aiSettingsDetail } from './ui/aiSettings'
+import { showAiAssistant } from './ui/aiAssistant'
+import { AiOrchestrator } from './ai/orchestrator'
 import { Chart, registerables } from 'chart.js'
 import { registerSW } from 'virtual:pwa-register'
 import { db } from './db/database'
@@ -89,6 +91,16 @@ let pelvicWakeLock: { release: () => Promise<void> } | undefined
 const LAST_BACKUP_KEY = 'fitlog-last-backup-at'
 const PELVIC_PLAN_LEVEL_KEY = 'fitlog-pelvic-plan-level'
 
+const aiAssistant = new AiOrchestrator({
+  context: () => ({ today: getLocalDateString(), localTime: new Date().toLocaleString('sv-SE'), timezoneOffsetMinutes: new Date().getTimezoneOffset(), activeTab, foodDate, workoutDate, planView }),
+  onCommitted: async proposal => {
+    if (activeTab === 'today') await renderTodayPage()
+    else if (activeTab === 'plan' && proposal.domain === 'plan') await renderPlanPage()
+    else if (activeTab === 'food' && ['food', 'nutritionTargets'].includes(proposal.domain)) await renderFoodPage()
+    else if (activeTab === 'workout' && proposal.domain === 'training' && !workoutEditorOpen) await renderWorkoutPage()
+    else if (activeTab === 'progress' && proposal.domain !== 'plan') { weightChart?.destroy(); weightChart = undefined; reportWeightChart?.destroy(); reportWeightChart = undefined; await renderProgressPage() }
+  },
+})
 const app = document.querySelector<HTMLDivElement>('#app')!
 const esc = (value: unknown): string => String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]!)
 const valueOf = (form: FormData, key: string): string => String(form.get(key) ?? '')
@@ -257,7 +269,7 @@ async function render(): Promise<void> {
   const subtitle = activeTab === 'today' ? `${formatHeaderDate(today).replace('今天 · ', '')} · 今天也继续保持` : activeTab === 'workout' ? formatHeaderDate(workoutDate) : activeTab === 'progress' ? '看见每一次积累' : ''
   app.innerHTML = `
     <div class="app-frame">
-      <header class="topbar${activeTab === 'today' ? ' today-topbar' : activeTab === 'food' ? ' food-topbar' : ''}"><div><h1>${title}</h1>${subtitle ? `<p class="header-date">${subtitle}</p>` : ''}</div><div class="topbar-page-actions">${activeTab === 'food' ? '<button class="food-page-action" id="use-diet-template" type="button">使用模板</button><button class="food-page-action" id="food-library" type="button">食物库</button>' : ''}${activeTab === 'plan' ? `<button class="icon-btn quiet" id="plan-add-task" type="button" aria-label="新建任务">${icon('plus', 20)}</button>` : ''}<button class="icon-btn quiet topbar-management" id="open-management" type="button" aria-label="管理与设置">${icon('more', 21)}</button></div></header>
+      <header class="topbar${activeTab === 'today' ? ' today-topbar' : activeTab === 'food' ? ' food-topbar' : ''}"><div><h1>${title}</h1>${subtitle ? `<p class="header-date">${subtitle}</p>` : ''}</div><div class="topbar-page-actions">${activeTab === 'food' ? '<button class="food-page-action" id="use-diet-template" type="button">使用模板</button><button class="food-page-action" id="food-library" type="button">食物库</button>' : ''}${activeTab === 'plan' ? `<button class="icon-btn quiet" id="plan-add-task" type="button" aria-label="新建任务">${icon('plus', 20)}</button>` : ''}<button class="icon-btn quiet topbar-ai" id="open-ai-assistant" type="button" aria-label="AI 助手">${icon('sparkles', 20)}</button><button class="icon-btn quiet topbar-management" id="open-management" type="button" aria-label="管理与设置">${icon('more', 21)}</button></div></header>
       <main id="view" class="${activeTab === 'today' ? 'today-dashboard' : ''}" aria-live="polite"></main>
       <nav class="bottom-nav" aria-label="主导航">
         <button data-tab="today" class="${activeTab === 'today' ? 'active' : ''}" aria-current="${activeTab === 'today' ? 'page' : 'false'}">${icon('home', 21)}<span>今日</span></button>
@@ -271,6 +283,7 @@ async function render(): Promise<void> {
     activeTab = button.dataset.tab as Tab
     void render().catch(fail)
   }))
+  app.querySelector('#open-ai-assistant')?.addEventListener('click', () => { void flushWorkoutAutosave().then(() => showAiAssistant(aiAssistant, { openModal, esc, openFoodLibrary: () => void showFoodLibrary() })).catch(fail) })
   app.querySelector('#open-management')?.addEventListener('click', showManagementHub)
   app.querySelector('#plan-add-task')?.addEventListener('click', () => void showTaskEditor(undefined, planView === 'today' ? today : undefined))
   if (activeTab === 'today') await renderTodayPage()
@@ -786,7 +799,7 @@ function showManagementHub(): void {
   view.querySelector('#more-import')?.addEventListener('click', () => void showFoodLibrary())
   view.querySelector('#more-backup')?.addEventListener('click', () => void showSettings().catch(fail))
   view.querySelector('#more-github-sync')?.addEventListener('click', () => { void flushWorkoutAutosave().then(() => showGitHubSync({ openModal, esc, toast, restored: async () => { workoutAutosave.cancel(); currentWorkout = undefined; workoutEditorOpen = false; await render() } })).catch(fail) })
-  view.querySelector('#more-ai-settings')?.addEventListener('click', () => showAiSettings({ openModal, esc }))
+  view.querySelector('#more-ai-settings')?.addEventListener('click', () => showAiSettings({ openModal, esc, changed: () => aiAssistant.settingsChanged() }, aiAssistant.profiles))
   view.querySelector('#more-about')?.addEventListener('click', () => { openModal('应用信息', `<div class="about-card"><span class="brand-mark large">${icon('leaf', 30)}</span><h2>FitLog Lite</h2><p>一款轻盈、安静的本地个人健康记录工具。</p><small>饮食 · 力量训练 · 体重 · 凯格尔训练</small></div>`) })
 }
 

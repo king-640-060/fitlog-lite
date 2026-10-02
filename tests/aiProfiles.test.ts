@@ -18,6 +18,7 @@ describe('device-local AI profiles', () => {
     profiles.activate(b.id); expect(profiles.active?.model).toBe('model-b')
     profiles.delete(b.id); expect(profiles.active).toBeUndefined(); expect(profiles.key(b.id)).toBe('')
     expect(profiles.profiles.map(p => p.id)).toEqual([a.id])
+    expect(() => profiles.save({ ...input, name: 'secret-A' }, 'new-secret')).toThrow('凭据')
   })
   it('does not manufacture credentials, defaults all scopes on, validates corrupt metadata and persists permission projection', () => {
     const storage = memoryStorage(), profiles = new AiProfiles(storage)

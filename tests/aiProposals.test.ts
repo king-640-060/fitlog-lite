@@ -6,6 +6,7 @@ import { createTaskTag } from '../src/services/taskTagService'
 import { saveNutritionTarget } from '../src/services/nutritionTargetService'
 import { upsertWeight } from '../src/services/weightService'
 import { exportBackup } from '../src/services/backupService'
+import { encryptSyncText, decryptSyncText } from '../src/services/syncCryptoService'
 const environments: ReturnType<typeof aiEnvironment>[] = []
 const setup = () => { const result = aiEnvironment(); environments.push(result); return result }
 afterEach(async () => { vi.restoreAllMocks(); for (const env of environments.splice(0)) { env.database.close(); await env.database.delete() } })
@@ -122,5 +123,24 @@ describe('explicit local proposal confirmation', () => {
     const backup = await exportBackup(env.database)
     expect(backup.schemaVersion).toBe(7); expect(Object.keys(backup.data)).toHaveLength(14)
     expect(JSON.stringify(backup)).not.toMatch(/known-AI-secret|known-github-secret|ai-profiles|apiKey|AI助手/)
+    const envelope = await encryptSyncText(JSON.stringify(backup), 'synthetic-data-password')
+    expect(envelope.formatVersion).toBe(1)
+    const decrypted = await decryptSyncText(envelope, 'synthetic-data-password')
+    expect(JSON.parse(decrypted)).toEqual(backup)
+    expect(decrypted).not.toMatch(/known-AI-secret|known-github-secret|ai-profiles|apiKey|synthetic-data-password/)
+  })
+  it('invalidates changed weight, cardio, habit-definition and tag sources instead of silently rebuilding previews', async () => {
+    const env = setup(); await upsertWeight('2026-09-29', 72, env.database)
+    const weight = await env.execute('propose_weight', { date: '2026-09-29', weightKg: 71 })
+    await upsertWeight('2026-09-29', 80, env.database)
+    expect((await env.proposals.confirm(weight.proposalId)).status).toBe('expired'); expect((await env.database.weights.toArray())[0].weightKg).toBe(80)
+    const cardio = await env.execute('propose_cardio_session', { date: '2026-09-29', activityType: 'treadmill', durationMinutes: 20, speed: 6 })
+    await env.database.cardioSessions.add({ id: 'another', date: '2026-09-29', activityType: 'treadmill', durationMinutes: 30, speed: 7, createdAt: '', updatedAt: '' })
+    expect((await env.proposals.confirm(cardio.proposalId)).status).toBe('expired'); expect(await env.database.cardioSessions.count()).toBe(1)
+    const habit = await env.execute('propose_habit', { name: '读书' }); await createHabit({ name: '散步' }, env.database)
+    expect((await env.proposals.confirm(habit.proposalId)).status).toBe('expired'); expect((await env.database.habits.toArray()).map(row => row.name)).toEqual(['散步'])
+    const tag = await createTaskTag('旧标签', env.database), tasks = await env.execute('propose_tasks', { tasks: [{ title: '计划', tagNames: ['新标签'] }] })
+    await env.database.taskTags.update(tag.id, { name: '改过标签', normalizedName: '改过标签' })
+    expect((await env.proposals.confirm(tasks.proposalId)).status).toBe('expired'); expect(await env.database.tasks.count()).toBe(0); expect(await env.database.taskTags.count()).toBe(1)
   })
 })
