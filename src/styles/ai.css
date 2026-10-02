@@ -13,7 +13,7 @@
 .ai-eyebrow { display: block; margin-bottom: 5px; font-size: .75rem; color: var(--text-secondary); }
 .ai-capabilities { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 0 0 18px; font-size: .75rem; color: var(--text-secondary); }
 .ai-settings-links { margin-block: 18px; }
-.ai-settings-links button { justify-content: space-between; }
+.ai-settings-links button { grid-template-columns: minmax(0, 1fr) 18px; justify-content: space-between; }
 .ai-permissions { margin-block: 12px; border-radius: 16px; padding: 0 12px; background: var(--surface-soft); }
 .ai-permissions label { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 52px; border-bottom: 1px solid var(--divider); }
 .ai-permissions label:last-child { border: 0; }

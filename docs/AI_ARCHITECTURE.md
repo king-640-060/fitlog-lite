@@ -11,7 +11,7 @@ POST `{baseUrl}/chat/completions` sends `model`, `messages`, optional `tools` an
 Official references verified for this implementation:
 
 - [OpenAI function calling](https://developers.openai.com/api/docs/guides/function-calling): Chat Completions function definitions, assistant calls and matching tool result messages.
-- [智谱 OpenAI compatibility](https://docs.bigmodel.cn/cn/guide/develop/openai/introduction): preset API root `https://open.bigmodel.cn/api/paas/v4`. This is an editable address preset, not a core vendor binding. Model remains user-entered.
+- [智谱 OpenAI compatibility](https://docs.bigmodel.cn/cn/guide/develop/openai/introduction): preset API root `https://open.bigmodel.cn/api/paas/v4`. This is an editable address preset, not a core vendor binding. Models use exact explicitly fetched IDs with a manual fallback; no hard-coded model table is maintained.
 
 Connection testing sends only `Reply with OK.`. A separate forced `fitlog_capability_probe` verifies actual tool-call output without app data. Profiles with unknown/unsupported capability can chat but receive no FitLog tools; even unsolicited calls cannot execute. A failed network/authorization probe is an error, not proof of incompatibility. GET `/models` is best effort, capped at 200 IDs; failure leaves manual model entry and the saved profile usable.
 
@@ -128,3 +128,13 @@ Local bounds: 2 images (required nutrition table, optional front), 20 MiB/source
 Canvas JPEG qualities are .88, .84, then .80 only if required by the output bound. Native orientation decode precedes drawing; output strips EXIF/GPS. Gallery never forces camera. Images exist only in workflow memory and do not enter AI history, storage or reports. Both privacy notices explicitly acknowledge provider-controlled handling. Text/model/tool/schema fields keep known-secret scanning; validated image data receives MIME/signature/size checks without textual secret substring scans across base64.
 
 The parser accepts optional `nutrients.energyKj` for a second observed kJ value alongside explicit kcal. Neither the model nor the UI recomputes label values; a local difference above max(1 kcal, 5%) adds a review warning. kcal is preferred and saved directly. Manual and Vision editors preserve canonical kcal across unit-only switches. Duplicate handling compares normalized name and brand locally without sending the library. Use/update/new require explicit selection; existing-food preview fields are rechecked in the transaction. Update plus intake is atomic, while historical FoodLog snapshots remain unchanged.
+
+## Settings and assistant presentation (stabilization)
+
+AI Config and all execution/storage contracts remain V1. `aiSettings.ts` now owns UI-only current-service, editor, permissions, management and privacy subviews. Overview performs no request. 智谱 uses its existing preset root, normally hidden; custom roots and advanced endpoint/name edits remain generic. Explicit model refresh uses the existing bounded adapter, preserves an absent current ID and falls back to manual input on failure. No vendor model defaults are added.
+
+Save and Test commits device configuration first, then runs the existing data-free Chat, forced Tools and exact-digit Vision probes sequentially. Results are independent: unsupported/error in one capability does not discard the profile or prevent the next probe. Only captured root/key/model results may be applied; field changes abort and invalidate pending work, subview/close changes also invalidate the UI generation. Individual tests and save-only remain advanced. Keys stay in device storage and empty DOM values after saving.
+
+Six read switches and write proposals are in a separate permission view with real input controls. Enforcement remains in the unchanged registry/proposal transaction. UI simplification adds no permission or mutation path. The assistant filters the existing repeated chat-only notice from ordinary message rendering and displays one compact status notice, while protocol/history semantics remain unchanged. HTTP 400 adds an actionable fixed Chinese message; optional raw provider diagnostics are deliberately not displayed.
+
+Assistant and Vision use the common Sheet viewport/lifecycle; no private resize listeners remain. Conversation/proposal DOM updates, IME shortcuts, near-bottom scroll, Stop, camera and memory session behavior remain. Header controls are quiet icons; the composer reserves the same width for Send/Stop. Mock browser verification and physical iPhone/provider checks remain distinct.

@@ -13,7 +13,8 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi): void
   const head = dialog.querySelector<HTMLElement>('.modal-head')!
   head.querySelector('h2')!.insertAdjacentHTML('afterend', `<div class="ai-header-actions"><button class="icon-btn quiet" id="ai-assistant-settings" aria-label="AI 设置">${icon('settings', 19)}</button><button class="icon-btn quiet" id="ai-clear-chat" aria-label="清空对话">${icon('trash', 17)}</button></div>`)
   host.innerHTML = `<div class="ai-current-profile"></div><div class="ai-capability-notice" hidden><strong>FitLog 数据读取尚未验证</strong><span>当前只能普通聊天</span><button class="text-btn" id="ai-notice-settings">打开设置</button></div><div class="ai-conversation" role="log" aria-label="AI 对话" aria-live="polite"></div><div class="ai-session-usage"></div><form class="ai-composer">${ui.openFoodVision ? `<button class="secondary ai-camera" id="ai-food-camera" type="button" aria-label="拍包装录入">${icon('camera', 18)}</button>` : ''}<label class="sr-only" for="ai-message-input">向 AI 助手提问</label><textarea id="ai-message-input" rows="1" maxlength="${AI_LIMITS.userChars}" placeholder="提问，或描述记录" enterkeyhint="enter"></textarea><span class="ai-send-slot"><button class="primary" type="submit" id="ai-send">发送</button><button class="secondary" type="button" id="ai-stop" hidden>停止</button></span></form><p class="ai-footer-note">AI 建议需要确认后才会写入。</p>`
-  host.querySelector<HTMLElement>('.ai-current-profile')!.textContent = active ? `${active.name} · ${active.model}` : '尚未连接 AI 服务'
+  const providerLabel = active?.preset === 'zhipu' ? '智谱' : active?.name.startsWith('自定义 · ') ? '自定义服务' : active?.name
+  host.querySelector<HTMLElement>('.ai-current-profile')!.textContent = active ? `${providerLabel} · ${active.model}` : '尚未连接 AI 服务'
   host.querySelector<HTMLElement>('.ai-capability-notice')!.hidden = !active || active.toolCapability === 'supported'
   const log = host.querySelector<HTMLElement>('.ai-conversation')!, textarea = host.querySelector<HTMLTextAreaElement>('textarea')!, composer = host.querySelector<HTMLFormElement>('form')!
   const sendButton = host.querySelector<HTMLButtonElement>('#ai-send')!, stopButton = host.querySelector<HTMLButtonElement>('#ai-stop')!
@@ -43,7 +44,7 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi): void
       nodeMap.clear(); log.replaceChildren()
       const welcome = document.createElement('section'); welcome.className = 'ai-welcome'
       const heading = document.createElement('h3'); heading.textContent = engine.profiles.active ? '从一条记录或一个问题开始' : '连接你自己的 AI 服务'
-      const note = document.createElement('p'); note.className = 'ai-note'; note.textContent = engine.profiles.active ? '读取真实记录，计算交给 FitLog。写入前会给你预览。' : '配置完成后，可以聊聊饮食、训练和计划。'
+      const note = document.createElement('p'); note.className = 'ai-note'; note.textContent = engine.profiles.active ? engine.profiles.active.toolCapability === 'supported' ? '读取真实记录，计算交给 FitLog。写入前会给你预览。' : '可以先聊聊饮食、训练或计划。验证数据能力后，可按权限读取记录。' : '配置完成后，可以聊聊饮食、训练和计划。'
       welcome.append(heading, note)
       if (!engine.profiles.active) { const setup = document.createElement('button'); setup.className = 'secondary'; setup.textContent = '配置 AI'; setup.addEventListener('click', openSettings); welcome.append(setup) }
       else if (!engine.profiles.privacyAcknowledged) {

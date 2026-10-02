@@ -17,7 +17,7 @@
 .vision-consent, .form label.vision-consent { display: flex; flex-direction: row; align-items: flex-start; gap: 9px; font-size: 13px; line-height: 1.65; color: var(--text-secondary); min-height: 44px; padding-block: 8px; }
 .vision-consent input { flex: 0 0 auto; width: 20px; height: 20px; margin-top: 1px; accent-color: var(--accent); }
 .vision-energy { color: var(--accent-strong); font-size: 14px; font-variant-numeric: tabular-nums; }
-.vision-status { min-height: 20px; }
+.vision-status { min-height: 44px; }
 .vision-macros, .vision-intake-preview { border-top: 1px solid var(--divider); padding-top: 12px; display: grid; gap: 8px; }
 .vision-preview strong { color: var(--accent-strong); font-variant-numeric: tabular-nums; }
 .food-vision input, .food-vision select { font-size: 16px; min-width: 0; }

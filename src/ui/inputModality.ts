@@ -12,7 +12,7 @@ export function setupInputModality(): () => void {
   document.addEventListener('pointerdown', pointer, { capture: true, signal: events.signal })
   document.addEventListener('touchstart', pointer, { capture: true, passive: true, signal: events.signal })
   document.addEventListener('keydown', event => {
-    const editable = event.target instanceof Element && !!event.target.closest('input, textarea, select, [contenteditable=true]')
+    const editable = event.target instanceof Element && !!event.target.closest('textarea, [contenteditable=true], input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=button]):not([type=submit])')
     if (isKeyboardNavigation(event.key, editable, event.isComposing)) set('keyboard')
   }, { capture: true, signal: events.signal })
   set('pointer')

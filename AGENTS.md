@@ -117,6 +117,19 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 - Mock provider tests are separate from real provider compatibility and physical iPhone verification. Never use real user keys or business records in automated browser QA.
 - Food packaging Vision is one explicit workflow shared by Food Library, meal entry and the assistant. It uses the existing adapter directly, without agent tools/history. The model only transcribes visible label fields with bounded evidence; local validation and kJ/kcal conversion own all numbers. Never estimate nutrition from a dish photo, infer density or treat mL as grams. Images/extraction stay in memory and out of DB/Backup/Sync; saving an ordinary Food and optional FoodLog requires a local preview and explicit confirmation.
 
+## Durable interaction rules
+
+- Touch focus must not show keyboard-style outlines; keyboard focus must remain explicit.
+- Do not use global transform-based button press feedback.
+- Do not animate ordinary rerenders as page entrances or replay nutrition counts/rings.
+- Sheets share one VisualViewport/keyboard lifecycle through `src/ui/sheetController.ts`; close normally before replacement and run consumers’ cleanup.
+- Avoid backdrop blur in mobile dialogs.
+- Do not autofocus mobile sheet forms or their close buttons; initial focus belongs to the title anchor.
+- Hover-only visuals must be scoped to hover-capable fine pointers.
+- Accent is reserved for primary/selected states and concise semantic marks, not general decoration.
+- Preserve native text selection, 16px editable text, 44px targets and user scaling.
+- Existing data/business contracts take priority over visual changes. Read `docs/INTERACTION_VISUAL_SYSTEM.md` for shared primitives and boundaries.
+
 ## Targeted file map
 
 - `src/main.ts`: application state, views, dialogs, event bindings, mobile viewport behavior.

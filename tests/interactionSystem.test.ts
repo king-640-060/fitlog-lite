@@ -28,3 +28,19 @@ describe('shared interaction stability', () => {
     for (const line of css.split('\n').filter(line => line.includes(':hover'))) expect(line).toContain('@media (hover: hover) and (pointer: fine)')
   })
 })
+
+describe('visual and accessibility primitives', () => {
+  it('keeps secondary actions neutral and primary/selected emphasis separate', () => {
+    const primitives = readFileSync('src/styles/primitives.css', 'utf8')
+    const secondary = primitives.match(/\.secondary\s*\{([^}]+)\}/)![1]
+    expect(secondary).toContain('background: var(--surface-soft)'); expect(secondary).not.toContain('var(--accent-soft)')
+    expect(primitives).toContain('font-size: 1rem'); expect(primitives).toContain('min-height: 44px')
+    expect(css).not.toContain('chart-reveal'); expect(css).not.toContain('goal-crossed')
+  })
+  it('has one native modal boundary and no per-sheet viewport listeners', () => {
+    const main = readFileSync('src/main.ts', 'utf8'), controller = readFileSync('src/ui/sheetController.ts', 'utf8')
+    expect(main).not.toContain('.showModal()'); expect(controller).toContain('dialog.showModal()')
+    expect(controller).toContain('primary.close()'); expect(controller).toContain("dialog.dispatchEvent(new Event('close'))")
+    expect(main).not.toContain("class=\"primary training-card-action\" id=\"add-cardio\"")
+  })
+})

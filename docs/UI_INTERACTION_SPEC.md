@@ -24,7 +24,7 @@ The shared page backdrop keeps the warm white base, restrained asymmetric glows,
 - A goal ring represents 0–100% in its main track. If no goal is set, use a faint empty track and show “尚未设置目标”; do not imply 0% completion. A zero goal is not a denominator.
 - At 100%, the main ring is full and text says “已达目标”. Above 100%, keep the main ring full, show a thinner coral outer ring capped at one revolution, and put the exact excess in text. Never wrap the main ring around to zero.
 - Today's screen uses small rings; the Food screen may use a prominent calorie ring and three smaller nutrient rings. All ring values must be readable as text and exposed to assistive technology.
-- Animate first appearance once: main ring about 500–650 ms, small rings about 400–550 ms. On data changes, progress and numbers may move over 250–350 ms without flashing or rebuilding the whole view. A first crossing of 100% may receive a single subtle 1.02 scale pulse.
+- Render final numbers and ring offsets immediately. Ordinary rerenders, updates and date switches never replay counts, ring entrances or goal pulses. Charts also show final data without replaying a reveal.
 
 ## Today dashboard hierarchy
 
@@ -75,7 +75,7 @@ The shared page backdrop keeps the warm white base, restrained asymmetric glows,
 
 ## Motion and performance
 
-- Buttons press in about 100–140 ms; state changes take 150–220 ms; sheets take 220–280 ms; number counts take 300–500 ms. Keep motion finite, lightweight, and secondary to responsiveness.
+- Buttons use background/color/opacity feedback without scale. Ordinary page rerenders have no entrance animation. Sheet opening is 200 ms with 16px translation and a small opacity change; toasts may enter once. Native Date Rail scroll and the actual pelvic timer retain their functional updates.
 - Use CSS, SVG, vanilla TypeScript, and the existing Chart.js. Do not add a large UI or animation framework. Avoid continuous layout measurement, redundant DOM rebuilding, and perpetual animation loops.
 - Honor `prefers-reduced-motion: reduce`: render final ring and number values immediately and disable decorative motion. Timer phase, remaining time, and completion must stay understandable in text.
 - Data correctness takes priority over animation. Never invent a trend from fewer than two weight points or infer a Workout set completion state from fields that do not encode one.
@@ -139,7 +139,7 @@ The shared page backdrop keeps the warm white base, restrained asymmetric glows,
 - Dates are device-local YYYY-MM-DD, parsed at local noon. Month arrows cross years, and outside-month selections switch the visible month. Today and selection have independent ARIA/visual states.
 - Selection is a draft; completion explicitly commits, while cancellation/dismissal does not. Food distant jumps use existing `commitFoodDate(date, true)` and preserve Date Rail scrolling, settlement, recentering and stale-render protection. Workout completion preserves its current workout/editor reset behavior.
 - Task hosts the picker as a subview inside its existing Sheet. Hide and preserve its original form DOM, title, tags, note and time; never open a second dialog. The hidden date field retains FormData semantics. Today/Tomorrow/None remain direct choices; None preserves Inbox behavior.
-- Date cells provide at least 44 px touch targets with 38 px rounded selection surfaces. Trigger press uses scale .985/120 ms, release 160 ms ease-out; cells use scale .97/110 ms and selected background/color 170 ms. No month animation, border-width jumps or persistent touch outline. Explicit `:focus-visible` outlines remain; Reduced Motion disables new transitions/transforms.
+- Date cells provide at least 44 px touch targets with 38 px rounded selection surfaces. Trigger/cell press uses quiet background or opacity feedback without scale; selection uses background/color only. No month animation, border-width jumps or persistent touch outline. Keyboard modality retains explicit 2px focus; Reduced Motion disables decorative transitions.
 - The grid uses full Chinese date labels and one roving tab stop. Arrow keys move focus by one/seven local days across months; Enter/Space selects the focused draft. Month navigation does not commit selection.
 
 ## GitHub connection setup
@@ -149,7 +149,7 @@ The shared page backdrop keeps the warm white base, restrained asymmetric glows,
 ## Optional AI assistant
 
 - Each of the five topbars has a compact icon-only “AI 助手” entry before Management; never add a sixth bottom tab. Food keeps Template and Library visible and usable at 320px.
-- AI Settings belongs to Management → Application before About. It manages multiple editable provider profiles, explicit activation and confirmed deletion. Presets only populate editable addresses; model remains editable. Saved API Keys stay out of DOM values and show an empty password field with “已保存；留空则保持不变”.
+- AI Settings belongs to Management → Application before About. Its first view shows only the current service/model, compact capabilities, Edit, permission summary and advanced management. Six read switches and write proposals live in a permission subview; multiple profiles, rename, individual probes and confirmed deletion are advanced. Without an active profile show Provider/API Key/Model connection form. 智谱 GLM hides its preset root in the normal form; Custom shows the root, and advanced editing remains available. Model selection uses exact explicitly fetched `/models` IDs; manual entry is always available and automatically opens on failure. Preserve a current model absent from the returned list. Save and Test saves first, then probes Chat, Tools and Vision sequentially with independent outcomes. Never fetch when opening an overview. Saved API Keys stay empty in edit-form values with “已保存；留空则保持不变”.
 - First enablement explains exactly what leaves the device and requests a device acknowledgement. Six read scopes and write-proposal permission are independent controls. Unknown/unsupported tool capability allows chat only and explicitly says it cannot read/modify FitLog data.
 - The assistant uses the existing Sheet with nearly full VisualViewport height, Safe Area, a stable header/composer and a separate conversation scroll. Warm surfaces, soft Fresh Green user bubbles and quiet activity/usage text maintain the app hierarchy. Render AI as text, never raw HTML.
 - The 16px input autogrows only to 120px. Enter inserts a newline; Send or explicit Ctrl/Cmd+Enter outside IME composition sends. Busy requests show Stop. Closing the Sheet stops an active request. No automatic retries or fallback forwarding.
@@ -158,3 +158,15 @@ The shared page backdrop keeps the warm white base, restrained asymmetric glows,
 - Successful confirmation updates the relevant current view through existing rendering paths, without page reload or losing an active strength editor. AI failures leave ordinary offline recording usable.
 - The data repository must be Private and initialized with a README. Provide concise preparation steps and selected-repo Contents: Read and write guidance; do not create repositories or request Administration. Missing/inaccessible repo errors name the exact default destination and preparation steps.
 - After the user's explicit connection action, check the remote in the same sheet and show either create-password confirmation (12+ characters) or a single existing-backup password field with “解锁并检查”. Preserve all subsequent encryption, validation, confirmation, conflict, SHA race, disconnection and data-preservation rules. Opening an already connected status screen performs no network request.
+
+## Shared interaction and visual system
+
+Read [INTERACTION_VISUAL_SYSTEM.md](INTERACTION_VISUAL_SYSTEM.md) for implementation boundaries and verification.
+
+- Pointer/touch never shows a keyboard outline on buttons, links, summary, icon actions or custom rows. Inputs get a quiet border without glow. Navigation keys switch the explicit input modality; ordinary text entry/IME does not. Keyboard focus remains a clear 2px ring on all controls. Do not globally remove focus outlines.
+- Sheet initial focus is a noninteractive title anchor (`tabindex=-1`); never autofocus a form or close button. Async tag creation restores the title only if the user stayed there. Keyboard dismissal restores its connected trigger with preventScroll. Date subviews preserve DOM and focus the heading, while Arrow/Enter interaction uses the roving day stop.
+- Native dialogs share `sheetController`: one primary sheet, normal close/abort/cleanup before replacement, independent temporary confirmations, one app lifetime VisualViewport coordinator, reference-counted background scroll lock and exact original scroll restoration. Native cancel can be consumed by a domain subview.
+- Sheets are content/form/large/assistant variants with stable handle/header, a min-height-zero independent scroll body and optional footer. Height, offset and keyboard overlap come from the shared viewport variables. Native focus scrolling is preferred; no repeated forced scrollIntoView. Bottom navigation may hide for the keyboard without changing app-frame padding.
+- Backdrops use RGBA without blur. Hover is limited to hover-capable fine pointers. Press feedback uses background/color/opacity, never global button transforms. Safari tap highlight is suppressed on actual interactive surfaces; text selection and user scaling remain available.
+- Controls use 12–14px radius, cards 16–18px and sheets 26px. Only chips/status marks use pills. Shared primitives live in dedicated CSS, domain files own layout. Secondary actions use neutral warm surfaces; Fresh Green is for primary/selected states and concise semantic marks. Cards use quiet borders; two shadow tokens serve selected/floating surfaces. Metadata remains readable.
+- Assistant header uses title, readable provider/model, quiet Settings/Clear icons and close. A compact UI notice describes unverified FitLog access; it is not a chat message. Safe errors use a small title/explanation/action card. HTTP 400 says “请求参数无效，请检查模型名称和接口兼容性。”; raw provider bodies are never shown. Camera, fixed-width Send/Stop, 16px IME-safe textarea, near-bottom autoscroll and memory session contracts remain.
