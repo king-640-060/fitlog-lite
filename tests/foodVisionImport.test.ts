@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { FitLogDatabase } from '../src/db/database'
-import { FoodVisionWrite, logReviewedVisionFood, validateVisionIntake } from '../src/services/foodVisionImportService'
+import { FoodVisionWrite, logReviewedVisionFood, validateVisionIntake, findVisionDuplicates } from '../src/services/foodVisionImportService'
 import { exportBackup, restoreBackup } from '../src/services/backupService'
 const databases: FitLogDatabase[] = []
 const setup = () => { const database = new FitLogDatabase(`vision-${crypto.randomUUID()}`); databases.push(database); return database }
@@ -41,11 +41,45 @@ describe('reviewed food packaging writes', () => {
     const database = setup(); expect(() => new FoodVisionWrite(input, { ...actual, date: '2026-10-03' }, database, () => '2026-10-02')).toThrow('未来')
     expect(await database.foods.count()).toBe(0); expect(await database.foodLogs.count()).toBe(0)
   })
+  it('allows explicitly unclassified intake without inventing a meal', async () => {
+    const database = setup(), result = await new FoodVisionWrite(input, { ...actual, meal: undefined }, database).confirm()
+    expect(result.log?.meal).toBeUndefined(); expect(result.log?.date).toBe(actual.date)
+  })
   it('exports only ordinary V7 Food/FoodLog values, retains all 14 stores and restores snapshots unchanged', async () => {
     const database = setup(); const result = await new FoodVisionWrite(input, actual, database).confirm()
     const backup = await exportBackup(database); expect(backup.schemaVersion).toBe(7); expect(database.verno).toBe(7); expect(Object.keys(backup.data)).toHaveLength(14)
     expect(JSON.stringify(backup)).not.toMatch(/data:image|evidence|food-label|visionCapability|apiKey|extraction/)
     const target = setup(); await restoreBackup(backup, target)
     expect(await target.foodLogs.get(result.log!.id)).toEqual(result.log); expect(await target.foods.get(result.food.id)).toEqual(result.food)
+  })
+})
+
+
+describe('explicit duplicate resolution', () => {
+  it('matches normalized name/brand and refuses silent duplication', async () => {
+    const database = setup(), { food } = await new FoodVisionWrite({ ...input, name: ' Noodle ', brand: 'Brand A' }, undefined, database).confirm()
+    const recognized = { ...input, name: 'noodle', brand: ' brand a ' }
+    expect((await findVisionDuplicates(recognized, database))[0]?.id).toBe(food.id)
+    await expect(new FoodVisionWrite(recognized, undefined, database).confirm()).rejects.toThrow('同名食物')
+    await new FoodVisionWrite(recognized, undefined, database, undefined, { mode: 'new' }).confirm()
+    expect(await database.foods.count()).toBe(2)
+  })
+  it('uses or updates an existing Food, preserves historical snapshots and rolls back failed updates', async () => {
+    const database = setup(), { food, log } = await new FoodVisionWrite(input, actual, database).confirm()
+    const revised = { ...input, calories: 200, protein: 2 }
+    const reused = await new FoodVisionWrite(revised, actual, database, undefined, { mode: 'use', existing: food }).confirm()
+    expect(reused.food.calories).toBe(input.calories); expect(await database.foods.count()).toBe(1)
+    vi.spyOn(database.foodLogs, 'add').mockRejectedValueOnce(new Error('log failed'))
+    const update = new FoodVisionWrite(revised, actual, database, undefined, { mode: 'update', existing: food })
+    await expect(update.confirm()).rejects.toThrow('log failed'); expect(await database.foods.get(food.id)).toEqual(food)
+    const updated = await update.confirm(); expect(updated.food.id).toBe(food.id); expect(updated.log?.caloriesPerReference).toBe(200)
+    expect(await database.foodLogs.get(log!.id)).toEqual(log); expect(await database.foods.count()).toBe(1)
+  })
+  it('rechecks the existing Food inside confirmation before reuse/update', async () => {
+    const database = setup(), { food } = await new FoodVisionWrite(input, undefined, database).confirm()
+    const update = new FoodVisionWrite({ ...input, calories: 200 }, actual, database, undefined, { mode: 'update', existing: food })
+    await database.foods.update(food.id, { brand: 'changed' })
+    await expect(update.confirm()).rejects.toThrow('预览后发生变化'); expect(await database.foodLogs.count()).toBe(0)
+    expect((await database.foods.get(food.id))?.calories).toBe(input.calories)
   })
 })

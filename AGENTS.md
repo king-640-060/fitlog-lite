@@ -93,6 +93,7 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 - Business dates use the device-local `YYYY-MM-DD` calendar date.
 - Never generate a business date with `toISOString().slice(0, 10)` or another UTC truncation.
 - ISO timestamps are appropriate for created/updated/start/finish metadata, not local business dates.
+- Food.calories and FoodLog calorie snapshots are canonical kcal. UI may accept kJ using exactly 1 kcal = 4.184 kJ; never derive calories from macros. Unit-only edits must preserve exact canonical energy.
 - FoodLog preserves a nutrition and display snapshot; later Food edits or deletion must not rewrite history.
 - Workout preserves exercise-name and set history; later Exercise edits or deletion must not rewrite history.
 - Templates are inputs for creating records, not live links to generated records.

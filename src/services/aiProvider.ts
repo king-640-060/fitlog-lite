@@ -1,6 +1,6 @@
 import type { AiChatRequest, AiChatResponse, AiProviderProfile, AiToolCall, AiUsage } from '../ai/types'
 import { AI_LIMITS, AiError, assertNoKnownSecrets, normalizeAiBaseUrl } from '../ai/security'
-import { AI_VISION_LIMITS, assertVisionDataUrl, visionImagePart, type PreparedVisionImage } from '../ai/visionImages'
+import { AI_VISION_LIMITS, assertVisionDataUrl, visionDataBytes, visionImagePart, type PreparedVisionImage } from '../ai/visionImages'
 
 export interface AiProviderAdapter {
   chat(request: AiChatRequest): Promise<AiChatResponse>
@@ -11,13 +11,15 @@ export interface AiProviderAdapter {
 }
 /** Pure protocol payload construction; credentials belong only to transport headers. */
 export function buildAiRequest(model: string, request: AiChatRequest) {
-  let imageCount = 0
+  let imageCount = 0, imageBytes = 0
   const messages = request.messages.map(message => {
     const content = Array.isArray(message.content) ? message.content.map(part => {
       if (part.type === 'text' && typeof part.text === 'string') return { type: 'text' as const, text: part.text }
       if (part.type !== 'image_url' || message.role !== 'user') throw new AiError('invalid_image', '图片只能由用户主动选择')
       assertVisionDataUrl(part.image_url?.url)
-      if (++imageCount > AI_VISION_LIMITS.images) throw new AiError('image_limit', '一次最多识别 3 张包装图片')
+      if (++imageCount > AI_VISION_LIMITS.images) throw new AiError('image_limit', '一次最多识别 2 张包装图片')
+      imageBytes += visionDataBytes(part.image_url.url)
+      if (imageBytes > AI_VISION_LIMITS.totalBytes) throw new AiError('image_limit', '图片总量过大，请缩小后再识别')
       const detail = part.image_url.detail
       if (detail !== undefined && !['auto', 'low', 'high'].includes(detail)) throw new AiError('invalid_image', '图片识别参数无效')
       return { type: 'image_url' as const, image_url: { url: part.image_url.url, ...(detail ? { detail } : {}) } }
@@ -46,7 +48,13 @@ export class OpenAICompatibleChatAdapter implements AiProviderAdapter {
   private async request(path: '/chat/completions' | '/models', body?: unknown, signal?: AbortSignal): Promise<unknown> {
     if (!this.apiKey) throw new AiError('missing_key', '请先配置 API Key')
     assertNoKnownSecrets(this.profile.baseUrl + path, this.secrets)
-    if (body) assertNoKnownSecrets(body, this.secrets)
+    if (body) {
+      // The validated, ephemeral raster payload is not text. Scan all other fields.
+      const payload = body as ReturnType<typeof buildAiRequest>
+      const textual = { ...payload, messages: payload.messages.map(message => ({ ...message, content: Array.isArray(message.content) ? message.content.map(part => part.type === 'image_url' ? { type: part.type, image_url: { ...part.image_url, url: '[validated local image]' } } : part) : message.content })) }
+      assertNoKnownSecrets(textual, this.secrets)
+      if (JSON.stringify(body).length > 9 * 1024 * 1024) throw new AiError('request_limit', '请求过大，请缩小图片或上下文')
+    }
     const controller = new AbortController()
     let timedOut = false
     const abort = () => controller.abort()
@@ -58,7 +66,7 @@ export class OpenAICompatibleChatAdapter implements AiProviderAdapter {
       if (!response.ok) {
         // Inspect a bounded error solely to distinguish an explicit image rejection.
         // Never display or log this untrusted provider text.
-        const vision = body && JSON.stringify(body).includes('"type":"image_url"')
+        const vision = (body as ReturnType<typeof buildAiRequest> | undefined)?.messages.some(message => Array.isArray(message.content) && message.content.some(part => part.type === 'image_url'))
         if (vision && [400, 415, 422].includes(response.status) && response.body) {
           const reader = response.body.getReader(); let text = '', bytes = 0
           try { while (true) { const chunk = await reader.read(); if (chunk.done) break; bytes += chunk.value.byteLength; if (bytes > 8192) break; text += new TextDecoder().decode(chunk.value) } }

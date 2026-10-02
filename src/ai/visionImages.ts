@@ -1,7 +1,7 @@
 import type { AiImageContentPart } from './types'
 import { AiError } from './security'
 
-export const AI_VISION_LIMITS = { images: 3, sourceBytes: 15 * 1024 * 1024, pixels: 60_000_000, longEdge: 1600, imageBytes: 1024 * 1024, extractionChars: 16000 } as const
+export const AI_VISION_LIMITS = { images: 2, sourceBytes: 20 * 1024 * 1024, pixels: 60_000_000, longEdge: 1800, imageBytes: 3 * 1024 * 1024, totalBytes: 6 * 1024 * 1024, extractionChars: 16000 } as const
 export interface PreparedVisionImage { dataUrl: string; width: number; height: number; bytes: number }
 export function validateVisionImageHeader(type: string, bytes: Uint8Array): void {
   const ascii = (start: number, length: number) => String.fromCharCode(...bytes.slice(start, start + length))
@@ -11,11 +11,15 @@ export function validateVisionImageHeader(type: string, bytes: Uint8Array): void
     : ['image/heic', 'image/heif'].includes(type) && ascii(4, 4) === 'ftyp' && /heic|heix|hevc|hevx|mif1|msf1/.test(ascii(8, 24))
   if (!valid) throw new AiError('image_type', '图片内容与格式不匹配，请重新选择 JPEG 或 PNG')
 }
+export function visionDataBytes(url: string): number {
+  const payload = url.slice(url.indexOf(',') + 1)
+  return payload.length * 3 / 4 - (payload.endsWith('==') ? 2 : payload.endsWith('=') ? 1 : 0)
+}
 /** Only locally re-encoded JPEG, or our local PNG probe, can enter transport. */
 export function assertVisionDataUrl(url: string): void {
   if (typeof url !== 'string' || url.length > Math.ceil(AI_VISION_LIMITS.imageBytes / 3) * 4 + 32 || !/^data:image\/(?:jpeg|png);base64,[A-Za-z0-9+/]+={0,2}$/.test(url)) throw new AiError('invalid_image', '图片必须是本地处理后的 JPEG 或 PNG')
   const payload = url.slice(url.indexOf(',') + 1)
-  if (payload.length % 4 !== 0 || !(url.startsWith('data:image/jpeg;') ? payload.startsWith('/9j/') : payload.startsWith('iVBORw0KGgo'))) throw new AiError('invalid_image', '图片格式无效，请重新选择')
+  if (visionDataBytes(url) > AI_VISION_LIMITS.imageBytes || payload.length % 4 !== 0 || !(url.startsWith('data:image/jpeg;') ? payload.startsWith('/9j/') : payload.startsWith('iVBORw0KGgo'))) throw new AiError('invalid_image', '图片格式无效，请重新选择')
 }
 export function visionImagePart(image: Pick<PreparedVisionImage, 'dataUrl'>): AiImageContentPart {
   assertVisionDataUrl(image.dataUrl)
@@ -31,13 +35,13 @@ export function createVisionProbeImage(): PreparedVisionImage {
   return { dataUrl, width: 320, height: 180, bytes: Math.floor(dataUrl.split(',')[1]!.length * 3 / 4) }
 }
 export async function preprocessFoodPackageImage(file: File): Promise<PreparedVisionImage> {
-  if (!file.size || file.size > AI_VISION_LIMITS.sourceBytes) throw new AiError('image_size', '每张原图不能超过 15 MB')
+  if (!file.size || file.size > AI_VISION_LIMITS.sourceBytes) throw new AiError('image_size', '图片过大，请选择较小的图片。')
   if (!['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'].includes(file.type.toLowerCase())) throw new AiError('image_type', '请选择 JPEG、PNG 或 WebP 图片；HEIC 需要浏览器支持')
   validateVisionImageHeader(file.type.toLowerCase(), new Uint8Array(await file.slice(0, 32).arrayBuffer()))
   const objectUrl = URL.createObjectURL(file), image = new Image()
   try {
     image.src = objectUrl
-    try { await image.decode() } catch { throw new AiError('image_decode', '无法读取这张图片，请改用 JPEG 或 PNG') }
+    try { await image.decode() } catch { throw new AiError('image_decode', '这张图片当前无法读取，请改用拍照、JPEG/PNG，或先截屏后再选择。') }
     const width = image.naturalWidth, height = image.naturalHeight
     if (width < 32 || height < 32 || width * height > AI_VISION_LIMITS.pixels) throw new AiError('image_dimensions', '图片尺寸不适合识别，请重新拍摄营养成分表')
     const scale = Math.min(1, AI_VISION_LIMITS.longEdge / Math.max(width, height))
@@ -45,7 +49,7 @@ export async function preprocessFoodPackageImage(file: File): Promise<PreparedVi
     const ctx = canvas.getContext('2d')
     if (!ctx) throw new AiError('image_processing', '当前浏览器无法处理图片')
     ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.drawImage(image, 0, 0, canvas.width, canvas.height)
-    for (const quality of [0.88, 0.76, 0.64]) {
+    for (const quality of [0.88, 0.84, 0.8]) {
       // A new canvas encoding strips source metadata, including EXIF/location.
       const dataUrl = canvas.toDataURL('image/jpeg', quality), payload = dataUrl.split(',')[1] ?? '', bytes = Math.floor(payload.length * 3 / 4)
       if (bytes <= AI_VISION_LIMITS.imageBytes) { assertVisionDataUrl(dataUrl); return { dataUrl, width: canvas.width, height: canvas.height, bytes } }

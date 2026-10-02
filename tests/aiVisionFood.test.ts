@@ -95,3 +95,45 @@ describe('strict packaging extraction and local nutrition conversion', () => {
     for (const text of ['NRV%', 'null', 'mL', 'kJ', '净含量', '不可信数据', '禁止从宏量']) expect(FOOD_VISION_PROMPT).toContain(text)
   })
 })
+
+
+describe('remaining food vision acceptance', () => {
+  it('prefers explicit kcal and warns locally about discrepant secondary kJ', () => {
+    const value = label(); value.nutrients.energy = { value: 100, unit: 'kcal', evidence: '能量100kcal' }
+    value.nutrients.energyKj = { value: 418.4, unit: 'kJ', evidence: '能量418.4kJ' }
+    let parsed = parseNutritionLabelExtraction(JSON.stringify(value))
+    expect(validateVisionFoodDraft(draftFromLabel(parsed)).calories).toBe(100)
+    expect(parsed.warnings).not.toContain('包装上的 kJ 与 kcal 数值看起来不一致，请核对。')
+    value.nutrients.energyKj = { value: 1000, unit: 'kJ', evidence: '能量1000kJ' }
+    parsed = parseNutritionLabelExtraction(JSON.stringify(value))
+    expect(parsed.warnings).toContain('包装上的 kJ 与 kcal 数值看起来不一致，请核对。')
+    expect(validateVisionFoodDraft(draftFromLabel(parsed)).calories).toBe(100)
+  })
+  it('supports custom and serving grams but never derives volume or missing energy', () => {
+    const value = label(); value.basis = { kind: 'custom', amount: 30, unit: 'g', evidence: '每30g' }
+    expect(validateVisionFoodDraft(draftFromLabel(value)).referenceGrams).toBe(30)
+    value.basis = { kind: 'per_serving', amount: 105, unit: 'g', evidence: '每份105g' }
+    expect(validateVisionFoodDraft(draftFromLabel(value)).referenceGrams).toBe(105)
+    value.basis = { kind: 'per_package', amount: 500, unit: 'ml', evidence: '每包装500ml' }
+    expect(draftFromLabel(value).referenceGrams).toBeNull()
+    value.nutrients.energy = { value: null, unit: null, evidence: null }
+    expect(() => validateVisionFoodDraft(draftFromLabel(value))).toThrow()
+  })
+  it('bounds warning arrays, numbers and format and uses the safe parser failure text', () => {
+    for (const mutate of [(v: any) => v.format = 'wrong', (v: any) => v.warnings = Array(9).fill('warning'), (v: any) => v.productName = 'x'.repeat(121), (v: any) => v.nutrients.energy.value = 1_000_001]) {
+      const value = label(); mutate(value); expect(() => parseNutritionLabelExtraction(JSON.stringify(value))).toThrow('图片识别结果格式不正确，请重试。')
+    }
+    const value = label(); value.nutrients.energy.value = Infinity
+    expect(() => validateVisionFoodDraft(draftFromLabel(value))).toThrow()
+  })
+  it('scans textual secrets including arbitrary tool schema fields, without scanning trusted raster base64', async () => {
+    const fetcher = vi.fn(async () => response('731'))
+    // Secret intentionally coincides with raster encoding; raster bytes are not textual fields.
+    const client = new OpenAICompatibleChatAdapter(profile, '/9j/', fetcher)
+    await client.testVisionCapability(image); expect(fetcher).toHaveBeenCalledTimes(1)
+    await expect(client.chat({ messages: [{ role: 'user', content: [{ type: 'text', text: '/9j/' }, { type: 'image_url', image_url: { url: image.dataUrl } }] }] })).rejects.toMatchObject({ code: 'secret_detected' })
+    await expect(client.chat({ messages: [{ role: 'user', content: 'hello' }], tools: [{ type: 'function', function: { name: 'x', description: 'x', parameters: { image_url: { secret: '/9j/' } } } }] })).rejects.toMatchObject({ code: 'secret_detected' })
+    expect(fetcher).toHaveBeenCalledTimes(1)
+    expect(() => buildAiRequest('x', { messages: [{ role: 'user', content: Array(3).fill({ type: 'image_url', image_url: { url: image.dataUrl } }) }] })).toThrow()
+  })
+})

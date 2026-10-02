@@ -4,6 +4,7 @@ import './styles/main.css'
 import './styles/plan.css'
 import './styles/ai.css'
 import './styles/foodVision.css'
+import { bindEnergyEditor } from './ui/energyEditor'
 import { showFoodVisionImport } from './ui/foodVisionImport'
 import { showAiSettings, aiSettingsDetail } from './ui/aiSettings'
 import { showAiAssistant } from './ui/aiAssistant'
@@ -286,7 +287,7 @@ async function render(): Promise<void> {
     activeTab = button.dataset.tab as Tab
     void render().catch(fail)
   }))
-  app.querySelector('#open-ai-assistant')?.addEventListener('click', () => { void flushWorkoutAutosave().then(() => showAiAssistant(aiAssistant, { openModal, esc, openFoodLibrary: () => void showFoodLibrary(), openFoodVision: () => openFoodVisionWorkflow(activeTab === 'food' ? foodDate : getLocalDateString()) })).catch(fail) })
+  app.querySelector('#open-ai-assistant')?.addEventListener('click', () => { void flushWorkoutAutosave().then(() => showAiAssistant(aiAssistant, { openModal, esc, openFoodLibrary: () => void showFoodLibrary(), openFoodVision: () => openFoodVisionWorkflow(getLocalDateString()) })).catch(fail) })
   app.querySelector('#open-management')?.addEventListener('click', showManagementHub)
   app.querySelector('#plan-add-task')?.addEventListener('click', () => void showTaskEditor(undefined, planView === 'today' ? today : undefined))
   if (activeTab === 'today') await renderTodayPage()
@@ -1342,7 +1343,7 @@ function showNutritionTargetForm(date: string, target?: NutritionTarget): void {
 }
 
 function openFoodVisionWorkflow(date: string, meal?: MealType): void {
-  showFoodVisionImport({ openModal, esc, profiles: aiAssistant.profiles, openSettings: () => showAiSettings({ openModal, esc, changed: () => aiAssistant.settingsChanged() }, aiAssistant.profiles), onSaved: async () => { if (activeTab === 'food') await renderFoodPage(); else if (activeTab === 'today') await renderTodayPage() } }, { date, meal })
+  showFoodVisionImport({ openModal, esc, profiles: aiAssistant.profiles, openSettings: () => showAiSettings({ openModal, esc, changed: () => aiAssistant.settingsChanged() }, aiAssistant.profiles), onFinish: logged => { if (!logged) void showFoodLibrary() }, onSaved: async (_food, logged) => { toast(logged ? meal ? '已记录' : '已加入食物库并记录饮食' : '已加入食物库'); if (activeTab === 'food') await renderFoodPage(); else if (activeTab === 'today') await renderTodayPage() } }, { date, meal })
 }
 
 async function showAddFoodLog(meal: MealType): Promise<void> {
@@ -1428,15 +1429,15 @@ function foodFields(food?: Food): string {
 async function showFoodForm(food?: Food): Promise<void> {
   const dialog = openModal(food ? '编辑食物' : '新建食物', foodFields(food))
   const energyInput = dialog.querySelector<HTMLInputElement>('[name=calories]')!, energyUnit = dialog.querySelector<HTMLSelectElement>('[name=energyUnit]')!
-  let previousUnit: EnergyUnit = 'kcal'
+  const energyEditor = bindEnergyEditor(energyInput, energyUnit, food?.calories)
   const updateEnergyPreview = () => { const node = dialog.querySelector('#food-energy-preview')!; try { const kcal = energyToKcal(Number(energyInput.value), energyUnit.value as EnergyUnit); node.textContent = energyInput.value.trim() ? `${formatNumber(kcal)} kcal · ${formatNumber(kcalToKj(kcal))} kJ` : '填写包装能量，保存时统一为 kcal' } catch { node.textContent = '请填写有效能量' } }
   energyInput.addEventListener('input', updateEnergyPreview)
-  energyUnit.addEventListener('change', () => { const next = energyUnit.value as EnergyUnit; if (energyInput.value.trim() && Number.isFinite(Number(energyInput.value)) && Number(energyInput.value) >= 0) { const kcal = energyToKcal(Number(energyInput.value), previousUnit); energyInput.value = String(next === 'kJ' ? kcalToKj(kcal) : kcal) }; previousUnit = next; updateEnergyPreview() })
+  energyUnit.addEventListener('change', updateEnergyPreview)
   updateEnergyPreview()
   dialog.querySelector<HTMLFormElement>('#food-form')?.addEventListener('submit', async (event) => {
     event.preventDefault(); const data = new FormData(event.currentTarget as HTMLFormElement)
     try {
-      await saveFood({ name: valueOf(data, 'name'), brand: valueOf(data, 'brand'), referenceGrams: Number(valueOf(data, 'referenceGrams')), calories: energyToKcal(Number(valueOf(data, 'calories')), valueOf(data, 'energyUnit') === 'kJ' ? 'kJ' : 'kcal'), protein: valueOf(data, 'protein') as unknown as number, carbs: valueOf(data, 'carbs') as unknown as number, fat: valueOf(data, 'fat') as unknown as number }, food?.id)
+      await saveFood({ name: valueOf(data, 'name'), brand: valueOf(data, 'brand'), referenceGrams: Number(valueOf(data, 'referenceGrams')), calories: energyEditor.kcal ?? NaN, protein: valueOf(data, 'protein') as unknown as number, carbs: valueOf(data, 'carbs') as unknown as number, fat: valueOf(data, 'fat') as unknown as number }, food?.id)
       dialog.close(); toast('已保存'); await renderFoodPage(); void showFoodLibrary()
     } catch (error) { fail(error) }
   })

@@ -1,6 +1,7 @@
 import type { AiProviderAdapter } from './aiProvider'
 import { FOOD_VISION_PROMPT } from '../ai/foodVisionPrompt'
 import { AI_VISION_LIMITS, visionImagePart, type PreparedVisionImage } from '../ai/visionImages'
+import { kjToKcal } from '../utils/energy'
 import { AiError, assertNoKnownSecrets } from '../ai/security'
 
 export type LabelBasisKind = 'per_100g' | 'per_100ml' | 'per_serving' | 'per_package' | 'custom' | 'unknown'
@@ -9,10 +10,10 @@ export interface NutritionLabelExtractionV1 {
   format: 'fitlog-food-label'; version: 1; productName: string | null; brand: string | null
   netQuantity: LabelValue<'g' | 'kg' | 'ml' | 'l'>
   basis: { kind: LabelBasisKind; amount: number | null; unit: 'g' | 'ml' | null; evidence: string | null }
-  nutrients: { energy: LabelValue<'kJ' | 'kcal'>; protein: LabelValue<'g'>; carbs: LabelValue<'g'>; fat: LabelValue<'g'> }
+  nutrients: { energy: LabelValue<'kJ' | 'kcal'>; energyKj?: LabelValue<'kJ'>; protein: LabelValue<'g'>; carbs: LabelValue<'g'>; fat: LabelValue<'g'> }
   warnings: string[]
 }
-const invalid = (): never => { throw new AiError('invalid_label', '识别结果格式或单位不完整，请重新拍摄，或核对图片后手动填写') }
+const invalid = (): never => { throw new AiError('invalid_label', '图片识别结果格式不正确，请重试。') }
 function object(value: unknown, keys: string[]): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return invalid()
   const result = value as Record<string, unknown>
@@ -57,15 +58,19 @@ export function parseNutritionLabelExtraction(response: string): NutritionLabelE
   if (basis.amount !== null && !evidenceMatches(basis.amount, basis.unit!, basis.evidence!)) return invalid()
   if (basis.kind === 'per_100g' && (basis.amount !== 100 || basis.unit !== 'g')) return invalid()
   if (basis.kind === 'per_100ml' && (basis.amount !== 100 || basis.unit !== 'ml')) return invalid()
-  const nutrientsRaw = object(root.nutrients, ['energy', 'protein', 'carbs', 'fat'])
+  const hasKj = !!root.nutrients && typeof root.nutrients === 'object' && Object.hasOwn(root.nutrients, 'energyKj')
+  const nutrientsRaw = object(root.nutrients, ['energy', 'protein', 'carbs', 'fat', ...(hasKj ? ['energyKj'] : [])])
+  const energy = labelValue(nutrientsRaw.energy, ['kJ', 'kcal']), energyKj = hasKj ? labelValue(nutrientsRaw.energyKj, ['kJ']) : undefined
+  if (energyKj?.value !== null && energyKj?.value !== undefined && energy.unit !== 'kcal') return invalid()
   if (!Array.isArray(root.warnings) || root.warnings.length > 8) return invalid()
   const warnings = root.warnings.map(value => text(value, 200) ?? invalid())
-  return { format: 'fitlog-food-label', version: 1, productName: text(root.productName, 120), brand: text(root.brand, 120), netQuantity: labelValue(root.netQuantity, ['g', 'kg', 'ml', 'l']), basis, nutrients: { energy: labelValue(nutrientsRaw.energy, ['kJ', 'kcal']), protein: labelValue(nutrientsRaw.protein, ['g']), carbs: labelValue(nutrientsRaw.carbs, ['g']), fat: labelValue(nutrientsRaw.fat, ['g']) }, warnings }
+  if (energy.value !== null && energyKj?.value !== null && energyKj?.value !== undefined && Math.abs(kjToKcal(energyKj.value) - energy.value) > Math.max(1, energy.value * 0.05)) warnings.push('包装上的 kJ 与 kcal 数值看起来不一致，请核对。')
+  return { format: 'fitlog-food-label', version: 1, productName: text(root.productName, 120), brand: text(root.brand, 120), netQuantity: labelValue(root.netQuantity, ['g', 'kg', 'ml', 'l']), basis, nutrients: { energy, ...(energyKj ? { energyKj } : {}), protein: labelValue(nutrientsRaw.protein, ['g']), carbs: labelValue(nutrientsRaw.carbs, ['g']), fat: labelValue(nutrientsRaw.fat, ['g']) }, warnings }
 }
 export async function analyzeFoodPackageImages(options: { client: Pick<AiProviderAdapter, 'chat'>; images: readonly PreparedVisionImage[]; signal?: AbortSignal; secrets?: readonly string[] }): Promise<NutritionLabelExtractionV1> {
-  if (!options.images.length || options.images.length > AI_VISION_LIMITS.images) throw new AiError('image_limit', '请选择 1 到 3 张同一产品的包装图片')
+  if (!options.images.length || options.images.length > AI_VISION_LIMITS.images) throw new AiError('image_limit', '请选择营养成分表，可另选一张包装正面。')
   if (options.signal?.aborted) throw new AiError('aborted', '已停止本次识别')
-  const response = await options.client.chat({ messages: [{ role: 'system', content: FOOD_VISION_PROMPT }, { role: 'user', content: [{ type: 'text', text: '转录这些同一产品的包装图片中的营养成分表，未知字段为 null。' }, ...options.images.map(visionImagePart)] }], signal: options.signal })
+  const response = await options.client.chat({ messages: [{ role: 'system', content: FOOD_VISION_PROMPT }, { role: 'user', content: [{ type: 'text', text: '第一张图片是营养成分表，第二张如有则是同一产品的包装正面。只转录可见信息，未知字段为 null。' }, ...options.images.map(visionImagePart)] }], signal: options.signal })
   if (options.signal?.aborted) throw new AiError('aborted', '已停止本次识别')
   if (response.toolCalls.length) throw new AiError('invalid_label', '图片识别返回了无效工具请求，请重新识别')
   assertNoKnownSecrets(response.content, options.secrets ?? [])
