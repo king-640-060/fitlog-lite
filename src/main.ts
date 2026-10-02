@@ -2197,7 +2197,6 @@ let assistantLaunchQueue = Promise.resolve()
 function launchAssistant(options: AiAssistantLaunchOptions = {}): Promise<void> {
   const job = assistantLaunchQueue.then(async () => {
     await flushWorkoutAutosave()
-    aiAssistant.settingsChanged()
     if (assistantHandle?.dialog.isConnected && assistantHandle.dialog.open) assistantHandle.applyLaunch(options)
     else assistantHandle = showAiAssistant(aiAssistant, { openModal, esc, openFoodLibrary: () => void showFoodLibrary(), openFoodVision: () => openFoodVisionWorkflow(getLocalDateString()) }, options)
   })
