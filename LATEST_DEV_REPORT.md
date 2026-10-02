@@ -2,59 +2,63 @@
 
 ## Latest verified production state — 2026-10-02
 
-AI Voice Mode and app-side Quick Launch fragments are implemented and released. Full42-field report: [AI_VOICE_QUICK_LAUNCH_DEV_REPORT.md](docs/AI_VOICE_QUICK_LAUNCH_DEV_REPORT.md). Contract/platform gate: [AI_QUICK_LAUNCH.md](docs/AI_QUICK_LAUNCH.md). **Independent iPhone Home Screen launcher, same-storage routing and one-tap-to-listen remain Pending / unsupported by verified path.**
+AI Streaming and Global Sheet Scroll Stabilization are implemented. Full requested55-field report: [AI_STREAMING_SHEET_SCROLL_DEV_REPORT.md](docs/AI_STREAMING_SHEET_SCROLL_DEV_REPORT.md). Ordinary assistant text now arrives incrementally; tools execute only after complete aggregation/validation. Browser toolbar movement no longer changes shared Sheet geometry in closed-keyboard mode.
 
 | Identity | Value |
 | --- | --- |
-| START_COMMIT | 9f8b5c9d59e7d936a4ee69c69d1796eecf018ada |
-| AI_VOICE_QUICK_LAUNCH_COMMIT | 33cc62c85b4ecf0a964d8293e62fc5a5e3c27b0d |
-| Application QA / END_COMMIT | 6ab921dc76fd2fb0edd3bdec83c5c653cfe46b9c |
-| Initial application Actions | [36999415822](https://github.com/king-640-060/fitlog-lite/actions/runs/36999415822) SUCCESS; Pages6807048574 |
-| Final application Actions | [36999687683](https://github.com/king-640-060/fitlog-lite/actions/runs/36999687683) SUCCESS |
-| Verified application production HEAD | 6ab921dc76fd2fb0edd3bdec83c5c653cfe46b9c; Pages6807096297 SUCCESS |
-| REPORT_COMMIT / final main HEAD | This report commit; exact SHA from release response/artifact and `git log -1 --format=%H -- LATEST_DEV_REPORT.md` |
-| Production | https://king-640-060.github.io/fitlog-lite/ |
+| START_COMMIT |65824ed85e0edd1e407d9f78651e19ef1a7178ae|
+| AI_STREAMING_COMMIT |6f676db46702c70a52a174dc0a0457350a548518|
+| SHEET_SCROLL_STABILIZATION_COMMIT / END_COMMIT |1731f8d2386e2e2045691bc172d5092e648537e6|
+| QA_FIX_COMMIT |N/A; QA repairs included in the two application commits|
+| Application Actions |[37009831045](https://github.com/king-640-060/fitlog-lite/actions/runs/37009831045) SUCCESS|
+| Application production HEAD / Pages |1731f8d2386e2e2045691bc172d5092e648537e6 /6808900296 SUCCESS|
+| REPORT_COMMIT / final main / production HEAD |This report commit; exact SHA/Actions/Pages receipt in final response/artifact and `git log -1 --format=%H -- LATEST_DEV_REPORT.md`|
+| Production |https://king-640-060.github.io/fitlog-lite/|
 
-Bounded HTTPS pull/push timed out. API confirmed START equals remote main, verified identical Git blobs/tree/commits and advanced main with force:false/exact-parent checks. No history rewrite. The report-only deployment serves the same verified application; its exact head/Actions/deployment receipt is in the final response/artifact.
+Normal HTTPS fast-forward push succeeded, no publishing workaround or history rewrite. The final report-only deployment serves the same verified application assets.
 
 ## Delivered behavior
 
-- Browser SpeechRecognition service detects standard then webkit API, uses zh-CN/one finite session/interim/one alternative, aggregates final segments only on end, and prevents duplicate/stale sends with a generation. Stop finishes; close/hidden/pagehide abort/dispose and remove handlers. No background restart, FitLog audio capture/persistence/upload, MediaRecorder/getUserMedia/STT backend/provider or new dependency.
-- Quiet44px Mic, polite status/static dot and compact independent voice privacy acknowledgement in the existing shared Sheet. Voice does not focus the textarea or open the keyboard. First quick use shows Start; missing activation/automatic denial falls back quietly. Unsupported browsers retain normal text and system keyboard dictation guidance.
-- Typed text, final voice and quick prompts share submitText→engine.send. Existing Key/scopes/model/tool/proposal protections remain. Manual Send aborts speech and sends current typed text. Existing typed+spoken text combines by newline; busy/oversized drafts remain editable. Writes still require explicit proposal confirmation.
-- Fragment-only `#quick=ai`, `#quick=ai&voice=1`, `#quick=ai&prompt=<encoded text>&send=1`. Strict one-time decoding, trim/6000-character bound; immediate replaceState cleanup retains pathname/query/Pages base. Cold routing follows db/render; warm captured hashchange events serialize through Workout autosave and reuse one assistant. Rapid prompts do not create multiple Sheets. Reload never replays a consumed prompt.
-- Prompt/draft stays memory-only. No profile keeps the composer text; AI privacy acknowledgement may continue the unchanged pending prompt. Busy never defers automatic send. In-page draft/history persists on close/reopen; reload clears it. QA patch preserves the first secret-blocked error card on reopening without an unnecessary settings-change clear.
-- Camera/Food Vision, typed Send/Stop, IME, shared Sheet/viewport/Safe Area and confirmation footer remain. At320px textarea+Send use row one and Camera+Mic row two; wider screens use one row.
+- Native Chat Completions `chatStream` with stream:true for ordinary assistant rounds; typed/Voice-final/Quick Launch share engine.send. Vision/extraction and capability/connection probes stay nonstreaming. Same Provider/key, chat/tools model and independent visionModel/fallback.
+- Incremental UTF-8 SSE framing across arbitrary chunks, LF/CRLF/CR, multiple events/data lines, comments ignored. DONE ends and cancels reader; valid complete events permit EOF without DONE, truncated final data rejects. HTTP200 JSON fallback consumes the same response and emits once. No retry or stream_options.
+- Tool index0–15 aggregation; consistent repeated IDs/type, fragmented names/arguments,64KiB/tool incremental bound and complete final validation before execution. Existing8-round guard, matching results, duplicate-call cache, scopes and explicit proposals remain. Partial tools never execute.
+- First text replaces thinking in one keyed bubble; paragraph updated with textContent, one paint/frame, immediate busy/clear/error changes. Near-bottom follows; upward reading stays. Streaming live region off; separate polite completion status. No business-page rerender or new animation.
+- Stop/close abort fetch and reader. Already displayed partial UI retained with safe error but unfinished turn excluded from completed history. Optional completed usage only.45s headers/30s byte-stall/120s absolute stream cap; nonstream45s. Rolling possible-secret prefix protection prevents cross-delta credential display and avoids scanning the growing text each token.
+- Pure shared Sheet keyboard state: editable focus +140px opens;80px closes with hysteresis and geometry held through blur/dismissal. Closed bottomOffset/overlap/offsetTop0 and stable layout height. Toolbar resize/scroll never repositions Sheet; nonediting visual scroll returns early; one coalesced update/frame and no unchanged style writes.
+- Real keyboard adjusts visual geometry; native field focus scroll first, scoped residual correction only when still obscured. No smooth keyboard adjustment/fixed dismissal delay/private listeners/global touchmove prevention. Voice never focuses an input or opens keyboard mode. Orientation/width and actual desktop resize refresh baseline.
+- Existing native Sheet lifecycle, one primary, replacement lease/no unlock, temporary confirmation/scroll preservation and exact background scroll/style restoration remain. Assistant conversation and Settings modal-body own their vertical scroll. No scrollIntoView calls remain: Date Rail and explicit meal reveal directly scroll their own surfaces.
 
 ## Automated Verification
 
-Actual baseline405tests/40files PASS; final425tests/43files PASS (+20). Full AI Provider/Dual Model/Tools/Proposals/security/Vision/Nutrition/Interaction/Date Picker/Sync/Backup/Restore/frozenV7/history gates PASS. New parser/speech/voice-engine tests verify interim/no-speech/denied/stale/abort/stop/final-only behavior and proposal/secret safety.
+Actual baseline425tests/43files; final487tests/45files (+62) PASS. New47 streaming tests,11 viewport tests and4 engine live/partial/Stop cases. Existing Tools/Proposals/dual routing/Vision/Nutrition/Date Picker/Sync/Backup/Restore/frozenV7/history gates PASS. Typecheck, full tests, normal build, Pages build and diff-check PASS. No dependency/package-lock/manifest/schema/frozen fixture changes.
 
-Typecheck, full tests, normal build, Pages build with GITHUB_REPOSITORY and diff-check PASS. Local build QA (no HMR)320×812 /375×812 /390×844 /430×932: seven browser suites aiVoice/aiAssistant/aiDualModelRouting/foodVision/interactionStabilization/sharedDatePicker/githubSyncSafety PASS. Synthetic speech/profile/key/image/record and mocked Provider only. Screenshots inspected at320/390; 44px Mic,16px textarea, reachable footer/no overflow/quiet touch feedback verified.
+Static Pages build local QA at320×812 /375×812 /390×844 /430×932: eight suites aiStreaming/aiAssistant/aiVoice/aiDualModelRouting/foodVision/interactionStabilization/sharedDatePicker/githubSyncSafety PASS. Delayed browser ReadableStream proves text before DONE, one bubble, no business-view mutations, near-bottom/upward-read, Stop, half-tool cancellation, complete tool loop, partial history exclusion, cross-delta secrets, Voice/Quick streams. Existing JSON mocks cover fallback.
 
-| Pages asset | Bytes | Vite gzip | SHA-256 |
-| --- | --- | --- | --- |
-| index-D1fd2jUl.js | 674632 | 216.19kB | ad3e712950f7e70e9764df9a89d178e2d45cdf8a91e3a9328b375e57c5b22f67 |
-| index-C-p-6ets.css | 102884 | 18.45kB | 86933073443f82397ef8a8d42195f892022479f874511eeee6b0ddf3a43c3f97 |
+Long Sheet QA uses temporary2400px synthetic content and20 native wheel up/down cycles with deterministic boundary scrolls and mocked toolbar movements. All major Sheets checked: AI Assistant/Settings, Food Library/Editor, Task, Workout, Cardio, Habit, GitHub Sync, Backup/Restore, Vision Import. Stable top/bottom/background and zero toolbar CSS writes PASS. Focused mocked keyboard sequences cover AI root/Key/model, Food name/energy/macros, Task title/note and assistant textarea; blur/dismissal/orientation plus actual desktop height resize PASS. Screenshots inspected at390/320. These are Chromium geometry checks, not physical Safari touch/keyboard proof.
 
-PWA precache17entries/794.61KiB; no new package. Existing>500kB JS warning remains. Security audit found no new audio capture/storage/logging or direct write path. The existing pelvic generated AudioContext cue is unchanged.
+| Pages asset | Bytes | Python gzip bytes | Vite gzip estimate | SHA-256 |
+| --- | --- | --- | --- | --- |
+|index-CjrfcL7Y.js|683288|215441|218.75kB|d102118dd5c6924fccc930df118427d0c6750909c442075da917e8bdbea59766|
+|index-C-p-6ets.css|102884|18275|18.45kB|86933073443f82397ef8a8d42195f892022479f874511eeee6b0ddf3a43c3f97|
+
+Precache17entries/803.06KiB. JS +8656raw bytes (~1.28%); CSS identical. Existing>500kB warning retained; no new package.
 
 ## Production Verification
 
-Final application Actions36999687683 /Pages6807096297 SUCCESS. Production JS/CSS bytes/SHA match the final local Pages build. Production390×844 /430×932: all seven mocked browser suites PASS, zero page errors. Cold/warm/rapid quick routes, cleanup/no replay, privacy/no-profile/busy drafts, secret guard, final/end once, manual Stop/Send, close/background abort, unsupported text, proposals, pending Workout autosave and model/Vision/interaction/date/Sync regressions verified.
+Application Actions37009831045 and Pages6808900296 SUCCESS at END_COMMIT. Production JS/CSS bytes/SHA exactly match local final Pages build; five tabs, AI Settings and Sync entries PASS.
 
-Cross-deployment preservation PASS in the same existing dedicated synthetic persistent browser profile:14stores/15frozen historical records identical, AI config/API Key and voice acknowledgement fingerprints unchanged, no business reseed/reset. Exact new JS under original Service Worker; actual SW offline cold reload PASS. This is desktop evidence and does not prove an external iPhone storage context.
+Production390×844 /430×932: all eight mocked browser suites PASS (aiStreaming, aiAssistant, aiVoice, aiDualModelRouting, foodVision, interactionStabilization, sharedDatePicker, githubSyncSafety), zero page errors. Delayed incremental text, complete tools, Stop/history/secret guards, Voice/Quick, long Sheet toolbar/keyboard/scroll/confirm/replace, five tabs and existing write/date/Sync regressions verified. Production JS/CSS bytes and SHA exactly match the final Pages build.
+
+Same existing synthetic persistent profile across deployment: all14stores/15frozen historical records remain identical, saved AI Profiles/API Key/visionModel/Voice privacy acknowledgement fingerprints unchanged; no business reseeding/reset. Exact new JS loaded under the original Service Worker, then actual offline cold reload PASS. Desktop evidence only; not proof of external iPhone storage context.
 
 ## Versions
 
-fitlog-lite-db /DexieV7 /14stores; BackupV7; RestoreV1–V7; SyncEnvelopeV1; AIConfigV1; AISystemPromptV1; FoodVisionPrompt/extractionV1. No schema/migration/business service/manifest/package/frozen-fixture change. Five tabs, local dates, canonical kcal and historical snapshots remain.
+fitlog-lite-db /DexieV7 /14stores; BackupV7; RestoreV1–V7; SyncEnvelopeV1; AIConfig/SystemPromptV1; FoodVisionPrompt/extractionV1. No migration, historical recalculation or business-service changes. Five tabs, local dates, canonical kcal and factual snapshots remain.
 
-## Manual Device Verification
+## Manual Device Verification / remaining risks
 
-Real SpeechRecognition and real Provider Pending; no real microphone/Key/quota used. Physical iPhone Safari and installed PWA Pending. Independent FitLog AI Home Screen launcher, one-tap-to-listen and external same-storage routing Pending / unsupported by verified path. Browser mocks and desktop SW checks do not establish those results.
-
-Do not install a second web app or use undocumented webapp:// as a production shortcut. Candidate launcher must show original standalone Food/Weight/Tasks and saved Provider/key without re-entry/Restore/Sync. Safari opening, second empty PWA or re-entering Key = FAIL. No unverified Shortcut recipe is supplied; normal manifest/start_url='.' and app icon remain. See the physical checklist in AI_QUICK_LAUNCH. Remaining risks are these manual platform/provider categories and the existing bundle warning; no unresolved automated/production failure.
+Real Provider/CORS/buffering/tool-delta compatibility and real SpeechRecognition Pending; no real Key/quota/microphone used. Physical iPhone Safari and installed PWA touch/toolbar/keyboard/Safe Area Pending. Desktop original SW offline check is separate from physical standalone verification. Independent FitLog AI Home Screen icon, one-tap-to-listen and same-storage external routing remain Pending / unsupported by verified path. No duplicate web-app installation or undocumented URL scheme recipe; normal manifest/start_url='.' unchanged. See [AI_QUICK_LAUNCH.md](docs/AI_QUICK_LAUNCH.md) and the new report's physical checklist. Existing large-bundle warning remains; no unresolved automated/production failure.120s stream hard cap is intentional.
 
 ## ChatGPT Baseline
 
-Read AGENTS→LATEST_DEV_REPORT→UI_INTERACTION_SPEC/INTERACTION_VISUAL_SYSTEM/AI_ARCHITECTURE/FOOD_VISION_IMPORT/AI_QUICK_LAUNCH. END6ab921dc76fd2fb0edd3bdec83c5c653cfe46b9c implements browser/system voice via final/end-only shared engine.send, generation-guarded close/background abort, device-only voice ack, quiet44px Mic and320px two-row composer. Fragment-only quick=ai/voice=1/prompt/send=1 consumed immediately; cold/warm serialized routing flushes Workout and reuses one Sheet. Prompt drafts memory-only; busy never defers auto-send; privacy preserves/resumes unchanged text. Existing Keys/scopes/models/tools/proposals remain; voice cannot confirm/write. 425tests/43files, seven browser suites local4/prod2sizes, exact asset identity and same-profile14store/15row+AIconfig preservation+SW offline cold boot PASS. Real Speech/Provider, physical Safari/PWA, independent Home Screen/storage context/one-tap Pending. DBV7/BackupV7/RestoreV1–V7/SyncV1 and manifest unchanged.
+Read AGENTS→LATEST_DEV_REPORT→UI_INTERACTION_SPEC/INTERACTION_VISUAL_SYSTEM/AI_ARCHITECTURE/AI_QUICK_LAUNCH/FOOD_VISION_IMPORT. END1731f8d2386e2e2045691bc172d5092e648537e6 adds native stream:true assistant rounds with incremental UTF-8 SSE, complete indexed tools/64KiB safety, same-response JSON fallback, Stop/cancel, partial-turn history exclusion, rolling credential guard and45/30/120s timers. Voice/Quick share engine.send; probes/Vision remain nonstream, dual routing unchanged. Shared pure Sheet state uses focus+140/80px hysteresis, closed stable height/0 offsets, no toolbar reposition, coalesced central writes, scoped residual keyboard correction and existing replacement/confirm/original scroll lock.487tests/45files and eight local4/prod2size suites PASS; exact assets and same synthetic14store/15row+AIconfig/key/visionModel/voice ack preservation+SW offline cold boot PASS. Physical Safari/installed PWA/real Provider/Speech/external icon-storage path Pending. DBV7/BackupV7/RestoreV1–V7/SyncV1 and manifest unchanged. Exact report/main/production receipt in final artifact.
