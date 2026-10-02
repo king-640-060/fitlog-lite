@@ -3,7 +3,7 @@ import { parseNutritionLabelExtraction, analyzeFoodPackageImages, type Nutrition
 import { buildAiRequest, OpenAICompatibleChatAdapter } from '../src/services/aiProvider'
 import { draftFromLabel, validateVisionFoodDraft } from '../src/services/foodVisionImportService'
 import { AI_FOOD_VISION_PROMPT_VERSION, FOOD_VISION_PROMPT } from '../src/ai/foodVisionPrompt'
-import { AI_VISION_LIMITS, assertVisionDataUrl, validateVisionImageHeader } from '../src/ai/visionImages'
+import { AI_VISION_LIMITS, FOOD_VISION_PROFILES, visionImagePart, assertVisionDataUrl, validateVisionImageHeader } from '../src/ai/visionImages'
 import { energyToKcal, kcalToKj } from '../src/utils/energy'
 import type { AiProviderProfile } from '../src/ai/types'
 const image = { dataUrl: 'data:image/jpeg;base64,/9j/AA==', width: 100, height: 100, bytes: 4 }
@@ -11,6 +11,24 @@ const profile: AiProviderProfile = { id: 'vision', name: 'vision', baseUrl: 'htt
 export const label = (): NutritionLabelExtractionV1 => ({ format: 'fitlog-food-label', version: 1, productName: '方便面', brand: '测试品牌', netQuantity: { value: 120, unit: 'g', evidence: '净含量120g' }, basis: { kind: 'per_100g', amount: 100, unit: 'g', evidence: '每100克' }, nutrients: { energy: { value: 1980, unit: 'kJ', evidence: '能量1980kJ' }, protein: { value: 9.2, unit: 'g', evidence: '蛋白质9.2g' }, carbs: { value: 60, unit: 'g', evidence: '碳水60g' }, fat: { value: null, unit: null, evidence: null } }, warnings: ['脂肪看不清'] })
 const response = (content: string) => new Response(JSON.stringify({ choices: [{ message: { content } }] }))
 describe('bounded multimodal transport and independent capability', () => {
+  it('bounds role-specific fast profiles and keeps explicit high/probe routing', () => {
+    expect(FOOD_VISION_PROFILES.nutrition.longEdge).toBe(1400)
+    expect(FOOD_VISION_PROFILES.front.longEdge).toBe(1000)
+    expect(FOOD_VISION_PROFILES.nutrition.bytes + FOOD_VISION_PROFILES.front.bytes).toBeLessThan(AI_VISION_LIMITS.totalBytes / 2)
+    expect(visionImagePart({ ...image, detail: 'auto' }).image_url.detail).toBe('auto')
+    expect(visionImagePart({ ...image, detail: 'low' }).image_url.detail).toBe('low')
+    expect(visionImagePart(image).image_url.detail).toBe('high')
+  })
+  it('reports only numeric timings and does not retry parser failures', async () => {
+    const onTiming = vi.fn(), visionChat = vi.fn(async () => ({ content: JSON.stringify(label()), toolCalls: [] }))
+    await analyzeFoodPackageImages({ client: { visionChat }, images: [{ ...image, detail: 'auto', preprocessMs: 17 }], onTiming })
+    expect(onTiming.mock.calls[0]?.[0]).toMatchObject({ preprocessMs: 17, payloadBytes: 4 })
+    expect(Object.values(onTiming.mock.calls[0]![0]).every(v => typeof v === 'number')).toBe(true)
+    expect((visionChat.mock.calls[0]?.[0] as any).messages[1].content[1].image_url.detail).toBe('auto')
+    const failed = vi.fn(async () => ({ content: 'invalid', toolCalls: [] }))
+    await expect(analyzeFoodPackageImages({ client: { visionChat: failed }, images: [image] })).rejects.toThrow()
+    expect(failed).toHaveBeenCalledTimes(1)
+  })
   it('rejects disguised SVG/HTML before decoding and accepts real raster signatures', () => {
     expect(() => validateVisionImageHeader('image/jpeg', new TextEncoder().encode('<svg onload="alert(1)">'))).toThrow()
     expect(() => validateVisionImageHeader('image/png', new Uint8Array([137,80,78,71,13,10,26,10]))).not.toThrow()

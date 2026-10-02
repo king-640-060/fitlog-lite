@@ -67,12 +67,17 @@ export function parseNutritionLabelExtraction(response: string): NutritionLabelE
   if (energy.value !== null && energyKj?.value !== null && energyKj?.value !== undefined && Math.abs(kjToKcal(energyKj.value) - energy.value) > Math.max(1, energy.value * 0.05)) warnings.push('包装上的 kJ 与 kcal 数值看起来不一致，请核对。')
   return { format: 'fitlog-food-label', version: 1, productName: text(root.productName, 120), brand: text(root.brand, 120), netQuantity: labelValue(root.netQuantity, ['g', 'kg', 'ml', 'l']), basis, nutrients: { energy, ...(energyKj ? { energyKj } : {}), protein: labelValue(nutrientsRaw.protein, ['g']), carbs: labelValue(nutrientsRaw.carbs, ['g']), fat: labelValue(nutrientsRaw.fat, ['g']) }, warnings }
 }
-export async function analyzeFoodPackageImages(options: { client: Pick<AiProviderAdapter, 'visionChat'>; images: readonly PreparedVisionImage[]; signal?: AbortSignal; secrets?: readonly string[] }): Promise<NutritionLabelExtractionV1> {
+export interface FoodVisionTiming { preprocessMs: number; requestMs: number; parseMs: number; totalMs: number; payloadBytes: number }
+export async function analyzeFoodPackageImages(options: { client: Pick<AiProviderAdapter, 'visionChat'>; images: readonly PreparedVisionImage[]; signal?: AbortSignal; secrets?: readonly string[]; onTiming?: (timing: FoodVisionTiming) => void }): Promise<NutritionLabelExtractionV1> {
   if (!options.images.length || options.images.length > AI_VISION_LIMITS.images) throw new AiError('image_limit', '请选择营养成分表，可另选一张包装正面。')
   if (options.signal?.aborted) throw new AiError('aborted', '已停止本次识别')
+  const started = performance.now()
   const response = await options.client.visionChat({ messages: [{ role: 'system', content: FOOD_VISION_PROMPT }, { role: 'user', content: [{ type: 'text', text: '第一张图片是营养成分表，第二张如有则是同一产品的包装正面。只转录可见信息，未知字段为 null。' }, ...options.images.map(visionImagePart)] }], signal: options.signal })
   if (options.signal?.aborted) throw new AiError('aborted', '已停止本次识别')
+  const responded = performance.now()
   if (response.toolCalls.length) throw new AiError('invalid_label', '图片识别返回了无效工具请求，请重新识别')
   assertNoKnownSecrets(response.content, options.secrets ?? [])
-  return parseNutritionLabelExtraction(response.content)
+  const result = parseNutritionLabelExtraction(response.content), finished = performance.now(), preprocessMs = options.images.reduce((sum, image) => sum + (image.preprocessMs ?? 0), 0)
+  options.onTiming?.({ preprocessMs, requestMs: responded - started, parseMs: finished - responded, totalMs: preprocessMs + finished - started, payloadBytes: options.images.reduce((sum, image) => sum + image.bytes, 0) })
+  return result
 }
