@@ -15,11 +15,12 @@ try {
     await page.evaluate(async () => { const registration = await navigator.serviceWorker.getRegistration(); await registration?.update() })
     for (let attempt = 0; attempt < 10; attempt++) {
       await page.locator('[data-tab=food]').click(); await page.locator('#food-library').click()
+      await page.waitForSelector('dialog .library-list') // Food Library opens after its asynchronous IndexedDB read.
       if (await page.locator('#food-vision-import').count()) break
       await page.locator('dialog [data-close]').click(); await page.waitForTimeout(1500); await page.reload({ waitUntil: 'networkidle' })
     }
     assert.equal(await page.locator('#food-vision-import').count(), 1, 'new application must actually run in the old profile')
-    await page.locator('#food-vision-import').click(); await page.waitForSelector('#vision-camera-file')
+    await page.locator('#food-vision-import').click(); await page.waitForSelector('#vision-camera-file', { state: 'attached' })
     assert.equal(await page.locator('#vision-album-file').getAttribute('capture'), null)
     await page.locator('dialog [data-close]').click()
   }

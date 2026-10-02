@@ -1,76 +1,107 @@
 # FitLog Lite Development Report — Food Packaging Vision
 
-## 状态：本地实现已验证，待补齐需求后发布
+Verified date: 2026-10-02 (Asia/Shanghai).
 
-收到的需求附件共有 686 行，在第 21 节 JSON Parsing 的完整 JSON fence 示例开头（`json …`）处结束。已通过异步问题请求补贴后续内容，目前尚未收到。以下是已收到需求及核心场景的可独立实现部分，不代表缺失验收项已经完成。没有 push 或触发本轮生产部署。
+The continuation was audited against the existing local implementation. The two earlier commits were preserved. Minimal acceptance fixes added image roles, first-transmission privacy acknowledgement, duplicate resolution, exact canonical-energy state, optional secondary kJ review, explicit unclassified meal, offline/manual handling and additional regression coverage.
 
-| 字段 | 当前结果 |
+## Commit and release identity
+
+| Field | Value |
 | --- | --- |
-| START_COMMIT | `a677eca53d2653c7764b845b365d075dced2481a` |
-| LOCAL_IMPLEMENTATION_COMMIT | `6c99796f2147d20c3f7baeee234361433ff1ee67` — Add reviewed food packaging vision import |
-| END_COMMIT | Pending：尚无本轮已发布应用提交 |
-| REPORT_COMMIT / local main HEAD | 此报告的独立文档提交；用 `git log -1 --format=%H -- docs/AI_FOOD_VISION_DEV_REPORT.md` 解析 |
-| remote main / production baseline | `a677eca53d2653c7764b845b365d075dced2481a` |
-| Production | https://king-640-060.github.io/fitlog-lite/ |
-| 本轮 Actions | 未触发；未宣称新增功能已在生产可用 |
+| START_COMMIT (continuation) | e46aaf5b29e989a992239619a8101e41ecf9f9f2 |
+| Original Vision production baseline | a677eca53d2653c7764b845b365d075dced2481a |
+| AI_VISION_COMMIT | 6c99796f2147d20c3f7baeee234361433ff1ee67 |
+| FOOD_VISION_IMPORT_COMMIT / APPLICATION_COMMIT | 6c99796f2147d20c3f7baeee234361433ff1ee67 |
+| Original local report commit | e46aaf5b29e989a992239619a8101e41ecf9f9f2 |
+| VISION_FIX_COMMIT / END_COMMIT | 508057ca0f955859975a89dae68efee368378bcc |
+| Final report commit | This report / verification-harness commit; resolve via `git log -1 --format=%H -- LATEST_DEV_REPORT.md`. Its SHA is returned in the release response. |
+| Production application | 508057ca0f955859975a89dae68efee368378bcc; any following report-only build serves the same verified JS/CSS |
+| Production URL | https://king-640-060.github.io/fitlog-lite/ |
 
-开始时 main 工作区干净。按要求执行 status、branch、pull、log；pull 遇到 GitHub TCP 超时，随后 GitHub API 独立确认远端 main 与本地 HEAD 精确一致。工作从该实际基线开始，没有重置数据库或使用真实用户数据。
+Git HTTPS pull/push timed out. GitHub Git Data API rechecked the remote parent, created identical blobs/trees/commits, verified exact SHAs and advanced main without force. Original local commits were not reset, amended or squashed. Final remote/local main equality is checked after report publication.
 
-## 已实现
+## Complete acceptance fields
 
-- 原 Profile → AiClient → OpenAICompatibleChatAdapter 架构增加多模态 content parts，文本及工具请求兼容。仅允许本地处理后的 JPEG 和本地 PNG 测试图；拒绝任意远程、file、blob、script、SVG 图片地址。
-- AI Config 仍 V1，optional visionCapability 独立于 toolCapability；旧配置读取为 unknown。API root/model/key 修改重置两项能力。配置卡显示对话、工具、图片状态，保留旧测试按钮并增加“测试图片识别”。本机生成白底 731 测试图，准确返回数字才验证成功；明确图片不支持才判定 unsupported，网络/HTTP/超时或错误数字仍待验证。
-- 食物库、四餐记录入口和全局助手相机按钮共用 showFoodVisionImport。进入时捕获本地日期及餐次，其他页面的全局入口用 Today。选择图片不发网络请求，明确识别动作及图片同意后才发送给当前 Provider。
-- 本地 Canvas 解码/缩放/重新编码 JPEG，剥离源元数据；3 张同产品图片、原图 15 MiB/张、6000 万像素、长边 1600px、输出 1 MiB/张。检查 raster 文件头，HEIC 依赖浏览器原生解码。图片留在内存并在关闭/成功后释放。
-- 独立 Vision Prompt V1 和 analyzeFoodPackageImages 单次请求，无 agent tools/history/FitLog 业务数据。严格格式及版本解析，允许一个完整 JSON fence；拒绝额外字段、字符串/百分比数值、非有限/负数、未知单位、过长结果。关键 evidence 上限 100 字符，并检查数值及单位与 evidence 一致；这不证明模型没有猜测，最终用户核对仍必须。
-- 可查看较大图片、展开包装原文、核对并编辑名称/品牌/基准重量/能量/三项宏量。看不清的宏量保持未知，不填零。每份保留真实基准克数；每包装只有明确净重量可作为整包基准；100mL/容量/未知重量不转换或猜测密度，需要用户填写对应实际克数。
-- 包装核对与普通食物编辑均支持 kJ/kcal；本地严格按 4.184 换算，预览两种单位，Food/FoodLog 存 kcal，绝不按宏量 4/4/9 推算。普通编辑切换单位保持能量，不覆写历史日志。
-- 核对勾选 → App 预览 → 明确确认。只保存食物不建日志，可继续按实际日期/餐次/克数记录。“保存并记录”调用现有 saveFood/logFood，两个 store 一个事务；失败回滚，不重复确认。未来事实饮食阻止写入。新增同名食物明确提示，不静默覆盖现有食品。
-- 保存后继续记录会在事务中检查 Food 是否修改或删除；FoodLog snapshot 保留所确认的营养与名称。取消零写入，Stop/关闭取消识别，迟到的旧配置响应不能进入核对状态，刷新失败不把已成功保存误报为回滚。
-- 使用现有 Sheet、共享日期选择器、16px 输入、VisualViewport 和 Safe Area，图片查看/日期子视图在同一 Sheet 内；未添加数据库表、SDK、OCR、后台、代理或依赖。
+| # | Field | Verified behavior / evidence |
+| --- | --- | --- |
+| 1 | START_COMMIT | Continuation e46aaf5b29e989a992239619a8101e41ecf9f9f2; original production baseline above |
+| 2 | AI_VISION_COMMIT | 6c99796f2147d20c3f7baeee234361433ff1ee67 |
+| 3 | FOOD_VISION_IMPORT_COMMIT / APPLICATION_COMMIT | Same combined implementation commit 6c99796f2147d20c3f7baeee234361433ff1ee67 |
+| 4 | VISION_FIX_COMMIT | 508057ca0f955859975a89dae68efee368378bcc |
+| 5 | END_COMMIT | 508057ca0f955859975a89dae68efee368378bcc |
+| 6 | FINAL_REPORT_COMMIT | Report / verification-harness commit containing this report; full SHA in final response |
+| 7 | main HEAD | Final report / verification-harness commit, descendant of END_COMMIT; full SHA in final response |
+| 8 | production HEAD | Final successful report-only deployment, same application assets as END_COMMIT; full SHA in final response |
+| 9 | Vision protocol | Existing OpenAI-compatible Chat Completions: text/image_url, local JPEG/PNG data URLs, detail high; no tools/history/SDK/proxy |
+| 10 | visionCapability | Independent of tools; legacy missing→unknown; unknown may try; valid extraction/exact 731 probe→supported; explicit image rejection→unsupported; network/429/5xx/timeout never establish unsupported. Routing/model/key changes reset both. |
+| 11 | Camera support | Both image slots: accept=image/*, capture=environment; browser attribute/workflow QA PASS, real iPhone Pending |
+| 12 | Gallery / photo library | Both slots: accept=image/* without capture; same preprocessing/workflow; browser PASS |
+| 13 | Max images | Two; nutrition-table slot required, package-front optional; front alone cannot send |
+| 14 | Preprocessing | Native decode → resize → new Canvas → JPEG; source ≤20 MiB; decoded ≤60M pixels |
+| 15 | EXIF stripping | Synthetic orientation-6 JPEG tested through actual UI; clockwise orientation retained and EXIF removed from re-encoded output |
+| 16 | Image dimensions | Long edge ≤1800px; no upscale; dimensions below 32px rejected |
+| 17 | JPEG quality | .88; .84 then .80 only when needed by final-size bound |
+| 18 | Payload limits | ≤3 MiB per encoded image; ≤6 MiB total binary; ≤9 MiB serialized request, checked before fetch; 45s timeout, no automatic retry |
+| 19 | Original image persistence | Original/processed images and extraction/evidence only in workflow memory; no business DB/localStorage/Backup/Sync/history/reports; source object URLs revoked, close aborts and drops references |
+| 20 | Vision prompt version | AI_FOOD_VISION_PROMPT_VERSION=1 |
+| 21 | Extraction JSON | fitlog-food-label V1; strict exact shape, bounded finite nonnegative values/enums/strings; pure JSON or one complete fence. Optional energyKj retains a second observed energy. |
+| 22 | Evidence | ≤100 characters; numeric/unit witness checked; expandable escaped text. Cannot prove real transcription quality; user must review. |
+| 23 | Missing fields | Name/reference grams/energy require correction; optional brand blank; missing macros→undefined, never zero; no macro-derived calories |
+| 24 | per100g | referenceGrams=100; net content cannot replace basis |
+| 25 | per-serving | Explicit gram amount (including 105g) retained; otherwise user supplies grams; custom 30g supported |
+| 26 | per-package | Explicit package gram basis or clearly observed net g/kg when no conflicting volume basis; kg×1000 locally |
+| 27 | per100mL safety | No mL→g/density assumption; explicit gram equivalence required; volume net quantity does not become grams |
+| 28 | kJ/kcal | Deterministic 1 kcal=4.184 kJ; direct explicit kcal preferred; secondary kJ discrepancy above max(1 kcal, 5%) warns without blocking correction |
+| 29 | Canonical kcal | Food, FoodLog snapshots, imports, Targets, Reports and AI tools remain kcal; no schema or semantics change |
+| 30 | Food editor units | Same canonical EnergyEditor in manual/Vision forms; unit-only switching and unrelated edits preserve exact energy; numeric edits convert locally |
+| 31 | Duplicates | Normalized name+brand; current/recognized summaries; explicit Use existing / Update existing / Save as new; transaction source recheck; no silent duplicate or historical rewrite |
+| 32 | Save-only | Ordinary Food created/updated/reused; no FoodLog; completed flow returns to refreshed Food Library |
+| 33 | Save+record | Captured local date/meal; explicit grams; shared date picker; general meal starts blank and includes explicit Unclassified; future factual intake blocked |
+| 34 | Transaction | Existing saveFood/logFood in one foods+foodLogs transaction; both-or-neither for create/update; deduplicated confirmation, cancellation/stale-source guard |
+| 35 | Whole package | Actual grams initially blank; tap-only shortcut for observed net g/kg; local calorie/macro preview via calculateNutrition |
+| 36 | Food Library entry | 拍包装录入, including empty library; camera/gallery available |
+| 37 | Meal picker entry | 拍包装并记录, including empty library; dinner context retained; successful record closes sheet, refreshes and toasts 已记录 |
+| 38 | Assistant entry | Camera icon with 拍包装录入 aria label opens the same workflow; local Today captured; text assistant regression PASS |
+| 39 | Privacy | Separate fitlog-ai-vision-privacy-ack-v1; first actual packaging request requires 我知道了; explains provider transmission, local metadata removal and provider-dependent retention |
+| 40 | Security audit | Keys only Authorization; textual model/messages/tools/schema scanned; validated raster base64 exempt from textual substring scan; XSS escaped; model cannot control image src; no native date input/UTC business-date truncation/new dependencies; no image business persistence |
+| 41 | Tests / files | 377 tests / 38 files PASS; focus aiVisionFood, foodVisionImport, energy, aiProfiles plus existing frozen-V7, reopen/migration/population, Backup/Sync and all domain regressions |
+| 42 | Typecheck | npm run typecheck PASS |
+| 43 | Build | npm run build PASS |
+| 44 | Pages build | GITHUB_REPOSITORY=king-640-060/fitlog-lite npm run build PASS |
+| 45 | Bundle JS/CSS | index-BQv77Iqt.js 655765 B (Vite gzip 210.34 kB); index-C2fNovyN.css 98569 B (Vite gzip 17.90 kB). Existing >500kB chunk warning. |
+| 46 | Actions run | [36978286625](https://github.com/king-640-060/fitlog-lite/actions/runs/36978286625) — success |
+| 47 | Production verification | 390×844 / 430×932 mock Vision, AI Assistant, Shared Date Picker and GitHub Sync safety PASS; five main views/settings/sync entry PASS; live asset SHA-256 exact match |
+| 48 | Cross-deploy preservation | Same synthetic persistent browser profile before/after deployment: fitlog-lite-db V7, all 14 stores / 15 frozen records compared exactly, PASS; no DB reset between phases |
+| 49 | Real Provider | Pending: no real Key used; production recognition QA uses explicit mock/interception |
+| 50 | Physical iPhone | Pending: Safari + installed PWA camera/gallery/camera return/orientation/keyboard/units/save+record |
+| 51 | Versions | fitlog-lite-db; Dexie V7 / 14 stores; Backup V7; Restore V1–V7; Sync Envelope V1; AI Config V1; System Prompt V1; Food Vision Prompt/extraction V1 |
+| 52 | Remaining risks | Real model accuracy/CORS and physical device behavior unverified; HEIC depends on browser decode; existing large JS bundle warning. Evidence validation is consistency checking, not proof the model read correctly. |
 
 ## Automated Verification
 
-| Gate | 实际结果 |
-| --- | --- |
-| Vitest | **367 tests / 37 files PASS**；相对基线 335/35 新增 32 个用例及 2 个文件 |
-| 新文件 | aiVisionFood.test.ts、foodVisionImport.test.ts；aiProfiles 增加能力兼容/重置用例 |
-| Typecheck | PASS |
-| Normal build | PASS |
-| GitHub Pages build | `GITHUB_REPOSITORY=king-640-060/fitlog-lite npm run build` PASS |
-| git diff-check | PASS |
-| Food Vision browser | 320×812、375×812、390×844、430×932 PASS |
-| Existing AI browser | 四种宽度 PASS |
-| Shared Date Picker browser | 四种宽度 PASS，包括延迟标签创建焦点回归 |
-| GitHub Sync safety browser | 四种宽度 PASS，均为模拟请求/合成记录 |
-| Frozen preservation / migrations / reopen / populate / Restore V1–V7 / encrypted Sync | 全套测试 PASS |
-
-新覆盖包含：多模态协议与 URL/大小/角色边界、独立 probe、错误分类、严格 JSON/证据/NRV/单位/基准检查、精确换算、未知宏量、取消/预确认零写入、双确认、实际 FoodLog 写失败导致 Food 回滚、源记录失效、快照不变及 V7 Backup/Restore。浏览器以生成的虚构标签图片与模拟 Provider 验证三个入口、预处理、图片查看、日期/餐次、保存后继续记录、错误/Stop、迟到配置响应、手动 kJ 编辑及安全文本。没有真实模型 OCR 质量结论。
-
-### Pages bundle
-
-| Asset | Bytes | Vite gzip | SHA-256 |
-| --- | --- | --- | --- |
-| index-BVBaSRe_.js | 649,026 | 207.98 kB | 43cf390b1a529fd04b5690310aa1a2a7024a4590a1fd962e43e67b8458e65045 |
-| index-DSkAZsKR.css | 98,336 | 17.86 kB | 8e68f5d183c18be5f9ebf5edc7213f5fde6ad6c441c56dc244fc618c71bb370c |
-
-PWA precache 17 entries / 765.16 KiB。既有 >500kB chunk warning 仍在；没有新增包。
+- Typecheck, 377/38 complete tests, normal build, Pages build and git diff --check: PASS.
+- Food Vision browser QA: 320×812, 375×812, 390×844, 430×932 PASS. Mock provider only, synthetic images/secrets/business records. Includes two image roles, EXIF orientation/stripping, gallery attributes, unknown Vision with tools/scopes/writes disabled, missing name/energy/macros, local kJ conversion, explicit duplicate update, immutable snapshots, explicit Unclassified, whole-package tap, captured dinner/date, save-only/save+record/cancel/double tap, shared-date cancellation, error/CORS/Stop, late profile changes, offline recognition guard/manual Food and exact manual energy preservation.
+- AI Assistant, Shared Date Picker and GitHub Sync safety browser regression: all four local sizes PASS.
+- Frozen legacy fixtures, database definitions, Backup/Restore/Sync schemas and package files unchanged.
 
 ## Production Verification
 
-本轮没有发布，新增 Vision 的生产 QA 和 Actions 均 Pending。只读复验既有独立合成生产 profile：fitlog-lite-db / Dexie V7 / 14 stores / 15 个 frozen 合成记录精确保持一致。此结果验证当前基线，不能代替本轮上线后的验证。发布时继续使用既有 preservation profile 检查新入口生效后全量记录一致，再运行生产 390/430 mock UI 与资源哈希比较。
+- Application deployment [36978286625](https://github.com/king-640-060/fitlog-lite/actions/runs/36978286625): success, including typecheck/tests/build/deploy. GitHub Pages deployment 6803454325 at application SHA 508057ca0f955859975a89dae68efee368378bcc: success.
+- 390×844 / 430×932: Food Vision mock workflow, AI Assistant mock regression, Shared Date Picker and GitHub Sync safety PASS. No real Provider Key or personal photo was used.
+- The requested complete mock example (红烧牛肉面, 测试品牌, net105g, per100g, energy1980kJ, protein9.2g, carbs61.3g, fat21g) also passed both production sizes. Food canonical energy 473.23135755258124 kcal; actual 50g FoodLog 236.61567877629062 kcal, P4.6/C30.65/F10.5. Grams starts blank and whole-package105g requires an explicit tap; local 2026-10-02/dinner retained.
+- Live JS/CSS bytes and SHA-256 equal the locally verified final Pages build. Five Today/Plan/Food/Workout/Progress views, AI Settings and GitHub Sync entry loaded without page errors.
+- Before deployment, the dedicated `/tmp/fitlog-vision-release-profile` held frozen synthetic V7 data. After deployment, it actually opened the new Vision workflow under its Service Worker, then read all 14 stores and compared all 15 records exactly: PASS. No business DB clearing/restoring was performed after setup or during deployment.
+- The final report also corrects two waits in the new preservation harness: wait for the asynchronous library DOM before checking its entry, and wait for the intentionally hidden camera file input to be attached rather than visible. These were test-observer errors, not application data or cache-update failures. Application assets remain unchanged by this follow-up.
 
-## Manual Device / Real Provider Verification
+### Verified Pages asset SHA-256
 
-- Real Vision Provider：Pending；没有使用真实 Key、用户图片或业务记录。真实模型支持、CORS、识别准确性和收费待单独验证。
-- Physical iPhone Safari / installed PWA：Pending；相机/照片库、HEIC、原图方向、软件键盘、Safe Area 和 standalone 需实体设备验证。
+- index-BQv77Iqt.js: 9acc8a0ac4366cdd006d2bebb7db5f952efc739f5195211c19300003fab3f0a7
+- index-C2fNovyN.css: 34c8770f0b60582f5c34240ca849ad34ef7f6c42fdc894a10209098fc3e90c4d
 
-## Versions / Next Step
+## Manual Device Verification
 
-fitlog-lite-db；Dexie **V7 / 14 stores**；Backup **V7**；Restore **V1–V7**；Sync Envelope **V1**；AI Config **V1**；原 System Prompt **V1**；Food Vision Prompt **V1**。没有迁移、历史重算或用户数据清理。
-
-下一步需要第 21 节之后的完整需求，核对差异并实现缺失验收项，然后按 AGENTS 流程发布 main、等待 Actions、验证生产并更新正式 END_COMMIT。已知架构限制为浏览器 BYOK/Provider CORS、原生 HEIC 支持差异、已有 bundle warning；未发现本地自动化回归。
+Real Provider and physical iPhone Safari/installed PWA are Pending, separate from automated and production mock QA. No actual camera/photo-library OS permission, HEIC support or real Provider OCR/CORS claim is made.
 
 ## ChatGPT Baseline
 
-Production main remains a677eca53d2653c7764b845b365d075dced2481a. Local implementation 6c99796f2147d20c3f7baeee234361433ff1ee67 adds shared Food packaging Vision, independent capability probe, strict evidence-backed JSON extraction, local Canvas JPEG processing, kJ/kcal conversion, human review and explicit atomic Food/FoodLog saving. 367/37 tests, typecheck, normal/Pages builds and four-size Vision/AI/DatePicker/Sync mock suites pass. No schema/dependency changes. Unpublished: attachment ends at section 21 / line 686 and the remaining specification is pending. Continue from these local commits without rebuilding from production; complete missing requirements, publish and perform production upgrade checks. Real Vision and physical iPhone Pending.
+Continue from current production main; application baseline 508057ca0f955859975a89dae68efee368378bcc, followed only by the release report. Read AGENTS.md → LATEST_DEV_REPORT.md; UI work also reads UI_INTERACTION_SPEC and AI work AI_ARCHITECTURE. The Food packaging workflow is complete and released: two-role photos, direct Vision extraction, deterministic energy/basis, editable review, duplicate selection and atomic ordinary Food/FoodLog writes. No migrations/dependencies. 377 tests/38 files PASS. Preserve canonical kcal, unknown macros, local business dates, snapshots, frozen V7 compatibility and manual encrypted GitHub Sync. Real Provider/physical iPhone remain Pending.
