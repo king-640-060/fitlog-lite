@@ -85,7 +85,7 @@ h3 { margin-bottom: 5px; font-size: 1rem; }
 .header-date { margin: 7px 0 0; color: var(--text-secondary); font-size: .88rem; }
 .today-topbar { align-items: center; padding-bottom: 13px; }
 .today-topbar h1 { font-size: 1.83rem; font-weight: 760; }
-.today-topbar .header-date { text-wrap: balance; margin-top: 5px; color: var(--text-tertiary); font-size: .79rem; }
+.today-topbar .header-date { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 5px; color: var(--text-tertiary); font-size: .79rem; }
 .topbar-actions { display: flex; gap: 8px; }
 .settings-btn { margin-top: 0; border-color: transparent; background: transparent; color: var(--text-secondary);  }
 .settings-btn.active { background: var(--accent-soft); color: var(--accent-strong); }
