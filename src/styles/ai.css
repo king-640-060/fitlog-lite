@@ -1,0 +1,15 @@
+.ai-note { color: var(--muted); font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
+.ai-profile { display: flex; gap: 12px; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.ai-profile > div:first-child { min-width: 0; overflow-wrap: anywhere; }
+.ai-profile small { display: block; margin-top: 5px; color: var(--muted); }
+.ai-profile-actions { display: flex; flex-shrink: 0; gap: 6px; }
+.ai-profile-actions button { padding: 8px 10px; min-height: 44px; }
+.ai-permissions { border-radius: 18px; padding: 4px 14px; background: var(--surface, #fff); }
+.ai-permissions label { display: flex; align-items: center; justify-content: space-between; gap: 14px; min-height: 48px; }
+.ai-permissions input, .ai-privacy input { width: 20px; height: 20px; accent-color: var(--accent); }
+.ai-settings-tests { display: flex; flex-wrap: wrap; gap: 6px; }
+.ai-settings-tests button { flex: 1; min-width: 100px; min-height: 44px; font-size: 13px; padding: 8px; }
+.ai-privacy { font-size: 13px; padding: 14px; border-radius: 16px; background: var(--accent-soft, #edf4e7); line-height: 1.6; }
+.ai-privacy label { display: flex; flex-direction: row; align-items: center; gap: 8px; min-height: 44px; }
+.ai-status { font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; min-height: 20px; }
+.ai-profile-form input, .ai-profile-form select { min-width: 0; width: 100%; font-size: 16px; }

@@ -1,6 +1,7 @@
-export type IconName = 'home' | 'settings' | 'utensils' | 'dumbbell' | 'scale' | 'plus' | 'x' | 'search' | 'archive' | 'check' | 'trash' | 'edit' | 'download' | 'upload' | 'chevron' | 'calendar' | 'activity' | 'trend' | 'more' | 'leaf' | 'info' | 'sunrise' | 'sun' | 'moon' | 'snack' | 'stairs'
+export type IconName = 'sparkles' | 'home' | 'settings' | 'utensils' | 'dumbbell' | 'scale' | 'plus' | 'x' | 'search' | 'archive' | 'check' | 'trash' | 'edit' | 'download' | 'upload' | 'chevron' | 'calendar' | 'activity' | 'trend' | 'more' | 'leaf' | 'info' | 'sunrise' | 'sun' | 'moon' | 'snack' | 'stairs'
 
 const iconPaths: Record<IconName, string> = {
+  sparkles: '<path d="m12 3 2.3 6.7L21 12l-6.7 2.3L12 21l-2.3-6.7L3 12l6.7-2.3Z"/><path d="M20 2v4M18 4h4"/>',
   home: '<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10M9 20v-6h6v6"/>',
   settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z"/><circle cx="12" cy="12" r="3"/>',
   utensils: '<path d="M3 2v7c0 1.1.9 2 2 2h4c1.1 0 2-.9 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
