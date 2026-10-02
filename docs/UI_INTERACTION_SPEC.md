@@ -185,3 +185,10 @@ Read [INTERACTION_VISUAL_SYSTEM.md](INTERACTION_VISUAL_SYSTEM.md) for implementa
 ### Incremental assistant responses
 
 Ordinary typed, Voice-final and Quick Launch sends use safe incremental text. One keyed bubble updates at most once per frame; busy controls update immediately. Near-bottom follows, upward reading does not. Stop cancels fetch/reader and keeps partial UI outside completed history. Streaming text is not a live-region paragraph; a separate polite status announces completion. Tools execute only from a fully aggregated validated response, and writes still need confirmation. Probes and packaging Vision remain nonstreaming.
+
+## Mobile page reserve and Food density
+
+- App frame reserves top `env(safe-area-inset-top)` once. Topbar owns ordinary spacing; small Food/Workout rows may wrap as complete action groups. Main pages reserve the shared fixed navigation height (including bottom Safe Area) plus breathing room. All five tabs and the final Recent Workout item must remain reachable above navigation.
+- Food Library uses Search + Add first, then two secondary actions: 拍包装录入 / 导入文件. Import opens the existing shared Sheet with 表格文件（CSV） / 数据文件（JSON） and reuses one parsing/preview/confirmation path. Management 导入数据 opens the same chooser. Empty library says 还没有食物 / 拍包装录入，或手动新建; no matches says 没有匹配的食物 and offers Clear Search.
+- Food Editor owns `food-form`: full-width name, brand, reference grams and energy row/unit; quiet energy conversion hint; three equal P/C/F columns at 320/375/390/430 with 8px gaps, no orphan half-cell. Grams stay inside numeric fields. Form gaps12px, inputs46px and16px text, Save48px. Canonical kcal and unit-only energy edits retain existing semantics.
+- Management retains its grouped IA. Consumer AI summary names service and optional separately configured chat/image routes; exact model IDs stay in AI Settings. Local data copy stays concise and still asks for Backup before changing devices or clearing browser data.

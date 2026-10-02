@@ -29,7 +29,6 @@
 .energy-input-row input { min-width: 0; flex: 1; }
 .energy-input-row select { flex: 0 0 82px; }
 .food-energy-preview { color: var(--text-secondary); font-size: 13px; margin: 0; font-variant-numeric: tabular-nums; }
-.import-actions { flex-wrap: wrap; }
 @media (prefers-reduced-motion: reduce) { .food-vision-sheet { animation: none; } }
 
 .vision-images .vision-thumbnail { display: block; width: 100%; padding: 0; border: 0; background: transparent; }

@@ -19,7 +19,8 @@ describe('shared interaction stability', () => {
   })
   it('prevents replay animation, scale presses, focus glow and private sheet viewport code', () => {
     expect(/(^|\n)button:active\s*\{[^}]*transform/.test(css)).toBe(false)
-    expect(css).not.toContain('page-in'); expect(css).not.toContain('backdrop-filter'); expect(css).not.toContain('0 0 0 3px')
+    // Match the animation name, not shared tokens such as --page-inline.
+    expect(css).not.toMatch(/\bpage-in\b/); expect(css).not.toContain('backdrop-filter'); expect(css).not.toContain('0 0 0 3px')
     expect(source).not.toMatch(/querySelector\('dialog'\)\?\.remove/)
     expect(source).not.toMatch(/<input[^>]*autofocus/)
     expect(source).not.toContain('requestAnimationFrame(paint)')

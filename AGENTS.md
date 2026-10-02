@@ -141,6 +141,10 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 - Preserve native text selection, 16px editable text, 44px targets and user scaling.
 - Existing data/business contracts take priority over visual changes. Read `docs/INTERACTION_VISUAL_SYSTEM.md` for shared primitives and boundaries.
 
+- Main-tab content must reserve fixed bottom navigation plus Safe Area. The app shell owns iPhone top Safe Area once; no per-page device-specific top padding.
+- Keep short Chinese actions together; change layout instead of letting one character drop to a new line. Avoid orphan half-width fields in mobile forms.
+- Reduce density through shared spacing while retaining >=44px touch targets and >=16px editable text.
+
 ## Targeted file map
 
 - `src/main.ts`: application state, views, dialogs, event bindings, mobile viewport behavior.

@@ -1,4 +1,4 @@
-.topbar > div:first-child { min-width: 0; }
+.topbar > div:first-child { flex: 1; min-width: 0; }
 .topbar-page-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 2px; }
 .topbar-page-actions .icon-btn { width: 44px; min-width: 44px; min-height: 44px; }
 .topbar-management { color: var(--text-secondary); }
@@ -70,7 +70,7 @@
 .plan-quiet-danger { justify-self: start; min-height: 44px; padding: 0 5px; border: 0; background: transparent; color: var(--danger); font-size: .83rem; font-weight: 650; }
 
 .task-editor-sheet .modal-body { padding-bottom: calc(18px + env(safe-area-inset-bottom)); }
-.task-editor { display: grid; gap: 17px; padding-bottom: 8px; }
+.task-editor { display: grid; gap: var(--group-gap); padding-bottom: 8px; }
 .task-title-field, .task-note-field, .task-editor-section label { display: grid; gap: 7px; color: var(--text-secondary); font-size: .82rem; font-weight: 650; }
 .task-title-field input { min-height: 52px; font-size: 1.05rem; }
 .task-tag-suggestions { overflow: hidden; margin-top: -10px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-soft); }

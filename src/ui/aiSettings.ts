@@ -14,7 +14,12 @@ export interface AiSettingsUi { openModal: (title: string, body: string, wide?: 
 export const AI_SCOPE_LABELS: Record<AiScope, string> = { food: '饮食', training: '训练', weight: '体重', plan: '计划', habit: '习惯', nutritionTargets: '营养目标' }
 export const AI_PRIVACY_TEXT = 'AI 功能会把你的提问，以及完成当前请求所需的 FitLog 数据发送给你配置的 AI 服务商。FitLog 不会自动上传整个数据库。'
 export const AI_CREDENTIAL_TEXT = 'API Key 只保存在当前设备浏览器。本模式适用于你自己的私人 FitLog；同源脚本和浏览器环境理论上能够访问该凭据。'
-export function aiSettingsDetail(profiles = new AiProfiles()): string { const active = profiles.active; return active ? `已连接 · ${active.name} · ${active.model}` : '连接你自己的 AI 服务' }
+export function aiSettingsDetail(profiles = new AiProfiles()): string {
+  const active = profiles.active
+  if (!active) return '连接你自己的 AI 服务'
+  const service = active.preset === 'zhipu' ? '智谱' : '自定义服务'
+  return `已连接 · ${service}${active.visionModel ? ' · 对话与图片已配置' : ''}`
+}
 const capability = (value: AiProviderProfile['toolCapability']) => value === 'supported' ? '已验证' : value === 'unsupported' ? '未支持' : '待验证'
 export function showAiSettings(ui: AiSettingsUi, profiles = new AiProfiles()): void {
   const dialog = ui.openModal('AI 设置', '<div id="ai-settings"></div>', true)
