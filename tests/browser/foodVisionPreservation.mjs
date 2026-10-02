@@ -13,13 +13,17 @@ try {
   await page.waitForSelector('#open-management')
   if (phase === 'after') {
     await page.evaluate(async () => { const registration = await navigator.serviceWorker.getRegistration(); await registration?.update() })
+    const expectedScript = process.env.FITLOG_STABILIZATION_QA === '1' ? fs.readFileSync('dist/index.html', 'utf8').match(/assets\/([^"/]+\.js)/)[1] : undefined
     for (let attempt = 0; attempt < 10; attempt++) {
-      await page.locator('[data-tab=food]').click(); await page.locator('#food-library').click()
-      await page.waitForSelector('dialog .library-list') // Food Library opens after its asynchronous IndexedDB read.
-      if (await page.locator('#food-vision-import').count()) break
-      await page.locator('dialog [data-close]').click(); await page.waitForTimeout(1500); await page.reload({ waitUntil: 'networkidle' })
+      const actualScript = await page.locator('script[type=module][src]').getAttribute('src')
+      if (!expectedScript || actualScript?.endsWith(expectedScript)) break
+      await page.waitForTimeout(1500); await page.reload({ waitUntil: 'networkidle' })
     }
-    assert.equal(await page.locator('#food-vision-import').count(), 1, 'new application must actually run in the old profile')
+    if (expectedScript) assert.ok((await page.locator('script[type=module][src]').getAttribute('src')).endsWith(expectedScript), 'the exact new application must run under the old Service Worker profile')
+    await page.locator('[data-tab=food]').click(); await page.locator('#food-library').click()
+    await page.waitForSelector('dialog .library-list')
+    assert.equal(await page.locator('#food-vision-import').count(), 1)
+    if (expectedScript) assert.equal(await page.locator('dialog').getAttribute('data-sheet-variant'), 'large')
     await page.locator('#food-vision-import').click(); await page.waitForSelector('#vision-camera-file', { state: 'attached' })
     assert.equal(await page.locator('#vision-album-file').getAttribute('capture'), null)
     await page.locator('dialog [data-close]').click()
