@@ -14,7 +14,7 @@ Mobile Layout / Information Density Audit implemented and production verified. F
 | REPORT_COMMIT / final main / production HEAD |This report commit; exact SHA/Actions/Pages receipt in final artifact and `git log -1 --format=%H -- LATEST_DEV_REPORT.md`|
 | Production |https://king-640-060.github.io/fitlog-lite/|
 
-Normal HTTPS fast-forward push succeeded. No history rewrite or publishing workaround. Report-only release keeps identical application assets.
+Application commits used normal HTTPS fast-forward push. Report HTTPS push timed out; report publication uses the verified GitHub Git Data API fallback with exact blob/tree/commit hashes, exact-parent checks and force:false. No history rewrite. Report-only release keeps identical application assets.
 
 ## Delivered behavior
 

@@ -80,6 +80,10 @@ DATE: 2026-10-02. Production: https://king-640-060.github.io/fitlog-lite/.
 |index-BC5K5E_w.js|684958|215911|f0a6804a02c6bc17149ce2e0e98fa477b4f35d7f9f5108517c646a20b95eb07a|
 |index-CRvGw-68.css|104999|18790|e7b33e4d1f1b72fc37fb105c384866306c632b3628d5929d1dab011936663dcb|
 
+## Release transport
+
+Application commits used normal HTTPS push. Report HTTPS push timed out; verified GitHub Git Data API publication preserved exact blob/tree/commit hashes and checked the remote parent again before force:false fast-forward. No reset/amend/force push or history rewrite.
+
 ## Automated Verification
 
 QA_FIX_COMMIT / final application END is bed79ecdd0e95c6a3956f2c1c0a95a2d3ac79329: compact Today header metadata now stays on one line with accessible full text and visual ellipsis.
