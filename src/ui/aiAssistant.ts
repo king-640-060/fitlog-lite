@@ -1,3 +1,4 @@
+import { setSheetVariant } from './sheetController'
 import { AiOrchestrator, AI_CHAT_ONLY_MESSAGE } from '../ai/orchestrator'
 import { AI_LIMITS } from '../ai/security'
 import { showAiSettings, AI_PRIVACY_TEXT, type AiSettingsUi } from './aiSettings'
@@ -7,7 +8,7 @@ import { icon } from './icons'
 export interface AiAssistantUi extends AiSettingsUi { beforeOpen?: () => Promise<void>; openFoodLibrary?: () => void; openFoodVision?: () => void }
 export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi): void {
   const dialog = ui.openModal('AI 助手', '<div class="ai-assistant"></div>', true)
-  dialog.classList.add('ai-assistant-sheet')
+  dialog.classList.add('ai-assistant-sheet'); setSheetVariant(dialog, 'assistant')
   const host = dialog.querySelector<HTMLElement>('.ai-assistant')!, active = engine.profiles.active
   host.innerHTML = `<div class="ai-assistant-toolbar"><div class="ai-current-profile"></div><button class="text-btn" id="ai-assistant-settings">设置</button><button class="text-btn" id="ai-clear-chat">清空</button></div><div class="ai-conversation" role="log" aria-label="AI 对话" aria-live="polite"></div><div class="ai-session-usage"></div><form class="ai-composer">${ui.openFoodVision ? `<button class="secondary ai-camera" id="ai-food-camera" type="button" aria-label="拍包装录入">${icon('camera', 18)}</button>` : ''}<label class="sr-only" for="ai-message-input">向 AI 助手提问</label><textarea id="ai-message-input" rows="1" maxlength="${AI_LIMITS.userChars}" placeholder="提问，或描述记录" enterkeyhint="enter"></textarea><button class="primary" type="submit" id="ai-send">发送</button><button class="secondary" type="button" id="ai-stop" hidden>停止</button></form><p class="ai-footer-note">AI 建议需要确认后才会写入。</p>`
   host.querySelector<HTMLElement>('.ai-current-profile')!.textContent = active ? `${active.name} · ${active.model}` : '尚未连接 AI 服务'
@@ -15,12 +16,6 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi): void
   const sendButton = host.querySelector<HTMLButtonElement>('#ai-send')!, stopButton = host.querySelector<HTMLButtonElement>('#ai-stop')!
   const usage = host.querySelector<HTMLElement>('.ai-session-usage')!
   const openSettings = () => { dialog.close(); showAiSettings({ ...ui, changed: () => { engine.settingsChanged(); ui.changed?.() } }, engine.profiles) }
-  const updateViewport = () => {
-    const viewport = window.visualViewport
-    dialog.style.setProperty('--ai-viewport-height', `${Math.max(120, (viewport?.height ?? window.innerHeight) - 12)}px`)
-    dialog.style.bottom = `${Math.max(0, window.innerHeight - ((viewport?.height ?? window.innerHeight) + (viewport?.offsetTop ?? 0)))}px`
-  }
-  window.visualViewport?.addEventListener('resize', updateViewport); window.visualViewport?.addEventListener('scroll', updateViewport); window.addEventListener('resize', updateViewport); updateViewport()
   let composing = false
   const grow = () => { textarea.style.height = 'auto'; textarea.style.height = `${Math.min(120, Math.max(44, textarea.scrollHeight))}px` }
   textarea.addEventListener('input', () => { grow(); sendButton.disabled = engine.busy || !textarea.value.trim() || !engine.profiles.active || !engine.profiles.privacyAcknowledged })
@@ -100,7 +95,6 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi): void
   engine.onChange = draw; draw()
   dialog.addEventListener('close', () => {
     engine.stop(); if (engine.onChange === draw) engine.onChange = undefined
-    window.visualViewport?.removeEventListener('resize', updateViewport); window.visualViewport?.removeEventListener('scroll', updateViewport); window.removeEventListener('resize', updateViewport)
   }, { once: true })
   dialog.querySelector('[data-close]')!.innerHTML = icon('x')
 }

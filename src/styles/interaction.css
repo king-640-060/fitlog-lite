@@ -1,0 +1,14 @@
+/* Shared interaction policy. Modality is explicit so Safari touch focus stays quiet. */
+:root { --focus-ring: var(--accent-mid); --press-bg: color-mix(in srgb, var(--text-primary) 6%, var(--surface-soft)); --control-radius: 12px; --control-height: 44px; --sheet-radius: 26px; }
+:where(button, a, summary, [role="button"], label:has(input), label:has(select)) { -webkit-tap-highlight-color: transparent; }
+:where(button, a, summary, [role="button"]):active { background-color: var(--press-bg); }
+.primary:active { background-color: var(--accent-pressed); }
+:where(.text-btn, .sheet-link):active { opacity: .7; background: transparent; }
+.food-date-item:active { background: transparent; }
+input:focus, textarea:focus, select:focus { border-color: var(--accent-mid); box-shadow: none; }
+html[data-input-modality="pointer"] :is(button, a, summary, [role="button"], input, textarea, select):focus { outline: none; box-shadow: none; }
+html[data-input-modality="keyboard"] :is(button, a, summary, [role="button"], input, textarea, select, [tabindex="0"]):focus { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.sheet-focus-anchor:focus { outline: none; }
+html[data-input-modality="keyboard"] .habit-target-row:focus-within { outline: 2px solid var(--focus-ring); outline-offset: 2px; border-radius: var(--control-radius); }
+html[data-input-modality="keyboard"] .habit-weekday-option input:focus + span { outline: 2px solid var(--focus-ring); outline-offset: 1px; }
+html[data-input-modality="pointer"] .habit-weekday-option input:focus + span { outline: none; }

@@ -1,3 +1,7 @@
+import { setupInputModality } from './ui/inputModality'
+import { openSheet, presentDialog, setupSheetViewport } from './ui/sheetController'
+import './styles/interaction.css'
+import './styles/sheets.css'
 import { mountDatePicker, datePickerLabel, type DatePickerController } from './ui/datePicker'
 import { showGitHubSync, githubSyncDetail } from './ui/githubSync'
 import './styles/main.css'
@@ -146,36 +150,7 @@ function formatBackupTime(value: string | null): string {
   }).format(date)
 }
 
-function setupMobileViewport(): void {
-  const viewport = window.visualViewport
-  if (!viewport) return
-
-  type EditableControl = HTMLInputElement | HTMLTextAreaElement
-  const isEditableControl = (value: Element | null): value is EditableControl => (
-    value instanceof HTMLInputElement || value instanceof HTMLTextAreaElement
-  )
-
-  const update = () => {
-    const keyboardOpen = isEditableControl(document.activeElement) && viewport.height < window.innerHeight - 120
-    const keyboardOverlap = keyboardOpen ? Math.max(0, window.innerHeight - viewport.height) : 0
-    document.body.classList.toggle('keyboard-open', keyboardOpen)
-    document.documentElement.style.setProperty('--visual-viewport-height', `${viewport.height}px`)
-    document.documentElement.style.setProperty('--keyboard-overlap', `${keyboardOverlap}px`)
-  }
-  viewport.addEventListener('resize', update)
-  document.addEventListener('focusin', (event) => {
-    const target = event.target instanceof Element ? event.target : null
-    if (!isEditableControl(target)) return
-    update()
-  })
-  document.addEventListener('focusout', () => {
-    window.requestAnimationFrame(() => {
-      if (isEditableControl(document.activeElement)) return
-      update()
-    })
-  })
-  update()
-}
+function setupMobileViewport(): void { setupInputModality(); setupSheetViewport() }
 
 function toast(message: string, tone: 'normal' | 'error' = 'normal'): void {
   document.querySelector('.toast')?.remove()
@@ -208,18 +183,7 @@ async function flushWorkoutAutosave(workout?: Workout): Promise<void> {
   await workoutAutosave.flush(workout)
 }
 
-function openModal(title: string, body: string, wide = false): HTMLDialogElement {
-  document.querySelector('dialog')?.remove()
-  const dialog = document.createElement('dialog')
-  dialog.className = wide ? 'sheet sheet-wide' : 'sheet'
-  dialog.innerHTML = `<div class="sheet-handle" aria-hidden="true"></div><div class="modal-head"><h2>${esc(title)}</h2><button class="icon-btn quiet" data-close aria-label="关闭">${icon('x')}</button></div><div class="modal-body">${body}</div>`
-  document.body.append(dialog)
-  dialog.querySelector('[data-close]')?.addEventListener('click', () => dialog.close())
-  dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close() })
-  dialog.addEventListener('close', () => dialog.remove())
-  dialog.showModal()
-  return dialog
-}
+function openModal(title: string, body: string, wide = false): HTMLDialogElement { return openSheet(esc(title), body, icon('x'), wide) }
 
 function showBusinessDatePicker(title: string, date: string, commit: (date: string) => void): void {
   const dialog = openModal(title, '<div id="business-date-picker"></div>')
@@ -236,12 +200,11 @@ function confirmAction(title: string, message: string, confirmLabel = '确认删
     const dialog = document.createElement('dialog')
     dialog.className = 'confirm-dialog'
     dialog.innerHTML = `<div class="confirm-mark ${danger ? 'danger-mark' : ''}">${icon(danger ? 'trash' : 'check', 24)}</div><h2>${esc(title)}</h2><p>${esc(message)}</p><div class="dialog-actions"><button data-cancel>${esc(cancelLabel)}</button><button class="${danger ? 'danger-solid' : 'primary'}" data-confirm>${esc(confirmLabel)}</button></div>`
-    document.body.append(dialog)
     let result = false
     dialog.querySelector('[data-cancel]')?.addEventListener('click', () => dialog.close())
     dialog.querySelector('[data-confirm]')?.addEventListener('click', () => { result = true; dialog.close() })
     dialog.addEventListener('close', () => { dialog.remove(); resolve(result) }, { once: true })
-    dialog.showModal()
+    presentDialog(dialog, true)
   })
 }
 
@@ -250,11 +213,10 @@ function chooseNutritionTargetConflict(): Promise<'preserve' | 'replace' | undef
     const dialog = document.createElement('dialog')
     dialog.className = 'confirm-dialog'
     dialog.innerHTML = `<div class="confirm-mark">${icon('activity', 24)}</div><h2>这一天已经有营养目标</h2><p>添加食物记录时，要保留现有目标，还是使用模板中的目标？</p><div class="dialog-actions"><button data-choice="preserve">保留现有目标</button><button class="primary" data-choice="replace">使用模板目标</button></div>`
-    document.body.append(dialog)
     let choice: 'preserve' | 'replace' | undefined
     dialog.querySelectorAll<HTMLButtonElement>('[data-choice]').forEach((button) => button.addEventListener('click', () => { choice = button.dataset.choice as 'preserve' | 'replace'; dialog.close() }))
     dialog.addEventListener('close', () => { dialog.remove(); resolve(choice) }, { once: true })
-    dialog.showModal()
+    presentDialog(dialog, true)
   })
 }
 
@@ -464,7 +426,6 @@ async function renderTodayPage(): Promise<void> {
     <section class="today-card today-activity-card weight-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon weight-icon">${icon('scale', 19)}</span><h2>体重</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 15)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(weightState.status)}</strong><span class="today-activity-meta">${esc(weightState.meta)}</span></div><button class="secondary today-activity-action" id="today-record-weight">${esc(weightState.action)}</button></div></section>
     <section class="today-card today-activity-card pelvic-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon pelvic-icon">${icon('leaf', 19)}</span><h2>凯格尔训练</h2></div><button class="text-btn" id="today-pelvic-history">训练记录 ${icon('chevron', 15)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(pelvicState.status)}</strong><span class="today-activity-meta">${esc(pelvicState.meta)}</span></div><button class="secondary today-activity-action" id="today-pelvic">${esc(pelvicState.action)}</button></div></section>
     ${todayHabitCardHtml(habits, habitCheckIns, today)}`
-  animateNutritionRings(view)
   view.querySelector('#today-food-details')?.addEventListener('click', () => { activeTab = 'food'; foodDate = today; void render().catch(fail) })
   view.querySelector('#today-workout')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = openWorkout; workoutEditorOpen = Boolean(openWorkout); void render().catch(fail) })
   view.querySelector('#today-weight-details')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; void render().catch(fail) })
@@ -711,7 +672,7 @@ async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> 
   }
   const applyTag = (tag: TaskTag, restoreTitleFocus = true) => {
     if (!selectedTagIds.includes(tag.id)) selectedTagIds.push(tag.id)
-    if (activeQuery) { const replacement = replaceActiveHashtagQuery(title.value, activeQuery); title.value = replacement.text; if (restoreTitleFocus) title.focus(); title.setSelectionRange(replacement.caret, replacement.caret) }
+    if (activeQuery) { const replacement = replaceActiveHashtagQuery(title.value, activeQuery); title.value = replacement.text; if (restoreTitleFocus) title.focus({ preventScroll: true }); title.setSelectionRange(replacement.caret, replacement.caret) }
     activeQuery = undefined; suggestions.hidden = true; title.setAttribute('aria-expanded', 'false'); renderChips()
   }
   const updateSuggestions = () => {
@@ -765,7 +726,7 @@ async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> 
   const returnToForm = () => {
     picker?.destroy(); picker = undefined; pickerView.hidden = true; form.hidden = false
     dialog.querySelector('h2')!.textContent = task ? '编辑任务' : '新建任务'
-    dateTrigger.focus({ preventScroll: true })
+    if (document.documentElement.dataset.inputModality === 'keyboard') dateTrigger.focus({ preventScroll: true })
   }
   dateTrigger.addEventListener('click', () => {
     form.hidden = true; pickerView.hidden = false; dialog.querySelector('h2')!.textContent = '选择任务日期'
@@ -793,7 +754,6 @@ async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> 
     if (!task || !await confirmAction('删除这个任务？', '删除后无法恢复。', '删除任务')) return
     try { await deleteTask(task.id); dialog.close(); if (activeTab === 'plan') await renderPlanPage(); else await refreshTodayPlanCard() } catch (error) { fail(error) }
   })
-  window.requestAnimationFrame(() => { if (dialog.isConnected) title.focus() })
 }
 
 function showManagementHub(): void {
@@ -896,12 +856,13 @@ interface PreviousRingValue { actual: number; goal?: number }
 
 function ringSvgHtml(actual: number, goal: number | undefined, size: 'large' | 'small' | 'tiny', previous?: PreviousRingValue): string {
   const progress = getGoalProgress(actual, goal)
-  const before = previous ? getGoalProgress(previous.actual, previous.goal) : getGoalProgress(0, goal)
+  void previous
+  const before = progress
   const mainLength = 2 * Math.PI * 40
   const outerLength = 2 * Math.PI * 49
   const mainStart = mainLength * (1 - before.main)
   const outerStart = outerLength * (1 - before.outer)
-  const crossed = previous && before.main < 1 && progress.main === 1 ? ' goal-crossed' : ''
+  const crossed = ''
   return `<svg class="goal-ring ${size} ${progress.state}${crossed}" viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-track" cx="60" cy="60" r="40"/><circle class="ring-main" cx="60" cy="60" r="40" stroke-dasharray="${mainLength}" stroke-dashoffset="${mainStart}" data-final-offset="${mainLength * (1 - progress.main)}"/><circle class="ring-outer-track" cx="60" cy="60" r="49"/><circle class="ring-outer" cx="60" cy="60" r="49" stroke-dasharray="${outerLength}" stroke-dashoffset="${outerStart}" data-final-offset="${outerLength * (1 - progress.outer)}"/></svg>`
 }
 
@@ -918,37 +879,9 @@ function nutritionMetricHtml(key: string, label: string, actual: number, target:
   const progress = getGoalProgress(actual, target)
   const amount = target === undefined ? `${formatNumber(actual)}g` : `${formatNumber(actual)} / ${formatNumber(target)}g`
   const status = progress.state === 'above' ? `<small class="metric-excess">+${formatNumber(progress.excess)}g</small>` : progress.state === 'reached' ? '<small>已达目标</small>' : progress.state === 'unset' ? '<small>未设目标</small>' : ''
-  return `<span class="nutrition-metric ${key}" data-progress-key="${key}" data-actual="${actual}" ${target === undefined ? '' : `data-goal="${target}"`} aria-label="${label} ${amount} ${goalStatusText(actual, target, 'g')}"><b>${label}</b>${ringSvgHtml(actual, target, 'small', previous)}<span class="macro-value" aria-hidden="true"><span data-count-from="${previous?.actual ?? 0}" data-count-to="${actual}">${formatNumber(previous?.actual ?? 0)}</span>${target === undefined ? 'g' : ` / ${formatNumber(target)}g`}</span>${status}</span>`
+  return `<span class="nutrition-metric ${key}" data-progress-key="${key}" data-actual="${actual}" ${target === undefined ? '' : `data-goal="${target}"`} aria-label="${label} ${amount} ${goalStatusText(actual, target, 'g')}"><b>${label}</b>${ringSvgHtml(actual, target, 'small', previous)}<span class="macro-value" aria-hidden="true"><span data-count-from="${previous?.actual ?? 0}" data-count-to="${actual}">${formatNumber(actual)}</span>${target === undefined ? 'g' : ` / ${formatNumber(target)}g`}</span>${status}</span>`
 }
 
-function animateNutritionRings(root: HTMLElement): void {
-  const rings = root.querySelectorAll<SVGCircleElement>('[data-final-offset]')
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  const applyFinal = () => rings.forEach((ring) => ring.style.strokeDashoffset = ring.dataset.finalOffset ?? '')
-  if (reduced) applyFinal()
-  else window.requestAnimationFrame(() => { if (root.isConnected) applyFinal() })
-}
-
-function animateNutritionNumber(root: HTMLElement, durationOverride?: number): void {
-  const numbers = [...root.querySelectorAll<HTMLElement>('[data-count-to]')]
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  const start = performance.now()
-  const duration = durationOverride ?? (numbers.some((element) => Number(element.dataset.countFrom) > 0) ? 300 : 550)
-  const paint = (now: number) => {
-    if (!root.isConnected) return
-    const elapsed = Math.min(1, (now - start) / duration)
-    const eased = 1 - (1 - elapsed) ** 3
-    numbers.forEach((element) => {
-      const from = Number(element.dataset.countFrom)
-      const to = Number(element.dataset.countTo)
-      const value = from + (to - from) * eased
-      element.textContent = element.hasAttribute('data-count-integer') ? String(Math.round(value)) : formatNumber(value)
-    })
-    if (elapsed < 1) window.requestAnimationFrame(paint)
-  }
-  if (reduced) numbers.forEach((element) => { element.textContent = element.hasAttribute('data-count-integer') ? element.dataset.countTo ?? '0' : formatNumber(Number(element.dataset.countTo)) })
-  else window.requestAnimationFrame(paint)
-}
 
 function foodLogRowHtml(log: FoodLog): string {
   return `<article class="food-row"><button class="food-row-main" data-edit-log="${esc(log.id)}" aria-label="编辑 ${esc(log.foodName)}"><span><strong>${esc(log.foodName)}</strong><small>${log.brand ? `${esc(log.brand)} · ` : ''}${formatNumber(log.grams)} g</small></span><span class="food-kcal"><strong>${formatNumber(log.totalCalories)} <small>kcal</small></strong></span></button><details class="row-menu"><summary aria-label="${esc(log.foodName)}更多操作">···</summary><div><button data-delete-log="${esc(log.id)}">删除记录</button></div></details></article>`
@@ -1203,7 +1136,7 @@ async function renderFoodPage(): Promise<void> {
   const groups = groupFoodLogs(logs)
   const completionStrip = target ? foodCompletionStripHtml(requestedDate, getNutritionCompletionSummary(target, logs)) : ''
   const slotHtml = `<div class="food-content-body" data-food-date="${requestedDate}">
-    <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="food-calorie-row"><div class="calorie-gauge" data-progress-key="calories" data-actual="${totals.calories}" ${calorieTarget === undefined ? '' : `data-goal="${calorieTarget}"`} aria-label="热量 ${calorieAmount} ${goalStatusText(totals.calories, calorieTarget, 'kcal')}">${ringSvgHtml(totals.calories, calorieTarget, 'large', previous.get('calories'))}<div class="calorie-gauge-center"><strong data-count-from="${previous.get('calories')?.actual ?? 0}" data-count-to="${totals.calories}">${formatNumber(previous.get('calories')?.actual ?? 0)}</strong><small>kcal</small></div></div><div class="calorie-gauge-caption"><span>当日摄入</span>${calorieTarget === undefined ? '<strong>按自己的节奏记录</strong>' : `<strong>目标 ${formatNumber(calorieTarget)} kcal</strong>`}<span class="${getGoalProgress(totals.calories, calorieTarget).state === 'above' ? 'metric-excess' : ''}">${goalStatusText(totals.calories, calorieTarget, 'kcal')}</span></div></div><div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div>${completionStrip}</section>
+    <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="food-calorie-row"><div class="calorie-gauge" data-progress-key="calories" data-actual="${totals.calories}" ${calorieTarget === undefined ? '' : `data-goal="${calorieTarget}"`} aria-label="热量 ${calorieAmount} ${goalStatusText(totals.calories, calorieTarget, 'kcal')}">${ringSvgHtml(totals.calories, calorieTarget, 'large', previous.get('calories'))}<div class="calorie-gauge-center"><strong data-count-from="${previous.get('calories')?.actual ?? 0}" data-count-to="${totals.calories}">${formatNumber(totals.calories)}</strong><small>kcal</small></div></div><div class="calorie-gauge-caption"><span>当日摄入</span>${calorieTarget === undefined ? '<strong>按自己的节奏记录</strong>' : `<strong>目标 ${formatNumber(calorieTarget)} kcal</strong>`}<span class="${getGoalProgress(totals.calories, calorieTarget).state === 'above' ? 'metric-excess' : ''}">${goalStatusText(totals.calories, calorieTarget, 'kcal')}</span></div></div><div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div>${completionStrip}</section>
     <section class="food-meals-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '按餐次记录，更清楚'}</span></div>${logs.length ? '<button class="food-save-template" id="save-day-diet-template" type="button" aria-label="将当天饮食保存为模板">保存为模板</button>' : ''}</section>
     <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday)).join('')}</div></div>`
   let rail = view.querySelector<HTMLElement>('.food-date-rail')
@@ -1222,8 +1155,6 @@ async function renderFoodPage(): Promise<void> {
   view.dataset.foodContentDate = requestedDate
   const body = content.firstElementChild as HTMLElement
   if (firstAppearance || previousDate === requestedDate) {
-    animateNutritionRings(body)
-    animateNutritionNumber(body)
   } else {
     body.querySelectorAll<SVGCircleElement>('[data-final-offset]').forEach((ring) => { ring.style.strokeDashoffset = ring.dataset.finalOffset ?? '' })
     body.querySelectorAll<HTMLElement>('[data-count-to]').forEach((number) => { number.textContent = formatNumber(Number(number.dataset.countTo)) })
@@ -1364,7 +1295,7 @@ async function showAddFoodLog(meal: MealType): Promise<void> {
     results.querySelectorAll<HTMLButtonElement>('[data-food]').forEach((button) => button.addEventListener('click', () => {
       const food = foods.find((item) => item.id === button.dataset.food)!
       dialog.querySelector('.modal-head h2')!.textContent = `记录${mealNames[meal]} · ${food.name}`
-      dialog.querySelector('.modal-body')!.innerHTML = `<form id="log-food-form" class="form quantity-form"><div class="selected-food"><span>每 ${formatNumber(food.referenceGrams)}g</span><strong>${formatNumber(food.calories)} kcal</strong></div><label class="quantity-label">吃了多少？<span class="quantity-input"><input name="grams" id="grams" type="number" inputmode="decimal" min="0.1" step="0.1" placeholder="230" required autofocus><b>g</b></span></label><div class="preview-number"><span>预计热量</span><strong id="kcal-preview">— kcal</strong></div><button class="primary" type="submit">添加</button></form>`
+      dialog.querySelector('.modal-body')!.innerHTML = `<form id="log-food-form" class="form quantity-form"><div class="selected-food"><span>每 ${formatNumber(food.referenceGrams)}g</span><strong>${formatNumber(food.calories)} kcal</strong></div><label class="quantity-label">吃了多少？<span class="quantity-input"><input name="grams" id="grams" type="number" inputmode="decimal" min="0.1" step="0.1" placeholder="230" required><b>g</b></span></label><div class="preview-number"><span>预计热量</span><strong id="kcal-preview">— kcal</strong></div><button class="primary" type="submit">添加</button></form>`
       const input = dialog.querySelector<HTMLInputElement>('#grams')!
       input.addEventListener('input', () => {
         const grams = Number(input.value)
@@ -2238,7 +2169,7 @@ async function renderWeightPage(withProgressTabs = false): Promise<void> {
 
 function showWeightForm(date: string, value?: number): void {
   const title = value === undefined ? date === getLocalDateString() ? '今日体重' : '记录体重' : '编辑体重'
-  const dialog = openModal(title, `<form id="weight-sheet-form" class="form weight-sheet-form"><p>${formatHeaderDate(date)}</p><label class="weight-input"><span class="sr-only">体重（千克）</span><input name="weight" type="number" inputmode="decimal" min="0.1" step="0.1" value="${value ?? ''}" placeholder="72.4" required autofocus><b>kg</b></label><button class="primary" type="submit">保存</button></form>`)
+  const dialog = openModal(title, `<form id="weight-sheet-form" class="form weight-sheet-form"><p>${formatHeaderDate(date)}</p><label class="weight-input"><span class="sr-only">体重（千克）</span><input name="weight" type="number" inputmode="decimal" min="0.1" step="0.1" value="${value ?? ''}" placeholder="72.4" required><b>kg</b></label><button class="primary" type="submit">保存</button></form>`)
   dialog.querySelector<HTMLFormElement>('#weight-sheet-form')?.addEventListener('submit', async (event) => { event.preventDefault(); try { await upsertWeight(date, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'weight')); dialog.close(); toast('已保存'); await render() } catch (error) { fail(error) } })
 }
 

@@ -103,10 +103,9 @@ export function mountDatePicker(host: HTMLElement, options: DatePickerOptions): 
     else if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); choose(state.focused); render(true) }
   }, { signal: events.signal })
   render()
-  const frame = requestAnimationFrame(() => { if (host.isConnected && !events.signal.aborted) render(true) })
   return {
     value: () => state.selected,
     setValue: date => { state.select(date); render() },
-    destroy: () => { events.abort(); cancelAnimationFrame(frame); host.replaceChildren() },
+    destroy: () => { events.abort(); host.replaceChildren() },
   }
 }

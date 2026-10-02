@@ -35,9 +35,7 @@ export function showFoodVisionImport(ui: FoodVisionImportUi, context: { date: st
   let controller: AbortController | undefined, generation = 0, busy = false, pending: FoodVisionWrite | undefined, savedFood: Food | undefined, netGrams: number | undefined, acknowledged = visionPrivacyAcknowledged(), reviewWasEdited = false
   const errorText = (error: unknown) => error instanceof AiError ? safeAiError(error) : error instanceof Error ? error.message : '操作未完成，请重试'
   const status = (message: string) => { const node = host.querySelector<HTMLElement>('.vision-status'); if (node) node.textContent = message }
-  const updateViewport = () => { dialog.style.setProperty('--vision-height', `${Math.max(120, (window.visualViewport?.height ?? innerHeight) - 12)}px`); dialog.style.bottom = `${Math.max(0, innerHeight - ((window.visualViewport?.height ?? innerHeight) + (window.visualViewport?.offsetTop ?? 0)))}px` }
-  visualViewport?.addEventListener('resize', updateViewport); visualViewport?.addEventListener('scroll', updateViewport); window.addEventListener('resize', updateViewport); updateViewport()
-  dialog.addEventListener('close', () => { generation++; controller?.abort(); pending?.cancel(); images = []; extraction = undefined; visualViewport?.removeEventListener('resize', updateViewport); visualViewport?.removeEventListener('scroll', updateViewport); window.removeEventListener('resize', updateViewport) }, { once: true })
+  dialog.addEventListener('close', () => { generation++; controller?.abort(); pending?.cancel(); images = []; extraction = undefined }, { once: true })
   const bindSettings = () => host.querySelector('#vision-settings')?.addEventListener('click', () => { dialog.close(); ui.openSettings() })
   const setBusy = (value: boolean) => { busy = value; host.querySelectorAll<HTMLButtonElement | HTMLInputElement | HTMLSelectElement>('button, input, select').forEach(node => { if (node.id !== 'vision-stop') node.disabled = value }); const stop = host.querySelector<HTMLElement>('#vision-stop'); if (stop) stop.hidden = !value }
   const selectedImages = () => images.filter((image): image is PreparedVisionImage => !!image)
@@ -49,7 +47,7 @@ export function showFoodVisionImport(ui: FoodVisionImportUi, context: { date: st
     preserved.forEach(({ node }) => { node.hidden = true })
     const viewer = document.createElement('section'); viewer.className = 'vision-image-view'
     viewer.innerHTML = `<button type="button" class="text-btn">返回核对</button><p class="vision-note">可使用浏览器缩放查看数字。</p><img src="${image.dataUrl}" alt="营养成分表原图">`
-    host.append(viewer); viewer.querySelector('button')!.addEventListener('click', () => { viewer.remove(); preserved.forEach(({ node, hidden }) => { node.hidden = hidden }); button.focus() })
+    host.append(viewer); viewer.querySelector('button')!.addEventListener('click', () => { viewer.remove(); preserved.forEach(({ node, hidden }) => { node.hidden = hidden }); button.focus({ preventScroll: true }) })
   }))
   const choose = () => {
     const title = dialog.querySelector('h2'); if (title) title.textContent = context.meal ? '拍包装并记录' : '拍包装录入'

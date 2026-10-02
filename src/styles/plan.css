@@ -24,9 +24,7 @@
 .plan-filter-button.is-active { max-width: clamp(90px, 30vw, 130px); padding-inline: 9px; border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border)); background: var(--accent-soft); color: var(--accent-strong); }
 .plan-filter-clear { width: 44px; padding: 0; }
 .plan-filter-button:active, .plan-filter-button:focus-visible, .plan-filter-clear:active, .plan-filter-clear:focus-visible { background: var(--surface-soft); }
-@media (hover: hover) {
-  .plan-filter-button:hover, .plan-filter-clear:hover { background: var(--surface-soft); }
-}
+@media (hover: hover) and (pointer: fine) { .plan-filter-button:hover, .plan-filter-clear:hover { background: var(--surface-soft); } }
 .plan-list-section { display: grid; gap: 8px; }
 .plan-list-section h3 { margin: 0 2px; color: var(--text-secondary); font-size: .8rem; font-weight: 650; }
 .plan-task-group { overflow: hidden; border: 1px solid var(--border); border-radius: 17px; background: var(--surface); }

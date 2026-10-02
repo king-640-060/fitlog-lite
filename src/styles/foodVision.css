@@ -1,5 +1,3 @@
-.food-vision-sheet { max-height: var(--vision-height, calc(100dvh - 12px)); }
-.food-vision-sheet .modal-body { max-height: calc(var(--vision-height, 100dvh) - 82px - env(safe-area-inset-bottom)); }
 .food-vision { display: grid; gap: 16px; min-width: 0; }
 .food-vision p { margin: 0; line-height: 1.65; overflow-wrap: anywhere; }
 .vision-note, .vision-status { color: var(--text-secondary); font-size: 13px; }
