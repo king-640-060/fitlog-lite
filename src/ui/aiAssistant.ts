@@ -4,12 +4,12 @@ import { showAiSettings, AI_PRIVACY_TEXT, type AiSettingsUi } from './aiSettings
 import { aiProposalPreviewLines, aiProposalStatusLabels, aiSuggestionPrompts, aiUsageText, shouldSendAiShortcut } from './aiUiHelpers'
 import { icon } from './icons'
 
-export interface AiAssistantUi extends AiSettingsUi { beforeOpen?: () => Promise<void>; openFoodLibrary?: () => void }
+export interface AiAssistantUi extends AiSettingsUi { beforeOpen?: () => Promise<void>; openFoodLibrary?: () => void; openFoodVision?: () => void }
 export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi): void {
   const dialog = ui.openModal('AI 助手', '<div class="ai-assistant"></div>', true)
   dialog.classList.add('ai-assistant-sheet')
   const host = dialog.querySelector<HTMLElement>('.ai-assistant')!, active = engine.profiles.active
-  host.innerHTML = `<div class="ai-assistant-toolbar"><div class="ai-current-profile"></div><button class="text-btn" id="ai-assistant-settings">设置</button><button class="text-btn" id="ai-clear-chat">清空</button></div><div class="ai-conversation" role="log" aria-label="AI 对话" aria-live="polite"></div><div class="ai-session-usage"></div><form class="ai-composer"><label class="sr-only" for="ai-message-input">向 AI 助手提问</label><textarea id="ai-message-input" rows="1" maxlength="${AI_LIMITS.userChars}" placeholder="提问，或描述记录" enterkeyhint="enter"></textarea><button class="primary" type="submit" id="ai-send">发送</button><button class="secondary" type="button" id="ai-stop" hidden>停止</button></form><p class="ai-footer-note">AI 建议需要确认后才会写入。</p>`
+  host.innerHTML = `<div class="ai-assistant-toolbar"><div class="ai-current-profile"></div><button class="text-btn" id="ai-assistant-settings">设置</button><button class="text-btn" id="ai-clear-chat">清空</button></div><div class="ai-conversation" role="log" aria-label="AI 对话" aria-live="polite"></div><div class="ai-session-usage"></div><form class="ai-composer">${ui.openFoodVision ? `<button class="secondary ai-camera" id="ai-food-camera" type="button" aria-label="拍包装录入">${icon('camera', 18)}</button>` : ''}<label class="sr-only" for="ai-message-input">向 AI 助手提问</label><textarea id="ai-message-input" rows="1" maxlength="${AI_LIMITS.userChars}" placeholder="提问，或描述记录" enterkeyhint="enter"></textarea><button class="primary" type="submit" id="ai-send">发送</button><button class="secondary" type="button" id="ai-stop" hidden>停止</button></form><p class="ai-footer-note">AI 建议需要确认后才会写入。</p>`
   host.querySelector<HTMLElement>('.ai-current-profile')!.textContent = active ? `${active.name} · ${active.model}` : '尚未连接 AI 服务'
   const log = host.querySelector<HTMLElement>('.ai-conversation')!, textarea = host.querySelector<HTMLTextAreaElement>('textarea')!, composer = host.querySelector<HTMLFormElement>('form')!
   const sendButton = host.querySelector<HTMLButtonElement>('#ai-send')!, stopButton = host.querySelector<HTMLButtonElement>('#ai-stop')!
@@ -32,6 +32,7 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi): void
     const text = textarea.value; textarea.value = ''; grow(); void engine.send(text)
   })
   stopButton.addEventListener('click', () => engine.stop())
+  host.querySelector('#ai-food-camera')?.addEventListener('click', () => { dialog.close(); ui.openFoodVision?.() })
   host.querySelector('#ai-assistant-settings')?.addEventListener('click', openSettings)
   host.querySelector('#ai-clear-chat')?.addEventListener('click', () => engine.clear())
   const nodeMap = new Map<string, HTMLElement>()
@@ -91,6 +92,7 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi): void
       }
     }
     usage.textContent = aiUsageText(engine.usage) ? `本次对话累计 ${aiUsageText(engine.usage)}` : ''
+    const camera = host.querySelector<HTMLButtonElement>('#ai-food-camera'); if (camera) camera.disabled = engine.busy
     sendButton.hidden = engine.busy; stopButton.hidden = !engine.busy
     sendButton.disabled = engine.busy || !textarea.value.trim() || !engine.profiles.active || !engine.profiles.privacyAcknowledged
     if (nearBottom) log.scrollTop = log.scrollHeight; else log.scrollTop = oldScroll

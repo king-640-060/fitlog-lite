@@ -18,12 +18,12 @@ export function validateFoodInput(input: Partial<FoodInput>): FoodInput {
   }
 }
 
-export async function saveFood(input: Partial<FoodInput>, id?: string): Promise<Food> {
+export async function saveFood(input: Partial<FoodInput>, id?: string, database: FitLogDatabase = db): Promise<Food> {
   const value = validateFoodInput(input)
   const now = new Date().toISOString()
-  const existing = id ? await db.foods.get(id) : undefined
+  const existing = id ? await database.foods.get(id) : undefined
   const food: Food = { ...value, id: id ?? crypto.randomUUID(), createdAt: existing?.createdAt ?? now, updatedAt: now }
-  await db.foods.put(food)
+  await database.foods.put(food)
   return food
 }
 

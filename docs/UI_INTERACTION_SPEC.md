@@ -56,6 +56,14 @@ The shared page backdrop keeps the warm white base, restrained asymmetric glows,
 - Show “未分类” only when records actually lack a meal. Editing a record may explicitly assign or clear its meal. Recompute each meal's nutrients from its FoodLog snapshots, not stored subtotals.
 - The four meal sections use light separators, compact empty guidance, and an expandable record list. Preserve editing and deletion for every FoodLog, including unclassified and long lists.
 
+## Food packaging Vision import
+
+- Food Library “拍包装录入”, meal picker “拍包装并记录”, and the assistant camera button open the same workflow. Capture the selected local Food date and meal at entry; global entry outside Food defaults to local Today. Preserve the five bottom tabs and normal offline Food recording.
+- Camera/album selection preprocesses locally. No selected image leaves the device before an explicit recognition action and image consent. The app re-encodes bounded JPEG images, strips source metadata, and uses only the configured Provider. A separate local image probe verifies Vision; unknown/error capability never implies unsupported. Images do not become general chat attachments.
+- Show selectable image previews with a larger in-sheet view, label basis and expandable source evidence, then editable Food fields. Missing macros stay blank/unknown. Energy accepts kJ or kcal and displays both; persisted Food/FoodLog calories remain kcal using exactly 4.184 kJ/kcal, never 4/4/9.
+- A capacity label requires the actual grams corresponding to its nutrition basis. Never prefill 100g for 100mL or use density 1. Every save requires a user check of basis, units and values, an App-calculated preview and explicit confirmation. Saving only Food creates no FoodLog. Save-and-record captures actual grams/date/meal and writes both stores atomically. Future factual intake is blocked; same-name imports add a clearly previewed new Food rather than overwriting existing records.
+- Stop/dismissal aborts recognition and clears image memory. Back from the date subview preserves the intake form. Inputs are 16px, controls at least 44px, and the sheet follows VisualViewport/Safe Area. Larger image/source views stay inside the existing sheet.
+
 ## Nutrition completion
 
 - Nutrition completion belongs to the selected Food date. It derives remaining targets from existing NutritionTarget and FoodLog snapshots, while suggestions use current Food Library values. Calories and macros are independent stored values; never derive calories from macros.

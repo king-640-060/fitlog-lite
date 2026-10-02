@@ -12,7 +12,7 @@ const setup = (supported = true) => {
   const values = new Map<string, string>(), storage = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value) }, removeItem: (key: string) => { values.delete(key) } }
   const profiles = new AiProfiles(storage), profile = profiles.save({ name: 'A', baseUrl: 'https://a.example/v1', model: 'a-model' }, 'synthetic-key-A')
   profiles.acknowledgePrivacy(); profiles.setCapability(profile.id, supported ? 'supported' : 'unsupported')
-  const chat = vi.fn(), clientFactory = vi.fn(() => ({ chat, testConnection: vi.fn(), testToolCapability: vi.fn(), listModels: vi.fn() }))
+  const chat = vi.fn(), clientFactory = vi.fn(() => ({ chat, testConnection: vi.fn(), testToolCapability: vi.fn(), testVisionCapability: vi.fn(), listModels: vi.fn() }))
   const engine = new AiOrchestrator({ profiles, database: env.database, context: () => env.context, clientFactory })
   return { env, engine, chat, profiles, profile, clientFactory, storage }
 }

@@ -1,0 +1,67 @@
+// Fresh synthetic browser contexts and mock providers only. No real image/key/data.
+import assert from 'node:assert/strict'
+const { chromium } = await import(process.env.FITLOG_PLAYWRIGHT_MODULE)
+const base = process.env.FITLOG_QA_URL || 'http://127.0.0.1:5174/'
+const prod = base.includes('github.io')
+const browser = await chromium.launch({ headless: true, executablePath: process.env.FITLOG_CHROME })
+const sizes = prod ? [[390,844],[430,932]] : [[320,812],[375,812],[390,844],[430,932]]
+const extraction = () => ({ format:'fitlog-food-label',version:1,productName:'包装食品 <img onerror=attack>',brand:'测试品牌',netQuantity:{value:120,unit:'g',evidence:'净含量120g'},basis:{kind:'per_100g',amount:100,unit:'g',evidence:'每100克'},nutrients:{energy:{value:1980,unit:'kJ',evidence:'能量1980kJ'},protein:{value:9.2,unit:'g',evidence:'蛋白质9.2g'},carbs:{value:60,unit:'g',evidence:'碳水60g'},fat:{value:null,unit:null,evidence:null}},warnings:['脂肪看不清']})
+for (const [width,height] of sizes) {
+  const context = await browser.newContext({ viewport:{width,height},hasTouch:true,isMobile:true,timezoneId:'Asia/Shanghai',serviceWorkers:'block' })
+  const page = await context.newPage(), errors = [], requests = [], consoles=[]
+  page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>consoles.push(m.text()))
+  let httpStatus=200, network=false, hold=false, release, label=extraction(), probeAnswer='731'
+  await page.route('https://mock-vision.invalid/**',async route=>{
+    if(route.request().method()==='OPTIONS'){await route.fulfill({status:204});return}
+    const body=route.request().postDataJSON();requests.push(body)
+    assert.equal(JSON.stringify(body).includes('synthetic-vision-key'),false)
+    if(network){await route.abort('failed');return}
+    if(hold){hold=false;await new Promise(resolve=>{release=resolve})}
+    if(httpStatus!==200){await route.fulfill({status:httpStatus,body:'provider raw secret'}).catch(()=>{});return}
+    const content=body.messages.length===1?probeAnswer:JSON.stringify(label)
+    await route.fulfill({json:{choices:[{message:{content}}]}}).catch(()=>{})
+  })
+  await page.goto(base,{waitUntil:'networkidle'});await page.waitForSelector('#open-management')
+  const nav=async tab=>page.locator(`[data-tab=${tab}]`).click()
+  const close=async()=>page.locator('dialog [data-close]').click()
+  const records=async store=>page.evaluate(async store=>{const d=await new Promise(resolve=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>resolve(q.result)});const rows=await new Promise(resolve=>{const q=d.transaction(store).objectStore(store).getAll();q.onsuccess=()=>resolve(q.result)});d.close();return rows},store)
+  const layout=async name=>{await page.waitForTimeout(280);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.equal(await page.locator('.modal-body').evaluate(e=>e.scrollWidth<=e.clientWidth),true);assert.equal(await page.locator('input[type=date]').count(),0);await page.screenshot({path:`/tmp/food-vision-${prod?'prod':'local'}-${width}-${name}.png`})}
+  const png=Buffer.from(await page.evaluate(()=>{const c=document.createElement('canvas');c.width=2400;c.height=1800;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.fillStyle='#111';x.font='90px sans-serif';['包装食品','每100克','能量1980kJ','蛋白质9.2g','碳水60g'].forEach((t,i)=>x.fillText(t,120,250+i*200));return c.toDataURL('image/png').split(',')[1]}),'base64')
+  const file={name:'synthetic-package.png',mimeType:'image/png',buffer:png}
+  const library=async()=>{await nav('food');await page.locator('#food-library').click();await page.locator('#food-vision-import').click()}
+  await library();assert.equal(requests.length,0);await layout('unconfigured');await close()
+  await page.locator('#open-management').click();await page.locator('#more-ai-settings').click();await page.locator('#ai-add-profile').click()
+  await page.locator('[name=name]').fill('图片服务');await page.locator('[name=baseUrl]').fill('https://mock-vision.invalid/v1');await page.locator('[name=apiKey]').fill('synthetic-vision-key');await page.locator('[name=model]').fill('editable-vision-model');await page.locator('#ai-privacy-ack').check()
+  await page.locator('#ai-test-vision').click();await page.getByText('图片识别已验证，保存后可拍包装录入',{exact:true}).waitFor()
+  assert.equal(requests[0].messages.length,1);assert.equal(requests[0].tools,undefined);assert.equal(requests[0].messages[0].content[0].text.includes('731'),false);assert.ok(requests[0].messages[0].content[1].image_url.url.startsWith('data:image/png;base64,'))
+  await page.locator('form button[type=submit]').click();assert.ok((await page.locator('.ai-profile').innerText()).includes('工具：待验证 · 图片：已验证'));await layout('settings');await close()
+  const analyze=async()=>{await page.locator('#vision-album-file').setInputFiles(file);await page.waitForSelector('.vision-images img');await page.locator('#vision-consent').check();await page.locator('#vision-analyze').click();await page.waitForSelector('#vision-review-form')}
+  await library();await analyze();await page.locator('[data-view-image]').first().click();await page.waitForSelector('.vision-image-view');await layout('image-view');await page.locator('.vision-image-view button').click();await layout('review')
+  const req=requests.at(-1);assert.equal(req.tools,undefined);assert.equal(req.messages.length,2);assert.ok(req.messages[1].content[1].image_url.url.startsWith('data:image/jpeg;base64,'));assert.equal(req.messages[1].content[1].image_url.detail,'high')
+  assert.equal(await page.locator('[name=energyUnit]').inputValue(),'kJ');assert.equal(await page.locator('[name=fat]').inputValue(),'');assert.equal(await page.locator('.vision-label-source img').count(),0)
+  assert.equal(await page.locator('[name=referenceGrams]').inputValue(),'100');assert.ok((await page.locator('#vision-energy-converted').innerText()).includes('473.2 kcal'))
+  assert.equal((await records('foods')).length,0);await page.locator('#vision-reviewed').check();await page.locator('#vision-review-form [type=submit]').click();await page.waitForSelector('#vision-confirm');assert.equal((await records('foods')).length,0);await layout('preview');await page.locator('#vision-cancel').click();assert.equal((await records('foods')).length,0)
+  await library();await analyze();await page.locator('#vision-reviewed').check();await page.locator('#vision-review-form [type=submit]').click();await page.waitForSelector('#vision-confirm');await page.locator('#vision-confirm').evaluate(e=>{e.click();e.click()});await page.waitForSelector('#vision-continue-log')
+  let foods=await records('foods');assert.equal(foods.length,1);assert.equal(foods[0].calories,1980/4.184);assert.equal(foods[0].fat,undefined);assert.equal((await records('foodLogs')).length,0);assert.equal(JSON.stringify(foods).includes('evidence'),false)
+  await page.locator('#vision-continue-log').click();await page.locator('[name=grams]').fill('50');await page.locator('[name=meal]').selectOption('dinner');await page.locator('#vision-date').click();await page.locator('[data-cancel]').click();assert.equal(await page.locator('[name=grams]').inputValue(),'50');assert.equal(await page.locator('[name=meal]').inputValue(),'dinner')
+  await page.locator('#vision-date').click();const picker=page.locator('.date-picker');for(let i=0;i<24;i++){const t=await picker.locator('.date-picker-month-head strong').innerText();if(t==='2026年9月')break;const [y,m]=t.match(/\d+/g).map(Number);await picker.locator(`[data-month="${y*12+m>2026*12+9?-1:1}"]`).click()};await picker.locator('[data-date="2026-09-29"]').click();await picker.locator('[data-done]').click()
+  await page.locator('#vision-intake-form [type=submit]').click();await page.waitForSelector('#vision-confirm');assert.equal((await records('foodLogs')).length,0);await page.locator('#vision-confirm').click();await page.waitForSelector('#vision-finish');const logs=await records('foodLogs');assert.equal(logs.length,1);assert.equal(logs[0].date,'2026-09-29');assert.equal(logs[0].meal,'dinner');assert.equal(logs[0].totalCalories,1980/4.184/2);assert.equal(logs[0].totalFat,undefined);await page.locator('#vision-finish').click()
+  // Meal entrance inherits its date and exact meal, then saves Food+FoodLog atomically.
+  await page.locator('[data-add-meal=lunch]').first().click();await page.locator('#vision-food-from-picker').click();await analyze();await page.locator('[name=name]').fill('午餐包装');await page.locator('#vision-reviewed').check();await page.locator('#vision-save-log').click();assert.equal(await page.locator('[name=meal]').inputValue(),'lunch');const selectedDate=await page.locator('.food-content-body').getAttribute('data-food-date');await page.locator('[name=grams]').fill('25');await page.locator('#vision-intake-form [type=submit]').click();await page.waitForSelector('#vision-confirm');assert.equal((await records('foods')).length,1);await page.locator('#vision-confirm').click();await page.waitForSelector('#vision-finish');assert.equal((await records('foods')).length,2);assert.equal((await records('foodLogs')).find(log=>log.foodName==='午餐包装').date,selectedDate);await page.locator('#vision-finish').click()
+  // Global assistant reuses the same workflow; per-100mL never pre-fills grams.
+  await page.locator('#open-ai-assistant').click();await page.locator('#ai-food-camera').click();label=extraction();label.basis={kind:'per_100ml',amount:100,unit:'ml',evidence:'每100mL'};await analyze();assert.equal(await page.locator('[name=referenceGrams]').inputValue(),'');assert.ok((await page.locator('.vision-warning').allInnerTexts()).join(' ').includes('mL 不能当作 g'));await layout('ml');await close()
+  label=extraction();await library();await page.locator('#vision-album-file').setInputFiles(file);await page.waitForSelector('.vision-images img');const before=requests.length;await page.locator('#vision-analyze').click();assert.equal(requests.length,before);await page.locator('#vision-consent').check()
+  for(const status of [401,429,500]){httpStatus=status;await page.locator('#vision-analyze').click();await page.waitForFunction(()=>document.querySelector('#vision-stop')?.hidden===true);assert.equal((await page.locator('.vision-status').innerText()).includes('provider raw secret'),false)}
+  httpStatus=200;network=true;await page.locator('#vision-analyze').click();await page.getByText(/CORS/).waitFor();network=false
+  hold=true;await page.locator('#vision-analyze').click();await page.waitForFunction(()=>document.querySelector('#vision-stop')?.hidden===false);await page.locator('#vision-stop').click();await page.getByText('已停止本次请求',{exact:true}).waitFor();release?.();await close()
+  assert.equal((await records('foods')).length,2);assert.equal((await records('foodLogs')).length,2)
+  // A late response from a changed configuration cannot become a reviewed draft.
+  await library();await page.locator('#vision-album-file').setInputFiles(file);await page.waitForSelector('.vision-images img');await page.locator('#vision-consent').check();release=undefined;hold=true;await page.locator('#vision-analyze').click();for(let i=0;i<100&&!release;i++)await new Promise(resolve=>setTimeout(resolve,10));assert.ok(release)
+  const originalProfiles=await page.evaluate(()=>localStorage.getItem('fitlog-ai-profiles-v1'));await page.evaluate(()=>{const values=JSON.parse(localStorage.getItem('fitlog-ai-profiles-v1'));values[0].model='changed-model';values[0].visionCapability='unknown';localStorage.setItem('fitlog-ai-profiles-v1',JSON.stringify(values))});release();await page.getByText('AI 配置已变化，请使用当前配置重新识别',{exact:true}).waitFor();assert.equal(await page.locator('#vision-review-form').count(),0);await page.evaluate(value=>localStorage.setItem('fitlog-ai-profiles-v1',value),originalProfiles);await close()
+  // Existing manual editor keeps kcal storage and converts units without changing energy.
+  await page.locator('#food-library').click();await page.locator('#new-food').click();await page.locator('[name=name]').fill('手动 kJ');await page.locator('[name=energyUnit]').selectOption('kJ');await page.locator('[name=calories]').fill('418.4');await layout('manual-kj');await page.locator('#food-form [type=submit]').click();await page.waitForSelector('#new-food');foods=await records('foods');const manual=foods.find(f=>f.name==='手动 kJ');assert.ok(Math.abs(manual.calories-100)<1e-10);await page.locator(`[data-edit-food="${manual.id}"]`).click();await page.locator('[name=energyUnit]').selectOption('kJ');assert.ok(Math.abs(Number(await page.locator('[name=calories]').inputValue())-418.4)<1e-8);await page.locator('#food-form [type=submit]').click();await page.waitForSelector('#new-food');await close()
+  assert.equal(JSON.stringify(await records('foods')).includes('data:image'),false);assert.deepEqual(errors,[]);assert.equal(consoles.join('\n').includes('synthetic-vision-key'),false)
+  console.log(JSON.stringify({mode:prod?'production':'local',width,height,threeEntrances:true,probe:true,preprocessing:true,explicitWrites:true,dualUnits:true,mlGuard:true,stopErrors:true,errors}))
+  await context.close()
+}
+await browser.close()

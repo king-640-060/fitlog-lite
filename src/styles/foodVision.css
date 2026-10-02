@@ -1,0 +1,41 @@
+.food-vision-sheet { max-height: var(--vision-height, calc(100dvh - 12px)); }
+.food-vision-sheet .modal-body { max-height: calc(var(--vision-height, 100dvh) - 82px - env(safe-area-inset-bottom)); }
+.food-vision { display: grid; gap: 16px; min-width: 0; }
+.food-vision p { margin: 0; line-height: 1.65; overflow-wrap: anywhere; }
+.vision-note, .vision-status { color: var(--text-secondary); font-size: 13px; }
+.vision-source-actions { display: flex; gap: 10px; }
+.vision-source-actions button { flex: 1; min-height: 44px; display: flex; justify-content: center; align-items: center; gap: 6px; }
+.vision-images { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.vision-images:empty { display: none; }
+.vision-images figure { margin: 0; position: relative; }
+.vision-images img { display: block; width: 100%; height: 112px; object-fit: contain; background: var(--surface); border-radius: 14px; border: 1px solid var(--border); }
+.vision-images button[data-remove-image] { position: absolute; top: 2px; right: 2px; width: 44px; height: 44px; padding: 0; display: grid; place-items: center; background: var(--surface); }
+.vision-provider, .vision-label-source, .vision-preview, .vision-done { padding: 16px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); display: grid; gap: 10px; min-width: 0; overflow-wrap: anywhere; }
+.vision-provider strong { font-size: 14px; }
+.vision-provider .text-btn { justify-self: start; padding-left: 0; }
+.vision-label-source h3, .vision-preview h3, .vision-done h3 { font-size: 17px; margin: 0; }
+.vision-label-source p { font-size: 13px; color: var(--text-secondary); }
+.vision-warning { color: var(--danger); font-size: 13px; }
+.vision-consent, .form label.vision-consent { display: flex; flex-direction: row; align-items: flex-start; gap: 9px; font-size: 13px; line-height: 1.65; color: var(--text-secondary); min-height: 44px; padding-block: 8px; }
+.vision-consent input { flex: 0 0 auto; width: 20px; height: 20px; margin-top: 1px; accent-color: var(--accent); }
+.vision-energy { color: var(--accent-strong); font-size: 14px; font-variant-numeric: tabular-nums; }
+.vision-status { min-height: 20px; }
+.vision-macros, .vision-intake-preview { border-top: 1px solid var(--divider); padding-top: 12px; display: grid; gap: 8px; }
+.vision-preview strong { color: var(--accent-strong); font-variant-numeric: tabular-nums; }
+.food-vision input, .food-vision select { font-size: 16px; min-width: 0; }
+.food-vision [hidden] { display: none !important; }
+.food-vision .full-btn { min-height: 44px; }
+.food-vision .date-picker-trigger { width: 100%; }
+.ai-composer .ai-camera { width: 44px; padding: 0; display: grid; place-items: center; }
+.energy-input-row { display: flex; gap: 8px; }
+.energy-input-row input { min-width: 0; flex: 1; }
+.energy-input-row select { flex: 0 0 82px; }
+.food-energy-preview { color: var(--text-secondary); font-size: 13px; margin: 0; font-variant-numeric: tabular-nums; }
+.import-actions { flex-wrap: wrap; }
+@media (prefers-reduced-motion: reduce) { .food-vision-sheet { animation: none; } }
+
+.vision-images .vision-thumbnail { display: block; width: 100%; padding: 0; border: 0; background: transparent; }
+.vision-image-view { display: grid; gap: 12px; }
+.vision-image-view img { width: 100%; height: auto; display: block; border-radius: 14px; }
+.vision-evidence { display: grid; gap: 7px; padding-top: 10px; }
+.vision-label-source summary { min-height: 44px; display: flex; align-items: center; color: var(--accent-strong); font-size: 13px; cursor: pointer; }

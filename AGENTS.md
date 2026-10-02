@@ -114,6 +114,7 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 - No AI destructive, arbitrary DB/HTTP, Restore/Clear/GitHub Sync, Workout factual-session or Pelvic factual-session tools. Tasks are plans, never proof of a health activity.
 - Bound requests, tool arguments/results, rounds and history. Abort and failures must preserve business records. Treat names/notes/tool data as untrusted data and render AI text safely as text.
 - Mock provider tests are separate from real provider compatibility and physical iPhone verification. Never use real user keys or business records in automated browser QA.
+- Food packaging Vision is one explicit workflow shared by Food Library, meal entry and the assistant. It uses the existing adapter directly, without agent tools/history. The model only transcribes visible label fields with bounded evidence; local validation and kJ/kcal conversion own all numbers. Never estimate nutrition from a dish photo, infer density or treat mL as grams. Images/extraction stay in memory and out of DB/Backup/Sync; saving an ordinary Food and optional FoodLog requires a local preview and explicit confirmation.
 
 ## Targeted file map
 

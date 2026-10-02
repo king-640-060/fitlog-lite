@@ -16,7 +16,7 @@ export class AiProfiles {
       return values.slice(0, 20).flatMap(value => {
         try {
           if (!value || value.protocol !== 'openai-chat-completions' || typeof value.id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(value.id) || typeof value.name !== 'string' || typeof value.model !== 'string') return []
-          return [{ id: value.id, name: value.name.slice(0, 80), model: value.model.slice(0, 200), baseUrl: normalizeAiBaseUrl(value.baseUrl), protocol: 'openai-chat-completions', preset: value.preset === 'zhipu' ? 'zhipu' : 'custom', toolCapability: ['supported', 'unsupported'].includes(value.toolCapability) ? value.toolCapability : 'unknown', createdAt: String(value.createdAt), updatedAt: String(value.updatedAt) } satisfies AiProviderProfile]
+          return [{ id: value.id, name: value.name.slice(0, 80), model: value.model.slice(0, 200), baseUrl: normalizeAiBaseUrl(value.baseUrl), protocol: 'openai-chat-completions', preset: value.preset === 'zhipu' ? 'zhipu' : 'custom', toolCapability: ['supported', 'unsupported'].includes(value.toolCapability) ? value.toolCapability : 'unknown', visionCapability: ['supported', 'unsupported'].includes(value.visionCapability) ? value.visionCapability : 'unknown', createdAt: String(value.createdAt), updatedAt: String(value.updatedAt) } satisfies AiProviderProfile]
         } catch { return [] }
       })
     } catch { return [] }
@@ -46,7 +46,7 @@ export class AiProfiles {
     assertNoKnownSecrets({ name, baseUrl, model }, [...this.knownSecrets, key.trim(), this.key(profileId)].filter(Boolean))
     const now = new Date().toISOString()
     const unchanged = existing && existing.baseUrl === baseUrl && existing.model === model && (!key.trim() || key.trim() === this.key(profileId))
-    const profile: AiProviderProfile = { id: profileId, name, baseUrl, model, protocol: 'openai-chat-completions', preset: input.preset ?? 'custom', toolCapability: unchanged ? existing.toolCapability : 'unknown', createdAt: existing?.createdAt ?? now, updatedAt: now }
+    const profile: AiProviderProfile = { id: profileId, name, baseUrl, model, protocol: 'openai-chat-completions', preset: input.preset ?? 'custom', toolCapability: unchanged ? existing.toolCapability : 'unknown', visionCapability: unchanged ? existing.visionCapability : 'unknown', createdAt: existing?.createdAt ?? now, updatedAt: now }
     // Explicit field projection keeps secrets out even if callers supply extra properties.
     this.storage.setItem(AI_STORAGE_KEYS.profiles, JSON.stringify([...profiles.filter(item => item.id !== profileId), profile]))
     if (key.trim()) this.storage.setItem(AI_STORAGE_KEYS.keyPrefix + profileId, key.trim())
@@ -56,6 +56,9 @@ export class AiProfiles {
   activate(id: string): void { if (!this.profiles.some(profile => profile.id === id)) throw new AiError('invalid_profile', '这份配置已不存在'); this.storage.setItem(AI_STORAGE_KEYS.active, id) }
   setCapability(id: string, capability: 'supported' | 'unsupported'): void {
     this.storage.setItem(AI_STORAGE_KEYS.profiles, JSON.stringify(this.profiles.map(profile => profile.id === id ? { ...profile, toolCapability: capability, updatedAt: new Date().toISOString() } : profile)))
+  }
+  setVisionCapability(id: string, capability: NonNullable<AiProviderProfile['visionCapability']>): void {
+    this.storage.setItem(AI_STORAGE_KEYS.profiles, JSON.stringify(this.profiles.map(profile => profile.id === id ? { ...profile, visionCapability: capability, updatedAt: new Date().toISOString() } : profile)))
   }
   delete(id: string): void {
     const active = this.active?.id === id

@@ -3,6 +3,8 @@ import { showGitHubSync, githubSyncDetail } from './ui/githubSync'
 import './styles/main.css'
 import './styles/plan.css'
 import './styles/ai.css'
+import './styles/foodVision.css'
+import { showFoodVisionImport } from './ui/foodVisionImport'
 import { showAiSettings, aiSettingsDetail } from './ui/aiSettings'
 import { showAiAssistant } from './ui/aiAssistant'
 import { AiOrchestrator } from './ai/orchestrator'
@@ -45,6 +47,7 @@ import { getGoalProgress } from './ui/progressRing'
 import { groupFoodLogs, isMealType, mealNames, mealTypes, type FoodMealGroup } from './utils/foodMeals'
 import { formatShortDate, getLocalDateString, shiftLocalDate } from './utils/date'
 import { findActiveHashtagQuery, normalizeTaskTagName, replaceActiveHashtagQuery, validateTaskTagName, type ActiveHashtagQuery } from './utils/taskTags'
+import { energyToKcal, kcalToKj, type EnergyUnit } from './utils/energy'
 import { calculateNutrition, formatNumber } from './utils/nutrition'
 import { cardioActivityDefinitions, formatCardioMetrics, getCardioActivityLabel, getCardioActivityType } from './utils/cardio'
 import { getReportRange, shiftReportPeriod, type ReportMode, type ReportResult } from './utils/reporting'
@@ -283,7 +286,7 @@ async function render(): Promise<void> {
     activeTab = button.dataset.tab as Tab
     void render().catch(fail)
   }))
-  app.querySelector('#open-ai-assistant')?.addEventListener('click', () => { void flushWorkoutAutosave().then(() => showAiAssistant(aiAssistant, { openModal, esc, openFoodLibrary: () => void showFoodLibrary() })).catch(fail) })
+  app.querySelector('#open-ai-assistant')?.addEventListener('click', () => { void flushWorkoutAutosave().then(() => showAiAssistant(aiAssistant, { openModal, esc, openFoodLibrary: () => void showFoodLibrary(), openFoodVision: () => openFoodVisionWorkflow(activeTab === 'food' ? foodDate : getLocalDateString()) })).catch(fail) })
   app.querySelector('#open-management')?.addEventListener('click', showManagementHub)
   app.querySelector('#plan-add-task')?.addEventListener('click', () => void showTaskEditor(undefined, planView === 'today' ? today : undefined))
   if (activeTab === 'today') await renderTodayPage()
@@ -1338,9 +1341,15 @@ function showNutritionTargetForm(date: string, target?: NutritionTarget): void {
   })
 }
 
+function openFoodVisionWorkflow(date: string, meal?: MealType): void {
+  showFoodVisionImport({ openModal, esc, profiles: aiAssistant.profiles, openSettings: () => showAiSettings({ openModal, esc, changed: () => aiAssistant.settingsChanged() }, aiAssistant.profiles), onSaved: async () => { if (activeTab === 'food') await renderFoodPage(); else if (activeTab === 'today') await renderTodayPage() } }, { date, meal })
+}
+
 async function showAddFoodLog(meal: MealType): Promise<void> {
+  const recordDate = foodDate
   const foods = await db.foods.orderBy('name').toArray()
-  const dialog = openModal(`记录${mealNames[meal]}`, foods.length ? `<div class="form"><label class="search-field"><span class="sr-only">搜索食物</span>${icon('search', 19)}<input id="food-search" type="search" placeholder="搜索食物或品牌" autocomplete="off"></label><div id="food-results" class="picker-list"></div><button class="sheet-link" id="create-food-from-picker">${icon('plus', 18)} 新建食物</button></div>` : `<div class="empty compact minimal"><div class="empty-icon">${icon('archive', 24)}</div><h3>食物库还是空的</h3><p>先创建一种食物。</p><button class="primary" id="create-first-food">${icon('plus', 18)} 新建食物</button></div>`, true)
+  const dialog = openModal(`记录${mealNames[meal]}`, foods.length ? `<div class="form"><label class="search-field"><span class="sr-only">搜索食物</span>${icon('search', 19)}<input id="food-search" type="search" placeholder="搜索食物或品牌" autocomplete="off"></label><div id="food-results" class="picker-list"></div><button class="sheet-link" id="vision-food-from-picker">${icon('camera', 18)} 拍包装并记录</button><button class="sheet-link" id="create-food-from-picker">${icon('plus', 18)} 新建食物</button></div>` : `<div class="empty compact minimal"><div class="empty-icon">${icon('archive', 24)}</div><h3>食物库还是空的</h3><p>先创建一种食物。</p><button class="secondary" id="vision-food-from-picker">${icon('camera', 18)} 拍包装并记录</button><button class="primary" id="create-first-food">${icon('plus', 18)} 新建食物</button></div>`, true)
+  dialog.querySelector('#vision-food-from-picker')?.addEventListener('click', () => { dialog.close(); openFoodVisionWorkflow(recordDate, meal) })
   if (!foods.length) {
     dialog.querySelector('#create-first-food')?.addEventListener('click', () => { dialog.close(); void showFoodForm() })
     return
@@ -1361,7 +1370,7 @@ async function showAddFoodLog(meal: MealType): Promise<void> {
         dialog.querySelector('#kcal-preview')!.textContent = Number.isFinite(grams) && grams > 0 ? `${formatNumber(calculateNutrition(food, grams).calories)} kcal` : '— kcal'
       })
       dialog.querySelector<HTMLFormElement>('#log-food-form')?.addEventListener('submit', async (event) => {
-        event.preventDefault(); try { await logFood(food, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'grams'), foodDate, meal); dialog.close(); toast('已保存'); await renderFoodPage() } catch (error) { fail(error) }
+        event.preventDefault(); try { await logFood(food, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'grams'), recordDate, meal); dialog.close(); toast('已保存'); await renderFoodPage() } catch (error) { fail(error) }
       })
     }))
   }
@@ -1373,7 +1382,7 @@ async function showFoodLibrary(query = ''): Promise<void> {
   const foods = await db.foods.orderBy('name').toArray()
   let currentQuery = query
   let searchTimer: number | undefined
-  const dialog = openModal('食物库', `<div class="toolbar"><label class="search-field"><span class="sr-only">搜索食物库</span>${icon('search', 19)}<input id="library-search" type="search" value="${esc(query)}" placeholder="搜索食物"></label><button class="icon-btn add-button" id="new-food" aria-label="新建食物">${icon('plus')}</button></div><div class="import-actions"><button id="import-csv">${icon('upload', 17)} 表格文件</button><button id="import-json">${icon('upload', 17)} 数据文件</button><input id="import-file" type="file" hidden></div><div class="library-list"></div>`, true)
+  const dialog = openModal('食物库', `<div class="toolbar"><label class="search-field"><span class="sr-only">搜索食物库</span>${icon('search', 19)}<input id="library-search" type="search" value="${esc(query)}" placeholder="搜索食物"></label><button class="icon-btn add-button" id="new-food" aria-label="新建食物">${icon('plus')}</button></div><div class="import-actions"><button id="food-vision-import">${icon('camera', 17)} 拍包装录入</button><button id="import-csv">${icon('upload', 17)} 表格文件</button><button id="import-json">${icon('upload', 17)} 数据文件</button><input id="import-file" type="file" hidden></div><div class="library-list"></div>`, true)
   const list = dialog.querySelector<HTMLElement>('.library-list')!
   const draw = (nextQuery: string) => {
     currentQuery = nextQuery
@@ -1393,6 +1402,7 @@ async function showFoodLibrary(query = ''): Promise<void> {
     searchTimer = window.setTimeout(() => draw(value), 120)
   })
   dialog.addEventListener('close', () => window.clearTimeout(searchTimer), { once: true })
+  dialog.querySelector('#food-vision-import')?.addEventListener('click', () => { const date = activeTab === 'food' ? foodDate : getLocalDateString(); dialog.close(); openFoodVisionWorkflow(date) })
   dialog.querySelector('#new-food')?.addEventListener('click', () => { dialog.close(); void showFoodForm() })
   const fileInput = dialog.querySelector<HTMLInputElement>('#import-file')!
   dialog.querySelector('#import-csv')?.addEventListener('click', () => { fileInput.accept = '.csv,text/csv'; fileInput.click() })
@@ -1412,15 +1422,21 @@ async function showFoodLibrary(query = ''): Promise<void> {
 }
 
 function foodFields(food?: Food): string {
-  return `<form id="food-form" class="form grid-form"><label class="full">食物名称 *<input name="name" value="${esc(food?.name)}" placeholder="鸡胸肉" required></label><label class="full">品牌<input name="brand" value="${esc(food?.brand)}" placeholder="可选"></label><label>基准重量 *<input name="referenceGrams" type="number" inputmode="decimal" min="0.1" step="0.1" value="${food?.referenceGrams ?? 100}" required><span>g</span></label><label>热量 *<input name="calories" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.calories ?? ''}" placeholder="165" required><span>kcal</span></label><label>蛋白质<input name="protein" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.protein ?? ''}"><span>g</span></label><label>碳水<input name="carbs" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.carbs ?? ''}"><span>g</span></label><label>脂肪<input name="fat" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.fat ?? ''}"><span>g</span></label><button class="primary full" type="submit">保存食物</button></form>`
+  return `<form id="food-form" class="form grid-form"><label class="full">食物名称 *<input name="name" value="${esc(food?.name)}" placeholder="鸡胸肉" required></label><label class="full">品牌<input name="brand" value="${esc(food?.brand)}" placeholder="可选"></label><label>基准重量 *<input name="referenceGrams" type="number" inputmode="decimal" min="0.1" step="0.1" value="${food?.referenceGrams ?? 100}" required><span>g</span></label><label class="full">能量 *<div class="energy-input-row"><input name="calories" type="number" inputmode="decimal" min="0" step="any" value="${food?.calories ?? ''}" placeholder="165" required><select name="energyUnit" aria-label="能量单位"><option value="kcal">kcal</option><option value="kJ">kJ</option></select></div></label><p id="food-energy-preview" class="food-energy-preview full"></p><label>蛋白质<input name="protein" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.protein ?? ''}"><span>g</span></label><label>碳水<input name="carbs" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.carbs ?? ''}"><span>g</span></label><label>脂肪<input name="fat" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.fat ?? ''}"><span>g</span></label><button class="primary full" type="submit">保存食物</button></form>`
 }
 
 async function showFoodForm(food?: Food): Promise<void> {
   const dialog = openModal(food ? '编辑食物' : '新建食物', foodFields(food))
+  const energyInput = dialog.querySelector<HTMLInputElement>('[name=calories]')!, energyUnit = dialog.querySelector<HTMLSelectElement>('[name=energyUnit]')!
+  let previousUnit: EnergyUnit = 'kcal'
+  const updateEnergyPreview = () => { const node = dialog.querySelector('#food-energy-preview')!; try { const kcal = energyToKcal(Number(energyInput.value), energyUnit.value as EnergyUnit); node.textContent = energyInput.value.trim() ? `${formatNumber(kcal)} kcal · ${formatNumber(kcalToKj(kcal))} kJ` : '填写包装能量，保存时统一为 kcal' } catch { node.textContent = '请填写有效能量' } }
+  energyInput.addEventListener('input', updateEnergyPreview)
+  energyUnit.addEventListener('change', () => { const next = energyUnit.value as EnergyUnit; if (energyInput.value.trim() && Number.isFinite(Number(energyInput.value)) && Number(energyInput.value) >= 0) { const kcal = energyToKcal(Number(energyInput.value), previousUnit); energyInput.value = String(next === 'kJ' ? kcalToKj(kcal) : kcal) }; previousUnit = next; updateEnergyPreview() })
+  updateEnergyPreview()
   dialog.querySelector<HTMLFormElement>('#food-form')?.addEventListener('submit', async (event) => {
     event.preventDefault(); const data = new FormData(event.currentTarget as HTMLFormElement)
     try {
-      await saveFood({ name: valueOf(data, 'name'), brand: valueOf(data, 'brand'), referenceGrams: Number(valueOf(data, 'referenceGrams')), calories: Number(valueOf(data, 'calories')), protein: valueOf(data, 'protein') as unknown as number, carbs: valueOf(data, 'carbs') as unknown as number, fat: valueOf(data, 'fat') as unknown as number }, food?.id)
+      await saveFood({ name: valueOf(data, 'name'), brand: valueOf(data, 'brand'), referenceGrams: Number(valueOf(data, 'referenceGrams')), calories: energyToKcal(Number(valueOf(data, 'calories')), valueOf(data, 'energyUnit') === 'kJ' ? 'kJ' : 'kcal'), protein: valueOf(data, 'protein') as unknown as number, carbs: valueOf(data, 'carbs') as unknown as number, fat: valueOf(data, 'fat') as unknown as number }, food?.id)
       dialog.close(); toast('已保存'); await renderFoodPage(); void showFoodLibrary()
     } catch (error) { fail(error) }
   })

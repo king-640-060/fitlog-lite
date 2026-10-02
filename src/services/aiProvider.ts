@@ -1,17 +1,32 @@
 import type { AiChatRequest, AiChatResponse, AiProviderProfile, AiToolCall, AiUsage } from '../ai/types'
 import { AI_LIMITS, AiError, assertNoKnownSecrets, normalizeAiBaseUrl } from '../ai/security'
+import { AI_VISION_LIMITS, assertVisionDataUrl, visionImagePart, type PreparedVisionImage } from '../ai/visionImages'
 
 export interface AiProviderAdapter {
   chat(request: AiChatRequest): Promise<AiChatResponse>
   testConnection(signal?: AbortSignal): Promise<void>
   testToolCapability(signal?: AbortSignal): Promise<'supported' | 'unsupported'>
+  testVisionCapability(image: PreparedVisionImage, signal?: AbortSignal): Promise<'unknown' | 'supported' | 'unsupported'>
   listModels(signal?: AbortSignal): Promise<string[]>
 }
 /** Pure protocol payload construction; credentials belong only to transport headers. */
 export function buildAiRequest(model: string, request: AiChatRequest) {
+  let imageCount = 0
+  const messages = request.messages.map(message => {
+    const content = Array.isArray(message.content) ? message.content.map(part => {
+      if (part.type === 'text' && typeof part.text === 'string') return { type: 'text' as const, text: part.text }
+      if (part.type !== 'image_url' || message.role !== 'user') throw new AiError('invalid_image', '图片只能由用户主动选择')
+      assertVisionDataUrl(part.image_url?.url)
+      if (++imageCount > AI_VISION_LIMITS.images) throw new AiError('image_limit', '一次最多识别 3 张包装图片')
+      const detail = part.image_url.detail
+      if (detail !== undefined && !['auto', 'low', 'high'].includes(detail)) throw new AiError('invalid_image', '图片识别参数无效')
+      return { type: 'image_url' as const, image_url: { url: part.image_url.url, ...(detail ? { detail } : {}) } }
+    }) : message.content
+    return { role: message.role, content, ...(message.tool_calls ? { tool_calls: message.tool_calls.map(call => ({ id: call.id, type: call.type, function: { name: call.function.name, arguments: call.function.arguments } })) } : {}), ...(message.tool_call_id ? { tool_call_id: message.tool_call_id } : {}) }
+  })
   return {
     model,
-    messages: request.messages.map(message => ({ role: message.role, content: message.content, ...(message.tool_calls ? { tool_calls: message.tool_calls.map(call => ({ id: call.id, type: call.type, function: { name: call.function.name, arguments: call.function.arguments } })) } : {}), ...(message.tool_call_id ? { tool_call_id: message.tool_call_id } : {}) })),
+    messages,
     ...(request.tools?.length ? { tools: request.tools.map(tool => ({ type: tool.type, function: { name: tool.function.name, description: tool.function.description, parameters: tool.function.parameters } })), tool_choice: request.toolChoice ?? 'auto' } : {}),
   }
 }
@@ -40,7 +55,18 @@ export class OpenAICompatibleChatAdapter implements AiProviderAdapter {
     const timeout = setTimeout(() => { timedOut = true; controller.abort() }, this.timeoutMs)
     try {
       const response = await this.fetcher.call(globalThis, this.profile.baseUrl + path, { method: body ? 'POST' : 'GET', headers: { Authorization: `Bearer ${this.apiKey}`, 'Content-Type': 'application/json' }, ...(body ? { body: JSON.stringify(body) } : {}), credentials: 'omit', cache: 'no-store', redirect: 'error', signal: controller.signal })
-      if (!response.ok) { await response.body?.cancel(); throw statusError(response.status) }
+      if (!response.ok) {
+        // Inspect a bounded error solely to distinguish an explicit image rejection.
+        // Never display or log this untrusted provider text.
+        const vision = body && JSON.stringify(body).includes('"type":"image_url"')
+        if (vision && [400, 415, 422].includes(response.status) && response.body) {
+          const reader = response.body.getReader(); let text = '', bytes = 0
+          try { while (true) { const chunk = await reader.read(); if (chunk.done) break; bytes += chunk.value.byteLength; if (bytes > 8192) break; text += new TextDecoder().decode(chunk.value) } }
+          finally { await reader.cancel(); reader.releaseLock() }
+          if (/unsupported[_ -](?:image|vision)|(?:image|vision|图片|图像).{0,80}(?:not supported|unsupported|不支持)|(?:does not support|不支持).{0,80}(?:image|vision|图片|图像)/i.test(text)) throw new AiError('vision_unsupported', '当前模型或接口明确不支持图片识别')
+        } else await response.body?.cancel()
+        throw statusError(response.status)
+      }
       const declared = Number(response.headers.get('Content-Length'))
       if (declared > AI_LIMITS.responseBytes) { await response.body?.cancel(); throw new AiError('response_limit', 'AI 响应过大，请缩小请求范围') }
       if (!response.body) throw new AiError('invalid_response', 'AI 服务返回了空响应')
@@ -95,6 +121,12 @@ export class OpenAICompatibleChatAdapter implements AiProviderAdapter {
     if (!Array.isArray(result?.data)) throw new AiError('invalid_response', '服务未提供模型列表，可以手动填写模型名称')
     return [...new Set(result.data.flatMap(item => typeof item?.id === 'string' && item.id.length <= 200 ? [item.id] : []))].slice(0, AI_LIMITS.modelIds)
   }
+  async testVisionCapability(image: PreparedVisionImage, signal?: AbortSignal): Promise<'unknown' | 'supported' | 'unsupported'> {
+    try {
+      const result = await this.chat({ messages: [{ role: 'user', content: [{ type: 'text', text: '读取图片中央的三个数字，只返回数字。' }, visionImagePart(image)] }], signal })
+      return result.content.trim() === '731' && !result.toolCalls.length ? 'supported' : 'unknown'
+    } catch (error) { if (error instanceof AiError && error.code === 'vision_unsupported') return 'unsupported'; throw error }
+  }
 }
 /** Immutable credentials and routing for one turn, independent of later profile changes. */
 export class AiClient implements AiProviderAdapter {
@@ -103,5 +135,6 @@ export class AiClient implements AiProviderAdapter {
   chat(request: AiChatRequest): Promise<AiChatResponse> { return this.adapter.chat(request) }
   testConnection(signal?: AbortSignal): Promise<void> { return this.adapter.testConnection(signal) }
   testToolCapability(signal?: AbortSignal): Promise<'supported' | 'unsupported'> { return this.adapter.testToolCapability(signal) }
+  testVisionCapability(image: PreparedVisionImage, signal?: AbortSignal): Promise<'unknown' | 'supported' | 'unsupported'> { return this.adapter.testVisionCapability(image, signal) }
   listModels(signal?: AbortSignal): Promise<string[]> { return this.adapter.listModels(signal) }
 }
