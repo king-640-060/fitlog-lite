@@ -12,12 +12,28 @@ const setup = (supported = true) => {
   const values = new Map<string, string>(), storage = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => { values.set(key, value) }, removeItem: (key: string) => { values.delete(key) } }
   const profiles = new AiProfiles(storage), profile = profiles.save({ name: 'A', baseUrl: 'https://a.example/v1', model: 'a-model' }, 'synthetic-key-A')
   profiles.acknowledgePrivacy(); profiles.setCapability(profile.id, supported ? 'supported' : 'unsupported')
-  const chat = vi.fn(), clientFactory = vi.fn(() => ({ chat, testConnection: vi.fn(), testToolCapability: vi.fn(), testVisionCapability: vi.fn(), listModels: vi.fn() }))
+  const chat = vi.fn(), clientFactory = vi.fn(() => ({ chat, visionChat: vi.fn(), testConnection: vi.fn(), testToolCapability: vi.fn(), testVisionCapability: vi.fn(), listModels: vi.fn() }))
   const engine = new AiOrchestrator({ profiles, database: env.database, context: () => env.context, clientFactory })
   return { env, engine, chat, profiles, profile, clientFactory, storage }
 }
 afterEach(async () => { for (const env of environments.splice(0)) { env.database.close(); await env.database.delete() } })
 describe('bounded assistant orchestration', () => {
+  it('keeps an in-flight chat and its history when only the image model changes', async () => {
+    const { engine, chat, profiles, profile, clientFactory } = setup()
+    let finish!: (value: AiChatResponse) => void
+    chat.mockImplementationOnce(() => new Promise(resolve => { finish = resolve }))
+    const sending = engine.send('继续聊天')
+    await vi.waitFor(() => expect(chat).toHaveBeenCalledTimes(1))
+    profiles.save({ ...profile, visionModel: 'independent-image' }, '', profile.id); engine.settingsChanged()
+    expect(chat.mock.calls[0][0].signal.aborted).toBe(false)
+    finish(reply('保留聊天结果')); await sending
+    expect(engine.items.at(-1)?.content).toBe('保留聊天结果')
+    chat.mockResolvedValueOnce(reply('继续')); await engine.send('下一问')
+    expect(JSON.stringify(chat.mock.calls[1][0].messages)).toContain('保留聊天结果')
+    expect(clientFactory.mock.calls[1][0].model).toBe('a-model')
+    profiles.save({ ...profiles.active!, model: 'chat-two' }, '', profile.id); engine.settingsChanged()
+    expect(engine.items).toEqual([])
+  })
   it('retains natural-language conversation in memory, accumulates provided usage and clears only AI state', async () => {
     const { engine, chat, env } = setup()
     chat.mockResolvedValueOnce({ ...reply('你好'), usage: { inputTokens: 10, outputTokens: 2, totalTokens: 12 } }).mockResolvedValueOnce({ ...reply('继续'), usage: { totalTokens: 5 } })

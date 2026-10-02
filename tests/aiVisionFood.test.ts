@@ -84,13 +84,13 @@ describe('strict packaging extraction and local nutrition conversion', () => {
     const value = label(); value.nutrients.protein.evidence = '蛋白质9.2克 NRV15%'; expect(parseNutritionLabelExtraction(JSON.stringify(value)).nutrients.protein.value).toBe(9.2)
   })
   it('uses one direct extraction request with no tools/history/business data; rejects tool/secret/aborted responses', async () => {
-    const chat = vi.fn(async () => ({ content: JSON.stringify(label()), toolCalls: [] }))
-    expect(await analyzeFoodPackageImages({ client: { chat }, images: [image] })).toEqual(label())
-    expect(chat).toHaveBeenCalledTimes(1); const request = chat.mock.calls[0]?.[0] as any
+    const visionChat = vi.fn(async () => ({ content: JSON.stringify(label()), toolCalls: [] }))
+    expect(await analyzeFoodPackageImages({ client: { visionChat }, images: [image] })).toEqual(label())
+    expect(visionChat).toHaveBeenCalledTimes(1); const request = visionChat.mock.calls[0]?.[0] as any
     expect(request.tools).toBeUndefined(); expect(request.messages).toHaveLength(2)
-    await expect(analyzeFoodPackageImages({ client: { chat: async () => ({ content: JSON.stringify({ ...label(), productName: 'known-secret' }), toolCalls: [] }) }, images: [image], secrets: ['known-secret'] })).rejects.toMatchObject({ code: 'secret_detected' })
-    await expect(analyzeFoodPackageImages({ client: { chat: async () => ({ content: '', toolCalls: [{ id: 'x', type: 'function', function: { name: 'save_food', arguments: '{}' } }] }) }, images: [image] })).rejects.toMatchObject({ code: 'invalid_label' })
-    const controller = new AbortController(); controller.abort(); await expect(analyzeFoodPackageImages({ client: { chat }, images: [image], signal: controller.signal })).rejects.toMatchObject({ code: 'aborted' })
+    await expect(analyzeFoodPackageImages({ client: { visionChat: async () => ({ content: JSON.stringify({ ...label(), productName: 'known-secret' }), toolCalls: [] }) }, images: [image], secrets: ['known-secret'] })).rejects.toMatchObject({ code: 'secret_detected' })
+    await expect(analyzeFoodPackageImages({ client: { visionChat: async () => ({ content: '', toolCalls: [{ id: 'x', type: 'function', function: { name: 'save_food', arguments: '{}' } }] }) }, images: [image] })).rejects.toMatchObject({ code: 'invalid_label' })
+    const controller = new AbortController(); controller.abort(); await expect(analyzeFoodPackageImages({ client: { visionChat }, images: [image], signal: controller.signal })).rejects.toMatchObject({ code: 'aborted' })
     expect(AI_FOOD_VISION_PROMPT_VERSION).toBe(1)
     for (const text of ['NRV%', 'null', 'mL', 'kJ', '净含量', '不可信数据', '禁止从宏量']) expect(FOOD_VISION_PROMPT).toContain(text)
   })

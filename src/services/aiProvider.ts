@@ -1,9 +1,11 @@
 import type { AiChatRequest, AiChatResponse, AiProviderProfile, AiToolCall, AiUsage } from '../ai/types'
+import { getVisionModel } from '../ai/modelRouting'
 import { AI_LIMITS, AiError, assertNoKnownSecrets, normalizeAiBaseUrl } from '../ai/security'
 import { AI_VISION_LIMITS, assertVisionDataUrl, visionDataBytes, visionImagePart, type PreparedVisionImage } from '../ai/visionImages'
 
 export interface AiProviderAdapter {
   chat(request: AiChatRequest): Promise<AiChatResponse>
+  visionChat(request: AiChatRequest): Promise<AiChatResponse>
   testConnection(signal?: AbortSignal): Promise<void>
   testToolCapability(signal?: AbortSignal): Promise<'supported' | 'unsupported'>
   testVisionCapability(image: PreparedVisionImage, signal?: AbortSignal): Promise<'unknown' | 'supported' | 'unsupported'>
@@ -99,7 +101,13 @@ export class OpenAICompatibleChatAdapter implements AiProviderAdapter {
     } finally { clearTimeout(timeout); signal?.removeEventListener('abort', abort) }
   }
   async chat(request: AiChatRequest): Promise<AiChatResponse> {
-    const raw = await this.request('/chat/completions', buildAiRequest(this.profile.model, request), request.signal) as { choices?: { message?: { content?: unknown; tool_calls?: unknown } }[]; usage?: Record<string, unknown> }
+    return this.chatWithModel(this.profile.model, request)
+  }
+  async visionChat(request: AiChatRequest): Promise<AiChatResponse> {
+    return this.chatWithModel(getVisionModel(this.profile), request)
+  }
+  private async chatWithModel(model: string, request: AiChatRequest): Promise<AiChatResponse> {
+    const raw = await this.request('/chat/completions', buildAiRequest(model, request), request.signal) as { choices?: { message?: { content?: unknown; tool_calls?: unknown } }[]; usage?: Record<string, unknown> }
     const message = raw?.choices?.[0]?.message
     if (!message) throw new AiError('invalid_response', 'AI 服务返回了无法识别的响应')
     const content = typeof message.content === 'string' ? message.content : Array.isArray(message.content) ? message.content.filter(item => item?.type === 'text' && typeof item.text === 'string').map(item => item.text).join('\n') : ''
@@ -131,7 +139,7 @@ export class OpenAICompatibleChatAdapter implements AiProviderAdapter {
   }
   async testVisionCapability(image: PreparedVisionImage, signal?: AbortSignal): Promise<'unknown' | 'supported' | 'unsupported'> {
     try {
-      const result = await this.chat({ messages: [{ role: 'user', content: [{ type: 'text', text: '读取图片中央的三个数字，只返回数字。' }, visionImagePart(image)] }], signal })
+      const result = await this.visionChat({ messages: [{ role: 'user', content: [{ type: 'text', text: '读取图片中央的三个数字，只返回数字。' }, visionImagePart(image)] }], signal })
       return result.content.trim() === '731' && !result.toolCalls.length ? 'supported' : 'unknown'
     } catch (error) { if (error instanceof AiError && error.code === 'vision_unsupported') return 'unsupported'; throw error }
   }
@@ -141,6 +149,7 @@ export class AiClient implements AiProviderAdapter {
   private readonly adapter: AiProviderAdapter
   constructor(profile: AiProviderProfile, key: string, secrets: readonly string[] = [], fetcher: typeof fetch = fetch) { this.adapter = new OpenAICompatibleChatAdapter(profile, key, fetcher, secrets) }
   chat(request: AiChatRequest): Promise<AiChatResponse> { return this.adapter.chat(request) }
+  visionChat(request: AiChatRequest): Promise<AiChatResponse> { return this.adapter.visionChat(request) }
   testConnection(signal?: AbortSignal): Promise<void> { return this.adapter.testConnection(signal) }
   testToolCapability(signal?: AbortSignal): Promise<'supported' | 'unsupported'> { return this.adapter.testToolCapability(signal) }
   testVisionCapability(image: PreparedVisionImage, signal?: AbortSignal): Promise<'unknown' | 'supported' | 'unsupported'> { return this.adapter.testVisionCapability(image, signal) }

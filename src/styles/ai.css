@@ -12,6 +12,7 @@
 .ai-service-icon { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 auto; border-radius: 12px; background: var(--surface-soft); color: var(--accent-strong); }
 .ai-eyebrow { display: block; margin-bottom: 5px; font-size: .75rem; color: var(--text-secondary); }
 .ai-capabilities { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 0 0 18px; font-size: .75rem; color: var(--text-secondary); }
+.ai-capabilities span { max-width: 100%; overflow-wrap: anywhere; }
 .ai-settings-links { margin-block: 18px; }
 .ai-settings-links button { grid-template-columns: minmax(0, 1fr) 18px; justify-content: space-between; }
 .ai-settings-links strong { display: block; }
@@ -28,6 +29,13 @@
 .ai-privacy-details h3 { margin-top: 20px; }
 .ai-profile-form input, .ai-profile-form select { font-size: 16px; }
 .ai-field-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: .85rem; }
+.ai-image-routing { min-width: 0; margin: 0; padding: 8px 0 0; border: 0; border-radius: 0; border-top: 1px solid var(--divider); gap: 4px; }
+.ai-image-routing legend { font-size: .85rem; padding: 0 6px 0 0; }
+.ai-profile-form .ai-model-choice { display: flex; flex-direction: row; align-items: center; gap: 10px; min-height: 44px; font-size: .85rem; font-weight: 500; }
+.ai-model-choice input { width: 20px; height: 20px; min-height: 20px; padding: 0; accent-color: var(--accent-mid); }
+#ai-vision-field { display: grid; gap: 8px; margin-top: 8px; }
+.ai-vision-advice { padding: 0 0 10px; }
+.ai-vision-advice .ai-note { margin: 0; }
 .ai-model-field .ai-note { margin: 6px 0 0; }
 .ai-advanced { padding-top: 4px; border-top: 1px solid var(--divider); }
 .ai-advanced summary { display: flex; align-items: center; min-height: 44px; color: var(--text-secondary); font-size: .85rem; cursor: pointer; }

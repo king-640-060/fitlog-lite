@@ -108,6 +108,7 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 
 ## Optional FitLog AI contract
 
+- One AI profile shares its Provider, Base URL and credential. Chat and tool calls use `model`; image input uses optional `visionModel`, falling back to `model` for legacy profiles. Invalidate only the capability whose effective route changed; a Vision-only edit must preserve an ongoing chat and its context.
 - Read `docs/AI_ARCHITECTURE.md` before changing AI. Provider profiles are editable device-only transport configuration; core business semantics must not depend on a vendor or model.
 - AI credentials, configuration, chat, usage, plan handles and proposals never enter business DB stores, Backup or GitHub Sync. Keep API Keys separately stored from profile metadata and empty in edit-form values; never log credentials or raw provider errors.
 - AI reads use bounded registered tools with real scope enforcement. Preserve saved FoodLog/Workout facts, independent calories and unknown missing macros. Reports and nutrition completion reuse existing local services/calculators.

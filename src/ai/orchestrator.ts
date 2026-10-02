@@ -49,7 +49,14 @@ export class AiOrchestrator {
   clear(): void {
     this.generation++; this.stop(); this.items = []; this.history = []; this.usage = {}; this.plans.clear(); this.proposals.clear(); this.onChange?.()
   }
-  settingsChanged(): void { this.clear(); this.configurationSignature = undefined }
+  private chatSignature(profile: AiProviderProfile): string {
+    return JSON.stringify([profile.id, profile.baseUrl, profile.model, profile.toolCapability, this.profiles.key(profile.id), this.profiles.permissions])
+  }
+  settingsChanged(): void {
+    const active = this.profiles.active
+    if (active && this.configurationSignature === this.chatSignature(active)) return
+    this.clear(); this.configurationSignature = undefined
+  }
   async send(value: string): Promise<void> {
     if (this.busy) return
     const text = value.trim()
@@ -62,7 +69,7 @@ export class AiOrchestrator {
       assertNoKnownSecrets(text, this.profiles.knownSecrets)
     } catch (error) { this.add('error', safeAiError(error)); return }
     const captured = structuredClone(profile!), key = this.profiles.key(captured.id), secrets = this.profiles.knownSecrets
-    const signature = JSON.stringify([captured.id, captured.baseUrl, captured.model, captured.toolCapability, key, this.profiles.permissions])
+    const signature = this.chatSignature(captured)
     if (this.configurationSignature && this.configurationSignature !== signature) this.clear()
     this.configurationSignature = signature
     const generation = this.generation, controller = new AbortController(); this.controller = controller; this.busy = true

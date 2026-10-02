@@ -1,5 +1,6 @@
 export interface AiProviderProfile {
   id: string; name: string; protocol: 'openai-chat-completions'; baseUrl: string; model: string
+  visionModel?: string
   preset?: 'zhipu' | 'custom'; toolCapability?: 'unknown' | 'supported' | 'unsupported'
   visionCapability?: 'unknown' | 'supported' | 'unsupported'
   createdAt: string; updatedAt: string
