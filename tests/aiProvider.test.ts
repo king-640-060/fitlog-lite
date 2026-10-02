@@ -46,10 +46,14 @@ describe('OpenAI-compatible browser transport', () => {
     const chatOnly = new OpenAICompatibleChatAdapter(profile, 'key', async () => response({ content: 'OK' }))
     expect(await chatOnly.testToolCapability()).toBe('unsupported')
   })
-  it.each([401, 403, 404, 429, 500])('sanitizes HTTP %s without retry or raw provider errors', async status => {
+  it.each([400, 401, 403, 404, 429, 500])('sanitizes HTTP %s without retry or raw provider errors', async status => {
     const fetcher = vi.fn(async () => new Response('RAW SECRET FROM PROVIDER', { status }))
     await expect(new OpenAICompatibleChatAdapter(profile, 'key', fetcher).testConnection()).rejects.toMatchObject({ code: `http_${status}` })
     expect(fetcher).toHaveBeenCalledTimes(1)
+  })
+  it('gives HTTP 400 a fixed actionable message without reflecting malicious provider data', async () => {
+    const adapter = new OpenAICompatibleChatAdapter(profile, 'private-key', async () => new Response('<script>private-key</script> raw parameters', { status: 400 }))
+    await expect(adapter.testConnection()).rejects.toMatchObject({ code: 'http_400', message: '请求参数无效，请检查模型名称和接口兼容性。' })
   })
   it('distinguishes cancellation, timeout, CORS/network, invalid JSON and response size bounds', async () => {
     const aborting: typeof fetch = async (_url, options) => new Promise((_resolve, reject) => { if (options?.signal?.aborted) reject(new DOMException('Abort', 'AbortError')); else options?.signal?.addEventListener('abort', () => reject(new DOMException('Abort', 'AbortError'))) })

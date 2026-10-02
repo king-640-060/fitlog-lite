@@ -103,6 +103,7 @@ export function mountDatePicker(host: HTMLElement, options: DatePickerOptions): 
     else if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); choose(state.focused); render(true) }
   }, { signal: events.signal })
   render()
+  host.closest('dialog')?.querySelector<HTMLElement>('.sheet-focus-anchor')?.focus({ preventScroll: true })
   return {
     value: () => state.selected,
     setValue: date => { state.select(date); render() },

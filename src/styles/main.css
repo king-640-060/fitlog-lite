@@ -43,6 +43,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { min-width: 320px; min-height: 100%; overflow-x: hidden; scroll-padding: 120px 0; }
 body { isolation: isolate; margin: 0; min-width: 320px; min-height: 100vh; min-height: 100dvh; overflow-x: hidden; background: var(--bg); color: var(--text-primary); }
 /* One static, non-interactive backdrop; opaque content surfaces cover it. */
@@ -244,7 +245,7 @@ h3 { margin-bottom: 5px; font-size: 1rem; }
 .food-kcal strong { font-size: 1.12rem; }
 .food-kcal strong small { margin-left: 2px; font-size: .68rem; font-weight: 550; }
 .row-delete { width: 38px; min-width: 38px; min-height: 38px; border-color: transparent; background: transparent; color: var(--text-tertiary); }
-.row-delete:focus-visible { color: var(--danger); }
+html[data-input-modality="keyboard"] .row-delete:focus-visible { color: var(--danger); }
 @media (hover: hover) and (pointer: fine) { .row-delete:hover { color: var(--danger); } }
 .row-menu { position: relative; z-index: 3; margin: 0; }
 .row-menu summary { display: grid; width: 42px; min-height: 44px; place-items: center; list-style: none; color: var(--text-tertiary); cursor: pointer; font-size: 1.1rem; font-weight: 750; }
@@ -341,7 +342,7 @@ h3 { margin-bottom: 5px; font-size: 1rem; }
 .pelvic-completion .primary { width: 100%; margin-top: 7px; }
 .pelvic-specialty-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
 .pelvic-specialty { display: grid; min-width: 0; min-height: 103px; align-content: start; gap: 6px; padding: 13px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); text-align: left; }
-.pelvic-specialty:focus-visible { border-color: var(--accent); background: var(--accent-soft); }
+html[data-input-modality="keyboard"] .pelvic-specialty:focus-visible { border-color: var(--accent); background: var(--accent-soft); }
 @media (hover: hover) and (pointer: fine) { .pelvic-specialty:hover { border-color: var(--accent); background: var(--accent-soft); } }
 .pelvic-specialty strong { font-size: .88rem; }
 .pelvic-specialty span { color: var(--text-secondary); font-size: .74rem; line-height: 1.3; }
@@ -457,7 +458,7 @@ fieldset { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--borde
 .set-row input { min-height: 46px; padding: 7px 6px; border-color: var(--divider); border-radius: 12px; background: color-mix(in srgb, var(--surface-soft) 52%, transparent); font-size: 1rem; text-align: center; scroll-margin-block: 110px; }
 .set-row input:focus { background: var(--surface); }
 .set-row .icon-btn { width: 38px; min-width: 38px; min-height: 38px; color: var(--text-tertiary); }
-.set-row .icon-btn:focus-visible, .exercise-head .danger:focus-visible { color: var(--danger); }
+html[data-input-modality="keyboard"] .set-row .icon-btn:focus-visible, .exercise-head .danger:focus-visible { color: var(--danger); }
 @media (hover: hover) and (pointer: fine) { .set-row .icon-btn:hover, .exercise-head .danger:hover { color: var(--danger); } }
 .exercise-head .danger { color: var(--text-tertiary); }
 .set-row .set-note { grid-column: 2 / -1; min-height: 39px; margin-bottom: 4px; padding-inline: 10px; text-align: left; }
@@ -468,7 +469,7 @@ fieldset { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--borde
 .action-stack button { width: 100%; min-height: 50px; }
 .quiet-action { border-color: var(--border); background: var(--surface); color: var(--accent-strong); font-weight: 700; }
 .workout-actions .danger-button { min-height: 44px; background: transparent; color: var(--text-tertiary); }
-.workout-actions .danger-button:focus-visible { color: var(--danger); }
+html[data-input-modality="keyboard"] .workout-actions .danger-button:focus-visible { color: var(--danger); }
 @media (hover: hover) and (pointer: fine) { .workout-actions .danger-button:hover { color: var(--danger); } }
 .history-head { padding-top: 3px; }
 .history-card { position: relative; display: grid; gap: 12px; width: 100%; padding: 16px 28px 16px 3px; border: 0; border-bottom: 1px solid var(--divider); border-radius: 0; background: transparent; text-align: left; }
@@ -515,7 +516,7 @@ fieldset { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--borde
 .calendar-legend-icon .icon { width: 14px; height: 14px; stroke-width: 1.8; }
 .calendar-detail-sheet .modal-head [data-close] { width: 44px; min-width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--text-secondary); }
 .calendar-detail-sheet .modal-head [data-close] .icon { width: 18px; height: 18px; }
-.calendar-detail-sheet .modal-head [data-close]:focus-visible { background: var(--surface-soft); }
+html[data-input-modality="keyboard"] .calendar-detail-sheet .modal-head [data-close]:focus-visible { background: var(--surface-soft); }
 @media (hover: hover) and (pointer: fine) { .calendar-detail-sheet .modal-head [data-close]:hover { background: var(--surface-soft); } }
 .calendar-day-sheet { overflow: hidden; border: 1px solid color-mix(in srgb, var(--border) 58%, transparent); border-radius: 18px; background: var(--surface); }
 .day-detail-row { display: grid; grid-template-columns: 116px minmax(0, 1fr); align-items: center; gap: 9px; min-height: 68px; padding: 10px 12px; }
@@ -534,7 +535,7 @@ fieldset { display: grid; gap: 8px; padding: 12px; border: 1px solid var(--borde
 .calendar-day-actions button .icon { color: var(--accent-strong); }
 .calendar-day-danger { display: flex; justify-content: center; margin-top: 18px; padding-top: 13px; border-top: 1px solid var(--divider); }
 .calendar-day-danger .danger-button { min-height: 44px; border-color: transparent; background: transparent; color: var(--text-tertiary); }
-.calendar-day-danger .danger-button:focus-visible { color: var(--danger); }
+html[data-input-modality="keyboard"] .calendar-day-danger .danger-button:focus-visible { color: var(--danger); }
 @media (hover: hover) and (pointer: fine) { .calendar-day-danger .danger-button:hover { color: var(--danger); } }
 .weight-hero > p { margin-bottom: 8px; color: var(--text-secondary); font-size: .84rem; }
 .weight-change { display: block; margin-top: 12px; color: var(--info); font-size: .86rem; }

@@ -1,9 +1,9 @@
 /* Shared interaction policy. Modality is explicit so Safari touch focus stays quiet. */
 :root { --focus-ring: var(--accent-mid); --press-bg: color-mix(in srgb, var(--text-primary) 6%, var(--surface-soft)); --control-radius: 12px; --control-height: 44px; --sheet-radius: 26px; }
 :where(button, a, summary, [role="button"], label:has(input), label:has(select)) { -webkit-tap-highlight-color: transparent; }
-:where(button, a, summary, [role="button"]):active { background-color: var(--press-bg); }
+html :where(button, a, summary, [role="button"]):active { background-color: var(--press-bg); }
 .primary:active { background-color: var(--accent-pressed); }
-:where(.text-btn, .sheet-link):active { opacity: .7; background: transparent; }
+html :where(.text-btn, .sheet-link):active { opacity: .7; background: transparent; }
 .food-date-item:active { background: transparent; }
 input:focus, textarea:focus, select:focus { border-color: var(--accent-mid); box-shadow: none; }
 html[data-input-modality="pointer"] :is(button, a, summary, [role="button"], input, textarea, select):focus { outline: none; box-shadow: none; }

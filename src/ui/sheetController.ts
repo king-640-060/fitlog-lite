@@ -10,7 +10,8 @@ export function setupSheetViewport(): () => void {
   const events = new AbortController(), viewport = window.visualViewport
   const update = () => {
     const editing = document.activeElement instanceof Element && !!document.activeElement.closest('input:not([type=checkbox]):not([type=radio]), textarea, [contenteditable=true]')
-    const value = sheetViewport(viewport?.height ?? innerHeight, viewport?.offsetTop ?? 0, innerHeight, editing)
+    const current = window.visualViewport
+    const value = sheetViewport(current?.height ?? innerHeight, current?.offsetTop ?? 0, innerHeight, editing)
     for (const [key, number] of Object.entries({ height: value.height, 'offset-top': value.offsetTop, 'bottom-offset': value.bottomOffset, 'keyboard-overlap': value.keyboardOverlap })) document.documentElement.style.setProperty(`--sheet-${key === 'height' ? 'viewport-height' : key}`, `${number}px`)
     document.body.classList.toggle('keyboard-open', value.keyboardOverlap > 0)
   }
@@ -40,7 +41,7 @@ export function setSheetVariant(dialog: HTMLDialogElement, variant: SheetVariant
 /** Normal close notifies consumers synchronously once, before replacement. Native late close is suppressed. */
 export function presentDialog(dialog: HTMLDialogElement, overlay = false): HTMLDialogElement {
   const release = lockBackground(), trigger = document.activeElement instanceof HTMLElement ? document.activeElement : undefined
-  if (!overlay && primary?.open) { primary.dataset.replacing = 'true'; primary.close() }
+  if (!overlay && primary) { primary.dataset.replacing = 'true'; primary.close() }
   if (!overlay) primary = dialog
   let finalized = false, delivered = false
   const nativeClose = dialog.close.bind(dialog)
@@ -58,7 +59,7 @@ export function presentDialog(dialog: HTMLDialogElement, overlay = false): HTMLD
     if (finalized) return
     nativeClose(value); dialog.dispatchEvent(new Event('close'))
   }
-  dialog.addEventListener('cancel', event => { event.preventDefault(); dialog.close() })
+  // Native Escape emits close unless a domain subview prevents cancel. Do not pre-empt that event.
   dialog.querySelector('[data-close]')?.addEventListener('click', () => dialog.close())
   dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close() })
   const title = dialog.querySelector<HTMLElement>('h2')

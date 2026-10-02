@@ -10,8 +10,11 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi): void
   const dialog = ui.openModal('AI 助手', '<div class="ai-assistant"></div>', true)
   dialog.classList.add('ai-assistant-sheet'); setSheetVariant(dialog, 'assistant')
   const host = dialog.querySelector<HTMLElement>('.ai-assistant')!, active = engine.profiles.active
-  host.innerHTML = `<div class="ai-assistant-toolbar"><div class="ai-current-profile"></div><button class="text-btn" id="ai-assistant-settings">设置</button><button class="text-btn" id="ai-clear-chat">清空</button></div><div class="ai-conversation" role="log" aria-label="AI 对话" aria-live="polite"></div><div class="ai-session-usage"></div><form class="ai-composer">${ui.openFoodVision ? `<button class="secondary ai-camera" id="ai-food-camera" type="button" aria-label="拍包装录入">${icon('camera', 18)}</button>` : ''}<label class="sr-only" for="ai-message-input">向 AI 助手提问</label><textarea id="ai-message-input" rows="1" maxlength="${AI_LIMITS.userChars}" placeholder="提问，或描述记录" enterkeyhint="enter"></textarea><button class="primary" type="submit" id="ai-send">发送</button><button class="secondary" type="button" id="ai-stop" hidden>停止</button></form><p class="ai-footer-note">AI 建议需要确认后才会写入。</p>`
+  const head = dialog.querySelector<HTMLElement>('.modal-head')!
+  head.querySelector('h2')!.insertAdjacentHTML('afterend', `<div class="ai-header-actions"><button class="icon-btn quiet" id="ai-assistant-settings" aria-label="AI 设置">${icon('settings', 19)}</button><button class="icon-btn quiet" id="ai-clear-chat" aria-label="清空对话">${icon('trash', 17)}</button></div>`)
+  host.innerHTML = `<div class="ai-current-profile"></div><div class="ai-capability-notice" hidden><strong>FitLog 数据读取尚未验证</strong><span>当前只能普通聊天</span><button class="text-btn" id="ai-notice-settings">打开设置</button></div><div class="ai-conversation" role="log" aria-label="AI 对话" aria-live="polite"></div><div class="ai-session-usage"></div><form class="ai-composer">${ui.openFoodVision ? `<button class="secondary ai-camera" id="ai-food-camera" type="button" aria-label="拍包装录入">${icon('camera', 18)}</button>` : ''}<label class="sr-only" for="ai-message-input">向 AI 助手提问</label><textarea id="ai-message-input" rows="1" maxlength="${AI_LIMITS.userChars}" placeholder="提问，或描述记录" enterkeyhint="enter"></textarea><span class="ai-send-slot"><button class="primary" type="submit" id="ai-send">发送</button><button class="secondary" type="button" id="ai-stop" hidden>停止</button></span></form><p class="ai-footer-note">AI 建议需要确认后才会写入。</p>`
   host.querySelector<HTMLElement>('.ai-current-profile')!.textContent = active ? `${active.name} · ${active.model}` : '尚未连接 AI 服务'
+  host.querySelector<HTMLElement>('.ai-capability-notice')!.hidden = !active || active.toolCapability === 'supported'
   const log = host.querySelector<HTMLElement>('.ai-conversation')!, textarea = host.querySelector<HTMLTextAreaElement>('textarea')!, composer = host.querySelector<HTMLFormElement>('form')!
   const sendButton = host.querySelector<HTMLButtonElement>('#ai-send')!, stopButton = host.querySelector<HTMLButtonElement>('#ai-stop')!
   const usage = host.querySelector<HTMLElement>('.ai-session-usage')!
@@ -28,8 +31,9 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi): void
   })
   stopButton.addEventListener('click', () => engine.stop())
   host.querySelector('#ai-food-camera')?.addEventListener('click', () => { dialog.close(); ui.openFoodVision?.() })
-  host.querySelector('#ai-assistant-settings')?.addEventListener('click', openSettings)
-  host.querySelector('#ai-clear-chat')?.addEventListener('click', () => engine.clear())
+  head.querySelector('#ai-assistant-settings')?.addEventListener('click', openSettings)
+  head.querySelector('#ai-clear-chat')?.addEventListener('click', () => engine.clear())
+  host.querySelector('#ai-notice-settings')?.addEventListener('click', openSettings)
   const nodeMap = new Map<string, HTMLElement>()
   const draw = () => {
     if (!dialog.isConnected) return
@@ -46,18 +50,18 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi): void
         const privacy = document.createElement('p'); privacy.className = 'ai-note'; privacy.textContent = AI_PRIVACY_TEXT
         const ack = document.createElement('button'); ack.textContent = '我知道了'; ack.addEventListener('click', () => { engine.profiles.acknowledgePrivacy(); draw() }); welcome.append(privacy, ack)
       } else {
-        if (engine.profiles.active.toolCapability !== 'supported') { const notice = document.createElement('p'); notice.className = 'ai-note'; notice.textContent = AI_CHAT_ONLY_MESSAGE; welcome.append(notice) }
         const suggestions = document.createElement('div'); suggestions.className = 'ai-suggestions'
-        for (const prompt of aiSuggestionPrompts) { const button = document.createElement('button'); button.type = 'button'; button.textContent = prompt; button.addEventListener('click', () => { textarea.value = prompt; grow(); draw(); textarea.focus() }); suggestions.append(button) }
+        for (const prompt of aiSuggestionPrompts) { const button = document.createElement('button'); button.type = 'button'; button.textContent = prompt; button.addEventListener('click', () => { textarea.value = prompt; grow(); draw(); textarea.focus({ preventScroll: true }) }); suggestions.append(button) }
         welcome.append(suggestions)
         if (ui.openFoodLibrary) { const library = document.createElement('button'); library.className = 'text-btn'; library.textContent = '管理食物库'; library.addEventListener('click', () => { dialog.close(); ui.openFoodLibrary!() }); welcome.append(library) }
       }
       log.append(welcome)
     } else {
       log.querySelector('.ai-welcome')?.remove()
-      const ids = new Set(engine.items.map(item => item.id))
+      const visibleItems = engine.items.filter(item => !(item.kind === 'notice' && item.content === AI_CHAT_ONLY_MESSAGE))
+      const ids = new Set(visibleItems.map(item => item.id))
       for (const [id, node] of nodeMap) if (!ids.has(id)) { node.remove(); nodeMap.delete(id) }
-      for (const item of engine.items) {
+      for (const item of visibleItems) {
         let node = nodeMap.get(item.id)
         if (!node) { node = document.createElement('article'); node.className = `ai-message ai-${item.kind}`; nodeMap.set(item.id, node); log.append(node) }
         if (item.kind === 'proposal') {
@@ -79,7 +83,9 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi): void
           }
         } else if (node.dataset.content !== item.content) {
           node.dataset.content = item.content; node.replaceChildren()
+          if (item.kind === 'error') { const title = document.createElement('strong'); title.className = 'ai-error-title'; title.textContent = '请求未完成'; node.append(title) }
           const content = document.createElement('p'); content.textContent = item.content; node.append(content)
+          if (item.kind === 'error' && /配置|模型|接口|API Key/.test(item.content)) { const settings = document.createElement('button'); settings.className = 'text-btn'; settings.textContent = '检查设置'; settings.addEventListener('click', openSettings); node.append(settings) }
           if (item.usage && aiUsageText(item.usage)) { const tokens = document.createElement('small'); tokens.className = 'ai-note'; tokens.textContent = aiUsageText(item.usage); node.append(tokens) }
         }
         // A proposal can finish generating while the request remains active.

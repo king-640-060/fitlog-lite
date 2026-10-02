@@ -33,7 +33,7 @@ export function buildAiRequest(model: string, request: AiChatRequest) {
   }
 }
 const statusError = (status: number): AiError => {
-  const messages: Record<number, string> = { 401: 'API Key 无效或已过期，请检查配置', 403: '当前 API Key 没有访问权限', 404: '未找到 API 地址、模型或接口，请检查配置', 429: '请求额度或速率已达到限制，请稍后再试' }
+  const messages: Record<number, string> = { 400: '请求参数无效，请检查模型名称和接口兼容性。', 401: 'API Key 无效或已过期，请检查配置', 403: '当前 API Key 没有访问权限', 404: '未找到 API 地址、模型或接口，请检查配置', 429: '请求额度或速率已达到限制，请稍后再试' }
   return new AiError(`http_${status}`, messages[status] ?? (status >= 500 ? 'AI 服务暂时不可用，请稍后再试' : 'AI 服务拒绝了请求，请检查配置'))
 }
 export class OpenAICompatibleChatAdapter implements AiProviderAdapter {

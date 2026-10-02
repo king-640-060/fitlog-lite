@@ -30,11 +30,11 @@ for (const [width,height] of sizes) {
   const file={name:'synthetic-package.png',mimeType:'image/png',buffer:png}
   const library=async()=>{await nav('food');await page.locator('#food-library').click();await page.locator('#food-vision-import').click()}
   await library();assert.ok((await page.locator('.vision-provider').innerText()).includes('先配置一个支持图片识别的 AI 服务。'));assert.equal(requests.length,0);await layout('unconfigured');await close()
-  await page.locator('#open-management').click();await page.locator('#more-ai-settings').click();await page.locator('#ai-add-profile').click()
-  await page.locator('[name=name]').fill('图片服务');await page.locator('[name=baseUrl]').fill('https://mock-vision.invalid/v1');await page.locator('[name=apiKey]').fill('synthetic-vision-key');await page.locator('[name=model]').fill('editable-vision-model');await page.locator('#ai-privacy-ack').check()
+  await page.locator('#open-management').click();await page.locator('#more-ai-settings').click();await page.locator('.ai-advanced summary').click();await page.locator('[name=preset]').selectOption('custom')
+  await page.locator('[name=name]').fill('图片服务');await page.locator('[name=baseUrl]').fill('https://mock-vision.invalid/v1');await page.locator('[name=apiKey]').fill('synthetic-vision-key');await page.locator('#ai-manual-model').click();await page.locator('[name=model]').fill('editable-vision-model');await page.locator('#ai-privacy-ack').check()
   await page.locator('#ai-test-vision').click();await page.getByText('图片识别已验证，保存后可拍包装录入',{exact:true}).waitFor()
   assert.equal(requests[0].messages.length,1);assert.equal(requests[0].tools,undefined);assert.equal(requests[0].messages[0].content[0].text.includes('731'),false);assert.ok(requests[0].messages[0].content[1].image_url.url.startsWith('data:image/png;base64,'))
-  await page.locator('form button[type=submit]').click();assert.ok((await page.locator('.ai-profile').innerText()).includes('工具：待验证 · 图片：已验证'));await layout('settings');await close()
+  await page.locator('#ai-save-only').click();assert.ok((await page.locator('.ai-capabilities').innerText()).includes('图片识别 · 已验证'));await layout('settings');await close()
   const consent=async()=>{if(await page.locator('#vision-consent').count())await page.locator('#vision-consent').check()}
   const analyze=async()=>{await page.locator('#vision-album-file').setInputFiles(file);await page.waitForSelector('.vision-images img');await consent();await page.locator('#vision-analyze').click();await page.waitForSelector('#vision-review-form')}
   await page.evaluate(()=>{const p=JSON.parse(localStorage.getItem('fitlog-ai-profiles-v1'));p[0].toolCapability='unsupported';p[0].visionCapability='unknown';localStorage.setItem('fitlog-ai-profiles-v1',JSON.stringify(p));localStorage.setItem('fitlog-ai-permissions-v1',JSON.stringify({read:{food:false,training:false,weight:false,plan:false,habit:false,nutritionTargets:false},writeProposals:false}))})
