@@ -2,60 +2,41 @@
 
 ## Latest verified production state — 2026-10-02
 
-Mobile Layout / Information Density Audit implemented and production verified. Full requested66-field report: [MOBILE_LAYOUT_DEV_REPORT.md](docs/MOBILE_LAYOUT_DEV_REPORT.md).
+Comprehensive Mobile UI / UX Quality Audit implemented and production verified. Full105-field report: [UI_QUALITY_AUDIT_DEV_REPORT.md](docs/UI_QUALITY_AUDIT_DEV_REPORT.md). Reusable inventory/matrix: [UI_QA_MATRIX.md](docs/UI_QA_MATRIX.md).
 
 | Identity | Value |
-| --- | --- |
-| START_COMMIT |67f6112a55c99ea91857b8b3123c397b317ebff5|
-| MOBILE_LAYOUT_COMMIT |d94b4ed924cbead8297f5120e622f3bbe57b7e9b|
-| QA_FIX_COMMIT / END_COMMIT |bed79ecdd0e95c6a3956f2c1c0a95a2d3ac79329|
-| Application Actions |[37017973063](https://github.com/king-640-060/fitlog-lite/actions/runs/37017973063) SUCCESS|
-| Application production HEAD / Pages |bed79ecdd0e95c6a3956f2c1c0a95a2d3ac79329 /6810338037 SUCCESS|
-| REPORT_COMMIT / final main / production HEAD |This report commit; exact SHA/Actions/Pages receipt in final artifact and `git log -1 --format=%H -- LATEST_DEV_REPORT.md`|
+|---|---|
+| START_COMMIT |f62b6b957c3852cc3b8f10ae6a3b679a54fd75f2|
+| FORM_PRESENTATION_FIX_COMMIT |b426359b7b07a353655f39cb1eddc474c6615090|
+| VISION_QUALITY_COMMIT |48acde9d23e4a99b1abeea0ada1f39a44bccaaef|
+| UI_QUALITY_AUDIT_COMMIT / END_COMMIT |799e9188305d245bad03ed4c6c3d5de25bd37ba2|
+| Application Actions |[37027614694](https://github.com/king-640-060/fitlog-lite/actions/runs/37027614694) SUCCESS|
+| Application production HEAD / Pages |799e9188305d245bad03ed4c6c3d5de25bd37ba2 /6812032205 SUCCESS|
+| REPORT_COMMIT / final main / production HEAD |This report commit; exact SHA/Actions/Pages in final external artifact and git log -1 --format=%H -- LATEST_DEV_REPORT.md|
 | Production |https://king-640-060.github.io/fitlog-lite/|
-
-Application commits used normal HTTPS fast-forward push. Report HTTPS push timed out; report publication uses the verified GitHub Git Data API fallback with exact blob/tree/commit hashes, exact-parent checks and force:false. No history rewrite. Report-only release keeps identical application assets.
 
 ## Delivered behavior
 
-- App frame owns top `env(safe-area-inset-top)` once; topbar adds ordinary spacing. Existing immersive fixed headers retain their central reserve. No device/per-tab padding or standalone duplicate inset.
-- Five-tab fixed nav and main bottom reserve derive from one row-height/padding/bottom-inset token expression. Pages reserve its full visible height +20px breathing room; last Recent Workout row scrolls wholly above navigation.
-- Shared spacing aliases page-inline16, section-gap20, card-padding16, card-gap10, field-gap12, group-gap16;44px controls and16px editable text retained. Topbar title can shrink, Food/Workout small-screen groups wrap as whole actions, compact Today date metadata uses visual ellipsis while keeping full accessible text.
-- Food Library: Search/Add, then 拍包装录入 / 导入文件. Shared content Sheet chooser exposes CSV and JSON; Management Import uses the same existing parser/preview/confirm logic. Dense rows and one modal-body vertical scroll. Empty state distinguishes no Foods from no matches with a debounce-safe Clear Search.
-- Dedicated Food form: full-width name/brand/reference grams/energy + unit and quiet conversion hint; three equal P/C/F inputs with8px gap,12px form spacing and48px Save. No unexplained orphan grid cell or shared grid-form change. Canonical kcal/4.184 and unit-only energy edits unchanged.
-- Workout cards reduce padding18→16, gap14→10, icon38→34. Strength keeps primary Start/Continue; Cardio/Kegel use compact44px neutral secondary actions; section heads align. Timer/autosave/history/template/business logic unchanged.
-- Management retains grouped IA and62px rows. Local note is short and still asks for Backup before changing device/clearing browser data. Consumer AI summary names service and optional separately configured image route, while actual model IDs stay in AI detail.
-- Empty Exercise/Template managers gain clear next-step copy; empty lists use existing content Sheet variant. Habit/Task empty grammar and paired/complete fields in other forms remain. No broad form rebuild or decorative additions.
+- Shared integer kcal/kJ display and precise canonical EnergyEditor; unchanged-unit and untouched decimal sources preserve original precision at actual save. Generic automatic nutrition/grams/weight labels max1decimal without exponent/noise; no per-keystroke rounding.
+- Text-field CSS excludes native checkbox/radio;20–22px controls inside44px labels. History target44px; Diet template icon accessible names. No native appearance replacement.
+- Vision Fast nutrition1400px/.82/auto and front1000px/.80/low, async JPEG metadata stripping, explicit high1800px retry with no automatic duplicate call. Images/sourceFiles/drafts/numeric-only metrics remain memory-only. Sample request content58.87% smaller; real Provider accuracy/latency Pending.
+- Vision renderStep resets shared Sheet body scroll immediately+guarded RAF; viewer preserves review DOM/focus/position. Ordinary picker lists share Sheet body scrolling. Long brand/model/repo layouts bounded; task time below title;140%发送/停止 remains intact.
+- Durable AGENTS/UI/Visual/Vision/AI docs and reusable uiQualityAudit gate. No schema, migration, Backup/Restore/Sync contract, frozen fixtures, package/framework or AI engine change.
 
 ## Automated Verification
 
-Actual baseline487tests/45files; final487tests/45files PASS. No fake claim of added unit cases: new mobileLayout browser suite covers geometry/actions/imports/forms/summary/120% root fonts. Existing animation guard now matches complete `page-in` name, avoiding false matches against `--page-inline`; no gate disabled. Typecheck, full tests, normal build, Pages build, diff-check PASS.
-
-Local320×812 /375×812 /390×844 /430×932: mobileLayout and eight existing suites PASS (aiStreaming, aiAssistant, aiVoice, aiDualModelRouting, foodVision, interactionStabilization, sharedDatePicker, githubSyncSafety). Production390×844 /430×932: same nine suites PASS. Screenshots inspected across sizes; long Chinese Food/brand/exercise/Task fixtures and120% font simulation included. Safe Area47px top/34px bottom is mocked geometry, not physical Safari proof.
-
-| Pages asset | Bytes | Python gzip bytes | Vite gzip estimate | SHA-256 |
-| --- | --- | --- | --- | --- |
-|index-BC5K5E_w.js|684958|215911|219.19kB|f0a6804a02c6bc17149ce2e0e98fa477b4f35d7f9f5108517c646a20b95eb07a|
-|index-CRvGw-68.css|104999|18790|18.97kB|e7b33e4d1f1b72fc37fb105c384866306c632b3628d5929d1dab011936663dcb|
-
-Precache17entries/806.76KiB. JS+1670B (~0.24%); CSS+2115B. Existing>500kB JS warning; no package/lockfile/manifest/frozen fixture/DB/service/AI engine/Sheet controller changes.
+Baseline487tests/45files; final495tests/46files PASS. Typecheck, normal build, Pages build, diff PASS. Local320/375/390/430:10suites allPASS (uiQualityAudit,mobileLayout,aiStreaming,aiAssistant,aiVoice,aiDualModelRouting,foodVision,interactionStabilization,sharedDatePicker,githubSyncSafety).128states per width/512screenshots; core120/140fonts and812×375/844×390landscape; actual screenshot manual inspection. Matrix records applicable vs unavailable states.
 
 ## Production Verification
 
-Application Actions37017973063 and Pages6810338037 SUCCESS at END_COMMIT. Production JS/CSS exact bytes/SHA match final Pages build; five tabs/AI Settings/Sync entries PASS. Nine suites at390/430 PASS with zero page errors, including streaming/tools/Stop/history/secret guards, Voice/Quick, dual routing/Vision, long Sheet toolbar/keyboard/hysteresis/confirmation/replace/scroll restoration, Date Picker and Sync safety.
+Same10suites390/430 PASS;236newgate screenshots and representative manual inspection. Actual JS/CSS bytes+SHA match verifiedPages build; JS688112B/gzip217071B, CSS105489B/gzip18909B,17precache/810.31KiB. Same existing synthetic persistent profile before/after deployment:14stores,15frozen rows,AIprofile/key/active/visionModel/voiceack unchanged, exactnewSW+offlinecoldboot PASS; no business reseeding/reset. Report-only deployment keeps identical application assets and is rechecked in final external receipt.
 
-Same existing synthetic persistent profile across application and final report deployment: all14stores/15frozen historical rows identical, AI Profiles/API Key/visionModel/Voice privacy ack fingerprints unchanged; no business reseeding/reset. Original Service Worker loads exact new JS, then actual offline cold reload PASS. This desktop synthetic evidence does not prove an external iPhone storage context. Final report-only deployment receipt appears in final artifact.
+## Manual Device Verification / Remaining limits
 
-## Versions
+Production首次并发Streaming等待150ms「正在思考」状态超时；保留失败日志，原完整套件单独复跑390/430 PASS，未弱化/跳过断言。最终10套结果包含此次完整复跑；并发短暂状态断言时序敏感性需留意，详情见完整报告。
 
-fitlog-lite-db /DexieV7 /14stores; BackupV7; RestoreV1–V7; SyncEnvelopeV1; AIConfig/SystemPromptV1; FoodVisionPrompt/extractionV1. No migration, historical recalculation or business semantic change. Existing local dates and snapshots remain.
-
-## Manual Device Verification / remaining risks
-
-Physical iPhone verification: **PENDING**. Check original installed PWA and Safari: all five topbars, Workout date/template/exercise actions and final history row, Food Library/CSV/JSON chooser, Food Editor P/C/F + unit/save, Management summary, AI Assistant keyboard and long touch scroll, toolbar changes and rotation. No doubled top inset or Home Indicator overlap; system zoom remains usable. Preserve existing records/configuration—do not clear/reinstall for QA.
-
-Real Provider/CORS/buffering and real SpeechRecognition Pending. Independent external FitLog AI icon/one-tap listening/same-storage route remain Pending / unsupported by the previously verified path; normal manifest unchanged. No unresolved automated or production failure. See [AI_QUICK_LAUNCH.md](docs/AI_QUICK_LAUNCH.md) for that separate gate.
+Physical iPhone Safari, original installed PWA, real Provider/Fast accuracy/timings, real SpeechRecognition and external quick-launch same installed storage context remain Pending. Chrome font/SafeArea/keyboard mocks and offline persistent profile are separate evidence. Existing>500KB JS warning remains. No unresolved automated/production failure. Full checklist and synchronization chronology in105-field report.
 
 ## ChatGPT Baseline
 
-Read AGENTS→LATEST→UI_INTERACTION_SPEC/INTERACTION_VISUAL_SYSTEM; AI display work also reads AI_ARCHITECTURE/AI_QUICK_LAUNCH. ENDbed79ec… centralizes main Safe Areas/nav reserve, Food two-action Library/common import chooser/dedicated full-width+three-macro form, compact Workout hierarchy, consumer AI summary/local note/shared spacing.487tests/45files +nine local4/prod2 suites, builds/typecheck/diff PASS; exact assets and same14store/15row+AIconfig/key/visionModel/voiceack preservation/SW offline PASS. DBV7/BackupV7/RestoreV1–V7/SyncV1 and AI/Sheet engines unchanged. Physical iPhone/real Provider/Speech/external AI storage path Pending. Exact report/main/production receipt in final artifact.
+Read AGENTS → this report → UI_INTERACTION_SPEC and relevant docs. Current source wins. DBfitlog-lite-db/DexieV7/14stores/BackupV7/RestoreV1–V7/SyncEnvelopeV1 unchanged; no migration. Preserve history/canonical data and AIconfig. Continue reusable UI matrix/gates, native controls and Vision Fast/manualHigh/scroll contracts; do not infer physical/provider PASS. ApplicationEND above; final report receipt in external artifact.
