@@ -2,71 +2,67 @@
 
 ## Latest verified production state — 2026-10-02
 
-Food Packaging Vision V1 is complete and released. This report supersedes the previous unreleased local note. Full 52-field acceptance details: [AI_FOOD_VISION_DEV_REPORT.md](docs/AI_FOOD_VISION_DEV_REPORT.md).
+Interaction & Visual System Stabilization is complete and released. Full 52-field acceptance report: [INTERACTION_VISUAL_DEV_REPORT.md](docs/INTERACTION_VISUAL_DEV_REPORT.md). Durable rules: [INTERACTION_VISUAL_SYSTEM.md](docs/INTERACTION_VISUAL_SYSTEM.md).
 
 | Identity | Value |
 | --- | --- |
-| START_COMMIT (continuation) | e46aaf5b29e989a992239619a8101e41ecf9f9f2 |
-| Original production baseline | a677eca53d2653c7764b845b365d075dced2481a |
-| Original implementation / AI_VISION_COMMIT / APPLICATION_COMMIT | 6c99796f2147d20c3f7baeee234361433ff1ee67 |
-| VISION_FIX_COMMIT / END_COMMIT / verified production application | 508057ca0f955859975a89dae68efee368378bcc |
-| Final report/main HEAD | This report and verification-harness follow-up commit; exact SHA returned in release response and available from `git log -1 --format=%H -- LATEST_DEV_REPORT.md` |
+| START_COMMIT | ee446bf4fb01a0a1e9fd0bdabbe63b7185143ddc |
+| INTERACTION_STABILIZATION_COMMIT | 76c9e8fec46eb9a37a0569a684ecfb91643c9ac5 |
+| AI_UI_SIMPLIFICATION_COMMIT | 624353c1d07b56d4a7610a7c7f2eef29c7c33281 |
+| VISUAL_SYSTEM_COMMIT | 0af568c478cad26299a976962e1178a4f138b62c |
+| END_COMMIT / last application | 832f812aef96d0238dc93dbc6339e10f883f5c09 — final service/permission summary layout |
+| Verified application deployment HEAD | 4a83b1178f56e53aaafaa2ebe2c2bf876a1f2582 — only persistent verifier strengthened; same END application assets |
+| Application Actions | [36986639166](https://github.com/king-640-060/fitlog-lite/actions/runs/36986639166) — success |
+| Report/main HEAD | This report commit; exact SHA is returned in the release response and available from `git log -1 --format=%H -- LATEST_DEV_REPORT.md` |
 | Production | https://king-640-060.github.io/fitlog-lite/ |
-| Application Actions | [36978286625](https://github.com/king-640-060/fitlog-lite/actions/runs/36978286625) — success |
 
-The existing 6c99796 and e46aaf5 commits were preserved. HTTPS Git transport timed out; GitHub Git Data API verified identical commit/tree/blob SHAs and advanced main without force. The report follow-up contains no application change; its deployment serves the same verified assets. The calling release response records the final report commit, remote main and final successful Actions run.
+Git HTTPS push timed out. GitHub Git Data API verified identical blob/tree/commit SHAs and advanced main without force. Original history was preserved. Intermediate Actions were superseded by concurrency; the application-verification deployment completed. The report deployment serves the same verified app assets, with its final main/deployment/Actions recorded in the release response.
 
 ## Delivered behavior
 
-- Food Library, meal recording and assistant camera share one explicit packaging workflow. Two slots: nutrition table required, front optional. Camera uses rear-camera hint; gallery does not force the camera. Library/meal capture selected Food date; assistant captures local Today.
-- Native decode → new Canvas → JPEG removes metadata and preserves decoded orientation. Max 20 MiB source, 60M decoded pixels, 1800px long edge, quality .88/.84/.80 as needed, 3 MiB/image, 6 MiB total binary, 9 MiB request. Images/extraction stay in workflow memory and never enter business DB/Backup/Sync/history. Independent first-image privacy acknowledgement explains transmission and provider-controlled retention.
-- Existing OpenAI-compatible adapter sends text/image_url parts directly with no tools/history/business data. Vision capability is independent, unknown can try, exact probe or validated extraction can verify support. Only explicit image rejection establishes unsupported. 45s timeout, Stop, no retry/proxy/new dependency.
-- Prompt/extraction V1 copies visible label fields with bounded evidence; strict parser rejects malformed results. Missing macros remain undefined; missing energy/name/gram basis requires correction. No 4/4/9, density or whole-package assumptions.
-- Per100g/custom/explicit serving gram bases retain grams. Per-package can use explicit g/kg; volume labels require manual gram equivalence. Energy uses exactly 4.184 kJ/kcal and canonical kcal. Explicit kcal wins; a second observed kJ may trigger local discrepancy warning. Shared manual/Vision energy state preserves exact energy through unit-only switches and unrelated edits.
-- Editable review → local preview → explicit confirmation. Duplicate name+brand requires Use existing / Update existing / Save as new. Transaction rechecks existing source. Save-only writes Food; save+record uses existing services atomically, retains historical snapshots and prevents double taps. Actual grams starts blank; whole-package shortcut requires a tap. Explicit meal (including Unclassified), shared date picker and future-intake guard remain local.
+- Explicit pointer/keyboard modality. Touch controls have no persistent keyboard outline or input glow; keyboard controls retain 2px focus. Initial Sheet focus is its title, with no input/X autofocus. Hidden Habit controls follow the same policy. Hover requires a fine hover pointer; controls use quiet background/color/opacity presses.
+- Shared native Sheet lifecycle: one primary, normal close/once-only cleanup before replacement, native confirmations above the preserved Sheet, title/keyboard trigger focus, reference-counted background lock and original scroll restoration. Native cancel can return from a date subview. No duplicate AI/Vision viewport listeners.
+- One VisualViewport coordinator, shared height/offset/bottom/overlap variables, stable header and independent body/assistant conversation/composer. Bottom-nav hiding does not change page padding. Content/form/large/assistant variants share Safe Area handling. Backdrops are RGBA with no blur.
+- Ordinary page updates, nutrition values/rings and charts display final states without entrance/count/pulse replay. Sheet/toast motion stays bounded; native rail/timer functional updates remain.
+- AI Settings shows the current service first, with permissions, profiles and long privacy details in subviews. No profile opens Provider/Key/Model connection. Zhipu hides its preset root normally; Custom and advanced endpoint edits stay generic. Explicit exact `/models` selection preserves missing current IDs and has an always-available/manual-on-error fallback.
+- Save and Test saves locally then probes Chat, Tools, Vision independently. Stale root/key/model/subview/close work is aborted/ignored. Advanced single probes and save-only remain. Keys stay empty in saved edit-form values.
+- Assistant has quiet header controls, readable provider/model, compact chat-only notice and safe errors, two-column suggestions and a fixed-width Send/Stop slot. HTTP400 gives parameter/model/interface guidance; raw errors stay hidden. IME, Stop, camera, near-bottom scroll, memory session, actual tools/proposals/permissions/writes are preserved.
+- Neutral secondary actions and management surfaces, flat 16–18px cards, 12–14px controls, 26px sheets and two shadow tokens refine Fresh Green. Smaller delete/reorder/summary controls were enlarged; metadata and AI summary rows remain readable at320px. No dependency/framework was added.
 
 ## Automated Verification
 
-- npm run typecheck: PASS.
-- npm test: **377 tests / 38 files PASS**, including frozen legacy compatibility, populate/reopen/migration/Backup, GitHub Sync, AI and existing domain regressions.
-- npm run build: PASS.
-- GITHUB_REPOSITORY=king-640-060/fitlog-lite npm run build: PASS.
-- git diff --check: PASS.
-- Local 320×812, 375×812, 390×844, 430×932: Food Vision, AI Assistant, Shared Date Picker and GitHub Sync safety browser scripts PASS. Synthetic images, keys, records and mock Provider only.
-- Security audit: escaped model output; bearer-only key; bounded safe errors; textual secrets scanned without scanning raster base64 as text; image storage exclusions; no native business date inputs/UTC date truncation/new dependencies.
-- Frozen legacy fixtures, business database/schema, Backup/Restore/Sync and package files unchanged.
+- Baseline: **377 tests /38 files PASS**; final: **384 tests /39 files PASS**.
+- npm run typecheck, npm test, npm run build, Pages build with GITHUB_REPOSITORY, git diff --check: PASS.
+- 320×812 /375×812 /390×844 /430×932: Interaction Stabilization, Assistant, Food Vision, Shared Date Picker and GitHub Sync Safety browser scripts all PASS. Synthetic images/credentials/records and mocked provider only.
+- Added modality/keyboard/caret/IME, viewport geometry, forbidden CSS/rAF/static boundary, neutral primitive and HTTP400 regressions. Existing frozen V7/history/Backup/Restore, Nutrition Completion, AI orchestrator/tools/proposals/security, Vision and Sync pass.
+- Full interaction audit is documented in INTERACTION_VISUAL_SYSTEM. Legitimate rAF/scroll exceptions are native Food Rail visual scheduling/centering and the actual pelvic timer/explicit meal picker. No user-facing native date inputs.
+- Business DB/schema, existing business/AI execution services, package files and frozen fixtures remain unchanged except the safe Provider HTTP400 message.
 
 ### Pages assets
 
 | Asset | Bytes | Vite gzip | SHA-256 |
 | --- | --- | --- | --- |
-| index-BQv77Iqt.js | 655765 | 210.34 kB | 9acc8a0ac4366cdd006d2bebb7db5f952efc739f5195211c19300003fab3f0a7 |
-| index-C2fNovyN.css | 98569 | 17.90 kB | 34c8770f0b60582f5c34240ca849ad34ef7f6c42fdc894a10209098fc3e90c4d |
+| index-NzqvkQaX.js | 662972 | 212.52 kB | 477d82869d30fb193b8a479dec2bff473d1377b660e5428d3ebce746d123688f |
+| index-C3VM3X0K.css | 101276 | 18.17 kB | 2007bba0d1e0ed695ee8440bea85b61693098967dfee4cc82391c0ce1451fbad |
 
-PWA precache: 17 entries / 771.97 KiB. Existing >500kB JS chunk warning remains.
+PWA precache:17 entries /781.65KiB. Existing >500kB JS warning remains.
 
 ## Production Verification
 
-- Application Actions and Pages deployment at END_COMMIT: success. Live JS/CSS bytes and SHA-256 match the verified Pages build exactly.
-- 390×844 / 430×932 mock Vision workflow PASS, including camera/gallery attributes, review, kJ conversion, save-only/save+record, user edits, duplicates and historical snapshots, actual dinner/date, Stop/errors, unknown/unsupported capability and manual/offline paths.
-- Complete 105g/per100g/1980kJ/P9.2/C61.3/F21 mock example PASS at both sizes: canonical 473.23135755258124 kcal; 50g record 236.61567877629062 kcal. Missing macro/energy and mL guard covered separately.
-- Production AI Assistant, Shared Date Picker and GitHub Sync safety regression at both sizes: PASS. Five main views, AI Settings and GitHub Sync entry: PASS; no page errors.
-- **Cross-deploy preservation PASS:** same persistent synthetic browser profile before/after deployment; new workflow loaded under Service Worker; all 14 stores / 15 frozen records exactly unchanged. Stable fitlog-lite-db identity / Dexie V7. No database reset during upgrade. The new verifier's asynchronous-DOM/hidden-input waits were corrected in this report follow-up.
+- Actions36986639166 and Pages deployment6804934011 at verified HEAD: success. Live asset bytes/hash exactly match the verified Pages build.
+- 390×844 /430×932: all five browser suites PASS, including touch/keyboard/title focus, major Sheets/confirmation/subview/Escape/rapid close, viewport mock/scroll restore, current settings/model/partial capabilities, HTTP400/errors/Stop/proposals, Food/Vision/DatePicker/Workout/Progress, offline core and Sync safety. No page errors.
+- **Cross-deployment preservation PASS:** same dedicated synthetic persistent browser profile before/after; exact new JS build loaded under the old Service Worker; stable fitlog-lite-db /DexieV7, all14stores /15frozen records unchanged. After check is readonly, without resetting DB.
 
 ## Versions and compatibility
 
-- DB identity fitlog-lite-db; Dexie V7 /14 stores, no migration.
-- Backup V7; Restore V1–V7; GitHub Sync Envelope V1.
-- AI Config V1; AI System Prompt V1; Food Vision Prompt / extraction V1.
-- Food/FoodLog/Targets/imports/Reports/tools keep canonical kcal, local business dates, unknown macro semantics and historical snapshots.
-- Bottom navigation remains exactly Today / Plan / Food / Workout / Progress. Progress remains Trend / Calendar / Reports; Calendar day details and weekly/monthly Reports retain their existing meanings. Nutrition Completion and manual encrypted GitHub Sync remain available.
+DB identity fitlog-lite-db; DexieV7 /14stores; BackupV7; RestoreV1–V7; SyncEnvelopeV1; AIConfigV1; AISystemPromptV1; FoodVisionPrompt/extractionV1. No migrations. Canonical kcal, unknown macros, local business dates and saved snapshots are preserved. Five bottom tabs remain Today/Plan/Food/Workout/Progress; Progress remains Trend/Calendar/Reports.
 
-## Manual Device Verification / remaining risks
+## Manual Device Verification
 
-- Real Provider: **Pending**, no real API Key used. Mock production tests do not establish real image transcription quality or CORS compatibility.
-- Physical iPhone Safari and installed PWA: **Pending** for camera/photo-library return, orientation/HEIC, keyboard, Safe Area, energy units and save+record.
-- HEIC relies on native browser decoding. Evidence checks only numeric/unit consistency; user review is still required. Existing large JS bundle warning remains.
+- Real Provider: **Pending**, no real API Key used.
+- Physical iPhone Safari and installed standalone PWA: **Pending**. Chromium touch/keyboard geometry and Service Worker upgrade verification do not establish physical device behavior.
+- Device checklist: X/touch rings; keyboard and reachable last form/save; rapid sheets/background position; settings scrolling; composer/IME/Safe Area; camera/photo-library/rotation return.
 
 ## ChatGPT Baseline
 
-Read AGENTS.md → LATEST_DEV_REPORT.md, then UI_INTERACTION_SPEC / AI_ARCHITECTURE for relevant work. Current production application baseline is 508057ca0f955859975a89dae68efee368378bcc with this report/verification follow-up on main. Food Packaging Vision is released and shared across three entries, with two image roles, device-only privacy acknowledgement, deterministic nutrition/unit handling, explicit duplicate selection and atomic ordinary Food/FoodLog writes. 377 tests/38 files PASS; production mock QA and cross-deploy 14-store preservation PASS. No schema/dependency changes. Real Provider and physical iPhone remain Pending. Keep all data preservation contracts.
+Read AGENTS → LATEST_DEV_REPORT → UI_INTERACTION_SPEC → INTERACTION_VISUAL_SYSTEM; AI_ARCHITECTURE for AI changes. Application END832f812aef96d0238dc93dbc6339e10f883f5c09 with verifier/report follow-ups on main. Shared input modality/Sheet lifecycle/viewport are authoritative. No touch ring/global press scale/page or nutrition count/ring/chart replay/backdrop blur. AI settings is current-service-first with permissions/advanced subviews, exact models/manual fallback and independent Save-and-Test. Assistant execution contracts remain unchanged. Fresh Green uses neutral secondary controls, flat cards and clear typography. 384tests/39files PASS; production mock suites and exact14-store preservation PASS. Real Provider/physical iPhone Pending. Preserve all DBV7/BackupV7/RestoreV1–V7/SyncV1/AIConfig+PromptsV1 contracts.
