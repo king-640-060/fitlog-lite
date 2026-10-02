@@ -1,3 +1,4 @@
+import { VOICE_PRIVACY_TEXT } from '../services/speechRecognitionService'
 import { getVisionModel } from '../ai/modelRouting'
 import { AiError } from '../ai/security'
 import { setSheetVariant } from './sheetController'
@@ -24,7 +25,7 @@ export function showAiSettings(ui: AiSettingsUi, profiles = new AiProfiles()): v
   const view = (html: string, title = 'AI 设置') => { controller?.abort(); controller = undefined; generation++; host.innerHTML = html; dialog.querySelector('h2')!.textContent = title; dialog.querySelector('.modal-body')!.scrollTop = 0 }
   dialog.addEventListener('close', () => { generation++; controller?.abort() }, { once: true })
   const privacy = () => {
-    view(`<button class="text-btn" id="ai-settings-back">${icon('chevron', 16)} 返回</button><section class="ai-privacy-details"><h3>数据如何使用</h3><p>${AI_PRIVACY_TEXT}</p><h3>设备上的凭据</h3><p>${AI_CREDENTIAL_TEXT}</p><h3>包装图片</h3><p>${VISION_PRIVACY_TEXT}</p><p>${VISION_PROVIDER_PRIVACY_TEXT}</p></section>`, 'AI 隐私说明')
+    view(`<button class="text-btn" id="ai-settings-back">${icon('chevron', 16)} 返回</button><section class="ai-privacy-details"><h3>数据如何使用</h3><p>${AI_PRIVACY_TEXT}</p><h3>设备上的凭据</h3><p>${AI_CREDENTIAL_TEXT}</p><h3>语音输入</h3><p>${VOICE_PRIVACY_TEXT}</p><h3>包装图片</h3><p>${VISION_PRIVACY_TEXT}</p><p>${VISION_PROVIDER_PRIVACY_TEXT}</p></section>`, 'AI 隐私说明')
     host.querySelector('#ai-settings-back')!.addEventListener('click', overview)
   }
   const permissions = () => {

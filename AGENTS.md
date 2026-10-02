@@ -118,6 +118,14 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 - Mock provider tests are separate from real provider compatibility and physical iPhone verification. Never use real user keys or business records in automated browser QA.
 - Food packaging Vision is one explicit workflow shared by Food Library, meal entry and the assistant. It uses the existing adapter directly, without agent tools/history. The model only transcribes visible label fields with bounded evidence; local validation and kJ/kcal conversion own all numbers. Never estimate nutrition from a dish photo, infer density or treat mL as grams. Images/extraction stay in memory and out of DB/Backup/Sync; saving an ordinary Food and optional FoodLog requires a local preview and explicit confirmation.
 
+## Voice and quick launch contract
+
+- Voice input is only an input method for the existing AI assistant. Final transcripts use the same `engine.send` path as typed input; voice never confirms proposals or writes directly.
+- FitLog does not persist audio or own a MediaStream. Browser/OS speech recognition must not be described as guaranteed on-device or offline. Abort on close, visibility loss and pagehide; no background listening or automatic restart.
+- Quick-launch prompts use ephemeral URL fragments, never normal query strings. Consume immediately, keep drafts only in memory, and retain existing secret/permission/proposal enforcement.
+- External iOS launchers are unverified until a physical device proves the same installed web-app storage context, existing business records and AI configuration/key without re-entry/Restore/Sync.
+- Do not create a duplicate Home Screen web app merely to obtain a second icon. Do not rely on undocumented URL schemes for production data access. Keep the normal manifest identity/start URL and main icon behavior.
+
 ## Durable interaction rules
 
 - Touch focus must not show keyboard-style outlines; keyboard focus must remain explicit.

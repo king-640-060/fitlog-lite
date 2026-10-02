@@ -29,6 +29,7 @@ Connection testing sends only `Reply with OK.`. A separate forced `fitlog_capabi
 | `fitlog-ai-permissions-v1` | Six read scopes + write-proposal permission |
 | `fitlog-ai-privacy-ack-v1` | Device acknowledgement |
 | `fitlog-ai-vision-privacy-ack-v1` | Independent first-image transmission acknowledgement |
+| `fitlog-ai-voice-privacy-ack-v1` | Independent browser/system voice acknowledgement |
 
 Food, Training, Weight, Plan, Habit, Nutrition Targets read permissions default on. Write proposals default on; there is no direct-write permission. The registry removes unauthorized definitions and checks authorization on every execution. Confirmation checks it again inside the business transaction. Reports require all five relevant health scopes; they contain no Tasks. Turning off Weight also removes the compound Report tool to avoid disclosure through reports.
 
@@ -117,7 +118,7 @@ Conversation, usage and proposal cards survive closing/reopening within the page
 
 Unit files: aiProvider, aiProfiles, aiTools, aiProposals, aiOrchestrator, aiSecurity, aiUiHelpers. Browser script `tests/browser/aiAssistant.mjs` intercepts synthetic provider requests in fresh synthetic browser contexts at four mobile sizes; production uses 390/430. Existing frozen-V7, GitHub Sync and Shared Date Picker gates remain required. These mocks verify app behavior and protocol shape; they do not establish a real vendor's model quality, CORS policy or tool compatibility. Physical iPhone Safari/PWA keyboard and Safe Area behavior remain a distinct manual verification category.
 
-Future protocols can supply a new adapter, preserving the same tools, facts, proposals and write-confirmation semantics. Streaming, remote/backend credential custody, voice, search, MCP/RAG, automatic plans or automatic writes remain outside V1. Packaging Vision uses the direct workflow below.
+Future protocols can supply a new adapter, preserving the same tools, facts, proposals and write-confirmation semantics. Streaming, remote/backend credential custody, search, MCP/RAG, automatic plans or automatic writes remain outside V1. Voice is an optional input method described below. Packaging Vision uses the direct workflow below.
 
 ## Packaging Vision
 
@@ -144,3 +145,14 @@ The model section says “对话与 FitLog 数据模型”. Image routing defaul
 Six read switches and write proposals are in a separate permission view with real input controls. Enforcement remains in the unchanged registry/proposal transaction. UI simplification adds no permission or mutation path. The assistant filters the existing repeated chat-only notice from ordinary message rendering and displays one compact status notice, while protocol/history semantics remain unchanged. HTTP 400 adds an actionable fixed Chinese message; optional raw provider diagnostics are deliberately not displayed.
 
 Assistant and Vision use the common Sheet viewport/lifecycle; no private resize listeners remain. Conversation/proposal DOM updates, IME shortcuts, near-bottom scroll, Stop, camera and memory session behavior remain. Header controls are quiet icons; the composer reserves the same width for Send/Stop. Mock browser verification and physical iPhone/provider checks remain distinct.
+
+
+## Voice input and quick launch
+
+`SpeechRecognitionService` feature-detects standard / Safari-prefixed Web Speech recognition. Chinese (`zh-CN`), one finite session, interim results and one alternative; no FitLog audio capture, upload, backend, STT provider or dependency. Browser/OS processing may require network. Interim text stays in a live status area; final segments are deduplicated by result index and published only once on `end`. Stop asks the service to finish; abort invalidates session callbacks before detaching. Close/hidden/pagehide abort, dispose removes handlers/listeners, and no session restarts itself.
+
+The assistant's shared `submitText` path handles typed, final voice and quick text. Profile, privacy, busy, composition and 6000-character checks precede unchanged `engine.send`, known-secret guarding, provider/tool routing, scopes and proposals. Voice combines existing composer text with final transcript using a newline. Manual Send aborts voice and sends current typed text only. Voice never confirms a card. Camera/Vision model support and Tools support do not gate ordinary voice chat.
+
+`quickLaunch.ts` parses only fragment fields: `#quick=ai`, `#quick=ai&voice=1`, `#quick=ai&prompt=<encoded text>&send=1`. Prompt is untrusted ephemeral text, decoded once, trimmed and bounded. Unknown fields are ignored; malformed/oversized prompts do not launch. Valid and rejected AI fragments are consumed immediately using `history.replaceState`, preserving pathname/query/Pages base. Startup routes after database/render readiness; warm hashchange uses the same serialized opening/autosave flush. An already-open assistant receives the intent without a second Sheet or stopping an active turn. Busy prompts stay in the composer with no deferred automatic send; privacy-blocked prompts may continue after acknowledgement if unchanged. Missing service keeps the draft; in-page close/reopen preserves it only in memory, reload clears it.
+
+Voice privacy is a separate device-local acknowledgement, excluded from DB/Backup/Sync along with all drafts/recognition state. No mic silently starts on first disclosure. Quick Voice without active user activation shows a calm start button; automatic policy denial also falls back to that button. Feature detection and mocks do not prove physical Safari/PWA microphone or external launcher behavior. See [AI_QUICK_LAUNCH.md](AI_QUICK_LAUNCH.md) for the contract and storage verification gate.

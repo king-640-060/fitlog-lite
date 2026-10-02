@@ -4,40 +4,93 @@ import { AI_LIMITS } from '../ai/security'
 import { showAiSettings, AI_PRIVACY_TEXT, type AiSettingsUi } from './aiSettings'
 import { aiProposalPreviewLines, aiProposalStatusLabels, aiSuggestionPrompts, aiUsageText, shouldSendAiShortcut } from './aiUiHelpers'
 import { icon } from './icons'
+import { SpeechRecognitionService, SPEECH_UNSUPPORTED, VOICE_PRIVACY_KEY, VOICE_PRIVACY_TEXT } from '../services/speechRecognitionService'
 
 export interface AiAssistantUi extends AiSettingsUi { beforeOpen?: () => Promise<void>; openFoodLibrary?: () => void; openFoodVision?: () => void }
-export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi): void {
+export interface AiAssistantLaunchOptions { voice?: boolean; initialText?: string; autoSend?: boolean }
+export interface AiAssistantHandle { dialog: HTMLDialogElement; applyLaunch: (options: AiAssistantLaunchOptions) => void }
+const drafts = new WeakMap<AiOrchestrator, string>()
+export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi, options: AiAssistantLaunchOptions = {}): AiAssistantHandle {
   const dialog = ui.openModal('AI 助手', '<div class="ai-assistant"></div>', true)
   dialog.classList.add('ai-assistant-sheet'); setSheetVariant(dialog, 'assistant')
-  const host = dialog.querySelector<HTMLElement>('.ai-assistant')!, active = engine.profiles.active
+  const host = dialog.querySelector<HTMLElement>('.ai-assistant')!
   const head = dialog.querySelector<HTMLElement>('.modal-head')!
   head.querySelector('h2')!.insertAdjacentHTML('afterend', `<div class="ai-header-actions"><button class="icon-btn quiet" id="ai-assistant-settings" aria-label="AI 设置">${icon('settings', 19)}</button><button class="icon-btn quiet" id="ai-clear-chat" aria-label="清空对话">${icon('trash', 17)}</button></div>`)
-  host.innerHTML = `<div class="ai-current-profile"></div><div class="ai-capability-notice" hidden><strong>FitLog 数据读取尚未验证</strong><span>当前只能普通聊天</span><button class="text-btn" id="ai-notice-settings">打开设置</button></div><div class="ai-conversation" role="log" aria-label="AI 对话" aria-live="polite"></div><div class="ai-session-usage"></div><form class="ai-composer">${ui.openFoodVision ? `<button class="secondary ai-camera" id="ai-food-camera" type="button" aria-label="拍包装录入">${icon('camera', 18)}</button>` : ''}<label class="sr-only" for="ai-message-input">向 AI 助手提问</label><textarea id="ai-message-input" rows="1" maxlength="${AI_LIMITS.userChars}" placeholder="提问，或描述记录" enterkeyhint="enter"></textarea><span class="ai-send-slot"><button class="primary" type="submit" id="ai-send">发送</button><button class="secondary" type="button" id="ai-stop" hidden>停止</button></span></form><p class="ai-footer-note">AI 建议需要确认后才会写入。</p>`
-  const providerLabel = active?.preset === 'zhipu' ? '智谱' : active?.name.startsWith('自定义 · ') ? '自定义服务' : active?.name
-  host.querySelector<HTMLElement>('.ai-current-profile')!.textContent = active ? `${providerLabel} · ${active.model}` : '尚未连接 AI 服务'
-  host.querySelector<HTMLElement>('.ai-capability-notice')!.hidden = !active || active.toolCapability === 'supported'
+  host.innerHTML = `<div class="ai-current-profile"></div><div class="ai-capability-notice" hidden><strong>FitLog 数据读取尚未验证</strong><span>当前只能普通聊天</span><button class="text-btn" id="ai-notice-settings">打开设置</button></div><div class="ai-conversation" role="log" aria-label="AI 对话" aria-live="polite"></div><div class="ai-session-usage"></div><section class="ai-voice-panel" hidden><p class="ai-note ai-voice-disclosure" hidden></p><div class="ai-voice-row"><span class="ai-voice-status" role="status" aria-live="polite"></span><button class="text-btn" id="ai-voice-start" type="button" hidden>开始说话</button></div></section><form class="ai-composer">${ui.openFoodVision ? `<button class="secondary ai-camera" id="ai-food-camera" type="button" aria-label="拍包装录入">${icon('camera', 18)}</button>` : ''}<button class="secondary ai-mic" id="ai-mic" type="button" aria-label="语音输入" aria-pressed="false">${icon('mic', 18)}</button><label class="sr-only" for="ai-message-input">向 AI 助手提问</label><textarea id="ai-message-input" rows="1" maxlength="${AI_LIMITS.userChars}" placeholder="提问，或描述记录" enterkeyhint="enter"></textarea><span class="ai-send-slot"><button class="primary" type="submit" id="ai-send">发送</button><button class="secondary" type="button" id="ai-stop" hidden>停止</button></span></form><p class="ai-footer-note">AI 建议需要确认后才会写入。</p>`
   const log = host.querySelector<HTMLElement>('.ai-conversation')!, textarea = host.querySelector<HTMLTextAreaElement>('textarea')!, composer = host.querySelector<HTMLFormElement>('form')!
   const sendButton = host.querySelector<HTMLButtonElement>('#ai-send')!, stopButton = host.querySelector<HTMLButtonElement>('#ai-stop')!
   const usage = host.querySelector<HTMLElement>('.ai-session-usage')!
   const openSettings = () => { dialog.close(); showAiSettings({ ...ui, changed: () => { engine.settingsChanged(); ui.changed?.() } }, engine.profiles) }
-  let composing = false
+  let composing = false, closed = false, pendingAutoText: string | undefined
+  const speech = new SpeechRecognitionService()
+  const mic = host.querySelector<HTMLButtonElement>('#ai-mic')!, voicePanel = host.querySelector<HTMLElement>('.ai-voice-panel')!, voiceStatus = host.querySelector<HTMLElement>('.ai-voice-status')!, disclosure = host.querySelector<HTMLElement>('.ai-voice-disclosure')!, voiceStart = host.querySelector<HTMLButtonElement>('#ai-voice-start')!
+  const voiceAcknowledged = () => localStorage.getItem(VOICE_PRIVACY_KEY) === '1'
+  const showVoice = (message: string, action?: string, privacy = false) => {
+    voicePanel.hidden = false; voiceStatus.textContent = message; voiceStart.hidden = !action
+    if (action) voiceStart.textContent = action
+    disclosure.hidden = !privacy; disclosure.textContent = privacy ? VOICE_PRIVACY_TEXT : ''
+    voicePanel.classList.toggle('is-listening', speech.active)
+  }
   const grow = () => { textarea.style.height = 'auto'; textarea.style.height = `${Math.min(120, Math.max(44, textarea.scrollHeight))}px` }
-  textarea.addEventListener('input', () => { grow(); sendButton.disabled = engine.busy || !textarea.value.trim() || !engine.profiles.active || !engine.profiles.privacyAcknowledged })
-  textarea.addEventListener('compositionstart', () => { composing = true })
-  textarea.addEventListener('compositionend', () => { composing = false })
+  textarea.value = drafts.get(engine) || ''
+  const submitText = (text: string): boolean => {
+    if (closed || composing || !text.trim()) return false
+    if (speech.active) speech.abort()
+    if (engine.busy) { showVoice('上一条请求还在处理中。'); return false }
+    if (!engine.profiles.active || !engine.profiles.privacyAcknowledged) { draw(); return false }
+    if (text.length > AI_LIMITS.userChars) { showVoice(`文字最多 ${AI_LIMITS.userChars} 个字符，请编辑后发送。`); return false }
+    pendingAutoText = undefined; textarea.value = ''; drafts.delete(engine); grow(); void engine.send(text); return true
+  }
+  textarea.addEventListener('input', () => { pendingAutoText = undefined; drafts.set(engine, textarea.value); grow(); draw() })
+  textarea.addEventListener('compositionstart', () => { composing = true; draw() })
+  textarea.addEventListener('compositionend', () => { composing = false; draw() })
   textarea.addEventListener('keydown', event => { if (shouldSendAiShortcut(event, composing)) { event.preventDefault(); composer.requestSubmit() } })
   composer.addEventListener('submit', event => {
-    event.preventDefault(); if (engine.busy || composing || !textarea.value.trim()) return
-    const text = textarea.value; textarea.value = ''; grow(); void engine.send(text)
+    event.preventDefault(); if (composing) return
+    speech.abort(); submitText(textarea.value)
   })
+  const startVoice = (automatic = false) => {
+    if (closed || engine.busy || composing || document.visibilityState !== 'visible') return
+    if (speech.state === 'unsupported') { showVoice(SPEECH_UNSUPPORTED); return }
+    if (!engine.profiles.active || !engine.profiles.privacyAcknowledged) { showVoice('连接 AI 服务并确认数据隐私说明后，可以开始语音。', '开始说话'); draw(); return }
+    if (!voiceAcknowledged()) { showVoice('开始前，请了解语音如何处理。', automatic ? '开始语音' : '我知道了', true); return }
+    // Never focus an editable field: voice mode must not open the software keyboard.
+    if (document.activeElement === textarea) textarea.blur()
+    pendingAutoText = undefined
+    speech.start({
+      onState: state => {
+        if (closed) return
+        mic.setAttribute('aria-pressed', String(speech.active)); mic.setAttribute('aria-label', speech.active ? '停止语音输入' : '语音输入')
+        if (state === 'starting' || state === 'listening') showVoice('正在听…')
+        if (state === 'stopping') showVoice('正在结束语音…')
+        voicePanel.classList.toggle('is-listening', speech.active)
+      },
+      onInterim: text => { if (!closed) showVoice(text ? `正在听… ${text}` : '正在听…') },
+      onFinal: text => {
+        if (closed) return
+        textarea.value = [textarea.value.trim(), text].filter(Boolean).join('\n'); drafts.set(engine, textarea.value); grow()
+        showVoice('语音已转为文字。'); submitText(textarea.value); draw()
+      },
+      onError: (message, code) => { if (!closed) { showVoice(automatic && ['not-allowed', 'service-not-allowed'].includes(code) ? '准备好后开始说话' : message, speech.state === 'unsupported' ? undefined : '开始说话'); draw() } },
+    })
+  }
+  mic.addEventListener('click', () => { if (speech.active) speech.stop(); else startVoice() })
+  voiceStart.addEventListener('click', () => { if (disclosure.hidden === false) localStorage.setItem(VOICE_PRIVACY_KEY, '1'); startVoice() })
+  const abortVoice = () => { if (speech.active) { speech.abort(); showVoice('语音输入已取消。', '开始说话') } }
+  const visibility = () => { if (document.visibilityState !== 'visible') abortVoice() }
+  document.addEventListener('visibilitychange', visibility); window.addEventListener('pagehide', abortVoice)
   stopButton.addEventListener('click', () => engine.stop())
   host.querySelector('#ai-food-camera')?.addEventListener('click', () => { dialog.close(); ui.openFoodVision?.() })
   head.querySelector('#ai-assistant-settings')?.addEventListener('click', openSettings)
-  head.querySelector('#ai-clear-chat')?.addEventListener('click', () => engine.clear())
+  head.querySelector('#ai-clear-chat')?.addEventListener('click', () => { speech.abort(); pendingAutoText = undefined; textarea.value = ''; drafts.delete(engine); grow(); engine.clear() })
   host.querySelector('#ai-notice-settings')?.addEventListener('click', openSettings)
   const nodeMap = new Map<string, HTMLElement>()
   const draw = () => {
     if (!dialog.isConnected) return
+    const active = engine.profiles.active
+    const providerLabel = active?.preset === 'zhipu' ? '智谱' : active?.name.startsWith('自定义 · ') ? '自定义服务' : active?.name
+    host.querySelector<HTMLElement>('.ai-current-profile')!.textContent = active ? `${providerLabel} · ${active.model}` : '尚未连接 AI 服务'
+    host.querySelector<HTMLElement>('.ai-capability-notice')!.hidden = !active || active.toolCapability === 'supported'
     const nearBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 72
     const oldScroll = log.scrollTop
     if (!engine.items.length) {
@@ -49,7 +102,7 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi): void
       if (!engine.profiles.active) { const setup = document.createElement('button'); setup.className = 'secondary'; setup.textContent = '配置 AI'; setup.addEventListener('click', openSettings); welcome.append(setup) }
       else if (!engine.profiles.privacyAcknowledged) {
         const privacy = document.createElement('p'); privacy.className = 'ai-note'; privacy.textContent = AI_PRIVACY_TEXT
-        const ack = document.createElement('button'); ack.textContent = '我知道了'; ack.addEventListener('click', () => { engine.profiles.acknowledgePrivacy(); draw() }); welcome.append(privacy, ack)
+        const ack = document.createElement('button'); ack.textContent = '我知道了'; ack.addEventListener('click', () => { engine.profiles.acknowledgePrivacy(); const pending = pendingAutoText; pendingAutoText = undefined; if (pending && textarea.value === pending) submitText(pending); draw() }); welcome.append(privacy, ack)
       } else {
         const suggestions = document.createElement('div'); suggestions.className = 'ai-suggestions'
         for (const prompt of aiSuggestionPrompts) { const button = document.createElement('button'); button.type = 'button'; button.textContent = prompt; button.addEventListener('click', () => { textarea.value = prompt; grow(); draw(); textarea.focus({ preventScroll: true }) }); suggestions.append(button) }
@@ -95,13 +148,41 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi): void
     }
     usage.textContent = aiUsageText(engine.usage) ? `本次对话累计 ${aiUsageText(engine.usage)}` : ''
     const camera = host.querySelector<HTMLButtonElement>('#ai-food-camera'); if (camera) camera.disabled = engine.busy
+    mic.disabled = engine.busy || composing; voiceStart.disabled = engine.busy || composing
     sendButton.hidden = engine.busy; stopButton.hidden = !engine.busy
     sendButton.disabled = engine.busy || !textarea.value.trim() || !engine.profiles.active || !engine.profiles.privacyAcknowledged
     if (nearBottom) log.scrollTop = log.scrollHeight; else log.scrollTop = oldScroll
   }
   engine.onChange = draw; draw()
   dialog.addEventListener('close', () => {
+    closed = true; pendingAutoText = undefined; drafts.set(engine, textarea.value); speech.dispose()
+    document.removeEventListener('visibilitychange', visibility); window.removeEventListener('pagehide', abortVoice)
     engine.stop(); if (engine.onChange === draw) engine.onChange = undefined
   }, { once: true })
   dialog.querySelector('[data-close]')!.innerHTML = icon('x')
+  const applyLaunch = (launch: AiAssistantLaunchOptions) => {
+    if (closed) return
+    if (launch.initialText?.trim()) {
+      const text = launch.initialText.trim()
+      if (text.length > AI_LIMITS.userChars) return
+      textarea.value = [textarea.value.trim(), text].filter(Boolean).join('\n'); drafts.set(engine, textarea.value); grow()
+      pendingAutoText = undefined
+      if (launch.autoSend) {
+        if (engine.busy) showVoice('上一条请求还在处理中。')
+        else if (!engine.profiles.privacyAcknowledged && engine.profiles.active) pendingAutoText = textarea.value
+        else submitText(textarea.value)
+      }
+    }
+    if (launch.voice) {
+      if (engine.busy) showVoice('上一条请求还在处理中。')
+      else if (speech.active) showVoice('正在听…')
+      else if (speech.state === 'unsupported') showVoice(SPEECH_UNSUPPORTED)
+      else if (!voiceAcknowledged()) showVoice('开始前，请了解语音如何处理。', '开始语音', true)
+      else if (navigator.userActivation?.isActive) startVoice(true)
+      else showVoice('准备好后开始说话', '开始说话')
+    }
+    draw()
+  }
+  grow(); applyLaunch(options)
+  return { dialog, applyLaunch }
 }

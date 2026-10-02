@@ -12,7 +12,8 @@ import './styles/foodVision.css'
 import { bindEnergyEditor } from './ui/energyEditor'
 import { showFoodVisionImport } from './ui/foodVisionImport'
 import { showAiSettings, aiSettingsDetail } from './ui/aiSettings'
-import { showAiAssistant } from './ui/aiAssistant'
+import { consumeQuickLaunch } from './ui/quickLaunch'
+import { showAiAssistant, type AiAssistantLaunchOptions, type AiAssistantHandle } from './ui/aiAssistant'
 import { AiOrchestrator } from './ai/orchestrator'
 import { Chart, registerables } from 'chart.js'
 import { registerSW } from 'virtual:pwa-register'
@@ -250,7 +251,7 @@ async function render(): Promise<void> {
     activeTab = button.dataset.tab as Tab
     void render().catch(fail)
   }))
-  app.querySelector('#open-ai-assistant')?.addEventListener('click', () => { void flushWorkoutAutosave().then(() => showAiAssistant(aiAssistant, { openModal, esc, openFoodLibrary: () => void showFoodLibrary(), openFoodVision: () => openFoodVisionWorkflow(getLocalDateString()) })).catch(fail) })
+  app.querySelector('#open-ai-assistant')?.addEventListener('click', () => { void launchAssistant().catch(fail) })
   app.querySelector('#open-management')?.addEventListener('click', showManagementHub)
   app.querySelector('#plan-add-task')?.addEventListener('click', () => void showTaskEditor(undefined, planView === 'today' ? today : undefined))
   if (activeTab === 'today') await renderTodayPage()
@@ -2191,7 +2192,26 @@ function showRestorePreview(backup: ValidatedBackup): void {
   dialog.querySelector('#confirm-restore')?.addEventListener('click', async () => { if (!await confirmAction('覆盖当前全部数据？', '恢复会清除当前数据并替换为备份内容，此操作无法撤销。', '恢复备份')) return; try { await restoreBackup(backup); dialog.close(); currentWorkout = undefined; workoutEditorOpen = false; toast('恢复完成'); await render() } catch (error) { fail(error) } })
 }
 
+let assistantHandle: AiAssistantHandle | undefined
+let assistantLaunchQueue = Promise.resolve()
+function launchAssistant(options: AiAssistantLaunchOptions = {}): Promise<void> {
+  const job = assistantLaunchQueue.then(async () => {
+    await flushWorkoutAutosave()
+    aiAssistant.settingsChanged()
+    if (assistantHandle?.dialog.isConnected && assistantHandle.dialog.open) assistantHandle.applyLaunch(options)
+    else assistantHandle = showAiAssistant(aiAssistant, { openModal, esc, openFoodLibrary: () => void showFoodLibrary(), openFoodVision: () => openFoodVisionWorkflow(getLocalDateString()) }, options)
+  })
+  assistantLaunchQueue = job.catch(() => undefined)
+  return job
+}
+function routeQuickLaunch(event?: HashChangeEvent): void {
+  const hash = event ? new URL(event.newURL).hash : window.location.hash
+  const intent = consumeQuickLaunch({ hash, pathname: window.location.pathname, search: window.location.search }, window.history)
+  if (intent) void launchAssistant({ voice: intent.voice, initialText: intent.prompt, autoSend: intent.autoSend }).catch(fail)
+}
+
 async function start(): Promise<void> {
+  const initialIntent = consumeQuickLaunch(window.location, window.history)
   setupMobileViewport()
   document.addEventListener('click', (event) => {
     const target = event.target instanceof Element ? event.target : null
@@ -2207,7 +2227,12 @@ async function start(): Promise<void> {
       if (pelvicTimerState.status !== 'paused' && pelvicTimerState.status !== 'completed') void requestPelvicWakeLock()
     }
   })
-  try { await db.open(); await render() } catch (error) { app.innerHTML = `<div class="fatal"><h1>无法打开 FitLog Lite</h1><p>${esc(error instanceof Error ? error.message : '请刷新后重试')}</p></div>` }
+  try {
+    await db.open(); await render()
+    window.addEventListener('hashchange', routeQuickLaunch)
+    if (initialIntent) await launchAssistant({ voice: initialIntent.voice, initialText: initialIntent.prompt, autoSend: initialIntent.autoSend })
+    routeQuickLaunch()
+  } catch (error) { app.innerHTML = `<div class="fatal"><h1>无法打开 FitLog Lite</h1><p>${esc(error instanceof Error ? error.message : '请刷新后重试')}</p></div>` }
 }
 
 void start()
