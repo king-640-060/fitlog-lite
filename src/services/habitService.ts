@@ -99,3 +99,21 @@ export async function deleteUnusedHabit(id: string, database: FitLogDatabase = d
     await database.habits.delete(id)
   })
 }
+
+/** Desired state preserves the existing unique habit/date identity and schedule semantics. */
+export async function setHabitCheckInState(habitId: string, date: string, completed: boolean, database: FitLogDatabase = db): Promise<boolean> {
+  validateHabitDate(date)
+  if (typeof completed !== 'boolean') throw new Error('习惯状态不合法')
+  return database.transaction('rw', database.habits, database.habitCheckIns, async () => {
+    const habit = await database.habits.get(habitId)
+    if (!habit?.active) throw new Error('习惯未启用')
+    const existing = await database.habitCheckIns.where('[habitId+date]').equals([habitId, date]).first()
+    if (Boolean(existing) === completed) return completed
+    if (existing) await database.habitCheckIns.delete(existing.id)
+    else {
+      const now = new Date().toISOString()
+      await database.habitCheckIns.add({ id: crypto.randomUUID(), habitId, date, completedAt: now, createdAt: now, updatedAt: now })
+    }
+    return completed
+  })
+}

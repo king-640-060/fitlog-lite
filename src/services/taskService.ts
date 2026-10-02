@@ -73,6 +73,21 @@ export async function toggleTaskCompletion(id: string, database: FitLogDatabase 
   })
 }
 
+/** Desired state for explicit proposals; repeating a request never flips completion. */
+export async function setTaskCompletionState(id: string, completed: boolean, database: FitLogDatabase = db): Promise<Task> {
+  if (typeof completed !== 'boolean') throw new Error('任务状态不合法')
+  return database.transaction('rw', database.tasks, async () => {
+    const task = await database.tasks.get(id)
+    if (!task) throw new Error('找不到任务')
+    if (Boolean(task.completedAt) === completed) return task
+    const now = new Date().toISOString(), updated = { ...task, updatedAt: now }
+    if (completed) updated.completedAt = now
+    else delete updated.completedAt
+    await database.tasks.put(updated)
+    return updated
+  })
+}
+
 export const getTask = (id: string, database: FitLogDatabase = db): Promise<Task | undefined> => database.tasks.get(id)
 
 export async function getTasksByDate(date: string, database: FitLogDatabase = db): Promise<Task[]> {

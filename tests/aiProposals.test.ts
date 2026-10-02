@@ -1,0 +1,126 @@
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { aiEnvironment, aiFood } from './helpers/ai'
+import { createHabit, setHabitCheckInState } from '../src/services/habitService'
+import { createTask, setTaskCompletionState } from '../src/services/taskService'
+import { createTaskTag } from '../src/services/taskTagService'
+import { saveNutritionTarget } from '../src/services/nutritionTargetService'
+import { upsertWeight } from '../src/services/weightService'
+import { exportBackup } from '../src/services/backupService'
+const environments: ReturnType<typeof aiEnvironment>[] = []
+const setup = () => { const result = aiEnvironment(); environments.push(result); return result }
+afterEach(async () => { vi.restoreAllMocks(); for (const env of environments.splice(0)) { env.database.close(); await env.database.delete() } })
+describe('explicit local proposal confirmation', () => {
+  it('has no writes before confirmation or cancellation, creates correct meal snapshots atomically and prevents duplicate confirms', async () => {
+    const env = setup(); await env.database.foods.bulkAdd([aiFood('a'), aiFood('b', { protein: undefined })])
+    const before = (await exportBackup(env.database)).data
+    const args = { date: '2026-09-29', meal: 'dinner', items: [{ foodId: 'a', grams: 150 }, { foodId: 'b', grams: 50 }] }
+    const cancelled = await env.execute('propose_food_logs', args)
+    expect((await exportBackup(env.database)).data).toEqual(before)
+    env.proposals.cancel(cancelled.proposalId); await env.proposals.confirm(cancelled.proposalId)
+    expect((await exportBackup(env.database)).data).toEqual(before)
+    const proposal = await env.execute('propose_food_logs', args)
+    expect(proposal.preview.totals).toMatchObject({ calories: 400 }); expect(proposal.preview.totals.protein).toBeUndefined()
+    const results = await Promise.all([env.proposals.confirm(proposal.proposalId), env.proposals.confirm(proposal.proposalId)])
+    expect(results.every(result => result.status === 'completed')).toBe(true)
+    const logs = await env.database.foodLogs.toArray(); expect(logs).toHaveLength(2)
+    expect(logs.find(log => log.foodId === 'a')).toMatchObject({ date: '2026-09-29', meal: 'dinner', grams: 150, totalCalories: 300 })
+    await env.proposals.confirm(proposal.proposalId); expect(await env.database.foodLogs.count()).toBe(2)
+  })
+  it('rejects changed food snapshots and invalid/future data without writing', async () => {
+    const env = setup(); await env.database.foods.add(aiFood('a'))
+    const proposal = await env.execute('propose_food_logs', { date: '2026-09-29', meal: 'dinner', items: [{ foodId: 'a', grams: 100 }] })
+    await env.database.foods.update('a', { calories: 500 })
+    expect(await env.proposals.confirm(proposal.proposalId)).toMatchObject({ status: 'expired' }); expect(await env.database.foodLogs.count()).toBe(0)
+    for (const items of [[{ foodId: 'a', grams: 100 }, { foodId: 'missing', grams: 100 }], [{ foodId: 'a', grams: -1 }]]) expect((await env.execute('propose_food_logs', { date: '2026-09-29', meal: 'dinner', items })).error).toBeTruthy()
+    expect((await env.execute('propose_food_logs', { date: '2026-10-03', meal: 'dinner', items: [{ foodId: 'a', grams: 100 }] })).error).toBe('future_factual_log')
+    expect(await env.database.foodLogs.count()).toBe(0)
+  })
+  it('rolls back an actual second FoodLog write failure and task/tag batch failure', async () => {
+    const env = setup(); await env.database.foods.bulkAdd([aiFood('a'), aiFood('b')])
+    const proposal = await env.execute('propose_food_logs', { date: '2026-09-29', meal: 'dinner', items: [{ foodId: 'a', grams: 100 }, { foodId: 'b', grams: 100 }] })
+    const add = env.database.foodLogs.add.bind(env.database.foodLogs)
+    vi.spyOn(env.database.foodLogs, 'add').mockImplementationOnce(add).mockRejectedValueOnce(new Error('second write failed'))
+    expect(await env.proposals.confirm(proposal.proposalId)).toMatchObject({ status: 'expired' }); expect(await env.database.foodLogs.count()).toBe(0)
+    const tasks = await env.execute('propose_tasks', { tasks: [{ title: '第一项', tagNames: ['新标签'] }, { title: '第二项', date: '2026-10-03', tagNames: ['新标签'] }] })
+    const addTask = env.database.tasks.add.bind(env.database.tasks)
+    vi.spyOn(env.database.tasks, 'add').mockImplementationOnce(addTask).mockRejectedValueOnce(new Error('second task failed'))
+    await env.proposals.confirm(tasks.proposalId)
+    expect(await env.database.tasks.count()).toBe(0); expect(await env.database.taskTags.count()).toBe(0)
+  })
+  it('creates multiple tasks, reuses normalized tags, previews new tags and retains Inbox semantics', async () => {
+    const env = setup(), tag = await createTaskTag('旅行', env.database)
+    const proposal = await env.execute('propose_tasks', { tasks: [{ title: '买牙膏', tagNames: ['旅行', 'Shopping'] }, { title: '明天会议', date: '2026-10-03', startTime: '09:30', endTime: '10:30', tagNames: ['shopping'] }] })
+    expect(proposal.preview.newTags).toEqual(['将创建标签 #shopping'])
+    expect(await env.database.tasks.count()).toBe(0)
+    expect(await env.proposals.confirm(proposal.proposalId)).toMatchObject({ status: 'completed' })
+    const tasks = await env.database.tasks.toArray(); expect(tasks.find(task => task.title === '买牙膏')?.date).toBeUndefined()
+    expect(tasks.find(task => task.title === '买牙膏')?.tagIds).toContain(tag.id); expect(await env.database.taskTags.count()).toBe(2)
+    expect((await env.execute('propose_tasks', { tasks: [{ title: 'okay' }, { title: 'invalid', date: '2026-02-30' }] })).error).toBeTruthy()
+    expect(await env.database.tasks.count()).toBe(2)
+  })
+  it('upserts weight and optional nutrition targets with replacement previews; rejects stale or revoked proposals', async () => {
+    const env = setup(); await upsertWeight('2026-09-29', 72, env.database)
+    const weight = await env.execute('propose_weight', { date: '2026-09-29', weightKg: 71.5 })
+    expect(weight.preview).toMatchObject({ beforeWeightKg: 72, weightKg: 71.5, replacesExisting: true })
+    await env.proposals.confirm(weight.proposalId); expect((await env.database.weights.toArray())[0].weightKg).toBe(71.5)
+    const target = await env.execute('propose_nutrition_target', { date: '2026-09-29', calories: 1800 })
+    expect(await env.database.nutritionTargets.count()).toBe(0); await env.proposals.confirm(target.proposalId)
+    expect((await env.database.nutritionTargets.toArray())[0].protein).toBeUndefined()
+    const stale = await env.execute('propose_nutrition_target', { date: '2026-09-29', protein: 100 })
+    await saveNutritionTarget('2026-09-29', { calories: 2000 }, env.database)
+    expect((await env.proposals.confirm(stale.proposalId)).status).toBe('expired')
+    const revoked = await env.execute('propose_weight', { date: '2026-09-29', weightKg: 60 }); env.permissions.read.weight = false
+    expect((await env.proposals.confirm(revoked.proposalId)).status).toBe('expired'); expect((await env.database.weights.toArray())[0].weightKg).toBe(71.5)
+  })
+  it('creates habits and cardio, keeps desired-state check-ins/tasks idempotent and refuses inactive/stale entities', async () => {
+    const env = setup()
+    const habitProposal = await env.execute('propose_habit', { name: '读书', weekdays: [1, 3], targetPerWeek: 2 })
+    expect(await env.database.habits.count()).toBe(0); await env.proposals.confirm(habitProposal.proposalId)
+    const habit = (await env.database.habits.toArray())[0]
+    const checkIn = await env.execute('propose_set_habit_checkin', { habitId: habit.id, date: '2026-09-29', completed: true })
+    await env.proposals.confirm(checkIn.proposalId); await setHabitCheckInState(habit.id, '2026-09-29', true, env.database)
+    expect(await env.database.habitCheckIns.count()).toBe(1)
+    const task = await createTask({ title: '任务', tagIds: [] }, env.database)
+    const taskProposal = await env.execute('propose_set_task_completion', { taskId: task.id, completed: true })
+    await env.proposals.confirm(taskProposal.proposalId); const before = await env.database.tasks.get(task.id)
+    await setTaskCompletionState(task.id, true, env.database); expect(await env.database.tasks.get(task.id)).toEqual(before)
+    const cardio = await env.execute('propose_cardio_session', { date: '2026-09-29', activityType: 'treadmill', durationMinutes: 30, inclinePercent: 0 })
+    expect(await env.database.cardioSessions.count()).toBe(0); await env.proposals.confirm(cardio.proposalId)
+    expect((await env.database.cardioSessions.toArray())[0]).toMatchObject({ activityType: 'treadmill', inclinePercent: 0, durationMinutes: 30 })
+    expect((await env.execute('propose_cardio_session', { date: '2026-09-29', activityType: 'treadmill', durationMinutes: 30 })).error).toBeTruthy()
+    const staleTask = await env.execute('propose_set_task_completion', { taskId: task.id, completed: false }); await env.database.tasks.update(task.id, { title: '改过的任务' })
+    expect((await env.proposals.confirm(staleTask.proposalId)).status).toBe('expired')
+    const staleHabit = await env.execute('propose_set_habit_checkin', { habitId: habit.id, date: '2026-09-30', completed: true }); await env.database.habits.update(habit.id, { active: false })
+    expect((await env.proposals.confirm(staleHabit.proposalId)).status).toBe('expired')
+    expect(await env.database.habitCheckIns.count()).toBe(1)
+    expect(await env.database.workouts.count()).toBe(0); expect(await env.database.pelvicFloorSessions.count()).toBe(0)
+  })
+  it('adopts only exact locally calculated plans with source guards, preferences and future preview protection', async () => {
+    const env = setup(); await env.database.foods.bulkAdd([aiFood('rice'), aiFood('excluded')]); await saveNutritionTarget('2026-09-29', { calories: 300 }, env.database)
+    const result = await env.execute('get_nutrition_completion', { date: '2026-09-29', allowedFoodIds: ['rice'], excludedFoodIds: ['excluded'] })
+    expect(result.plans.length).toBeGreaterThan(0); expect(result.plans.every((plan: { items: { food: { id: string } }[] }) => plan.items.every(item => item.food.id === 'rice'))).toBe(true)
+    const plan = result.plans[0]
+    expect((await env.execute('propose_adopt_nutrition_plan', { planId: plan.planId, meal: 'dinner', grams: 999 })).error).toBe('invalid_arguments')
+    const proposal = await env.execute('propose_adopt_nutrition_plan', { planId: plan.planId, meal: 'dinner' })
+    expect(await env.database.foodLogs.count()).toBe(0); await env.proposals.confirm(proposal.proposalId)
+    expect((await env.database.foodLogs.toArray()).map(log => log.grams)).toEqual(plan.items.map((item: { grams: number }) => item.grams))
+    const changed = await env.execute('get_nutrition_completion', { date: '2026-09-29' })
+    await saveNutritionTarget('2026-09-29', { calories: 600 }, env.database)
+    const recalculated = await env.execute('get_nutrition_completion', { date: '2026-09-29' })
+    const stale = await env.execute('propose_adopt_nutrition_plan', { planId: recalculated.plans[0].planId, meal: 'lunch' })
+    await env.database.foods.update('rice', { name: 'changed' }); expect((await env.proposals.confirm(stale.proposalId)).status).toBe('expired')
+    if (changed.plans.length) expect((await env.execute('propose_adopt_nutrition_plan', { planId: changed.plans[0].planId, meal: 'lunch' })).error).toBeTruthy()
+    await saveNutritionTarget('2026-10-03', { calories: 300 }, env.database)
+    const future = await env.execute('get_nutrition_completion', { date: '2026-10-03' }); expect(future.futurePreviewOnly).toBe(true)
+    expect((await env.execute('propose_adopt_nutrition_plan', { planId: future.plans[0].planId, meal: 'dinner' })).error).toBe('future_factual_log')
+    env.plans.clear(); expect((await env.execute('propose_adopt_nutrition_plan', { planId: plan.planId, meal: 'dinner' })).error).toBe('plan_expired')
+  })
+  it('expires cancelled/cleared sessions and never sends credentials in V7 Backup payload', async () => {
+    const env = setup(), habit = await createHabit({ name: 'test' }, env.database)
+    const proposal = await env.execute('propose_set_habit_checkin', { habitId: habit.id, date: '2026-09-29', completed: true })
+    env.proposals.clear(); await expect(env.proposals.confirm(proposal.proposalId)).rejects.toThrow('失效')
+    const backup = await exportBackup(env.database)
+    expect(backup.schemaVersion).toBe(7); expect(Object.keys(backup.data)).toHaveLength(14)
+    expect(JSON.stringify(backup)).not.toMatch(/known-AI-secret|known-github-secret|ai-profiles|apiKey|AI助手/)
+  })
+})
