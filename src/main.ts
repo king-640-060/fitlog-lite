@@ -705,9 +705,9 @@ async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> 
     chips.hidden = !selectedTagIds.length
     chips.querySelectorAll<HTMLButtonElement>('[data-remove-task-tag]').forEach((button) => button.addEventListener('click', () => { selectedTagIds.splice(selectedTagIds.indexOf(button.dataset.removeTaskTag!), 1); renderChips(); updateSuggestions() }))
   }
-  const applyTag = (tag: TaskTag) => {
+  const applyTag = (tag: TaskTag, restoreTitleFocus = true) => {
     if (!selectedTagIds.includes(tag.id)) selectedTagIds.push(tag.id)
-    if (activeQuery) { const replacement = replaceActiveHashtagQuery(title.value, activeQuery); title.value = replacement.text; title.focus(); title.setSelectionRange(replacement.caret, replacement.caret) }
+    if (activeQuery) { const replacement = replaceActiveHashtagQuery(title.value, activeQuery); title.value = replacement.text; if (restoreTitleFocus) title.focus(); title.setSelectionRange(replacement.caret, replacement.caret) }
     activeQuery = undefined; suggestions.hidden = true; title.setAttribute('aria-expanded', 'false'); renderChips()
   }
   const updateSuggestions = () => {
@@ -724,8 +724,14 @@ async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> 
     suggestions.querySelectorAll<HTMLButtonElement>('[data-task-tag]').forEach((button) => button.addEventListener('click', () => { const tag = allTags.find((item) => item.id === button.dataset.taskTag); if (tag) applyTag(tag) }))
     suggestions.querySelector('#task-create-tag')?.addEventListener('click', () => {
       if (!activeQuery) return
-      const query = activeQuery
-      pendingTagCreation = createTaskTag(query.query).then((tag) => { allTags.push(tag); activeQuery = query; applyTag(tag) }).catch(fail)
+      const query = activeQuery, requestedTitle = title.value, trigger = document.activeElement
+      pendingTagCreation = createTaskTag(query.query).then((tag) => {
+        if (!dialog.isConnected) return
+        allTags.push(tag)
+        // Async storage may finish after the user moves to another field or edits the title.
+        activeQuery = title.value === requestedTitle ? query : undefined
+        applyTag(tag, document.activeElement === title || document.activeElement === trigger)
+      }).catch(fail)
     })
   }
   title.addEventListener('compositionstart', () => { composing = true; suggestions.hidden = true; title.setAttribute('aria-expanded', 'false') })

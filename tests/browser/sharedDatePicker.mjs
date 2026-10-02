@@ -53,8 +53,20 @@ for (const [width, height] of dimensions) {
   assert.equal(await page.locator('.food-date-item[aria-current="date"]').getAttribute('data-food-date'),'2027-01-01')
   await page.locator('#food-return-today').click(); await page.waitForFunction(day => document.querySelector('.food-content-body')?.dataset.foodDate===day,day)
   await nav('plan'); await page.locator('#plan-add-task').click(); await page.waitForSelector('#task-form')
+  // Hold a real IndexedDB write lock to reproduce slow asynchronous tag creation.
+  await page.evaluate(async () => {
+    const database = await new Promise(resolve => { const request=indexedDB.open('fitlog-lite-db');request.onsuccess=()=>resolve(request.result) })
+    const transaction=database.transaction('taskTags','readwrite'), store=transaction.objectStore('taskTags')
+    window.taskTagLockHeld=true
+    const keepAlive=()=>{const request=store.count();request.onsuccess=()=>{if(window.taskTagLockHeld)keepAlive()}}
+    keepAlive();transaction.oncomplete=()=>database.close()
+  })
   await page.locator('[name=title]').fill('未保存的标题 #旅行'); await page.locator('#task-create-tag').click()
   await page.locator('[name=note]').fill('未保存的备注')
+  await page.evaluate(()=>{window.taskTagLockHeld=false})
+  await page.waitForFunction(()=>document.querySelector('#task-selected-tags')?.textContent.includes('#旅行'))
+  assert.equal(await page.evaluate(()=>document.activeElement?.getAttribute('name')),'note', 'async tag completion must not steal note focus')
+  assert.equal(await page.locator('[name=title]').inputValue(),'未保存的标题')
   await page.locator('[name=startTime]').fill('09:30'); await page.locator('[name=endTime]').fill('10:30')
   const formIdentity = await page.locator('#task-form').evaluate(e => { e.dataset.identity='same-form';return e.dataset.identity })
   await page.locator('#task-date-picker-open').click(); assert.equal(await page.locator('dialog').count(),1); await layout('task')
