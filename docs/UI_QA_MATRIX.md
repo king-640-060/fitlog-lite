@@ -1,0 +1,78 @@
+# UI QA release matrix
+
+Inventory established during initial inspection and maintained after fixes. B = verified browser gate for applicable representative states; V = deterministic validation/unit coverage; K = shared keyboard mock gate (physical keyboard pending); P = physical device pending; — = no distinct state or outside core landscape scope. B is not a claim that every Cartesian combination was exercised. Screenshot names and exact per-width state counts are in the JSON receipts. Production results are recorded in the release report.
+
+Every screen reviews empty/normal/long/error-loading/keyboard, four widths320/375/390/430, landscape applicability, target/overflow/Safe Area/bottom obstruction. Unsupported states must be documented rather than reported PASS.
+
+| Screen | Entry point | Empty | Normal | Long | Error/loading | Keyboard | 320 | 375 | 390 | 430 | Landscape | Target | Overflow | Safe Area | Bottom | iPhone |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Today | Bottom Today | B | B | B | — | — | B | B | B | B | B | B | B | B/P | B | P |
+| Plan Today/Upcoming/Inbox/Completed | Plan tabs/completed | B | B | B | — | — | B | B | B | B | B | B | B | B/P | B | P |
+| Task create/edit | Plan new/row | — | B | B | V | K/P | B | B | B | B | — | B | B | B/P | B | P |
+| Tag filter/manager/editor | Plan tags | B | B | B | V | K/P | B | B | B | B | — | B | B | B/P | B | P |
+| Food | Bottom Food | B | B | B | — | — | B | B | B | B | B | B | B | B/P | B | P |
+| Food Library | Food Library | B | B | B | — | K/P | B | B | B | B | — | B | B | B/P | B | P |
+| Food Editor | Library new/row | — | B | B | V | K/P | B | B | B | B | — | B | B | B/P | B | P |
+| Food Picker/AddLog/EditLog | Meal add/record | B | B | B | V | K/P | B | B | B | B | — | B | B | B/P | B | P |
+| Nutrition Target/Completion | Food goal/completion | B | B | B | V | K/P | B | B | B | B | — | B | B | B/P | B | P | P |
+| Diet Template Manager/Editor/Picker | Management/Food template | B | B | B | V | K/P | B | B | B | B | — | B | B | B/P | B | P | P |
+| Import Chooser/Preview | Library/Management import | B | B | B | B | — | B | B | B | B | — | B | B | B/P | B | P |
+| Vision Choose/Review/Quantity/Duplicate/Preview/Done/Viewer | Packaging flow | B | B | B | B | K/P | B | B | B | B | B | B | B | B/P | B | P |
+| Workout | Bottom Workout | B | B | B | — | — | B | B | B | B | B | B | B | B/P | B | P |
+| Strength Start/Editor/History/Detail | Workout start/history | B | B | B | V | K/P | B | B | B | B | — | B | B | B/P | B | P |
+| Exercise Library/Editor/Picker | Management/strength | B | B | B | V | K/P | B | B | B | B | — | B | B | B/P | B | P | P |
+| Workout Template Manager/Editor/Picker | Management/strength start | B | B | B | V | K/P | B | B | B | B | — | B | B | B/P | B | P | T | P |
+| Cardio Editor/History | Workout cardio | — | B | B | V | K/P | B | B | B | B | — | B | B | B/P | B | P | T | P |
+| Kegel Setup/Timer/History | Workout pelvic | B | B | B | V | — | B | B | B | B | — | B | B | B/P | B | P |
+| Progress Trend/Weight Editor | Progress trend/record | B | B | — | V | K/P | B | B | B | B | — | B | B | B/P | B | P | P |
+| Calendar/Day Detail/Reports | Progress tabs/date | B | B | B | — | — | B | B | B | B | — | B | B | B/P | B | P |
+| Management/About | Topbar management | — | B | — | — | — | B | B | B | B | — | B | B | B/P | B | P |
+| Habit Manager/Reorder/Editor | Management/Today habit | B | B | B | V | K/P | B | B | B | B | — | B | B | B/P | B | P | P |
+| AI Assistant | Topbar AI | B | B | B | B | K/P | B | B | B | B | B | B | B | B/P | B | P |
+| AI Settings Overview/Editor/Permissions/Privacy/Profiles | Management AI | B | B | B | B | K/P | B | B | B | B | — | B | B | B/P | B | P | P |
+| Backup/Restore/Preview/Confirm | Management Backup | — | B | — | B | — | B | B | B | B | — | B | B | B/P | B | P |
+| GitHub Sync setup/status/password/conflict/restore | Management Sync | B | B | B | B | K/P | B | B | B | B | — | B | B | B/P | B | P | P |
+| Shared Date Picker/Confirm/Toast | Date/destructive/save | B | B | — | B | — | B | B | B | B | — | B | B | B/P | B | P |
+
+## Repeatable procedure
+
+1. Isolated synthetic records, mock credentials/provider; never real business records/Keys/Tokens. Long Chinese/English names/model/repo/errors and large numbers.
+2. Each Sheet open/top/bottom/close/reopen. Root and actual offending child overflow, header/close separation, >=44px controls/labels, >=16px editable text. Horizontal allowlist only Date Rail and chart canvas.
+3. Applicable empty/populated/search-none/validation/loading/error/disabled states; keyboard blur/dismiss, nested confirmation and exact background restore.
+4. Font100/120/140%; landscape812×375/844×390 core pages/Assistant/Vision review. Actual screenshots and manual inspection.
+5. Typecheck/full tests/build/Pages build/diff, nine existing browser suites + uiQualityAudit locally; production390/430.
+6. Exact production assets and same persistent synthetic14-store/15frozen-row/AI-config profile across deployment, SW/offline cold boot.
+7. Separate physical Safari, original installed PWA, real Provider/SpeechRecognition status. Pending never means browser PASS.
+
+## Display policy
+
+Canonical storage/calculation retain precision. Automatic energy input/preview use integer kcal/kJ; macros/grams/weight/chart labels at most one decimal, duration at most one decimal (timer seconds integer), percent labels rounded. Never round each keystroke. Unit-only energy changes preserve exact canonical kcal.
+
+## Inventory accounting and state evidence
+
+27 grouped rows expand to74 named screens/subviews: Today; Plan Today/Upcoming/Inbox/Completed; Task create/edit; Tag filter/manager/editor; Food; Library; Food create/edit; Food picker/add log/edit log; Nutrition target/completion; Diet template manager/editor/picker; Import choose/preview; Vision choose/review/quantity/duplicate/preview/done/viewer; Workout; Strength start/editor/history/detail; Exercise library/editor/picker; Workout template manager/editor/picker; Cardio editor/history; Kegel setup/timer/history; Progress trend/weight editor; Calendar/day detail/reports; Management/About; Habit manager/reorder/editor; AI Assistant; AI overview/editor/permissions/privacy/profiles; Backup/restore preview/confirmation; Sync setup/status/password/conflict/restore; Shared date picker/confirmation/toast.
+
+The new uiQualityAudit gate records128 states per local width (512 captures, including14 font-scale states and10 landscape states per width); production118 per width (236 captures). Other suites add functional states; they are not counted twice in this total. The committed harness fails on offending child bounds, undersized targets, clipped buttons, missing icon names, editable fonts, malformed native toggle geometry, noisy numbers and Sheet header/body overlap. A Date Rail and chart canvas are the only intentional horizontal regions. Habit weekday44px overlays are an intentional native-control exception.
+
+| Gate | Actual scope |
+|---|---|
+| uiQualityAudit | Main empty/populated/bottom; task/tag/editor; libraries search-none; long Chinese/English/model/repository; 26-food picker top/bottom/reopen; numeric unit-only and untouched exact save; all seven Vision steps/viewer/parser error/manual high retry; AI permission/routing controls; nested Restore confirmation; fonts120/140; local landscape |
+| mobileLayout | Five tabs/Safe Area mock/bottom reserve; food CSV/JSON imports; three macro columns; form/editor/management widths; font120 |
+| interactionStabilization | Modality/focus trap/return; shared mocked VisualViewport keyboard and toolbar distinction; scroll/lock/restoration; rapid open/close; settings/models/errors; reduced motion; landscape |
+| sharedDatePicker | Full app date entry replacement; range/leap date/return-to-form; Calendar selected date |
+| aiStreaming / aiAssistant | Busy/Stop/partial/fallback/tool proposal/error; long conversation; bounded contextual reads and explicit writes |
+| aiVoice / aiDualModelRouting | Mock voice lifecycle/permission/disclosure/quick launch; model routing/legacy fallback/capability invalidation |
+| foodVision | Extraction/evidence/unknown macros/kJ canonical; Stop/close/duplicate/save snapshot; denied writes/image memory |
+| githubSyncSafety | Synthetic encrypted setup/unlock/remote/local/conflict/restore; errors/disabled; no unintended writes |
+
+Loading/error screenshot coverage is explicitly concentrated in AI/Vision/Sync/import. Local synchronous forms do not have provider loading states; validation is covered by service tests. K refers to representative forms sharing the Sheet controller, not a physical keyboard test for every field. Landscape is core smoke only; other screens remain portrait-oriented. Safe Area uses47px top /34px bottom emulation; physical safe-area values remain Pending.
+
+## Run gate
+
+Use installed Playwright via FITLOG_PLAYWRIGHT_MODULE and Chrome via FITLOG_CHROME. Build Pages with GITHUB_REPOSITORY=king-640-060/fitlog-lite npm run build, serve dist under /fitlog-lite/, set FITLOG_QA_URL, then run node tests/browser/uiQualityAudit.mjs and each of the nine gates listed above. Production URL automatically selects390/430; local selects320/375/390/430. No real provider key/token or user DB is allowed.
+
+Receipts: /tmp/ui-quality-local-receipt.json and /tmp/ui-quality-prod-receipt.json. Screenshots: /tmp/ui-quality-{local|prod}-{width}-{state}.png. Copy final receipts/logs and selected manually inspected images into the external release artifact folder; do not commit screenshot binaries.
+
+## Required physical check (Pending)
+
+Use existing Safari and the original installed PWA without clearing/reinstalling: Today/Plan/Food/Workout/Progress top and bottom; Library/edit/1584kJ round trip; Vision camera/gallery/review checkbox/top reset/viewer return; Habit/AI routing controls; long Sheet keyboard open/close; native scroll and background restoration; real Provider fast/high accuracy and latency; Voice permission/Stop/close; offline cold boot with existing records and stored AI configuration. Record each result separately from browser PASS.

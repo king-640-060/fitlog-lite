@@ -91,14 +91,14 @@
 .ai-voice-row button { flex: 0 0 auto; min-height: 44px; }
 .ai-voice-panel.is-listening .ai-voice-status::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 6px; border-radius: 50%; background: var(--accent-strong); }
 @media (max-width: 350px) {
-  .ai-composer { display: grid; grid-template-columns: 44px 44px minmax(0, 1fr) 56px; }
+  .ai-composer { display: grid; grid-template-columns: 44px 44px minmax(0, 1fr) max-content; }
   .ai-composer textarea { grid-column: 1 / 4; grid-row: 1; width: 100%; }
   .ai-composer .ai-send-slot { grid-column: 4; grid-row: 1; }
   .ai-composer .ai-camera { grid-column: 1; grid-row: 2; }
   .ai-composer .ai-mic { grid-column: 2; grid-row: 2; }
 }
-.ai-send-slot { flex: 0 0 56px; width: 56px; }
-.ai-send-slot button { width: 100%; min-height: 44px; font-size: .85rem; }
+.ai-send-slot { flex: 0 0 auto; min-width: 56px; width: max-content; }
+.ai-send-slot button { width: 100%; min-height: 44px; font-size: .85rem; white-space: nowrap; }
 .ai-composer button[hidden] { display: none; }
 .ai-composer .primary:disabled { opacity: 1; background: var(--surface-soft); border-color: transparent; color: var(--text-tertiary); }
 .ai-footer-note { flex: 0 0 auto; margin: 7px 0 0; color: var(--text-secondary); font-size: .7rem; line-height: 1.4; text-align: center; }

@@ -2,6 +2,16 @@
 
 Read this before changing UI or interaction code. This document holds durable product rules; current implementation and data semantics remain authoritative.
 
+## Comprehensive mobile quality gate
+
+- Use `docs/UI_QA_MATRIX.md` for screen/state inventory and explicit applicability. Local320/375/390/430, production390/430, fonts100/120/140%, core landscape812×375/844×390. Read actual screenshots in addition to geometry assertions.
+- Do not conceal horizontal defects with root overflow clipping. Bound flexible columns with minmax(0,1fr), wrap unbroken names, keep short Chinese actions together. Task times occupy a separate line so long titles retain available width.
+- Shared input boxes exclude checkbox/radio. Preserve native20–22px controls and >=44px labels, >=16px editable text and scaling. Habit weekday44px accessible overlays are an existing intentional exception.
+- Automatic kcal/kJ inputs and previews are integer; canonical calculations retain exact values. Unit-only changes and untouched formatted fields must not rewrite source precision. Macros/grams/weight use at most one decimal; unknown fields remain blank. Do not format each keystroke.
+- Shared Sheet body owns ordinary form/library/picker scrolling. AI conversation has its existing dedicated stream scroll region. Vision choose/review/quantity/duplicate/preview/done replacements reset body scroll immediately and on a guarded next frame; no input autofocus. The viewer temporarily hides review children and restores the same DOM/focus/scroll on return.
+- Vision uses Fast preprocessing by image role and manual high-detail retry. A parser failure never triggers a second call automatically. In-memory numeric-only timings are diagnostics, not persisted business fields.
+- Browser keyboard/Safe Area mocks are regression evidence only. Physical iPhone Safari, original installed PWA, real Provider and SpeechRecognition require separate verification.
+
 ## Visual direction
 
 The interface is entirely Chinese and iPhone first: 浅、柔、净、暖、绿、稳. Use warm ivory surfaces, fresh leaf emphasis, quiet spacing, clear numbers, and restrained feedback. Standard units such as kg, g, kcal, cm, s, and min may remain Latin. Do not show Workout, Nutrition, Progress, Set, Reps, RPE, or RIR as UI labels.

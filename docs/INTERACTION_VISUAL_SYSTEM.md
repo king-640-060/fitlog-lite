@@ -1,5 +1,15 @@
 # FitLog Interaction & Visual System
 
+## Mobile quality invariants
+
+`docs/UI_QA_MATRIX.md` and `tests/browser/uiQualityAudit.mjs` define the reusable release audit. Root clipping is not a substitute for child overflow checks. Main content reserves bottom navigation/Safe Area; Sheet body owns ordinary long forms and pickers. Keep Chinese action labels intact and task time metadata below the title.
+
+Text-field selectors exclude checkbox/radio. Native20–22px toggles live in >=44px labels without appearance replacement; Habit weekday overlays retain their existing44px hit areas. Editable text is >=16px, user scaling remains enabled.
+
+Energy presentation uses integer kcal/kJ while canonical precision stays unchanged. Generic automatic nutrition/grams/weight presentation uses at most one decimal. Restore untouched exact form sources during FormData creation; input edits and programmatic changes take precedence. Never round ongoing keystrokes.
+
+Vision step rendering owns scrollTop0 immediately and on a guarded frame; viewer return restores the same review nodes and scroll. All image/source/timing state is memory-only. Fast nutrition1400px/auto and front1000px/low are defaults; high-detail1800px retry requires a fresh explicit recognition action.
+
 ## Boundaries
 
 Vanilla TypeScript and existing CSS only. Business entities/services, historical snapshots, local date semantics, canonical kcal, Food Vision parsing/writes, AI tools/permissions/proposals, Backup/Restore/Sync and the 14-store Dexie V7 identity are unchanged. Visual rules never override data preservation. Five bottom tabs and Progress Trend/Calendar/Reports remain.

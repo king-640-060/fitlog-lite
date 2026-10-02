@@ -58,8 +58,8 @@
 /* Base and typography */
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html { min-width: 320px; min-height: 100%; overflow-x: hidden; scroll-padding: 120px 0; }
-body { isolation: isolate; margin: 0; min-width: 320px; min-height: 100vh; min-height: 100dvh; overflow-x: hidden; background: var(--bg); color: var(--text-primary); }
+html { min-width: 320px; min-height: 100%; scroll-padding: 120px 0; }
+body { isolation: isolate; margin: 0; min-width: 320px; min-height: 100vh; min-height: 100dvh; background: var(--bg); color: var(--text-primary); }
 /* One static, non-interactive backdrop; opaque content surfaces cover it. */
 body::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
@@ -396,9 +396,10 @@ html[data-input-modality="keyboard"] .pelvic-specialty:focus-visible { border-co
 .quantity-input { position: static !important; display: flex; align-items: baseline; gap: 10px; margin-top: 5px; color: var(--text-secondary); }
 .quantity-input input { min-height: 62px; padding: 4px 12px; font-size: 2.25rem; font-weight: 700; letter-spacing: -.03em; }
 .quantity-input b { font-size: 1rem; }
-.picker-list, .library-list { display: grid; max-height: 54vh; overflow-y: auto; }
-.picker-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 62px; padding: 10px 2px; border: 0; border-bottom: 1px solid var(--divider); border-radius: 0; background: transparent; text-align: left; }
-.picker-item span { display: grid; gap: 3px; }
+.picker-list, .library-list { display: grid; }
+.picker-item { display: grid; grid-template-columns: minmax(0, 1fr) minmax(70px, 95px); align-items: center; gap: 12px; min-height: 62px; padding: 10px 2px; border: 0; border-bottom: 1px solid var(--divider); border-radius: 0; background: transparent; text-align: left; }
+.picker-item span { display: grid; min-width: 0; gap: 3px; overflow-wrap: anywhere; }
+.picker-item em { overflow-wrap: anywhere; text-align: right; }
 .picker-item small, .picker-item em { color: var(--text-secondary); font-size: .78rem; font-style: normal; }
 .toolbar { display: grid; grid-template-columns: minmax(0, 1fr) 44px; gap: 8px; margin-bottom: 10px; }
 .library-list { max-height: none; overflow: visible; }

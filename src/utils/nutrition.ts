@@ -32,4 +32,5 @@ export function createFoodLogSnapshot(food: Food, grams: number, date: string, m
   }
 }
 
-export const formatNumber = (value: number): string => Number(value.toFixed(1)).toString()
+const displayNumber = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1, useGrouping: false })
+export const formatNumber = (value: number): string => displayNumber.format(Object.is(value, -0) || Math.abs(value) < 0.05 ? 0 : value)

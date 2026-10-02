@@ -1,3 +1,4 @@
+import { formatEnergyInputValue } from '../utils/energy'
 import type { CardioSession, PelvicFloorSession, Workout } from '../db/types'
 import { pelvicFloorSessionDurationSeconds } from '../services/pelvicFloorService'
 import { formatNumber } from '../utils/nutrition'
@@ -43,17 +44,17 @@ export function buildCalendarDayDetailRows(
     summary?.fat === undefined ? undefined : `脂肪 ${formatNumber(summary.fat)} 克`,
   ].filter((value): value is string => Boolean(value))
   const targetDetails = [
-    target?.calories === undefined ? undefined : `${formatNumber(target.calories)} kcal`,
+    target?.calories === undefined ? undefined : `${formatEnergyInputValue(target.calories)} kcal`,
     target?.protein === undefined ? undefined : `蛋白质 ${formatNumber(target.protein)}g`,
     target?.carbs === undefined ? undefined : `碳水 ${formatNumber(target.carbs)}g`,
     target?.fat === undefined ? undefined : `脂肪 ${formatNumber(target.fat)}g`,
   ].filter((value): value is string => Boolean(value))
   const targetLine = targetDetails.length ? `目标 ${targetDetails.join(' · ')}` : undefined
   const foodRecorded = Boolean(summary?.foodLogCount)
-  const foodPrimary = foodRecorded ? `${formatNumber(summary?.calories ?? 0)} kcal` : '未记录'
+  const foodPrimary = foodRecorded ? `${formatEnergyInputValue(summary?.calories ?? 0)} kcal` : '未记录'
   const foodSecondary = [...(foodRecorded && macros.length ? [macros.join(' · ')] : []), ...(targetLine ? [targetLine] : [])]
   const food = row('food', '饮食', foodPrimary, foodSecondary, !foodRecorded)
-  food.accessibleLabel = ['饮食', foodRecorded ? `${formatNumber(summary?.calories ?? 0)} 千卡` : '未记录', ...(foodRecorded ? spokenMacros : []), ...(targetLine ? [targetLine.replace('kcal', '千卡').replaceAll('g', '克')] : [])].join('，')
+  food.accessibleLabel = ['饮食', foodRecorded ? `${formatEnergyInputValue(summary?.calories ?? 0)} 千卡` : '未记录', ...(foodRecorded ? spokenMacros : []), ...(targetLine ? [targetLine.replace('kcal', '千卡').replaceAll('g', '克')] : [])].join('，')
 
   const exerciseCount = workouts.reduce((total, workout) => total + workout.exercises.length, 0)
   const setCount = workouts.reduce((total, workout) => total + workout.exercises.reduce((sum, exercise) => sum + exercise.sets.length, 0), 0)

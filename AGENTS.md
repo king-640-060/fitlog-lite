@@ -144,6 +144,11 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 - Main-tab content must reserve fixed bottom navigation plus Safe Area. The app shell owns iPhone top Safe Area once; no per-page device-specific top padding.
 - Keep short Chinese actions together; change layout instead of letting one character drop to a new line. Avoid orphan half-width fields in mobile forms.
 - Reduce density through shared spacing while retaining >=44px touch targets and >=16px editable text.
+- Automatic energy displays are integer kcal/kJ; canonical kcal and untouched numeric sources retain precision. Other automatic nutrition/weight/gram labels use at most one decimal. Never round each keystroke or write rounded presentation back on a unit-only change.
+- Shared text-field CSS excludes native checkbox/radio controls. Native controls are20–22px inside >=44px labels; do not replace native appearance. Habit weekday overlays retain their existing accessible44px behavior.
+- Food Vision defaults to role-specific Fast profiles (nutrition1400px/auto, front1000px/low). High detail is an explicit user retry, never an automatic second request. Keep images/source files and numeric-only timings ephemeral.
+- Vision step replacement owns immediate and next-frame scrollTop0. Image viewer return preserves review DOM and scroll position. Ordinary pickers share the Sheet body scroll owner.
+- UI releases maintain `docs/UI_QA_MATRIX.md` and run `tests/browser/uiQualityAudit.mjs` alongside existing browser gates. Inspect actual screenshots; distinguish browser emulation from physical Safari/PWA/provider verification.
 
 ## Targeted file map
 
