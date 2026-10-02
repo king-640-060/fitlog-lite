@@ -2,59 +2,59 @@
 
 ## Latest verified production state — 2026-10-02
 
-Capability-specific AI model routing is complete and released. Full30-field report: [AI_DUAL_MODEL_DEV_REPORT.md](docs/AI_DUAL_MODEL_DEV_REPORT.md). AI contracts: [AI_ARCHITECTURE.md](docs/AI_ARCHITECTURE.md), [FOOD_VISION_IMPORT.md](docs/FOOD_VISION_IMPORT.md). Shared interaction rules remain in [INTERACTION_VISUAL_SYSTEM.md](docs/INTERACTION_VISUAL_SYSTEM.md).
+AI Voice Mode and app-side Quick Launch fragments are implemented and released. Full42-field report: [AI_VOICE_QUICK_LAUNCH_DEV_REPORT.md](docs/AI_VOICE_QUICK_LAUNCH_DEV_REPORT.md). Contract/platform gate: [AI_QUICK_LAUNCH.md](docs/AI_QUICK_LAUNCH.md). **Independent iPhone Home Screen launcher, same-storage routing and one-tap-to-listen remain Pending / unsupported by verified path.**
 
 | Identity | Value |
 | --- | --- |
-| START_COMMIT | b2f6a64f3d04386d1c17508851b4573475e100dc |
-| DUAL_MODEL_ROUTING_COMMIT | 9fd4bcbc8d6dac4683b5b6f8b1e1c2a21b02bbf8 |
-| END_COMMIT / last application | 9fd4bcbc8d6dac4683b5b6f8b1e1c2a21b02bbf8 |
-| Application Actions | [36994775092](https://github.com/king-640-060/fitlog-lite/actions/runs/36994775092) — SUCCESS |
-| Verified application production HEAD | 9fd4bcbc8d6dac4683b5b6f8b1e1c2a21b02bbf8; Pages deployment6806256081 SUCCESS |
-| REPORT_COMMIT / final main HEAD | This report commit; exact SHA is returned in the release response and from `git log -1 --format=%H -- LATEST_DEV_REPORT.md` |
+| START_COMMIT | 9f8b5c9d59e7d936a4ee69c69d1796eecf018ada |
+| AI_VOICE_QUICK_LAUNCH_COMMIT | 33cc62c85b4ecf0a964d8293e62fc5a5e3c27b0d |
+| Application QA / END_COMMIT | 6ab921dc76fd2fb0edd3bdec83c5c653cfe46b9c |
+| Initial application Actions | [36999415822](https://github.com/king-640-060/fitlog-lite/actions/runs/36999415822) SUCCESS; Pages6807048574 |
+| Final application Actions | [36999687683](https://github.com/king-640-060/fitlog-lite/actions/runs/36999687683) SUCCESS |
+| Verified application production HEAD | 6ab921dc76fd2fb0edd3bdec83c5c653cfe46b9c; Pages6807096297 SUCCESS |
+| REPORT_COMMIT / final main HEAD | This report commit; exact SHA from release response/artifact and `git log -1 --format=%H -- LATEST_DEV_REPORT.md` |
 | Production | https://king-640-060.github.io/fitlog-lite/ |
 
-HTTPS pull/push timed out. API verification confirmed START=remote main, then Git Data API verified identical blobs/tree/commit and advanced main with force:false. No history was rewritten. Final report deployment serves the same verified application assets; its exact head/Actions/deployment is in the release response.
+Bounded HTTPS pull/push timed out. API confirmed START equals remote main, verified identical Git blobs/tree/commits and advanced main with force:false/exact-parent checks. No history rewrite. The report-only deployment serves the same verified application; its exact head/Actions/deployment receipt is in the final response/artifact.
 
 ## Delivered behavior
 
-- One profile retains one Provider/Base URL/API Key. `model` routes chat and FitLog tools; optional `visionModel` routes image input through the same client/adapter. `getVisionModel` supplies the legacy fallback to `model`; `visionChat` and `chat` share the transport, bounds, safe errors and normalization.
-- Device AI Config remainsV1. Reader ignores invalid optional image IDs without rejecting old profiles. Save trims/omits blank, rejects >200 characters, explicitly projects metadata and scans image IDs for known secrets. Keys remain separate and empty in saved edit fields.
-- Effective-route invalidation is independent: image-only changes preserve Tools; chat-only changes preserve independently routed Vision; fallback chat changes or root/key changes invalidate both. Same effective route/rename preserves verification.
-- Ordinary assistant configuration excludes Vision metadata. A Vision-only save/test preserves an active chat, history and proposals; actual chat routing/tool capability/permissions changes still clear context. Existing explicit business-write confirmation remains authoritative.
-- Vision probe and Food packaging extraction use the effective image model. Captured image request signatures include ID/root/image model/key; changed image routing rejects late results, while chat-only edits with an independent image model remain valid. Privacy,731 probe,preprocessing,EXIF removal,limits,kJ/kcal,unknown macros,atomic writes and snapshots stay unchanged.
-- AI Settings keeps the stabilized hierarchy. Image routing defaults to the shared model; a radio choice progressively reveals an independent image selector. A single explicit `/models` fetch fills both selectors using one editor-session cache, with exact IDs and manual fallback. No model-name heuristics, vendor model defaults, second profile/key/root or automatic extra request. Save & Test saves first and runs Chat→Tools→Vision independently; partial failure does not roll back working chat/tools. Failed shared-image testing offers “选择图片模型”.
+- Browser SpeechRecognition service detects standard then webkit API, uses zh-CN/one finite session/interim/one alternative, aggregates final segments only on end, and prevents duplicate/stale sends with a generation. Stop finishes; close/hidden/pagehide abort/dispose and remove handlers. No background restart, FitLog audio capture/persistence/upload, MediaRecorder/getUserMedia/STT backend/provider or new dependency.
+- Quiet44px Mic, polite status/static dot and compact independent voice privacy acknowledgement in the existing shared Sheet. Voice does not focus the textarea or open the keyboard. First quick use shows Start; missing activation/automatic denial falls back quietly. Unsupported browsers retain normal text and system keyboard dictation guidance.
+- Typed text, final voice and quick prompts share submitText→engine.send. Existing Key/scopes/model/tool/proposal protections remain. Manual Send aborts speech and sends current typed text. Existing typed+spoken text combines by newline; busy/oversized drafts remain editable. Writes still require explicit proposal confirmation.
+- Fragment-only `#quick=ai`, `#quick=ai&voice=1`, `#quick=ai&prompt=<encoded text>&send=1`. Strict one-time decoding, trim/6000-character bound; immediate replaceState cleanup retains pathname/query/Pages base. Cold routing follows db/render; warm captured hashchange events serialize through Workout autosave and reuse one assistant. Rapid prompts do not create multiple Sheets. Reload never replays a consumed prompt.
+- Prompt/draft stays memory-only. No profile keeps the composer text; AI privacy acknowledgement may continue the unchanged pending prompt. Busy never defers automatic send. In-page draft/history persists on close/reopen; reload clears it. QA patch preserves the first secret-blocked error card on reopening without an unnecessary settings-change clear.
+- Camera/Food Vision, typed Send/Stop, IME, shared Sheet/viewport/Safe Area and confirmation footer remain. At320px textarea+Send use row one and Camera+Mic row two; wider screens use one row.
 
 ## Automated Verification
 
-- Actual baseline384tests/39files PASS; final405tests/40files PASS (+21). New reader/save/secret/effective-route matrix/5-request routing/legacy/stale image signature/active chat and history tests; all existing AI/Tools/Proposals/security/Vision/Nutrition/Backup/Restore/Sync/frozenV7/history gates PASS.
-- Typecheck, full tests, normal build, Pages build with GITHUB_REPOSITORY and git diff --check: PASS.
-- Local320×812 /375×812 /390×844 /430×932: Dual Model Routing, Assistant, Food Vision, Interaction Stabilization, Shared Date Picker, GitHub Sync Safety browser suites PASS. Synthetic profiles/keys/images/records and mocked provider only.
-- Screenshot inspection repaired image-radio row layout and verified44px options,16px inputs,320px no overflow and unchanged shared Sheet/focus/viewport behavior.
+Actual baseline405tests/40files PASS; final425tests/43files PASS (+20). Full AI Provider/Dual Model/Tools/Proposals/security/Vision/Nutrition/Interaction/Date Picker/Sync/Backup/Restore/frozenV7/history gates PASS. New parser/speech/voice-engine tests verify interim/no-speech/denied/stale/abort/stop/final-only behavior and proposal/secret safety.
+
+Typecheck, full tests, normal build, Pages build with GITHUB_REPOSITORY and diff-check PASS. Local build QA (no HMR)320×812 /375×812 /390×844 /430×932: seven browser suites aiVoice/aiAssistant/aiDualModelRouting/foodVision/interactionStabilization/sharedDatePicker/githubSyncSafety PASS. Synthetic speech/profile/key/image/record and mocked Provider only. Screenshots inspected at320/390; 44px Mic,16px textarea, reachable footer/no overflow/quiet touch feedback verified.
 
 | Pages asset | Bytes | Vite gzip | SHA-256 |
 | --- | --- | --- | --- |
-| index-D-UBZopM.js | 667152 | 213.56kB | 86c318bc496a400a258dcdc72e2440ccd5f842acef5c63d06496d213aa704ff5 |
-| index-DTxpCV3q.css | 101890 | 18.27kB | 8baf40154d9fa20456d833b4a3e76fe52df241f3ee92f999f9f2be709724367d |
+| index-D1fd2jUl.js | 674632 | 216.19kB | ad3e712950f7e70e9764df9a89d178e2d45cdf8a91e3a9328b375e57c5b22f67 |
+| index-C-p-6ets.css | 102884 | 18.45kB | 86933073443f82397ef8a8d42195f892022479f874511eeee6b0ddf3a43c3f97 |
 
-PWA precache17entries/786.33KiB; no added dependencies. Existing>500kB JS warning remains.
+PWA precache17entries/794.61KiB; no new package. Existing>500kB JS warning remains. Security audit found no new audio capture/storage/logging or direct write path. The existing pelvic generated AudioContext cue is unchanged.
 
 ## Production Verification
 
-- Application Actions36994775092 and Pages deployment6806256081 SUCCESS. Production JS/CSS bytes/SHA-256 exactly match the final local Pages build.
-- Production390×844 /430×932: all six browser suites PASS with no page errors. Covers the legacyglm-4.5 supported-tool/unsupported-image case, independent selector/save/reopen, single list reuse, manual fallback, connection/tool/image-probe/package models, partial400, changed-image rejection, chat-only changes during image scan and image-only changes during a chat; ordinary assistant/packaging writes/date/interaction/Sync regressions PASS.
-- Cross-deployment data preservation PASS: same dedicated synthetic persistent profile before modification and after deployment; exact new JS runs under the old Service Worker, fitlog-lite-db V7 /14stores /15frozen records all unchanged. Both checks readonly; no reset/reseed.
+Final application Actions36999687683 /Pages6807096297 SUCCESS. Production JS/CSS bytes/SHA match the final local Pages build. Production390×844 /430×932: all seven mocked browser suites PASS, zero page errors. Cold/warm/rapid quick routes, cleanup/no replay, privacy/no-profile/busy drafts, secret guard, final/end once, manual Stop/Send, close/background abort, unsupported text, proposals, pending Workout autosave and model/Vision/interaction/date/Sync regressions verified.
+
+Cross-deployment preservation PASS in the same existing dedicated synthetic persistent browser profile:14stores/15frozen historical records identical, AI config/API Key and voice acknowledgement fingerprints unchanged, no business reseed/reset. Exact new JS under original Service Worker; actual SW offline cold reload PASS. This is desktop evidence and does not prove an external iPhone storage context.
 
 ## Versions
 
-fitlog-lite-db /DexieV7 /14stores; BackupV7; RestoreV1–V7; SyncEnvelopeV1; AIConfigV1; AISystemPromptV1; FoodVisionPrompt/extractionV1. No migration/package/frozen-fixture changes. Five tabs, Progress views, canonical kcal/local dates and historical snapshots remain unchanged.
+fitlog-lite-db /DexieV7 /14stores; BackupV7; RestoreV1–V7; SyncEnvelopeV1; AIConfigV1; AISystemPromptV1; FoodVisionPrompt/extractionV1. No schema/migration/business service/manifest/package/frozen-fixture change. Five tabs, local dates, canonical kcal and historical snapshots remain.
 
 ## Manual Device Verification
 
-- Real Provider: Pending. No real API Key used; actual account model availability/image quality/CORS requires the owner’s test.
-- Physical iPhone Safari /installed standalone PWA: Pending. Mock touch/viewport and successful deployment do not establish physical keyboard/camera/gallery/Safe Area behavior.
-- User steps: AI设置→编辑当前服务→保留聊天模型→图片识别选择“单独选择图片模型”→读取模型列表→选择候选或手填精确ID→保存并测试，直到图片识别显示“已验证”。
+Real SpeechRecognition and real Provider Pending; no real microphone/Key/quota used. Physical iPhone Safari and installed PWA Pending. Independent FitLog AI Home Screen launcher, one-tap-to-listen and external same-storage routing Pending / unsupported by verified path. Browser mocks and desktop SW checks do not establish those results.
+
+Do not install a second web app or use undocumented webapp:// as a production shortcut. Candidate launcher must show original standalone Food/Weight/Tasks and saved Provider/key without re-entry/Restore/Sync. Safari opening, second empty PWA or re-entering Key = FAIL. No unverified Shortcut recipe is supplied; normal manifest/start_url='.' and app icon remain. See the physical checklist in AI_QUICK_LAUNCH. Remaining risks are these manual platform/provider categories and the existing bundle warning; no unresolved automated/production failure.
 
 ## ChatGPT Baseline
 
-Read AGENTS→LATEST_DEV_REPORT→UI_INTERACTION_SPEC/AI_ARCHITECTURE/FOOD_VISION_IMPORT. END9fd4bcbc8d6dac4683b5b6f8b1e1c2a21b02bbf8 adds optionalvisionModel in one V1 profile/root/key. Chat/tools=model; image probe/import=visionChat+getVisionModel fallback. Only changed effective capabilities reset; Vision-only settings preserve active ordinary chat/history/proposals. Two selectors reuse one editor-session model list and manual fallback, with progressive image expansion and no fixed model IDs. 405tests/40files; six browser suites local4sizes/production2sizes; asset identity and exact14store preservation PASS. Real Provider/physical Safari/PWA Pending. DBV7/BackupV7/RestoreV1–V7/SyncV1/AIConfig+PromptsV1 unchanged. Preserve all interaction/Sheet/viewport/security/nutrition/history contracts.
+Read AGENTS→LATEST_DEV_REPORT→UI_INTERACTION_SPEC/INTERACTION_VISUAL_SYSTEM/AI_ARCHITECTURE/FOOD_VISION_IMPORT/AI_QUICK_LAUNCH. END6ab921dc76fd2fb0edd3bdec83c5c653cfe46b9c implements browser/system voice via final/end-only shared engine.send, generation-guarded close/background abort, device-only voice ack, quiet44px Mic and320px two-row composer. Fragment-only quick=ai/voice=1/prompt/send=1 consumed immediately; cold/warm serialized routing flushes Workout and reuses one Sheet. Prompt drafts memory-only; busy never defers auto-send; privacy preserves/resumes unchanged text. Existing Keys/scopes/models/tools/proposals remain; voice cannot confirm/write. 425tests/43files, seven browser suites local4/prod2sizes, exact asset identity and same-profile14store/15row+AIconfig preservation+SW offline cold boot PASS. Real Speech/Provider, physical Safari/PWA, independent Home Screen/storage context/one-tap Pending. DBV7/BackupV7/RestoreV1–V7/SyncV1 and manifest unchanged.
