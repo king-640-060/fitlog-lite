@@ -104,7 +104,7 @@ try { for (const [width,height] of sizes) {
   }
   await gauge(0,undefined,'unset','尚未设置目标');await todayWorkout(false);await capture('today-no-open')
   await gauge(840,1800,'below','47%');await gauge(1800,1800,'reached','已达目标');await gauge(2100,1800,'above','高于目标 300 kcal');await gauge(0,0,'zero','目标为 0')
-  const workoutCheck = async name => {await nav('workout');const g=await geometry('.training-card-action');assert.equal(g.length,3);for(const a of g){assert.ok(Math.abs(a.width-a.innerWidth)<=2);assert.ok(a.height>=48);assert.equal(a.minHeight,'48px');assert.equal(a.whiteSpace,'nowrap')};for(const key of ['width','height'])assert.ok(Math.max(...g.map(a=>a[key]))-Math.min(...g.map(a=>a[key]))<=2);assert.equal(new Set(g.map(a=>a.radius)).size,1);assert.equal(new Set(g.map(a=>a.padding)).size,1);assert.ok(g[0].primary&&g[1].secondary&&g[2].secondary);const link=page.locator('.training-card-link');if(await link.count())assert.ok(await link.evaluate(e=>e.getBoundingClientRect().top>=e.previousElementSibling.getBoundingClientRect().bottom));workoutGeometry.push({name,actions:g});await capture(name)}
+  const workoutCheck = async name => {await nav('workout');const g=await geometry('.training-card-action');assert.equal(g.length,3);for(const a of g){assert.ok(Math.abs(a.width-a.innerWidth)<=2);assert.ok(a.height>=48);assert.equal(a.minHeight,'48px');assert.equal(a.whiteSpace,'nowrap')};for(const key of ['width','height'])assert.ok(Math.max(...g.map(a=>a[key]))-Math.min(...g.map(a=>a[key]))<=2);assert.equal(new Set(g.map(a=>a.radius)).size,1);assert.equal(new Set(g.map(a=>a.padding)).size,1);assert.ok(g.every(a=>a.primary&&!a.secondary));const styles=await page.locator(".training-card-action").evaluateAll(es=>es.map(e=>{const s=getComputedStyle(e);return {background:s.backgroundColor,color:s.color,border:s.borderColor,fontSize:s.fontSize,fontWeight:s.fontWeight}}));for(const s of styles)assert.deepEqual(s,styles[0]);const link=page.locator('.training-card-link');if(await link.count())assert.ok(await link.evaluate(e=>e.getBoundingClientRect().top>=e.previousElementSibling.getBoundingClientRect().bottom));workoutGeometry.push({name,actions:g});await capture(name)}
   await workoutCheck('workout-empty')
   const finished={...fixture.workouts[0],date},cardio={...fixture.cardioSessions[0],date},pelvic={...fixture.pelvicFloorSessions[0],date}
   await put({workouts:[finished],cardioSessions:[cardio],pelvicFloorSessions:[pelvic]});await workoutCheck('workout-one-completed');assert.equal(await page.locator('[data-cardio-id]').count(),1);assert.ok((await page.locator('#view').innerText()).includes('今日已完成 1 次'));await todayWorkout(false)
@@ -121,6 +121,38 @@ try { for (const [width,height] of sizes) {
   assert.deepEqual(errors,[])
   receipts.push({width,height,states,scrollChecks,ringStyles,workoutGeometry,fonts:[100,120,140],plan:['today','upcoming','inbox','filtered-empty','completed-only'],gauge:['unset','below','reached','above','zero'],workout:['empty','one','multiple','completed','open'],errors})
  } finally {await context.close()}
-}} finally {await browser.close()}
+}
+ // Exercise the shared primary interaction rules on a fine-pointer surface as well.
+ // This is an isolated context; disabled states are synthetic and never activate flows.
+ if(!baseline){
+  const context=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'})
+  try{
+   const page=await context.newPage();await page.goto(base,{waitUntil:'networkidle'});await page.locator('[data-tab=workout]').click();await page.waitForSelector('.training-card-action')
+   assert.ok(await page.evaluate(()=>matchMedia('(hover: hover) and (pointer: fine)').matches))
+   const states=[]
+   const style=async button=>button.evaluate(e=>{const s=getComputedStyle(e);return {background:s.backgroundColor,color:s.color,border:s.borderColor,opacity:s.opacity,cursor:s.cursor,outline:s.outline,fontSize:s.fontSize,fontWeight:s.fontWeight,height:e.getBoundingClientRect().height,radius:s.borderRadius,padding:s.padding}})
+   const token=async name=>page.evaluate(name=>{const e=document.createElement('span');e.style.color=`var(${name})`;document.body.append(e);const color=getComputedStyle(e).color;e.remove();return color},name)
+   for(const state of ['default','hover','active','focus-visible','disabled']){
+    const values=[]
+    for(const id of ['start-workout','add-cardio','start-pelvic-floor']){
+     const button=page.locator('#'+id)
+     await button.evaluate(e=>{const r=e.getBoundingClientRect();scrollTo(0,scrollY+r.top-(innerHeight-r.height)/2)})
+     if(state==='hover')await button.hover()
+     if(state==='active'){await button.hover();await page.mouse.down()}
+     if(state==='focus-visible'){await page.keyboard.press('Tab');await button.focus();assert.ok(await button.evaluate(e=>e.matches(':focus-visible')))}
+     if(state==='disabled')await button.evaluate(e=>e.disabled=true)
+     await page.waitForTimeout(220);const value=await style(button);values.push(value)
+     assert.equal(value.background,await token(state==='hover'?'--accent-hover':state==='active'?'--accent-pressed':'--accent'))
+     assert.equal(value.color,await token('--accent-ink'));assert.equal(value.height,48);assert.equal(value.radius,'14px');assert.equal(value.padding,'0px 16px')
+     if(state==='focus-visible')assert.ok(value.outline.startsWith('rgb(')&&value.outline.includes('solid 2px'))
+     if(state==='disabled'){assert.equal(value.opacity,'0.48');assert.equal(value.cursor,'not-allowed');await button.evaluate(e=>e.disabled=false)}
+     await page.mouse.move(0,0);if(state==='active')await page.mouse.up();await button.evaluate(e=>e.blur());await page.waitForTimeout(220)
+    }
+    for(const value of values)assert.deepEqual(value,values[0]);states.push({state,values})
+   }
+   await fs.writeFile(`/tmp/workout-primary-${prod?'prod':'local'}-states.json`,JSON.stringify(states,null,2))
+  }finally{await context.close()}
+ }
+} finally {await browser.close()}
 await fs.writeFile(`/tmp/semantic-${baseline?'baseline':prod?'prod':'local'}-receipt.json`,JSON.stringify(receipts,null,2))
 console.log(JSON.stringify({suite:'uiSemanticConsistency',mode:baseline?'baseline':prod?'prod':'local',receipts}))
