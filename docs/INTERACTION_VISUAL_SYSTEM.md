@@ -12,7 +12,7 @@ Vision step rendering owns scrollTop0 immediately and on a guarded frame; viewer
 
 ## Boundaries
 
-Vanilla TypeScript and existing CSS only. Business entities/services, historical snapshots, local date semantics, canonical kcal, Food Vision parsing/writes, AI tools/permissions/proposals, BackupV9/RestoreV1–V9/SyncV1 and the stable 17-store DexieV9 identity preserve all prior records. Nutrition strategy stores are additive; daily target provenance is a snapshot, never a live link. Visual rules never override data preservation. Five bottom tabs and Progress Trend/Calendar/Reports remain.
+Vanilla TypeScript and existing CSS only. Business entities/services, historical snapshots, local date semantics, canonical kcal, Food Vision parsing/writes, AI tools/permissions/proposals, BackupV10/RestoreV1–V10/SyncV1 and the stable18-store DexieV10 identity preserve all prior records. Nutrition strategy stores are additive; daily target provenance is a snapshot, never a live link. Visual rules never override data preservation. Five bottom tabs and Progress Trend/Calendar/Reports remain.
 
 ## Shared layers
 
@@ -107,3 +107,10 @@ The manager has one create entry and a content-sized empty state, current phase/
 Food serving mode reuses existing secondary buttons and primary save, quiet accent-soft selected state, aria-pressed and a shared Sheet body. Optional serving mass and the existing reference nutrition have separate labels; conversion notes are metadata, not a second nutritional authority. Long names/decimal counts remain readable at140% and320px. Clear-meal is a quiet destructive link inside the expanded group, with the shared final danger dialog.
 
 Calendar category Food uses one fork path; the same category primitive owns grid/legend/day-detail size and alignment. Today Training is titled 训练 and uses existing card-heading/text-btn/chevron navigation. Ordinary body status pairs with secondary 记录训练 using today-activity-body/action, with no isolated footer row. This opens today’s existing Strength/Cardio creation region without a write or a chooser. An open strength workout replaces that CTA with compact primary 继续力量训练 beside its own status, resuming the same workout. Empty/completed/Cardio states retain the ordinary CTA. Cardio metrics share one unitless presentation helper, preserving minutes and actual stored values.
+
+
+## Contextual notes / app-owned video results
+
+Special-diet notes use quiet Fresh Green existing text/secondary controls and grouped editable rows; no warning/discipline design. Keep ordinary meal records as Food's main content. Meal/day estimates are contextual and never modify intake or target presentation. Reuse the shared Sheet for edit/photo subview, no private keyboard/viewport coordinator. Calendar category icon/legend/details share existing glyph geometry, with special diet prioritized inside max4 visible markers.
+
+Video cards are application DOM, not model HTML.16:9 stable thumbnails,3-line title, secondary channel,44px actions; long copy wraps without orphan actions. Active official playback needs minimum200×200, source Referer and unobstructed controls. Show loading/failure outside the iframe. One active player per Sheet, removed on switch/close/Clear; all artifacts memory-only. See VIDEO_SEARCH and AI_ARCHITECTURE for transport/data boundaries.

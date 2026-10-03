@@ -45,15 +45,15 @@ describe('optional serving input and factual grams snapshots',()=>{
 describe('one V8 → V9 migration and Backup V9 preservation',()=>{
  it('opens actual production V8, preserves all 17 stores, then retains new Food fields on reopen and Backup round-trip',async()=>{
   const d=make(),previous=legacyV8Database(d.name);await previous.open();await previous.transaction('rw',previous.tables,async()=>{for(const [store,rows] of Object.entries(v8))await previous.table(store).bulkAdd(rows)});previous.close()
-  await d.open();expect(d.verno).toBe(9);expect(d.tables).toHaveLength(17);for(const [store,rows] of Object.entries(v8))for(const row of rows)expect(await d.table(store).get(row.id)).toEqual(row)
+  await d.open();expect(d.verno).toBe(10);expect(d.tables).toHaveLength(18);for(const [store,rows] of Object.entries(v8))for(const row of rows)expect(await d.table(store).get(row.id)).toEqual(row)
   expect((await d.foods.get('food-old'))?.servingGrams).toBeUndefined();expect(d.foods.schema.indexes.map(i=>i.name)).not.toContain('servingGrams');expect(d.foodLogs.schema.indexes.map(i=>i.name)).not.toContain('[date+meal]')
-  await saveFood({...input,servingGrams:150.123456},'new-food',d);const backup=await exportBackup(d);expect(backup.schemaVersion).toBe(9);d.close();await d.open();expect((await exportBackup(d)).data).toEqual(backup.data)
+  await saveFood({...input,servingGrams:150.123456},'new-food',d);const backup=await exportBackup(d);expect(backup.schemaVersion).toBe(10);d.close();await d.open();expect((await exportBackup(d)).data).toEqual(backup.data)
   const target=make();await restoreBackup(JSON.parse(JSON.stringify(backup)),target);expect((await exportBackup(target)).data).toEqual(backup.data)
   await restoreBackup({app:'FitLog Lite',schemaVersion:8,exportedAt:backup.exportedAt,data:v8},target);expect((await target.foods.get('food-old'))?.servingGrams).toBeUndefined();expect((await exportBackup(target)).data.nutritionTargets).toEqual(v8.nutritionTargets)
  })
  it('new frozen V9 records survive reopen, first-populate does not reseed, and encrypted sync preserves serving/provenance',async()=>{
   const d=make(),frozen=legacyV9Database(d.name);await frozen.open();await frozen.transaction('rw',frozen.tables,async()=>{for(const [store,rows] of Object.entries(v9))await frozen.table(store).bulkAdd(rows)});frozen.close();await d.open()
-  expect(d.tables.map(t=>t.name).sort()).toEqual(Object.keys(LEGACY_V9_SCHEMA).sort());for(const [store,rows] of Object.entries(v9))for(const row of rows)expect(await d.table(store).get(row.id)).toEqual(row)
+  expect(d.tables.map(t=>t.name).sort()).toEqual([...Object.keys(LEGACY_V9_SCHEMA), 'dietEvents'].sort());expect(await d.dietEvents.count()).toBe(0);for(const [store,rows] of Object.entries(v9))for(const row of rows)expect(await d.table(store).get(row.id)).toEqual(row)
   expect(await d.exercises.count()).toBe(v9.exercises.length);const backup=await exportBackup(d),encrypted=await encryptSyncText(JSON.stringify(backup),'synthetic-password-only-123'),restored=JSON.parse(await decryptSyncText(encrypted,'synthetic-password-only-123'))
   const target=make();await restoreBackup(restored,target);expect((await exportBackup(target)).data).toEqual(backup.data);expect(encrypted.formatVersion).toBe(1);expect(JSON.stringify(encrypted)).not.toContain('PRIVATE_TEST_FOOD')
   const changed=structuredClone(backup);changed.data.foods[0]!.servingGrams=170;expect(await syncDataHash(changed.data)).not.toBe(await syncDataHash(backup.data))

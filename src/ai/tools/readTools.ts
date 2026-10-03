@@ -1,3 +1,4 @@
+import { dietEventContext } from '../../services/dietEventService'
 import type { EntityTable } from 'dexie'
 import { defineTool, arraySchema, booleanSchema, dateSchema, enumSchema, numberSchema, objectSchema, rangeSchema, stringSchema } from './types'
 import { AiError } from '../security'
@@ -29,7 +30,7 @@ function snapshotNutrition(logs: FoodLog[], target = {}) {
 async function nutritionDay(date: string, env: AiToolEnvironment) {
   requireAiDate(date)
   const [logs, target] = await Promise.all([env.database.foodLogs.where('date').equals(date).sortBy('createdAt'), env.database.nutritionTargets.where('date').equals(date).first()])
-  return { date, ...snapshotNutrition(logs, target), target: target ?? null, meals: [...mealTypes, 'unassigned'].map(meal => ({ meal, ...snapshotNutrition(logs.filter(log => meal === 'unassigned' ? !log.meal : log.meal === meal)), items: logs.filter(log => meal === 'unassigned' ? !log.meal : log.meal === meal).slice(0, 50).map(log => ({ id: log.id, foodName: log.foodName, brand: log.brand, grams: log.grams, calories: log.totalCalories, protein: log.totalProtein, carbs: log.totalCarbs, fat: log.totalFat })) })), ...(logs.length > 50 ? { truncated: true } : {}) }
+  return { date, dietEvents: dietEventContext(await env.database.dietEvents.where('date').equals(date).limit(11).toArray()), ...snapshotNutrition(logs, target), target: target ?? null, meals: [...mealTypes, 'unassigned'].map(meal => ({ meal, ...snapshotNutrition(logs.filter(log => meal === 'unassigned' ? !log.meal : log.meal === meal)), items: logs.filter(log => meal === 'unassigned' ? !log.meal : log.meal === meal).slice(0, 50).map(log => ({ id: log.id, foodName: log.foodName, brand: log.brand, grams: log.grams, calories: log.totalCalories, protein: log.totalProtein, carbs: log.totalCarbs, fat: log.totalFat })) })), ...(logs.length > 50 ? { truncated: true } : {}) }
 }
 const range = <T extends { id: string }>(table: EntityTable<T, 'id'>, start: string, end: string) => table.where('date').between(start, end, true, true).toArray()
 type RangeArgs = { start: string; end: string }
@@ -45,8 +46,8 @@ export const readTools: AiTool[] = [
   defineTool<{ date: string }>('get_nutrition_day', '读取当日饮食与目标', 'READ', ['food', 'nutritionTargets'], objectSchema({ date: dateSchema }), ({ date }, env) => nutritionDay(date, env)),
   defineTool<RangeArgs>('get_nutrition_range', '读取饮食区间摘要', 'READ', ['food', 'nutritionTargets'], rangeSchema, async ({ start, end }, env) => {
     const days = requireAiRange(start, end, 31)
-    const [logs, targets] = await Promise.all([range(env.database.foodLogs, start, end), range(env.database.nutritionTargets, start, end)])
-    return { start, end, days: days.map(date => ({ date, ...snapshotNutrition(logs.filter(log => log.date === date), targets.find(target => target.date === date)), target: targets.find(target => target.date === date) ?? null })) }
+    const [logs, targets, events] = await Promise.all([range(env.database.foodLogs, start, end), range(env.database.nutritionTargets, start, end), range(env.database.dietEvents, start, end)])
+    return { start, end, days: days.map(date => ({ date, dietEvents: dietEventContext(events.filter(event => event.date === date)), ...snapshotNutrition(logs.filter(log => log.date === date), targets.find(target => target.date === date)), target: targets.find(target => target.date === date) ?? null })) }
   }),
   defineTool<{ start?: string; end?: string; includeInbox?: boolean; includeCompleted?: boolean }>('get_tasks', '读取计划任务', 'READ', ['plan'], objectSchema({ start: dateSchema, end: dateSchema, includeInbox: booleanSchema, includeCompleted: booleanSchema }, []), async ({ start, end, includeInbox = false, includeCompleted = false }, env) => {
     const first = start ?? env.context().today, last = end ?? shiftLocalDate(first, 30); requireAiRange(first, last, 31)

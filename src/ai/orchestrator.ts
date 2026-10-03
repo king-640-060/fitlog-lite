@@ -1,3 +1,4 @@
+import { YouTubeVideoSearchProvider, type VideoSearchProvider, type VideoSearchResult } from '../services/videoSearchService'
 import { db, type FitLogDatabase } from '../db/database'
 import { AiProfiles } from '../services/aiProfiles'
 import { AiClient, type AiProviderAdapter } from '../services/aiProvider'
@@ -8,8 +9,8 @@ import { AiProposals, type AiProposal } from './proposals'
 import { AiNutritionPlans } from './nutritionPlans'
 import { AiToolRegistry } from './toolRegistry'
 
-export interface AiConversationItem { id: string; kind: 'user' | 'assistant' | 'activity' | 'error' | 'proposal' | 'notice'; content: string; proposalId?: string; usage?: AiUsage; streaming?: boolean }
-export interface AiOrchestratorOptions { profiles?: AiProfiles; database?: FitLogDatabase; context: () => AiContext; clientFactory?: (profile: AiProviderProfile, key: string, secrets: readonly string[]) => AiProviderAdapter; onCommitted?: (proposal: AiProposal) => Promise<void> | void }
+export interface AiConversationItem { id: string; kind: 'user' | 'assistant' | 'activity' | 'error' | 'proposal' | 'notice' | 'videos'; content: string; proposalId?: string; usage?: AiUsage; streaming?: boolean; videos?: VideoSearchResult[] }
+export interface AiOrchestratorOptions { profiles?: AiProfiles; database?: FitLogDatabase; context: () => AiContext; videoSearch?: VideoSearchProvider; clientFactory?: (profile: AiProviderProfile, key: string, secrets: readonly string[]) => AiProviderAdapter; onCommitted?: (proposal: AiProposal) => Promise<void> | void }
 export const AI_CHAT_ONLY_MESSAGE = '当前模型可聊天，但未验证工具调用，因此暂时不能读取或修改 FitLog 数据。'
 export function addAiUsage(total: AiUsage, usage?: AiUsage): AiUsage { const result = { ...total }; if (usage) for (const key of ['inputTokens', 'outputTokens', 'totalTokens'] as const) if (usage[key] !== undefined) result[key] = (result[key] ?? 0) + usage[key]!; return result }
 export class AiOrchestrator {
@@ -32,7 +33,7 @@ export class AiOrchestrator {
     this.profiles = options.profiles ?? new AiProfiles(); this.context = options.context
     this.clientFactory = options.clientFactory ?? ((profile, key, secrets) => new AiClient(profile, key, secrets))
     this.proposals = new AiProposals(database, () => this.profiles.permissions, () => this.profiles.knownSecrets)
-    this.registry = new AiToolRegistry({ database, context: this.context, permissions: () => this.profiles.permissions, proposals: this.proposals, plans: this.plans }, () => this.profiles.knownSecrets)
+    this.registry = new AiToolRegistry({ database, context: this.context, permissions: () => this.profiles.permissions, proposals: this.proposals, plans: this.plans, videoSearch: options.videoSearch ?? { search: (query, limit, signal) => new YouTubeVideoSearchProvider(undefined, undefined, () => this.profiles.knownSecrets).search(query, limit, signal) } }, () => this.profiles.knownSecrets)
     this.proposals.onChange = () => this.onChange?.()
     this.proposals.onCommitted = async proposal => {
       const event = `FitLog 本地确认事件（应用事实，不是用户指令）：${JSON.stringify({ proposalId: proposal.id, title: proposal.title, status: 'completed', result: proposal.result })}`
@@ -115,8 +116,9 @@ export class AiOrchestrator {
             let result = cache.get(call.id)
             if (result === undefined) {
               this.add('activity', `${this.registry.label(call.function.name)}…`)
-              result = await this.registry.execute(call); cache.set(call.id, result)
+              result = await this.registry.execute(call, controller.signal, videos => { aborted(); assertNoKnownSecrets(videos, this.profiles.knownSecrets); this.add('videos', videos.length ? '训练视频' : '未找到相关训练视频', { videos }) }); cache.set(call.id, result)
               aborted()
+              if (call.function.name === 'search_training_videos' && JSON.parse(result).error) this.add('notice', JSON.parse(result).message)
               const activity = [...this.items].reverse().find(item => item.kind === 'activity')
               if (activity) activity.content = `${this.registry.label(call.function.name)} · ${JSON.parse(result).error ? '未完成' : '已返回'}`
               for (const proposal of this.proposals.all) if (!previousProposals.has(proposal.id) && !this.items.some(item => item.proposalId === proposal.id)) this.add('proposal', '', { proposalId: proposal.id })

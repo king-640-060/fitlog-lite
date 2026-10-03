@@ -1,3 +1,4 @@
+import { VIDEO_KEY } from './videoSearchService'
 import type { AiPermissions, AiProviderProfile, AiScope } from '../ai/types'
 import { AiError, assertNoKnownSecrets, normalizeAiBaseUrl } from '../ai/security'
 import { getVisionModel } from '../ai/modelRouting'
@@ -24,7 +25,7 @@ export class AiProfiles {
   }
   get active(): AiProviderProfile | undefined { return this.profiles.find(profile => profile.id === this.storage.getItem(AI_STORAGE_KEYS.active)) }
   key(id: string): string { return this.storage.getItem(AI_STORAGE_KEYS.keyPrefix + id) || '' }
-  get knownSecrets(): string[] { return [...this.profiles.map(profile => this.key(profile.id)), this.storage.getItem('fitlog-github-sync-token-v1') || ''].filter(Boolean) }
+  get knownSecrets(): string[] { return [...this.profiles.map(profile => this.key(profile.id)), this.storage.getItem('fitlog-github-sync-token-v1') || '', this.storage.getItem(VIDEO_KEY) || ''].filter(Boolean) }
   get privacyAcknowledged(): boolean { return this.storage.getItem(AI_STORAGE_KEYS.privacy) === '1' }
   acknowledgePrivacy(): void { this.storage.setItem(AI_STORAGE_KEYS.privacy, '1') }
   get permissions(): AiPermissions {

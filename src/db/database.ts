@@ -1,11 +1,12 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { CardioSession, DietTemplate, Exercise, Food, FoodLog, Habit, HabitCheckIn, NutritionTarget, NutritionStrategyTemplate, NutritionStrategyVariant, NutritionStrategyPhase, PelvicFloorSession, Task, TaskTag, WeightLog, Workout, WorkoutTemplate } from './types'
+import type { CardioSession, DietEvent, DietTemplate, Exercise, Food, FoodLog, Habit, HabitCheckIn, NutritionTarget, NutritionStrategyTemplate, NutritionStrategyVariant, NutritionStrategyPhase, PelvicFloorSession, Task, TaskTag, WeightLog, Workout, WorkoutTemplate } from './types'
 
 export const PRODUCTION_DATABASE_NAME = 'fitlog-lite-db'
 
 export const STARTER_EXERCISE_NAMES = ['杠铃卧推', '深蹲', '硬拉', '引体向上', '哑铃弯举', '杠铃划船', '哑铃侧平举'] as const
 
 export class FitLogDatabase extends Dexie {
+  dietEvents!: EntityTable<DietEvent, 'id'>
   foods!: EntityTable<Food, 'id'>
   foodLogs!: EntityTable<FoodLog, 'id'>
   exercises!: EntityTable<Exercise, 'id'>
@@ -92,6 +93,9 @@ export class FitLogDatabase extends Dexie {
     }).upgrade(() => {
       // servingGrams is optional and unindexed. Preserve every V8 row, including strategy snapshots.
       // No inferred serving mass, FoodLog recalculation or second intermediate schema.
+    })
+    this.version(10).stores({ dietEvents: 'id, date, kind, scope, createdAt' }).upgrade(() => {
+      // Add one empty contextual store. Preserve every V9 row and index without inference.
     })
     this.on('populate', () => {
       const now = new Date().toISOString()

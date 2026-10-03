@@ -2,8 +2,9 @@ import { db, type FitLogDatabase } from '../db/database'
 
 export async function clearDayRecords(date: string, database: FitLogDatabase = db): Promise<void> {
   await database.transaction('rw', [
-    database.foodLogs, database.workouts, database.cardioSessions, database.pelvicFloorSessions, database.weights, database.nutritionTargets,
+    database.dietEvents, database.foodLogs, database.workouts, database.cardioSessions, database.pelvicFloorSessions, database.weights, database.nutritionTargets,
   ], async () => {
+    await database.dietEvents.where('date').equals(date).delete()
     await database.foodLogs.where('date').equals(date).delete()
     await database.workouts.where('date').equals(date).delete()
     await database.cardioSessions.where('date').equals(date).delete()

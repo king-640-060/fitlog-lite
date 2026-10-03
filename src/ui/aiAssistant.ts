@@ -1,3 +1,4 @@
+import { videoCardRenderer } from './videoCards'
 import { setSheetVariant } from './sheetController'
 import { AiOrchestrator, AI_CHAT_ONLY_MESSAGE } from '../ai/orchestrator'
 import { AI_LIMITS } from '../ai/security'
@@ -83,8 +84,9 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi, optio
   stopButton.addEventListener('click', () => engine.stop())
   host.querySelector('#ai-food-camera')?.addEventListener('click', () => { dialog.close(); ui.openFoodVision?.() })
   head.querySelector('#ai-assistant-settings')?.addEventListener('click', openSettings)
-  head.querySelector('#ai-clear-chat')?.addEventListener('click', () => { speech.abort(); pendingAutoText = undefined; textarea.value = ''; drafts.delete(engine); grow(); engine.clear() })
+  head.querySelector('#ai-clear-chat')?.addEventListener('click', () => { speech.abort(); pendingAutoText = undefined; textarea.value = ''; drafts.delete(engine); grow(); videoCards.stop(); engine.clear() })
   host.querySelector('#ai-notice-settings')?.addEventListener('click', openSettings)
+  const videoCards = videoCardRenderer(dialog)
   const nodeMap = new Map<string, HTMLElement>()
   let paintFrame = 0, wasBusy = engine.busy
   const draw = () => {
@@ -96,7 +98,7 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi, optio
     const nearBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 72
     const oldScroll = log.scrollTop
     if (!engine.items.length) {
-      nodeMap.clear(); log.replaceChildren()
+      videoCards.stop(); nodeMap.clear(); log.replaceChildren()
       const welcome = document.createElement('section'); welcome.className = 'ai-welcome'
       const heading = document.createElement('h3'); heading.textContent = engine.profiles.active ? '从一条记录或一个问题开始' : '连接你自己的 AI 服务'
       const note = document.createElement('p'); note.className = 'ai-note'; note.textContent = engine.profiles.active ? engine.profiles.active.toolCapability === 'supported' ? '读取真实记录，计算交给 FitLog。写入前会给你预览。' : '可以先聊聊饮食、训练或计划。验证数据能力后，可按权限读取记录。' : '配置完成后，可以聊聊饮食、训练和计划。'
@@ -121,7 +123,9 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi, optio
         let node = nodeMap.get(item.id)
         if (!node) { node = document.createElement('article'); node.setAttribute('aria-live', 'off'); node.setAttribute('aria-atomic', 'false'); nodeMap.set(item.id, node); log.append(node) }
         const className = `ai-message ai-${item.kind}`; if (node.className !== className) node.className = className
-        if (item.kind === 'proposal') {
+        if (item.kind === 'videos') {
+          if (!node.dataset.videos) { videoCards.render(node, item.videos ?? [], item.content); node.dataset.videos = '1' }
+        } else if (item.kind === 'proposal') {
           const proposal = engine.proposals.get(item.proposalId!)
           if (!proposal) continue
           if (node.dataset.status === proposal.status) { node.querySelectorAll<HTMLButtonElement>('.ai-proposal-actions .primary').forEach(button => { button.disabled = engine.busy || proposal.status !== 'pending' }); continue }

@@ -341,4 +341,15 @@ export interface BackupDataV9 extends BackupBase {
   data: BackupDataV8['data']
 }
 
-export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6 | BackupDataV7 | BackupDataV8 | BackupDataV9
+export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6 | BackupDataV7 | BackupDataV8 | BackupDataV9 | BackupDataV10
+
+/** Context only: estimates never contribute to canonical FoodLog nutrition. */
+export interface DietEvent {
+  id: string; date: string; kind: 'indulgence'; scope: MealType | 'day'; note?: string
+  estimatedCalories?: number; estimatedCaloriesLow?: number; estimatedCaloriesHigh?: number
+  estimateSource?: 'manual' | 'photo'; createdAt: string; updatedAt: string
+}
+export interface BackupDataV10 extends BackupBase {
+  schemaVersion: 10
+  data: BackupDataV9['data'] & { dietEvents: DietEvent[] }
+}

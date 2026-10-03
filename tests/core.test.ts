@@ -158,7 +158,7 @@ describe('体重', () => {
 describe('备份', () => {
   it('验证备份 schema', () => {
     const backup = { app: 'FitLog Lite', schemaVersion: 1, exportedAt: new Date().toISOString(), data: { foods: [], foodLogs: [], exercises: [], workouts: [], weights: [] } }
-    expect(validateBackup(backup)).toMatchObject({ schemaVersion: 9, data: { workoutTemplates: [], dietTemplates: [], nutritionTargets: [], pelvicFloorSessions: [], cardioSessions: [] } })
+    expect(validateBackup(backup)).toMatchObject({ schemaVersion: 10, data: { workoutTemplates: [], dietTemplates: [], nutritionTargets: [], pelvicFloorSessions: [], cardioSessions: [] } })
     expect(() => validateBackup({ ...backup, schemaVersion: 5 })).toThrow()
   })
 })

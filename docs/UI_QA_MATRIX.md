@@ -105,3 +105,12 @@ Preservation: stable fitlog-lite-db, one explicitV8→V9 upgrade,17stores/unchan
 ## Today Training action follow-up
 
 Only Today Training changes: 训练 title, header 查看训练 navigation, body secondary 记录训练 paired with status through today-activity primitives, replaced by primary 继续力量训练 for an open workout. Existing foodServing suite covers empty/Cardio/completed/combined/open plus enlarged5-exercise16-set and120-minute metrics, stale history, local-day creation navigation, zero writes on navigation/record/continuation and return-to-Today refresh. Local320/375/390/430 ×100/120/140%; production390/430; inspect390/100,320/140,430/100 screenshots for all five core states. DB/Backup/Restore/Sync and all non-Today functionality unchanged; physical Safari/original installed PWA remain Pending.
+
+
+## Video Search / DietEvent release gates
+
+Keep all14 existing browser suites; add `videoSearch.mjs` and `dietEvents.mjs` (16 total). Local320/375/390/430 and production390/430, fonts100/120/140. Video covers no config/independent consent/save+test,1/3 long Chinese/English results, thumbnail failure, fixed derived links, no iframe before click, one playing/switching, close/Clear/reopen/no re-search and provider error. Official player/search are mocked; real YouTube remains a separate Not performed category. Inspect actual320/140,390/100,430/100 screenshots.
+
+Diet covers empty/mark-only/manual/long-note/multiple/day/historical selected dates, real local edit/delete, quiet day+meal coexistence, independent photo disclosure,2 Canvas JPEG images/gallery vs camera, Vision route/image payload/review/use/draft/explicit Save, day-photo disabled, mocked keyboard/Safe Area, canonical totals/17 old stores unchanged, ordinary/meal/day/crowded6-category Calendar+detail and delete marker removal. Preserve frozenV9 fixtures, add frozenV10. Verify stable100/18 migration, all prior indexes/rows, reopen/populate, BackupV10/RestoreV1–V10 and all-store rollback/Sync envelopeV1/hash.
+
+Physical iPhone Safari, original installed PWA, YouTube in-app playback and meal-photo camera/gallery are four independent Pending categories until real device evidence exists. Mock browser/provider PASS never proves them.

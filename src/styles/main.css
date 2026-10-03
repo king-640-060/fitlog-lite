@@ -938,3 +938,40 @@ body.keyboard-open .bottom-nav { display: none; }
 .meal-clear-confirm .dialog-actions { grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); }
 .meal-clear-confirm .dialog-actions button { white-space: nowrap; }
 .workout-today-card .today-training-token { white-space: nowrap; }
+
+/* Contextual diet notes and app-owned video results share existing controls. */
+.diet-events { margin: var(--section-gap) 0; }
+.diet-events-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.diet-events-heading h2, .diet-events-heading h3 { margin: 0; font-size: 1rem; }
+.diet-event-row { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; margin-top: 8px; padding: 12px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); color: var(--text-primary); }
+.diet-event-row > span:first-child { display: grid; gap: 5px; min-width: 0; flex: 1; }
+.diet-event-row strong, .diet-event-note, .diet-event-row small { overflow-wrap: anywhere; }
+.diet-events:not(.diet-events-detail) .diet-event-note { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.diet-event-row small, .diet-event-edit { color: var(--text-secondary); font-size: .8rem; }
+.diet-event-edit { white-space: nowrap; flex-shrink: 0; }
+.diet-events-detail { padding: 12px; border-top: 1px solid var(--border); margin: 0; }
+.calendar-category-dietEvent { --calendar-color: var(--accent-strong); --calendar-bg: var(--accent-soft); }
+.meal-photo-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.meal-photo-images { display: flex; gap: 10px; }
+.meal-photo-images figure { margin: 12px 0; width: min(45%, 160px); }
+.meal-photo-images img { width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: 12px; }
+.meal-photo-review { display: grid; gap: 12px; }
+.meal-photo-review label { display: grid; gap: 6px; }
+.meal-photo-review input { font-size: 16px; }
+.meal-photo-review li { overflow-wrap: anywhere; }
+.ai-message.ai-videos { width: 100%; max-width: 100%; padding: 0; white-space: normal; }
+.ai-videos h3 { margin: 0 0 10px; font-size: 1rem; }
+.video-card { border: 1px solid var(--border); border-radius: 14px; padding: 10px; margin-top: 10px; min-width: 0; }
+.video-media { width: 100%; position: relative; aspect-ratio: 16/9; background: var(--surface-soft); border-radius: 10px; overflow: hidden; }
+.video-media img, .video-media iframe { width: 100%; height: 100%; object-fit: cover; border: 0; display: block; }
+.video-media iframe { position: absolute; inset: 0; }
+.video-media.thumbnail-missing::before { content: 'YouTube · 训练视频'; position: absolute; inset: 0; display: grid; place-items: center; color: var(--text-secondary); }
+.video-media.is-playing { min-height: 200px; min-width: 200px; }
+.video-status { margin: 8px 0; color: var(--text-secondary); font-size: .8rem; }
+.video-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; overflow-wrap: anywhere; margin-top: 10px; }
+.video-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.video-actions a { min-height: 44px; display: inline-flex; align-items: center; }
+.video-card .ai-note { overflow-wrap: anywhere; }
+/* Keep four glyphs plus the context overflow count inside the existing day geometry. */
+.calendar-day-details { width: 100%; }
+.calendar-markers:has(.calendar-marker-overflow) { gap: 0; }
