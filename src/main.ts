@@ -54,6 +54,7 @@ import { foodPagerLabel, foodRailDates, foodRailFocus, foodRailNeedsRecenter, is
 import { icon, type IconName } from './ui/icons'
 import { habitPlanText, habitTodaySummary, habitWeekdayLabels } from './ui/habitPresentation'
 import { getGoalProgress } from './ui/progressRing'
+import { calorieArc, CALORIE_ARC_SPAN, CALORIE_RADIUS, CALORIE_OUTER_RADIUS } from './ui/calorieGaugeGeometry'
 import { groupFoodLogs, isMealType, mealNames, mealTypes, type FoodMealGroup } from './utils/foodMeals'
 import { formatShortDate, getLocalDateString, shiftLocalDate } from './utils/date'
 import { findActiveHashtagQuery, normalizeTaskTagName, replaceActiveHashtagQuery, validateTaskTagName, type ActiveHashtagQuery } from './utils/taskTags'
@@ -426,7 +427,7 @@ async function renderTodayPage(): Promise<void> {
   const view = document.querySelector<HTMLElement>('#view')!
   view.innerHTML = `
     ${todayPlanCardHtml(todayTasks, taskTags)}
-    <section class="today-card nutrition-today-card"><div class="card-heading"><div><span class="card-icon nutrition-icon">${icon('utensils', 19)}</span><h2>今日饮食</h2></div><button class="text-btn" id="today-food-details">查看详情 ${icon('chevron', 15)}</button></div><div class="today-calorie-layout">${calorieGaugeHtml(totals.calories, target?.calories, 'today')}</div><div class="today-macros"><div class="protein"><span>蛋白质</span><strong>${formatNumber(totals.protein)}${target?.protein === undefined ? 'g' : ` / ${formatNumber(target.protein)}g`}</strong></div><div class="carbs"><span>碳水</span><strong>${formatNumber(totals.carbs)}${target?.carbs === undefined ? 'g' : ` / ${formatNumber(target.carbs)}g`}</strong></div><div class="fat"><span>脂肪</span><strong>${formatNumber(totals.fat)}${target?.fat === undefined ? 'g' : ` / ${formatNumber(target.fat)}g`}</strong></div></div></section>
+    <section class="today-card nutrition-today-card"><div class="card-heading"><div><span class="card-icon nutrition-icon">${icon('utensils', 19)}</span><h2>今日饮食</h2></div><button class="text-btn" id="today-food-details">查看详情 ${icon('chevron', 15)}</button></div><div class="today-calorie-layout">${calorieGaugeHtml(totals.calories, target?.calories, 'today')}</div><div class="today-macros nutrition-tiles">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein)}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs)}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat)}</div></section>
     <section class="today-card workout-today-card"><div class="card-heading"><div><span class="card-icon workout-icon">${icon('dumbbell', 19)}</span><h2>今日训练</h2></div></div><div class="today-training-row"><strong>无氧</strong><span>${workouts.length ? `力量训练 · ${strengthExercises} 个动作 · ${strengthSets} 组${openWorkout ? ' · 记录中' : ''}` : '今天还没有力量训练'}</span></div><div class="today-training-row"><strong>有氧</strong><span>${cardioSessions.length === 1 ? `${getCardioActivityLabel(cardioSessions[0]!)} · ${formatNumber(cardioMinutes)} 分钟 · ${formatCardioMetrics(cardioSessions[0]!).join(' · ')}` : cardioSessions.length ? `有氧训练 · ${cardioSessions.length} 次 · 共 ${formatNumber(cardioMinutes)} 分钟` : '今天还没有有氧训练'}</span></div><button class="${openWorkout ? 'primary' : 'secondary'} today-workout-action" id="today-workout">${openWorkout ? '继续力量训练' : '查看训练'}</button></section>
     <section class="today-card today-activity-card weight-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon weight-icon">${icon('scale', 19)}</span><h2>体重</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 15)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(weightState.status)}</strong><span class="today-activity-meta">${esc(weightState.meta)}</span></div><button class="secondary today-activity-action" id="today-record-weight">${esc(weightState.action)}</button></div></section>
     <section class="today-card today-activity-card pelvic-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon pelvic-icon">${icon('leaf', 19)}</span><h2>凯格尔训练</h2></div><button class="text-btn" id="today-pelvic-history">训练记录 ${icon('chevron', 15)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(pelvicState.status)}</strong><span class="today-activity-meta">${esc(pelvicState.meta)}</span></div><button class="secondary today-activity-action" id="today-pelvic">${esc(pelvicState.action)}</button></div></section>
@@ -877,6 +878,11 @@ interface PreviousRingValue { actual: number; goal?: number }
 
 function ringSvgHtml(actual: number, goal: number | undefined, size: 'large' | 'small' | 'tiny', previous?: PreviousRingValue): string {
   const progress = getGoalProgress(actual, goal)
+  if (size === 'large') {
+    const main = calorieArc(CALORIE_RADIUS), outer = calorieArc(CALORIE_OUTER_RADIUS)
+    const path = (name: string, arc: typeof main, value?: number) => `<path class="${name}" d="${arc.path}"${value === undefined ? '' : ` stroke-dasharray="${arc.length} ${arc.length}" stroke-dashoffset="${arc.length * (1 - value)}" data-final-offset="${arc.length * (1 - value)}" stroke-opacity="${value > 0 ? 1 : 0}"`}/>`
+    return `<svg class="goal-ring ${size} ${progress.state}" viewBox="0 0 120 120" data-arc-span="${CALORIE_ARC_SPAN}" aria-hidden="true">${path('ring-track', main)}${path('ring-main', main, progress.main)}${path('ring-outer-track', outer)}${path('ring-outer', outer, progress.outer)}</svg>`
+  }
   void previous
   const before = progress
   const mainLength = 2 * Math.PI * 40
@@ -909,7 +915,8 @@ function nutritionMetricHtml(key: string, label: string, actual: number, target:
   const progress = getGoalProgress(actual, target)
   const amount = target === undefined ? `${formatNumber(actual)}g` : `${formatNumber(actual)} / ${formatNumber(target)}g`
   const status = progress.state === 'above' ? `<small class="metric-excess">+${formatNumber(progress.excess)}g</small>` : progress.state === 'reached' ? '<small>已达目标</small>' : progress.state === 'unset' ? '<small>未设目标</small>' : ''
-  return `<span class="nutrition-metric ${key}" data-progress-key="${key}" data-actual="${actual}" ${target === undefined ? '' : `data-goal="${target}"`} aria-label="${label} ${amount} ${goalStatusText(actual, target, 'g')}"><b>${label}</b>${ringSvgHtml(actual, target, 'small', previous)}<span class="macro-value" aria-hidden="true"><span data-count-from="${previous?.actual ?? 0}" data-count-to="${actual}">${formatNumber(actual)}</span>${target === undefined ? 'g' : ` / ${formatNumber(target)}g`}</span>${status}</span>`
+  void previous
+  return `<div class="nutrition-metric ${key} ${progress.state}" role="group" data-progress-key="${key}" data-actual="${actual}" ${target === undefined ? '' : `data-goal="${target}"`} aria-label="${label} ${amount} ${goalStatusText(actual, target, 'g')}"><span class="macro-label">${label}</span><strong class="macro-value" aria-hidden="true">${amount}</strong>${status}</div>`
 }
 
 
@@ -1160,7 +1167,7 @@ async function renderFoodPage(): Promise<void> {
   const groups = groupFoodLogs(logs)
   const completionStrip = target ? foodCompletionStripHtml(requestedDate, getNutritionCompletionSummary(target, logs)) : ''
   const slotHtml = `<div class="food-content-body" data-food-date="${requestedDate}">
-    <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="food-calorie-row">${calorieGaugeHtml(totals.calories, calorieTarget, 'food', previous.get('calories'))}</div><div class="macros ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div>${completionStrip}</section>
+    <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="food-calorie-row">${calorieGaugeHtml(totals.calories, calorieTarget, 'food', previous.get('calories'))}</div><div class="macros nutrition-tiles ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div>${completionStrip}</section>
     <section class="food-meals-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '按餐次记录，更清楚'}</span></div>${logs.length ? '<button class="food-save-template" id="save-day-diet-template" type="button" aria-label="将当天饮食保存为模板">保存为模板</button>' : ''}</section>
     <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday)).join('')}</div></div>`
   let rail = view.querySelector<HTMLElement>('.food-date-rail')

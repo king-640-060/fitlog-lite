@@ -135,7 +135,7 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 - Do not expose duplicate equivalent create actions in the same empty state; retain one visible, keyboard-accessible next action and preserve populated-state creation.
 - Repeated cards on the same functional surface share action geometry; primary/secondary changes emphasis, not structure. Geometry may differ by interaction context: Today dashboard navigation stays compact (ongoing continuation may be primary), while dedicated Workout execution cards use full-width actions. Dedicated Workout execution cards use the same primary lime treatment for their main action; geometry and interaction states remain shared across Strength, Cardio and Kegel.
 - Unset progress indicators remain semantically neutral and muted, but sufficiently visible against the actual card background. Scope contrast adjustments to the affected surface.
-- Progress visualization and the metric it represents must remain visually coupled; reuse shared gauge and progress semantics across summary/detail surfaces.
+- Progress visualization and its metric remain coupled. Today/Food share the280° open calorie SVG gauge (6px main/3px excess, neutral unset) and Today-style macro tiles without donuts. Keep existing goal/excess/unknown semantics, canonical precision and static final rendering; see UI_INTERACTION_SPEC for geometry and contrast.
 - Explanatory section footnotes must not look interactive: no setting icon, bold row title, chevron or card surface.
 - Touch focus must not show keyboard-style outlines; keyboard focus must remain explicit.
 - Do not use global transform-based button press feedback.

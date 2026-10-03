@@ -85,7 +85,7 @@ try { for (const [width,height] of sizes) {
    if(goal===undefined)assert.ok(!(await page.locator('.today-calorie-layout').innerText()).includes('0%'))
    else assert.ok((await page.locator('.today-calorie-layout').innerText()).includes(`目标 ${goal} kcal`))
    if(state==='above'||state==='reached')assert.equal(Number(await page.locator('.today-calorie-gauge .ring-main').getAttribute('stroke-dashoffset')),0)
-   if(state==='above')assert.ok(Number(await page.locator('.today-calorie-gauge .ring-outer').getAttribute('stroke-dashoffset'))<2*Math.PI*49)
+   if(state==='above')assert.ok(Number(await page.locator('.today-calorie-gauge .ring-outer').getAttribute('stroke-dashoffset'))<55*280*Math.PI/180)
    await capture('today-'+state)
    const ringStyle = async selector => page.locator(selector).evaluate(e=>{const s=getComputedStyle(e),root=getComputedStyle(document.documentElement);return {stroke:s.stroke,opacity:Number(s.opacity),dash:s.strokeDasharray,strokeWidth:s.strokeWidth,border:root.getPropertyValue('--border').trim(),neutral:root.getPropertyValue('--text-tertiary').trim(),accent:root.getPropertyValue('--accent-mid').trim()}})
    const todayTrack=await ringStyle('.today-calorie-gauge .ring-track')
@@ -93,8 +93,8 @@ try { for (const [width,height] of sizes) {
    // SVG CSS colors normalize to rgb; compare against a probe using the actual theme token.
    const tokenColor = async token => page.evaluate(token=>{const e=document.createElement('span');e.style.color=`var(${token})`;document.body.append(e);const value=getComputedStyle(e).color;e.remove();return value},token)
    assert.equal(active.stroke,await tokenColor('--accent-mid'))
-   if(state==='unset'){assert.ok(todayTrack.opacity>.55);assert.equal(todayTrack.stroke,await tokenColor('--text-tertiary'));assert.notEqual(todayTrack.stroke,await tokenColor('--border'));assert.equal(todayTrack.dash,'3px, 7px');assert.equal(todayTrack.strokeWidth,'8px')}
-   else {assert.equal(todayTrack.stroke,await tokenColor('--border'));assert.equal(todayTrack.opacity,1)}
+   if(state==='unset'){assert.ok(todayTrack.opacity>.55);assert.equal(todayTrack.stroke,await tokenColor('--text-tertiary'));assert.notEqual(todayTrack.stroke,await tokenColor('--border'));assert.equal(todayTrack.dash,'3px, 7px');assert.equal(todayTrack.strokeWidth,'6px')}
+   else {assert.equal(todayTrack.stroke,await tokenColor('--border'));assert.equal(todayTrack.opacity,.55)}
    const todaySvg=await page.locator('.today-calorie-gauge svg').innerHTML()
    await nav('food');assert.equal(await page.locator('.food-nutrition-hero .calorie-gauge svg').innerHTML(),todaySvg);assert.equal(await page.locator('.food-nutrition-hero .calorie-gauge-center strong').innerText(),String(Math.round(actual)));await capture('food-'+state)
    const foodTrack=await ringStyle('.food-nutrition-hero .calorie-gauge .ring-track')

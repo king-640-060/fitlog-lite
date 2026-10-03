@@ -23,22 +23,23 @@ The shared page backdrop keeps the warm white base, restrained asymmetric glows,
 ## Color and status
 
 - Use fresh yellow-green sparingly for primary actions and compact active marks, supported by deep green ink and muted sage surfaces. Bright accents never serve as body text; lime primary surfaces use dark ink, including hover and pressed states.
-- Deep leaf green carries readable links, icons, and selected labels; muted sage and soft leaf surfaces carry secondary states. Calorie/protein rings use the darker accent-mid rather than bright lime. Keep text-action contrast at least 4.5:1 on page and card surfaces, and provide a distinct keyboard focus outline.
+- Deep leaf green carries readable links, icons, and selected labels; muted sage and soft leaf surfaces carry secondary states. Calorie arcs use the darker accent-mid rather than bright lime; macro tiles retain their category surfaces and readable ink. Keep text-action contrast at least 4.5:1 on page and card surfaces, and provide a distinct keyboard focus outline.
 - Preserve semantic category colors: carbohydrate yellow, fat orange, danger/excess coral, cardio amber, pelvic olive, and weight blue-gray. Theme updates must not collapse meal, Calendar, or Report categories into one green.
 - Muted coral indicates an amount over a goal or a destructive action. Preserve each nutrient's category color when it exceeds a goal; use coral only for the extra amount or outer ring.
 - Say what happened: “高于目标 150 kcal”, “+12 g”, or “已达目标”. Do not label a recorded value “失败”, “超标”, or “不健康”.
 - Destructive controls are visually quiet until the final confirmation. The final confirmation is distinctly dangerous and names the scope and irreversibility.
 
-## Rings and numbers
+## Nutrition gauge and numbers
 
-- A goal ring represents 0–100% in its main track. If no goal is set, use a neutral muted empty track that remains visible against the actual card background and show “尚未设置目标”; do not imply 0% completion. Today alone uses text-tertiary at .85 opacity for its unset calorie track; Food retains .65. Both keep3/7 dashes and8px stroke. A zero goal is not a denominator.
-- At 100%, the main ring is full and text says “已达目标”. Above 100%, keep the main ring full, show a thinner coral outer ring capped at one revolution, and put the exact excess in text. Never wrap the main ring around to zero.
-- Today's screen uses small rings; the Food screen may use a prominent calorie ring and three smaller nutrient rings. All ring values must be readable as text and exposed to assistive technology.
-- Render final numbers and ring offsets immediately. Ordinary rerenders, updates and date switches never replay counts, ring entrances or goal pulses. Charts also show final data without replaying a reveal.
+- Today and Food reuse calorieGaugeHtml/goal-ring with one true SVG280° clockwise arc and a symmetric80° bottom opening, radii46/55 in the120×120 viewBox. Main stroke6, excess stroke3, round endpoints; no masking, gradient, glow, shadow or animated rotation. Sizes remain112px Today/140px Food; number > unit > active accent-mid arc > track.
+- Map existing getGoalProgress fractions only to the available arc length. Zero progress hides active stroke,100% fills the main arc, above keeps it full and maps the capped excess to a thinner coral outer open arc. Exact excess remains in text; never wrap to zero or alter nutrition calculations.
+- Normal track uses border/.55. Unset stays a neutral text-tertiary3/7 dashed open track, Today .85 and Food .65; no unset0% implication. Goal0 keeps its existing zero/above semantics without division.
+- Macro tiles on both pages reuse nutritionMetricHtml and nutrition-tiles: existing Today11px radius/7px9px padding/semantic surfaces and label/value hierarchy. No macro donut or linear indicator; actual/goal text plus existing unset/reached/excess state text provides progress meaning. Keep category colors above goal and use coral only for exact excess. All values/status remain accessible text.
+- Render final numbers/offsets immediately. Ordinary rerenders and date switches never replay counts, entrances or pulses. Canonical kcal and saved snapshots stay exact; displayed energy remains integer and macros retain existing formatting.
 
 ## Today dashboard hierarchy
 
-- Today's Food card is the primary dashboard card: the shared Food calorie gauge owns its actual kcal value at the ring center, with goal/status beside it and three aligned nutrient tiles below. Today uses a compact112px modifier; unset, zero, reached and excess retain the same calculations and SVG as Food. The full gauge exposes an accessible intake/goal/status description.
+- Today's Food card is the primary dashboard card: the shared Food calorie gauge owns its actual kcal value at the ring center, with goal/status beside it and three aligned nutrient tiles below. Today uses a compact112px modifier; unset, zero, reached and excess retain the same calculations and open SVG as Food. The full gauge exposes an accessible intake/goal/status description.
 - Workout and Weight are secondary cards. Today’s 查看训练 is compact, right-aligned secondary navigation. An active workout’s 继续力量训练 is primary with the same geometry; Weight entry stays soft green. Empty states never reserve chart space or imply recorded data.
 - Kegel is a shorter tertiary habit card with a lighter action. Preserve all existing routes and business meaning while varying visual weight.
 - Habit is an independent data domain without a bottom tab. Users create their own habit definitions; schedules and weekly targets are optional guidance and never prevent a check-in on any day. Each active habit may be checked in once per device-local business date, with a second tap undoing that check-in. Today owns quick check-in and the global management entry owns habit management. Do not use streaks, badges, failure, or punitive missed-day language. Reports derive history from saved check-ins.
