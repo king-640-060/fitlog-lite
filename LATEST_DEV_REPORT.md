@@ -2,34 +2,44 @@
 
 ## Latest verified production state — 2026-10-03
 
-Physical iPhone Visual Follow-up completed and production browser verified. [Full56-field report](docs/IPHONE_VISUAL_FOLLOW_UP_DEV_REPORT.md); [QA matrix](docs/UI_QA_MATRIX.md).
+Workout main CTA primary lime unification completed and production browser verified.
 
 | Identity | Value |
 |---|---|
-| START_COMMIT | 373295e777fbc9bfce925024d7c9557c1989d15b |
-| IPHONE_VISUAL_FIX_COMMIT / END_COMMIT | d9225cea0667d1d0af440340fdefb7570d1812d8 |
-| Application Actions / Pages | 37085897715 / 6821577743 SUCCESS |
+| START_COMMIT | 7d7fd38e72cc2713b6d1fa64dd01991d76f2d07a |
+| APPLICATION_COMMIT / END_COMMIT | a158382bbed378ab4e06faf4e5eefdcc9ab621af |
+| Application Actions / Pages | 37094186703 / 6822854580 SUCCESS |
 | REPORT_COMMIT / final main / production HEAD | This report commit; exact SHA via git log -1 --format=%H -- LATEST_DEV_REPORT.md and external final report |
 | Production | https://king-640-060.github.io/fitlog-lite/ |
 
-## Delivered behavior
+## Delivered change and boundaries
 
-- Dedicated Workout three actions share full content width,48px minimum height,14px radius and0 16px padding. Strength lime primary; Cardio/Kegel secondary. Card spacing and recent link retained. Today navigation/continuation stays compact44px.
-- Only Today unset calorie track uses text-tertiary/.85;3/7 dashes and8px stroke unchanged. Active accent-mid unchanged. Food-specific .65 unchanged; baseline/new unset Food card pixels identical. src/main.ts and shared calorieGaugeHtml untouched.
-- Plan empty single-create behavior and Management section footnote/fresh scroll behavior unchanged. Context-specific action geometry and visible neutral unset indicators documented in AGENTS/UI/visual rules.
+- src/main.ts changes exactly two class values: add-cardio and start-pelvic-floor use primary training-card-action, matching Strength. Empty/populated/open labels and all handlers unchanged.
+- Dedicated Workout execution cards use the same primary lime treatment for their main action; geometry and interaction states remain shared across Strength, Cardio and Kegel.
+- Reuse existing primary background/border accent, accent-ink text, accent-hover/pressed, keyboard focus and disabled primitives. No copied colors or Cardio/Kegel overrides. No CSS file changed.
+- Geometry unchanged: full content width,48px height,14px radius,0 16px padding,16px base font size; shared primary font-weight700. Card structure/spacing, recent link, Today compact actions and all other UI remain unchanged.
+- AGENTS, UI interaction/visual rules and QA matrix updated. Historical release reports remain historical.
 
 ## Automated Verification
 
-Baseline/final495tests/46files PASS; typecheck, build, Pages build, diff PASS.11browser suites locally320/375/390/430 PASS, including semantic40states per width/160PNG and uiQualityAudit512PNG.120/140% fonts, long Start label, empty/completed/open Workout and recent cardio, Today compact, ring selector isolation and existing Plan/Management/AI/Sheet/Vision/Date/Sync retained. Actual focused screenshots manually inspected.
+npm run typecheck, npm test (495tests/46files), npm run build, Pages build and git diff --check PASS. An initial run found the obsolete test that prohibited Cardio primary; it was replaced by all-three-primary assertions, then the full495tests passed.
+
+Updated tests/interactionSystem.test.ts, tests/browser/mobileLayout.mjs and tests/browser/uiSemanticConsistency.mjs. All three main CTAs must be primary and not secondary; shared computed styling and unchanged geometry are checked in empty/one/multiple/completed/open states and120/140% fonts. An isolated fine-pointer context checks default/hover/active/focus-visible/disabled styles for all three, including theme-token color,48px height,14px radius and padding equality. No business handlers are activated by these synthetic state checks.
+
+All11existing browser gates local320/375/390/430 PASS: uiSemanticConsistency, mobileLayout, uiQualityAudit, interactionStabilization, aiStreaming, aiAssistant, aiVoice, aiDualModelRouting, foodVision, sharedDatePicker, githubSyncSafety. Semantic40screens per width plus five desktop interaction-state comparisons; uiQualityAudit128screens per width. Actual Workout screenshots were inspected, including390 empty/populated/open and320 font140.
 
 ## Production Verification
 
-All11suites390/430 PASS; semantic80PNG and uiQualityAudit236PNG. Production390 Today/Workout recaptured. ExactJS/CSS matchPages build. Existing synthetic persistent14stores/15records/AI config/key retained without reseeding; updatedSW/offline cold bootPASS. Final report-only deployment receipt and exact final SHA in external report.
+Same11gates390/430 PASS; semantic80captures plus five shared-state comparisons, uiQualityAudit236captures.390 three-card empty/populated/open screenshots manually inspected. Exact production JS/CSS match Pages build. Existing synthetic persistent14store/15record profile and AI configuration/key unchanged, no business reseeding; SW update and offline cold bootPASS.
 
-## Manual Device Verification / Remaining limits
+## Data compatibility
 
-Physical iPhone Safari/original installed PWA two-fix recheck Pending. Browser screenshots do not prove physical display behavior. Existing>500KB warning remains. No unresolved automated/production failures. Real Provider/SpeechRecognition/external launcher were not retested this round.
+fitlog-lite-db, DexieV7 (IDB70),14stores, BackupV7, RestoreV1–V7, SyncV1 unchanged. No migration. No DB/Backup/Restore/AI/Workout business implementation changed; production runtime delta is exactly two CTA class substitutions.
+
+## Remaining issues / Manual Device Verification
+
+No unresolved implementation, automated or production-browser failures. Physical iPhone Safari/original installed PWA were not tested this round. Existing>500KB build warning remains; no dependency or bundle strategy changes were requested.
 
 ## ChatGPT Baseline
 
-Current code wins. Dedicated execution cards full-width48px; Today dashboard compact44px. Today unset contrast .85 only; Food .65/shared gauge calculations unchanged. DBfitlog-lite-db/DexieV7/14stores/BackupV7/RestoreV1–V7/SyncV1 unchanged, no migration. Retain11release gates; separate browser evidence fromphysical device verification.
+Read AGENTS→LATEST→UI specs. Dedicated Workout Strength/Cardio/Kegel main CTAs all use existing primary lime, full-width48px/14px; shared interaction states. Today actions remain compact. Today unset .85 / Food unset .65 contrast work remains. DBV7/14stores/BackupV7/RestoreV1–V7/SyncV1 unchanged, no migration.495tests/46files and local/production11gatesPASS; physical device evidence remains separate.
