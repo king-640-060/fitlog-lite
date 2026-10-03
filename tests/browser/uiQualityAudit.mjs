@@ -121,6 +121,7 @@ try { for (const [width,height] of sizes) {
   await click('[data-progress-view=calendar]');await audit('calendar');await click('[aria-selected=true]');await audit('calendar-day');await close()
   await click('[data-progress-view=reports]');await audit('report-week');await click('[data-report-mode=month]');await audit('report-month')
   await management();await audit('management');await management('more-about');await audit('about');await close()
+  await management('more-diagnostics');await page.waitForSelector('[data-diagnostic="App build"]');await audit('pwa-diagnostics');assert.match(await page.locator('[data-diagnostic="App build"]').innerText(),/^[a-f0-9]{40}$/);await close()
   await management('more-backup');await audit('backup-restore')
   await page.locator('#backup-file').setInputFiles({name:'synthetic-backup.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({app:'FitLog Lite',schemaVersion:7,exportedAt:'2026-09-28T10:00:00Z',data:fixture}))});await page.waitForSelector('#confirm-restore');await audit('restore-preview');await click('#confirm-restore');await audit('restore-danger-confirm');await page.locator('.confirm-dialog [data-cancel]').click();await close()
   await management('more-github-sync');await audit('github-sync');await close()

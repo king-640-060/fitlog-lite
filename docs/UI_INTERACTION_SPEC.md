@@ -207,3 +207,7 @@ Ordinary typed, Voice-final and Quick Launch sends use safe incremental text. On
 - Food Library uses Search + Add first, then two secondary actions: 拍包装录入 / 导入文件. Import opens the existing shared Sheet with 表格文件（CSV） / 数据文件（JSON） and reuses one parsing/preview/confirmation path. Management 导入数据 opens the same chooser. Empty library says 还没有食物 / 拍包装录入，或手动新建; no matches says 没有匹配的食物 and offers Clear Search.
 - Food Editor owns `food-form`: full-width name, brand, reference grams and energy row/unit; quiet energy conversion hint; three equal P/C/F columns at 320/375/390/430 with 8px gaps, no orphan half-cell. Grams stay inside numeric fields. Form gaps12px, inputs46px and16px text, Save48px. Canonical kcal and unit-only energy edits retain existing semantics.
 - Management retains its grouped IA. Consumer AI summary names service and optional separately configured chat/image routes; exact model IDs stay in AI Settings. Local data copy stays concise and still asks for Backup before changing devices or clearing browser data.
+
+## PWA runtime and update confirmation
+
+Management → Application → Version diagnostics owns App/SW identity and safe updates. Download updates without interrupting editing; explicit confirmation, transient-state guards, write drain and matching controller build precede one reload. Never clear site data or reinstall. URL diagnostics omit credentials/query/fragment. Legacy clients must close before their waiting replacement can activate. Physical Safari/PWA evidence remains distinct; see [PWA_RUNTIME.md](PWA_RUNTIME.md).

@@ -130,6 +130,8 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 
 ## Durable interaction rules
 
+- PWA updates download without reloading an open client. Management → Application → Version diagnostics shows independently measured App/SW builds. Activate a waiting worker and reload once only after explicit confirmation, transient-state checks and a write drain. Preserve forms, selected Vision images, AI drafts/proposals and business records. Never clear site data or reinstall as an upgrade remedy. Build identities come from Git at build time; diagnostics exclude URL queries/fragments, credentials and business data. See `docs/PWA_RUNTIME.md` for legacy-client transition and physical evidence requirements.
+
 - Do not expose duplicate equivalent create actions in the same empty state; retain one visible, keyboard-accessible next action and preserve populated-state creation.
 - Repeated cards on the same functional surface share action geometry; primary/secondary changes emphasis, not structure. Geometry may differ by interaction context: Today dashboard navigation stays compact (ongoing continuation may be primary), while dedicated Workout execution cards use full-width actions. Dedicated Workout execution cards use the same primary lime treatment for their main action; geometry and interaction states remain shared across Strength, Cardio and Kegel.
 - Unset progress indicators remain semantically neutral and muted, but sufficiently visible against the actual card background. Scope contrast adjustments to the affected surface.

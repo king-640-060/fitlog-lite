@@ -1,0 +1,8 @@
+.pwa-diagnostics { display: grid; gap: 16px; min-width: 0; }
+.pwa-diagnostics dl { margin: 0; }
+.pwa-diagnostics dl > div { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.pwa-diagnostics dt { color: var(--text-secondary); font-size: 13px; }
+.pwa-diagnostics dd { margin: 5px 0 0; font-size: 14px; overflow-wrap: anywhere; user-select: text; }
+.pwa-diagnostics p { margin: 0; }
+.pwa-actions { display: grid; gap: 10px; }
+.pwa-actions button { width: 100%; }

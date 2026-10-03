@@ -15,6 +15,13 @@ try{
  })
  if(phase==='after'){
   await page.evaluate(async()=>{await(await navigator.serviceWorker.getRegistration())?.update()})
+  if(await page.evaluate(async()=>!!(await navigator.serviceWorker.getRegistration())?.waiting)){
+   // Saved synthetic profile: end every legacy scope client so a prompt worker can activate naturally.
+   for(const other of context.pages())if(other!==page)await other.close()
+   await page.goto('https://king-640-060.github.io/',{waitUntil:'domcontentloaded'})
+   await page.waitForFunction(async()=>{const r=await navigator.serviceWorker.getRegistration('/fitlog-lite/');return r?.active?.state==='activated'&&!r.waiting&&!r.installing})
+   await page.goto('https://king-640-060.github.io/fitlog-lite/',{waitUntil:'networkidle'});await page.waitForSelector('#open-management')
+  }
   const expected=fs.readFileSync('dist/index.html','utf8').match(/assets\/([^"/]+\.js)/)[1]
   for(let n=0;n<10;n++){if((await page.locator('script[type=module][src]').getAttribute('src')).endsWith(expected))break;await page.waitForTimeout(1500);await page.reload({waitUntil:'networkidle'})}
   assert.ok((await page.locator('script[type=module][src]').getAttribute('src')).endsWith(expected),'new bundle under original persistent Service Worker')

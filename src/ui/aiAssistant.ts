@@ -10,6 +10,7 @@ export interface AiAssistantUi extends AiSettingsUi { beforeOpen?: () => Promise
 export interface AiAssistantLaunchOptions { voice?: boolean; initialText?: string; autoSend?: boolean }
 export interface AiAssistantHandle { dialog: HTMLDialogElement; applyLaunch: (options: AiAssistantLaunchOptions) => void }
 const drafts = new WeakMap<AiOrchestrator, string>()
+export function hasAiAssistantDraft(engine: AiOrchestrator): boolean { return Boolean(drafts.get(engine)?.trim()) }
 export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi, options: AiAssistantLaunchOptions = {}): AiAssistantHandle {
   const dialog = ui.openModal('AI 助手', '<div class="ai-assistant"></div>', true)
   dialog.classList.add('ai-assistant-sheet'); setSheetVariant(dialog, 'assistant')

@@ -89,3 +89,7 @@ Physical iPhone Safari/installed PWA remain manual categories, independent of Ch
 - Compact Chinese action phrases stay together with domain rules / `compact-action`. If a phrase cannot fit, change the row or grid; never force a final character onto another line or globally prevent long copy from wrapping.
 - Mobile forms must not leave unexplained orphan cells. Food uses its own single-column form and three-column P/C/F group; shared grid-form stays unchanged.
 - Dedicated Workout Strength, Cardio and Kegel main actions all reuse the existing full-width primary lime class and its interaction states. Today actions remain compact. Use quiet borders and existing radii.
+
+## Runtime diagnostics
+
+Keep version and worker details inside Management → Application → Version diagnostics, using the existing Sheet and primary/secondary button primitives. Long SHAs and sanitized URLs wrap without clipping; controls retain shared touch/focus states. No homepage diagnostic decoration. Waiting activation and reload require user confirmation and transient-state preservation; see [PWA_RUNTIME.md](PWA_RUNTIME.md).

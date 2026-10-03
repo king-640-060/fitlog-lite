@@ -14,10 +14,12 @@ import { bindEnergyEditor } from './ui/energyEditor'
 import { showFoodVisionImport } from './ui/foodVisionImport'
 import { showAiSettings, aiSettingsDetail } from './ui/aiSettings'
 import { consumeQuickLaunch } from './ui/quickLaunch'
-import { showAiAssistant, type AiAssistantLaunchOptions, type AiAssistantHandle } from './ui/aiAssistant'
+import { showAiAssistant, hasAiAssistantDraft, type AiAssistantLaunchOptions, type AiAssistantHandle } from './ui/aiAssistant'
+import { PwaRuntime } from './pwa/runtime'
+import { updateBlockReason } from './pwa/diagnostics'
+import { showPwaDiagnostics } from './ui/pwaDiagnostics'
 import { AiOrchestrator } from './ai/orchestrator'
 import { Chart, registerables } from 'chart.js'
-import { registerSW } from 'virtual:pwa-register'
 import { db } from './db/database'
 import { applyNutritionCompletionPlan } from './services/nutritionCompletionService'
 import { completeNutrition, completionKeys, getNutritionCompletionSummary, isFutureBusinessDate, type NutritionCompletionSummary } from './utils/nutritionCompletion'
@@ -62,7 +64,7 @@ import { getReportRange, shiftReportPeriod, type ReportMode, type ReportResult }
 import { getTodayPelvicState, getTodayWeightState } from './utils/todayActivity'
 
 Chart.register(...registerables)
-registerSW({ immediate: true })
+const pwaRuntime = new PwaRuntime()
 
 type Tab = 'today' | 'plan' | 'food' | 'workout' | 'progress'
 type ProgressView = 'trend' | 'calendar' | 'reports'
@@ -766,7 +768,7 @@ function showManagementHub(): void {
   const dialog = openModal('管理与设置', '<div id="management-hub"></div>')
   const view = dialog.querySelector<HTMLElement>('#management-hub')!
   const row = (id: string, iconName: IconName, title: string, detail: string) => `<button id="${id}"><span class="setting-icon">${icon(iconName, 18)}</span><span><strong>${title}</strong><small>${detail}</small></span>${icon('chevron', 17)}</button>`
-  view.innerHTML = `<section class="settings-section"><h3>内容与模板</h3><div class="settings-group">${row('more-food-library', 'utensils', '食物库', '管理食物与营养数据')}${row('more-exercise-library', 'dumbbell', '动作库', '管理力量训练动作')}${row('more-workout-templates', 'activity', '训练模板', '管理常用训练组合')}${row('more-diet-templates', 'archive', '饮食模板', '管理常用饮食组合')}</div></section><section class="settings-section"><h3>个人管理</h3><div class="settings-group">${row('more-habits', 'leaf', '习惯', '创建、排序与停用打卡习惯')}</div></section><section class="settings-section"><h3>数据与备份</h3><div class="settings-group">${row('more-import', 'upload', '导入数据', '从表格或数据文件导入食物')}${row('more-backup', 'download', '备份与恢复', '导出或恢复完整本地数据')}${row('more-github-sync', 'archive', 'GitHub 同步', esc(githubSyncDetail()))}</div><p class="settings-section-note" role="note">数据保存在当前设备。更换设备或清除浏览器数据前，请先备份。</p></section><section class="settings-section"><h3>应用</h3><div class="settings-group">${row('more-ai-settings', 'sparkles', 'AI 设置', esc(aiSettingsDetail()))}${row('more-about', 'info', '关于 FitLog Lite', 'FitLog Lite · 本地优先')}</div></section>`
+  view.innerHTML = `<section class="settings-section"><h3>内容与模板</h3><div class="settings-group">${row('more-food-library', 'utensils', '食物库', '管理食物与营养数据')}${row('more-exercise-library', 'dumbbell', '动作库', '管理力量训练动作')}${row('more-workout-templates', 'activity', '训练模板', '管理常用训练组合')}${row('more-diet-templates', 'archive', '饮食模板', '管理常用饮食组合')}</div></section><section class="settings-section"><h3>个人管理</h3><div class="settings-group">${row('more-habits', 'leaf', '习惯', '创建、排序与停用打卡习惯')}</div></section><section class="settings-section"><h3>数据与备份</h3><div class="settings-group">${row('more-import', 'upload', '导入数据', '从表格或数据文件导入食物')}${row('more-backup', 'download', '备份与恢复', '导出或恢复完整本地数据')}${row('more-github-sync', 'archive', 'GitHub 同步', esc(githubSyncDetail()))}</div><p class="settings-section-note" role="note">数据保存在当前设备。更换设备或清除浏览器数据前，请先备份。</p></section><section class="settings-section"><h3>应用</h3><div class="settings-group">${row('more-ai-settings', 'sparkles', 'AI 设置', esc(aiSettingsDetail()))}${row('more-diagnostics', 'info', '版本诊断', '查看 App build、SW 状态与更新')}${row('more-about', 'info', '关于 FitLog Lite', 'FitLog Lite · 本地优先')}</div></section>`
   view.querySelector('#more-food-library')?.addEventListener('click', () => void showFoodLibrary())
   view.querySelector('#more-exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
   view.querySelector('#more-workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
@@ -776,6 +778,19 @@ function showManagementHub(): void {
   view.querySelector('#more-backup')?.addEventListener('click', () => void showSettings().catch(fail))
   view.querySelector('#more-github-sync')?.addEventListener('click', () => { void flushWorkoutAutosave().then(() => showGitHubSync({ openModal, esc, toast, restored: async () => { workoutAutosave.cancel(); currentWorkout = undefined; workoutEditorOpen = false; await render() } })).catch(fail) })
   view.querySelector('#more-ai-settings')?.addEventListener('click', () => showAiSettings({ openModal, esc, changed: () => aiAssistant.settingsChanged() }, aiAssistant.profiles))
+  view.querySelector('#more-diagnostics')?.addEventListener('click', () => showPwaDiagnostics(pwaRuntime, {
+    openModal, esc,
+    confirm: () => confirmAction('更新应用？', '已保存的本地记录会保留。应用将重新打开，当前 AI 对话会结束。', '确认更新', false),
+    blockReason: dialog => updateBlockReason({
+      otherDialog: Array.from(document.querySelectorAll<HTMLDialogElement>('dialog[open]')).some(open => open !== dialog),
+      workout: workoutEditorOpen,
+      timer: pelvicSessionSaving || pelvicTimerState?.status === 'running' || pelvicTimerState?.status === 'paused',
+      aiBusy: aiAssistant.busy,
+      aiDraft: hasAiAssistantDraft(aiAssistant),
+      aiProposal: aiAssistant.proposals.all.some(proposal => proposal.status === 'pending' || proposal.status === 'processing'),
+    }),
+    drainWrites: async () => { await flushWorkoutAutosave(); await db.transaction('r', db.tables, async () => {}) },
+  }))
   view.querySelector('#more-about')?.addEventListener('click', () => { openModal('应用信息', `<div class="about-card"><span class="brand-mark large">${icon('leaf', 30)}</span><h2>FitLog Lite</h2><p>一款轻盈、安静的本地个人健康记录工具。</p><small>饮食 · 力量训练 · 体重 · 凯格尔训练</small></div>`) })
 }
 

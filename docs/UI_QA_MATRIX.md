@@ -79,3 +79,7 @@ Receipts: /tmp/ui-quality-local-receipt.json and /tmp/ui-quality-prod-receipt.js
 ## Required physical check (Pending)
 
 Use existing Safari and the original installed PWA without clearing/reinstalling: Today/Plan/Food/Workout/Progress top and bottom; Library/edit/1584kJ round trip; Vision camera/gallery/review checkbox/top reset/viewer return; Habit/AI routing controls; long Sheet keyboard open/close; native scroll and background restoration; real Provider fast/high accuracy and latency; Voice permission/Stop/close; offline cold boot with existing records and stored AI configuration. Record each result separately from browser PASS.
+
+## PWA identity and upgrade gate
+
+`pwaUpgrade.mjs` serves real old and new generated bundles/SWs under one `/fitlog-lite/` origin, observes waiting without reload while a selected Vision image exists, closes legacy clients for bootstrap, verifies App/controller Git markers, all fourteen frozen business stores/fifteen rows and synthetic AI config/key, and creates a new page offline. Optional FITLOG_PWA_PROMPT_DIST tests a prior prompt build against a distinct Git build: retained AI draft blocks switching, another client blocks activation, cancel retains the client and explicit confirmation reloads once. UI quality includes the diagnostics Sheet at each mobile width. Physical Safari/installed PWA remain separate Pending categories; see PWA_RUNTIME.md.
