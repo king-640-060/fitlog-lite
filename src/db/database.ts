@@ -87,6 +87,12 @@ export class FitLogDatabase extends Dexie {
       // Add only three strategy stores. Legacy goals and factual snapshots stay byte-for-byte intact.
       // Optional strategySelection has no inferred backfill; sourceTemplateId remains DietTemplate provenance.
     })
+    this.version(9).stores({
+      foods: 'id, name, brand, [name+brand], createdAt',
+    }).upgrade(() => {
+      // servingGrams is optional and unindexed. Preserve every V8 row, including strategy snapshots.
+      // No inferred serving mass, FoodLog recalculation or second intermediate schema.
+    })
     this.on('populate', () => {
       const now = new Date().toISOString()
       return this.exercises.bulkAdd(STARTER_EXERCISE_NAMES.map((name) => ({

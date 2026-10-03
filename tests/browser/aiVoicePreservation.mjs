@@ -32,16 +32,16 @@ try{
  }
  const values=await page.evaluate(async()=>{
   const db=await new Promise((resolve,reject)=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error)})
-  if(![70,80].includes(db.version)||db.objectStoreNames.length!==(db.version===70?14:17))throw Error('database identity changed')
+  if(![70,80,90].includes(db.version)||db.objectStoreNames.length!==(db.version===70?14:17))throw Error('database identity changed')
   const records={};for(const store of db.objectStoreNames)records[store]=await new Promise((resolve,reject)=>{const q=db.transaction(store,'readonly').objectStore(store).getAll();q.onsuccess=()=>resolve(q.result);q.onerror=()=>reject(q.error)})
   for(const store of ['nutritionStrategyTemplates','nutritionStrategyVariants','nutritionStrategyPhases']) { if(records[store]?.length)throw Error('Legacy upgrade unexpectedly created strategy records');delete records[store] }
   const version=db.version;db.close();const ai={};for(const key of Object.keys(localStorage).filter(k=>k.startsWith('fitlog-ai-')).sort())ai[key]=localStorage.getItem(key)
   return {records,ai,version}
  })
- if(phase==='after')assert.equal(values.version,80,'Production migrated to Dexie V8')
+ if(phase==='after')assert.equal(values.version,90,'Production migrated to Dexie V9')
  const canonical=records=>JSON.stringify(Object.fromEntries(Object.entries(records).sort(([a],[b])=>a.localeCompare(b)).map(([key,rows])=>[key,rows.sort((a,b)=>a.id.localeCompare(b.id))])))
  assert.equal(canonical(values.records),canonical(fixture),'all 14 frozen stores/15 rows remain identical')
  const hash=text=>createHash('sha256').update(text).digest('hex'),result={businessHash:hash(canonical(values.records)),aiConfigHash:hash(JSON.stringify(values.ai)),aiKeys:Object.keys(values.ai)}
  if(phase==='before')fs.writeFileSync(snapshot,JSON.stringify(result));else assert.deepEqual(result,JSON.parse(fs.readFileSync(snapshot,'utf8')))
- console.log(JSON.stringify({phase,stableDb:'fitlog-lite-db',dexie:values.version/10,stores:values.version===80?17:14,legacyStoresPreserved:14,newStrategyStoresEmpty:true,records:15,businessPreserved:true,aiConfigAndKeyPreserved:phase==='after',voiceAckPreserved:phase==='after',samePersistentProfile:true,noBusinessReseeding:true,offlineColdBoot:phase==='after'}))
+ console.log(JSON.stringify({phase,stableDb:'fitlog-lite-db',dexie:values.version/10,stores:values.version>=80?17:14,legacyStoresPreserved:14,newStrategyStoresEmpty:true,records:15,businessPreserved:true,aiConfigAndKeyPreserved:phase==='after',voiceAckPreserved:phase==='after',samePersistentProfile:true,noBusinessReseeding:true,offlineColdBoot:phase==='after'}))
 }finally{await context.close()}

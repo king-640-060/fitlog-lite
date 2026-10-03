@@ -62,7 +62,7 @@ export class FoodVisionWrite {
       const choice = this.choice
       const current = choice && choice.mode !== 'new' ? await recheckFood(choice.existing, this.database) : undefined
       if (!choice && (await findVisionDuplicates(this.food, this.database)).length) throw new Error('食物库已有同名食物，请选择使用已有、更新已有或另存为新食物。')
-      const food = choice?.mode === 'use' ? current! : await saveFood(this.food, choice?.mode === 'update' ? current!.id : undefined, this.database)
+      const food = choice?.mode === 'use' ? current! : await saveFood(choice?.mode === 'update' ? { ...this.food, servingGrams: current!.servingGrams } : this.food, choice?.mode === 'update' ? current!.id : undefined, this.database)
       const log = this.intake ? await logFood(food, this.intake.grams, this.intake.date, this.intake.meal, this.database) : undefined
       return { food, log }
     })

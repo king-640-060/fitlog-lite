@@ -5,6 +5,7 @@ import { validateFoodInput, type FoodInput } from './foodService'
 const aliases: Record<keyof FoodInput, string[]> = {
   name: ['name', '名称'], brand: ['brand', '品牌'], referenceGrams: ['reference_g', 'referenceGrams', '基准克数'],
   calories: ['calories', '热量'], protein: ['protein', '蛋白质'], carbs: ['carbs', '碳水'], fat: ['fat', '脂肪'],
+  servingGrams: ['servingGrams', 'serving_g', '每份克数'],
 }
 
 export interface ImportError { row: number; reason: string }
@@ -21,6 +22,7 @@ export function normalizeFoodRow(row: Record<string, unknown>): FoodInput {
     name: getValue(row, aliases.name) as string, brand: getValue(row, aliases.brand) as string,
     referenceGrams: rawReference === '' || rawReference === undefined ? 100 : rawReference as number,
     calories: getValue(row, aliases.calories) as number,
+    servingGrams: getValue(row, aliases.servingGrams) as number,
     protein: getValue(row, aliases.protein) as number,
     carbs: getValue(row, aliases.carbs) as number,
     fat: getValue(row, aliases.fat) as number,

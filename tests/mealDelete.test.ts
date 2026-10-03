@@ -1,0 +1,17 @@
+import 'fake-indexeddb/auto'
+import Dexie from 'dexie'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { FitLogDatabase } from '../src/db/database'
+import { deleteFoodLog, deleteFoodLogsForMeal, logFood, saveFood } from '../src/services/foodService'
+import { exportBackup } from '../src/services/backupService'
+import { groupFoodLogs } from '../src/utils/foodMeals'
+import type { MealType } from '../src/db/types'
+const databases: FitLogDatabase[]=[]
+afterEach(async()=>{vi.restoreAllMocks();for(const d of databases.splice(0)){d.close();await Dexie.delete(d.name)}})
+async function setup(){const d=new FitLogDatabase(`meal-delete-${crypto.randomUUID()}`);databases.push(d);const food=await saveFood({name:'食物',referenceGrams:100,calories:120,servingGrams:150},undefined,d);for(const [date,meal,count] of [['2026-10-03','breakfast',2],['2026-10-03','lunch',4],['2026-10-03','dinner',3],['2026-10-03','snack',1],['2026-10-03',undefined,2],['2026-10-04','lunch',5],['2026-10-04',undefined,1]] as const)for(let i=0;i<count;i++)await logFood(food,100,date,meal,d);return d}
+describe('transactional exact date and actual meal-group deletion',()=>{
+ it('deletes only four current-date lunches, preserving every other record and store',async()=>{const d=await setup(),before=await exportBackup(d),ids=before.data.foodLogs.filter(l=>l.date==='2026-10-03'&&l.meal==='lunch').map(l=>l.id);expect(await deleteFoodLogsForMeal('2026-10-03','lunch',d,ids)).toBe(4);const after=await exportBackup(d);expect(after.data.foodLogs).toEqual(before.data.foodLogs.filter(l=>!ids.includes(l.id)));for(const [store,rows] of Object.entries(before.data))if(store!=='foodLogs')expect(after.data[store as keyof typeof after.data]).toEqual(rows);expect(groupFoodLogs(after.data.foodLogs.filter(l=>l.date==='2026-10-03')).map(g=>g.logs.length)).toEqual([2,0,3,1,2]);expect(await deleteFoodLogsForMeal('2026-10-03','lunch',d)).toBe(0)})
+ it.each(['breakfast','lunch','dinner','snack',undefined] as const)('supports actual group %s, including only current-date unclassified',async meal=>{const d=await setup(),before=await d.foodLogs.toArray(),expected=before.filter(l=>l.date==='2026-10-03'&&l.meal===meal);expect(await deleteFoodLogsForMeal('2026-10-03',meal,d)).toBe(expected.length);expect(await d.foodLogs.toArray()).toEqual(before.filter(l=>!expected.some(e=>e.id===l.id)))})
+ it('single deletion retains other same-meal records; stale preview and invalid scope delete nothing',async()=>{const d=await setup(),lunch=(await d.foodLogs.toArray()).filter(l=>l.date==='2026-10-03'&&l.meal==='lunch');await deleteFoodLog(lunch[0]!.id,d);expect(await d.foodLogs.get(lunch[0]!.id)).toBeUndefined();const before=await d.foodLogs.toArray();await expect(deleteFoodLogsForMeal('2026-10-03','lunch',d,lunch.map(l=>l.id))).rejects.toThrow('已变化');for(const [date,meal] of [['2026-02-30','lunch'],['bad','lunch'],['2026-10-03','all']] as const)await expect(deleteFoodLogsForMeal(date,meal as MealType,d)).rejects.toThrow();expect(await d.foodLogs.toArray()).toEqual(before)})
+ it('bulk storage failure aborts transaction with no partial removal',async()=>{const d=await setup(),before=await d.foodLogs.toArray();vi.spyOn(d.foodLogs,'bulkDelete').mockImplementationOnce(async ids=>{await d.foodLogs.delete((ids as string[])[0]!);throw new Error('injected delete failure')});await expect(deleteFoodLogsForMeal('2026-10-03','lunch',d)).rejects.toThrow('injected');expect(await d.foodLogs.toArray()).toEqual(before)})
+})

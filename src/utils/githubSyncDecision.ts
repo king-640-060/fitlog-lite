@@ -1,4 +1,4 @@
-import type { BackupDataV8 } from '../db/types'
+import type { BackupDataV9 } from '../db/types'
 import { STARTER_EXERCISE_NAMES } from '../db/database'
 export type GitHubSyncAction = 'first-upload' | 'current' | 'upload' | 'adopt-baseline' | 'restore' | 'conflict' | 'unpaired-restore' | 'unpaired-conflict' | 'remote-missing'
 export interface SyncDecisionInput {
@@ -19,7 +19,7 @@ export function decideGitHubSyncAction(i: SyncDecisionInput): GitHubSyncAction {
   if (remoteChanged) return 'restore'
   return localChanged ? 'upload' : 'current'
 }
-export function hasMeaningfulLocalUserData(data: BackupDataV8['data']): boolean {
+export function hasMeaningfulLocalUserData(data: BackupDataV9['data']): boolean {
   if (Object.entries(data).some(([store, rows]) => store !== 'exercises' && rows.length > 0)) return true
   const names = new Set<string>(STARTER_EXERCISE_NAMES)
   return data.exercises.length !== names.size || data.exercises.some(e => !names.delete(e.name) || e.notes !== undefined || e.updatedAt !== e.createdAt)

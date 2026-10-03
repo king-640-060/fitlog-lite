@@ -12,7 +12,7 @@ Vision step rendering owns scrollTop0 immediately and on a guarded frame; viewer
 
 ## Boundaries
 
-Vanilla TypeScript and existing CSS only. Business entities/services, historical snapshots, local date semantics, canonical kcal, Food Vision parsing/writes, AI tools/permissions/proposals, BackupV8/RestoreV1–V8/SyncV1 and the stable 17-store DexieV8 identity preserve all prior records. Nutrition strategy stores are additive; daily target provenance is a snapshot, never a live link. Visual rules never override data preservation. Five bottom tabs and Progress Trend/Calendar/Reports remain.
+Vanilla TypeScript and existing CSS only. Business entities/services, historical snapshots, local date semantics, canonical kcal, Food Vision parsing/writes, AI tools/permissions/proposals, BackupV9/RestoreV1–V9/SyncV1 and the stable 17-store DexieV9 identity preserve all prior records. Nutrition strategy stores are additive; daily target provenance is a snapshot, never a live link. Visual rules never override data preservation. Five bottom tabs and Progress Trend/Calendar/Reports remain.
 
 ## Shared layers
 
@@ -38,7 +38,7 @@ AI Assistant's modal-body remains overflow-hidden with conversation as its only 
 
 ## Visual grammar
 
-- Repeated cards on the same functional surface share geometry; different interaction contexts may differ. Dedicated Workout training-card base owns full content width,48px minimum height,14px radius and nowrap. Dedicated Workout execution cards use the same primary lime treatment for their main action; geometry and interaction states remain shared across Strength, Cardio and Kegel. Today dashboard navigation stays compact secondary, with ongoing workout continuation primary in the same compact geometry.
+- Repeated cards on the same functional surface share geometry; different interaction contexts may differ. Dedicated Workout training-card base owns full content width,48px minimum height,14px radius and nowrap. Dedicated Workout execution cards use the same primary lime treatment for their main action; geometry and interaction states remain shared across Strength, Cardio and Kegel. Today dashboard navigation is compact header text with a chevron; ongoing workout continuation stays compact primary within its corresponding strength status, without an isolated footer row.
 - Today/Food reuse calorieGaugeHtml and goal-ring, backed by calorieGaugeGeometry's280° SVG arc with80° symmetric bottom gap. Main r46/stroke6 and excess r55/stroke3 share round endpoints, active accent-mid, weak border/.55 track and centered kcal hierarchy. Unset keeps text-tertiary3/7 dashes with Today .85/Food .65. Existing zero/reached/excess fractions map to the available arc, exact excess stays in text and outer progress remains capped. No mask or replay animation.
 - Macro tiles reuse nutritionMetricHtml/nutrition-tiles on both pages, carrying Today’s11px radius,7px9px padding, label/value hierarchy and category surfaces. No macro SVG or linear bar; actual/goal plus unset/reached/excess text carries existing semantics. Value/category colors persist above goal; only excess is coral.
 - Section explanatory text belongs to section-footnote grammar, not interactive-row grammar. `.settings-section-note` is a muted paragraph with8px top/10px inline margin, .74rem text and1.5 line-height, outside the group but inside the section; no box, icon, heading or action affordance.
@@ -100,3 +100,10 @@ Keep version and worker details inside Management → Application → Version di
 Day selection, manager, detail and editor use existing Sheet/button/form primitives. Daily variants are uniform quiet cards with actual/goal inputs already owned by Nutrition Target; selected cards use accent-soft plus a visible check and aria-pressed. The deterministic apply preview/primary stays in the shared Sheet footer while choices scroll. Saved daily values/names are displayed separately from current definition values; selection is based only on persisted provenance.
 
 The manager has one create entry and a content-sized empty state, current phase/actual weights, other templates and archived definitions. Detail provides phase history, copy-as-new, editing and explicit activation. Creation shows a name plus summary cards; only one variant is edited at a time in a same-Sheet subview, preserving the parent form. Reorder uses 44px arrow controls; long lists and save remain in the shared body. Variant inputs reuse existing nutrition validation/presentation with single-column layout. Activation reuses the shared date picker and previews old phase closure; it is not a scheduler. No private viewport/keyboard listeners.
+
+
+## Food serving / training presentation boundaries
+
+Food serving mode reuses existing secondary buttons and primary save, quiet accent-soft selected state, aria-pressed and a shared Sheet body. Optional serving mass and the existing reference nutrition have separate labels; conversion notes are metadata, not a second nutritional authority. Long names/decimal counts remain readable at140% and320px. Clear-meal is a quiet destructive link inside the expanded group, with the shared final danger dialog.
+
+Calendar category Food uses one fork path; the same category primitive owns grid/legend/day-detail size and alignment. Today training uses its existing card-heading text-btn navigation and no bottom empty action row. Continuing an open strength workout remains primary beside its own status. Cardio metrics share one unitless presentation helper, preserving minutes and actual stored values.

@@ -1,6 +1,7 @@
+import { bindFoodQuantity, foodQuantityFields } from './ui/foodQuantity'
 import { bindNumericPresentation } from './ui/numericPresentation'
 import { setupInputModality } from './ui/inputModality'
-import { openSheet, presentDialog, setupSheetViewport } from './ui/sheetController'
+import { openSheet, presentDialog, setSheetVariant, setupSheetViewport } from './ui/sheetController'
 import './styles/interaction.css'
 import './styles/sheets.css'
 import { mountDatePicker, datePickerLabel, type DatePickerController } from './ui/datePicker'
@@ -30,7 +31,7 @@ import type { CardioActivityType, CardioSession, DietTemplate, Exercise, Food, F
 import { exportBackup, restoreBackup, validateBackup, type ValidatedBackup } from './services/backupService'
 import { clearDayRecords } from './services/dayRecordsService'
 import { deleteCardioSession, getCardioSessionsByDate, saveCardioSession, updateCardioSession } from './services/cardioService'
-import { logFood, saveFood, updateFoodLogDetails, validateFoodInput } from './services/foodService'
+import { deleteFoodLog, deleteFoodLogsForMeal, logFood, saveFood, updateFoodLogDetails, validateFoodInput } from './services/foodService'
 import { buildImportPreview, parseFoodCsv, parseFoodJson, type ImportPreview } from './services/importService'
 import { upsertWeight } from './services/weightService'
 import { createHabit, deleteUnusedHabit, getActiveHabits, getHabitCheckInsByDate, reorderHabits, setHabitActive, toggleHabitCheckIn, updateHabit } from './services/habitService'
@@ -203,10 +204,10 @@ function showBusinessDatePicker(title: string, date: string, commit: (date: stri
   dialog.addEventListener('close', () => picker.destroy(), { once: true })
 }
 
-function confirmAction(title: string, message: string, confirmLabel = '确认删除', danger = true, cancelLabel = '取消'): Promise<boolean> {
+function confirmAction(title: string, message: string, confirmLabel = '确认删除', danger = true, cancelLabel = '取消', layout?: 'meal-clear'): Promise<boolean> {
   return new Promise((resolve) => {
     const dialog = document.createElement('dialog')
-    dialog.className = 'confirm-dialog'
+    dialog.className = `confirm-dialog${layout === 'meal-clear' ? ' meal-clear-confirm' : ''}`
     dialog.innerHTML = `<div class="confirm-mark ${danger ? 'danger-mark' : ''}">${icon(danger ? 'trash' : 'check', 24)}</div><h2>${esc(title)}</h2><p>${esc(message)}</p><div class="dialog-actions"><button data-cancel>${esc(cancelLabel)}</button><button class="${danger ? 'danger-solid' : 'primary'}" data-confirm>${esc(confirmLabel)}</button></div>`
     let result = false
     dialog.querySelector('[data-cancel]')?.addEventListener('click', () => dialog.close())
@@ -430,12 +431,13 @@ async function renderTodayPage(): Promise<void> {
   view.innerHTML = `
     ${todayPlanCardHtml(todayTasks, taskTags)}
     <section class="today-card nutrition-today-card"><div class="card-heading"><div><span class="card-icon nutrition-icon">${icon('utensils', 19)}</span><h2>今日饮食</h2></div><button class="text-btn" id="today-food-details">查看详情 ${icon('chevron', 15)}</button></div><div class="today-calorie-layout">${calorieGaugeHtml(totals.calories, target?.calories, 'today')}</div><div class="today-macros nutrition-tiles">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein)}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs)}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat)}</div></section>
-    <section class="today-card workout-today-card"><div class="card-heading"><div><span class="card-icon workout-icon">${icon('dumbbell', 19)}</span><h2>今日训练</h2></div></div><div class="today-training-row"><strong>无氧</strong><span>${workouts.length ? `力量训练 · ${strengthExercises} 个动作 · ${strengthSets} 组${openWorkout ? ' · 记录中' : ''}` : '今天还没有力量训练'}</span></div><div class="today-training-row"><strong>有氧</strong><span>${cardioSessions.length === 1 ? `${getCardioActivityLabel(cardioSessions[0]!)} · ${formatNumber(cardioMinutes)} 分钟 · ${formatCardioMetrics(cardioSessions[0]!).join(' · ')}` : cardioSessions.length ? `有氧训练 · ${cardioSessions.length} 次 · 共 ${formatNumber(cardioMinutes)} 分钟` : '今天还没有有氧训练'}</span></div><button class="${openWorkout ? 'primary' : 'secondary'} today-workout-action" id="today-workout">${openWorkout ? '继续力量训练' : '查看训练'}</button></section>
+    <section class="today-card workout-today-card"><div class="card-heading"><div><span class="card-icon workout-icon">${icon('dumbbell', 19)}</span><h2>今日训练</h2></div><button class="text-btn" id="today-workout-details">查看训练 ${icon('chevron', 15)}</button></div><div class="today-training-row today-strength-row"><strong>无氧</strong><div class="today-strength-status"><span>${workouts.length ? `力量训练 · ${strengthExercises} 个动作 · ${strengthSets} 组${openWorkout ? ' · 记录中' : ''}` : '今天还没有力量训练'}</span>${openWorkout ? '<button class="primary today-workout-action" id="today-workout">继续力量训练</button>' : ''}</div></div><div class="today-training-row"><strong>有氧</strong><span>${cardioSessions.length === 1 ? [getCardioActivityLabel(cardioSessions[0]!), `${formatNumber(cardioMinutes)} 分钟`, ...formatCardioMetrics(cardioSessions[0]!)].join(' · ') : cardioSessions.length ? `有氧训练 · ${cardioSessions.length} 次 · 共 ${formatNumber(cardioMinutes)} 分钟` : '今天还没有有氧训练'}</span></div></section>
     <section class="today-card today-activity-card weight-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon weight-icon">${icon('scale', 19)}</span><h2>体重</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 15)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(weightState.status)}</strong><span class="today-activity-meta">${esc(weightState.meta)}</span></div><button class="secondary today-activity-action" id="today-record-weight">${esc(weightState.action)}</button></div></section>
     <section class="today-card today-activity-card pelvic-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon pelvic-icon">${icon('leaf', 19)}</span><h2>凯格尔训练</h2></div><button class="text-btn" id="today-pelvic-history">训练记录 ${icon('chevron', 15)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(pelvicState.status)}</strong><span class="today-activity-meta">${esc(pelvicState.meta)}</span></div><button class="secondary today-activity-action" id="today-pelvic">${esc(pelvicState.action)}</button></div></section>
     ${todayHabitCardHtml(habits, habitCheckIns, today)}`
   view.querySelector('#today-food-details')?.addEventListener('click', () => { activeTab = 'food'; foodDate = today; void render().catch(fail) })
-  view.querySelector('#today-workout')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = openWorkout; workoutEditorOpen = Boolean(openWorkout); void render().catch(fail) })
+  view.querySelector('#today-workout-details')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = false; void render().catch(fail) })
+  view.querySelector('#today-workout')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = openWorkout; workoutEditorOpen = Boolean(openWorkout); showWorkoutHistory = false; void render().catch(fail) })
   view.querySelector('#today-weight-details')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; void render().catch(fail) })
   view.querySelector('#today-record-weight')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; weightDate = today; void render().then(() => showWeightForm(today, weights.find((item) => item.date === today)?.weightKg)).catch(fail) })
   view.querySelector('#today-pelvic')?.addEventListener('click', () => { workoutDate = today; void showPelvicFloorSetup().catch(fail) })
@@ -927,7 +929,7 @@ function foodLogRowHtml(log: FoodLog): string {
   return `<article class="food-row"><button class="food-row-main" data-edit-log="${esc(log.id)}" aria-label="编辑 ${esc(log.foodName)}"><span><strong>${esc(log.foodName)}</strong><small>${log.brand ? `${esc(log.brand)} · ` : ''}${formatNumber(log.grams)} g</small></span><span class="food-kcal"><strong>${formatNumber(log.totalCalories)} <small>kcal</small></strong></span></button><details class="row-menu"><summary aria-label="${esc(log.foodName)}更多操作">···</summary><div><button data-delete-log="${esc(log.id)}">删除记录</button></div></details></article>`
 }
 
-function foodMealSectionHtml(group: FoodMealGroup, isToday: boolean): string {
+function foodMealSectionHtml(group: FoodMealGroup, isToday: boolean, expanded = false): string {
   const meal = group.meal
   const key = meal ?? 'unclassified'
   const count = group.logs.length
@@ -937,10 +939,10 @@ function foodMealSectionHtml(group: FoodMealGroup, isToday: boolean): string {
     : `${isToday ? '今天' : '这天'}还没有记录${group.name}`
   const mealIcon: Record<MealType, IconName> = { breakfast: 'sunrise', lunch: 'sun', dinner: 'moon', snack: 'snack' }
   return `<section class="food-meal ${count ? 'has-logs' : 'is-empty'}" data-meal-section="${key}">
-    <div class="food-meal-head"><button class="food-meal-summary" ${count ? `data-toggle-meal="${key}" aria-expanded="false"` : meal ? `data-add-meal="${meal}"` : ''} ${count || meal ? '' : 'disabled'} aria-label="${count ? `查看${group.name} ${count} 项记录` : `记录${group.name}`}"><span class="meal-symbol ${key}" aria-hidden="true">${icon(meal ? mealIcon[meal] : 'archive', 17)}</span><span class="meal-title"><strong>${group.name}</strong>${count ? `<small>${count} 项 · ${formatEnergyInputValue(group.calories)} kcal</small>` : ''}</span></button>${meal ? `<button class="meal-record" data-add-meal="${meal}">记录 ${icon('chevron', 15)}</button>` : '<span class="meal-unclassified-note">待整理</span>'}</div>
+    <div class="food-meal-head"><button class="food-meal-summary" ${count ? `data-toggle-meal="${key}" aria-expanded="${expanded}"` : meal ? `data-add-meal="${meal}"` : ''} ${count || meal ? '' : 'disabled'} aria-label="${count ? `查看${group.name} ${count} 项记录` : `记录${group.name}`}"><span class="meal-symbol ${key}" aria-hidden="true">${icon(meal ? mealIcon[meal] : 'archive', 17)}</span><span class="meal-title"><strong>${group.name}</strong>${count ? `<small>${count} 项 · ${formatEnergyInputValue(group.calories)} kcal</small>` : ''}</span></button>${meal ? `<button class="meal-record" data-add-meal="${meal}">记录 ${icon('chevron', 15)}</button>` : '<span class="meal-unclassified-note">待整理</span>'}</div>
     ${count ? `<p class="meal-macros">${macro}</p>` : ''}
     <p class="meal-preview">${preview}</p>
-    ${count ? `<div class="meal-log-list" hidden>${group.logs.map(foodLogRowHtml).join('')}</div>` : ''}
+    ${count ? `<div class="meal-log-list" ${expanded ? '' : 'hidden'}>${group.logs.map(foodLogRowHtml).join('')}<button type="button" class="text-btn danger compact-action meal-clear" data-clear-meal="${key}">清空本餐记录</button></div>` : ''}
   </section>`
 }
 
@@ -1169,10 +1171,11 @@ async function renderFoodPage(): Promise<void> {
   const calorieTarget = target?.calories
   const groups = groupFoodLogs(logs)
   const completionStrip = target ? foodCompletionStripHtml(requestedDate, getNutritionCompletionSummary(target, logs)) : ''
+  const expandedMeals = new Set(Array.from(view.querySelectorAll<HTMLButtonElement>('.food-content-body[data-food-date="' + requestedDate + '"] [data-toggle-meal][aria-expanded="true"]'), button => button.dataset.toggleMeal))
   const slotHtml = `<div class="food-content-body" data-food-date="${requestedDate}">
     <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="food-calorie-row">${calorieGaugeHtml(totals.calories, calorieTarget, 'food', previous.get('calories'))}</div><div class="macros nutrition-tiles ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div>${target?.strategySelection ? `<p class="strategy-food-source">${esc(target.strategySelection.templateName)} · ${esc(target.strategySelection.variantName)}</p>` : ''}${completionStrip}</section>
     <section class="food-meals-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '按餐次记录，更清楚'}</span></div>${logs.length ? '<button class="food-save-template" id="save-day-diet-template" type="button" aria-label="将当天饮食保存为模板">保存为模板</button>' : ''}</section>
-    <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday)).join('')}</div></div>`
+    <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday, expandedMeals.has(group.meal ?? 'unclassified'))).join('')}</div></div>`
   let rail = view.querySelector<HTMLElement>('.food-date-rail')
   let content = view.querySelector<HTMLElement>('.food-content')
   const firstAppearance = !rail
@@ -1213,10 +1216,18 @@ function bindFoodContent(slot: HTMLElement, target: NutritionTarget | undefined,
   slot.querySelector('[data-edit-nutrition-target]')?.addEventListener('click', () => showNutritionTargetForm(foodDate, target))
   slot.querySelectorAll<HTMLButtonElement>('[data-add-meal]').forEach((button) => button.addEventListener('click', () => { const meal = button.dataset.addMeal; if (isMealType(meal)) void showAddFoodLog(meal) }))
   slot.querySelectorAll<HTMLButtonElement>('[data-toggle-meal]').forEach((button) => button.addEventListener('click', () => { const list = button.closest('.food-meal')?.querySelector<HTMLElement>('.meal-log-list'); if (!list) return; list.hidden = !list.hidden; button.setAttribute('aria-expanded', String(!list.hidden)) }))
+  slot.querySelectorAll<HTMLButtonElement>('[data-clear-meal]').forEach(button => button.addEventListener('click', async () => {
+    const date = slot.dataset.foodDate!, meal = isMealType(button.dataset.clearMeal) ? button.dataset.clearMeal : undefined
+    const name = meal ? mealNames[meal] : '未分类', selected = logs.filter(log => meal === undefined ? !isMealType(log.meal) : log.meal === meal)
+    if (!await confirmAction(`清空${name}记录？`, `将删除 ${date} ${name}的 ${selected.length} 条饮食记录。此操作无法撤销，但不会删除食物库中的食物。`, `清空 ${selected.length} 条记录`, true, '取消', 'meal-clear')) return
+    button.disabled = true
+    try { await deleteFoodLogsForMeal(date, meal, db, selected.map(log => log.id)); toast('本餐记录已清空'); await renderFoodPage() }
+    catch (error) { button.disabled = false; fail(error) }
+  }))
   slot.querySelectorAll<HTMLButtonElement>('[data-delete-log]').forEach((button) => button.addEventListener('click', async () => {
     button.closest('details')?.removeAttribute('open')
     if (!await confirmAction('删除饮食记录？', '删除后无法撤销，但不会影响食物库。')) return
-    try { await db.foodLogs.delete(button.dataset.deleteLog!); toast('已删除'); await renderFoodPage() } catch (error) { fail(error) }
+    try { await deleteFoodLog(button.dataset.deleteLog!); toast('已删除'); await renderFoodPage() } catch (error) { fail(error) }
   }))
   slot.querySelectorAll<HTMLButtonElement>('[data-edit-log]').forEach((button) => button.addEventListener('click', async () => {
     const log = await db.foodLogs.get(button.dataset.editLog!)
@@ -1338,14 +1349,12 @@ async function showAddFoodLog(meal: MealType): Promise<void> {
     results.querySelectorAll<HTMLButtonElement>('[data-food]').forEach((button) => button.addEventListener('click', () => {
       const food = foods.find((item) => item.id === button.dataset.food)!
       dialog.querySelector('.modal-head h2')!.textContent = `记录${mealNames[meal]} · ${food.name}`
-      dialog.querySelector('.modal-body')!.innerHTML = `<form id="log-food-form" class="form quantity-form"><div class="selected-food"><span>每 ${formatNumber(food.referenceGrams)}g</span><strong>${formatEnergyInputValue(food.calories)} kcal</strong></div><label class="quantity-label">吃了多少？<span class="quantity-input"><input name="grams" id="grams" type="number" inputmode="decimal" min="0.1" step="0.1" placeholder="230" required><b>g</b></span></label><div class="preview-number"><span>预计热量</span><strong id="kcal-preview">— kcal</strong></div><button class="primary" type="submit">添加</button></form>`
-      const input = dialog.querySelector<HTMLInputElement>('#grams')!
-      input.addEventListener('input', () => {
-        const grams = Number(input.value)
-        dialog.querySelector('#kcal-preview')!.textContent = Number.isFinite(grams) && grams > 0 ? `${formatEnergyInputValue(calculateNutrition(food, grams).calories)} kcal` : '— kcal'
-      })
+      dialog.querySelector('.modal-body')!.innerHTML = `<form id="log-food-form" class="form quantity-form"><div class="selected-food"><span>每 ${formatNumber(food.referenceGrams)}g</span><strong>${formatEnergyInputValue(food.calories)} kcal</strong></div>${foodQuantityFields(food)}<button class="primary" type="submit">添加</button></form>`
+      setSheetVariant(dialog, 'form')
+      dialog.querySelector<HTMLElement>('.modal-body')!.scrollTop = 0
+      const quantity = bindFoodQuantity(dialog.querySelector<HTMLFormElement>('#log-food-form')!, food)
       dialog.querySelector<HTMLFormElement>('#log-food-form')?.addEventListener('submit', async (event) => {
-        event.preventDefault(); try { await logFood(food, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'grams'), recordDate, meal); dialog.close(); toast('已保存'); await renderFoodPage() } catch (error) { fail(error) }
+        event.preventDefault(); try { await logFood(food, quantity.grams(), recordDate, meal); dialog.close(); toast('已保存'); await renderFoodPage() } catch (error) { fail(error) }
       })
     }))
   }
@@ -1364,7 +1373,7 @@ async function showFoodLibrary(query = ''): Promise<void> {
     currentQuery = nextQuery
     const normalized = nextQuery.trim().toLocaleLowerCase()
     const filtered = foods.filter((food) => `${food.name} ${food.brand ?? ''}`.toLocaleLowerCase().includes(normalized))
-    list.innerHTML = filtered.length ? filtered.map((food) => `<article><button class="library-main" data-edit-food="${food.id}"><span><strong>${esc(food.name)}</strong>${food.brand ? `<small>${esc(food.brand)}</small>` : ''}<p>${formatEnergyInputValue(food.calories)} kcal / ${formatNumber(food.referenceGrams)}g</p></span>${icon('chevron', 17)}</button><button class="icon-btn row-delete" data-delete-food="${food.id}" aria-label="删除 ${esc(food.name)}">${icon('trash', 17)}</button></article>`).join('') : normalized ? '<div class="library-empty"><h3>没有匹配的食物</h3><p>换个关键词试试。</p><button class="text-btn compact-action" id="clear-food-search">清除搜索</button></div>' : '<div class="library-empty"><h3>还没有食物</h3><p>拍包装录入，或手动新建。</p></div>'
+    list.innerHTML = filtered.length ? filtered.map((food) => `<article><button class="library-main" data-edit-food="${food.id}"><span><strong>${esc(food.name)}</strong>${food.brand ? `<small>${esc(food.brand)}</small>` : ''}<p>${formatEnergyInputValue(food.calories)} kcal / ${formatNumber(food.referenceGrams)}g</p>${food.servingGrams === undefined ? '' : `<small class="food-serving-note">1 份 ${formatNumber(food.servingGrams)} g</small>`}</span>${icon('chevron', 17)}</button><button class="icon-btn row-delete" data-delete-food="${food.id}" aria-label="删除 ${esc(food.name)}">${icon('trash', 17)}</button></article>`).join('') : normalized ? '<div class="library-empty"><h3>没有匹配的食物</h3><p>换个关键词试试。</p><button class="text-btn compact-action" id="clear-food-search">清除搜索</button></div>' : '<div class="library-empty"><h3>还没有食物</h3><p>拍包装录入，或手动新建。</p></div>'
     list.querySelector('#clear-food-search')?.addEventListener('click', () => { window.clearTimeout(searchTimer); dialog.querySelector<HTMLInputElement>('#library-search')!.value = ''; draw('') })
     list.querySelectorAll<HTMLButtonElement>('[data-edit-food]').forEach((button) => button.addEventListener('click', () => { const food = foods.find((item) => item.id === button.dataset.editFood); dialog.close(); void showFoodForm(food) }))
     list.querySelectorAll<HTMLButtonElement>('[data-delete-food]').forEach((button) => button.addEventListener('click', async () => {
@@ -1405,7 +1414,7 @@ function showFoodImportChooser(foods: Food[], query = ''): void {
 }
 
 function foodFields(food?: Food): string {
-  return `<form id="food-form" class="form food-form"><label>食物名称 *<input name="name" value="${esc(food?.name)}" placeholder="鸡胸肉" required></label><label>品牌<input name="brand" value="${esc(food?.brand)}" placeholder="可选"></label><label>基准重量 *<input name="referenceGrams" type="number" inputmode="decimal" min="0.1" step="0.1" value="${food?.referenceGrams ?? 100}" required><span>g</span></label><div class="food-energy-group"><label>能量 *<div class="energy-input-row"><input name="calories" type="number" inputmode="decimal" min="0" step="any" value="${food?.calories ?? ''}" placeholder="165" required><select name="energyUnit" aria-label="能量单位"><option value="kcal">kcal</option><option value="kJ">kJ</option></select></div></label><p id="food-energy-preview" class="food-energy-preview"></p></div><div class="food-macro-grid" role="group" aria-label="宏量营养"><label>蛋白质<input name="protein" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.protein ?? ''}"><span>g</span></label><label>碳水<input name="carbs" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.carbs ?? ''}"><span>g</span></label><label>脂肪<input name="fat" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.fat ?? ''}"><span>g</span></label></div><button class="primary compact-action" type="submit">保存食物</button></form>`
+  return `<form id="food-form" class="form food-form"><label>食物名称 *<input name="name" value="${esc(food?.name)}" placeholder="鸡胸肉" required></label><label>品牌<input name="brand" value="${esc(food?.brand)}" placeholder="可选"></label><label>基准重量 *<input name="referenceGrams" type="number" inputmode="decimal" min="0.1" step="0.1" value="${food?.referenceGrams ?? 100}" required><span>g</span></label><div class="food-energy-group"><label>能量 *<div class="energy-input-row"><input name="calories" type="number" inputmode="decimal" min="0" step="any" value="${food?.calories ?? ''}" placeholder="165" required><select name="energyUnit" aria-label="能量单位"><option value="kcal">kcal</option><option value="kJ">kJ</option></select></div></label><p id="food-energy-preview" class="food-energy-preview"></p></div><div class="food-macro-grid" role="group" aria-label="宏量营养"><label>蛋白质<input name="protein" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.protein ?? ''}"><span>g</span></label><label>碳水<input name="carbs" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.carbs ?? ''}"><span>g</span></label><label>脂肪<input name="fat" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.fat ?? ''}"><span>g</span></label></div><label>每份克数（可选）<input name="servingGrams" type="number" inputmode="decimal" min="${Number.MIN_VALUE}" step="any" value="${food?.servingGrams ?? ''}" placeholder="150"><span>g</span></label><button class="primary compact-action" type="submit">保存食物</button></form>`
 }
 
 async function showFoodForm(food?: Food): Promise<void> {
@@ -1419,7 +1428,7 @@ async function showFoodForm(food?: Food): Promise<void> {
   dialog.querySelector<HTMLFormElement>('#food-form')?.addEventListener('submit', async (event) => {
     event.preventDefault(); const data = new FormData(event.currentTarget as HTMLFormElement)
     try {
-      await saveFood({ name: valueOf(data, 'name'), brand: valueOf(data, 'brand'), referenceGrams: Number(valueOf(data, 'referenceGrams')), calories: energyEditor.kcal ?? NaN, protein: valueOf(data, 'protein') as unknown as number, carbs: valueOf(data, 'carbs') as unknown as number, fat: valueOf(data, 'fat') as unknown as number }, food?.id)
+      await saveFood({ name: valueOf(data, 'name'), brand: valueOf(data, 'brand'), referenceGrams: Number(valueOf(data, 'referenceGrams')), servingGrams: valueOf(data, 'servingGrams') as unknown as number, calories: energyEditor.kcal ?? NaN, protein: valueOf(data, 'protein') as unknown as number, carbs: valueOf(data, 'carbs') as unknown as number, fat: valueOf(data, 'fat') as unknown as number }, food?.id)
       dialog.close(); toast('已保存'); await renderFoodPage(); void showFoodLibrary()
     } catch (error) { fail(error) }
   })
@@ -1475,7 +1484,7 @@ async function renderWorkoutPage(): Promise<void> {
   const view = document.querySelector<HTMLElement>('#view')!
   view.innerHTML = `<section class="context-row"><button type="button" id="workout-date-picker-open" class="date-control fitlog-date-trigger">${icon('calendar', 17)}<span>训练日期 · ${datePickerLabel(workoutDate).split(' · ')[0]}</span></button><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section>
     <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">无氧训练</h2></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('dumbbell', 20)}</span><div><h3>力量训练</h3><p>记录动作与组数</p></div></div><p class="training-card-summary">${openWorkout ? `正在记录 · ${strengthExercises} 个动作 · ${strengthSets} 组` : todayWorkouts.length ? `今日 ${strengthExercises} 个动作 · ${strengthSets} 组` : '今天还没有力量训练'}</p><button class="primary training-card-action" id="start-workout">${openWorkout ? '继续训练' : '开始力量训练'}</button></div></section>
-    <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">有氧训练</h2><button class="text-btn" id="cardio-history">历史记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('activity', 20)}</span><div><h3>有氧记录</h3><p>楼梯机 · 跑步机</p></div></div>${cardioSessions.length ? `<div class="training-card-summary"><span>${cardioSessions.length === 1 ? '今日 1 次' : `今日 ${cardioSessions.length} 次`}</span><strong>${formatNumber(cardioMinutes)} <small>分钟</small></strong><span>${cardioSessions.length === 1 ? `${getCardioActivityLabel(cardioSessions[0]!)} · ${formatCardioMetrics(cardioSessions[0]!).join(' · ')}` : `最近：${getCardioActivityLabel(latestCardio!)}`}</span></div>` : '<p class="training-card-summary">今天还没有有氧训练</p>'}<button class="primary training-card-action" id="add-cardio">${cardioSessions.length ? '再记一次' : '记录训练'}</button>${latestCardio ? `<button class="training-card-link" data-cardio-id="${latestCardio.id}">最近：${getCardioActivityLabel(latestCardio)} · ${formatNumber(latestCardio.durationMinutes)} 分钟 ${icon('chevron', 15)}</button>` : ''}</div></section>
+    <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">有氧训练</h2><button class="text-btn" id="cardio-history">历史记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('activity', 20)}</span><div><h3>有氧记录</h3><p>楼梯机 · 跑步机</p></div></div>${cardioSessions.length ? `<div class="training-card-summary"><span>${cardioSessions.length === 1 ? '今日 1 次' : `今日 ${cardioSessions.length} 次`}</span><strong>${formatNumber(cardioMinutes)} <small>分钟</small></strong><span>${cardioSessions.length === 1 ? [getCardioActivityLabel(cardioSessions[0]!), ...formatCardioMetrics(cardioSessions[0]!)].join(' · ') : `最近：${getCardioActivityLabel(latestCardio!)}`}</span></div>` : '<p class="training-card-summary">今天还没有有氧训练</p>'}<button class="primary training-card-action" id="add-cardio">${cardioSessions.length ? '再记一次' : '记录训练'}</button>${latestCardio ? `<button class="training-card-link" data-cardio-id="${latestCardio.id}">最近：${getCardioActivityLabel(latestCardio)} · ${formatNumber(latestCardio.durationMinutes)} 分钟 ${icon('chevron', 15)}</button>` : ''}</div></section>
     <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">凯格尔训练</h2><button class="text-btn" id="pelvic-floor-history">训练记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('leaf', 20)}</span><div><h3>今日训练 · ${dailyPlanRoutine.name}</h3><p>渐进计划 · 耐力控制与快速脉冲</p></div></div><p class="training-card-summary">${pelvicSessions.length ? `今日已完成 ${pelvicSessions.length} 次 · 累计 ${pelvicSeconds} 秒` : `${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</p><button class="primary training-card-action" id="start-pelvic-floor">开始训练</button></div></section><section class="section-head"><div><h2>最近力量训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 17)}</button>`).join('')}</div>`
   view.querySelector('#workout-date-picker-open')?.addEventListener('click', () => showBusinessDatePicker('选择训练日期', workoutDate, date => { workoutDate = date; currentWorkout = undefined; workoutEditorOpen = false; void render().catch(fail) }))
   view.querySelector('#exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
@@ -1498,7 +1507,7 @@ async function renderWorkoutPage(): Promise<void> {
 function showCardioForm(session?: CardioSession): void {
   const date = session?.date ?? workoutDate
   const selectedType = session ? getCardioActivityType(session) : 'stair_climber'
-  const dialog = openModal(session ? '编辑有氧训练' : '记录有氧训练', `<form id="cardio-form" class="form cardio-form"><p class="cardio-form-date">${formatHeaderDate(date)}</p><div class="cardio-type-group" role="group" aria-label="训练类型"><span>训练类型</span><div class="cardio-type-options">${(Object.keys(cardioActivityDefinitions) as CardioActivityType[]).map((type) => `<button type="button" data-cardio-type="${type}" aria-pressed="${selectedType === type}">${cardioActivityDefinitions[type].label}</button>`).join('')}</div></div><input type="hidden" name="activityType" value="${selectedType}"><label>时间<span class="cardio-input-wrap"><input name="duration" type="number" inputmode="decimal" min="0.01" step="any" value="${session?.durationMinutes ?? ''}" placeholder="25" required><span class="cardio-input-suffix">分钟</span></span></label><label>速度<span class="cardio-input-wrap"><input name="speed" type="number" inputmode="decimal" min="0.01" step="any" value="${session?.speed ?? ''}" placeholder="6.5"><span class="cardio-input-suffix" data-cardio-speed-unit>km/h</span></span></label><label data-cardio-incline>坡度<span class="cardio-input-wrap"><input name="inclinePercent" type="number" inputmode="decimal" min="0" step="any" value="${session?.inclinePercent ?? ''}" placeholder="8"><span class="cardio-input-suffix">%</span></span></label><label>备注<textarea name="note" rows="2" placeholder="可选">${esc(session?.note)}</textarea></label><div class="cardio-form-actions"><button class="primary" type="submit">${session ? '保存修改' : '保存记录'}</button>${session ? '<button class="danger-button" type="button" id="delete-cardio">删除记录</button>' : ''}</div></form>`)
+  const dialog = openModal(session ? '编辑有氧训练' : '记录有氧训练', `<form id="cardio-form" class="form cardio-form"><p class="cardio-form-date">${formatHeaderDate(date)}</p><div class="cardio-type-group" role="group" aria-label="训练类型"><span>训练类型</span><div class="cardio-type-options">${(Object.keys(cardioActivityDefinitions) as CardioActivityType[]).map((type) => `<button type="button" data-cardio-type="${type}" aria-pressed="${selectedType === type}">${cardioActivityDefinitions[type].label}</button>`).join('')}</div></div><input type="hidden" name="activityType" value="${selectedType}"><label>时间<span class="cardio-input-wrap"><input name="duration" type="number" inputmode="decimal" min="0.01" step="any" value="${session?.durationMinutes ?? ''}" placeholder="25" required><span class="cardio-input-suffix">分钟</span></span></label><label>速度<span class="cardio-input-wrap unitless"><input name="speed" type="number" inputmode="decimal" min="0.01" step="any" value="${session?.speed ?? ''}" placeholder="6.5"></span></label><label data-cardio-incline>坡度<span class="cardio-input-wrap unitless"><input name="inclinePercent" type="number" inputmode="decimal" min="0" step="any" value="${session?.inclinePercent ?? ''}" placeholder="8"></span></label><label>备注<textarea name="note" rows="2" placeholder="可选">${esc(session?.note)}</textarea></label><div class="cardio-form-actions"><button class="primary" type="submit">${session ? '保存修改' : '保存记录'}</button>${session ? '<button class="danger-button" type="button" id="delete-cardio">删除记录</button>' : ''}</div></form>`)
   const formElement = dialog.querySelector<HTMLFormElement>('#cardio-form')!
   const syncType = () => {
     const type = formElement.querySelector<HTMLInputElement>('[name="activityType"]')!.value
@@ -1507,7 +1516,6 @@ function showCardioForm(session?: CardioSession): void {
     const inclineField = formElement.querySelector<HTMLElement>('[data-cardio-incline]')!
     inclineField.hidden = !treadmill
     inclineField.querySelector('input')!.disabled = !treadmill
-    formElement.querySelector<HTMLElement>('[data-cardio-speed-unit]')!.hidden = !treadmill
     formElement.querySelectorAll<HTMLButtonElement>('[data-cardio-type]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.cardioType === type)))
   }
   formElement.querySelectorAll<HTMLButtonElement>('[data-cardio-type]').forEach((button) => button.addEventListener('click', () => {

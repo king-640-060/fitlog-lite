@@ -3,6 +3,7 @@ export interface Food {
   name: string
   brand?: string
   referenceGrams: number
+  servingGrams?: number // Optional input convenience; never a FoodLog history link.
   calories: number
   protein?: number
   carbs?: number
@@ -335,4 +336,9 @@ export interface BackupDataV8 extends BackupBase {
   }
 }
 
-export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6 | BackupDataV7 | BackupDataV8
+export interface BackupDataV9 extends BackupBase {
+  schemaVersion: 9
+  data: BackupDataV8['data']
+}
+
+export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6 | BackupDataV7 | BackupDataV8 | BackupDataV9

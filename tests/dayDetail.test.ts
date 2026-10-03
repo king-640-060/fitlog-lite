@@ -58,8 +58,8 @@ describe('Calendar 日期详情统一信息模型', () => {
 
   it('有氧单条显示类型及真实参数，多条仍只聚合总时间', () => {
     expect(rows(empty, [], [cardio('a', 25)])[2]).toMatchObject({ primary: '楼梯机 · 25 分钟', secondary: ['速度 6.5'] })
-    expect(rows(empty, [], [{ ...cardio('a', 30), activityType: 'treadmill', speed: 6.5, inclinePercent: 8 }])[2]).toMatchObject({ primary: '跑步机 · 30 分钟', secondary: ['速度 6.5 km/h', '坡度 8%'] })
-    expect(rows(empty, [], [{ ...cardio('a', 30), activityType: 'treadmill', speed: undefined, inclinePercent: 0 }])[2]).toMatchObject({ primary: '跑步机 · 30 分钟', secondary: ['坡度 0%'] })
+    expect(rows(empty, [], [{ ...cardio('a', 30), activityType: 'treadmill', speed: 6.5, inclinePercent: 8 }])[2]).toMatchObject({ primary: '跑步机 · 30 分钟', secondary: ['速度 6.5', '坡度 8'] })
+    expect(rows(empty, [], [{ ...cardio('a', 30), activityType: 'treadmill', speed: undefined, inclinePercent: 0 }])[2]).toMatchObject({ primary: '跑步机 · 30 分钟', secondary: ['坡度 0'] })
     expect(rows(empty, [], [cardio('a', 25), cardio('b', 20)])[2]).toMatchObject({ primary: '2 次', secondary: ['共 45 分钟'] })
   })
 

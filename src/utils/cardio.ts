@@ -17,7 +17,7 @@ export function getCardioActivityLabel(session: Pick<CardioSession, 'activityTyp
 export function formatCardioMetrics(session: Pick<CardioSession, 'activityType' | 'speed' | 'inclinePercent'>): string[] {
   if (getCardioActivityType(session) === 'stair_climber') return session.speed === undefined ? [] : [`速度 ${formatNumber(session.speed)}`]
   return [
-    session.speed === undefined ? undefined : `速度 ${formatNumber(session.speed)} km/h`,
-    session.inclinePercent === undefined ? undefined : `坡度 ${formatNumber(session.inclinePercent)}%`,
+    session.speed === undefined ? undefined : `速度 ${formatNumber(session.speed)}`,
+    session.inclinePercent === undefined ? undefined : `坡度 ${formatNumber(session.inclinePercent)}`,
   ].filter((value): value is string => value !== undefined)
 }

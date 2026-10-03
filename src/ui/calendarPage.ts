@@ -107,7 +107,7 @@ export const calendarLegendLabels: Record<CalendarCategory, string> = {
   food: '饮食', strength: '力量', cardio: '有氧', pelvic: '凯格尔', weight: '体重',
 }
 export const calendarCategoryIcons: Record<CalendarCategory, IconName> = {
-  food: 'utensils', strength: 'dumbbell', cardio: 'stairs', pelvic: 'leaf', weight: 'scale',
+  food: 'fork', strength: 'dumbbell', cardio: 'stairs', pelvic: 'leaf', weight: 'scale',
 }
 
 export function getCalendarRecordCategories(summary?: CalendarDaySummary): CalendarCategory[] {

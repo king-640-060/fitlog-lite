@@ -29,10 +29,10 @@ describe('有氧类型与记录', () => {
     expect(getCardioActivityType(record())).toBe('stair_climber')
     expect(getCardioActivityLabel(record())).toBe('楼梯机')
     expect(formatCardioMetrics(record())).toEqual(['速度 6.5'])
-    expect(formatCardioMetrics({ activityType: 'treadmill', speed: 6.5 })).toEqual(['速度 6.5 km/h'])
-    expect(formatCardioMetrics({ activityType: 'treadmill', inclinePercent: 8 })).toEqual(['坡度 8%'])
-    expect(formatCardioMetrics({ activityType: 'treadmill', speed: 6.5, inclinePercent: 8 })).toEqual(['速度 6.5 km/h', '坡度 8%'])
-    expect(formatCardioMetrics({ activityType: 'treadmill', inclinePercent: 0 })).toEqual(['坡度 0%'])
+    expect(formatCardioMetrics({ activityType: 'treadmill', speed: 6.5 })).toEqual(['速度 6.5'])
+    expect(formatCardioMetrics({ activityType: 'treadmill', inclinePercent: 8 })).toEqual(['坡度 8'])
+    expect(formatCardioMetrics({ activityType: 'treadmill', speed: 6.5, inclinePercent: 8 })).toEqual(['速度 6.5', '坡度 8'])
+    expect(formatCardioMetrics({ activityType: 'treadmill', inclinePercent: 0 })).toEqual(['坡度 0'])
   })
 
   it('楼梯机新增、按日期读取、编辑及删除，保存时去掉坡度', async () => {
@@ -123,7 +123,7 @@ describe('Dexie V4 → V5', () => {
     legacy.close()
     const database = newDatabase(name)
     await database.open()
-    expect(database.verno).toBe(8)
+    expect(database.verno).toBe(9)
     expect(database.tables).toHaveLength(17)
     for (const store of ['foods', 'foodLogs', 'exercises', 'workouts', 'weights', 'workoutTemplates', 'dietTemplates', 'nutritionTargets', 'pelvicFloorSessions'] as const) {
       expect(await database.table(store).get(`${store}-old`)).toMatchObject({ id: `${store}-old` })
@@ -154,7 +154,7 @@ describe('Backup V5 / Restore V1–V5', () => {
   it('V5 导出旧楼梯机时显式标记类型，不修改数据库原记录', async () => {
     const source = newDatabase(); await source.cardioSessions.add({ ...record(), note: '晚间' })
     const backup = await exportBackup(source)
-    expect(backup.schemaVersion).toBe(8)
+    expect(backup.schemaVersion).toBe(9)
     expect(backup.data.cardioSessions).toMatchObject([{ activityType: 'stair_climber', durationMinutes: 25, speed: 6.5, note: '晚间' }])
     expect((await source.cardioSessions.get('cardio-1'))?.activityType).toBeUndefined()
     const target = newDatabase(); await restoreBackup(JSON.parse(JSON.stringify(backup)), target)

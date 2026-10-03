@@ -92,3 +92,12 @@ Use existing Safari and the original installed PWA without clearing/reinstalling
 ## Nutrition strategy dedicated release gate
 
 `tests/browser/nutritionTemplates.mjs` adds the dedicated day-picker/manager/detail/editor/variant/activation suite at local320/375/390/430 and production390/430, fonts100/120/140. It exercises empty, one/four/eight variants, long Chinese names, active/inactive, persisted high/low selection, identical-number manual goals without guessed selection, actual UI create/copy/reorder/activation, historical saved values/names and archived history retention, shared start-date selection, keyboard-open variant editing, bottom Save reachability and0/1/many real WeightLogs. Inspect390/100,320/140 and430/100 screenshots for hierarchy/card alignment/text/CTA/Sheet density. Bounds/targets/keyboard/Safe Area mocks are browser evidence; physical Safari/original PWA remain Pending. Existing quality/semantic/gauge and all browser release gates remain required.
+
+
+## Six requirement round: nutrition strategy / servings / meal clear / Calendar / Cardio / Today
+
+Automated matrix:320/375/390/430px ×100/120/140%. Production browser matrix:390/430px ×100/120/140%. `nutritionTemplates.mjs` preserves the existing complete strategy coverage; `foodServing.mjs` adds absent/present serving, default grams,0.5/1.5/2.25 servings, exact mode conversion, long Food names, library/editor, shared mocked keyboard, snapshot immutability after serving edits; single/multiple meals, cancel, precise historical/unclassified deletion and retained expansion; four Calendar category combinations/single glyph/shared marker geometry/ARIA; treadmill/stair history/form and duration; seven Today training states, header navigation and coupled primary continuation. All existing release suites remain gates.
+
+Actual screenshot review must cover390/100,320/140,430/100 for strategy long/selected/editor/bottom CTA, serving conversion and keyboard, quiet meal deletion/confirmation, Calendar glyphs, natural Cardio separators and Today normal/open-workout density. Physical Safari/installed PWA remain separate manual evidence.
+
+Preservation: stable fitlog-lite-db, one explicitV8→V9 upgrade,17stores/unchanged indexes, optional serving mass without inference/history rewrite. FrozenV8 fixtures remain unchanged; new frozenV9 fixtures preserve strategy/provenance and serving precision. BackupV9 / RestoreV1–V9 / encrypted envelopeV1; validation-before-write and all-store rollback remain release blockers.

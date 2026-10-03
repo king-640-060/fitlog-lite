@@ -30,7 +30,7 @@ try {
   }
   const records = await page.evaluate(async ({ fixture, phase }) => {
     const database = await new Promise((resolve, reject) => { const q = indexedDB.open('fitlog-lite-db'); q.onsuccess = () => resolve(q.result); q.onerror = () => reject(q.error) })
-    if (database.version !== 80 || database.objectStoreNames.length !== 17) throw Error('V8 identity/stores changed')
+    if (database.version !== 90 || database.objectStoreNames.length !== 17) throw Error('V9 identity/stores changed')
     const stores = Object.keys(fixture)
     if (phase === 'before') {
       // Explicit test fixture setup, only in the dedicated synthetic browser profile above.

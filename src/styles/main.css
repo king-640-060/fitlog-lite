@@ -921,3 +921,19 @@ body.keyboard-open .bottom-nav { display: none; }
 @media (max-width: 370px) {
   .food-library-actions button { gap: var(--space-1); font-size: .8rem; }
 }
+
+/* Scoped Food input convenience and Today navigation layout. */
+.food-quantity-mode { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.food-quantity-mode button { white-space: nowrap; }
+.food-quantity-mode button[aria-pressed=true] { background: var(--accent-soft); border-color: var(--accent-mid); color: var(--accent-strong); }
+.food-serving-note { margin: 0; color: var(--text-secondary); font-size: .8rem; line-height: 1.5; overflow-wrap: anywhere; }
+.quantity-form .quantity-label > .quantity-caption { position: static; }
+.quantity-form #serving-conversion[hidden] { display: none; }
+.meal-clear { color: var(--danger); font-weight: 400; justify-self: end; margin-top: 4px; }
+.today-strength-status { display: grid; gap: 8px; min-width: 0; }
+.today-strength-status .today-workout-action { justify-self: start; }
+.workout-today-card .today-training-row:last-child { border-bottom: 0; }
+.cardio-input-wrap.unitless input { padding-right: 13px; }
+.workout-today-card .card-heading .text-btn { white-space: nowrap; }
+.meal-clear-confirm .dialog-actions { grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); }
+.meal-clear-confirm .dialog-actions button { white-space: nowrap; }

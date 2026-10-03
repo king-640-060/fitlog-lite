@@ -37,7 +37,7 @@ const read=async page=>page.evaluate(async()=>{
 const canonical=value=>JSON.stringify({...value,records:Object.fromEntries(Object.entries(value.records).sort(([a],[b])=>a.localeCompare(b)).map(([k,rows])=>[k,rows.sort((a,b)=>a.id.localeCompare(b.id))]))})
 const hash=value=>createHash('sha256').update(canonical(value)).digest('hex')
 const verifyMigration=(before,after)=>{
- assert.equal(after.version,80);assert.equal(Object.keys(after.records).length,17)
+ assert.equal(after.version,90);assert.equal(Object.keys(after.records).length,17)
  for(const name of ['nutritionStrategyTemplates','nutritionStrategyVariants','nutritionStrategyPhases'])assert.deepEqual(after.records[name],[],'additive migration must not synthesize goals/strategies')
  const preserved={version:before.version,records:Object.fromEntries(Object.keys(before.records).map(k=>[k,after.records[k]])),ai:after.ai}
  assert.equal(hash(preserved),hash(before),'all original records and AI credentials preserved across V7 to V8')
@@ -117,7 +117,7 @@ try{
    await page.close();await context.setOffline(true);page=await context.newPage();await open(page)
    assert.equal(await page.locator('meta[name=fitlog-build]').getAttribute('content'),expected);verifyMigration(before,await read(page));assert.equal(await workerBuild(page),expected)
    await diagnostics(page);assert.equal(await page.locator('[data-diagnostic=Registration]').innerText(),'已注册');assert.ok((await page.locator('[data-diagnostic=Active]').innerText()).includes(expected));await close(page)
-   receipts.push({mode,build:expected,waiting:true,selectedImagePreserved:true,aiDraftBlocked:mode==='prompt',pendingProposalBlocked:mode==='prompt',otherClientBlocked:mode==='prompt',cancelPreserved:mode==='prompt',singleConfirmedReload:mode==='prompt',dbVersion:80,stores:17,legacyStoresPreserved:14,newStrategyStoresEmpty:true,rows:15,businessAndAiHash:hash(before),offlineColdBoot:true,physicalSafari:'Pending',physicalInstalledPwa:'Pending'})
+   receipts.push({mode,build:expected,waiting:true,selectedImagePreserved:true,aiDraftBlocked:mode==='prompt',pendingProposalBlocked:mode==='prompt',otherClientBlocked:mode==='prompt',cancelPreserved:mode==='prompt',singleConfirmedReload:mode==='prompt',dbVersion:90,stores:17,legacyStoresPreserved:14,newStrategyStoresEmpty:true,rows:15,businessAndAiHash:hash(before),offlineColdBoot:true,physicalSafari:'Pending',physicalInstalledPwa:'Pending'})
   }finally{await context.close()}
  }
  console.log(JSON.stringify(receipts,null,2))
