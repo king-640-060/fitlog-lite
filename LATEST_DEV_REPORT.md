@@ -2,44 +2,55 @@
 
 ## Latest verified production state — 2026-10-03
 
-Workout main CTA primary lime unification completed and production browser verified.
+Shared search spacing and Food Vision effective-route labels corrected after targeted reproduction.
 
 | Identity | Value |
 |---|---|
-| START_COMMIT | 7d7fd38e72cc2713b6d1fa64dd01991d76f2d07a |
-| APPLICATION_COMMIT / END_COMMIT | a158382bbed378ab4e06faf4e5eefdcc9ab621af |
-| Application Actions / Pages | 37094186703 / 6822854580 SUCCESS |
-| REPORT_COMMIT / final main / production HEAD | This report commit; exact SHA via git log -1 --format=%H -- LATEST_DEV_REPORT.md and external final report |
+| START_COMMIT | 12decc4bc45630d9f32a6b4e2cb5bffbd5412d24 |
+| APPLICATION_COMMIT | 41ec0bacc0cb83a218b5b59c82a97f82e18fb1c9 |
+| Application Actions / Pages | 37102340765 / 6824133180 SUCCESS |
+| END_COMMIT / final main | This report commit; exact SHA via git log -1 --format=%H -- LATEST_DEV_REPORT.md and external final report |
 | Production | https://king-640-060.github.io/fitlog-lite/ |
+
+## Inspection before modification
+
+- Search: Regression. Absolute19px SVG overlaps text because generic input:not([type=checkbox]):not([type=radio]) specificity overrides .search-field input padding-left42px with13px. Baseline390: text starts32px, icon ends50px, field height46px. This shared primitive affects all seven search fields, independent of Safari-specific font behavior.
+- Vision: Partially implemented. Effective request routing and current-profile storage reads were already correct; the heading wrongly treated editable profile.name as a current chat-model label.
+- Reproduction: name=智谱 · glm-4.5, model=glm-5.3-flash, visionModel=glm-5.3-flash still displayed 智谱 · glm-4.5 · 图片：glm-5.3-flash. Settings values preserve a nonempty existing name on save; this is the exact source of the obsolete4.5 label. No evidence of model-save failure, wrong active selection or probe overwriting a route was found. Physical device storage was not read.
 
 ## Delivered change and boundaries
 
-- src/main.ts changes exactly two class values: add-cardio and start-pelvic-floor use primary training-card-action, matching Strength. Empty/populated/open labels and all handlers unchanged.
-- Dedicated Workout execution cards use the same primary lime treatment for their main action; geometry and interaction states remain shared across Strength, Cardio and Kegel.
-- Reuse existing primary background/border accent, accent-ink text, accent-hover/pressed, keyboard focus and disabled primitives. No copied colors or Cardio/Kegel overrides. No CSS file changed.
-- Geometry unchanged: full content width,48px height,14px radius,0 16px padding,16px base font size; shared primary font-weight700. Card structure/spacing, recent link, Today compact actions and all other UI remain unchanged.
-- AGENTS, UI interaction/visual rules and QA matrix updated. Historical release reports remain historical.
+- Search-specific typed selector now wins generic padding and reserves42px at the logical start edge. Absolute icon owns the matching13px logical start, vertical centering and pointer-events:none in primitives.css. Default measured icon/text gap11px, unchanged46px field/14px radius/surface-soft/16px editable font; ordinary text input padding13px unchanged. No search logic, placeholder, autofocus or Sheet/keyboard/VisualViewport changes.
+- Food Vision title uses aiModelRouteLabel(current active profile): provider label, model, optional effective image model via existing getVisionModel. Settings/Assistant reuse aiProviderLabel with their existing presentation preserved. No hard-coded model IDs in production code.
+- Existing explicit-independent-image rule retained: when visionModel is configured show both routes, even if equal; absent visionModel shows the shared model once. Capability text remains separate.
+- Image request path unchanged: vision-analyze reads profiles.active → new AiClient → analyzeFoodPackageImages → client.visionChat → adapter.visionChat → getVisionModel(profile) → POST model. Chat/tools still use profile.model; one provider/root/key. Names/capability probes cannot substitute for model fields.
+- Profiles, names, active selection, credentials, capability invalidation, chat/context signatures and business logic unchanged. src/main.ts inspected but unchanged.
+- Durable source-of-truth/search rules and QA matrix updated.
 
 ## Automated Verification
 
-npm run typecheck, npm test (495tests/46files), npm run build, Pages build and git diff --check PASS. An initial run found the obsolete test that prohibited Cardio primary; it was replaced by all-three-primary assertions, then the full495tests passed.
+Typecheck PASS; npm test498tests/46files PASS; npm run build (Pages base) PASS; git diff --check PASS. Existing>500KB bundle warning remains; no dependencies changed.
 
-Updated tests/interactionSystem.test.ts, tests/browser/mobileLayout.mjs and tests/browser/uiSemanticConsistency.mjs. All three main CTAs must be primary and not secondary; shared computed styling and unchanged geometry are checked in empty/one/multiple/completed/open states and120/140% fonts. An isolated fine-pointer context checks default/hover/active/focus-visible/disabled styles for all three, including theme-token color,48px height,14px radius and padding equality. No business handlers are activated by these synthetic state checks.
+Expanded tests/aiUiHelpers.test.ts and existing aiDualModelRouting/uiQualityAudit browser gates. A equal5.3/B chat4.5+image5.3/C fallback5.3 labels and actual requests verified; real editor save/reopen/restart with old name, capability-label separation and Vision-only editor save retaining ordinary conversation verified. Existing stale-request/capability invalidation/session tests retained.
 
-All11existing browser gates local320/375/390/430 PASS: uiSemanticConsistency, mobileLayout, uiQualityAudit, interactionStabilization, aiStreaming, aiAssistant, aiVoice, aiDualModelRouting, foodVision, sharedDatePicker, githubSyncSafety. Semantic40screens per width plus five desktop interaction-state comparisons; uiQualityAudit128screens per width. Actual Workout screenshots were inspected, including390 empty/populated/open and320 font140.
+All11existing local gates320/375/390/430 PASS: aiDualModelRouting, uiQualityAudit, mobileLayout, interactionStabilization, aiAssistant, aiVoice, foodVision, sharedDatePicker, githubSyncSafety, uiSemanticConsistency, aiStreaming. uiQualityAudit140states per width/560captures, including search placeholder/typed/cleared/ordinary-field at100/120/140% fonts. Actual relevant screenshots inspected.
+
+The initial new raw-height assertion was too strict during Sheet animation. It now requires computed min-height46px and allows0.5px rectangle precision; product geometry was not changed. Failed attempt and successful rerun retained separately. Git HTTPS pull timed out; GitHub API confirmed remote main equals START_COMMIT. Normal application push succeeded.
 
 ## Production Verification
 
-Same11gates390/430 PASS; semantic80captures plus five shared-state comparisons, uiQualityAudit236captures.390 three-card empty/populated/open screenshots manually inspected. Exact production JS/CSS match Pages build. Existing synthetic persistent14store/15record profile and AI configuration/key unchanged, no business reseeding; SW update and offline cold bootPASS.
+Application Actions37102340765 and exact-SHA Pages6824133180 SUCCESS. All11production gates390/430 PASS; quality130states per width/260captures. Search140% and Vision A/B/C screenshots inspected separately from assertions. Production JS/CSS match the verified Pages build byte-for-byte.
+
+Same existing synthetic persistent profile:14stores/15frozen records, AI profile/key/active/vision configuration and Voice acknowledgement unchanged; no business reseeding, SW update and offline cold boot PASS.
 
 ## Data compatibility
 
-fitlog-lite-db, DexieV7 (IDB70),14stores, BackupV7, RestoreV1–V7, SyncV1 unchanged. No migration. No DB/Backup/Restore/AI/Workout business implementation changed; production runtime delta is exactly two CTA class substitutions.
+fitlog-lite-db / DexieV7 (IDB70) /14stores / BackupV7 / RestoreV1–V7 / SyncV1 / AIConfigV1 unchanged. No migration, DB/Backup/Restore/Sync implementation or FoodLog historical changes.
 
 ## Remaining issues / Manual Device Verification
 
-No unresolved implementation, automated or production-browser failures. Physical iPhone Safari/original installed PWA were not tested this round. Existing>500KB build warning remains; no dependency or bundle strategy changes were requested.
+No unresolved implementation, automated or production-browser failures. Physical iPhone Safari/original installed PWA search typography, keyboard/zoom and real Provider requests were not tested. The reported card's image segment resolves getVisionModel; if the profile remains unchanged it requests glm-5.3-flash. The device's actual chat-model value cannot be established from the old profile name. Synthetic route tests are not actual user configuration or real-provider compatibility evidence.
 
 ## ChatGPT Baseline
 
-Read AGENTS→LATEST→UI specs. Dedicated Workout Strength/Cardio/Kegel main CTAs all use existing primary lime, full-width48px/14px; shared interaction states. Today actions remain compact. Today unset .85 / Food unset .65 contrast work remains. DBV7/14stores/BackupV7/RestoreV1–V7/SyncV1 unchanged, no migration.495tests/46files and local/production11gatesPASS; physical device evidence remains separate.
+Read AGENTS→LATEST→UI/visual/AI specs. Shared search icon reserve42px now wins generic input padding; ordinary fields remain13px. Food Vision title reads active model/getVisionModel, never an auto-name model snapshot. Explicit independent image display remains even when IDs equal; fallback shared route appears once. Actual request/session/preservation contracts unchanged.498tests/46files; local/production11browser gatesPASS. Data versions unchanged. Physical Safari/PWA/provider checks remain separate.
