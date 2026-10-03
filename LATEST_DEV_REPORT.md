@@ -1,47 +1,71 @@
 # FitLog Lite Development Report
 
-## Latest production round — Today Training action refinement
+## Latest production round — Training Video Search + contextual DietEvent
 
-- START_COMMIT: `9633e7462575315d3562913ee98db9983f9a1216`.
-- APPLICATION_COMMIT: `9acfee3781d320982d1b5e52abe2809816d5236a`.
-- Application Actions: https://github.com/king-640-060/fitlog-lite/actions/runs/37125251799, success. Pages deployment 6827978934, success.
-- END_COMMIT is the report-maintenance commit, resolved by `git log -1 --format=%H -- LATEST_DEV_REPORT.md`. The delivered external report/release receipt records its literal SHA and separately verified Actions/Pages/App/SW identities. A file cannot embed its own Git SHA.
-- Production: https://king-640-060.github.io/fitlog-lite/.
+- START_COMMIT: `567c9f2e2e5d164f6bfacbb23877e65666dd03f4`.
+- APPLICATION_COMMIT: `136a27b2b13237d642942e5f45a51c32832aaff6`.
+- Application Actions: https://github.com/king-640-060/fitlog-lite/actions/runs/37162831041 — success.
+- Pages deployment: `6834567346` — success, environment URL https://king-640-060.github.io/fitlog-lite/.
+- END_COMMIT: report-maintenance commit after this file is published. The application SHA and report SHA are intentionally separate.
 
-## Product result / boundaries
+## Product result
 
-Only the Today Training card changed. Its heading is 训练; the existing header text-btn + chevron 查看训练 remains browsing navigation. All ordinary states (empty, completed Strength, Cardio and combined) retain exactly one secondary 记录训练 paired with strength status in the existing today-activity-body grid, using today-activity-action. Cardio remains a separate full-width summary. No isolated footer row or empty action reserve. Activity-card/head/icon primitives match Weight/Kegel/Habit, and the ordinary CTA has the same computed minimum height/padding/radius/font/background/ink.
+### Training Video Search
 
-记录训练 resets the viewed Workout date to local Today, clears stale editor/history state, renders the existing creation region and resets page scroll to0. Users then choose the existing Strength or Cardio creation action. It does not choose Strength, open a new chooser, create an empty record or write to DB. 查看训练 uses the existing ordinary module route without a creation scroll request. An open strength workout replaces the ordinary CTA with compact primary 继续力量训练 inside its strength status and resumes that same workout. Returning to Today rerenders actual current records. Existing editor exit/autosave remains unchanged.
+1. Provider is an app-owned YouTube Data API v3 `search.list` READ adapter. The model never constructs a video URL.
+2. `search_training_videos(query, limit)` is exposed only when the existing READ permission environment allows the tool. Query bounds are 120 characters, 1–5 results, fixed exercise-keyword validation, no URLs, digits, private health context or known secrets.
+3. Configuration is device-only: `fitlog-video-search-config-v1`, `fitlog-video-search-key-v1`, and independent `fitlog-video-search-privacy-ack-v1`. The Key is not in DB, Backup, Sync, AIConfig, prompt, rendered text or logs; it is included in known-secret guards. The saved form is blank after save. Browser storage cannot make a browser Key a backend secret, which the UI discloses.
+4. Transport uses `X-Goog-Api-Key`, `credentials: omit`, `cache: no-store`, `redirect: error`, strict origin referrer policy, timeout, AbortSignal, bounded response reading and fixed safe errors. Provider HTML and thumbnail URLs are not trusted. Strict 11-character IDs produce local watch/embed/thumbnail URLs.
+5. Typed, memory-only video artifacts render as plain app-owned cards with text title/channel, fallback thumbnails, max five results and 44px actions. The model receives bounded metadata only; no iframe or HTML is returned to it.
+6. Playback is click-to-load using the official YouTube IFrame API and `youtube-nocookie.com`, no autoplay, inline/fullscreen enabled, source Referer preserved, one active player, destroy on switch/clear/close, fixed error and timeout fallback.
+7. Automated browser mocks cover widths 320/375/390/430 and font scales 100/120/140, 1/3 results, long Chinese/English titles, thumbnail failure, player switch, close/reopen, clear, provider failure, player error/timeout, pending search Stop/close abort and duplicate tool-call IDs. Receipt: 29 states × 4 widths locally; production 29 states × 2 widths. Real YouTube Key/provider test: **Not performed**. Physical playback: **Pending**.
 
-Strength and Cardio summaries remain separate. Short Strength name/count/status and Cardio metric phrases use the existing nowrap token, including enlarged text. Speed/incline remain unitless; minutes remain visible. No CSS override, breakpoint, absolute positioning, new primitive or dependency was introduced.
+### Contextual DietEvent
 
-## Unchanged production data baseline
+1. `DietEvent` is independent contextual data: `date`, `kind: indulgence`, `scope: MealType | day`, optional note, optional manual estimate, optional photo range/final estimate/source, timestamps and stable id. It never becomes FoodLog, NutritionTarget, report total, score, compensation or chat write.
+2. Dexie version 10 / IndexedDB version 100 adds exactly one empty `dietEvents` store; all 17 existing stores, indexes and snapshots remain unchanged. Migration does not infer or seed events. Backup schema is V10; Restore accepts V1–V10, validates all data before one 18-store replacement transaction and rolls back on injected failures. Sync/envelope V1 and AIConfig V1 remain unchanged.
+3. Food supports mark-only or multiple meal events, independent day events, note and optional manual `约 … kcal`; day events disable photo estimates and do not delete meal notes. Calendar has a sixth restrained flame marker, accessible 放纵餐/放纵日 labels, accurate overflow and a priority rule that keeps the DietEvent marker visible within four icons. Day Detail includes separate editable contextual cards and does not mix estimates into nutrition rows.
+4. Meal Photo Estimate is a separate, explicitly confirmed Vision route using the active profile's existing image adapter and a strict four-field parser. It accepts at most two local Canvas-reencoded images, stores no image, only fills a draft after review, requires explicit Save, preserves the original range and final value, and clears the draft when converting meal scope to day. Packaging-label Vision remains separate.
+5. AI nutrition READ day/range context includes bounded DietEvent notes/ranges with `contextualOnly` and possible overlap flags; canonical calories/macros still come only from FoodLog snapshots. NutritionTarget and Nutrition Strategy are untouched.
+6. Automated browser mocks cover widths 320/375/390/430 and font scales 100/120/140, mark-only, multiple meals, day scope, long notes, keyboard bottom, photo consent/camera/gallery, strict Vision response, review/draft/save, malformed response, Stop/close abort preservation, day conversion, Calendar ordinary/crowded/detail/delete/historical date and unchanged canonical totals. Receipt: 64 states × 4 widths locally; production 64 states × 2 widths. Physical camera/gallery: **Pending**.
 
-Stable fitlog-lite-db: DexieV9 / IndexedDB90 /17stores; BackupV9; RestoreV1–V9; manual encrypted SyncV1/envelopeV1; device-only AIConfigV1. No changes to DB, entities, services, Backup/Restore/Sync, Food serving/meal deletion, Nutrition Strategy, Calendar, Cardio/Workout models or other page layouts. Source changes are restricted to Today rendering/bindings in main.ts; main.css and shared primitives remain unchanged. Existing six-requirement features and historical snapshots remain the production baseline.
+## Data and preservation
 
-## Automated Verification
+- Original persistent synthetic profile: 14 legacy stores / 15 records preserved; AI configuration/key/voice acknowledgement hashes unchanged; four additive stores are empty after migration; no reseed, clear, Restore or reinstall. Offline cold boot passes.
+- Frozen V9→V10 fixture, reopen/populate, Backup V1–V10, restore validation/rollback and encrypted Sync V1/hash tests pass. No real user data or credentials were used.
+- Existing Today Training, FoodLog snapshots, Nutrition Targets/Strategies, Backup/Restore, Sync, AI Voice/Streaming, Vision packaging workflow and all other prior modules remain within their existing contracts.
 
-- npm run typecheck PASS; npm test566tests/52files PASS; npm run build and clean Pages build PASS. Existing >500kB advisory only.
-- Updated existing foodServing.mjs and uiSemanticConsistency.mjs; no added suite. Optional Today-only mode enables focused QA without claiming skipped Food/Meal/Calendar assertions.
-- Today ten states ×320/375/390/430 ×100/120/140%; dedicated pass168 local /84 production checks, including Cardio forms/history. Covers the five required states, completed5-exercise16-set plus120-minute/speed12.5/incline15, optional/multiple/large metrics, header/body nonoverlap, intact labels and44px actions, shared secondary geometry/styles, stale historical date/history reset, no new records on header/record/continuation click, original open workout and return refresh.
-- Full foodServing suite420 local states and210 production states; Nutrition strategies300/150. All14 existing release suites PASS locally and on the application deployment: uiQualityAudit, uiSemanticConsistency, interactionStabilization, mobileLayout, sharedDatePicker, githubSyncSafety, aiAssistant, aiVoice, aiDualModelRouting, foodVision, aiStreaming, nutritionGauge, nutritionTemplates, foodServing.
-- Initial targeted test corrections: Workout date trigger displays a calendar date rather than 今天; compare that exact local date. Compare header navigation to the state after exiting the existing editor, whose normal flush legitimately updates updatedAt; continuation click itself is checked before exit. These were corrected test expectations, with failures and successful reruns retained.
-- Actual screenshot inspection:390/100,320/140,430/100 for empty/Cardio/completed/combined/open, plus enlarged5-exercise16-set summary and full Today comparison with Weight/Kegel/Habit. No horizontal overflow or action overlap, orphan CTA character, duplicate body button, isolated footer or large reserved blank area.320/140 Strength counts were kept as whole phrases through the existing token.
+## Verification
 
-## Production Verification
+### Automated Verification
 
-- Application Actions/Pages succeeded. Clean build matches the production JS/CSS/SW bytes, Git build/precache/scope. Native App/controller/active/network match at390/430 and offline new-page cold boot passes.
-- Original synthetic persistent production profile retains the original14stores15records, three empty strategy stores and AI configuration/key/voice acknowledgement hashes; no reseed/clear/Restore/reinstall. DB90/17 unchanged; offline reopen passes. Vision preservation reads actual version/store count and the exact bundle.
-- Git HTTPS transport was unavailable at task start; the GitHub API independently verified remote main exactly matched START. Publication transport and literal final identities are recorded in release-receipt.json. Non-forced publication preserves exact Git commits.
+- `npm run typecheck`: PASS.
+- `npm test`: **633 tests / 55 files PASS**.
+- `npm run build` and Pages build: PASS. Existing Vite advisory about a >500 kB minified chunk remains.
+- Local original release suites: 14/14 PASS; new Video Search and DietEvent suites PASS.
+- Production deployment suites: 16/16 PASS, including exact asset, UI quality, preservation and offline checks.
+- Screenshot review: 320/140%, 390/100%, 430/100% Food, Calendar and AI states inspected. Long Food notes use a three-line preview while Day Detail retains full text; no horizontal overflow, orphaned action text, player overflow or hidden DietEvent marker.
 
-## Manual Device Verification / remaining issues
+### Production Verification
+
+- Production URL: https://king-640-060.github.io/fitlog-lite/.
+- Production JS/CSS bytes and SW precache match the local build for APPLICATION_COMMIT; App/SW build identity, scope and network deployment match. Main views, AI settings and GitHub Sync entry pass.
+- Native SW 390/430 offline cold-page and exact PWA upgrade/preservation checks pass.
+- Actions and Pages for APPLICATION_COMMIT are successful.
+
+### Manual Device Verification / remaining issues
 
 - Physical iPhone Safari: Pending.
 - Original installed PWA: Pending.
-- Physical keyboard/VisualViewport/Safe Area/font rendering: Pending. Chromium/mock viewport is not physical proof.
-- No confirmed unresolved defect within this round. On the original device confirm the existing update without clearing/reinstalling, check actual App/SW version, then compare the five Today states at enlarged text and test header/record/continuation routes with original data.
+- Physical YouTube playback with a real restricted Key: Pending; no real provider call was made in this round.
+- Physical meal-photo camera/gallery: Pending.
+- No confirmed unresolved automated or production defect.
 
 ## ChatGPT Baseline
 
-Current main changes only Today Training: 训练 heading, header 查看训练 navigation, ordinary secondary 记录训练 coupled to status and opening today’s existing creation region without a write, replaced by primary 继续力量训练 for an open strength workout. Reuses activity-card geometry; both summaries and Cardio unitless metrics remain; whole count/status tokens support enlarged text. DBV9/IDB90/17stores, BackupV9, RestoreV1–V9, SyncV1/envelopeV1 and AIConfigV1 unchanged.566tests/52files;14 release suites local/production; full420/210 and focused168/84 states; actual screenshots/native PWA/data+AI preservation/offline verified. Physical Safari/original installed PWA Pending. Literal commits/actions/pages and final production identity live in external receipt.
+From START `567c9f2e2e5d164f6bfacbb23877e65666dd03f4`, APPLICATION `136a27b2b13237d642942e5f45a51c32832aaff6` adds app-owned YouTube training-video search with typed click-to-load official playback and independent contextual DietEvent/meal-photo estimate flows. DBV10/IDB100/18 stores, BackupV10, RestoreV1–V10, SyncV1/envelopeV1 and AIConfigV1 boundaries hold. `npm test` 633/55, typecheck/build PASS, local and production browser suites PASS, screenshots and synthetic data/PWA preservation verified. Real YouTube provider, physical Safari/PWA, physical playback and physical camera/gallery remain Pending.
+
+## External release receipt
+
+The complete 37-item answer matrix, receipt JSON, screenshots and browser logs are stored in the task artifact directory:
+`/Users/zhaozhantian/Documents/Codex/2026-09-24/files-pasted-by-the-user-king/artifacts/video-search-diet-events-2026-10-04/`.
