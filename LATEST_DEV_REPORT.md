@@ -30,7 +30,7 @@ Same11gates390/430 PASS;76newsemantic PNG+236uiQuality PNG. ExactJS/CSS assets m
 
 ## Manual Device Verification / Remaining limits
 
-Physical iPhone Safari, original installed PWA, real Provider/Fast accuracy/latency, SpeechRecognition and external quick-launch same installed storage context Pending. Existing>500KB warning remains. Initial git network failures, pre-release harness/geometry fixes and interrupted preliminary gates are disclosed in fullreport; final gates completely rerun on finalbuild. No unresolved automated/production failure.
+Physical iPhone Safari, original installed PWA, real Provider/Fast accuracy/latency, SpeechRecognition and external quick-launch same installed storage context Pending. Existing>500KB warning remains. Initial git network failures, pre-release harness/geometry fixes and interrupted preliminary gate are disclosed in fullreport; final gates completely rerun on finalbuild. No unresolved automated/production failure.
 
 ## ChatGPT Baseline
 

@@ -84,7 +84,7 @@
 
 开始为干净main5795113；首次pull网络挂起中断，第二次40s超时；GitHub API确认remote同SHA。第三次45s有界pull实际成功Already up to date，在application commit前完成。没有reset、squash、force或历史回滚。
 
-新browser harness首次在tab click后立即检查异步render，改为等待已解析visibility；430×932较短Management正文不需要滚动，改为仅无scroll range时增加临时合成高度，以真实验证旧body滚动后的fresh-open。首次现有DatePicker gate捕获top +在data resolve前短暂可见，产品改为initial hidden后由最终state决定，并完整重跑。人工截图发现primary后加载仍48px，修改family基础选择器并断言三个按钮都44px。预检中的未完成两项gate在修改前终止，所有release gates最终使用同一最终Pages build完整重跑；不把预检或中断结果计为PASS。
+新browser harness首次在tab click后立即检查异步render，改为等待已解析visibility；430×932较短Management正文不需要滚动，改为仅无scroll range时增加临时合成高度，以真实验证旧body滚动后的fresh-open。首次现有DatePicker gate捕获top +在data resolve前短暂可见，产品改为initial hidden后由最终state决定，并完整重跑。人工截图发现primary后加载仍48px，修改family基础选择器并断言三个按钮都44px。最终重构建前，预检uiQualityAudit主动终止、interactionStabilization已自行完成；所有release gates最终使用同一最终Pages build完整重跑，不把预检或中断结果计为最终PASS。
 
 ## Evidence and manual review
 
