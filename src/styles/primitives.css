@@ -26,7 +26,8 @@ textarea { resize: vertical; }
 .grid-form { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 .grid-form .full { grid-column: 1 / -1; }
 .search-field { position: relative; display: block !important; }
-.search-field input { padding-left: 42px; }
+.search-field > input[type="search"] { padding-inline-start: 42px; }
+.search-field > .icon { position: absolute; z-index: 1; top: 50%; inset-inline-start: 13px; transform: translateY(-50%); color: var(--text-tertiary); pointer-events: none; }
 .sheet-link { display: flex; align-items: center; gap: 7px; min-height: 50px; border: 0; padding-inline: 2px; background: transparent; color: var(--accent-strong); font-weight: 700; }
 .radio { display: flex; align-items: center; gap: 8px; min-height: 44px; }
 .compact-button { min-width: 44px; min-height: 44px; padding-inline: 14px; border-radius: 13px; }

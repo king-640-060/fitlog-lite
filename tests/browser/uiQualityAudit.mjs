@@ -72,6 +72,20 @@ try { for (const [width,height] of sizes) {
   const close=async()=>{if(await page.locator('dialog[open]').count())await page.locator('dialog[open] [data-close]').click();await page.waitForTimeout(40)}
   const click=async selector=>{await page.locator(selector).first().click();await page.waitForTimeout(90)}
   const management=async(id)=>{await close();await click('#open-management');if(id)await click('#'+id)}
+  const searchAudit=async scale=>{
+   await click('#food-library')
+   const check=async state=>{
+    const geometry=await page.locator('#library-search').evaluate(e=>{
+     const c=getComputedStyle(e),r=e.getBoundingClientRect(),i=e.parentElement.querySelector('.icon').getBoundingClientRect()
+     return {gap:r.left+parseFloat(c.borderLeftWidth)+parseFloat(c.paddingLeft)-i.right,height:r.height,minHeight:c.minHeight,radius:c.borderRadius,font:parseFloat(c.fontSize),iconCenter:i.top+i.height/2,fieldCenter:r.top+r.height/2,placeholder:e.placeholder}
+    })
+    assert.ok(geometry.gap>=8,JSON.stringify(geometry));assert.equal(geometry.minHeight,'46px');assert.ok(geometry.height>=45.5,JSON.stringify(geometry));assert.equal(geometry.radius,'14px');assert.ok(geometry.font>=16);assert.ok(Math.abs(geometry.iconCenter-geometry.fieldCenter)<1);assert.equal(geometry.placeholder,'搜索食物')
+    await audit('search-font'+scale+'-'+state)
+   }
+   assert.equal(await page.locator('#library-search').inputValue(),'');assert.equal(await page.locator('#library-search').evaluate(e=>e===document.activeElement),false)
+   await check('placeholder');await page.locator('#library-search').fill('no-matching-xyz');await page.waitForSelector('#clear-food-search');await check('typed');await click('#clear-food-search');assert.equal(await page.locator('#library-search').inputValue(),'');await check('cleared')
+   await click('#new-food');assert.equal(await page.locator('#food-form [name=name]').evaluate(e=>getComputedStyle(e).paddingLeft),'13px');await audit('search-font'+scale+'-ordinary-field');await close()
+  }
   // Main empty states and shared empty libraries, then realistic long populated fixture.
   await put(Object.fromEntries(Object.keys(fixture).map(k=>[k,[]])))
   for(const tab of ['today','plan','food','workout','progress']){await nav(tab);await audit(tab+'-empty')}
@@ -82,7 +96,7 @@ try { for (const [width,height] of sizes) {
   await click('#plan-completed summary');await audit('plan-completed')
   await click('[data-task-edit]');await audit('task-editor');await click('#task-date-picker-open');await audit('task-date-picker');await close()
   await click('#plan-tag-filter');await audit('tag-filter');await click('#plan-manage-tags');await audit('tag-manager');await click('#task-tag-new');await audit('tag-editor');await close()
-  await nav('food');await click('[data-edit-nutrition-target]');await audit('nutrition-target');await close()
+  await nav('food');await searchAudit(100);await click('[data-edit-nutrition-target]');await audit('nutrition-target');await close()
   await click('#food-completion-open');await audit('nutrition-completion');await close()
   await click('#food-library');await audit('food-library-populated');await page.locator('#library-search').fill('no-matching-xyz');await page.waitForSelector('#clear-food-search');await audit('food-library-search-none');await click('#clear-food-search');await click('[data-edit-food]');await audit('food-editor-existing')
   await page.locator('[name=energyUnit]').selectOption('kJ');await page.locator('[name=energyUnit]').selectOption('kcal');await audit('food-energy-switch');await click('#food-form [type=submit]');await page.waitForSelector('#new-food');const stored=await page.evaluate(async()=>{const d=await new Promise(r=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>r(q.result)});const row=await new Promise(r=>{const q=d.transaction('foods').objectStore('foods').get('food-old');q.onsuccess=()=>r(q.result)});d.close();return row});assert.equal(stored.calories,populated.foods[0].calories);assert.equal(stored.protein,populated.foods[0].protein);assert.equal(stored.referenceGrams,populated.foods[0].referenceGrams);await audit('food-untouched-precision');await close()
@@ -141,7 +155,7 @@ try { for (const [width,height] of sizes) {
   // Explicit duplicate handling and deterministic saved-only completion in isolated test DB.
   await vision();await click('#vision-manual');await page.locator('[name=name]').fill(populated.foods[0].name);await page.locator('[name=brand]').fill(populated.foods[0].brand);await page.locator('[name=referenceGrams]').fill('100');await page.locator('[name=energyValue]').fill('123');await page.locator('#vision-reviewed').check();await click('#vision-review-form [type=submit]');await audit('vision-duplicate');await click('#vision-save-new');await audit('vision-save-preview');await click('#vision-confirm');await page.waitForSelector('#vision-finish');await audit('vision-done');await close()
   // Text scale stress; landscape smoke separately refreshes the shared stable viewport baseline.
-  for(const scale of [120,140]){await page.addStyleTag({content:`html { font-size:${scale}%; }`});for(const tab of ['today','plan','food','workout','progress']){await nav(tab);await audit('font'+scale+'-'+tab)}await nav('food');await click('#food-library');await click('#new-food');await audit('font'+scale+'-food-editor');await close();await click('#open-ai-assistant');await audit('font'+scale+'-assistant');await close()}
+  for(const scale of [120,140]){await page.addStyleTag({content:`html { font-size:${scale}%; }`});for(const tab of ['today','plan','food','workout','progress']){await nav(tab);await audit('font'+scale+'-'+tab)}await nav('food');await searchAudit(scale);await click('#food-library');await click('#new-food');await audit('font'+scale+'-food-editor');await close();await click('#open-ai-assistant');await audit('font'+scale+'-assistant');await close()}
   await page.addStyleTag({content:'html { font-size:100%; }'})
   if(!prod)for(const [w,h] of [[812,375],[844,390]]){await page.setViewportSize({width:w,height:h});await page.evaluate(()=>dispatchEvent(new Event('orientationchange')));for(const tab of ['today','food','workout']){await nav(tab);await audit('landscape'+w+'-'+tab)}await click('#open-ai-assistant');await audit('landscape'+w+'-assistant');await close();await nav('food');await vision();await click('#vision-manual');await audit('landscape'+w+'-vision-review');await close()}
   assert.deepEqual(errors,[])

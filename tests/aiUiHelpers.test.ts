@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { aiProposalPreviewLines, aiSuggestionPrompts, aiUsageText, shouldSendAiShortcut } from '../src/ui/aiUiHelpers'
+import { aiModelRouteLabel, aiProposalPreviewLines, aiSuggestionPrompts, aiUsageText, shouldSendAiShortcut } from '../src/ui/aiUiHelpers'
 import { buildFitLogSystemPrompt, AI_SYSTEM_PROMPT_VERSION } from '../src/ai/systemPrompt'
 describe('AI interface and prompt helpers', () => {
   it('displays App-calculated nutrition, unknown fields and replacement values without exposing transport IDs', () => {
@@ -7,6 +7,15 @@ describe('AI interface and prompt helpers', () => {
     expect(lines).toContain('晚餐'); expect(lines).toContain('300 kcal'); expect(lines).toContain('未知'); expect(lines).not.toContain('transport-only')
     expect(aiProposalPreviewLines({ id: 'p', title: '体重', domain: 'weight', status: 'pending', preview: { date: '2026-09-29', beforeWeightKg: 72, weightKg: 71, replacesExisting: true } }).join(' ')).toContain('72 kg → 71 kg')
     expect(aiUsageText({ totalTokens: 0 })).toBe('0 tokens'); expect(aiUsageText({})).toBe(''); expect(aiSuggestionPrompts).toHaveLength(6)
+  })
+  it.each([
+    ['glm-5.3-flash', 'glm-5.3-flash', '智谱 · glm-5.3-flash · 图片：glm-5.3-flash'],
+    ['glm-4.5', 'glm-5.3-flash', '智谱 · glm-4.5 · 图片：glm-5.3-flash'],
+    ['glm-5.3-flash', undefined, '智谱 · glm-5.3-flash'],
+  ])('labels effective routes independently of a stale name and probe status (%s / %s)', (model, visionModel, expected) => {
+    for (const visionCapability of ['unknown', 'supported', 'unsupported'] as const) {
+      expect(aiModelRouteLabel({ id: 'label', name: '智谱 · glm-4.5', preset: 'zhipu', model: model!, visionModel, visionCapability, baseUrl: 'https://synthetic.invalid/v1', protocol: 'openai-chat-completions', createdAt: '', updatedAt: '' })).toBe(expected)
+    }
   })
   it('preserves Enter/newline and IME composition; only explicit Ctrl/Cmd Enter sends', () => {
     const event = { key: 'Enter', ctrlKey: false, metaKey: false, isComposing: false }

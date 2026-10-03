@@ -1,7 +1,16 @@
 import type { AiProposal } from '../ai/proposals'
-import type { AiUsage } from '../ai/types'
+import type { AiUsage, AiProviderProfile } from '../ai/types'
+import { getVisionModel } from '../ai/modelRouting'
 import { formatNumber } from '../utils/nutrition'
 import { mealNames } from '../utils/foodMeals'
+
+/** Editable names identify saved profiles; they are never model routing metadata. */
+export function aiProviderLabel(profile: AiProviderProfile): string {
+  return profile.preset === 'zhipu' ? '智谱' : profile.name.startsWith('自定义 · ') ? '自定义服务' : profile.name
+}
+export function aiModelRouteLabel(profile: AiProviderProfile): string {
+  return `${aiProviderLabel(profile)} · ${profile.model}${profile.visionModel ? ` · 图片：${getVisionModel(profile)}` : ''}`
+}
 
 export const aiSuggestionPrompts = ['今天吃得怎么样？', '帮我记录晚餐', '这周训练怎么样？', '帮我看看最近体重', '帮我安排明天', '帮我补齐今天营养']
 export const aiProposalStatusLabels = { pending: '待确认', processing: '处理中', completed: '已完成', cancelled: '已取消', expired: '已失效' } as const

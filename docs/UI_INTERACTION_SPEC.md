@@ -92,6 +92,8 @@ The shared page backdrop keeps the warm white base, restrained asymmetric glows,
 - Honor `prefers-reduced-motion: reduce`: render final ring and number values immediately and disable decorative motion. Timer phase, remaining time, and completion must stay understandable in text.
 - Data correctness takes priority over animation. Never invent a trend from fewer than two weight points or infer a Workout set completion state from fields that do not encode one.
 
+Shared search fields use an absolute SVG and a reserved logical start inset that overrides generic input padding. Keep icon/text separated at100/120/140% fonts, center the icon vertically, and preserve ordinary text-field geometry and Sheet focus behavior.
+
 ## Mobile interaction
 
 - Preserve local business dates, iPhone Safe Area, and the five existing bottom tabs. Keep Safe Area separate from navigation body height; the tab bar should not jump during animation.

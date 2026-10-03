@@ -62,6 +62,31 @@ for(const [width,height] of sizes){
   await page.evaluate(()=>{const rows=JSON.parse(localStorage.getItem('fitlog-ai-profiles-v1'));delete rows[0].visionModel;rows[0].visionCapability='unknown';localStorage.setItem('fitlog-ai-profiles-v1',JSON.stringify(rows))})
   await vision();await page.locator('#vision-test').click();await page.waitForFunction(()=>document.querySelector('.vision-status')?.textContent.includes('图片能力已验证'));assert.equal(requests.at(-1).model,'chat-two');await page.locator('#vision-analyze').click();await page.waitForSelector('#vision-review-form');assert.equal(requests.at(-1).model,'chat-two');await close()
   await modify({visionCapability:'unknown'});await settings();await page.locator('[data-edit]').click();imageFailure='parameters';await page.locator('form button[type=submit]').click();await page.waitForFunction(()=>document.querySelector('.ai-status')?.textContent==='配置已保存。各项能力可以独立使用。');assert.equal((await saved()).toolCapability,'supported');assert.equal((await saved()).visionCapability,'unknown');assert.equal(await page.locator('#ai-vision-advice').isVisible(),true);assert.ok((await page.locator('[data-result=vision]').innerText()).includes('请求参数无效'));await page.locator('#ai-choose-vision').click();assert.equal(await page.locator('#ai-vision-field').isVisible(),true);await close();imageFailure=false
+  // Reproduce the physical report: an old auto-name survives real editor saves.
+  const saveRoutes=async(model,visionModel)=>{
+    await settings();await page.locator('[data-edit]').click();await page.locator('#ai-manual-model').click();await page.locator('[name=model]').fill(model)
+    await page.locator(`[name=imageRouting][value=${visionModel?'separate':'same'}]`).check()
+    if(visionModel){await page.locator('#ai-manual-vision-model').click();await page.locator('[name=visionModel]').fill(visionModel)}
+    await page.locator('.ai-advanced summary').click();await page.locator('#ai-save-only').click()
+    assert.equal((await saved()).name,'智谱 · glm-4.5');assert.equal((await saved()).model,model);assert.equal((await saved()).visionModel,visionModel)
+    assert.ok((await page.locator('.ai-current-service').innerText()).includes('聊天 / 数据 · '+model));await close()
+  }
+  for(const [scenario,model,visionModel] of [['A','glm-5.3-flash','glm-5.3-flash'],['B','glm-4.5','glm-5.3-flash'],['C','glm-5.3-flash',undefined]]){
+    await saveRoutes(model,visionModel)
+    // A restart reads latest active-profile storage; no probe or request is needed for its label.
+    await page.reload({waitUntil:'networkidle'})
+    await page.locator('#open-ai-assistant').click();assert.equal(await page.locator('.ai-current-profile').innerText(),'智谱 · '+model);await close()
+    await vision();const expected='智谱 · '+model+(visionModel?' · 图片：'+visionModel:'')
+    assert.equal(await page.locator('.vision-provider strong').innerText(),expected)
+    await page.screenshot({path:`/tmp/dual-${prod?'prod':'local'}-${width}-effective-${scenario}.png`})
+    if(await page.locator('#vision-test').count()){await page.locator('#vision-test').click();await page.waitForFunction(()=>document.querySelector('.vision-status')?.textContent.includes('图片能力已验证'));assert.equal(requests.at(-1).model,visionModel||model);assert.equal(await page.locator('.vision-provider strong').innerText(),expected)}
+    await page.locator('#vision-analyze').click();await page.waitForSelector('#vision-review-form');assert.equal(requests.at(-1).model,visionModel||model);await close()
+  }
+  // A real Vision-only editor save preserves the ordinary assistant's existing chat context.
+  await page.locator('#open-ai-assistant').click();await page.locator('#ai-message-input').fill('保留上下文');await page.locator('#ai-send').click();await page.getByText('继续使用聊天模型',{exact:true}).waitFor();await close()
+  await saveRoutes('glm-5.3-flash','image-two')
+  await page.locator('#open-ai-assistant').click();await page.getByText('保留上下文',{exact:true}).waitFor();await page.getByText('继续使用聊天模型',{exact:true}).waitFor();assert.equal(await page.locator('.ai-current-profile').innerText(),'智谱 · glm-5.3-flash');await close()
+  console.log(JSON.stringify({width,effectiveLabelsABC:true,editorSaveReopenRestart:true,probeCannotOverrideLabel:true,visionOnlyEditorContext:true}))
   assert.ok(requests.filter(r=>r.kind!=='models').every(r=>r.auth==='Bearer synthetic-dual-key'));assert.deepEqual(errors,[])
   console.log(JSON.stringify({mode:prod?'production':'local',width,height,sharedList:true,legacy:true,dualRouting:true,partialSuccess:true,staleImage:true,chatOnlyChange:true,errors}))
   await context.close()

@@ -108,6 +108,7 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 
 ## Optional FitLog AI contract
 
+- Model labels read the current active profile model and effective image route (getVisionModel), never an ID embedded in its editable name. Capability verification describes support separately. Preserve the existing explicit-independent-image display rule.
 - One AI profile shares its Provider, Base URL and credential. Chat and tool calls use `model`; image input uses optional `visionModel`, falling back to `model` for legacy profiles. Invalidate only the capability whose effective route changed; a Vision-only edit must preserve an ongoing chat and its context.
 - Read `docs/AI_ARCHITECTURE.md` before changing AI. Provider profiles are editable device-only transport configuration; core business semantics must not depend on a vendor or model.
 - AI credentials, configuration, chat, usage, plan handles and proposals never enter business DB stores, Backup or GitHub Sync. Keep API Keys separately stored from profile metadata and empty in edit-form values; never log credentials or raw provider errors.
@@ -154,6 +155,8 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 - Food Vision defaults to role-specific Fast profiles (nutrition1400px/auto, front1000px/low). High detail is an explicit user retry, never an automatic second request. Keep images/source files and numeric-only timings ephemeral.
 - Vision step replacement owns immediate and next-frame scrollTop0. Image viewer return preserves review DOM and scroll position. Ordinary pickers share the Sheet body scroll owner.
 - UI releases maintain `docs/UI_QA_MATRIX.md` and run `tests/browser/uiQualityAudit.mjs` alongside existing browser gates. Inspect actual screenshots; distinguish browser emulation from physical Safari/PWA/provider verification.
+
+- Shared search fields reserve the SVG icon with a selector that wins over generic input padding, matching logical start edges and centering the icon within the field. Ordinary text-field padding remains unchanged.
 
 ## Targeted file map
 

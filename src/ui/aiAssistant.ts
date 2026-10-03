@@ -2,7 +2,7 @@ import { setSheetVariant } from './sheetController'
 import { AiOrchestrator, AI_CHAT_ONLY_MESSAGE } from '../ai/orchestrator'
 import { AI_LIMITS } from '../ai/security'
 import { showAiSettings, AI_PRIVACY_TEXT, type AiSettingsUi } from './aiSettings'
-import { aiProposalPreviewLines, aiProposalStatusLabels, aiSuggestionPrompts, aiUsageText, shouldSendAiShortcut } from './aiUiHelpers'
+import { aiProviderLabel, aiProposalPreviewLines, aiProposalStatusLabels, aiSuggestionPrompts, aiUsageText, shouldSendAiShortcut } from './aiUiHelpers'
 import { icon } from './icons'
 import { SpeechRecognitionService, SPEECH_UNSUPPORTED, VOICE_PRIVACY_KEY, VOICE_PRIVACY_TEXT } from '../services/speechRecognitionService'
 
@@ -89,7 +89,7 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi, optio
   const draw = () => {
     if (!dialog.isConnected) return
     const active = engine.profiles.active
-    const providerLabel = active?.preset === 'zhipu' ? '智谱' : active?.name.startsWith('自定义 · ') ? '自定义服务' : active?.name
+    const providerLabel = active ? aiProviderLabel(active) : undefined
     host.querySelector<HTMLElement>('.ai-current-profile')!.textContent = active ? `${providerLabel} · ${active.model}` : '尚未连接 AI 服务'
     host.querySelector<HTMLElement>('.ai-capability-notice')!.hidden = !active || active.toolCapability === 'supported'
     const nearBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 72

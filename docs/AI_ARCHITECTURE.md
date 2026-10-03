@@ -19,6 +19,8 @@ Official references verified for this implementation:
 
 Connection testing sends only `Reply with OK.`. A separate forced `fitlog_capability_probe` verifies actual tool-call output without app data. Profiles with unknown/unsupported capability can chat but receive no FitLog tools; even unsolicited calls cannot execute. A failed network/authorization probe is an error, not proof of incompatibility. GET `/models` is best effort, capped at 200 IDs; failure leaves manual model entry and the saved profile usable.
 
+Model labels use the current active profile: model for chat/tools, getVisionModel(profile) for images. Editable profile names may contain an obsolete model ID and are not routing metadata. Food Vision, Settings and Assistant reuse aiProviderLabel; Vision uses aiModelRouteLabel. Preserve the existing rule: show the separate image line when visionModel is explicitly configured, including an ID equal to model; without it, display the shared model once. Capability status remains separate. Saving does not rewrite names or select another active profile.
+
 ## Assistant incremental streaming
 
 `AiProviderAdapter.chatStream(request, callbacks)` returns the same complete `AiChatResponse` as `chat`/`visionChat`, while `onContentDelta` publishes safe text as bytes arrive. Only ordinary assistant model rounds use this path, including final Voice transcripts and quick-launch prompts. Tools and chat continue to use `model`; Vision uses `visionModel` with fallback. Connection/tool/Vision probes, model listing and strict Food Vision extraction remain nonstreaming. No new Provider setting, SDK, `stream_options`, retry or alternate request is added.

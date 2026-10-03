@@ -48,6 +48,8 @@ AI Assistant's modal-body remains overflow-hidden with conversation as its only 
 - Primary uses lime with dark ink, secondary neutral warm surface, tertiary text/quiet icon, danger muted coral with explicit final confirmation. Common minimum touch height is 44px. Small delete/reorder/summary controls were expanded; the 320px Calendar bleeds slightly into page margins so seven columns remain 44px wide.
 - Editable text is at least 16px; input focus uses one quiet border and no 3px shadow. Text hierarchy is page → Sheet → section → row → body → metadata/helper. Counts use tabular numerals.
 
+Search geometry is owned by primitives.css: search-specific padding must win over generic text-field padding. Absolute icons and input text share the logical start edge; icons center within the field and ignore pointer events. Ordinary inputs retain their existing padding.
+
 ## Motion budget and audit
 
 | Pattern | Result / legitimate exception |

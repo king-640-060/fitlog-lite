@@ -387,7 +387,6 @@ html[data-input-modality="keyboard"] .pelvic-specialty:focus-visible { border-co
 .confirm-dialog h2 { margin-bottom: 8px; font-size: 1.25rem; }
 .confirm-dialog p { margin-bottom: 20px; color: var(--text-secondary); font-size: .88rem; line-height: 1.5; }
 .dialog-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-.search-field > .icon { position: absolute; z-index: 1; top: 13px; left: 13px; color: var(--text-tertiary); }
 .selected-food, .preview-number { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 14px; border-radius: 14px; background: var(--surface-soft); }
 .selected-food span, .preview-number span { color: var(--text-secondary); font-size: .84rem; }
 .preview-number strong { color: var(--accent-strong); font-size: 1.18rem; }
