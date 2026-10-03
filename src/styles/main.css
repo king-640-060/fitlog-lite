@@ -937,3 +937,4 @@ body.keyboard-open .bottom-nav { display: none; }
 .workout-today-card .card-heading .text-btn { white-space: nowrap; }
 .meal-clear-confirm .dialog-actions { grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); }
 .meal-clear-confirm .dialog-actions button { white-space: nowrap; }
+.workout-today-card .today-training-token { white-space: nowrap; }

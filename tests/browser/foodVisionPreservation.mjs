@@ -28,7 +28,7 @@ try {
     assert.equal(await page.locator('#vision-album-file').getAttribute('capture'), null)
     await page.locator('dialog [data-close]').click()
   }
-  const records = await page.evaluate(async ({ fixture, phase }) => {
+  const { records, version, storeCount } = await page.evaluate(async ({ fixture, phase }) => {
     const database = await new Promise((resolve, reject) => { const q = indexedDB.open('fitlog-lite-db'); q.onsuccess = () => resolve(q.result); q.onerror = () => reject(q.error) })
     if (database.version !== 90 || database.objectStoreNames.length !== 17) throw Error('V9 identity/stores changed')
     const stores = Object.keys(fixture)
@@ -41,9 +41,10 @@ try {
     }
     const result = {}
     for (const store of stores) result[store] = await new Promise((resolve, reject) => { const q = database.transaction(store, 'readonly').objectStore(store).getAll(); q.onsuccess = () => resolve(q.result); q.onerror = () => reject(q.error) })
-    database.close(); return result
+    const version = database.version, storeCount = database.objectStoreNames.length
+    database.close(); return { records: result, version, storeCount }
   }, { fixture, phase })
   const canonical = data => JSON.stringify(Object.fromEntries(Object.entries(data).map(([store, rows]) => [store, rows.sort((a, b) => a.id.localeCompare(b.id))])))
   assert.equal(canonical(records), canonical(fixture))
-  console.log(JSON.stringify({ phase, stableDb: 'fitlog-lite-db', dexie: 8, stores: 17, legacyStoresPreserved: 14, records: Object.values(records).reduce((n, rows) => n + rows.length, 0), exactPreservation: true }))
+  console.log(JSON.stringify({ phase, stableDb: 'fitlog-lite-db', dexie: version / 10, stores: storeCount, legacyStoresPreserved: 14, records: Object.values(records).reduce((n, rows) => n + rows.length, 0), exactPreservation: true }))
 } finally { await context.close() }

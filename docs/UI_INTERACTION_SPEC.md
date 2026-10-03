@@ -231,3 +231,5 @@ Management → Application → Version diagnostics owns App/SW identity and safe
 - Expanded meals offer quiet 清空本餐记录 via the existing danger confirmation: viewed local date, actual meal name, row count, irreversibility and Food Library preservation. Both single and bulk FoodLog deletion use foodService. Bulk delete uses one date+group transaction and rechecks the preview ID set; no all-day action or new compound index. Single deletion preserves same-date expansion while records remain, without global state.
 - Calendar Food uses the existing SVG system’s single fork glyph, through calendarCategoryIcons for grid/legend/day detail. Marker geometry/stroke/opacity and accessible category/history aggregation remain shared. Other Food icons are unchanged.
 - Shared formatCardioMetrics omits speed/incline display suffixes everywhere. Forms also omit km/h/%; duration keeps 分钟. Persisted speed/inclinePercent, validation, Backup and factual calculations retain their existing meanings.
+
+- Today recording status and individual Cardio label/value metrics remain whole inline phrases when wrapping, including140% fonts; do not strand the last character of 记录中 or a metric value.
