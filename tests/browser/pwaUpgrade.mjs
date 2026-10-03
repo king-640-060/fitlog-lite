@@ -101,7 +101,7 @@ try{
    assert.ok((await page.locator('[data-diagnostic="SW controller build / state"]').innerText()).includes(expected))
    assert.equal(await page.locator('[data-diagnostic="SW scope"]').innerText(),base)
    assert.ok(!(await page.locator('.pwa-diagnostics').innerText()).includes('synthetic-pwa-key'))
-   await page.screenshot({path:`/tmp/fitlog-pwa-${mode}-diagnostics.png`});await close(page)
+   await page.waitForTimeout(250);await page.screenshot({path:`/tmp/fitlog-pwa-${mode}-diagnostics.png`});await close(page)
    assert.equal(hash(await read(page)),hash(before))
    await page.locator('[data-tab=food]').click();await page.locator('#food-library').click()
    const gap=await page.locator('#library-search').evaluate(e=>e.getBoundingClientRect().left+parseFloat(getComputedStyle(e).paddingLeft)-e.parentElement.querySelector('.icon').getBoundingClientRect().right)
@@ -110,7 +110,7 @@ try{
    await page.close();await context.setOffline(true);page=await context.newPage();await open(page)
    assert.equal(await page.locator('meta[name=fitlog-build]').getAttribute('content'),expected);assert.equal(hash(await read(page)),hash(before));assert.equal(await workerBuild(page),expected)
    await diagnostics(page);assert.equal(await page.locator('[data-diagnostic=Registration]').innerText(),'已注册');assert.ok((await page.locator('[data-diagnostic=Active]').innerText()).includes(expected));await close(page)
-   receipts.push({mode,build:expected,waiting:true,noDraftOrImageLoss:true,pendingProposalBlocked:mode==='prompt',otherClientBlocked:mode==='prompt',cancelPreserved:mode==='prompt',singleConfirmedReload:mode==='prompt',dbVersion:70,stores:14,rows:15,businessAndAiHash:hash(before),offlineColdBoot:true,physicalSafari:'Pending',physicalInstalledPwa:'Pending'})
+   receipts.push({mode,build:expected,waiting:true,selectedImagePreserved:true,aiDraftBlocked:mode==='prompt',pendingProposalBlocked:mode==='prompt',otherClientBlocked:mode==='prompt',cancelPreserved:mode==='prompt',singleConfirmedReload:mode==='prompt',dbVersion:70,stores:14,rows:15,businessAndAiHash:hash(before),offlineColdBoot:true,physicalSafari:'Pending',physicalInstalledPwa:'Pending'})
   }finally{await context.close()}
  }
  console.log(JSON.stringify(receipts,null,2))

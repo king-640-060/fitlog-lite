@@ -1,56 +1,51 @@
-# FitLog Lite Development Report
+# Latest Development Report — runtime build diagnostics and safe PWA upgrades
 
-## Latest verified production state — 2026-10-03
+## Verified application release
 
-Shared search spacing and Food Vision effective-route labels corrected after targeted reproduction.
+- START_COMMIT: `33798a7c804e99a0e0a1940092db63c421f7c999`.
+- Application commit: `0c34d815fa714693d196b923e1f275859630b265`.
+- Application Actions: [37105059905](https://github.com/king-640-060/fitlog-lite/actions/runs/37105059905), SUCCESS. Pages deployment6824569455, SUCCESS.
+- Production: https://king-640-060.github.io/fitlog-lite/.
+- The following report-maintenance commit also deploys a new runtime SHA. Resolve it with `git log -1 --format=%H -- LATEST_DEV_REPORT.md`; executing App/controller identity is available in Version diagnostics, and network deployment identity in `/fitlog-lite/build-info.json`. Final exact SHA, asset bytes and Actions/Pages receipts are in the delivered development report. Never treat the application commit above as the runtime build of a later report-only deployment.
 
-| Identity | Value |
-|---|---|
-| START_COMMIT | 12decc4bc45630d9f32a6b4e2cb5bffbd5412d24 |
-| APPLICATION_COMMIT | 41ec0bacc0cb83a218b5b59c82a97f82e18fb1c9 |
-| Application Actions / Pages | 37102340765 / 6824133180 SUCCESS |
-| END_COMMIT / final main | This report commit; exact SHA via git log -1 --format=%H -- LATEST_DEV_REPORT.md and external final report |
-| Production | https://king-640-060.github.io/fitlog-lite/ |
+## Changes and boundaries
 
-## Inspection before modification
+Management → Application → Version diagnostics now reports build-time Git SHA, local/committed build type, sanitized App URL/expected scope, controller yes/no/build/state, registration scope and active/waiting/installing states/builds. A versioned imported worker script answers only its SHA and scope client count. Old workers without the handler remain explicitly unknown. Manual network deployment identity is separate from executing App/controller identity. No credentials, profile data, URL query/fragment, provider errors or business records are exposed or persisted.
 
-- Search: Regression. Absolute19px SVG overlaps text because generic input:not([type=checkbox]):not([type=radio]) specificity overrides .search-field input padding-left42px with13px. Baseline390: text starts32px, icon ends50px, field height46px. This shared primitive affects all seven search fields, independent of Safari-specific font behavior.
-- Vision: Partially implemented. Effective request routing and current-profile storage reads were already correct; the heading wrongly treated editable profile.name as a current chat-model label.
-- Reproduction: name=智谱 · glm-4.5, model=glm-5.3-flash, visionModel=glm-5.3-flash still displayed 智谱 · glm-4.5 · 图片：glm-5.3-flash. Settings values preserve a nonempty existing name on save; this is the exact source of the obsolete4.5 label. No evidence of model-save failure, wrong active selection or probe overwriting a route was found. Physical device storage was not read.
+PWA registration uses prompt mode, native scoped registration, updateViaCache none, no install-time skipWaiting, clientsClaim and Workbox precache/cleanup. Existing registration remains visible offline. Startup registration and throttled foreground/online checks discover updates without reloading. Explicit confirmation blocks open forms/images, active training/saves, busy AI, drafts and pending/processing proposals. It drains writes, rechecks safety and other scope clients, activates waiting worker, waits for the matching controller and reloads once. No startup/controllerchange reload loop, data clearing, unregister or reinstall remedy.
 
-## Delivered change and boundaries
+Legacy clients cannot acquire diagnostics retroactively. Save edits, close every FitLog Safari tab and fully close the original PWA, then reopen online so waiting activation can occur naturally. Physical iOS termination/storage contexts remain unverified. See [PWA_RUNTIME](docs/PWA_RUNTIME.md).
 
-- Search-specific typed selector now wins generic padding and reserves42px at the logical start edge. Absolute icon owns the matching13px logical start, vertical centering and pointer-events:none in primitives.css. Default measured icon/text gap11px, unchanged46px field/14px radius/surface-soft/16px editable font; ordinary text input padding13px unchanged. No search logic, placeholder, autofocus or Sheet/keyboard/VisualViewport changes.
-- Food Vision title uses aiModelRouteLabel(current active profile): provider label, model, optional effective image model via existing getVisionModel. Settings/Assistant reuse aiProviderLabel with their existing presentation preserved. No hard-coded model IDs in production code.
-- Existing explicit-independent-image rule retained: when visionModel is configured show both routes, even if equal; absent visionModel shows the shared model once. Capability text remains separate.
-- Image request path unchanged: vision-analyze reads profiles.active → new AiClient → analyzeFoodPackageImages → client.visionChat → adapter.visionChat → getVisionModel(profile) → POST model. Chat/tools still use profile.model; one provider/root/key. Names/capability probes cannot substitute for model fields.
-- Profiles, names, active selection, credentials, capability invalidation, chat/context signatures and business logic unchanged. src/main.ts inspected but unchanged.
-- Durable source-of-truth/search rules and QA matrix updated.
+**Search CSS and aiModelRouteLabel remain unchanged this round.** The reported physical overlap/old Vision title remain unresolved pending actual device runtime evidence. Stale PWA/client/SW is plausible but unconfirmed; the previous device build and real active profile fields are unknown. Production33798a7 directly served index-DGXlZzHp.js/index-BW17gAhe.css and its SW precached both; hosted resources do not prove device adoption.
 
-## Automated Verification
+## Automated verification
 
-Typecheck PASS; npm test498tests/46files PASS; npm run build (Pages base) PASS; git diff --check PASS. Existing>500KB bundle warning remains; no dependencies changed.
+- Typecheck PASS;500 tests /47 files PASS; Pages build PASS (existing monolithic chunk-size advisory remains).
+- Local11browser gates PASS: aiDualModelRouting, uiQualityAudit, mobileLayout, interactionStabilization, aiAssistant, aiVoice, foodVision, sharedDatePicker, githubSyncSafety, uiSemanticConsistency, aiStreaming. Quality audit141states per320/375/390/430px width, including diagnostics. Screenshots inspected.
+- Real generated old33798a7 App/SW → current build: selected Vision image survives new waiting worker; ending old scope clients activates the new worker; App/controller markers match; fourteen frozen stores/fifteen records and synthetic AI configuration/key stay identical; offline new-page boot PASS.
+- Prior prompt build → application build: AI draft/proposal and other client block switching, cancel preserves old client, explicit confirmation causes one reload with no loop, identical records/config and offline boot PASS. Initial prior prompt fixture was a clearly marked dirty local build; final report-maintenance verification uses two committed builds.
 
-Expanded tests/aiUiHelpers.test.ts and existing aiDualModelRouting/uiQualityAudit browser gates. A equal5.3/B chat4.5+image5.3/C fallback5.3 labels and actual requests verified; real editor save/reopen/restart with old name, capability-label separation and Vision-only editor save retaining ordinary conversation verified. Existing stale-request/capability invalidation/session tests retained.
+## Production verification
 
-All11existing local gates320/375/390/430 PASS: aiDualModelRouting, uiQualityAudit, mobileLayout, interactionStabilization, aiAssistant, aiVoice, foodVision, sharedDatePicker, githubSyncSafety, uiSemanticConsistency, aiStreaming. uiQualityAudit140states per width/560captures, including search placeholder/typed/cleared/ordinary-field at100/120/140% fonts. Actual relevant screenshots inspected.
+- Application production index JS `index-BlVJ1KQg.js` (692378B/SHA256046b8bf456f39c52020713191046f7da41abdc7b2ec20eac05fbb61033c2d1ea) and CSS `index-CMWgEc5H.css` (105212B/SHA2562cb5de4e10e94f219ebff294d9fbd4bb52e215e005d1b478e444c04c1fa55942) exactly match local application build. Entire sw.js bytes match; it precaches these assets and the versioned worker identity script. Network build-info.json is excluded from precache. Later deployment hashes are reported independently in the delivered final receipt.
+- Production browser native SW390/430px: App/controller/network build match, correct /fitlog-lite/ scope, online/manual check and offline new-page diagnostics PASS.
+- Production11browser gates PASS; quality audit131states per390/430px width.
+- Original synthetic persistent production profile: stable DB identity/version70, fourteen stores/fifteen frozen rows, AI configuration/key and voice acknowledgement remain identical to the before-release snapshot; quick launch and offline reopening PASS; no business reseeding.
+- The first preservation attempt failed its new-bundle assertion because the previous gate checked waiting before installation completed and relied on reload polling. The gate now waits for installation, ends legacy scope clients and reopens once with explicit asset/build assertions; the original snapshot was retained and retry passed. This failure is not evidence of data loss or the physical device's root cause.
 
-The initial new raw-height assertion was too strict during Sheet animation. It now requires computed min-height46px and allows0.5px rectangle precision; product geometry was not changed. Failed attempt and successful rerun retained separately. Git HTTPS pull timed out; GitHub API confirmed remote main equals START_COMMIT. Normal application push succeeded.
+## Data versions
 
-## Production Verification
+`fitlog-lite-db`: DexieV7/IDB70/14stores. BackupV7; RestoreV1–V7; GitHub SyncV1; AIConfigV1. No schema, persistence format, business service or historical snapshot changes. Diagnostics never enter DB/Backup/Sync.
 
-Application Actions37102340765 and exact-SHA Pages6824133180 SUCCESS. All11production gates390/430 PASS; quality130states per width/260captures. Search140% and Vision A/B/C screenshots inspected separately from assertions. Production JS/CSS match the verified Pages build byte-for-byte.
+## Manual device verification and remaining work
 
-Same existing synthetic persistent profile:14stores/15frozen records, AI profile/key/active/vision configuration and Voice acknowledgement unchanged; no business reseeding, SW update and offline cold boot PASS.
+- Physical iPhone Safari: **Pending**.
+- Original installed iPhone PWA: **Pending**.
+- Physical search overlap, Food Vision title and actual active profile routing: **Pending**, not marked solved.
+- Real Provider requests: not exercised; mock requests establish protocol/state behavior only.
 
-## Data compatibility
-
-fitlog-lite-db / DexieV7 (IDB70) /14stores / BackupV7 / RestoreV1–V7 / SyncV1 / AIConfigV1 unchanged. No migration, DB/Backup/Restore/Sync implementation or FoodLog historical changes.
-
-## Remaining issues / Manual Device Verification
-
-No unresolved implementation, automated or production-browser failures. Physical iPhone Safari/original installed PWA search typography, keyboard/zoom and real Provider requests were not tested. The reported card's image segment resolves getVisionModel; if the profile remains unchanged it requests glm-5.3-flash. The device's actual chat-model value cannot be established from the old profile name. Synthetic route tests are not actual user configuration or real-provider compatibility evidence.
+User flow: open right-top Management → Application → Version diagnostics, capture App/controller/active/waiting/installing/scope; if entry is absent, save edits and end all old FitLog clients, then reopen online without clearing data/reinstalling. Handle drafts/proposals/other windows, check/confirm any waiting update; capture diagnostics before/after reopening and then retest search/Vision. Only after a new App/controller build is proven collect Safari computed search geometry and non-secret profile name/model/visionModel/effectiveVisionModel if either remains wrong.
 
 ## ChatGPT Baseline
 
-Read AGENTS→LATEST→UI/visual/AI specs. Shared search icon reserve42px now wins generic input padding; ordinary fields remain13px. Food Vision title reads active model/getVisionModel, never an auto-name model snapshot. Explicit independent image display remains even when IDs equal; fallback shared route appears once. Actual request/session/preservation contracts unchanged.498tests/46files; local/production11browser gatesPASS. Data versions unchanged. Physical Safari/PWA/provider checks remain separate.
+Read AGENTS→LATEST→UI/visual/AI specs and PWA_RUNTIME. Build identities derive from Git on every build, including documentation-only deployments; trust executing diagnostic markers independently of network/Actions. Prompt SW downloads without disrupting editing; confirmation/safety/write drain/matching-controller precede one reload. Legacy clients must close for bootstrap. No search/model-label edits this round.500tests/47files; eleven local/production browser gates and real SW upgrade/preservation/offline checks PASS. Business versions unchanged. Physical Safari and original PWA require separate version screenshots; stale cause and the two original device bugs remain Pending.
