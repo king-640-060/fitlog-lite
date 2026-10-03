@@ -30,7 +30,7 @@ try {
   }
   const records = await page.evaluate(async ({ fixture, phase }) => {
     const database = await new Promise((resolve, reject) => { const q = indexedDB.open('fitlog-lite-db'); q.onsuccess = () => resolve(q.result); q.onerror = () => reject(q.error) })
-    if (database.version !== 70 || database.objectStoreNames.length !== 14) throw Error('V7 identity/stores changed')
+    if (database.version !== 80 || database.objectStoreNames.length !== 17) throw Error('V8 identity/stores changed')
     const stores = Object.keys(fixture)
     if (phase === 'before') {
       // Explicit test fixture setup, only in the dedicated synthetic browser profile above.
@@ -45,5 +45,5 @@ try {
   }, { fixture, phase })
   const canonical = data => JSON.stringify(Object.fromEntries(Object.entries(data).map(([store, rows]) => [store, rows.sort((a, b) => a.id.localeCompare(b.id))])))
   assert.equal(canonical(records), canonical(fixture))
-  console.log(JSON.stringify({ phase, stableDb: 'fitlog-lite-db', dexie: 7, stores: 14, records: Object.values(records).reduce((n, rows) => n + rows.length, 0), exactPreservation: true }))
+  console.log(JSON.stringify({ phase, stableDb: 'fitlog-lite-db', dexie: 8, stores: 17, legacyStoresPreserved: 14, records: Object.values(records).reduce((n, rows) => n + rows.length, 0), exactPreservation: true }))
 } finally { await context.close() }

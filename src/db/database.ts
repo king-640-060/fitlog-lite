@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { CardioSession, DietTemplate, Exercise, Food, FoodLog, Habit, HabitCheckIn, NutritionTarget, PelvicFloorSession, Task, TaskTag, WeightLog, Workout, WorkoutTemplate } from './types'
+import type { CardioSession, DietTemplate, Exercise, Food, FoodLog, Habit, HabitCheckIn, NutritionTarget, NutritionStrategyTemplate, NutritionStrategyVariant, NutritionStrategyPhase, PelvicFloorSession, Task, TaskTag, WeightLog, Workout, WorkoutTemplate } from './types'
 
 export const PRODUCTION_DATABASE_NAME = 'fitlog-lite-db'
 
@@ -20,6 +20,9 @@ export class FitLogDatabase extends Dexie {
   habitCheckIns!: EntityTable<HabitCheckIn, 'id'>
   tasks!: EntityTable<Task, 'id'>
   taskTags!: EntityTable<TaskTag, 'id'>
+  nutritionStrategyTemplates!: EntityTable<NutritionStrategyTemplate, 'id'>
+  nutritionStrategyVariants!: EntityTable<NutritionStrategyVariant, 'id'>
+  nutritionStrategyPhases!: EntityTable<NutritionStrategyPhase, 'id'>
 
   constructor(name = PRODUCTION_DATABASE_NAME) {
     super(name)
@@ -75,6 +78,14 @@ export class FitLogDatabase extends Dexie {
     this.version(7).stores({
       tasks: 'id, date, completedAt, createdAt, updatedAt, *tagIds',
       taskTags: 'id, &normalizedName, name, createdAt',
+    })
+    this.version(8).stores({
+      nutritionStrategyTemplates: 'id, name, archivedAt, updatedAt',
+      nutritionStrategyVariants: 'id, templateId, [templateId+sortOrder]',
+      nutritionStrategyPhases: 'id, templateId, &startDate',
+    }).upgrade(() => {
+      // Add only three strategy stores. Legacy goals and factual snapshots stay byte-for-byte intact.
+      // Optional strategySelection has no inferred backfill; sourceTemplateId remains DietTemplate provenance.
     })
     this.on('populate', () => {
       const now = new Date().toISOString()

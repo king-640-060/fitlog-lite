@@ -12,7 +12,7 @@ Vision step rendering owns scrollTop0 immediately and on a guarded frame; viewer
 
 ## Boundaries
 
-Vanilla TypeScript and existing CSS only. Business entities/services, historical snapshots, local date semantics, canonical kcal, Food Vision parsing/writes, AI tools/permissions/proposals, Backup/Restore/Sync and the 14-store Dexie V7 identity are unchanged. Visual rules never override data preservation. Five bottom tabs and Progress Trend/Calendar/Reports remain.
+Vanilla TypeScript and existing CSS only. Business entities/services, historical snapshots, local date semantics, canonical kcal, Food Vision parsing/writes, AI tools/permissions/proposals, BackupV8/RestoreV1–V8/SyncV1 and the stable 17-store DexieV8 identity preserve all prior records. Nutrition strategy stores are additive; daily target provenance is a snapshot, never a live link. Visual rules never override data preservation. Five bottom tabs and Progress Trend/Calendar/Reports remain.
 
 ## Shared layers
 
@@ -94,3 +94,9 @@ Physical iPhone Safari/installed PWA remain manual categories, independent of Ch
 ## Runtime diagnostics
 
 Keep version and worker details inside Management → Application → Version diagnostics, using the existing Sheet and primary/secondary button primitives. Long SHAs and sanitized URLs wrap without clipping; controls retain shared touch/focus states. No homepage diagnostic decoration. Waiting activation and reload require user confirmation and transient-state preservation; see [PWA_RUNTIME.md](PWA_RUNTIME.md).
+
+## Nutrition strategy interface
+
+Day selection, manager, detail and editor use existing Sheet/button/form primitives. Daily variants are uniform quiet cards with actual/goal inputs already owned by Nutrition Target; selected cards use accent-soft plus a visible check and aria-pressed. The deterministic apply preview/primary stays in the shared Sheet footer while choices scroll. Saved daily values/names are displayed separately from current definition values; selection is based only on persisted provenance.
+
+The manager has one create entry and a content-sized empty state, current phase/actual weights, other templates and archived definitions. Detail provides phase history, copy-as-new, editing and explicit activation. Creation shows a name plus summary cards; only one variant is edited at a time in a same-Sheet subview, preserving the parent form. Reorder uses 44px arrow controls; long lists and save remain in the shared body. Variant inputs reuse existing nutrition validation/presentation with single-column layout. Activation reuses the shared date picker and previews old phase closure; it is not a scheduler. No private viewport/keyboard listeners.

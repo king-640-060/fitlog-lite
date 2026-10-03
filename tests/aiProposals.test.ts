@@ -121,7 +121,7 @@ describe('explicit local proposal confirmation', () => {
     const proposal = await env.execute('propose_set_habit_checkin', { habitId: habit.id, date: '2026-09-29', completed: true })
     env.proposals.clear(); await expect(env.proposals.confirm(proposal.proposalId)).rejects.toThrow('失效')
     const backup = await exportBackup(env.database)
-    expect(backup.schemaVersion).toBe(7); expect(Object.keys(backup.data)).toHaveLength(14)
+    expect(backup.schemaVersion).toBe(8); expect(Object.keys(backup.data)).toHaveLength(17)
     expect(JSON.stringify(backup)).not.toMatch(/known-AI-secret|known-github-secret|ai-profiles|apiKey|AI助手/)
     const envelope = await encryptSyncText(JSON.stringify(backup), 'synthetic-data-password')
     expect(envelope.formatVersion).toBe(1)

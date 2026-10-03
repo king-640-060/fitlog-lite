@@ -14,3 +14,8 @@ export async function upsertWeight(date: string, value: unknown, database: FitLo
   await database.weights.put(log)
   return log
 }
+
+/** Actual saved records only; range inclusive and ordered by local business date. */
+export async function getWeightsInRange(startDate: string, endDate: string, database: FitLogDatabase = db): Promise<WeightLog[]> {
+  return database.weights.where('date').between(startDate, endDate, true, true).sortBy('date')
+}

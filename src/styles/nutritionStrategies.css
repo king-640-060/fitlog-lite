@@ -1,0 +1,49 @@
+/* Nutrition strategies own layout only; controls and Sheets keep the shared primitives. */
+.nutrition-strategy { display: grid; gap: var(--group-gap); min-width: 0; }
+.nutrition-strategy > section, .nutrition-strategy section > .strategy-list { min-width: 0; }
+.strategy-note, .strategy-section-label { margin: 0; color: var(--text-secondary); font-size: .8rem; line-height: 1.5; overflow-wrap: anywhere; }
+.strategy-section-label { margin-bottom: 6px; }
+.strategy-title { margin: 0 0 10px; color: var(--text-primary); font-size: 1.05rem; line-height: 1.45; overflow-wrap: anywhere; }
+.strategy-list, .strategy-choices { display: grid; gap: var(--card-gap); min-width: 0; }
+.strategy-choices { margin-top: 10px; }
+.strategy-choice, .strategy-variant-card, .strategy-template-card, .strategy-saved { display: grid; gap: 7px; min-width: 0; padding: 14px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); color: var(--text-primary); text-align: left; }
+.strategy-choice { width: 100%; align-content: start; align-items: stretch; justify-content: stretch; font-weight: 400; }
+.strategy-choice[aria-pressed=true] { background: var(--accent-soft); border-color: var(--accent-mid); }
+.strategy-variant-name { display: block; min-width: 0; font-size: .95rem; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
+.strategy-energy { display: block; color: var(--text-primary); font-size: 1rem; font-weight: 700; line-height: 1.3; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.strategy-macros { display: flex; gap: 5px 12px; flex-wrap: wrap; color: var(--text-secondary); font-size: .76rem; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.strategy-macros > span { white-space: nowrap; }
+.strategy-choice-mark { color: var(--accent-strong); font-size: .76rem; font-weight: 650; line-height: 1.4; }
+.strategy-saved { background: var(--surface-soft); }
+.strategy-saved > span:first-child, .strategy-saved small { overflow-wrap: anywhere; color: var(--text-secondary); font-size: .8rem; }
+.strategy-preview, .strategy-activation-preview { margin: 0; color: var(--text-secondary); font-size: .8rem; line-height: 1.55; overflow-wrap: anywhere; }
+.strategy-template-open { display: grid; gap: 6px; width: 100%; min-width: 0; min-height: 44px; padding: 0; border: 0; border-radius: 0; color: var(--text-primary); background: transparent; text-align: left; }
+.strategy-template-open > strong { min-width: 0; font-size: 1rem; line-height: 1.45; overflow-wrap: anywhere; }
+.strategy-template-open > span { font-size: .78rem; color: var(--text-secondary); line-height: 1.4; }
+.strategy-phase { padding-top: 10px; border-top: 1px solid var(--divider); }
+.strategy-phase h3 { font-size: .8rem; }
+.strategy-phase p { margin: 5px 0 9px; color: var(--text-secondary); font-size: .76rem; line-height: 1.5; }
+.strategy-weight { display: grid; gap: 5px; color: var(--text-secondary); font-size: .8rem; line-height: 1.5; overflow-wrap: anywhere; }
+.strategy-weight strong { color: var(--text-primary); font-weight: 600; }
+.strategy-empty { display: grid; gap: 7px; padding: 16px 0 4px; }
+.strategy-empty h3 { margin: 0; }
+.strategy-empty p { margin: 0; color: var(--text-secondary); font-size: .85rem; line-height: 1.5; }
+.strategy-archive summary { display: flex; align-items: center; min-height: 44px; color: var(--text-secondary); font-size: .85rem; }
+.strategy-links { display: grid; gap: 6px; padding-top: 8px; border-top: 1px solid var(--divider); }
+.nutrition-strategy .sheet-link { min-width: 0; min-height: 44px; white-space: nowrap; }
+.nutrition-strategy .full-btn { white-space: nowrap; }
+.strategy-editor-heading { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+.strategy-editor-heading span { color: var(--text-secondary); font-size: .78rem; }
+.strategy-editor-heading + .strategy-note { margin: 4px 0 10px; }
+.strategy-variant-actions { display: grid; grid-template-columns: minmax(0,1fr) 44px 44px 44px; align-items: center; gap: 4px; margin-top: 5px; padding-top: 8px; border-top: 1px solid var(--divider); }
+.strategy-variant-actions button { min-height: 44px; min-width: 44px; white-space: nowrap; }
+.strategy-error { margin: 0; color: var(--danger); font-size: .85rem; line-height: 1.5; overflow-wrap: anywhere; }
+.strategy-food-source { margin: 6px 0 0; color: var(--text-secondary); font-size: .73rem; line-height: 1.4; overflow-wrap: anywhere; }
+
+.nutrition-strategy .nutrition-goal-fields { grid-template-columns: minmax(0, 1fr); }
+
+.nutrition-strategy-footer { display: grid; gap: 8px; }
+.nutrition-strategy-footer .full-btn { white-space: nowrap; }
+
+#strategy-activation-root { display: grid; gap: var(--field-gap); min-width: 0; }
+.nutrition-strategy [hidden] { display: none !important; }

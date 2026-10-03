@@ -197,10 +197,45 @@ export interface DietTemplate {
   lastUsedAt?: string
 }
 
+export interface NutritionStrategyTemplate {
+  id: string
+  name: string
+  archivedAt?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface NutritionStrategyVariant extends NutritionGoal {
+  id: string
+  templateId: string
+  name: string
+  sortOrder: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface NutritionStrategyPhase {
+  id: string
+  templateId: string
+  templateName: string
+  startDate: string
+  endDate?: string
+  createdAt: string
+}
+
+export interface NutritionStrategySelection {
+  templateId: string
+  variantId: string
+  phaseId: string
+  templateName: string
+  variantName: string
+}
+
 export interface NutritionTarget extends NutritionGoal {
   id: string
   date: string
-  sourceTemplateId?: string
+  sourceTemplateId?: string // Existing DietTemplate origin; distinct from nutrition strategies.
+  strategySelection?: NutritionStrategySelection
   createdAt: string
   updatedAt: string
 }
@@ -291,4 +326,13 @@ export interface BackupDataV7 extends BackupBase {
   }
 }
 
-export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6 | BackupDataV7
+export interface BackupDataV8 extends BackupBase {
+  schemaVersion: 8
+  data: BackupDataV7['data'] & {
+    nutritionStrategyTemplates: NutritionStrategyTemplate[]
+    nutritionStrategyVariants: NutritionStrategyVariant[]
+    nutritionStrategyPhases: NutritionStrategyPhase[]
+  }
+}
+
+export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6 | BackupDataV7 | BackupDataV8

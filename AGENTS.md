@@ -96,7 +96,7 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 - Food.calories and FoodLog calorie snapshots are canonical kcal. UI may accept kJ using exactly 1 kcal = 4.184 kJ; never derive calories from macros. Unit-only edits must preserve exact canonical energy.
 - FoodLog preserves a nutrition and display snapshot; later Food edits or deletion must not rewrite history.
 - Workout preserves exercise-name and set history; later Exercise edits or deletion must not rewrite history.
-- Templates are inputs for creating records, not live links to generated records.
+- Templates are inputs for creating records, not live links to generated records. Nutrition strategies contain ordered daily variants; applying one snapshots its values and provenance into the existing NutritionTarget. DietTemplate sourceTemplateId and strategySelection are separate origins. Editing, removing variants or archiving strategies never rewrites saved daily targets. Phase activation is explicit, atomic, locally dated and does not generate daily targets.
 - Template application must deep-clone nested records and generate fresh identifiers where required.
 - Historical and restore semantics must remain deterministic.
 - Every database schema change requires an explicit Dexie migration path.
@@ -169,6 +169,7 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 - `src/services/workoutService.ts`: Exercise, Workout, validation, and autosave.
 - `src/services/templateService.ts`: Workout/Diet templates and template application transactions.
 - `src/services/nutritionTargetService.ts`: daily nutrition targets.
+- `src/services/nutritionStrategyService.ts` / `src/ui/nutritionStrategies.ts`: strategy definitions, daily selection, phase boundaries and real WeightLog summaries; three additive V8 stores.
 - `src/services/pelvicFloorTimer.ts`: pure timed-session state machine.
 - `src/services/pelvicFloorService.ts`: pelvic session persistence and duration.
 - `src/services/backupService.ts`: export, validation, compatibility, and transactional restore.

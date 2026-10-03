@@ -36,6 +36,12 @@ const read=async page=>page.evaluate(async()=>{
 })
 const canonical=value=>JSON.stringify({...value,records:Object.fromEntries(Object.entries(value.records).sort(([a],[b])=>a.localeCompare(b)).map(([k,rows])=>[k,rows.sort((a,b)=>a.id.localeCompare(b.id))]))})
 const hash=value=>createHash('sha256').update(canonical(value)).digest('hex')
+const verifyMigration=(before,after)=>{
+ assert.equal(after.version,80);assert.equal(Object.keys(after.records).length,17)
+ for(const name of ['nutritionStrategyTemplates','nutritionStrategyVariants','nutritionStrategyPhases'])assert.deepEqual(after.records[name],[],'additive migration must not synthesize goals/strategies')
+ const preserved={version:before.version,records:Object.fromEntries(Object.keys(before.records).map(k=>[k,after.records[k]])),ai:after.ai}
+ assert.equal(hash(preserved),hash(before),'all original records and AI credentials preserved across V7 to V8')
+}
 const seed=async page=>page.evaluate(async fixture=>{
  const d=await new Promise(resolve=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>resolve(q.result)})
  await new Promise((resolve,reject)=>{const t=d.transaction([...d.objectStoreNames],'readwrite');for(const name of d.objectStoreNames){const s=t.objectStore(name);s.clear();for(const row of fixture[name])s.put(row)}t.oncomplete=resolve;t.onerror=()=>reject(t.error)});d.close()
@@ -69,8 +75,9 @@ try{
    if(mode==='legacy'){
     // An old client cannot acquire the new prompt retroactively: close all old scope clients.
     const observer=await context.newPage();await observer.goto(origin+'/observer.html');await page.close()
-    for(let i=0;i<50&&(await workerBuild(observer))!==expected;i++)await observer.waitForTimeout(200)
-    assert.equal(await workerBuild(observer),expected)
+    // The out-of-scope observer may not start an idle worker for MessageChannel diagnostics.
+    // Wait for native activation, then prove the executing build on a real controlled App client below.
+    await observer.waitForFunction(async()=>{const r=await navigator.serviceWorker.getRegistration('/fitlog-lite/');return r?.active?.state==='activated'&&!r.waiting&&!r.installing})
     page=await context.newPage();await open(page);await observer.close()
    }else{
     await close(page)
@@ -102,15 +109,15 @@ try{
    assert.equal(await page.locator('[data-diagnostic="SW scope"]').innerText(),base)
    assert.ok(!(await page.locator('.pwa-diagnostics').innerText()).includes('synthetic-pwa-key'))
    await page.waitForTimeout(250);await page.screenshot({path:`/tmp/fitlog-pwa-${mode}-diagnostics.png`});await close(page)
-   assert.equal(hash(await read(page)),hash(before))
+   verifyMigration(before,await read(page))
    await page.locator('[data-tab=food]').click();await page.locator('#food-library').click()
    const gap=await page.locator('#library-search').evaluate(e=>e.getBoundingClientRect().left+parseFloat(getComputedStyle(e).paddingLeft)-e.parentElement.querySelector('.icon').getBoundingClientRect().right)
    assert.ok(gap>=8);await page.locator('#food-vision-import').click();assert.ok((await page.locator('.vision-provider').innerText()).includes('智谱 · glm-5.3-flash · 图片：glm-5.3-flash'));await close(page)
    // Cold page creation offline; original origin data and SW retained.
    await page.close();await context.setOffline(true);page=await context.newPage();await open(page)
-   assert.equal(await page.locator('meta[name=fitlog-build]').getAttribute('content'),expected);assert.equal(hash(await read(page)),hash(before));assert.equal(await workerBuild(page),expected)
+   assert.equal(await page.locator('meta[name=fitlog-build]').getAttribute('content'),expected);verifyMigration(before,await read(page));assert.equal(await workerBuild(page),expected)
    await diagnostics(page);assert.equal(await page.locator('[data-diagnostic=Registration]').innerText(),'已注册');assert.ok((await page.locator('[data-diagnostic=Active]').innerText()).includes(expected));await close(page)
-   receipts.push({mode,build:expected,waiting:true,selectedImagePreserved:true,aiDraftBlocked:mode==='prompt',pendingProposalBlocked:mode==='prompt',otherClientBlocked:mode==='prompt',cancelPreserved:mode==='prompt',singleConfirmedReload:mode==='prompt',dbVersion:70,stores:14,rows:15,businessAndAiHash:hash(before),offlineColdBoot:true,physicalSafari:'Pending',physicalInstalledPwa:'Pending'})
+   receipts.push({mode,build:expected,waiting:true,selectedImagePreserved:true,aiDraftBlocked:mode==='prompt',pendingProposalBlocked:mode==='prompt',otherClientBlocked:mode==='prompt',cancelPreserved:mode==='prompt',singleConfirmedReload:mode==='prompt',dbVersion:80,stores:17,legacyStoresPreserved:14,newStrategyStoresEmpty:true,rows:15,businessAndAiHash:hash(before),offlineColdBoot:true,physicalSafari:'Pending',physicalInstalledPwa:'Pending'})
   }finally{await context.close()}
  }
  console.log(JSON.stringify(receipts,null,2))

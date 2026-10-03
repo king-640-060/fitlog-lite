@@ -1,4 +1,4 @@
-import type { BackupData, BackupDataV7 } from '../db/types'
+import type { BackupData, BackupDataV8 } from '../db/types'
 import { db, type FitLogDatabase } from '../db/database'
 import { isMealType } from '../utils/foodMeals'
 import { getCardioActivityType } from '../utils/cardio'
@@ -9,7 +9,7 @@ type UnknownRecord = Record<string, unknown>
 
 const storeLabels = {
   foods: '食物', foodLogs: '饮食记录', exercises: '动作', workouts: '训练记录', weights: '体重记录',
-  workoutTemplates: '训练模板', dietTemplates: '饮食模板', nutritionTargets: '营养目标', pelvicFloorSessions: '凯格尔训练', cardioSessions: '有氧训练', habits: '习惯', habitCheckIns: '习惯打卡', tasks: '任务', taskTags: '标签',
+  workoutTemplates: '训练模板', dietTemplates: '饮食模板', nutritionTargets: '营养目标', pelvicFloorSessions: '凯格尔训练', cardioSessions: '有氧训练', habits: '习惯', habitCheckIns: '习惯打卡', tasks: '任务', taskTags: '标签', nutritionStrategyTemplates: '营养模板', nutritionStrategyVariants: '营养日方案', nutritionStrategyPhases: '营养阶段',
 } as const
 
 function objectValue(value: unknown, location: string): UnknownRecord {
@@ -231,6 +231,11 @@ function validateNutritionTarget(record: UnknownRecord, index: number): string {
     if (record[key] !== undefined) hasValue = true
   }
   if (!hasValue) throw new Error(`${location}：至少需要一项目标`)
+  if (record.strategySelection !== undefined) {
+    if (record.sourceTemplateId !== undefined) throw new Error(`${location}：目标来源不能同时为饮食模板和营养模板`)
+    const selection = objectValue(record.strategySelection, `${location} 来源`)
+    for (const key of ['templateId', 'variantId', 'phaseId', 'templateName', 'variantName']) nonEmptyString(selection[key], `${location} 来源 ${key}`)
+  }
   validateTimestamps(record, location)
   return date
 }
@@ -329,17 +334,17 @@ function validateHabitCheckIn(record: UnknownRecord, index: number): string {
 
 export interface ValidatedBackup {
   app: 'FitLog Lite'
-  schemaVersion: 7
+  schemaVersion: 8
   exportedAt: string
-  data: BackupDataV7['data']
+  data: BackupDataV8['data']
 }
 
 export function validateBackup(value: unknown): ValidatedBackup {
   if (!value || typeof value !== 'object') throw new Error('备份文件格式不正确')
   const backup = value as Partial<BackupData>
-  if (backup.app !== 'FitLog Lite' || (backup.schemaVersion !== 1 && backup.schemaVersion !== 2 && backup.schemaVersion !== 3 && backup.schemaVersion !== 4 && backup.schemaVersion !== 5 && backup.schemaVersion !== 6 && backup.schemaVersion !== 7)) throw new Error('不是兼容的 FitLog Lite 备份')
+  if (backup.app !== 'FitLog Lite' || (backup.schemaVersion !== 1 && backup.schemaVersion !== 2 && backup.schemaVersion !== 3 && backup.schemaVersion !== 4 && backup.schemaVersion !== 5 && backup.schemaVersion !== 6 && backup.schemaVersion !== 7 && backup.schemaVersion !== 8)) throw new Error('不是兼容的 FitLog Lite 备份')
   if (!backup.data || typeof backup.data !== 'object' || Array.isArray(backup.data)) throw new Error('备份 data 必须是 object')
-  const data = backup.data as Partial<BackupDataV7['data']>
+  const data = backup.data as Partial<BackupDataV8['data']>
   timestamp(backup.exportedAt, '备份 exportedAt')
   const keys = ['foods', 'foodLogs', 'exercises', 'workouts', 'weights'] as const
   for (const key of keys) if (!Array.isArray(backup.data[key])) throw new Error(`备份缺少 ${key} 数据`)
@@ -352,6 +357,10 @@ export function validateBackup(value: unknown): ValidatedBackup {
   const habitCheckIns = backup.schemaVersion >= 6 ? data.habitCheckIns : []
   const tasks = backup.schemaVersion >= 7 ? data.tasks : []
   const taskTags = backup.schemaVersion >= 7 ? data.taskTags : []
+  const nutritionStrategyTemplates = backup.schemaVersion >= 8 ? data.nutritionStrategyTemplates : []
+  const nutritionStrategyVariants = backup.schemaVersion >= 8 ? data.nutritionStrategyVariants : []
+  const nutritionStrategyPhases = backup.schemaVersion >= 8 ? data.nutritionStrategyPhases : []
+  if (!Array.isArray(nutritionStrategyTemplates) || !Array.isArray(nutritionStrategyVariants) || !Array.isArray(nutritionStrategyPhases)) throw new Error('备份缺少营养模板、日方案或阶段数据')
   if (!Array.isArray(workoutTemplates)) throw new Error('备份缺少 workoutTemplates 数据')
   if (!Array.isArray(dietTemplates)) throw new Error('备份缺少 dietTemplates 数据')
   if (!Array.isArray(nutritionTargets)) throw new Error('备份缺少 nutritionTargets 数据')
@@ -417,20 +426,71 @@ export function validateBackup(value: unknown): ValidatedBackup {
     if (record.completedAt !== undefined) timestamp(record.completedAt, `${location} completedAt`)
     validateTimestamps(record, location)
   })
+  const checkedStrategies = validateIds(nutritionStrategyTemplates, 'nutritionStrategyTemplates')
+  checkedStrategies.forEach((record, index) => {
+    const location = `营养模板第 ${index + 1} 项`
+    if (nonEmptyString(record.name, `${location} name`).length > 80) throw new Error(`${location}：名称过长`)
+    validateTimestamps(record, location)
+    if (record.archivedAt !== undefined) timestamp(record.archivedAt, `${location} archivedAt`)
+  })
+  const strategyIds = new Set(checkedStrategies.map(r => String(r.id)))
+  const checkedVariants = validateIds(nutritionStrategyVariants, 'nutritionStrategyVariants')
+  const orders = new Set<string>()
+  checkedVariants.forEach((record, index) => {
+    const location = `营养日方案第 ${index + 1} 项`
+    if (!strategyIds.has(nonEmptyString(record.templateId, `${location} templateId`))) throw new Error(`${location}：模板不存在`)
+    if (nonEmptyString(record.name, `${location} name`).length > 80) throw new Error(`${location}：名称过长`)
+    finite(record.sortOrder, `${location} sortOrder`, 0, true)
+    const order = `${record.templateId}\0${record.sortOrder}`
+    if (orders.has(order)) throw new Error(`${location}：顺序重复`)
+    orders.add(order)
+    let hasValue = false
+    for (const key of ['calories', 'protein', 'carbs', 'fat']) { optionalFinite(record[key], `${location} ${key}`, 0); if (record[key] !== undefined) hasValue = true }
+    if (!hasValue) throw new Error(`${location}：至少需要一项目标`)
+    validateTimestamps(record, location)
+  })
+  for (const template of checkedStrategies) {
+    const count = checkedVariants.filter(v => v.templateId === template.id).length
+    if (count < 1 || count > 32) throw new Error('营养模板需要 1–32 个日方案')
+  }
+  const checkedPhases = validateIds(nutritionStrategyPhases, 'nutritionStrategyPhases')
+  checkedPhases.forEach((record, index) => {
+    const location = `营养阶段第 ${index + 1} 项`
+    if (!strategyIds.has(nonEmptyString(record.templateId, `${location} templateId`))) throw new Error(`${location}：模板不存在`)
+    if (record.endDate === undefined && checkedStrategies.find(t => t.id === record.templateId)?.archivedAt) throw new Error(`${location}：当前模板不能已归档`)
+    nonEmptyString(record.templateName, `${location} templateName`)
+    const start = dateString(record.startDate, `${location} startDate`)
+    if (record.endDate !== undefined && dateString(record.endDate, `${location} endDate`) < start) throw new Error(`${location}：结束日期早于开始日期`)
+    timestamp(record.createdAt, `${location} createdAt`)
+  })
+  const sortedPhases = [...checkedPhases].sort((a, b) => String(a.startDate).localeCompare(String(b.startDate)))
+  for (let i = 1; i < sortedPhases.length; i++) {
+    const previous = sortedPhases[i - 1]!
+    if (!previous.endDate || String(previous.endDate) >= String(sortedPhases[i]!.startDate)) throw new Error('营养阶段重叠或存在多个当前阶段')
+  }
+  for (const target of checkedNutritionTargets) {
+    if (target.strategySelection === undefined) continue
+    const selection = target.strategySelection as UnknownRecord
+    const phase = checkedPhases.find(p => p.id === selection.phaseId)
+    if (!phase || phase.templateId !== selection.templateId) throw new Error('每日目标的营养阶段来源无效')
+    const variant = checkedVariants.find(v => v.id === selection.variantId)
+    // Removed variants intentionally remain explainable through name/value snapshots.
+    if (variant && variant.templateId !== selection.templateId) throw new Error('每日目标的日方案来源无效')
+  }
   return {
-    app: 'FitLog Lite', schemaVersion: 7, exportedAt: backup.exportedAt!,
+    app: 'FitLog Lite', schemaVersion: 8, exportedAt: backup.exportedAt!,
     data: {
       foods: backup.data.foods, foodLogs: backup.data.foodLogs, exercises: backup.data.exercises,
       workouts: backup.data.workouts, weights: backup.data.weights,
       workoutTemplates, dietTemplates,
-      nutritionTargets, pelvicFloorSessions, cardioSessions, habits, habitCheckIns, tasks, taskTags,
+      nutritionTargets, pelvicFloorSessions, cardioSessions, habits, habitCheckIns, tasks, taskTags, nutritionStrategyTemplates, nutritionStrategyVariants, nutritionStrategyPhases,
     },
   } as ValidatedBackup
 }
 
-export async function exportBackup(database: FitLogDatabase = db): Promise<BackupDataV7> {
-  return {
-    app: 'FitLog Lite', schemaVersion: 7, exportedAt: new Date().toISOString(),
+export async function exportBackup(database: FitLogDatabase = db): Promise<BackupDataV8> {
+  return database.transaction('r', database.tables, async () => ({
+    app: 'FitLog Lite' as const, schemaVersion: 8 as const, exportedAt: new Date().toISOString(),
     data: {
       foods: await database.foods.toArray(), foodLogs: await database.foodLogs.toArray(), exercises: await database.exercises.toArray(),
       workouts: await database.workouts.toArray(), weights: await database.weights.toArray(),
@@ -439,14 +499,17 @@ export async function exportBackup(database: FitLogDatabase = db): Promise<Backu
       cardioSessions: (await database.cardioSessions.toArray()).map((session) => ({ ...session, activityType: getCardioActivityType(session) })),
       habits: await database.habits.toArray(), habitCheckIns: await database.habitCheckIns.toArray(),
       tasks: await database.tasks.toArray(), taskTags: await database.taskTags.toArray(),
+      nutritionStrategyTemplates: await database.nutritionStrategyTemplates.toArray(),
+      nutritionStrategyVariants: await database.nutritionStrategyVariants.toArray(),
+      nutritionStrategyPhases: await database.nutritionStrategyPhases.toArray(),
     },
-  }
+  }))
 }
 
 export async function restoreBackup(backup: BackupData | unknown, database: FitLogDatabase = db): Promise<void> {
   const validated = validateBackup(backup)
-  await database.transaction('rw', [database.foods, database.foodLogs, database.exercises, database.workouts, database.weights, database.workoutTemplates, database.dietTemplates, database.nutritionTargets, database.pelvicFloorSessions, database.cardioSessions, database.habits, database.habitCheckIns, database.tasks, database.taskTags], async () => {
-    await Promise.all([database.foods.clear(), database.foodLogs.clear(), database.exercises.clear(), database.workouts.clear(), database.weights.clear(), database.workoutTemplates.clear(), database.dietTemplates.clear(), database.nutritionTargets.clear(), database.pelvicFloorSessions.clear(), database.cardioSessions.clear(), database.habits.clear(), database.habitCheckIns.clear(), database.tasks.clear(), database.taskTags.clear()])
+  await database.transaction('rw', [database.foods, database.foodLogs, database.exercises, database.workouts, database.weights, database.workoutTemplates, database.dietTemplates, database.nutritionTargets, database.pelvicFloorSessions, database.cardioSessions, database.habits, database.habitCheckIns, database.tasks, database.taskTags, database.nutritionStrategyTemplates, database.nutritionStrategyVariants, database.nutritionStrategyPhases], async () => {
+    await Promise.all([database.foods.clear(), database.foodLogs.clear(), database.exercises.clear(), database.workouts.clear(), database.weights.clear(), database.workoutTemplates.clear(), database.dietTemplates.clear(), database.nutritionTargets.clear(), database.pelvicFloorSessions.clear(), database.cardioSessions.clear(), database.habits.clear(), database.habitCheckIns.clear(), database.tasks.clear(), database.taskTags.clear(), database.nutritionStrategyTemplates.clear(), database.nutritionStrategyVariants.clear(), database.nutritionStrategyPhases.clear()])
     await database.foods.bulkAdd(validated.data.foods)
     await database.foodLogs.bulkAdd(validated.data.foodLogs)
     await database.exercises.bulkAdd(validated.data.exercises)
@@ -461,5 +524,8 @@ export async function restoreBackup(backup: BackupData | unknown, database: FitL
     await database.habitCheckIns.bulkAdd(validated.data.habitCheckIns)
     await database.taskTags.bulkAdd(validated.data.taskTags)
     await database.tasks.bulkAdd(validated.data.tasks)
+    await database.nutritionStrategyTemplates.bulkAdd(validated.data.nutritionStrategyTemplates)
+    await database.nutritionStrategyVariants.bulkAdd(validated.data.nutritionStrategyVariants)
+    await database.nutritionStrategyPhases.bulkAdd(validated.data.nutritionStrategyPhases)
   })
 }
