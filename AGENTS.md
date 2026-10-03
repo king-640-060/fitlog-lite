@@ -130,7 +130,8 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 ## Durable interaction rules
 
 - Do not expose duplicate equivalent create actions in the same empty state; retain one visible, keyboard-accessible next action and preserve populated-state creation.
-- Repeated card families share action geometry; primary/secondary changes emphasis, not structure. Navigation defaults to compact secondary; ongoing actions may be primary within that same geometry.
+- Repeated cards on the same functional surface share action geometry; primary/secondary changes emphasis, not structure. Geometry may differ by interaction context: Today dashboard navigation stays compact (ongoing continuation may be primary), while dedicated Workout execution cards use full-width actions.
+- Unset progress indicators remain semantically neutral and muted, but sufficiently visible against the actual card background. Scope contrast adjustments to the affected surface.
 - Progress visualization and the metric it represents must remain visually coupled; reuse shared gauge and progress semantics across summary/detail surfaces.
 - Explanatory section footnotes must not look interactive: no setting icon, bold row title, chevron or card surface.
 - Touch focus must not show keyboard-style outlines; keyboard focus must remain explicit.

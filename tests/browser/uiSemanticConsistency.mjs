@@ -11,7 +11,7 @@ const receipts = []
 try { for (const [width,height] of sizes) {
  const context = await browser.newContext({viewport:{width,height},hasTouch:true,isMobile:true,serviceWorkers:'block',timezoneId:'Asia/Shanghai'})
  try {
-  const page = await context.newPage(), errors = [], states = [], scrollChecks = []
+  const page = await context.newPage(), errors = [], states = [], scrollChecks = [], ringStyles = [], workoutGeometry = []
   page.on('pageerror', e => errors.push(e.message))
   await page.goto(base,{waitUntil:'networkidle'}); await page.waitForSelector('#open-management')
   await page.addStyleTag({content:':root { --safe-area-top:47px; --safe-area-bottom:34px; }'})
@@ -70,7 +70,7 @@ try { for (const [width,height] of sizes) {
   for(const view of ['today','upcoming','inbox']){await page.locator(`[data-plan-view=${view}]`).click();await createState(false);await capture('plan-'+view+'-populated')}
   await page.locator('[data-plan-view=today]').click();await page.locator('#plan-tag-filter').click();await page.locator('[data-filter-tag="tag-old"]').click();await createState(true);await capture('plan-filtered-empty');await page.locator('#plan-tag-filter-clear').click();await createState(false)
   await put({tasks:[{...task,completedAt:'2026-10-03T00:00:00Z'}]});await nav('today');await nav('plan');await createState(false);await capture('plan-completed-only')
-  const geometry = async selector => page.locator(selector).evaluateAll(elements=>elements.map(e=>{const r=e.getBoundingClientRect(),c=e.closest('.training-card,.today-card'),b=c.getBoundingClientRect(),s=getComputedStyle(c);return {height:r.height,width:r.width,innerWidth:b.width-parseFloat(s.paddingLeft)-parseFloat(s.paddingRight)-2,rightGap:b.right-parseFloat(s.paddingRight)-1-r.right,whiteSpace:getComputedStyle(e).whiteSpace,primary:e.classList.contains('primary'),secondary:e.classList.contains('secondary')}}))
+  const geometry = async selector => page.locator(selector).evaluateAll(elements=>elements.map(e=>{const r=e.getBoundingClientRect(),c=e.closest('.training-card,.today-card'),b=c.getBoundingClientRect(),s=getComputedStyle(c),a=getComputedStyle(e);return {height:r.height,width:r.width,innerWidth:b.width-parseFloat(s.paddingLeft)-parseFloat(s.paddingRight)-parseFloat(s.borderLeftWidth)-parseFloat(s.borderRightWidth),rightGap:b.right-parseFloat(s.paddingRight)-parseFloat(s.borderRightWidth)-r.right,minHeight:a.minHeight,radius:a.borderRadius,padding:a.padding,whiteSpace:a.whiteSpace,primary:e.classList.contains('primary'),secondary:e.classList.contains('secondary')}}))
   const actionGeometry = async selector => {const result=await geometry(selector);assert.ok(result.length);for(const g of result){assert.ok(g.height>=44);assert.ok(g.width<g.innerWidth);assert.ok(Math.abs(g.rightGap)<1.5);assert.equal(g.whiteSpace,'nowrap')}return result}
   const todayWorkout = async open => {await nav('today');await actionGeometry('#today-workout');assert.equal(await page.locator('#today-workout').innerText(),open?'继续力量训练':'查看训练');assert.equal(await page.locator('#today-workout').evaluate(e=>e.classList.contains('primary')),open);assert.equal(await page.locator('#today-workout').evaluate(e=>e.classList.contains('secondary')),!open)}
   const gauge = async (actual,goal,state,status) => {
@@ -87,12 +87,24 @@ try { for (const [width,height] of sizes) {
    if(state==='above'||state==='reached')assert.equal(Number(await page.locator('.today-calorie-gauge .ring-main').getAttribute('stroke-dashoffset')),0)
    if(state==='above')assert.ok(Number(await page.locator('.today-calorie-gauge .ring-outer').getAttribute('stroke-dashoffset'))<2*Math.PI*49)
    await capture('today-'+state)
+   const ringStyle = async selector => page.locator(selector).evaluate(e=>{const s=getComputedStyle(e),root=getComputedStyle(document.documentElement);return {stroke:s.stroke,opacity:Number(s.opacity),dash:s.strokeDasharray,strokeWidth:s.strokeWidth,border:root.getPropertyValue('--border').trim(),neutral:root.getPropertyValue('--text-tertiary').trim(),accent:root.getPropertyValue('--accent-mid').trim()}})
+   const todayTrack=await ringStyle('.today-calorie-gauge .ring-track')
+   const active=await ringStyle('.today-calorie-gauge .ring-main')
+   // SVG CSS colors normalize to rgb; compare against a probe using the actual theme token.
+   const tokenColor = async token => page.evaluate(token=>{const e=document.createElement('span');e.style.color=`var(${token})`;document.body.append(e);const value=getComputedStyle(e).color;e.remove();return value},token)
+   assert.equal(active.stroke,await tokenColor('--accent-mid'))
+   if(state==='unset'){assert.ok(todayTrack.opacity>.55);assert.equal(todayTrack.stroke,await tokenColor('--text-tertiary'));assert.notEqual(todayTrack.stroke,await tokenColor('--border'));assert.equal(todayTrack.dash,'3px, 7px');assert.equal(todayTrack.strokeWidth,'8px')}
+   else {assert.equal(todayTrack.stroke,await tokenColor('--border'));assert.equal(todayTrack.opacity,1)}
    const todaySvg=await page.locator('.today-calorie-gauge svg').innerHTML()
    await nav('food');assert.equal(await page.locator('.food-nutrition-hero .calorie-gauge svg').innerHTML(),todaySvg);assert.equal(await page.locator('.food-nutrition-hero .calorie-gauge-center strong').innerText(),String(Math.round(actual)));await capture('food-'+state)
+   const foodTrack=await ringStyle('.food-nutrition-hero .calorie-gauge .ring-track')
+   if(state==='unset'){assert.equal(foodTrack.opacity,.65);assert.equal(foodTrack.stroke,await tokenColor('--text-tertiary'));assert.equal(foodTrack.dash,'3px, 7px');assert.equal(foodTrack.strokeWidth,todayTrack.strokeWidth);assert.notEqual(foodTrack.opacity,todayTrack.opacity)}
+   else assert.deepEqual(foodTrack,todayTrack)
+   ringStyles.push({state,today:todayTrack,food:foodTrack,active})
   }
   await gauge(0,undefined,'unset','尚未设置目标');await todayWorkout(false);await capture('today-no-open')
   await gauge(840,1800,'below','47%');await gauge(1800,1800,'reached','已达目标');await gauge(2100,1800,'above','高于目标 300 kcal');await gauge(0,0,'zero','目标为 0')
-  const workoutCheck = async name => {await nav('workout');const g=await actionGeometry('.training-card-action');assert.equal(g.length,3);assert.deepEqual(g.map(v=>v.height),[44,44,44]);assert.ok(g[0].primary&&g[1].secondary&&g[2].secondary);await capture(name)}
+  const workoutCheck = async name => {await nav('workout');const g=await geometry('.training-card-action');assert.equal(g.length,3);for(const a of g){assert.ok(Math.abs(a.width-a.innerWidth)<=2);assert.ok(a.height>=48);assert.equal(a.minHeight,'48px');assert.equal(a.whiteSpace,'nowrap')};for(const key of ['width','height'])assert.ok(Math.max(...g.map(a=>a[key]))-Math.min(...g.map(a=>a[key]))<=2);assert.equal(new Set(g.map(a=>a.radius)).size,1);assert.equal(new Set(g.map(a=>a.padding)).size,1);assert.ok(g[0].primary&&g[1].secondary&&g[2].secondary);const link=page.locator('.training-card-link');if(await link.count())assert.ok(await link.evaluate(e=>e.getBoundingClientRect().top>=e.previousElementSibling.getBoundingClientRect().bottom));workoutGeometry.push({name,actions:g});await capture(name)}
   await workoutCheck('workout-empty')
   const finished={...fixture.workouts[0],date},cardio={...fixture.cardioSessions[0],date},pelvic={...fixture.pelvicFloorSessions[0],date}
   await put({workouts:[finished],cardioSessions:[cardio],pelvicFloorSessions:[pelvic]});await workoutCheck('workout-one-completed');assert.equal(await page.locator('[data-cardio-id]').count(),1);assert.ok((await page.locator('#view').innerText()).includes('今日已完成 1 次'));await todayWorkout(false)
@@ -104,9 +116,10 @@ try { for (const [width,height] of sizes) {
    await todayWorkout(true);await capture(`font${scale}-today`);await workoutCheck(`font${scale}-workout`);await nav('plan');await createState(false);await capture(`font${scale}-plan-populated`)
    await put({tasks:[]});await nav('today');await nav('plan');await createState(true);await capture(`font${scale}-plan-empty`);await management(`font${scale}-management`)
    await put({tasks:[task]})
+   await put({workouts:[]});await workoutCheck(`font${scale}-workout-start`);assert.equal(await page.locator('#start-workout').innerText(),'开始力量训练');await put({workouts:[{...finished,id:'open',finishedAt:undefined}]})
   }
   assert.deepEqual(errors,[])
-  receipts.push({width,height,states,scrollChecks,fonts:[100,120,140],plan:['today','upcoming','inbox','filtered-empty','completed-only'],gauge:['unset','below','reached','above','zero'],workout:['empty','one','multiple','completed','open'],errors})
+  receipts.push({width,height,states,scrollChecks,ringStyles,workoutGeometry,fonts:[100,120,140],plan:['today','upcoming','inbox','filtered-empty','completed-only'],gauge:['unset','below','reached','above','zero'],workout:['empty','one','multiple','completed','open'],errors})
  } finally {await context.close()}
 }} finally {await browser.close()}
 await fs.writeFile(`/tmp/semantic-${baseline?'baseline':prod?'prod':'local'}-receipt.json`,JSON.stringify(receipts,null,2))

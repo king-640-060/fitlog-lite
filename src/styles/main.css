@@ -275,7 +275,7 @@ html[data-input-modality="keyboard"] .row-delete:focus-visible { color: var(--da
 .training-card-summary { display: grid; gap: 3px; min-height: 22px; margin: 0; color: var(--text-secondary); font-size: .84rem; font-variant-numeric: tabular-nums; }
 .training-card-summary strong { color: var(--text-primary); font-size: 1.58rem; line-height: 1.2; font-weight: 750; }
 .training-card-summary strong small { color: var(--text-secondary); font-size: .78rem; font-weight: 550; }
-.training-card .training-card-action { width: auto; min-height: 44px; justify-self: end; border-radius: 14px; white-space: nowrap; }
+.training-card .training-card-action { width: 100%; min-height: 48px; justify-self: stretch; border-radius: 14px; white-space: nowrap; }
 .training-card-action:active, .pelvic-specialty:active {  }
 .training-card-link { display: flex; align-items: center; gap: 4px; justify-content: space-between; min-height: 44px; width: 100%; padding: 0; border: 0; background: transparent; color: var(--text-secondary); font-size: .76rem; text-align: left; font-variant-numeric: tabular-nums; }
 .cardio-form { gap: 17px; }
@@ -688,6 +688,7 @@ html[data-input-modality="keyboard"] .calendar-day-danger .danger-button:focus-v
 .today-calorie b { margin-left: auto; color: var(--accent-strong); font-size: .88rem; }
 .today-calorie-layout { display: grid; grid-template-columns: 112px minmax(0, 1fr); min-width: 0; align-items: center; gap: 12px; }
 .today-calorie-gauge { width: 112px; margin: 0; }
+.today-calorie-gauge .goal-ring.unset .ring-track { stroke: var(--text-tertiary); opacity: .85; }
 .today-calorie-gauge .calorie-gauge-center strong { font-size: 1.3rem; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
 .today-calorie-layout .calorie-gauge-caption { min-width: 0; justify-items: start; gap: 7px; text-align: left; line-height: 1.35; overflow-wrap: anywhere; }
 .today-calorie-layout .calorie-gauge-caption strong { font-size: .9rem; }
