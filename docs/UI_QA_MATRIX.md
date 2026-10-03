@@ -101,3 +101,7 @@ Automated matrix:320/375/390/430px ×100/120/140%. Production browser matrix:390
 Actual screenshot review must cover390/100,320/140,430/100 for strategy long/selected/editor/bottom CTA, serving conversion and keyboard, quiet meal deletion/confirmation, Calendar glyphs, natural Cardio separators and Today normal/open-workout density. Physical Safari/installed PWA remain separate manual evidence.
 
 Preservation: stable fitlog-lite-db, one explicitV8→V9 upgrade,17stores/unchanged indexes, optional serving mass without inference/history rewrite. FrozenV8 fixtures remain unchanged; new frozenV9 fixtures preserve strategy/provenance and serving precision. BackupV9 / RestoreV1–V9 / encrypted envelopeV1; validation-before-write and all-store rollback remain release blockers.
+
+## Today Training action follow-up
+
+Only Today Training changes: 训练 title, header 查看训练 navigation, body secondary 记录训练 paired with status through today-activity primitives, replaced by primary 继续力量训练 for an open workout. Existing foodServing suite covers empty/Cardio/completed/combined/open plus enlarged5-exercise16-set and120-minute metrics, stale history, local-day creation navigation, zero writes on navigation/record/continuation and return-to-Today refresh. Local320/375/390/430 ×100/120/140%; production390/430; inspect390/100,320/140,430/100 screenshots for all five core states. DB/Backup/Restore/Sync and all non-Today functionality unchanged; physical Safari/original installed PWA remain Pending.
