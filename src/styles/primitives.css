@@ -30,3 +30,5 @@ textarea { resize: vertical; }
 .sheet-link { display: flex; align-items: center; gap: 7px; min-height: 50px; border: 0; padding-inline: 2px; background: transparent; color: var(--accent-strong); font-weight: 700; }
 .radio { display: flex; align-items: center; gap: 8px; min-height: 44px; }
 .compact-button { min-width: 44px; min-height: 44px; padding-inline: 14px; border-radius: 13px; }
+
+.topbar-page-actions > [hidden] { display: none !important; }

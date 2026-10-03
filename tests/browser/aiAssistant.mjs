@@ -138,7 +138,7 @@ for (const [width,height] of sizes) {
   assert.equal(requests.at(-1).body.tools.some(tool=>tool.function.name==='get_weight_trend'),false)
   assert.equal(JSON.parse(requests.at(-1).body.messages.find(message=>message.role==='tool').content).error,'permission_denied')
   await close(); await page.reload({waitUntil:'networkidle'}); await open(); assert.equal(await page.locator('.ai-message').count(),0); await close()
-  await context.setOffline(true); await nav('plan'); await page.locator('#plan-add-task').click(); await page.locator('[name=title]').fill('离线任务仍可保存'); await page.locator('#task-form button[type=submit]').click(); await page.waitForFunction(()=>!document.querySelector('#task-form')); assert.equal((await records('tasks')).length,2)
+  await context.setOffline(true); await nav('plan'); await page.locator('#plan-add-task:visible, #plan-empty-add:visible').click(); await page.locator('[name=title]').fill('离线任务仍可保存'); await page.locator('#task-form button[type=submit]').click(); await page.waitForFunction(()=>!document.querySelector('#task-form')); assert.equal((await records('tasks')).length,2)
   await context.setOffline(false)
   assert.deepEqual(errors,[]); assert.equal(consoleLines.some(line=>line.includes('synthetic-private-key')||line.includes('synthetic-github-token')),false)
   console.log(`${prod?'Production':'Local'} AI mock UI ${width}×${height}: PASS; 5 tabs, settings, snapshots, proposals, errors, Stop, profile switch, reload, offline core`)

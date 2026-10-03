@@ -38,6 +38,10 @@ AI Assistant's modal-body remains overflow-hidden with conversation as its only 
 
 ## Visual grammar
 
+- Semantic emphasis must not implicitly change repeated-card geometry. Training-card base owns auto width,44px height, right alignment and nowrap; primary/secondary own emphasis. Today navigation follows compact secondary grammar, with ongoing workout continuation primary in the same geometry.
+- Progress indicators should visually contain or directly associate with the value they encode. Today/Food reuse `calorieGaugeHtml` and `ringSvgHtml`; the actual kcal is centered in the ring, goal/status beside it. Today adds only compact size/density; no separate ring calculation or animation.
+- Section explanatory text belongs to section-footnote grammar, not interactive-row grammar. `.settings-section-note` is a muted paragraph with8px top/10px inline margin, .74rem text and1.5 line-height, outside the group but inside the section; no box, icon, heading or action affordance.
+- Empty-state create has one visible equivalent entry. Plan hides its header create via `hidden` whenever the final view renders `.plan-empty`; the header primitive honors this visibility instead of overriding it with inline-grid display.
 - Warm ivory background/white surfaces and readable green ink preserve Fresh Green identity. Neutral secondary actions and grouped rows reduce repeated green panels. Green remains for primary, selection and semantic marks; Calendar/nutrient category colors remain distinct.
 - Small/control radius: 12–14px. Cards/groups: 16–18px. Sheet: 26px. Native confirmation:24px. Circles/pills are restricted to actual date/status/category marks, rings and timer geometry.
 - Two shadow tokens: subtle selected/navigation surfaces and floating sheets/toasts/menus. Cards are flat with a quiet border; no border + shadow + colored card triple decoration.

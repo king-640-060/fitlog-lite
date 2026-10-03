@@ -52,7 +52,7 @@ for (const [width, height] of dimensions) {
   await page.waitForFunction(() => document.querySelector('.food-content-body')?.dataset.foodDate === '2027-01-01')
   assert.equal(await page.locator('.food-date-item[aria-current="date"]').getAttribute('data-food-date'),'2027-01-01')
   await page.locator('#food-return-today').click(); await page.waitForFunction(day => document.querySelector('.food-content-body')?.dataset.foodDate===day,day)
-  await nav('plan'); await page.locator('#plan-add-task').click(); await page.waitForSelector('#task-form')
+  await nav('plan'); await page.locator('#plan-add-task:visible, #plan-empty-add:visible').click(); await page.waitForSelector('#task-form')
   // Hold a real IndexedDB write lock to reproduce slow asynchronous tag creation.
   await page.evaluate(async () => {
     const database = await new Promise(resolve => { const request=indexedDB.open('fitlog-lite-db');request.onsuccess=()=>resolve(request.result) })
@@ -81,7 +81,7 @@ for (const [width, height] of dimensions) {
   await page.locator('#task-form [type=submit]').click(); await page.waitForFunction(() => !document.querySelector('dialog[open]'))
   const records = async store => page.evaluate(async store => { const d=await new Promise(r=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>r(q.result)}); const rows=await new Promise(r=>{const q=d.transaction(store).objectStore(store).getAll();q.onsuccess=()=>r(q.result)});d.close();return rows },store)
   const saved = (await records('tasks'))[0]; assert.equal(saved.date,'2027-01-02');assert.equal(saved.startTime,'09:30');assert.equal(saved.note,'未保存的备注');assert.equal(saved.tagIds.length,1)
-  await page.locator('#plan-add-task').click();await page.locator('[name=title]').fill('收件箱测试')
+  await page.locator('#plan-add-task:visible, #plan-empty-add:visible').click();await page.locator('[name=title]').fill('收件箱测试')
   await page.locator('[data-task-date=tomorrow]').click();const tomorrow=await page.locator('[name=date]').inputValue();assert.ok(tomorrow>day)
   await page.locator('[data-task-date=today]').click();assert.equal(await page.locator('[name=date]').inputValue(),day)
   await page.locator('[data-task-date=none]').click();assert.equal(await page.locator('[name=date]').inputValue(),'');assert.equal(await page.locator('#task-date-picker-open').innerText(),'选择日期')

@@ -129,6 +129,10 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 
 ## Durable interaction rules
 
+- Do not expose duplicate equivalent create actions in the same empty state; retain one visible, keyboard-accessible next action and preserve populated-state creation.
+- Repeated card families share action geometry; primary/secondary changes emphasis, not structure. Navigation defaults to compact secondary; ongoing actions may be primary within that same geometry.
+- Progress visualization and the metric it represents must remain visually coupled; reuse shared gauge and progress semantics across summary/detail surfaces.
+- Explanatory section footnotes must not look interactive: no setting icon, bold row title, chevron or card surface.
 - Touch focus must not show keyboard-style outlines; keyboard focus must remain explicit.
 - Do not use global transform-based button press feedback.
 - Do not animate ordinary rerenders as page entrances or replay nutrition counts/rings.

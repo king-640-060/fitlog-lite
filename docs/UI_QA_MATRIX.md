@@ -36,6 +36,8 @@ Every screen reviews empty/normal/long/error-loading/keyboard, four widths320/37
 
 ## Repeatable procedure
 
+The semantic follow-up adds `tests/browser/uiSemanticConsistency.mjs` to the gates. Check duplicate equivalent create actions (including filtered-empty and completed-only Plan), progress value-to-indicator association (Today/Food unset/zero/below/reached/above), settings row vs section-note semantics, and repeated card action geometry (empty/completed/open strength, one/multiple/recent cardio, empty/completed Kegel). Capture all four widths and120/140% font smoke, Management close/reopen after arbitrary background/body scrolling. Browser evidence remains separate from physical iPhone.
+
 1. Isolated synthetic records, mock credentials/provider; never real business records/Keys/Tokens. Long Chinese/English names/model/repo/errors and large numbers.
 2. Each Sheet open/top/bottom/close/reopen. Root and actual offending child overflow, header/close separation, >=44px controls/labels, >=16px editable text. Horizontal allowlist only Date Rail and chart canvas.
 3. Applicable empty/populated/search-none/validation/loading/error/disabled states; keyboard blur/dismiss, nested confirmation and exact background restore.
@@ -56,6 +58,7 @@ The new uiQualityAudit gate records128 states per local width (512 captures, inc
 
 | Gate | Actual scope |
 |---|---|
+| uiSemanticConsistency |38states per width: Plan empty/populated Today/Upcoming/Inbox, filtered-empty/completed-only, single unfocusable hidden create; Today/Food exact shared SVG/value/ARIA/unset/zero/below/reached/above; Workout three44px/right-aligned actions across empty/completed/open and one/multiple/recent cardio/Kegel states; Management paragraph membership/close/reopen scrollTop0;120/140% core fonts. Receipts /tmp/semantic-{local\|prod}-receipt.json; isolated synthetic contexts only. |
 | uiQualityAudit | Main empty/populated/bottom; task/tag/editor; libraries search-none; long Chinese/English/model/repository; 26-food picker top/bottom/reopen; numeric unit-only and untouched exact save; all seven Vision steps/viewer/parser error/manual high retry; AI permission/routing controls; nested Restore confirmation; fonts120/140; local landscape |
 | mobileLayout | Five tabs/Safe Area mock/bottom reserve; food CSV/JSON imports; three macro columns; form/editor/management widths; font120 |
 | interactionStabilization | Modality/focus trap/return; shared mocked VisualViewport keyboard and toolbar distinction; scroll/lock/restoration; rapid open/close; settings/models/errors; reduced motion; landscape |
