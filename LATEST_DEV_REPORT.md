@@ -69,3 +69,68 @@ From START `567c9f2e2e5d164f6bfacbb23877e65666dd03f4`, APPLICATION `136a27b2b132
 
 The complete 37-item answer matrix, receipt JSON, screenshots and browser logs are stored in the task artifact directory:
 `/Users/zhaozhantian/Documents/Codex/2026-09-24/files-pasted-by-the-user-king/artifacts/video-search-diet-events-2026-10-04/`.
+
+
+## Multi-provider Training Video + Optional Training Journal Release
+
+### Release receipt (START / APP / END)
+
+1. **START_BASELINE**: `e4a66b83de090f10aa43622c739d07647a34a4d7`
+2. **APPLICATION_COMMIT**: `6cdd8571f878e777448b3584589d758dc5008769`
+3. **END/report commit**: will be recorded by the report-only commit below and then re-verified on Pages.
+
+### Provider implementation
+
+4. **Provider interface**: `TrainingVideoSearchRouter` owns policy, fallback, partial-failure notices and max-five projection; provider adapters implement the existing `search_training_videos` boundary.
+5. **Supported providers**: Bilibili through official Zhipu Web-Search-Pro route, and preserved YouTube Data API v3.
+6. **Bilibili search**: bounded exercise keywords are sent to the official OpenAI-compatible Zhipu `/chat/completions` route with `web-search-pro`; only validated Bilibili results are retained.
+7. **No undocumented API**: no page scraping, Bilibili internal API, CDN guessing, Douyin or arbitrary URL is used; this avoids undocumented behavior and keeps the provider boundary replaceable.
+8. **BV validation**: only HTTPS `www.bilibili.com`/canonical `/video/BV...` paths are accepted; article, HTTP, foreign hosts, path injection and malformed IDs are rejected.
+9. **Player URL**: Bilibili player URL is locally derived as `https://player.bilibili.com/player.html?bvid=...` with documented `autoplay=0`, `poster=1`, `danmaku=0` parameters.
+10. **YouTube V1**: strict 11-character ID projection, native search flags, privacy-enhanced official IFrame API and external fallback remain.
+11. **AUTO**: Bilibili runs first; YouTube runs immediately only when domestic results are empty or domestic fails and YouTube is enabled. No geolocation, language, timezone, VPN or timeout inference.
+12. **ALL**: enabled providers run best-effort in parallel and successful results are merged up to five cards.
+13. **Single failure**: a failed source becomes a safe notice; another successful source remains visible.
+14. **Domestic success / YouTube blocked**: unit/router tests cover domestic success without a YouTube call; mocked browser provider-error coverage covers YouTube 403. Real domestic credentials were not used.
+15. **V1→V2**: V2 migration reads the old YouTube key/config, preserves the key, and introduces independent V2 consent. No key is copied into business data.
+16. **Domestic credential location**: device-local `fitlog-video-search-bilibili-key-v2`, or reuse only when the active profile has explicit `preset=zhipu` and the official normalized base URL.
+17. **Credential persistence**: neither credential enters IndexedDB, Backup, Restore, Sync, AI messages, model tool metadata, logs or rendered result metadata; known-secret guards include both.
+
+### Training Journal
+
+18. **Structure**: optional progressive disclosure in existing Strength and Cardio forms/details.
+19. **Workout.note**: reused without a new field/store; outer whitespace is trimmed and exact inner newlines/Unicode remain.
+20. **CardioSession.note**: same normalization and existing field reuse.
+21. **Database**: remains Dexie DB V10 with 18 stores.
+22. **Backup**: remains Backup V10 and includes existing note fields through current snapshots.
+23. **Restore**: existing Restore V1–V10 validation/transaction path is unchanged.
+24. **Sync**: existing Sync/envelope V1 is unchanged.
+25. **Strength entry**: quiet “添加训练日志” opens the textarea; existing notes render as a compact pre-wrapped block with edit.
+26. **Cardio entry**: same progressive entry/edit pattern in Cardio form.
+27. **Today**: no new Today card or entry; current activity card behavior is untouched.
+28. **History marker**: Strength/Cardio history and Calendar Day Detail show only a small “有日志/有训练日志” marker.
+29. **Completion**: finishing a workout never prompts for a journal.
+30. **Validation**: max 2000 characters; empty becomes `undefined`; HTML is never interpreted.
+31. **Text preservation**: unit and browser tests cover line breaks, Unicode and outer-trim behavior.
+32. **Templates**: journal is excluded from Workout Templates; copied/started workouts have an empty note.
+33. **AI read**: `get_workout_summary` and `get_cardio_summary` expose bounded journals.
+34. **Subjective semantics**: AI receives `user-authored journal` / `subjective`; it may quote context, cannot diagnose from it and has no journal-write tool.
+
+### Verification / publishing
+
+35. **Unit tests**: `npm test -- --run` PASS, **639 tests / 57 files**.
+36. **Browser suite count**: existing 16 suites PASS locally; new `trainingJournal.mjs` is an additional targeted suite.
+37. **Local result**: full existing browser gate PASS at 320/375/390/430 where applicable; video suite 29 states per width; journal progressive entry PASS.
+38. **Production result**: video suite PASS at 390/430; journal progressive entry PASS.
+39. **Screenshots**: browser receipts and card screenshots are in `/tmp/video-search-local-*` and `/tmp/video-search-prod-*`; no real user data or credentials were used.
+40. **Real domestic provider**: **Pending** — no live Zhipu key was supplied or called.
+41. **Real Bilibili playback**: **Pending** — official player is mocked in automated browser checks; no live BV was played.
+42. **Real YouTube provider**: **Pending** — no live YouTube key was supplied or called.
+43. **Physical iPhone**: **Pending** — no physical device evidence was available in this round.
+44. **Original PWA**: **Pending** physical installed-PWA verification; Pages build and browser regression passed.
+45. **Actions**: GitHub Pages workflow for application commit completed **successfully**.
+46. **Pages**: `https://king-640-060.github.io/fitlog-lite/` served the new build after deployment; browser checks passed.
+47. **Production identity**: `build-info.json` reported application build `6cdd8571f878e777448b3584589d758dc5008769` before this report-only commit; it will be rechecked after the report commit.
+
+Official implementation references: [Zhipu Web-Search-Pro](https://docs.bigmodel.cn/cn/best-practice/case/ai-search-engine) and [Bilibili external player](https://player.bilibili.com/).
+
