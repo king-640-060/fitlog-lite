@@ -12,7 +12,7 @@ export class AiToolRegistry {
   private readonly secrets: () => readonly string[]
   constructor(environment: AiToolEnvironment, secrets: () => readonly string[] = () => [], tools: AiTool[] = [...readTools, ...proposalTools, ...videoTools]) { this.environment = environment; this.secrets = secrets; this.tools = new Map(tools.map(tool => [tool.name, tool])) }
   private allowed(tool: AiTool): boolean { const permissions = this.environment.permissions(); return tool.scopes.every(scope => permissions.read[scope]) && (tool.kind === 'READ' || permissions.writeProposals) }
-  definitions(): AiToolDefinition[] { return [...this.tools.values()].filter(tool => this.allowed(tool)).map(tool => ({ type: 'function', function: { name: tool.name, description: `${tool.label}。${tool.kind === 'PROPOSAL' ? '只生成待确认建议，绝不直接写入。' : tool.name === 'search_training_videos' ? '仅向 YouTube 搜索动作关键词；结果由应用验证。' : '只读取当前已保存的事实。'}`, parameters: tool.schema as unknown as Record<string, unknown> } })) }
+  definitions(): AiToolDefinition[] { return [...this.tools.values()].filter(tool => this.allowed(tool)).map(tool => ({ type: 'function', function: { name: tool.name, description: `${tool.label}。${tool.kind === 'PROPOSAL' ? '只生成待确认建议，绝不直接写入。' : tool.name === 'search_training_videos' ? '通过 YouTube Data API 或 B站 provider 搜索动作关键词；结果由应用验证。' : '只读取当前已保存的事实。'}`, parameters: tool.schema as unknown as Record<string, unknown> } })) }
   label(name: string): string { return this.tools.get(name)?.label ?? '处理工具请求' }
   async execute(call: AiToolCall, signal?: AbortSignal, onVideos?: AiToolEnvironment['onVideos']): Promise<string> {
     const before = new Set(this.environment.proposals.all.map(proposal => proposal.id))

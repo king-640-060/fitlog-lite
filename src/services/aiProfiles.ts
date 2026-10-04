@@ -1,10 +1,14 @@
-import { VIDEO_KEY } from './videoSearchService'
+import { BILIBILI_KEY_V2, VIDEO_KEY } from './videoSearchService'
 import type { AiPermissions, AiProviderProfile, AiScope } from '../ai/types'
 import { AiError, assertNoKnownSecrets, normalizeAiBaseUrl } from '../ai/security'
 import { getVisionModel } from '../ai/modelRouting'
 
 export const AI_STORAGE_KEYS = { profiles: 'fitlog-ai-profiles-v1', active: 'fitlog-ai-active-profile-v1', keyPrefix: 'fitlog-ai-key-v1:', permissions: 'fitlog-ai-permissions-v1', privacy: 'fitlog-ai-privacy-ack-v1' } as const
 export const ZHIPU_BASE_URL = 'https://open.bigmodel.cn/api/paas/v4'
+export function isCompatibleZhipuProfile(profile: AiProviderProfile | undefined): boolean {
+  if (!profile || profile.protocol !== 'openai-chat-completions') return false
+  return profile.preset === 'zhipu' && normalizeAiBaseUrl(profile.baseUrl) === ZHIPU_BASE_URL
+}
 export const AI_SCOPES: AiScope[] = ['food', 'training', 'weight', 'plan', 'habit', 'nutritionTargets']
 export const defaultAiPermissions = (): AiPermissions => ({ read: Object.fromEntries(AI_SCOPES.map(scope => [scope, true])) as AiPermissions['read'], writeProposals: true })
 export interface AiProfileInput { name: string; baseUrl: string; model: string; visionModel?: string; preset?: 'zhipu' | 'custom' }
@@ -25,7 +29,7 @@ export class AiProfiles {
   }
   get active(): AiProviderProfile | undefined { return this.profiles.find(profile => profile.id === this.storage.getItem(AI_STORAGE_KEYS.active)) }
   key(id: string): string { return this.storage.getItem(AI_STORAGE_KEYS.keyPrefix + id) || '' }
-  get knownSecrets(): string[] { return [...this.profiles.map(profile => this.key(profile.id)), this.storage.getItem('fitlog-github-sync-token-v1') || '', this.storage.getItem(VIDEO_KEY) || ''].filter(Boolean) }
+  get knownSecrets(): string[] { return [...this.profiles.map(profile => this.key(profile.id)), this.storage.getItem('fitlog-github-sync-token-v1') || '', this.storage.getItem(VIDEO_KEY) || '', this.storage.getItem(BILIBILI_KEY_V2) || ''].filter(Boolean) }
   get privacyAcknowledged(): boolean { return this.storage.getItem(AI_STORAGE_KEYS.privacy) === '1' }
   acknowledgePrivacy(): void { this.storage.setItem(AI_STORAGE_KEYS.privacy, '1') }
   get permissions(): AiPermissions {

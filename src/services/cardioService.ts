@@ -1,6 +1,7 @@
 import { db, type FitLogDatabase } from '../db/database'
 import type { CardioActivityType, CardioSession } from '../db/types'
 import { getLocalDateString } from '../utils/date'
+import { normalizeTrainingJournal } from './workoutService'
 
 export interface CardioSessionInput {
   date: string
@@ -25,12 +26,12 @@ export function validateCardioInput(input: CardioSessionInput): CardioSessionInp
     if (input.inclinePercent !== undefined && (!Number.isFinite(input.inclinePercent) || input.inclinePercent < 0)) throw new Error('坡度必须大于等于 0')
     if (input.speed === undefined && input.inclinePercent === undefined) throw new Error('跑步机请至少填写速度或坡度')
   }
-  if (input.note !== undefined && typeof input.note !== 'string') throw new Error('备注格式不正确')
+  const note = normalizeTrainingJournal(input.note)
   return {
     date: input.date, activityType: input.activityType, durationMinutes: input.durationMinutes,
     ...(input.speed === undefined ? {} : { speed: input.speed }),
     ...(input.activityType === 'treadmill' && input.inclinePercent !== undefined ? { inclinePercent: input.inclinePercent } : {}),
-    ...(input.note?.trim() ? { note: input.note.trim() } : {}),
+    ...(note ? { note } : {}),
   }
 }
 

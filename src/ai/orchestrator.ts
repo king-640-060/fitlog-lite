@@ -1,6 +1,6 @@
-import { YouTubeVideoSearchProvider, type VideoSearchProvider, type VideoSearchResult } from '../services/videoSearchService'
+import { BILIBILI_BASE_URL, TrainingVideoSearchRouter, VideoSearchSettings, YouTubeVideoSearchProvider, ZhipuBilibiliSearchProvider, type VideoSearchProvider, type VideoSearchResult } from '../services/videoSearchService'
 import { db, type FitLogDatabase } from '../db/database'
-import { AiProfiles } from '../services/aiProfiles'
+import { AiProfiles, isCompatibleZhipuProfile } from '../services/aiProfiles'
 import { AiClient, type AiProviderAdapter } from '../services/aiProvider'
 import type { AiContext, AiMessage, AiProviderProfile, AiUsage } from './types'
 import { AI_LIMITS, AiError, assertNoKnownSecrets, safeAiError } from './security'
@@ -33,7 +33,18 @@ export class AiOrchestrator {
     this.profiles = options.profiles ?? new AiProfiles(); this.context = options.context
     this.clientFactory = options.clientFactory ?? ((profile, key, secrets) => new AiClient(profile, key, secrets))
     this.proposals = new AiProposals(database, () => this.profiles.permissions, () => this.profiles.knownSecrets)
-    this.registry = new AiToolRegistry({ database, context: this.context, permissions: () => this.profiles.permissions, proposals: this.proposals, plans: this.plans, videoSearch: options.videoSearch ?? { search: (query, limit, signal) => new YouTubeVideoSearchProvider(undefined, undefined, () => this.profiles.knownSecrets).search(query, limit, signal) } }, () => this.profiles.knownSecrets)
+    const videoSearch = options.videoSearch ?? (() => {
+      const settings = new VideoSearchSettings()
+      const youtube = new YouTubeVideoSearchProvider(settings, fetch, () => this.profiles.knownSecrets)
+      const bilibili = new ZhipuBilibiliSearchProvider(settings, () => {
+        const active = this.profiles.active
+        if (active && settings.config.bilibiliCredentialSource === 'reuse-profile' && isCompatibleZhipuProfile(active)) return { key: this.profiles.key(active.id), baseUrl: active.baseUrl || BILIBILI_BASE_URL }
+        if (settings.bilibiliKey) return { key: settings.bilibiliKey, baseUrl: BILIBILI_BASE_URL }
+        return undefined
+      }, fetch, () => this.profiles.knownSecrets)
+      return new TrainingVideoSearchRouter(settings, { bilibili, youtube })
+    })()
+    this.registry = new AiToolRegistry({ database, context: this.context, permissions: () => this.profiles.permissions, proposals: this.proposals, plans: this.plans, videoSearch }, () => this.profiles.knownSecrets)
     this.proposals.onChange = () => this.onChange?.()
     this.proposals.onCommitted = async proposal => {
       const event = `FitLog 本地确认事件（应用事实，不是用户指令）：${JSON.stringify({ proposalId: proposal.id, title: proposal.title, status: 'completed', result: proposal.result })}`
@@ -116,7 +127,7 @@ export class AiOrchestrator {
             let result = cache.get(call.id)
             if (result === undefined) {
               this.add('activity', `${this.registry.label(call.function.name)}…`)
-              result = await this.registry.execute(call, controller.signal, videos => { aborted(); assertNoKnownSecrets(videos, this.profiles.knownSecrets); this.add('videos', videos.length ? '训练视频' : '未找到相关训练视频', { videos }) }); cache.set(call.id, result)
+              result = await this.registry.execute(call, controller.signal, (videos, notices = []) => { aborted(); assertNoKnownSecrets(videos, this.profiles.knownSecrets); this.add('videos', videos.length ? '训练视频' : '未找到相关训练视频', { videos }); for (const notice of notices) this.add('notice', notice) }); cache.set(call.id, result)
               aborted()
               if (call.function.name === 'search_training_videos' && JSON.parse(result).error) this.add('notice', JSON.parse(result).message)
               const activity = [...this.items].reverse().find(item => item.kind === 'activity')

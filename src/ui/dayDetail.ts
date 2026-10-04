@@ -61,14 +61,14 @@ export function buildCalendarDayDetailRows(
   const strength = workouts.length === 0
     ? row('strength', '无氧训练', '未训练', [], true)
     : workouts.length === 1
-      ? row('strength', '无氧训练', `${setCount} 组`, [`${exerciseCount} 个动作`])
-      : row('strength', '无氧训练', `${workouts.length} 次`, [`${setCount} 组 · ${exerciseCount} 个动作`])
+      ? row('strength', '无氧训练', `${setCount} 组`, [`${exerciseCount} 个动作`, ...(workouts[0]!.note ? ['有训练日志'] : [])])
+      : row('strength', '无氧训练', `${workouts.length} 次`, [`${setCount} 组 · ${exerciseCount} 个动作`, ...(workouts.some(workout => workout.note) ? ['有训练日志'] : [])])
 
   const cardio = cardioSessions.length === 0
     ? row('cardio', '有氧训练', '未训练', [], true)
     : cardioSessions.length === 1
-      ? row('cardio', '有氧训练', `${getCardioActivityLabel(cardioSessions[0]!)} · ${formatNumber(cardioSessions[0]!.durationMinutes)} 分钟`, formatCardioMetrics(cardioSessions[0]!))
-      : row('cardio', '有氧训练', `${cardioSessions.length} 次`, [`共 ${formatNumber(cardioSessions.reduce((total, session) => total + session.durationMinutes, 0))} 分钟`])
+      ? row('cardio', '有氧训练', `${getCardioActivityLabel(cardioSessions[0]!)} · ${formatNumber(cardioSessions[0]!.durationMinutes)} 分钟`, [...formatCardioMetrics(cardioSessions[0]!), ...(cardioSessions[0]!.note ? ['有训练日志'] : [])])
+      : row('cardio', '有氧训练', `${cardioSessions.length} 次`, [`共 ${formatNumber(cardioSessions.reduce((total, session) => total + session.durationMinutes, 0))} 分钟`, ...(cardioSessions.some(session => session.note) ? ['有训练日志'] : [])])
 
   const pelvicSeconds = pelvicSessions.reduce((total, session) => total + pelvicFloorSessionDurationSeconds(session), 0)
   const pelvic = pelvicSessions.length === 0

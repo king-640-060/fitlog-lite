@@ -2,6 +2,14 @@ import { db, type FitLogDatabase } from '../db/database'
 import type { Exercise, Workout, WorkoutSet } from '../db/types'
 import { finiteNumber, optionalNumber, requiredText } from '../utils/validation'
 
+export const TRAINING_JOURNAL_MAX_LENGTH = 2000
+export function normalizeTrainingJournal(value: unknown): string | undefined {
+  if (value !== undefined && typeof value !== 'string') throw new Error('训练日志格式不正确')
+  const text = String(value ?? '').trim()
+  if (text.length > TRAINING_JOURNAL_MAX_LENGTH) throw new Error(`训练日志最多 ${TRAINING_JOURNAL_MAX_LENGTH} 个字符`)
+  return text || undefined
+}
+
 export async function saveExercise(nameValue: unknown, notesValue?: unknown, id?: string): Promise<Exercise> {
   const name = requiredText(nameValue, '动作名称')
   const notes = String(notesValue ?? '').trim() || undefined
@@ -32,7 +40,7 @@ function isBlankWorkoutSet(set: WorkoutSet): boolean {
 export function normalizeWorkoutForSave(workout: Workout): Workout {
   return {
     ...workout,
-    note: String(workout.note ?? '').trim() || undefined,
+    note: normalizeTrainingJournal(workout.note),
     exercises: workout.exercises.map((exercise) => ({
       ...exercise,
       sets: exercise.sets.flatMap((set) => {

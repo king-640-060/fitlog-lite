@@ -439,6 +439,13 @@ html[data-input-modality="keyboard"] .set-row .icon-btn:focus-visible, html[data
 .add-set { width: 100%; justify-content: center; padding: 7px 16px 11px; scroll-margin-bottom: 150px; }
 .note-field { gap: 7px; color: var(--text-secondary); font-size: .8rem; font-weight: 650; }
 .note-field textarea { min-height: 60px; border-color: transparent; background: color-mix(in srgb, var(--surface-soft) 66%, transparent); }
+.training-journal { display: grid; gap: 8px; margin: 18px 0 4px; }
+.training-journal .quiet-action { justify-self: start; padding: 6px 0; color: var(--text-secondary); }
+.journal-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--text-secondary); font-size: .8rem; }
+.journal-copy { margin: 0; padding: 11px 13px; border-radius: 12px; background: color-mix(in srgb, var(--surface-soft) 70%, transparent); color: var(--text-secondary); font-size: .88rem; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+.journal-editor[hidden] { display: none; }
+.video-source-badge { position: absolute; top: 8px; left: 8px; z-index: 1; padding: 3px 7px; border-radius: 999px; background: color-mix(in srgb, var(--surface) 88%, transparent); color: var(--text-secondary); font-size: .7rem; font-weight: 700; }
+.video-settings-form input[type="radio"] { font-size: 16px; }
 .action-stack { display: grid; gap: 9px; }
 .action-stack button { width: 100%; min-height: 50px; }
 .quiet-action { border-color: var(--border); background: var(--surface); color: var(--accent-strong); font-weight: 700; }
@@ -965,7 +972,7 @@ body.keyboard-open .bottom-nav { display: none; }
 .video-media { width: 100%; position: relative; aspect-ratio: 16/9; background: var(--surface-soft); border-radius: 10px; overflow: hidden; }
 .video-media img, .video-media iframe { width: 100%; height: 100%; object-fit: cover; border: 0; display: block; }
 .video-media iframe { position: absolute; inset: 0; }
-.video-media.thumbnail-missing::before { content: 'YouTube · 训练视频'; position: absolute; inset: 0; display: grid; place-items: center; color: var(--text-secondary); }
+.video-media.thumbnail-missing::before { content: '训练视频'; position: absolute; inset: 0; display: grid; place-items: center; color: var(--text-secondary); }
 .video-media.is-playing { min-height: 200px; min-width: 200px; }
 .video-status { margin: 8px 0; color: var(--text-secondary); font-size: .8rem; }
 .video-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; overflow-wrap: anywhere; margin-top: 10px; }

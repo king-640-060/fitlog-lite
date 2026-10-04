@@ -5,7 +5,7 @@ import type { AiProposals } from '../proposals'
 import type { AiNutritionPlans } from '../nutritionPlans'
 import { AiError } from '../security'
 
-export interface AiToolEnvironment { videoSearch?: VideoSearchProvider; signal?: AbortSignal; onVideos?: (videos: VideoSearchResult[]) => void; database: FitLogDatabase; context: () => AiContext; permissions: () => AiPermissions; proposals: AiProposals; plans: AiNutritionPlans }
+export interface AiToolEnvironment { videoSearch?: VideoSearchProvider; signal?: AbortSignal; onVideos?: (videos: VideoSearchResult[], notices?: string[]) => void; database: FitLogDatabase; context: () => AiContext; permissions: () => AiPermissions; proposals: AiProposals; plans: AiNutritionPlans }
 export interface AiSchema { type: 'object' | 'array' | 'string' | 'number' | 'integer' | 'boolean'; properties?: Record<string, AiSchema>; required?: string[]; additionalProperties?: false; items?: AiSchema; minItems?: number; maxItems?: number; minLength?: number; maxLength?: number; minimum?: number; maximum?: number; enum?: (string | number)[]; description?: string }
 export interface AiTool { name: string; label: string; kind: 'READ' | 'PROPOSAL'; scopes: AiScope[]; schema: AiSchema; execute: (args: Record<string, unknown>, env: AiToolEnvironment) => Promise<unknown> | unknown }
 export const stringSchema = (maxLength = 200, description?: string): AiSchema => ({ type: 'string', minLength: 1, maxLength, ...(description ? { description } : {}) })
