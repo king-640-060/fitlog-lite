@@ -445,7 +445,6 @@ html[data-input-modality="keyboard"] .set-row .icon-btn:focus-visible, html[data
 .journal-copy { margin: 0; padding: 11px 13px; border-radius: 12px; background: color-mix(in srgb, var(--surface-soft) 70%, transparent); color: var(--text-secondary); font-size: .88rem; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
 .journal-editor[hidden] { display: none; }
 .video-source-badge { position: absolute; top: 8px; left: 8px; z-index: 1; padding: 3px 7px; border-radius: 999px; background: color-mix(in srgb, var(--surface) 88%, transparent); color: var(--text-secondary); font-size: .7rem; font-weight: 700; }
-.video-settings-form input[type="radio"] { font-size: 16px; }
 .action-stack { display: grid; gap: 9px; }
 .action-stack button { width: 100%; min-height: 50px; }
 .quiet-action { border-color: var(--border); background: var(--surface); color: var(--accent-strong); font-weight: 700; }

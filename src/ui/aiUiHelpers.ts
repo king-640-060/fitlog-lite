@@ -8,6 +8,10 @@ import { mealNames } from '../utils/foodMeals'
 export function aiProviderLabel(profile: AiProviderProfile): string {
   return profile.preset === 'zhipu' ? '智谱' : profile.name.startsWith('自定义 · ') ? '自定义服务' : profile.name
 }
+/** The chat/tool model identity. Keep editable profile names out of routing labels. */
+export function aiChatModelLabel(profile: AiProviderProfile): string {
+  return `${aiProviderLabel(profile)} · ${profile.model}`
+}
 export function aiModelRouteLabel(profile: AiProviderProfile): string {
   return `${aiProviderLabel(profile)} · ${profile.model}${profile.visionModel ? ` · 图片：${getVisionModel(profile)}` : ''}`
 }

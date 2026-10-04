@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { aiModelRouteLabel, aiProposalPreviewLines, aiSuggestionPrompts, aiUsageText, shouldSendAiShortcut } from '../src/ui/aiUiHelpers'
+import { aiChatModelLabel, aiModelRouteLabel, aiProposalPreviewLines, aiSuggestionPrompts, aiUsageText, shouldSendAiShortcut } from '../src/ui/aiUiHelpers'
 import { buildFitLogSystemPrompt, AI_SYSTEM_PROMPT_VERSION } from '../src/ai/systemPrompt'
 describe('AI interface and prompt helpers', () => {
   it('displays App-calculated nutrition, unknown fields and replacement values without exposing transport IDs', () => {
@@ -16,6 +16,9 @@ describe('AI interface and prompt helpers', () => {
     for (const visionCapability of ['unknown', 'supported', 'unsupported'] as const) {
       expect(aiModelRouteLabel({ id: 'label', name: '智谱 · glm-4.5', preset: 'zhipu', model: model!, visionModel, visionCapability, baseUrl: 'https://synthetic.invalid/v1', protocol: 'openai-chat-completions', createdAt: '', updatedAt: '' })).toBe(expected)
     }
+  })
+  it('uses the active chat model rather than the editable profile name', () => {
+    expect(aiChatModelLabel({ id: 'label', name: '旧配置名称', preset: 'zhipu', model: 'glm-5.3-fast', visionModel: 'glm-4.5v', visionCapability: 'supported', baseUrl: 'https://open.bigmodel.cn/api/paas/v4', protocol: 'openai-chat-completions', createdAt: '', updatedAt: '' })).toBe('智谱 · glm-5.3-fast')
   })
   it('preserves Enter/newline and IME composition; only explicit Ctrl/Cmd Enter sends', () => {
     const event = { key: 'Enter', ctrlKey: false, metaKey: false, isComposing: false }
