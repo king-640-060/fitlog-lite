@@ -11,7 +11,7 @@ const receipts = []
 try { for (const [width,height] of sizes) {
  const context = await browser.newContext({viewport:{width,height},hasTouch:true,isMobile:true,serviceWorkers:'block',timezoneId:'Asia/Shanghai'})
  try {
-  const page = await context.newPage(), errors = [], states = [], scrollChecks = [], ringStyles = [], workoutGeometry = []
+  const page = await context.newPage(), errors = [], states = [], scrollChecks = [], ringStyles = [], workoutGeometry = [], planEmptyStyles = []
   page.on('pageerror', e => errors.push(e.message))
   await page.goto(base,{waitUntil:'networkidle'}); await page.waitForSelector('#open-management')
   await page.addStyleTag({content:':root { --safe-area-top:47px; --safe-area-bottom:34px; }'})
@@ -59,8 +59,17 @@ try { for (const [width,height] of sizes) {
    assert.equal(await page.locator('#plan-add-task').isVisible(),!isEmpty)
    assert.equal(await page.locator('#plan-empty-add').count(),isEmpty?1:0)
    assert.equal(await page.locator('#plan-add-task:visible, #plan-empty-add:visible').count(),1)
-   if(isEmpty){await page.locator('#plan-add-task').evaluate(e=>e.focus());assert.notEqual(await page.evaluate(()=>document.activeElement?.id),'plan-add-task')}
+   if(isEmpty){await page.locator('#plan-add-task').evaluate(e=>e.focus());assert.notEqual(await page.evaluate(()=>document.activeElement?.id),'plan-add-task')
+    const styling = await page.locator('#plan-empty-add').evaluate(e=>{
+     const reference=document.createElement('button');reference.className='primary plan-empty-action';reference.textContent=e.textContent;e.parentElement.append(reference)
+     const read=node=>{const s=getComputedStyle(node);return Object.fromEntries(['backgroundColor','color','borderColor','minHeight','borderRadius','padding','fontSize'].map(k=>[k,s[k]]))}
+     const actual=read(e),expected=read(reference);reference.remove();return {actual,expected,primary:e.classList.contains('primary'),secondary:e.classList.contains('secondary')}
+    })
+    assert.ok(styling.primary&&!styling.secondary);assert.deepEqual(styling.actual,styling.expected);assert.ok(parseFloat(styling.actual.minHeight)>=44)
+    planEmptyStyles.push(styling.actual)
+   }
   }
+  await nav('today');assert.ok(await page.locator('#today-plan-add').evaluate(e=>e.classList.contains('secondary')&&!e.classList.contains('primary')))
   await nav('plan');await createState(true);await capture('plan-empty')
   await page.locator('#plan-empty-add').click();assert.equal(await page.locator('[name=date]').inputValue(),date);await close()
   for(const view of ['upcoming','inbox']){await page.locator(`[data-plan-view=${view}]`).click();await createState(true);await page.locator('#plan-empty-add').click();assert.equal(await page.locator('[name=date]').inputValue(),'');await close();await capture('plan-'+view+'-empty')}
@@ -114,12 +123,15 @@ try { for (const [width,height] of sizes) {
   for(const scale of [120,140]){
    await page.addStyleTag({content:`html { font-size:${scale}%; }`})
    await todayWorkout(true);await capture(`font${scale}-today`);await workoutCheck(`font${scale}-workout`);await nav('plan');await createState(false);await capture(`font${scale}-plan-populated`)
-   await put({tasks:[]});await nav('today');await nav('plan');await createState(true);await capture(`font${scale}-plan-empty`);await management(`font${scale}-management`)
+   await put({tasks:[]});await nav('today');await nav('plan');await createState(true);await capture(`font${scale}-plan-empty`)
+   for(const view of ['upcoming','inbox']){await page.locator(`[data-plan-view=${view}]`).click();await createState(true);await capture(`font${scale}-plan-${view}-empty`)}
+   await page.locator('[data-plan-view=today]').click()
+   await management(`font${scale}-management`)
    await put({tasks:[task]})
    await put({workouts:[]});await workoutCheck(`font${scale}-workout-start`);assert.equal(await page.locator('#start-workout').innerText(),'开始力量训练');await put({workouts:[{...finished,id:'open',finishedAt:undefined}]})
   }
   assert.deepEqual(errors,[])
-  receipts.push({width,height,states,scrollChecks,ringStyles,workoutGeometry,fonts:[100,120,140],plan:['today','upcoming','inbox','filtered-empty','completed-only'],gauge:['unset','below','reached','above','zero'],workout:['empty','one','multiple','completed','open'],errors})
+  receipts.push({width,height,states,scrollChecks,ringStyles,workoutGeometry,planEmptyStyles,todayPlanSecondary:true,fonts:[100,120,140],plan:['today','upcoming','inbox','filtered-empty','completed-only'],gauge:['unset','below','reached','above','zero'],workout:['empty','one','multiple','completed','open'],errors})
  } finally {await context.close()}
 }
  // Exercise the shared primary interaction rules on a fine-pointer surface as well.

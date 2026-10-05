@@ -33,3 +33,18 @@ textarea { resize: vertical; }
 .compact-button { min-width: 44px; min-height: 44px; padding-inline: 14px; border-radius: 13px; }
 
 .topbar-page-actions > [hidden] { display: none !important; }
+
+/* Accessible settings switch: the label is the touch target, the input owns state. */
+.form label.setting-toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 62px; padding: 9px 13px; cursor: pointer; }
+.form label.setting-toggle-row > span { position: static; }
+.setting-toggle-row + .setting-toggle-row { border-top: 1px solid var(--divider); }
+.setting-toggle-copy { display: grid; gap: 2px; min-width: 0; }
+.setting-toggle-copy strong { color: var(--text-primary); font-size: .94rem; }
+.setting-toggle-copy small { color: var(--text-secondary); font-size: .75rem; font-weight: 400; line-height: 1.45; }
+.form label.setting-toggle-row > .setting-toggle { position: relative; inset: auto; flex: 0 0 44px; width: 44px; height: 26px; }
+.setting-toggle input { position: absolute; inset: 0; width: 44px; height: 26px; opacity: 0; cursor: pointer; }
+.setting-toggle > span { display: block; width: 44px; height: 26px; padding: 2px; border-radius: 999px; background: var(--border); pointer-events: none; }
+.setting-toggle > span::after { content: ''; display: block; width: 22px; height: 22px; border-radius: 50%; background: var(--surface); }
+.setting-toggle input:checked + span { background: var(--accent-mid); }
+.setting-toggle input:checked + span::after { transform: translateX(18px); }
+html[data-input-modality="keyboard"] .setting-toggle input:focus-visible + span { outline: 2px solid var(--accent-mid); outline-offset: 3px; }

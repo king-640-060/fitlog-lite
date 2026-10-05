@@ -15,7 +15,7 @@ try {
         localStorage.setItem('fitlog-ai-key-v1:' + profile.id, 'synthetic-ai-key'); localStorage.setItem('fitlog-ai-privacy-ack-v1', '1')
         localStorage.setItem('fitlog-video-search-config-v2', JSON.stringify({ version: 2, enabled: { bilibili: true, youtube: false }, policy: 'auto', bilibiliStatus: 'unconfigured', youtubeStatus: 'unconfigured', bilibiliCredentialSource: 'reuse-profile' }))
       })
-      const page = await context.newPage(), errors = [], states = [], calls = { bilibili: 0, youtube: 0 }, auth = []
+      const page = await context.newPage(), errors = [], states = [], calls = { bilibili: 0, youtube: 0 }, auth = [], toggleMetrics = []
       let youtubeFail = false, holdBilibili = false, releaseBilibili
       page.setDefaultTimeout(15000); page.on('pageerror', error => errors.push(error.message))
       await page.route('https://open.bigmodel.cn/**', async route => {
@@ -37,6 +37,18 @@ try {
       const save = () => page.locator('#video-save-only').click()
       const test = async () => { await page.locator('.video-settings-form [type=submit]').click(); await page.waitForFunction(() => !document.querySelector('.video-settings-form [type=submit]')?.disabled) }
       const config = () => page.evaluate(() => JSON.parse(localStorage.getItem('fitlog-video-search-config-v2')))
+      let editorScroll = 0
+      const edit = async provider => {
+        editorScroll = await page.locator('.modal-body').evaluate(e => e.scrollTop)
+        await page.locator(`[data-provider-config=${provider}]`).click()
+        assert.equal(await page.locator('dialog[open]').count(), 1)
+        assert.equal(await page.locator('[data-video-home]').isVisible(), false)
+      }
+      const saveEditor = async provider => {
+        await page.locator(`[data-provider-save=${provider}]`).click()
+        assert.equal(await page.locator('[data-video-home]').isVisible(), true)
+        assert.ok(Math.abs(await page.locator('.modal-body').evaluate(e => e.scrollTop) - editorScroll) <= 1, 'parent scroll restored')
+      }
       const audit = async name => {
         await page.waitForTimeout(100)
         const failures = await page.evaluate(() => {
@@ -65,48 +77,82 @@ try {
         await page.screenshot({ path: `/tmp/video-settings-${prod ? 'prod' : 'local'}-${width}-${scale}-${name}-bottom.png` }); states.push(name)
       }
       await open()
-      assert.equal(await page.locator('.video-settings-model').innerText(), '智谱 · glm-5.3-fast')
+      assert.equal(await page.locator('[data-provider-config=bilibili] .video-provider-model').innerText(), '智谱 · glm-5.3-fast')
       assert.ok(!(await page.locator('dialog[open]').innerText()).includes('glm-4.5'))
       assert.equal(await page.locator('[name=videoKey]').isVisible(), false)
       assert.equal(await page.locator('[name=bilibiliKey]').isVisible(), false)
-      assert.equal(await page.locator('[data-policy-section]').isVisible(), false)
+      assert.equal(await page.locator('[data-policy-picker]').isVisible(), false)
+      assert.equal(await page.locator('[data-policy-section]').isVisible(), true)
       assert.equal(await page.locator('[data-provider-status=youtube] strong').innerText(), '未启用')
       await audit('reuse-unacknowledged')
+      await page.locator('dialog[open]').evaluate(e => Promise.all(e.getAnimations().map(a => a.finished)))
+      // Real native input events, retained DOM, and an actually scrolled shared body.
+      const metrics = await page.evaluate(async () => {
+        const dialog = document.querySelector('dialog[open]'), body = dialog.querySelector('.modal-body'), form = dialog.querySelector('form'), home = form.querySelector('[data-video-home]')
+        const extra = document.createElement('div'); extra.style.height = '300px'; extra.textContent = '合成滚动检查'; body.append(extra)
+        body.scrollTop = 60
+        const top = dialog.getBoundingClientRect().top, scroll = body.scrollTop, height = home.getBoundingClientRect().height, rows = [...form.querySelectorAll('[data-provider-config]')], samples = []
+        for (let round = 0; round < 4; round++) for (const name of ['enableBilibili', 'enableYoutube']) {
+          form.querySelector(`[name=${name}]`).click()
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+          samples.push({ name, topDelta: Math.abs(dialog.getBoundingClientRect().top - top), scrollDelta: Math.abs(body.scrollTop - scroll), homeHeightDelta: Math.abs(home.getBoundingClientRect().height - height) })
+        }
+        const retained = document.querySelector('dialog[open]') === dialog && dialog.querySelector('form') === form && rows.every(row => row.isConnected)
+        extra.remove(); body.scrollTop = 0
+        return { samples, retained, initialScroll: scroll }
+      })
+      assert.ok(metrics.retained); assert.ok(metrics.initialScroll > 0)
+      for (const sample of metrics.samples) { assert.ok(sample.topDelta <= 4, JSON.stringify(sample)); assert.ok(sample.scrollDelta <= 1, JSON.stringify(sample)); assert.ok(sample.homeHeightDelta <= 1, JSON.stringify(sample)) }
+      toggleMetrics.push(...metrics.samples)
       await test(); assert.equal(calls.bilibili, 0); assert.match(await page.locator('.video-config-status').innerText(), /隐私/)
       await page.locator('[name=videoConsent]').check(); await save()
       assert.equal(await page.locator('[name=videoConsent]').count(), 0)
       assert.match(await page.locator('.video-privacy').innerText(), /已确认视频搜索隐私说明/)
       assert.equal((await config()).policy, 'bilibili'); await audit('reuse-acknowledged')
+      await edit('bilibili'); assert.equal(await page.locator('[data-provider-section=bilibili]').isVisible(), true)
+      assert.equal(await page.locator('.modal-body').evaluate(e => e.scrollTop), 0)
+      assert.equal(await page.locator('.video-settings-model').innerText(), '智谱 · glm-5.3-fast'); await audit('bilibili-editor')
       await page.locator('[data-bil-source=separate]').click()
       assert.equal(await page.locator('[name=bilibiliKey]').isVisible(), true)
       assert.equal(await page.locator('[data-reuse-panel]').isVisible(), false); await audit('standalone-expanded')
-      await page.locator('[name=bilibiliKey]').fill('synthetic-domestic-key'); await save()
+      await page.locator('[name=bilibiliKey]').fill('synthetic-domestic-key'); await saveEditor('bilibili')
       assert.equal((await config()).bilibiliCredentialSource, 'separate'); assert.equal(await page.locator('[name=bilibiliKey]').inputValue(), '')
       await test(); assert.equal(auth.at(-1), 'Bearer synthetic-domestic-key'); assert.equal(calls.youtube, 0)
-      await page.locator('[data-bil-source=reuse-profile]').click(); await save()
+      await edit('bilibili'); await page.locator('[data-bil-source=reuse-profile]').click(); await saveEditor('bilibili')
       assert.equal((await config()).bilibiliCredentialSource, 'reuse-profile')
       assert.equal(await page.evaluate(() => localStorage.getItem('fitlog-video-search-bilibili-key-v2')), 'synthetic-domestic-key')
       await test(); assert.equal(auth.at(-1), 'Bearer synthetic-ai-key'); assert.equal(calls.youtube, 0)
       assert.equal(await page.locator('[data-provider-status=bilibili] strong').innerText(), '已连接'); await audit('bilibili-connected')
-      await page.locator('[name=enableYoutube]').check(); assert.equal(await page.locator('[data-policy-section]').isVisible(), true)
-      await page.locator('[name=videoKey]').fill('synthetic-youtube-key'); await save(); assert.equal((await config()).policy, 'auto')
+      await page.locator('[name=enableYoutube]').check(); assert.equal(await page.locator('[data-policy-picker]').isVisible(), true)
+      assert.equal(await page.locator('[name=videoKey]').isVisible(), false)
+      await edit('youtube'); await audit('youtube-editor')
+      await page.locator('[name=videoKey]').fill('bad'); await page.locator('[data-provider-save=youtube]').click()
+      assert.equal(await page.locator('[data-video-home]').isVisible(), false)
+      assert.match(await page.locator('[data-provider-section=youtube] .video-editor-status').innerText(), /格式/)
+      await page.locator('[name=videoKey]').fill('synthetic-youtube-key'); await saveEditor('youtube'); assert.equal((await config()).policy, 'auto')
+      assert.equal(await page.locator('[data-provider-section=youtube] .video-editor-status').textContent(), '')
       await page.locator('[name=policy]').selectOption('all'); await save(); assert.equal((await config()).policy, 'all'); await audit('both-enabled')
       youtubeFail = true; await test()
       assert.equal(await page.locator('[data-provider-status=bilibili] strong').innerText(), '已连接')
       assert.equal(await page.locator('[data-provider-status=youtube] strong').innerText(), '测试失败')
       assert.equal(await page.locator('.video-config-status').innerText(), '部分来源可用'); await audit('partial-success')
       await page.locator('[name=enableBilibili]').uncheck(); await save(); assert.equal((await config()).policy, 'youtube')
-      assert.equal(await page.locator('[name=bilibiliKey]').isVisible(), false); assert.equal(await page.locator('[data-policy-section]').isVisible(), false)
+      assert.equal(await page.locator('[name=bilibiliKey]').isVisible(), false); assert.equal(await page.locator('[data-policy-picker]').isVisible(), false)
       youtubeFail = false; const beforeB = calls.bilibili; await test(); assert.equal(calls.bilibili, beforeB); await audit('youtube-only')
       await page.locator('[name=enableYoutube]').uncheck(); await save()
       assert.deepEqual((await config()).enabled, { bilibili: false, youtube: false }); assert.equal((await config()).policy, 'auto')
       const beforeOff = { ...calls }; await test(); assert.deepEqual(calls, beforeOff)
       assert.match(await page.locator('.video-config-status').innerText(), /未启用视频来源/); await audit('both-off')
+      await edit('youtube'); await page.keyboard.press('Escape')
+      assert.equal(await page.locator('dialog[open]').count(), 1)
+      assert.equal(await page.locator('[data-video-home]').isVisible(), true)
+      await edit('youtube'); await saveEditor('youtube')
+      assert.deepEqual((await config()).enabled, { bilibili: false, youtube: false }, 'credential editing never enables a source')
       await page.locator('[name=enableBilibili]').check(); await save()
       await page.locator('#video-settings-back').click(); await page.locator('[data-edit]').click()
       await page.locator('#ai-manual-model').click(); await page.locator('[name=model]').fill('glm-5.4'); await page.locator('.ai-advanced summary').click(); await page.locator('[name=name]').fill('我的AI')
       await page.locator('#ai-save-only').click(); await page.locator('#ai-video-search').click()
-      assert.equal(await page.locator('.video-settings-model').innerText(), '智谱 · glm-5.4'); await audit('updated-active-model')
+      assert.equal(await page.locator('[data-provider-config=bilibili] .video-provider-model').innerText(), '智谱 · glm-5.4'); await audit('updated-active-model')
       // Closing or returning during a pending test must not persist a stale failure/success.
       holdBilibili = true; releaseBilibili = undefined
       const beforeStatus = (await config()).bilibiliStatus
@@ -119,10 +165,12 @@ try {
       await page.locator('.ai-advanced summary').click(); await page.locator('#ai-save-only').click()
       await page.locator('#ai-video-search').click()
       assert.equal(await page.locator('[data-reuse-panel]').count(), 0)
+      assert.equal(await page.locator('[name=bilibiliKey]').isVisible(), false)
+      await edit('bilibili')
       assert.equal(await page.locator('[name=bilibiliKey]').isVisible(), true)
       assert.match(await page.locator('dialog[open]').innerText(), /当前 AI 配置无法直接复用/); await audit('incompatible-profile')
       assert.deepEqual(errors, [])
-      receipts.push({ width, scale, states: states.length, calls, staleNameIgnored: true, modelReopenUpdated: true, visionExcluded: true, standaloneKeyRetained: true, partialSuccessRetained: true, bothOffNoNetwork: true, abortedResultNotPersisted: true, physicalIPhone: 'Pending', realProvider: 'Not performed' })
+      receipts.push({ width, scale, states: states.length, calls, toggleMetrics, maxTopDelta: Math.max(...toggleMetrics.map(s => s.topDelta)), maxScrollDelta: Math.max(...toggleMetrics.map(s => s.scrollDelta)), retainedDialogAndForm: metrics.retained, staleNameIgnored: true, modelReopenUpdated: true, visionExcluded: true, standaloneKeyRetained: true, partialSuccessRetained: true, bothOffNoNetwork: true, abortedResultNotPersisted: true, physicalIPhone: 'Pending', realProvider: 'Not performed' })
       console.log(JSON.stringify(receipts.at(-1)))
     } finally { await context.close() }
   }
