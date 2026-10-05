@@ -58,7 +58,11 @@ export class VideoSearchSettings {
     else if (!this.bilibiliKey) throw new AiError('missing_key', '请填写国内视频搜索 Key，或选择复用兼容的智谱 AI 配置')
     this.setConfig({ bilibiliStatus: 'configured', enabled: { ...this.config.enabled, bilibili: true }, bilibiliCredentialSource: 'separate' })
   }
-  setCredentialSource(source: VideoSearchConfigV2['bilibiliCredentialSource']): void { this.setConfig({ bilibiliCredentialSource: source, enabled: { ...this.config.enabled, bilibili: true } }) }
+  setCredentialSource(source: VideoSearchConfigV2['bilibiliCredentialSource']): void {
+    const current = this.config
+    // A connection result belongs to its credential source; changing source keeps the key but needs a fresh test.
+    this.setConfig({ bilibiliCredentialSource: source, enabled: { ...current.enabled, bilibili: true }, ...(current.bilibiliCredentialSource !== source ? { bilibiliStatus: source === 'separate' && this.bilibiliKey ? 'configured' : 'unconfigured' } : {}) })
+  }
   setPolicy(policy: VideoSourcePolicy): void { this.setConfig({ policy }) }
   setEnabled(provider: VideoProviderId, enabled: boolean): void { this.setConfig({ enabled: { ...this.config.enabled, [provider]: enabled } }) }
   setStatus(status: 'success' | 'failed', provider: VideoProviderId = 'youtube'): void { this.setConfig({ [provider === 'youtube' ? 'youtubeStatus' : 'bilibiliStatus']: status }) }

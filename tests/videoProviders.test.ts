@@ -23,10 +23,17 @@ describe('training video providers', () => {
     const router = new TrainingVideoSearchRouter(settings, { bilibili, youtube }); const outcome = await router.searchDetailed('face pull', 3)
     expect(outcome.videos[0]?.provider).toBe('bilibili'); expect(bilibili.search).toHaveBeenCalledOnce(); expect(youtube.search).not.toHaveBeenCalled()
   })
+  it('keeps a separate key while invalidating connection status when its source changes', () => {
+    const storage = memory(), settings = new VideoSearchSettings(storage)
+    settings.saveBilibiliKey('synthetic-domestic-key'); settings.setStatus('success', 'bilibili'); settings.setStatus('success', 'youtube')
+    settings.setCredentialSource('reuse-profile')
+    expect(settings.config.bilibiliStatus).toBe('unconfigured'); expect(settings.bilibiliKey).toBe('synthetic-domestic-key'); expect(settings.config.youtubeStatus).toBe('success')
+    settings.setCredentialSource('separate'); expect(settings.config.bilibiliStatus).toBe('configured')
+    settings.setStatus('success', 'bilibili'); settings.setCredentialSource('separate'); expect(settings.config.bilibiliStatus).toBe('success')
+  })
   it('falls back to YouTube on domestic failure and tolerates ALL partial failure', async () => {
     const settings = new VideoSearchSettings(memory()); settings.acknowledge(); settings.setEnabled('bilibili', true); settings.setEnabled('youtube', true)
     const bilibili = { search: vi.fn().mockRejectedValue(new Error('offline')) }; const youtube = { search: vi.fn().mockResolvedValue([result('youtube', 'Abcdefghij1')]) }; const router = new TrainingVideoSearchRouter(settings, { bilibili, youtube })
     expect((await router.searchDetailed('face pull', 3)).videos).toHaveLength(1); settings.setPolicy('all'); expect((await router.searchDetailed('face pull', 3)).notices).toContain('B站搜索暂时不可用')
   })
 })
-

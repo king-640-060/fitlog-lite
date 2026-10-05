@@ -4,7 +4,7 @@
 
 `docs/UI_QA_MATRIX.md` and `tests/browser/uiQualityAudit.mjs` define the reusable release audit. Root clipping is not a substitute for child overflow checks. Main content reserves bottom navigation/Safe Area; Sheet body owns ordinary long forms and pickers. Keep Chinese action labels intact and task time metadata below the title.
 
-Text-field selectors exclude checkbox/radio. Native20–22px toggles live in >=44px labels without appearance replacement; Habit weekday overlays retain their existing44px hit areas. Editable text is >=16px, user scaling remains enabled.
+Text-field selectors exclude checkbox/radio. Native20–22px toggles live in >=44px labels without appearance replacement; Habit weekday overlays retain their existing44px hit areas. Video Search source rows use a real transparent checkbox over a44×26px visual switch within a>=62px row; the label owns the touch area, shared modality rules own keyboard focus, and source credentials are progressively disclosed. Editable text is >=16px, user scaling remains enabled.
 
 Energy presentation uses integer kcal/kJ while canonical precision stays unchanged. Generic automatic nutrition/grams/weight presentation uses at most one decimal. Restore untouched exact form sources during FormData creation; input edits and programmatic changes take precedence. Never round ongoing keystrokes.
 
@@ -69,6 +69,8 @@ Search geometry is owned by primitives.css: search-specific padding must win ove
 | Tap highlight / text selection | Actual controls suppress native highlight. Rail keeps its existing selection restriction; app text remains selectable. |
 
 ## AI presentation
+
+Training Video Search settings reuse warm grouped source rows, restrained section headings, compact privacy and shared primary/secondary actions. Only enabled sources reveal credentials; both enabled reveal automatic/all strategy. Compatible B站 reuse shows the shared chat-model identity and a quiet standalone-key entry, with a direct field for incompatible profiles. Source tests and safe errors are independent, and disabled sources show 未启用. Closing aborts testing before any stale status can persist.
 
 Current service overview contains model, three capability labels, Edit, permission summary and advanced management. Permission switches and full privacy explanation are separate views. No active service opens the compact Provider/Key/Model form. 智谱 hides its preset URL normally; custom shows it; advanced endpoint edits remain possible. List/manual model selection uses exact returned IDs and keeps a missing current value with a warning.
 

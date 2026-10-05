@@ -13,7 +13,7 @@ export function aiChatModelLabel(profile: AiProviderProfile): string {
   return `${aiProviderLabel(profile)} · ${profile.model}`
 }
 export function aiModelRouteLabel(profile: AiProviderProfile): string {
-  return `${aiProviderLabel(profile)} · ${profile.model}${profile.visionModel ? ` · 图片：${getVisionModel(profile)}` : ''}`
+  return `${aiChatModelLabel(profile)}${profile.visionModel ? ` · 图片：${getVisionModel(profile)}` : ''}`
 }
 
 export const aiSuggestionPrompts = ['今天吃得怎么样？', '帮我记录晚餐', '这周训练怎么样？', '帮我看看最近体重', '帮我安排明天', '帮我补齐今天营养']
