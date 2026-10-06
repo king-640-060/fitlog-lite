@@ -120,3 +120,5 @@ Video cards are application DOM, not model HTML.16:9 stable thumbnails,3-line ti
 ## Push-to-talk and manual Habit danger actions
 
 Voice uses the existing composer mic geometry and shared selected/focus rules. Compact recording/timer and transcribing status sit next to composer; no large disclosure panel or private viewport logic. TTS has one quiet >=44px stop action. Static Voice privacy belongs in settings, without an app-specific startup acknowledgement. Habit editor keeps shared quiet danger below state controls; irreversible count confirmation uses the shared danger dialog. No new palette or primary geometry.
+
+App-owned video source badges remain in normal card flow beneath the media, inside the card and outside official player controls. Scope this rule to video cards so legacy library preview positioning cannot move badges onto the Sheet header.
