@@ -4,7 +4,7 @@
 
 `docs/UI_QA_MATRIX.md` and `tests/browser/uiQualityAudit.mjs` define the reusable release audit. Root clipping is not a substitute for child overflow checks. Main content reserves bottom navigation/Safe Area; Sheet body owns ordinary long forms and pickers. Keep Chinese action labels intact and task time metadata below the title.
 
-Text-field selectors exclude checkbox/radio. Native20–22px toggles live in >=44px labels without appearance replacement; Habit weekday overlays retain their existing44px hit areas. Video Search source rows use a real transparent checkbox over a44×26px visual switch within a>=62px row; the label owns the touch area, shared modality rules own keyboard focus, and source credentials live in explicitly entered same-Sheet editors. Editable text is >=16px, user scaling remains enabled.
+Text-field selectors exclude checkbox/radio. Native20–22px toggles live in >=44px labels without appearance replacement; Habit weekday overlays retain their existing44px hit areas. Editable text is >=16px, user scaling remains enabled.
 
 Energy presentation uses integer kcal/kJ while canonical precision stays unchanged. Generic automatic nutrition/grams/weight presentation uses at most one decimal. Restore untouched exact form sources during FormData creation; input edits and programmatic changes take precedence. Never round ongoing keystrokes.
 
@@ -70,7 +70,6 @@ Search geometry is owned by primitives.css: search-specific padding must win ove
 
 ## AI presentation
 
-Training Video Search settings reuse warm grouped source rows, restrained section headings, compact privacy and shared primary/secondary actions. Home retains both compact source configuration rows and every section regardless of enabled state. Toggles update only input state, status, details visibility and policy copy; no dialog/form replacement, large disclosure, height animation or outer transform. The stable policy slot switches between static copy and automatic/all selection. Credentials appear only after explicit row navigation; Back/Escape restore parent scroll and drafts. Compatible B站 reuse shows the shared chat-model identity and a quiet standalone-key entry, with a direct field for incompatible profiles. Source tests and safe errors are independent, and disabled sources show 未启用. Closing aborts testing before any stale status can persist.
 
 Current service overview contains model, three capability labels, Edit, permission summary and advanced management. Permission switches and full privacy explanation are separate views. No active service opens the compact Provider/Key/Model form. 智谱 hides its preset URL normally; custom shows it; advanced endpoint edits remain possible. List/manual model selection uses exact returned IDs and keeps a missing current value with a warning.
 
@@ -111,14 +110,28 @@ Food serving mode reuses existing secondary buttons and primary save, quiet acce
 Calendar category Food uses one fork path; the same category primitive owns grid/legend/day-detail size and alignment. Today Training is titled 训练 and uses existing card-heading/text-btn/chevron navigation. Ordinary body status pairs with secondary 记录训练 using today-activity-body/action, with no isolated footer row. This opens today’s existing Strength/Cardio creation region without a write or a chooser. An open strength workout replaces that CTA with compact primary 继续力量训练 beside its own status, resuming the same workout. Empty/completed/Cardio states retain the ordinary CTA. Cardio metrics share one unitless presentation helper, preserving minutes and actual stored values.
 
 
-## Contextual notes / app-owned video results
+## Contextual notes
 
 Special-diet notes use quiet Fresh Green existing text/secondary controls and grouped editable rows; no warning/discipline design. Keep ordinary meal records as Food's main content. Meal/day estimates are contextual and never modify intake or target presentation. Reuse the shared Sheet for edit/photo subview, no private keyboard/viewport coordinator. Calendar category icon/legend/details share existing glyph geometry, with special diet prioritized inside max4 visible markers.
 
-Video cards are application DOM, not model HTML.16:9 stable thumbnails,3-line title, secondary channel,44px actions; long copy wraps without orphan actions. Active official playback needs minimum200×200, source Referer and unobstructed controls. Show loading/failure outside the iframe. One active player per Sheet, removed on switch/close/Clear; all artifacts memory-only. See VIDEO_SEARCH and AI_ARCHITECTURE for transport/data boundaries.
 
 ## Push-to-talk and manual Habit danger actions
 
 Voice uses the existing composer mic geometry and shared selected/focus rules. Compact recording/timer and transcribing status sit next to composer; no large disclosure panel or private viewport logic. TTS has one quiet >=44px stop action. Static Voice privacy belongs in settings, without an app-specific startup acknowledgement. Habit editor keeps shared quiet danger below state controls; irreversible count confirmation uses the shared danger dialog. No new palette or primary geometry.
 
-App-owned video source badges remain in normal card flow beneath the media, inside the card and outside official player controls. Scope this rule to video cards so legacy library preview positioning cannot move badges onto the Sheet header.
+
+## Shared motion system (2026-10-06)
+
+Tokens: instant80ms, fast120ms, normal160ms, Sheet200ms; Toast entrance180ms and real recording indicator1300ms are the two semantic exceptions. Standard easing cubic-bezier(.2,0,0,1); emphasized cubic-bezier(.2,.8,.2,1). No animation dependencies.
+
+Primary press uses accent-pressed, secondary/icon press uses neutral surface, danger retains coral; disabled has no press transition. Hover remains fine-pointer-only. Selected choices share accent-soft/background, accent-strong/text and optional quiet accent border. Native checkbox/radio semantics and visible keyboard focus stay authoritative. Only internal checks/underlines transform; no global scale/bounce or card motion.
+
+Bottom Nav retains its nodes: active surface and text transition160ms. Main content enters .96→1/+4px only on genuine navigation,120ms. Initial render and domain refresh do not replay. Plan/Progress retain tab nodes, with reversible underline opacity and scaleX(.75→1),120ms; text stays fixed. Calendar transitions only selected surfaces, keeping Today's independent marker; no whole-grid entrance.
+
+Sheet entrance remains .85→1/+16px,200ms. Explicit same-Sheet navigation freezes its current frame and animates only inner content ±4px/160ms; returning restores parent scroll. Existing viewport/keyboard controller remains authoritative. Training Journal uses its existing add/edit control as an accessible expand/collapse control, preserving the mounted draft and existing autosave; only newly revealed editor content enters. Opt-in details disclosures use native layout followed by a short content entrance, without height:auto animation or global details interception.
+
+New user/assistant text enters .88→1/+3px once; subsequent stream tokens and reopened history never replay. Proposal and TTS status use restrained color feedback. Only true recording uses a small opacity dot (.55↔1/1300ms), stopped with capture. Toast enters +5px/180ms and exits opacity/120ms. Numbers and rings always show final values on initial render; no countup, ring reset or generic refresh animation.
+
+Reduced motion suppresses CSS decoration and explicit Web Animations, including cancellation if the preference changes. State remains readable without animation. No scroll-handler decoration or infinite RAF.
+
+Research: public [Douyin](https://www.douyin.com/jingxuan/sy) and [Bilibili](https://www.bilibili.com/) were attempted; automated access did not provide reliable mobile interaction evidence. Public [GUI Challenges](https://github.com/argyleink/gui-challenges), [switch](https://web.dev/articles/building/a-switch-component), [tabs](https://web.dev/articles/building/a-tabs-component) and [toast](https://web.dev/articles/building/a-toast-component) references informed native state ownership, small local feedback, short transitions and reduced-motion opt-outs. No brand palette, copied code, custom drag, spring, glow, 3D, confetti or countup was adopted.

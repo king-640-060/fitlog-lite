@@ -2,7 +2,7 @@
 
 ## Shipped app capabilities
 
-Primary Voice now uses app-owned getUserMedia/MediaRecorder, immediate track release, one official dedicated STT and final-text submission through the existing engine. Explicit training-video text can use the conservative no-chat READ fast path; other text retains incremental chatStream. Voice-originated final replies use system TTS with quiet Stop. No app voice acknowledgement blocker, background listening, auto restart, audio persistence or direct business writes. See AI_ARCHITECTURE.md for current endpoint/limits/key reuse and compatibility fallback.
+Primary Voice now uses app-owned getUserMedia/MediaRecorder, immediate track release, one official dedicated STT and final-text submission through the existing engine. All final text uses the ordinary incremental chatStream path; no external search capability exists. Voice-originated final replies use system TTS with quiet Stop. No app voice acknowledgement blocker, background listening, auto restart, audio persistence or direct business writes. See AI_ARCHITECTURE.md for current endpoint/limits/key reuse and compatibility fallback.
 
 The app-side quick-launch contract is implemented. **An independent iPhone Home Screen “FitLog AI” launcher and one-tap-to-listen are Pending**, with no verified same-storage path in this environment. No physical iPhone was accessible. App-side tests do not establish launcher safety.
 

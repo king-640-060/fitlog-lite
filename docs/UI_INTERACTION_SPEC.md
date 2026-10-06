@@ -234,7 +234,7 @@ Management → Application → Version diagnostics owns App/SW identity and safe
 - Today recording status and individual Cardio label/value metrics remain whole inline phrases when wrapping, including140% fonts; do not strand the last character of 记录中 or a metric value.
 
 
-## Contextual special diet and training videos
+## Contextual special diet
 
 Food places a quiet 特殊饮食 section after its goal/strategy summary and before meals. Empty entry 标记放纵餐; saved rows show meal/day label, optional approximate kcal, note and Edit. 整天 is 放纵日. Rough values are explicitly “仅作备注，不计入营养总计”; neither actual FoodLog snapshots nor daily targets change. Multiple meals and a day note remain independent; with a saved day note hide the add entry, while retaining/editing existing meals. No auto-merge. Deletion names date/scope and affects only the selected event; the existing clear-day confirmation now explicitly includes special-diet notes.
 
@@ -242,7 +242,6 @@ One shared Sheet edits scope/note/optional decimal kcal. Photo estimation is a s
 
 Calendar adds an independent restrained flame marker/放纵餐 legend; its accessible date label distinguishes 放纵餐 and 放纵日. Keep max4 icons and accurate overflow; special diet is always visible even with all six categories. Day detail includes editable contextual rows with notes/range, separate from actual food/target rows.
 
-AI Settings offers device-only 训练视频搜索 configuration, status and explicit test. The settings sheet uses a short intro, accessible source checkboxes styled as switches, permanent compact provider summaries, explicit same-Sheet credential editors and a compact privacy disclosure. B站 and YouTube main source rows describe their network expectations; toggles never reveal credential forms or recreate the Sheet. Both provider summary rows and all home sections remain mounted, with disabled detail slots retained but visually/accessibly hidden. Policy controls share one stable slot: both sources expose only automatic/all strategy choices, while one source shows static current-source copy and normalizes internally to its provider; both off shows explicit disabled copy and saves without a network test. Enter a credential editor only through its summary row; preserve parent DOM/drafts/scroll, reset editor scroll, and return on Back/Escape. Credential save does not implicitly enable a source. A compatible B站 profile displays `provider · activeProfile.model` for the current chat/tool route; editable profile names and vision IDs are not model identity. Standalone B站 credentials remain saved when switching back to profile reuse. Independent provider tests retain a successful source when another fails and show provider-specific status. AI conversation renders at most5 app-owned result cards,16:9 thumbnails, bounded readable titles/channel and44px Play/external actions. Clicking Play alone creates one privacy-enhanced official embed, inline/fullscreen with no autoplay. Switching/close/Clear destroys it; reopening only retains memory results. Provider controls are unobstructed; loading/error text is outside, with a safe external fallback. Current official minimum200×200 overrides a16:9 player height on narrow screens. Images/results never enter business backup.
 
 Food special-diet notes use a three-line preview to keep ordinary meal records prominent. Calendar Day Detail and the editor retain the full note; display truncation never changes persisted text.
 
@@ -250,4 +249,19 @@ Food special-diet notes use a three-line preview to keep ordinary meal records p
 
 Editor retains stop/reactivate plus quiet danger 删除习惯 below the normal save path. Stop preserves history. For records show “如果只是暂时不再执行，建议停用以保留历史。” Confirmation names actual X records, permanence and “删除习惯及 X 条记录”; cancel changes nothing. No history uses 删除习惯？ / 删除后无法恢复。. Confirm atomically deletes Habit + owned CheckIns, rejecting stale count; manager/Today refresh and all future report/history reads omit deleted records. No AI delete tool.
 
-B站 settings editor offers 测试 B站搜索 after existing independent video disclosure; safe request/candidate/valid counts stay in memory, never raw response/keys. HTTP success with zero validated videos explicitly says 搜索服务已连接，但没有解析到可用 B站视频. Geometry and toggle stability remain shared.
+
+## Shared motion system (2026-10-06)
+
+Tokens: instant80ms, fast120ms, normal160ms, Sheet200ms; Toast entrance180ms and real recording indicator1300ms are the two semantic exceptions. Standard easing cubic-bezier(.2,0,0,1); emphasized cubic-bezier(.2,.8,.2,1). No animation dependencies.
+
+Primary press uses accent-pressed, secondary/icon press uses neutral surface, danger retains coral; disabled has no press transition. Hover remains fine-pointer-only. Selected choices share accent-soft/background, accent-strong/text and optional quiet accent border. Native checkbox/radio semantics and visible keyboard focus stay authoritative. Only internal checks/underlines transform; no global scale/bounce or card motion.
+
+Bottom Nav retains its nodes: active surface and text transition160ms. Main content enters .96→1/+4px only on genuine navigation,120ms. Initial render and domain refresh do not replay. Plan/Progress retain tab nodes, with reversible underline opacity and scaleX(.75→1),120ms; text stays fixed. Calendar transitions only selected surfaces, keeping Today's independent marker; no whole-grid entrance.
+
+Sheet entrance remains .85→1/+16px,200ms. Explicit same-Sheet navigation freezes its current frame and animates only inner content ±4px/160ms; returning restores parent scroll. Existing viewport/keyboard controller remains authoritative. Training Journal uses its existing add/edit control as an accessible expand/collapse control, preserving the mounted draft and existing autosave; only newly revealed editor content enters. Opt-in details disclosures use native layout followed by a short content entrance, without height:auto animation or global details interception.
+
+New user/assistant text enters .88→1/+3px once; subsequent stream tokens and reopened history never replay. Proposal and TTS status use restrained color feedback. Only true recording uses a small opacity dot (.55↔1/1300ms), stopped with capture. Toast enters +5px/180ms and exits opacity/120ms. Numbers and rings always show final values on initial render; no countup, ring reset or generic refresh animation.
+
+Reduced motion suppresses CSS decoration and explicit Web Animations, including cancellation if the preference changes. State remains readable without animation. No scroll-handler decoration or infinite RAF.
+
+Research: public [Douyin](https://www.douyin.com/jingxuan/sy) and [Bilibili](https://www.bilibili.com/) were attempted; automated access did not provide reliable mobile interaction evidence. Public [GUI Challenges](https://github.com/argyleink/gui-challenges), [switch](https://web.dev/articles/building/a-switch-component), [tabs](https://web.dev/articles/building/a-tabs-component) and [toast](https://web.dev/articles/building/a-toast-component) references informed native state ownership, small local feedback, short transitions and reduced-motion opt-outs. No brand palette, copied code, custom drag, spring, glow, 3D, confetti or countup was adopted.

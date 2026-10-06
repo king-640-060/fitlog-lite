@@ -1,4 +1,4 @@
-import { videoCardRenderer } from './videoCards'
+import { animateMotion } from './motion'
 import { setSheetVariant } from './sheetController'
 import { AiOrchestrator, AI_CHAT_ONLY_MESSAGE } from '../ai/orchestrator'
 import { AI_LIMITS } from '../ai/security'
@@ -16,11 +16,13 @@ export interface AiAssistantHandle { dialog: HTMLDialogElement; applyLaunch: (op
 const drafts = new WeakMap<AiOrchestrator, string>()
 export function hasAiAssistantDraft(engine: AiOrchestrator): boolean { return Boolean(drafts.get(engine)?.trim()) }
 export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi, options: AiAssistantLaunchOptions = {}): AiAssistantHandle {
+  const historicalIds = new Set(engine.items.map(item => item.id))
+  const enteredIds = new Set<string>()
   const dialog = ui.openModal('AI 助手', '<div class="ai-assistant"></div>', true)
   dialog.classList.add('ai-assistant-sheet'); setSheetVariant(dialog, 'assistant')
   const host = dialog.querySelector<HTMLElement>('.ai-assistant')!
   const head = dialog.querySelector<HTMLElement>('.modal-head')!
-  head.querySelector('h2')!.insertAdjacentHTML('afterend', `<div class="ai-header-actions"><button class="icon-btn quiet" id="ai-assistant-settings" aria-label="AI 设置">${icon('settings', 19)}</button><button class="icon-btn quiet" id="ai-clear-chat" aria-label="清空对话">${icon('trash', 17)}</button></div>`)
+  head.querySelector('h2')!.insertAdjacentHTML('afterend', `<div class="ai-header-actions"><button class="icon-btn quiet" id="ai-assistant-settings" aria-label="AI 设置">${icon('settings', 20)}</button><button class="icon-btn quiet" id="ai-clear-chat" aria-label="清空对话">${icon('trash', 18)}</button></div>`)
   host.innerHTML = `<div class="ai-current-profile"></div><div class="ai-capability-notice" hidden><strong>FitLog 数据读取尚未验证</strong><span>当前只能普通聊天</span><button class="text-btn" id="ai-notice-settings">打开设置</button></div><div class="ai-conversation" role="log" aria-label="AI 对话" aria-live="off" aria-atomic="false"></div><div class="ai-session-usage"></div><span class="sr-only ai-completion-status" role="status" aria-live="polite" aria-atomic="true"></span><section class="ai-voice-panel" hidden><div class="ai-voice-row"><span class="ai-voice-status" role="status" aria-live="polite"></span><button class="text-btn" id="ai-voice-start" type="button" hidden>开始说话</button></div></section><div class="ai-tts-row" hidden><span>正在朗读</span><button class="text-btn" id="ai-tts-stop" type="button">停止朗读</button></div><form class="ai-composer">${ui.openFoodVision ? `<button class="secondary ai-camera" id="ai-food-camera" type="button" aria-label="拍包装录入">${icon('camera', 18)}</button>` : ''}<button class="secondary ai-mic" id="ai-mic" type="button" aria-label="开始语音" aria-pressed="false">${icon('mic', 18)}</button><label class="sr-only" for="ai-message-input">向 AI 助手提问</label><textarea id="ai-message-input" rows="1" maxlength="${AI_LIMITS.userChars}" placeholder="提问，或描述记录" enterkeyhint="enter"></textarea><span class="ai-send-slot"><button class="primary" type="submit" id="ai-send">发送</button><button class="secondary" type="button" id="ai-stop" hidden>停止</button></span></form><p class="ai-footer-note">AI 建议需要确认后才会写入。</p>`
   const log = host.querySelector<HTMLElement>('.ai-conversation')!, textarea = host.querySelector<HTMLTextAreaElement>('textarea')!, composer = host.querySelector<HTMLFormElement>('form')!
   const sendButton = host.querySelector<HTMLButtonElement>('#ai-send')!, stopButton = host.querySelector<HTMLButtonElement>('#ai-stop')!
@@ -114,9 +116,8 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi, optio
   stopButton.addEventListener('click', () => { ++voiceGeneration; reply.cancel(); engine.stop() })
   host.querySelector('#ai-food-camera')?.addEventListener('click', () => { dialog.close(); ui.openFoodVision?.() })
   head.querySelector('#ai-assistant-settings')?.addEventListener('click', openSettings)
-  head.querySelector('#ai-clear-chat')?.addEventListener('click', () => { abortVoice(); pendingAutoText = undefined; textarea.value = ''; drafts.delete(engine); grow(); videoCards.stop(); engine.clear() })
+  head.querySelector('#ai-clear-chat')?.addEventListener('click', () => { abortVoice(); pendingAutoText = undefined; textarea.value = ''; drafts.delete(engine); grow(); engine.clear() })
   host.querySelector('#ai-notice-settings')?.addEventListener('click', openSettings)
-  const videoCards = videoCardRenderer(dialog)
   const nodeMap = new Map<string, HTMLElement>()
   let paintFrame = 0, wasBusy = engine.busy
   const draw = () => {
@@ -128,7 +129,7 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi, optio
     const nearBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 72
     const oldScroll = log.scrollTop
     if (!engine.items.length) {
-      videoCards.stop(); nodeMap.clear(); log.replaceChildren()
+      nodeMap.clear(); log.replaceChildren()
       const welcome = document.createElement('section'); welcome.className = 'ai-welcome'
       const heading = document.createElement('h3'); heading.textContent = engine.profiles.active ? '从一条记录或一个问题开始' : '连接你自己的 AI 服务'
       const note = document.createElement('p'); note.className = 'ai-note'; note.textContent = engine.profiles.active ? engine.profiles.active.toolCapability === 'supported' ? '读取真实记录，计算交给 FitLog。写入前会给你预览。' : '可以先聊聊饮食、训练或计划。验证数据能力后，可按权限读取记录。' : '配置完成后，可以聊聊饮食、训练和计划。'
@@ -153,16 +154,15 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi, optio
         let node = nodeMap.get(item.id)
         if (!node) { node = document.createElement('article'); node.setAttribute('aria-live', 'off'); node.setAttribute('aria-atomic', 'false'); nodeMap.set(item.id, node); log.append(node) }
         const className = `ai-message ai-${item.kind}`; if (node.className !== className) node.className = className
-        if (item.kind === 'videos') {
-          if (!node.dataset.videos) { videoCards.render(node, item.videos ?? [], item.content); node.dataset.videos = '1' }
-        } else if (item.kind === 'proposal') {
+        if (item.kind === 'proposal') {
           const proposal = engine.proposals.get(item.proposalId!)
           if (!proposal) continue
           if (node.dataset.status === proposal.status) { node.querySelectorAll<HTMLButtonElement>('.ai-proposal-actions .primary').forEach(button => { button.disabled = engine.busy || proposal.status !== 'pending' }); continue }
+          const previousStatus = node.dataset.status
           node.dataset.status = proposal.status; node.dataset.proposalId = proposal.id; node.replaceChildren()
           const head = document.createElement('div'); head.className = 'ai-proposal-head'
           const title = document.createElement('strong'); title.textContent = proposal.title
-          const status = document.createElement('small'); status.textContent = aiProposalStatusLabels[proposal.status]; head.append(title, status); node.append(head)
+          const status = document.createElement('small'); status.textContent = aiProposalStatusLabels[proposal.status]; head.append(title, status); node.append(head); if (previousStatus) animateMotion(status, 'number')
           for (const line of aiProposalPreviewLines(proposal)) { const text = document.createElement('p'); text.textContent = line; node.append(text) }
           if (proposal.message) { const note = document.createElement('p'); note.className = 'ai-note'; note.textContent = proposal.message; node.append(note) }
           if (proposal.status === 'pending' || proposal.status === 'processing') {
@@ -181,6 +181,10 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi, optio
             if (/配置|模型|接口|API Key/.test(item.content)) { const settings = document.createElement('button'); settings.className = 'text-btn'; settings.textContent = '检查设置'; settings.addEventListener('click', openSettings); node.append(settings) }
           }
           if (item.usage && aiUsageText(item.usage) && !node.querySelector('small')) { const tokens = document.createElement('small'); tokens.className = 'ai-note'; tokens.textContent = aiUsageText(item.usage); node.append(tokens) }
+        }
+        if ((item.kind === 'user' || item.kind === 'assistant') && item.content && !enteredIds.has(item.id)) {
+          enteredIds.add(item.id)
+          if (!historicalIds.has(item.id)) animateMotion(node, 'message')
         }
         // A proposal can finish generating while the request remains active.
         if (item.kind === 'proposal') node.querySelectorAll<HTMLButtonElement>('.ai-proposal-actions .primary').forEach(button => { button.disabled = engine.busy || node!.dataset.status !== 'pending' })

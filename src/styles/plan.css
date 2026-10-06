@@ -13,11 +13,11 @@
 .plan-tabs { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--border); }
 .plan-tabs button { position: relative; min-height: 44px; border: 0; border-radius: 0; background: transparent; color: var(--text-secondary); font-size: .88rem; font-weight: 650; }
 .plan-tabs button.active { color: var(--accent-strong); }
-.plan-tabs button.active::after { position: absolute; right: 25%; bottom: -1px; left: 25%; height: 3px; border-radius: 99px 99px 0 0; background: var(--accent); content: ''; }
+.plan-tabs button::after { position: absolute; right: 25%; bottom: -1px; left: 25%; height: 3px; border-radius: 99px 99px 0 0; background: var(--accent); content: ''; opacity: 0; transform: scaleX(.75); transition: opacity var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard); }
 .plan-context-row { display: flex; min-width: 0; min-height: 44px; align-items: center; justify-content: space-between; gap: 8px; }
 .plan-context-label { min-width: 0; overflow: hidden; margin: 0; padding-left: 2px; color: var(--text-secondary); font-size: .83rem; text-overflow: ellipsis; white-space: nowrap; }
 .plan-context-actions, .plan-filter-active { display: flex; min-width: 0; flex: 0 0 auto; align-items: center; gap: 4px; }
-.plan-filter-button, .plan-filter-clear { display: inline-flex; min-width: 0; min-height: 44px; align-items: center; justify-content: center; border: 0; border-radius: 11px; background: transparent; color: var(--text-secondary); }
+.plan-filter-button, .plan-filter-clear { display: inline-flex; min-width: 0; min-height: 44px; align-items: center; justify-content: center; border: 0; border-radius: 12px; background: transparent; color: var(--text-secondary); }
 .plan-filter-button { gap: 5px; padding: 0 5px; font-size: .85rem; font-weight: 600; }
 .plan-filter-button span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .plan-filter-button .icon { flex: 0 0 auto; color: var(--text-tertiary); transform: rotate(90deg); }
@@ -78,7 +78,7 @@
 .task-tag-suggestions button { display: block; width: 100%; min-height: 44px; border: 0; border-radius: 0; background: transparent; text-align: left; }
 .task-tag-suggestions button + button { border-top: 1px solid var(--divider); }
 .task-selected-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: -7px; }
-.task-selected-tags button { min-height: 44px; padding: 0 10px; border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border)); border-radius: 11px; background: var(--accent-soft); color: var(--accent-strong); font-size: .79rem; }
+.task-selected-tags button { min-height: 44px; padding: 0 10px; border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border)); border-radius: 12px; background: var(--accent-soft); color: var(--accent-strong); font-size: .79rem; }
 .task-selected-tags button span { margin-left: 4px; }
 .task-editor-section { display: grid; gap: 9px; }
 .task-editor-section h3 { margin: 0; color: var(--text-secondary); font-size: .8rem; }
@@ -101,3 +101,10 @@
 
 .task-editor[hidden] { display: none; }
 .task-date-field { justify-content: flex-start; gap: 8px; font-size: .9rem; }
+
+.plan-tabs button.active::after, .page-tabs button.active::after { opacity: 1; transform: none; }
+.plan-task-check > span { transition: background-color var(--motion-normal) var(--ease-standard), border-color var(--motion-normal) var(--ease-standard), color var(--motion-normal) var(--ease-standard); }
+.plan-task-check .icon { opacity: 0; transform: scale(.8); transition: opacity var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard); }
+.plan-task-check[aria-pressed=true] .icon { opacity: 1; transform: none; }
+.plan-task-copy strong { transition: color var(--motion-normal) var(--ease-standard); }
+.plan-tag-picker > button.selected { background: var(--accent-soft); color: var(--accent-strong); }

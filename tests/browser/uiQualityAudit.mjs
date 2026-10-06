@@ -118,7 +118,7 @@ try { for (const [width,height] of sizes) {
   await click('#start-pelvic-floor');await audit('kegel-setup');await click('[data-pelvic-routine]');await audit('kegel-timer');await click('#pelvic-pause');await audit('kegel-paused');await click('#pelvic-finish');await page.locator('[data-confirm]').click();await page.waitForTimeout(100)
   await click('#pelvic-floor-history');await audit('kegel-history');await close()
   await nav('progress');await click('#record-weight');await audit('weight-editor');await close()
-  await click('[data-progress-view=calendar]');await audit('calendar');await click('[aria-selected=true]');await audit('calendar-day');await close()
+  await click('[data-progress-view=calendar]');await audit('calendar');await click('.calendar-day[aria-selected=true]');await audit('calendar-day');await close()
   await click('[data-progress-view=reports]');await audit('report-week');await click('[data-report-mode=month]');await audit('report-month')
   await management();await audit('management');await management('more-about');await audit('about');await close()
   await management('more-diagnostics');await page.waitForSelector('[data-diagnostic="App build"]');await audit('pwa-diagnostics');assert.match(await page.locator('[data-diagnostic="App build"]').innerText(),/^[a-f0-9]{40}$/);await close()

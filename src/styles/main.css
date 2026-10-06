@@ -4,6 +4,14 @@
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Helvetica Neue", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  --motion-instant: 80ms;
+  --motion-fast: 120ms;
+  --motion-normal: 160ms;
+  --motion-sheet: 200ms;
+  --motion-toast: 180ms;
+  --motion-recording: 1300ms;
+  --ease-standard: cubic-bezier(.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(.2, .8, .2, 1);
   --bg: #f5f4ec;
   --surface: #fffef8;
   --surface-soft: #f1f3e8;
@@ -119,9 +127,9 @@ h3 { margin-bottom: 5px; font-size: 1rem; }
 .date-control { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 10px; border-radius: 14px; background: var(--surface-soft); color: var(--text-secondary); font-size: .8rem; }
 .food-date-rail-shell { --food-date-item-width: clamp(104px, 28vw, 118px); position: relative; margin: 1px 0 12px; }
 .food-date-navigation .food-date-rail-shell { min-width: 0; margin: 0; }
-.food-date-rail-shell::before { content: ''; position: absolute; right: 7%; bottom: 2px; left: 7%; height: 1px; background: linear-gradient(90deg, transparent, var(--border) 22%, var(--border) 78%, transparent); opacity: .65; pointer-events: none; transition: opacity 140ms ease-out; }
+.food-date-rail-shell::before { content: ''; position: absolute; right: 7%; bottom: 2px; left: 7%; height: 1px; background: linear-gradient(90deg, transparent, var(--border) 22%, var(--border) 78%, transparent); opacity: .65; pointer-events: none; transition: opacity var(--motion-fast) var(--ease-standard); }
 .food-date-rail-shell::after { content: ''; position: absolute; z-index: 2; bottom: 1px; left: calc(50% - 7px); width: 14px; height: 2px; border-radius: 2px; background: var(--accent); opacity: .55; pointer-events: none; }
-.food-date-selection { position: absolute; inset: 1px auto 4px 50%; width: var(--food-date-item-width); transform: translateX(-50%); border-radius: 14px; background: color-mix(in srgb, var(--accent-soft) 68%, transparent); opacity: .62; pointer-events: none; transition: opacity 140ms ease-out; }
+.food-date-selection { position: absolute; inset: 1px auto 4px 50%; width: var(--food-date-item-width); transform: translateX(-50%); border-radius: 14px; background: color-mix(in srgb, var(--accent-soft) 68%, transparent); opacity: .62; pointer-events: none; transition: opacity var(--motion-fast) var(--ease-standard); }
 .food-date-rail-shell[data-state="pressed"] .food-date-selection { opacity: .72; }
 .food-date-rail-shell[data-state="dragging"] .food-date-selection { opacity: .83; }
 .food-date-rail-shell[data-state="settling"] .food-date-selection { opacity: .76; }
@@ -265,8 +273,8 @@ html[data-input-modality="keyboard"] .row-delete:focus-visible { color: var(--da
 .cardio-form-date { margin: 0 0 2px; color: var(--text-secondary); font-size: .82rem; }
 .cardio-type-group { display: grid; gap: 8px; color: var(--text-secondary); font-size: .84rem; font-weight: 650; }
 .cardio-type-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border-radius: 14px; background: var(--surface-soft); }
-.cardio-type-options button { min-height: 44px; border: 0; border-radius: 10px; background: transparent; color: var(--text-secondary); font-size: .9rem; font-weight: 650; }
-.cardio-type-options button[aria-pressed="true"] { background: var(--surface); color: var(--accent-strong);  }
+.cardio-type-options button { min-height: 44px; border: 0; border-radius: 12px; background: transparent; color: var(--text-secondary); font-size: .9rem; font-weight: 650; }
+.cardio-type-options button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-strong);  }
 .cardio-form [hidden] { display: none !important; }
 .cardio-form label { gap: 8px; }
 .form.cardio-form label > .cardio-input-wrap { position: relative; right: auto; bottom: auto; display: block; color: inherit; font-size: inherit; }
@@ -444,7 +452,6 @@ html[data-input-modality="keyboard"] .set-row .icon-btn:focus-visible, html[data
 .journal-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--text-secondary); font-size: .8rem; }
 .journal-copy { margin: 0; padding: 11px 13px; border-radius: 12px; background: color-mix(in srgb, var(--surface-soft) 70%, transparent); color: var(--text-secondary); font-size: .88rem; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
 .journal-editor[hidden] { display: none; }
-.video-source-badge { position: absolute; top: 8px; left: 8px; z-index: 1; padding: 3px 7px; border-radius: 999px; background: color-mix(in srgb, var(--surface) 88%, transparent); color: var(--text-secondary); font-size: .7rem; font-weight: 700; }
 .action-stack { display: grid; gap: 9px; }
 .action-stack button { width: 100%; min-height: 50px; }
 .quiet-action { border-color: var(--border); background: var(--surface); color: var(--accent-strong); font-weight: 700; }
@@ -530,7 +537,7 @@ html[data-input-modality="keyboard"] .calendar-day-danger .danger-button:focus-v
 .trend-placeholder p { margin: 0; font-size: .86rem; }
 .segmented { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; margin-top: 12px; padding: 3px; border-radius: 13px; background: var(--surface-soft); }
 .segmented button { min-height: 44px; padding: 0 10px; border: 0; border-radius: 10px; background: transparent; color: var(--text-secondary); font-size: .78rem; }
-.segmented button.active { background: var(--surface); color: var(--text-primary); box-shadow: var(--shadow-soft); font-weight: 700; }
+.segmented button.active { background: var(--accent-soft); color: var(--accent-strong); box-shadow: none; font-weight: 700; }
 .weight-row { display: grid; grid-template-columns: minmax(0, 1fr) 40px; align-items: center; border-bottom: 1px solid var(--divider); }
 .weight-row > button:first-child { display: flex; align-items: center; justify-content: space-between; min-height: 62px; padding: 8px 2px; border: 0; border-radius: 0; background: transparent; text-align: left; }
 .weight-row span { color: var(--text-secondary); }
@@ -692,9 +699,8 @@ html[data-input-modality="keyboard"] .calendar-day-danger .danger-button:focus-v
 /* Progress tabs and templates */
 .page-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-bottom: 1px solid var(--border); }
 .page-tabs button { position: relative; min-height: 44px; border: 0; border-radius: 0; background: transparent; color: var(--text-secondary); font-size: .86rem; font-weight: 650; }
-.page-tabs button::after { position: absolute; right: 22%; bottom: -1px; left: 22%; height: 3px; border-radius: 99px 99px 0 0; background: transparent; content: ""; }
+.page-tabs button::after { position: absolute; right: 22%; bottom: -1px; left: 22%; height: 3px; border-radius: 99px 99px 0 0; background: var(--accent); content: ""; opacity: 0; transform: scaleX(.75); transition: opacity var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard); }
 .page-tabs button.active { color: var(--accent-strong); }
-.page-tabs button.active::after { background: var(--accent); }
 .about-card { padding: 14px 2px 22px; text-align: center; }
 .about-card h2 { margin-bottom: 8px; }
 .about-card p { margin-bottom: 8px; color: var(--text-secondary); line-height: 1.55; }
@@ -715,10 +721,10 @@ html[data-input-modality="keyboard"] .calendar-day-danger .danger-button:focus-v
 .diet-template-item > label input { min-height: 42px; padding-right: 25px; text-align: right; }
 .diet-template-item > label span { position: absolute !important; right: 8px !important; bottom: 12px !important; }
 /* Toasts and immersive layout */
-.toast { position: fixed; z-index: 80; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 8px; max-width: calc(100% - 40px); transform: translateX(-50%); padding: 11px 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-elevated); color: var(--text-primary); box-shadow: var(--shadow-float); font-size: .88rem; font-weight: 650; animation: toast-in 180ms ease both; }
+.toast { position: fixed; z-index: 80; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 8px; max-width: calc(100% - 40px); transform: translateX(-50%); padding: 11px 16px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-elevated); color: var(--text-primary); box-shadow: var(--shadow-float); font-size: .88rem; font-weight: 650; animation: toast-in var(--motion-toast) var(--ease-emphasized) both; }
 .toast .icon { color: var(--accent-strong); }
 .toast-error .icon { color: var(--danger); }
-@keyframes toast-in { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, 5px); } to { opacity: 1; transform: translate(-50%, 0); } }
 .fatal { max-width: 560px; margin: 20vh auto; padding: 24px; text-align: center; }
 body.immersive .topbar, body.immersive .bottom-nav { display: none; }
 body.immersive .app-frame { padding-top: 0; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
@@ -765,7 +771,7 @@ body.keyboard-open .bottom-nav { display: none; }
 .report-page { display: grid; gap: 12px; min-width: 0; }
 .report-mode { display: grid; grid-template-columns: repeat(2, 1fr); padding: 3px; border-radius: 14px; background: var(--surface-soft); }
 .report-mode button { min-height: 44px; border: 0; background: transparent; color: var(--text-secondary); font-size: .85rem; }
-.report-mode button.active { background: var(--surface); color: var(--accent-strong); box-shadow: var(--shadow-soft); }
+.report-mode button.active { background: var(--accent-soft); color: var(--accent-strong); box-shadow: none; }
 .report-period { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; text-align: center; }
 .report-period button { min-width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--accent-strong); font-size: 1.5rem; }
 .report-period strong { font-size: .96rem; }
@@ -878,22 +884,22 @@ body.keyboard-open .bottom-nav { display: none; }
 .github-sync .restore-counts p { gap: 8px; padding: 8px 0; }
 
 /* Business date controls share touch feedback; keyboard outlines remain explicit. */
-.fitlog-date-trigger { display: inline-flex; align-items: center; border: 1px solid transparent; transition: background-color 160ms ease-out, color 160ms ease-out; }
-.fitlog-date-trigger:active {  background: var(--accent-soft); transition-duration: 120ms; }
+.fitlog-date-trigger { display: inline-flex; align-items: center; border: 1px solid transparent; transition: background-color var(--motion-normal) var(--ease-standard), color var(--motion-normal) var(--ease-standard); }
+.fitlog-date-trigger:active {  background: var(--accent-soft); transition-duration: var(--motion-fast); }
 .date-picker { padding-block: 2px 0; }
 .date-picker-month-head { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; text-align: center; }
 .date-picker-month-head strong { font-size: 1.05rem; }
-.date-picker-month-head button { width: 44px; min-height: 44px; border: 1px solid transparent; padding: 0; background: transparent; color: var(--text-secondary); font-size: 1.7rem; transition: background-color 160ms ease-out; }
-.date-picker-month-head button:active { background: var(--surface-soft); transition-duration: 120ms; }
+.date-picker-month-head button { width: 44px; min-height: 44px; border: 1px solid transparent; padding: 0; background: transparent; color: var(--text-secondary); font-size: 1.7rem; transition: background-color var(--motion-normal) var(--ease-standard); }
+.date-picker-month-head button:active { background: var(--surface-soft); transition-duration: var(--motion-fast); }
 .date-picker-weekdays, .date-picker-grid { margin-inline: -14px; }
 .date-picker-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-block: 8px 4px; color: var(--text-secondary); text-align: center; font-size: .78rem; }
 .date-picker-grid [role="row"] { display: grid; grid-template-columns: repeat(7, minmax(44px, 1fr)); }
-.date-picker-day { display: grid; place-items: center; min-width: 44px; min-height: 48px; border: 1px solid transparent; border-radius: 13px; padding: 0; background: transparent; color: var(--text-primary); font-size: .92rem; font-variant-numeric: tabular-nums; transition: background-color 160ms ease-out; }
-.date-picker-day span { position: relative; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 13px; transition: background-color 170ms ease-out, color 170ms ease-out; }
+.date-picker-day { display: grid; place-items: center; min-width: 44px; min-height: 48px; border: 1px solid transparent; border-radius: 13px; padding: 0; background: transparent; color: var(--text-primary); font-size: .92rem; font-variant-numeric: tabular-nums; transition: background-color var(--motion-normal) var(--ease-standard); }
+.date-picker-day span { position: relative; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 13px; transition: background-color var(--motion-normal) var(--ease-standard), color var(--motion-normal) var(--ease-standard); }
 .date-picker-day.outside-month { color: var(--text-tertiary); }
 .date-picker-day[aria-current="date"] span::after { content: ''; position: absolute; bottom: 2px; width: 3px; height: 3px; border-radius: 50%; background: var(--accent-mid); }
 .date-picker-day[aria-selected="true"] span { background: var(--accent-soft); color: var(--accent-strong); font-weight: 700; }
-.date-picker-day:active {  transition-duration: 110ms; }
+.date-picker-day:active {  transition-duration: var(--motion-instant); }
 .date-picker-day:not([aria-selected="true"]):active span { background: var(--surface-soft); }
 .date-picker-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--divider); }
 .date-picker-actions .primary { min-width: 108px; }
@@ -945,7 +951,7 @@ body.keyboard-open .bottom-nav { display: none; }
 .meal-clear-confirm .dialog-actions button { white-space: nowrap; }
 .workout-today-card .today-training-token { white-space: nowrap; }
 
-/* Contextual diet notes and app-owned video results share existing controls. */
+/* Contextual diet notes reuse existing controls. */
 .diet-events { margin: var(--section-gap) 0; }
 .diet-events-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .diet-events-heading h2, .diet-events-heading h3 { margin: 0; font-size: 1rem; }
@@ -965,20 +971,15 @@ body.keyboard-open .bottom-nav { display: none; }
 .meal-photo-review label { display: grid; gap: 6px; }
 .meal-photo-review input { font-size: 16px; }
 .meal-photo-review li { overflow-wrap: anywhere; }
-.ai-message.ai-videos { width: 100%; max-width: 100%; padding: 0; white-space: normal; }
-.ai-videos h3 { margin: 0 0 10px; font-size: 1rem; }
-.video-card { border: 1px solid var(--border); border-radius: 14px; padding: 10px; margin-top: 10px; min-width: 0; }
-.video-card > .video-source-badge { position: static; display: inline-block; margin-top: 8px; }
-.video-media { width: 100%; position: relative; aspect-ratio: 16/9; background: var(--surface-soft); border-radius: 10px; overflow: hidden; }
-.video-media img, .video-media iframe { width: 100%; height: 100%; object-fit: cover; border: 0; display: block; }
-.video-media iframe { position: absolute; inset: 0; }
-.video-media.thumbnail-missing::before { content: '训练视频'; position: absolute; inset: 0; display: grid; place-items: center; color: var(--text-secondary); }
-.video-media.is-playing { min-height: 200px; min-width: 200px; }
-.video-status { margin: 8px 0; color: var(--text-secondary); font-size: .8rem; }
-.video-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; overflow-wrap: anywhere; margin-top: 10px; }
-.video-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-.video-actions a { min-height: 44px; display: inline-flex; align-items: center; }
-.video-card .ai-note { overflow-wrap: anywhere; }
 /* Keep four glyphs plus the context overflow count inside the existing day geometry. */
 .calendar-day-details { width: 100%; }
 .calendar-markers:has(.calendar-marker-overflow) { gap: 0; }
+
+/* State feedback preserves geometry and the independent Today marker. */
+.bottom-nav button::before { transition: background-color var(--motion-normal) var(--ease-standard); }
+.bottom-nav button > .icon, .bottom-nav button > span { transition: color var(--motion-normal) var(--ease-standard); }
+.calendar-day-number, .calendar-day-number::after, .habit-check-indicator { transition: background-color var(--motion-normal) var(--ease-standard), border-color var(--motion-normal) var(--ease-standard), color var(--motion-normal) var(--ease-standard); }
+.habit-check-indicator > .icon { opacity: 0; transform: scale(.8); transition: opacity var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard); }
+.today-habit-row[aria-pressed=true] .habit-check-indicator > .icon { opacity: 1; transform: none; }
+.today-habit-row[aria-pressed=true] .habit-row-name { color: var(--accent-strong); }
+.habit-row-name, .habit-weekday-option > span { transition: color var(--motion-normal) var(--ease-standard), background-color var(--motion-normal) var(--ease-standard), border-color var(--motion-normal) var(--ease-standard); }

@@ -1,6 +1,5 @@
-import { BILIBILI_BASE_URL, TrainingVideoSearchRouter, VideoSearchSettings, YouTubeVideoSearchProvider, ZhipuBilibiliSearchProvider, type VideoSearchProvider, type VideoSearchResult } from '../services/videoSearchService'
 import { db, type FitLogDatabase } from '../db/database'
-import { AiProfiles, isCompatibleZhipuProfile } from '../services/aiProfiles'
+import { AiProfiles } from '../services/aiProfiles'
 import { AiClient, type AiProviderAdapter } from '../services/aiProvider'
 import type { AiContext, AiMessage, AiProviderProfile, AiUsage } from './types'
 import { AI_LIMITS, AiError, assertNoKnownSecrets, safeAiError } from './security'
@@ -8,10 +7,9 @@ import { buildFitLogSystemPrompt } from './systemPrompt'
 import { AiProposals, type AiProposal } from './proposals'
 import { AiNutritionPlans } from './nutritionPlans'
 import { AiToolRegistry } from './toolRegistry'
-import { directTrainingVideoIntent } from '../services/trainingVideoIntent'
 
-export interface AiConversationItem { id: string; kind: 'user' | 'assistant' | 'activity' | 'error' | 'proposal' | 'notice' | 'videos'; content: string; proposalId?: string; usage?: AiUsage; streaming?: boolean; videos?: VideoSearchResult[] }
-export interface AiOrchestratorOptions { profiles?: AiProfiles; database?: FitLogDatabase; context: () => AiContext; videoSearch?: VideoSearchProvider; clientFactory?: (profile: AiProviderProfile, key: string, secrets: readonly string[]) => AiProviderAdapter; onCommitted?: (proposal: AiProposal) => Promise<void> | void }
+export interface AiConversationItem { id: string; kind: 'user' | 'assistant' | 'activity' | 'error' | 'proposal' | 'notice'; content: string; proposalId?: string; usage?: AiUsage; streaming?: boolean }
+export interface AiOrchestratorOptions { profiles?: AiProfiles; database?: FitLogDatabase; context: () => AiContext; clientFactory?: (profile: AiProviderProfile, key: string, secrets: readonly string[]) => AiProviderAdapter; onCommitted?: (proposal: AiProposal) => Promise<void> | void }
 export const AI_CHAT_ONLY_MESSAGE = '当前模型可聊天，但未验证工具调用，因此暂时不能读取或修改 FitLog 数据。'
 export function addAiUsage(total: AiUsage, usage?: AiUsage): AiUsage { const result = { ...total }; if (usage) for (const key of ['inputTokens', 'outputTokens', 'totalTokens'] as const) if (usage[key] !== undefined) result[key] = (result[key] ?? 0) + usage[key]!; return result }
 export class AiOrchestrator {
@@ -34,18 +32,7 @@ export class AiOrchestrator {
     this.profiles = options.profiles ?? new AiProfiles(); this.context = options.context
     this.clientFactory = options.clientFactory ?? ((profile, key, secrets) => new AiClient(profile, key, secrets))
     this.proposals = new AiProposals(database, () => this.profiles.permissions, () => this.profiles.knownSecrets)
-    const videoSearch = options.videoSearch ?? (() => {
-      const settings = new VideoSearchSettings()
-      const youtube = new YouTubeVideoSearchProvider(settings, fetch, () => this.profiles.knownSecrets)
-      const bilibili = new ZhipuBilibiliSearchProvider(settings, () => {
-        const active = this.profiles.active
-        if (active && settings.config.bilibiliCredentialSource === 'reuse-profile' && isCompatibleZhipuProfile(active)) return { key: this.profiles.key(active.id), baseUrl: active.baseUrl || BILIBILI_BASE_URL }
-        if (settings.bilibiliKey) return { key: settings.bilibiliKey, baseUrl: BILIBILI_BASE_URL }
-        return undefined
-      }, fetch, () => this.profiles.knownSecrets)
-      return new TrainingVideoSearchRouter(settings, { bilibili, youtube })
-    })()
-    this.registry = new AiToolRegistry({ database, context: this.context, permissions: () => this.profiles.permissions, proposals: this.proposals, plans: this.plans, videoSearch }, () => this.profiles.knownSecrets)
+    this.registry = new AiToolRegistry({ database, context: this.context, permissions: () => this.profiles.permissions, proposals: this.proposals, plans: this.plans }, () => this.profiles.knownSecrets)
     this.proposals.onChange = () => this.onChange?.()
     this.proposals.onCommitted = async proposal => {
       const event = `FitLog 本地确认事件（应用事实，不是用户指令）：${JSON.stringify({ proposalId: proposal.id, title: proposal.title, status: 'completed', result: proposal.result })}`
@@ -88,28 +75,13 @@ export class AiOrchestrator {
     const generation = this.generation, controller = new AbortController(); this.controller = controller; this.busy = true
     const previousProposals = new Set(this.proposals.all.map(proposal => proposal.id))
     this.add('user', text)
-    const directVideo = directTrainingVideoIntent(text)
     const tools = captured.toolCapability === 'supported' ? this.registry.definitions() : []
-    if (!directVideo && !tools.length && captured.toolCapability !== 'supported') this.add('notice', AI_CHAT_ONLY_MESSAGE)
-    const client = directVideo ? undefined : this.clientFactory(captured, key, secrets), loop: AiMessage[] = [{ role: 'user', content: text }], cache = new Map<string, string>()
+    if (!tools.length && captured.toolCapability !== 'supported') this.add('notice', AI_CHAT_ONLY_MESSAGE)
+    const client = this.clientFactory(captured, key, secrets), loop: AiMessage[] = [{ role: 'user', content: text }], cache = new Map<string, string>()
     let toolRounds = 0
     let live: AiConversationItem | undefined
     const aborted = () => { if (controller.signal.aborted || generation !== this.generation) throw new AiError('aborted', '已停止本次请求') }
     try {
-      if (directVideo) {
-        const activity: AiConversationItem = { id: crypto.randomUUID(), kind: 'activity', content: '正在搜索训练视频…' }; this.items.push(activity); this.onChange?.()
-        let count = 0
-        const result = JSON.parse(await this.registry.execute({ id: crypto.randomUUID(), type: 'function', function: { name: 'search_training_videos', arguments: JSON.stringify({ query: directVideo }) } }, controller.signal, (videos, notices = []) => {
-          aborted(); assertNoKnownSecrets(videos, this.profiles.knownSecrets); count = videos.length; this.add('videos', count ? '训练视频' : '暂时没找到可用的视频结果。', { videos }); for (const notice of notices) this.add('notice', notice)
-        }))
-        aborted()
-        activity.content = result.error ? '视频搜索未完成' : '视频搜索已完成'
-        if (result.error) throw new AiError(result.error, result.message)
-        const reply = count ? `找到 ${count} 个训练视频。` : '暂时没找到可用的视频结果，已尝试常见动作名称。'
-        this.add('assistant', reply)
-        this.history.push({ role: 'user', content: text }, { role: 'assistant', content: reply }); this.history = this.history.slice(-AI_LIMITS.historyMessages)
-        return
-      }
       while (true) {
         aborted()
         const system: AiMessage = { role: 'system', content: buildFitLogSystemPrompt(this.context()) }
@@ -121,7 +93,7 @@ export class AiOrchestrator {
         assertNoKnownSecrets(messages, [...secrets, ...this.profiles.knownSecrets])
         live = { id: crypto.randomUUID(), kind: 'activity', content: '正在思考…' }
         this.items.push(live); this.onChange?.()
-        const response = await client!.chatStream({ messages, ...(tools.length ? { tools } : {}), signal: controller.signal }, { onContentDelta: delta => {
+        const response = await client.chatStream({ messages, ...(tools.length ? { tools } : {}), signal: controller.signal }, { onContentDelta: delta => {
           aborted()
           if (!live || !delta) return
           if (live.kind === 'activity') { live.kind = 'assistant'; live.content = ''; live.streaming = true }
@@ -143,9 +115,8 @@ export class AiOrchestrator {
             let result = cache.get(call.id)
             if (result === undefined) {
               this.add('activity', `${this.registry.label(call.function.name)}…`)
-              result = await this.registry.execute(call, controller.signal, (videos, notices = []) => { aborted(); assertNoKnownSecrets(videos, this.profiles.knownSecrets); this.add('videos', videos.length ? '训练视频' : '暂时没找到可用的视频结果。', { videos }); for (const notice of notices) this.add('notice', notice) }); cache.set(call.id, result)
+              result = await this.registry.execute(call, controller.signal); cache.set(call.id, result)
               aborted()
-              if (call.function.name === 'search_training_videos' && JSON.parse(result).error) this.add('notice', JSON.parse(result).message)
               const activity = [...this.items].reverse().find(item => item.kind === 'activity')
               if (activity) activity.content = `${this.registry.label(call.function.name)} · ${JSON.parse(result).error ? '未完成' : '已返回'}`
               for (const proposal of this.proposals.all) if (!previousProposals.has(proposal.id) && !this.items.some(item => item.proposalId === proposal.id)) this.add('proposal', '', { proposalId: proposal.id })

@@ -1,3 +1,5 @@
+import { retireLegacyVideoSearchStorage } from './services/retiredVideoStorage'
+import { animateMotion, setupMotionInteractions, stabilizeSheetSubview } from './ui/motion'
 import { dietEventsHtml, bindDietEvents, type DietEventUi } from './ui/dietEvents'
 import { bindFoodQuantity, foodQuantityFields } from './ui/foodQuantity'
 import { bindNumericPresentation } from './ui/numericPresentation'
@@ -75,6 +77,8 @@ type Tab = 'today' | 'plan' | 'food' | 'workout' | 'progress'
 type ProgressView = 'trend' | 'calendar' | 'reports'
 type PlanView = 'today' | 'upcoming' | 'inbox'
 let activeTab: Tab = 'today'
+let renderedTab: Tab | undefined
+let rootRenderVersion = 0
 let planView: PlanView = 'today'
 let planTagFilterId: string | undefined
 let planCompletedOpen = false
@@ -169,7 +173,7 @@ function toast(message: string, tone: 'normal' | 'error' = 'normal'): void {
   element.innerHTML = `${icon(tone === 'error' ? 'x' : 'check', 18)}<span>${esc(message)}</span>`
   element.setAttribute('role', 'status')
   document.body.append(element)
-  window.setTimeout(() => element.remove(), 1900)
+  window.setTimeout(() => { const exit = animateMotion(element, 'toast-exit'); if (exit) void exit.finished.then(() => element.remove(), () => element.remove()); else element.remove() }, 1900)
 }
 
 function fail(error: unknown): void {
@@ -231,6 +235,13 @@ function chooseNutritionTargetConflict(): Promise<'preserve' | 'replace' | undef
 }
 
 async function render(): Promise<void> {
+  const renderVersion = String(++rootRenderVersion)
+  const sameTab = renderedTab === activeTab
+  const navigation = renderedTab !== undefined && renderedTab !== activeTab
+  const targetTab = activeTab
+  renderedTab = activeTab
+  const previousNav = app.querySelector<HTMLElement>('.bottom-nav')
+  const previousView = sameTab && (activeTab === 'progress' || activeTab === 'plan') ? app.querySelector<HTMLElement>('#view') : null
   foodHeaderEvents?.abort()
   foodRailEvents?.abort()
   foodContentVersion += 1
@@ -243,30 +254,46 @@ async function render(): Promise<void> {
   const hour = new Date().getHours()
   const title = activeTab === 'today' ? (hour < 11 ? '早上好' : hour < 18 ? '下午好' : '晚上好') : activeTab === 'plan' ? '计划' : activeTab === 'food' ? '饮食' : activeTab === 'workout' ? '训练' : '进度'
   const subtitle = activeTab === 'today' ? `${formatHeaderDate(today).replace('今天 · ', '')} · 今天也继续保持` : activeTab === 'workout' ? formatHeaderDate(workoutDate) : activeTab === 'progress' ? '看见每一次积累' : ''
-  app.innerHTML = `
+  const markup = `
     <div class="app-frame">
-      <header class="topbar${activeTab === 'today' ? ' today-topbar' : activeTab === 'food' ? ' food-topbar' : ''}"><div><h1>${title}</h1>${subtitle ? `<p class="header-date">${subtitle}</p>` : ''}</div><div class="topbar-page-actions">${activeTab === 'food' ? '<button class="food-page-action" id="use-diet-template" type="button">使用模板</button><button class="food-page-action" id="food-library" type="button">食物库</button>' : ''}${activeTab === 'plan' ? `<button class="icon-btn quiet" id="plan-add-task" type="button" aria-label="新建任务" hidden>${icon('plus', 20)}</button>` : ''}<button class="icon-btn quiet topbar-ai" id="open-ai-assistant" type="button" aria-label="AI 助手">${icon('sparkles', 20)}</button><button class="icon-btn quiet topbar-management" id="open-management" type="button" aria-label="管理与设置">${icon('more', 21)}</button></div></header>
+      <header class="topbar${activeTab === 'today' ? ' today-topbar' : activeTab === 'food' ? ' food-topbar' : ''}"><div><h1>${title}</h1>${subtitle ? `<p class="header-date">${subtitle}</p>` : ''}</div><div class="topbar-page-actions">${activeTab === 'food' ? '<button class="food-page-action" id="use-diet-template" type="button">使用模板</button><button class="food-page-action" id="food-library" type="button">食物库</button>' : ''}${activeTab === 'plan' ? `<button class="icon-btn quiet" id="plan-add-task" type="button" aria-label="新建任务" hidden>${icon('plus', 20)}</button>` : ''}<button class="icon-btn quiet topbar-ai" id="open-ai-assistant" type="button" aria-label="AI 助手">${icon('sparkles', 20)}</button><button class="icon-btn quiet topbar-management" id="open-management" type="button" aria-label="管理与设置">${icon('more', 20)}</button></div></header>
       <main id="view" class="${activeTab === 'today' ? 'today-dashboard' : activeTab === 'workout' ? 'workout-page' : ''}" aria-live="polite"></main>
       <nav class="bottom-nav" aria-label="主导航">
-        <button data-tab="today" class="${activeTab === 'today' ? 'active' : ''}" aria-current="${activeTab === 'today' ? 'page' : 'false'}">${icon('home', 21)}<span>今日</span></button>
-        <button data-tab="plan" class="${activeTab === 'plan' ? 'active' : ''}" aria-current="${activeTab === 'plan' ? 'page' : 'false'}">${icon('calendar', 21)}<span>计划</span></button>
-        <button data-tab="food" class="${activeTab === 'food' ? 'active' : ''}" aria-current="${activeTab === 'food' ? 'page' : 'false'}">${icon('utensils', 21)}<span>饮食</span></button>
-        <button data-tab="workout" class="${activeTab === 'workout' ? 'active' : ''}" aria-current="${activeTab === 'workout' ? 'page' : 'false'}">${icon('dumbbell', 21)}<span>训练</span></button>
-        <button data-tab="progress" class="${activeTab === 'progress' ? 'active' : ''}" aria-current="${activeTab === 'progress' ? 'page' : 'false'}">${icon('trend', 21)}<span>进度</span></button>
+        <button data-tab="today" class="${activeTab === 'today' ? 'active' : ''}" aria-current="${activeTab === 'today' ? 'page' : 'false'}">${icon('home', 20)}<span>今日</span></button>
+        <button data-tab="plan" class="${activeTab === 'plan' ? 'active' : ''}" aria-current="${activeTab === 'plan' ? 'page' : 'false'}">${icon('calendar', 20)}<span>计划</span></button>
+        <button data-tab="food" class="${activeTab === 'food' ? 'active' : ''}" aria-current="${activeTab === 'food' ? 'page' : 'false'}">${icon('utensils', 20)}<span>饮食</span></button>
+        <button data-tab="workout" class="${activeTab === 'workout' ? 'active' : ''}" aria-current="${activeTab === 'workout' ? 'page' : 'false'}">${icon('dumbbell', 20)}<span>训练</span></button>
+        <button data-tab="progress" class="${activeTab === 'progress' ? 'active' : ''}" aria-current="${activeTab === 'progress' ? 'page' : 'false'}">${icon('trend', 20)}<span>进度</span></button>
       </nav>
     </div>`
-  document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((button) => button.addEventListener('click', () => {
+  if (previousNav) {
+    const fresh = document.createElement('div'); fresh.innerHTML = markup
+    app.querySelector('.topbar')!.replaceWith(fresh.querySelector('.topbar')!)
+    if (!previousView) app.querySelector('#view')!.replaceWith(fresh.querySelector('#view')!)
+  } else app.innerHTML = markup
+  const currentView = app.querySelector<HTMLElement>('#view')!
+  currentView.dataset.renderVersion = renderVersion
+  if (previousNav) {
+    previousNav.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach(button => {
+      const selected = button.dataset.tab === activeTab
+      button.classList.toggle('active', selected); button.setAttribute('aria-current', selected ? 'page' : 'false')
+    })
+  }
+  if (!previousNav) document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((button) => button.addEventListener('click', () => {
     activeTab = button.dataset.tab as Tab
     void render().catch(fail)
   }))
   app.querySelector('#open-ai-assistant')?.addEventListener('click', () => { void launchAssistant().catch(fail) })
   app.querySelector('#open-management')?.addEventListener('click', showManagementHub)
   app.querySelector('#plan-add-task')?.addEventListener('click', () => void showTaskEditor(undefined, planView === 'today' ? today : undefined))
-  if (activeTab === 'today') await renderTodayPage()
-  if (activeTab === 'plan') await renderPlanPage()
-  if (activeTab === 'food') await renderFoodPage()
-  if (activeTab === 'workout') await renderWorkoutPage()
-  if (activeTab === 'progress') await renderProgressPage()
+  switch (targetTab) {
+    case 'today': await renderTodayPage(); break
+    case 'plan': await renderPlanPage(); break
+    case 'food': await renderFoodPage(); break
+    case 'workout': await renderWorkoutPage(); break
+    case 'progress': await renderProgressPage(); break
+  }
+  if (navigation && currentView.isConnected && targetTab === activeTab && currentView.dataset.renderVersion === renderVersion) animateMotion(currentView, 'navigation')
 }
 
 const habitToggleQueue = new Map<string, Promise<void>>()
@@ -275,7 +302,7 @@ function todayHabitCardHtml(habits: Habit[], checkIns: HabitCheckIn[], date: str
   const checked = new Set(checkIns.map((item) => item.habitId))
   const count = habits.filter((habit) => checked.has(habit.id)).length
   const weekday = ((new Date(`${date}T12:00:00`).getDay() + 6) % 7) + 1
-  return `<section class="today-card today-activity-card today-habits-card" id="today-habits"><div class="card-heading today-activity-head"><div><span class="card-icon habit-icon">${icon('check', 19)}</span><h2>习惯</h2></div><button class="text-btn" id="today-habits-manage">管理 ${icon('chevron', 15)}</button></div>${habits.length ? `<div class="today-habit-list">${habits.map((habit) => `<button class="today-habit-row" type="button" data-habit-toggle="${esc(habit.id)}" aria-pressed="${checked.has(habit.id)}"><span class="habit-check-indicator" aria-hidden="true">${icon('check', 15)}</span><span class="habit-row-name">${esc(habit.name)}</span>${habit.weekdays?.includes(weekday) ? '<small class="habit-planned-badge">计划</small>' : ''}</button>`).join('')}</div><p class="today-habit-summary" id="today-habit-summary">${habitTodaySummary(count)}</p>` : '<div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">还没有习惯</strong><span class="today-activity-meta">完成时轻触打卡即可</span></div><button class="secondary today-activity-action" id="today-habit-create">创建习惯</button></div>'}</section>`
+  return `<section class="today-card today-activity-card today-habits-card" id="today-habits"><div class="card-heading today-activity-head"><div><span class="card-icon habit-icon">${icon('check', 20)}</span><h2>习惯</h2></div><button class="text-btn" id="today-habits-manage">管理 ${icon('chevron', 16)}</button></div>${habits.length ? `<div class="today-habit-list">${habits.map((habit) => `<button class="today-habit-row" type="button" data-habit-toggle="${esc(habit.id)}" aria-pressed="${checked.has(habit.id)}"><span class="habit-check-indicator" aria-hidden="true">${icon('check', 16)}</span><span class="habit-row-name">${esc(habit.name)}</span>${habit.weekdays?.includes(weekday) ? '<small class="habit-planned-badge">计划</small>' : ''}</button>`).join('')}</div><p class="today-habit-summary" id="today-habit-summary">${habitTodaySummary(count)}</p>` : '<div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">还没有习惯</strong><span class="today-activity-meta">完成时轻触打卡即可</span></div><button class="secondary today-activity-action" id="today-habit-create">创建习惯</button></div>'}</section>`
 }
 
 function bindTodayHabitCard(root: ParentNode, date: string): void {
@@ -317,10 +344,16 @@ async function showHabitManager(openCreate = false): Promise<void> {
   dialog.classList.add('habit-sheet')
   const body = dialog.querySelector<HTMLElement>('#habit-manager-body')!
   const scroll = dialog.querySelector<HTMLElement>('.modal-body')!
+  let mounted = false, managerScroll = 0
   const setScreen = (title: string, html: string) => {
+    const back = title === '习惯管理'
+    const navigate = mounted && dialog.querySelector('h2')!.textContent !== title
+    if (mounted) { if (dialog.querySelector('h2')!.textContent === '习惯管理') managerScroll = scroll.scrollTop; stabilizeSheetSubview(dialog) }
     dialog.querySelector('h2')!.textContent = title
     body.innerHTML = html
-    scroll.scrollTop = 0
+    scroll.scrollTop = back ? managerScroll : 0
+    if (navigate) animateMotion(body, back ? 'back' : 'subview')
+    mounted = true
   }
   let reorderMode = false
   const manager = async () => {
@@ -328,8 +361,8 @@ async function showHabitManager(openCreate = false): Promise<void> {
     if (!dialog.isConnected) return
     const active = all.filter((habit) => habit.active)
     const inactive = all.filter((habit) => !habit.active)
-    const row = (habit: Habit, index: number, list: Habit[]) => `<div class="habit-manager-row${reorderMode && habit.active ? ' is-reordering' : ''}">${reorderMode && habit.active ? `<span class="habit-manager-row-main"><strong>${esc(habit.name)}</strong><small>${esc(habitPlanText(habit))}</small></span><span class="habit-reorder-actions"><button type="button" data-habit-move="${esc(habit.id)}" data-direction="-1" aria-label="上移 ${esc(habit.name)}" ${index === 0 ? 'disabled' : ''}>↑</button><button type="button" data-habit-move="${esc(habit.id)}" data-direction="1" aria-label="下移 ${esc(habit.name)}" ${index === list.length - 1 ? 'disabled' : ''}>↓</button></span>` : `<button type="button" class="habit-manager-row-main" data-habit-edit="${esc(habit.id)}" aria-label="编辑 ${esc(habit.name)}"><span><strong>${esc(habit.name)}</strong><small>${esc(habitPlanText(habit))}${habit.active ? '' : ' · 已停用'}</small></span>${icon('chevron', 17)}</button>`}</div>`
-    setScreen('习惯管理', `<div class="habit-manager"><div class="habit-manager-toolbar"><span>${reorderMode ? '调整顺序' : `已启用 ${active.length} 项`}</span><div><button type="button" class="text-btn" id="habit-reorder" ${active.length < 2 ? 'hidden' : ''}>${reorderMode ? '完成' : '调整顺序'}</button>${reorderMode ? '' : '<button type="button" class="text-btn" id="habit-new">+ 新建</button>'}</div></div>${all.length ? `<section class="habit-manager-section"><h3>习惯</h3><div class="habit-manager-group">${active.length ? active.map((habit, index) => row(habit, index, active)).join('') : '<p class="habit-manager-empty-line">还没有启用的习惯</p>'}</div></section>${inactive.length ? `<section class="habit-manager-section"><h3>已停用</h3><div class="habit-manager-group">${inactive.map((habit, index) => row(habit, index, inactive)).join('')}</div></section>` : ''}` : '<div class="habit-manager-empty"><strong>还没有习惯</strong><p>创建一个需要时轻触打卡的习惯。</p><button type="button" class="secondary" id="habit-empty-new">新建习惯</button></div>'}</div>`)
+    const row = (habit: Habit, index: number, list: Habit[]) => `<div class="habit-manager-row${reorderMode && habit.active ? ' is-reordering' : ''}">${reorderMode && habit.active ? `<span class="habit-manager-row-main"><strong>${esc(habit.name)}</strong><small>${esc(habitPlanText(habit))}</small></span><span class="habit-reorder-actions"><button type="button" data-habit-move="${esc(habit.id)}" data-direction="-1" aria-label="上移 ${esc(habit.name)}" ${index === 0 ? 'disabled' : ''}>↑</button><button type="button" data-habit-move="${esc(habit.id)}" data-direction="1" aria-label="下移 ${esc(habit.name)}" ${index === list.length - 1 ? 'disabled' : ''}>↓</button></span>` : `<button type="button" class="habit-manager-row-main" data-habit-edit="${esc(habit.id)}" aria-label="编辑 ${esc(habit.name)}"><span><strong>${esc(habit.name)}</strong><small>${esc(habitPlanText(habit))}${habit.active ? '' : ' · 已停用'}</small></span>${icon('chevron', 18)}</button>`}</div>`
+    setScreen('习惯管理', `<div class="habit-manager"><div class="habit-manager-toolbar"><span>${reorderMode ? '调整顺序' : `已启用 ${active.length} 项`}</span><div><button type="button" class="text-btn" id="habit-reorder" ${active.length < 2 ? 'hidden' : ''}>${reorderMode ? '完成' : '调整顺序'}</button>${reorderMode ? '' : '<button type="button" class="text-btn" id="habit-new">+ 新建</button>'}</div></div>${all.length ? `<section class="habit-manager-section"><h3>习惯</h3><div class="habit-manager-group">${active.length ? active.map((habit, index) => row(habit, index, active)).join('') : '<p class="habit-manager-empty-line">还没有启用的习惯</p>'}</div></section>${inactive.length ? `<section class="habit-manager-section"><h3>已停用</h3><div class="habit-manager-group">${inactive.map((habit, index) => row(habit, index, inactive)).join('')}</div></section>` : ''}` : '<div class="habit-manager-empty"><strong>还没有习惯</strong><p>创建一个需要时轻触打卡的习惯。</p><button type="button" class="primary" id="habit-empty-new">新建习惯</button></div>'}</div>`)
     body.querySelector('#habit-new')?.addEventListener('click', () => void editor())
     body.querySelector('#habit-empty-new')?.addEventListener('click', () => void editor())
     body.querySelector('#habit-reorder')?.addEventListener('click', () => { reorderMode = !reorderMode; void manager() })
@@ -386,7 +419,7 @@ function todayPlanCardHtml(tasks: Task[], allTags: TaskTag[]): string {
   const pending = ordered.filter((task) => !task.completedAt)
   const recentComplete = ordered.filter((task) => task.completedAt).sort((a, b) => (b.completedAt ?? '').localeCompare(a.completedAt ?? '')).slice(0, 1)
   const visible = [...pending.slice(0, 4), ...recentComplete]
-  return `<section class="today-card today-activity-card today-plan-card" id="today-plan"><div class="card-heading today-activity-head"><div><span class="card-icon plan-icon">${icon('calendar', 19)}</span><h2>今日计划</h2></div><button class="text-btn" id="today-plan-all">查看全部 ${icon('chevron', 15)}</button></div>${visible.length ? `${taskGroupHtml(visible, tags)}${pending.length > 4 ? `<p class="today-plan-more">还有 ${pending.length - 4} 项</p>` : ''}` : '<div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">今天没有安排</strong><span class="today-activity-meta">有需要时随手记下来</span></div><button type="button" class="secondary today-activity-action" id="today-plan-add">添加任务</button></div>'}</section>`
+  return `<section class="today-card today-activity-card today-plan-card" id="today-plan"><div class="card-heading today-activity-head"><div><span class="card-icon plan-icon">${icon('calendar', 20)}</span><h2>今日计划</h2></div><button class="text-btn" id="today-plan-all">查看全部 ${icon('chevron', 16)}</button></div>${visible.length ? `${taskGroupHtml(visible, tags)}${pending.length > 4 ? `<p class="today-plan-more">还有 ${pending.length - 4} 项</p>` : ''}` : '<div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">今天没有安排</strong><span class="today-activity-meta">有需要时随手记下来</span></div><button type="button" class="secondary today-activity-action" id="today-plan-add">添加任务</button></div>'}</section>`
 }
 
 function bindTodayPlanCard(root: ParentNode): void {
@@ -409,6 +442,8 @@ async function refreshTodayPlanCard(): Promise<void> {
 }
 
 async function renderTodayPage(): Promise<void> {
+  const view = document.querySelector<HTMLElement>('#view')!
+  const viewVersion = view.dataset.renderVersion
   const today = getLocalDateString()
   const [logs, target, workouts, cardioSessions, pelvicSessions, weights, allPelvicSessions, habits, habitCheckIns, todayTasks, taskTags] = await Promise.all([
     db.foodLogs.where('date').equals(today).toArray(),
@@ -436,13 +471,13 @@ async function renderTodayPage(): Promise<void> {
   const weightState = getTodayWeightState(weights, today)
   const dailyPlanRoutine = pelvicPlanRoutine(selectedPelvicPlanLevel(getPelvicFloorPlanProgress(allPelvicSessions)))
   const pelvicState = getTodayPelvicState(pelvicSessions, dailyPlanRoutine.name, pelvicRoutineMinutes(dailyPlanRoutine))
-  const view = document.querySelector<HTMLElement>('#view')!
+  if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
   view.innerHTML = `
     ${todayPlanCardHtml(todayTasks, taskTags)}
-    <section class="today-card nutrition-today-card"><div class="card-heading"><div><span class="card-icon nutrition-icon">${icon('utensils', 19)}</span><h2>今日饮食</h2></div><button class="text-btn" id="today-food-details">查看详情 ${icon('chevron', 15)}</button></div><div class="today-calorie-layout">${calorieGaugeHtml(totals.calories, target?.calories, 'today')}</div><div class="today-macros nutrition-tiles">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein)}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs)}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat)}</div></section>
-    <section class="today-card today-activity-card workout-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon workout-icon">${icon('dumbbell', 19)}</span><h2>训练</h2></div><button class="text-btn" id="today-workout-details">查看训练 ${icon('chevron', 15)}</button></div><div class="today-training-row today-strength-row"><strong>无氧</strong><div class="today-strength-status${openWorkout ? '' : ' today-activity-body'}"><span>${workouts.length ? ['力量训练', `${strengthExercises} 个动作`, `${strengthSets} 组`, ...(openWorkout ? ['记录中'] : [])].map(metric => `<span class="today-training-token">${esc(metric)}</span>`).join(' · ') : '今天还没有力量训练'}</span>${openWorkout ? '<button class="primary today-workout-action" id="today-workout">继续力量训练</button>' : '<button class="secondary today-activity-action" id="today-workout">记录训练</button>'}</div></div><div class="today-training-row"><strong>有氧</strong><span>${cardioSessions.length === 1 ? [getCardioActivityLabel(cardioSessions[0]!), `${formatNumber(cardioMinutes)} 分钟`, ...formatCardioMetrics(cardioSessions[0]!)].map(metric => `<span class="today-training-token">${esc(metric)}</span>`).join(' · ') : cardioSessions.length ? `有氧训练 · ${cardioSessions.length} 次 · 共 ${formatNumber(cardioMinutes)} 分钟` : '今天还没有有氧训练'}</span></div></section>
-    <section class="today-card today-activity-card weight-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon weight-icon">${icon('scale', 19)}</span><h2>体重</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 15)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(weightState.status)}</strong><span class="today-activity-meta">${esc(weightState.meta)}</span></div><button class="secondary today-activity-action" id="today-record-weight">${esc(weightState.action)}</button></div></section>
-    <section class="today-card today-activity-card pelvic-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon pelvic-icon">${icon('leaf', 19)}</span><h2>凯格尔训练</h2></div><button class="text-btn" id="today-pelvic-history">训练记录 ${icon('chevron', 15)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(pelvicState.status)}</strong><span class="today-activity-meta">${esc(pelvicState.meta)}</span></div><button class="secondary today-activity-action" id="today-pelvic">${esc(pelvicState.action)}</button></div></section>
+    <section class="today-card nutrition-today-card"><div class="card-heading"><div><span class="card-icon nutrition-icon">${icon('utensils', 20)}</span><h2>今日饮食</h2></div><button class="text-btn" id="today-food-details">查看详情 ${icon('chevron', 16)}</button></div><div class="today-calorie-layout">${calorieGaugeHtml(totals.calories, target?.calories, 'today')}</div><div class="today-macros nutrition-tiles">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein)}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs)}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat)}</div></section>
+    <section class="today-card today-activity-card workout-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon workout-icon">${icon('dumbbell', 20)}</span><h2>训练</h2></div><button class="text-btn" id="today-workout-details">查看训练 ${icon('chevron', 16)}</button></div><div class="today-training-row today-strength-row"><strong>无氧</strong><div class="today-strength-status${openWorkout ? '' : ' today-activity-body'}"><span>${workouts.length ? ['力量训练', `${strengthExercises} 个动作`, `${strengthSets} 组`, ...(openWorkout ? ['记录中'] : [])].map(metric => `<span class="today-training-token">${esc(metric)}</span>`).join(' · ') : '今天还没有力量训练'}</span>${openWorkout ? '<button class="primary today-workout-action" id="today-workout">继续力量训练</button>' : '<button class="secondary today-activity-action" id="today-workout">记录训练</button>'}</div></div><div class="today-training-row"><strong>有氧</strong><span>${cardioSessions.length === 1 ? [getCardioActivityLabel(cardioSessions[0]!), `${formatNumber(cardioMinutes)} 分钟`, ...formatCardioMetrics(cardioSessions[0]!)].map(metric => `<span class="today-training-token">${esc(metric)}</span>`).join(' · ') : cardioSessions.length ? `有氧训练 · ${cardioSessions.length} 次 · 共 ${formatNumber(cardioMinutes)} 分钟` : '今天还没有有氧训练'}</span></div></section>
+    <section class="today-card today-activity-card weight-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon weight-icon">${icon('scale', 20)}</span><h2>体重</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 16)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(weightState.status)}</strong><span class="today-activity-meta">${esc(weightState.meta)}</span></div><button class="secondary today-activity-action" id="today-record-weight">${esc(weightState.action)}</button></div></section>
+    <section class="today-card today-activity-card pelvic-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon pelvic-icon">${icon('leaf', 20)}</span><h2>凯格尔训练</h2></div><button class="text-btn" id="today-pelvic-history">训练记录 ${icon('chevron', 16)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(pelvicState.status)}</strong><span class="today-activity-meta">${esc(pelvicState.meta)}</span></div><button class="secondary today-activity-action" id="today-pelvic">${esc(pelvicState.action)}</button></div></section>
     ${todayHabitCardHtml(habits, habitCheckIns, today)}`
   view.querySelector('#today-food-details')?.addEventListener('click', () => { activeTab = 'food'; foodDate = today; void render().catch(fail) })
   view.querySelector('#today-workout-details')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = false; void render().catch(fail) })
@@ -455,12 +490,30 @@ async function renderTodayPage(): Promise<void> {
   bindTodayHabitCard(view, today)
 }
 
+/** Keep tab controls connected so reversible CSS transitions survive content replacement. */
+function setTabbedViewHtml(view: HTMLElement, html: string): boolean {
+  const oldTabs = view.querySelector<HTMLElement>('.page-tabs, .plan-tabs')
+  if (!oldTabs) { view.innerHTML = html; return false }
+  const fresh = document.createElement('div'); fresh.innerHTML = html
+  const nextTabs = fresh.querySelector<HTMLElement>('.page-tabs, .plan-tabs')
+  if (!nextTabs || nextTabs.className !== oldTabs.className) { view.innerHTML = html; return false }
+  const container = oldTabs.parentElement!, nextContainer = nextTabs.parentElement!
+  for (const button of oldTabs.querySelectorAll<HTMLButtonElement>('button')) {
+    const next = nextTabs.querySelector<HTMLButtonElement>(`[${oldTabs.classList.contains('plan-tabs') ? 'data-plan-view' : 'data-progress-view'}="${button.dataset.planView ?? button.dataset.progressView}"]`)!
+    button.classList.toggle('active', next.classList.contains('active')); button.setAttribute('aria-selected', next.getAttribute('aria-selected')!)
+  }
+  for (const child of [...container.childNodes]) if (child !== oldTabs) child.remove()
+  nextTabs.remove(); container.append(...nextContainer.childNodes)
+  return true
+}
+
 function progressTabsHtml(): string {
   return `<div class="page-tabs" role="tablist" aria-label="进度视图"><button role="tab" data-progress-view="trend" class="${progressView === 'trend' ? 'active' : ''}" aria-selected="${progressView === 'trend'}">趋势</button><button role="tab" data-progress-view="calendar" class="${progressView === 'calendar' ? 'active' : ''}" aria-selected="${progressView === 'calendar'}">日历</button><button role="tab" data-progress-view="reports" class="${progressView === 'reports' ? 'active' : ''}" aria-selected="${progressView === 'reports'}">报告</button></div>`
 }
 
 function bindProgressTabs(root: ParentNode = document): void {
   root.querySelectorAll<HTMLButtonElement>('[data-progress-view]').forEach((button) => button.addEventListener('click', () => {
+    if (progressView === button.dataset.progressView) return
     progressView = button.dataset.progressView as ProgressView
     void render().catch(fail)
   }))
@@ -541,14 +594,16 @@ function reportNutritionHtml(report: ReportResult): string {
 }
 
 async function renderReportsPage(): Promise<void> {
+  const view = document.querySelector<HTMLElement>('#view')!
+  const viewVersion = view.dataset.renderVersion
   const today = getLocalDateString()
   const report = await loadReport(reportMode, reportAnchorDate, today)
   if (activeTab !== 'progress' || progressView !== 'reports') return
   const current = getReportRange(reportMode, today)
   const isCurrent = report.range.start === current.start
-  const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `${progressTabsHtml()}<div class="report-page"><div class="report-mode" role="group" aria-label="报告周期"><button data-report-mode="week" class="${reportMode === 'week' ? 'active' : ''}" aria-pressed="${reportMode === 'week'}">周报</button><button data-report-mode="month" class="${reportMode === 'month' ? 'active' : ''}" aria-pressed="${reportMode === 'month'}">月报</button></div><div class="report-period"><button id="report-previous" aria-label="${reportMode === 'week' ? '上一周' : '上个月'}">‹</button><strong>${reportPeriodLabel(report)}</strong><button id="report-next" aria-label="${reportMode === 'week' ? '下一周' : '下个月'}" ${isCurrent ? 'disabled' : ''}>›</button></div>${isCurrent ? '' : `<button class="report-return" id="report-return">回到本${reportMode === 'week' ? '周' : '月'}</button>`}${report.empty ? '<div class="report-empty">这段时间还没有记录。</div>' : `<div class="report-summary-grid"><div><strong>${report.summary.trainingDays}</strong><span>训练天数</span></div><div><strong>${formatNumber(report.summary.cardioMinutes)}</strong><span>有氧分钟</span></div><div><strong>${report.summary.foodDays}</strong><span>饮食记录天数</span></div><div><strong>${report.summary.habitCheckIns}</strong><span>习惯打卡次数</span></div></div>${reportTrainingHtml(report)}${reportWeightHtml(report)}${reportNutritionHtml(report)}`} ${reportHabitsHtml(report)}${report.empty ? '' : `<section class="report-section"><h2>本期摘要</h2><p class="report-note">${esc(report.text)}</p></section>`}</div>`
-  bindProgressTabs(view)
+  if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
+  const retainedTabs = setTabbedViewHtml(view, `${progressTabsHtml()}<div class="report-page"><div class="report-mode" role="group" aria-label="报告周期"><button data-report-mode="week" class="${reportMode === 'week' ? 'active' : ''}" aria-pressed="${reportMode === 'week'}">周报</button><button data-report-mode="month" class="${reportMode === 'month' ? 'active' : ''}" aria-pressed="${reportMode === 'month'}">月报</button></div><div class="report-period"><button id="report-previous" aria-label="${reportMode === 'week' ? '上一周' : '上个月'}">‹</button><strong>${reportPeriodLabel(report)}</strong><button id="report-next" aria-label="${reportMode === 'week' ? '下一周' : '下个月'}" ${isCurrent ? 'disabled' : ''}>›</button></div>${isCurrent ? '' : `<button class="report-return" id="report-return">回到本${reportMode === 'week' ? '周' : '月'}</button>`}${report.empty ? '<div class="report-empty">这段时间还没有记录。</div>' : `<div class="report-summary-grid"><div><strong>${report.summary.trainingDays}</strong><span>训练天数</span></div><div><strong>${formatNumber(report.summary.cardioMinutes)}</strong><span>有氧分钟</span></div><div><strong>${report.summary.foodDays}</strong><span>饮食记录天数</span></div><div><strong>${report.summary.habitCheckIns}</strong><span>习惯打卡次数</span></div></div>${reportTrainingHtml(report)}${reportWeightHtml(report)}${reportNutritionHtml(report)}`} ${reportHabitsHtml(report)}${report.empty ? '' : `<section class="report-section"><h2>本期摘要</h2><p class="report-note">${esc(report.text)}</p></section>`}</div>`)
+  if (!retainedTabs) bindProgressTabs(view)
   view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach((button) => button.addEventListener('click', () => { reportMode = button.dataset.reportMode as ReportMode; void render().catch(fail) }))
   view.querySelector('#report-previous')?.addEventListener('click', () => { reportAnchorDate = shiftReportPeriod(reportMode, reportAnchorDate, -1); void render().catch(fail) })
   view.querySelector('#report-next')?.addEventListener('click', () => { if (isCurrent) return; reportAnchorDate = shiftReportPeriod(reportMode, reportAnchorDate, 1); void render().catch(fail) })
@@ -577,7 +632,18 @@ function bindTaskRows(root: ParentNode, afterChange: (task: Task) => Promise<voi
   root.querySelectorAll<HTMLButtonElement>('[data-task-complete]').forEach((button) => button.addEventListener('click', () => {
     const id = button.dataset.taskComplete!
     const previous = taskToggleQueue.get(id) ?? Promise.resolve()
-    const next = previous.catch(() => {}).then(async () => { const task = await toggleTaskCompletion(id); await afterChange(task) }).catch(fail)
+    const circleStyle = getComputedStyle(button.querySelector('span')!)
+    const titleStyle = getComputedStyle(button.closest('.plan-task-row')!.querySelector('.plan-task-copy strong')!)
+    const before = { backgroundColor: circleStyle.backgroundColor, borderColor: circleStyle.borderColor, color: circleStyle.color }
+    const beforeTitle = { color: titleStyle.color }
+    const next = previous.catch(() => {}).then(async () => {
+      const task = await toggleTaskCompletion(id); await afterChange(task)
+      for (const check of document.querySelectorAll<HTMLButtonElement>('[data-task-complete]')) if (check.dataset.taskComplete === id) {
+        animateMotion(check.querySelector('span'), 'state', before)
+        animateMotion(check.closest('.plan-task-row')!.querySelector('.plan-task-copy strong'), 'state', beforeTitle)
+        animateMotion(check.querySelector('span > .icon'), task.completedAt ? 'completion' : 'completion-off')
+      }
+    }).catch(fail)
     taskToggleQueue.set(id, next)
     void next.finally(() => { if (taskToggleQueue.get(id) === next) taskToggleQueue.delete(id) })
   }))
@@ -594,18 +660,21 @@ function planDateHeading(date: string, today: string): string {
   return `${date === shiftLocalDate(today, 1) ? '明天 · ' : ''}${year}${monthDay} · ${weekday}`
 }
 
+let planRenderVersion = 0
 async function renderPlanPage(): Promise<void> {
+  const version = ++planRenderVersion
+  const view = document.querySelector<HTMLElement>('#view')!
+  const viewVersion = view.dataset.renderVersion
   const today = getLocalDateString()
   const [tasks, allTags] = await Promise.all([
     planView === 'today' ? getTasksByDate(today) : planView === 'upcoming' ? getUpcomingTasks(today) : getInboxTasks(),
     getTaskTags(),
   ])
-  if (activeTab !== 'plan') return
+  if (activeTab !== 'plan' || version !== planRenderVersion || !view.isConnected || view.dataset.renderVersion !== viewVersion) return
   if (planTagFilterId && !allTags.some((tag) => tag.id === planTagFilterId)) planTagFilterId = undefined
   const filtered = sortTasksForPlan(planTagFilterId ? tasks.filter((task) => task.tagIds.includes(planTagFilterId!)) : tasks)
   const tags = new Map(allTags.map((tag) => [tag.id, tag]))
   const currentFilter = allTags.find((tag) => tag.id === planTagFilterId)
-  const view = document.querySelector<HTMLElement>('#view')!
   let content = ''
   if (planView === 'today' || planView === 'inbox') {
     const pending = filtered.filter((task) => !task.completedAt)
@@ -624,10 +693,10 @@ async function renderPlanPage(): Promise<void> {
   }
   const context = planView === 'today' ? planDateHeading(today, today) : planView === 'upcoming' ? '未来安排' : '未安排日期'
   const filter = `<button type="button" id="plan-tag-filter" class="plan-filter-button${currentFilter ? ' is-active' : ''}" aria-label="${currentFilter ? `当前筛选标签 ${esc(currentFilter.name)}，选择其他标签` : '筛选标签'}"><span>${currentFilter ? `#${esc(currentFilter.name)}` : '标签'}</span>${icon('chevron', 14)}</button>`
-  view.innerHTML = `<div class="plan-page"><div class="plan-tabs" role="tablist" aria-label="计划视图"><button role="tab" data-plan-view="today" aria-selected="${planView === 'today'}" class="${planView === 'today' ? 'active' : ''}">今天</button><button role="tab" data-plan-view="upcoming" aria-selected="${planView === 'upcoming'}" class="${planView === 'upcoming' ? 'active' : ''}">近期</button><button role="tab" data-plan-view="inbox" aria-selected="${planView === 'inbox'}" class="${planView === 'inbox' ? 'active' : ''}">收件箱</button></div><div class="plan-context-row"><p class="plan-context-label">${esc(context)}</p><div class="plan-context-actions">${currentFilter ? `<div class="plan-filter-active">${filter}<button type="button" id="plan-tag-filter-clear" class="plan-filter-clear" aria-label="清除标签筛选 ${esc(currentFilter.name)}">${icon('x', 15)}</button></div>` : filter}</div></div>${content}</div>`
+  const retainedTabs = setTabbedViewHtml(view, `<div class="plan-page"><div class="plan-tabs" role="tablist" aria-label="计划视图"><button role="tab" data-plan-view="today" aria-selected="${planView === 'today'}" class="${planView === 'today' ? 'active' : ''}">今天</button><button role="tab" data-plan-view="upcoming" aria-selected="${planView === 'upcoming'}" class="${planView === 'upcoming' ? 'active' : ''}">近期</button><button role="tab" data-plan-view="inbox" aria-selected="${planView === 'inbox'}" class="${planView === 'inbox' ? 'active' : ''}">收件箱</button></div><div class="plan-context-row"><p class="plan-context-label">${esc(context)}</p><div class="plan-context-actions">${currentFilter ? `<div class="plan-filter-active">${filter}<button type="button" id="plan-tag-filter-clear" class="plan-filter-clear" aria-label="清除标签筛选 ${esc(currentFilter.name)}">${icon('x', 16)}</button></div>` : filter}</div></div>${content}</div>`)
   const topCreate = app.querySelector<HTMLButtonElement>('#plan-add-task')
   if (topCreate) topCreate.hidden = Boolean(view.querySelector('.plan-empty'))
-  view.querySelectorAll<HTMLButtonElement>('[data-plan-view]').forEach((button) => button.addEventListener('click', () => { planView = button.dataset.planView as PlanView; void renderPlanPage().catch(fail) }))
+  if (!retainedTabs) view.querySelectorAll<HTMLButtonElement>('[data-plan-view]').forEach((button) => button.addEventListener('click', () => { if (planView === button.dataset.planView) return; planView = button.dataset.planView as PlanView; void renderPlanPage().catch(fail) }))
   view.querySelector('#plan-tag-filter')?.addEventListener('click', () => void showTaskTagFilter())
   view.querySelector('#plan-tag-filter-clear')?.addEventListener('click', () => { planTagFilterId = undefined; void renderPlanPage().catch(fail) })
   view.querySelector('#plan-empty-add')?.addEventListener('click', () => void showTaskEditor(undefined, planView === 'today' ? today : undefined))
@@ -675,7 +744,7 @@ async function showTaskTagManager(): Promise<void> {
 async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> {
   const allTags = await getTaskTags()
   const selectedTagIds = [...(task?.tagIds ?? [])]
-  const dialog = openModal(task ? '编辑任务' : '新建任务', `<form id="task-form" class="task-editor"><label class="task-title-field">任务<input name="title" maxlength="120" value="${esc(task?.title ?? '')}" placeholder="要做什么？" required autocomplete="off" aria-expanded="false" aria-controls="task-tag-suggestions"></label><div id="task-tag-suggestions" class="task-tag-suggestions" role="listbox" hidden></div><div id="task-selected-tags" class="task-selected-tags"></div><section class="task-editor-section"><h3>日期</h3><div class="task-date-choices"><button type="button" data-task-date="today">今天</button><button type="button" data-task-date="tomorrow">明天</button><button type="button" data-task-date="none">无日期</button></div><input type="hidden" name="date" value="${esc(task?.date ?? defaultDate ?? '')}"><button type="button" id="task-date-picker-open" class="task-date-field fitlog-date-trigger">${icon('calendar', 17)}<span>选择日期</span></button></section><section class="task-editor-section" id="task-time-section"><h3>时间（可选）</h3><div class="task-time-fields"><label>开始时间<input type="time" name="startTime" value="${esc(task?.startTime ?? '')}"></label><label>结束时间<input type="time" name="endTime" value="${esc(task?.endTime ?? '')}"></label></div><p class="task-inline-error" id="task-time-error" role="alert" hidden>结束时间必须晚于开始时间</p></section><label class="task-note-field">备注（可选）<textarea name="note" maxlength="2000" rows="3" placeholder="补充一点细节">${esc(task?.note ?? '')}</textarea></label><div class="task-editor-actions"><button type="submit" class="primary full-btn">保存任务</button></div>${task ? '<button type="button" class="plan-quiet-danger" id="task-delete">删除任务</button>' : ''}</form>`)
+  const dialog = openModal(task ? '编辑任务' : '新建任务', `<form id="task-form" class="task-editor"><label class="task-title-field">任务<input name="title" maxlength="120" value="${esc(task?.title ?? '')}" placeholder="要做什么？" required autocomplete="off" aria-expanded="false" aria-controls="task-tag-suggestions"></label><div id="task-tag-suggestions" class="task-tag-suggestions" role="listbox" hidden></div><div id="task-selected-tags" class="task-selected-tags"></div><section class="task-editor-section"><h3>日期</h3><div class="task-date-choices"><button type="button" data-task-date="today">今天</button><button type="button" data-task-date="tomorrow">明天</button><button type="button" data-task-date="none">无日期</button></div><input type="hidden" name="date" value="${esc(task?.date ?? defaultDate ?? '')}"><button type="button" id="task-date-picker-open" class="task-date-field fitlog-date-trigger">${icon('calendar', 18)}<span>选择日期</span></button></section><section class="task-editor-section" id="task-time-section"><h3>时间（可选）</h3><div class="task-time-fields"><label>开始时间<input type="time" name="startTime" value="${esc(task?.startTime ?? '')}"></label><label>结束时间<input type="time" name="endTime" value="${esc(task?.endTime ?? '')}"></label></div><p class="task-inline-error" id="task-time-error" role="alert" hidden>结束时间必须晚于开始时间</p></section><label class="task-note-field">备注（可选）<textarea name="note" maxlength="2000" rows="3" placeholder="补充一点细节">${esc(task?.note ?? '')}</textarea></label><div class="task-editor-actions"><button type="submit" class="primary full-btn">保存任务</button></div>${task ? '<button type="button" class="plan-quiet-danger" id="task-delete">删除任务</button>' : ''}</form>`)
   dialog.classList.add('task-editor-sheet')
   const form = dialog.querySelector<HTMLFormElement>('#task-form')!
   const title = form.querySelector<HTMLInputElement>('[name="title"]')!
@@ -730,7 +799,7 @@ async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> 
   const updateDateControls = () => {
     const date = dateInput.value
     form.querySelector('#task-date-picker-open span')!.textContent = date ? datePickerLabel(date) : '选择日期'
-    form.querySelectorAll<HTMLButtonElement>('[data-task-date]').forEach((button) => { const value = button.dataset.taskDate === 'today' ? getLocalDateString() : button.dataset.taskDate === 'tomorrow' ? shiftLocalDate(getLocalDateString(), 1) : ''; button.classList.toggle('active', value === date) })
+    form.querySelectorAll<HTMLButtonElement>('[data-task-date]').forEach((button) => { const value = button.dataset.taskDate === 'today' ? getLocalDateString() : button.dataset.taskDate === 'tomorrow' ? shiftLocalDate(getLocalDateString(), 1) : ''; button.classList.toggle('active', value === date); button.setAttribute('aria-pressed', String(value === date)) })
     form.querySelector<HTMLElement>('#task-time-section')!.hidden = !date
     if (!date) { startInput.value = ''; endInput.value = '' }
     endInput.disabled = !startInput.value
@@ -745,13 +814,15 @@ async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> 
   dialog.querySelector('.modal-body')!.append(pickerView)
   const dateTrigger = form.querySelector<HTMLButtonElement>('#task-date-picker-open')!
   let picker: DatePickerController | undefined
+  let taskParentScroll = 0
   const returnToForm = () => {
-    picker?.destroy(); picker = undefined; pickerView.hidden = true; form.hidden = false
+    picker?.destroy(); picker = undefined; pickerView.hidden = true; form.hidden = false; dialog.querySelector('.modal-body')!.scrollTop = taskParentScroll; animateMotion(form, 'back')
     dialog.querySelector('h2')!.textContent = task ? '编辑任务' : '新建任务'
     if (document.documentElement.dataset.inputModality === 'keyboard') dateTrigger.focus({ preventScroll: true })
   }
   dateTrigger.addEventListener('click', () => {
-    form.hidden = true; pickerView.hidden = false; dialog.querySelector('h2')!.textContent = '选择任务日期'
+    taskParentScroll = dialog.querySelector('.modal-body')!.scrollTop
+    stabilizeSheetSubview(dialog); form.hidden = true; pickerView.hidden = false; animateMotion(pickerView, 'subview'); dialog.querySelector('h2')!.textContent = '选择任务日期'
     dialog.querySelector('.modal-body')!.scrollTop = 0
     picker = mountDatePicker(pickerView, {
       value: dateInput.value || getLocalDateString(),
@@ -781,7 +852,7 @@ async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> 
 function showManagementHub(): void {
   const dialog = openModal('管理与设置', '<div id="management-hub"></div>')
   const view = dialog.querySelector<HTMLElement>('#management-hub')!
-  const row = (id: string, iconName: IconName, title: string, detail: string) => `<button id="${id}"><span class="setting-icon">${icon(iconName, 18)}</span><span><strong>${title}</strong><small>${detail}</small></span>${icon('chevron', 17)}</button>`
+  const row = (id: string, iconName: IconName, title: string, detail: string) => `<button id="${id}"><span class="setting-icon">${icon(iconName, 18)}</span><span><strong>${title}</strong><small>${detail}</small></span>${icon('chevron', 18)}</button>`
   view.innerHTML = `<section class="settings-section"><h3>内容与模板</h3><div class="settings-group">${row('more-food-library', 'utensils', '食物库', '管理食物与营养数据')}${row('more-exercise-library', 'dumbbell', '动作库', '管理力量训练动作')}${row('more-workout-templates', 'activity', '训练模板', '管理常用训练组合')}${row('more-diet-templates', 'archive', '饮食模板', '管理常用饮食组合')}${row('more-nutrition-strategies', 'leaf', '营养模板', '多个日目标方案与使用阶段')}</div></section><section class="settings-section"><h3>个人管理</h3><div class="settings-group">${row('more-habits', 'leaf', '习惯', '创建、排序与停用打卡习惯')}</div></section><section class="settings-section"><h3>数据与备份</h3><div class="settings-group">${row('more-import', 'upload', '导入数据', '从表格或数据文件导入食物')}${row('more-backup', 'download', '备份与恢复', '导出或恢复完整本地数据')}${row('more-github-sync', 'archive', 'GitHub 同步', esc(githubSyncDetail()))}</div><p class="settings-section-note" role="note">数据保存在当前设备。更换设备或清除浏览器数据前，请先备份。</p></section><section class="settings-section"><h3>应用</h3><div class="settings-group">${row('more-ai-settings', 'sparkles', 'AI 设置', esc(aiSettingsDetail()))}${row('more-diagnostics', 'info', '版本诊断', '查看 App build、SW 状态与更新')}${row('more-about', 'info', '关于 FitLog Lite', 'FitLog Lite · 本地优先')}</div></section>`
   view.querySelector('#more-food-library')?.addEventListener('click', () => void showFoodLibrary())
   view.querySelector('#more-exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
@@ -810,10 +881,12 @@ function showManagementHub(): void {
 }
 
 async function renderCalendarOverview(withProgressTabs = false): Promise<void> {
-  const summaries = await loadMonthSummaries(calendarYear, calendarMonth)
   const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `${withProgressTabs ? progressTabsHtml() : ''}<section class="calendar-overview-head"><button class="icon-btn quiet calendar-prev" id="calendar-prev" aria-label="上个月">${icon('chevron', 20)}</button><div><strong>${calendarYear}年 ${calendarMonth + 1}月</strong><button class="text-btn" id="calendar-today">回到今天</button></div><button class="icon-btn quiet" id="calendar-next" aria-label="下个月">${icon('chevron', 20)}</button></section><div id="calendar-host"></div><section class="calendar-legend" aria-label="日历标记说明">${calendarCategories.map((category) => `<span class="calendar-legend-item"><i class="calendar-legend-icon calendar-category-${category}" aria-hidden="true">${icon(calendarCategoryIcons[category], 14)}</i><span>${calendarLegendLabels[category]}</span></span>`).join('')}</section>`
-  if (withProgressTabs) bindProgressTabs(view)
+  const viewVersion = view.dataset.renderVersion
+  const summaries = await loadMonthSummaries(calendarYear, calendarMonth)
+  if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
+  const retainedTabs = setTabbedViewHtml(view, `${withProgressTabs ? progressTabsHtml() : ''}<section class="calendar-overview-head"><button class="icon-btn quiet calendar-prev" id="calendar-prev" aria-label="上个月">${icon('chevron', 20)}</button><div><strong>${calendarYear}年 ${calendarMonth + 1}月</strong><button class="text-btn" id="calendar-today">回到今天</button></div><button class="icon-btn quiet" id="calendar-next" aria-label="下个月">${icon('chevron', 20)}</button></section><div id="calendar-host"></div><section class="calendar-legend" aria-label="日历标记说明">${calendarCategories.map((category) => `<span class="calendar-legend-item"><i class="calendar-legend-icon calendar-category-${category}" aria-hidden="true">${icon(calendarCategoryIcons[category], 14)}</i><span>${calendarLegendLabels[category]}</span></span>`).join('')}</section>`)
+  if (withProgressTabs && !retainedTabs) bindProgressTabs(view)
   const host = view.querySelector<HTMLElement>('#calendar-host')!
   host.append(renderMonthCalendar({
     year: calendarYear,
@@ -870,7 +943,7 @@ async function showCalendarDaySheet(date: string, summary?: CalendarDaySummary):
   const target = summary?.nutritionTarget
   const rows = buildCalendarDayDetailRows(summary, workouts, cardioSessions, pelvicSessions)
   const canClear = hasDayRecords(summary) || Boolean(target)
-  const detailHtml = rows.map((row) => `<article class="day-detail-row" role="group" aria-label="${esc(row.accessibleLabel)}"><div class="day-detail-label"><span class="day-detail-icon calendar-category-${row.key}" aria-hidden="true">${icon(calendarCategoryIcons[row.key], 15)}</span><span>${esc(row.label)}</span></div><div class="day-detail-content"><strong class="${row.empty ? 'is-empty' : ''}">${esc(row.primary)}</strong>${row.secondary.map((detail) => `<span>${esc(detail)}</span>`).join('')}</div></article>`).join('')
+  const detailHtml = rows.map((row) => `<article class="day-detail-row" role="group" aria-label="${esc(row.accessibleLabel)}"><div class="day-detail-label"><span class="day-detail-icon calendar-category-${row.key}" aria-hidden="true">${icon(calendarCategoryIcons[row.key], 16)}</span><span>${esc(row.label)}</span></div><div class="day-detail-content"><strong class="${row.empty ? 'is-empty' : ''}">${esc(row.primary)}</strong>${row.secondary.map((detail) => `<span>${esc(detail)}</span>`).join('')}</div></article>`).join('')
   const dialog = openModal(formatHeaderDate(date), `<div class="calendar-day-sheet">${detailHtml}${dietEvents.length ? dietEventsHtml(dietEvents, esc, true) : ''}</div><section class="calendar-quick-record" aria-label="快捷记录"><h3>快捷记录</h3><div class="calendar-day-actions"><button id="calendar-day-food">${icon('utensils', 18)} 饮食</button><button id="calendar-day-workout">${icon('dumbbell', 18)} 训练</button><button id="calendar-day-weight">${icon('scale', 18)} 体重</button></div></section>${canClear ? '<div class="calendar-day-danger"><button id="calendar-clear-day" class="danger-button">清空当天记录</button></div>' : ''}`)
   dialog.classList.add('calendar-detail-sheet')
   bindDietEvents(dialog, date, dietEvents, dietEventUi())
@@ -952,7 +1025,7 @@ function foodMealSectionHtml(group: FoodMealGroup, isToday: boolean, expanded = 
     : `${isToday ? '今天' : '这天'}还没有记录${group.name}`
   const mealIcon: Record<MealType, IconName> = { breakfast: 'sunrise', lunch: 'sun', dinner: 'moon', snack: 'snack' }
   return `<section class="food-meal ${count ? 'has-logs' : 'is-empty'}" data-meal-section="${key}">
-    <div class="food-meal-head"><button class="food-meal-summary" ${count ? `data-toggle-meal="${key}" aria-expanded="${expanded}"` : meal ? `data-add-meal="${meal}"` : ''} ${count || meal ? '' : 'disabled'} aria-label="${count ? `查看${group.name} ${count} 项记录` : `记录${group.name}`}"><span class="meal-symbol ${key}" aria-hidden="true">${icon(meal ? mealIcon[meal] : 'archive', 17)}</span><span class="meal-title"><strong>${group.name}</strong>${count ? `<small>${count} 项 · ${formatEnergyInputValue(group.calories)} kcal</small>` : ''}</span></button>${meal ? `<button class="meal-record" data-add-meal="${meal}">记录 ${icon('chevron', 15)}</button>` : '<span class="meal-unclassified-note">待整理</span>'}</div>
+    <div class="food-meal-head"><button class="food-meal-summary" ${count ? `data-toggle-meal="${key}" aria-expanded="${expanded}"` : meal ? `data-add-meal="${meal}"` : ''} ${count || meal ? '' : 'disabled'} aria-label="${count ? `查看${group.name} ${count} 项记录` : `记录${group.name}`}"><span class="meal-symbol ${key}" aria-hidden="true">${icon(meal ? mealIcon[meal] : 'archive', 18)}</span><span class="meal-title"><strong>${group.name}</strong>${count ? `<small>${count} 项 · ${formatEnergyInputValue(group.calories)} kcal</small>` : ''}</span></button>${meal ? `<button class="meal-record" data-add-meal="${meal}">记录 ${icon('chevron', 16)}</button>` : '<span class="meal-unclassified-note">待整理</span>'}</div>
     ${count ? `<p class="meal-macros">${macro}</p>` : ''}
     <p class="meal-preview">${preview}</p>
     ${count ? `<div class="meal-log-list" ${expanded ? '' : 'hidden'}>${group.logs.map(foodLogRowHtml).join('')}<button type="button" class="text-btn danger compact-action meal-clear" data-clear-meal="${key}">清空本餐记录</button></div>` : ''}
@@ -1187,7 +1260,7 @@ async function renderFoodPage(): Promise<void> {
   const completionStrip = target ? foodCompletionStripHtml(requestedDate, getNutritionCompletionSummary(target, logs)) : ''
   const expandedMeals = new Set(Array.from(view.querySelectorAll<HTMLButtonElement>('.food-content-body[data-food-date="' + requestedDate + '"] [data-toggle-meal][aria-expanded="true"]'), button => button.dataset.toggleMeal))
   const slotHtml = `<div class="food-content-body" data-food-date="${requestedDate}">
-    <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 15)}</button></div><div class="food-calorie-row">${calorieGaugeHtml(totals.calories, calorieTarget, 'food', previous.get('calories'))}</div><div class="macros nutrition-tiles ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div>${target?.strategySelection ? `<p class="strategy-food-source">${esc(target.strategySelection.templateName)} · ${esc(target.strategySelection.variantName)}</p>` : ''}${completionStrip}</section>
+    <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 16)}</button></div><div class="food-calorie-row">${calorieGaugeHtml(totals.calories, calorieTarget, 'food', previous.get('calories'))}</div><div class="macros nutrition-tiles ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div>${target?.strategySelection ? `<p class="strategy-food-source">${esc(target.strategySelection.templateName)} · ${esc(target.strategySelection.variantName)}</p>` : ''}${completionStrip}</section>
     ${dietEventsHtml(dietEvents, esc)}
     <section class="food-meals-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '按餐次记录，更清楚'}</span></div>${logs.length ? '<button class="food-save-template" id="save-day-diet-template" type="button" aria-label="将当天饮食保存为模板">保存为模板</button>' : ''}</section>
     <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday, expandedMeals.has(group.meal ?? 'unclassified'))).join('')}</div></div>`
@@ -1350,7 +1423,7 @@ function openFoodVisionWorkflow(date: string, meal?: MealType): void {
 async function showAddFoodLog(meal: MealType): Promise<void> {
   const recordDate = foodDate
   const foods = await db.foods.orderBy('name').toArray()
-  const dialog = openModal(`记录${mealNames[meal]}`, foods.length ? `<div class="form"><label class="search-field"><span class="sr-only">搜索食物</span>${icon('search', 19)}<input id="food-search" type="search" placeholder="搜索食物或品牌" autocomplete="off"></label><div id="food-results" class="picker-list"></div><button class="sheet-link" id="vision-food-from-picker">${icon('camera', 18)} 拍包装并记录</button><button class="sheet-link" id="create-food-from-picker">${icon('plus', 18)} 新建食物</button></div>` : `<div class="empty compact minimal"><div class="empty-icon">${icon('archive', 24)}</div><h3>食物库还是空的</h3><p>先创建一种食物。</p><button class="secondary" id="vision-food-from-picker">${icon('camera', 18)} 拍包装并记录</button><button class="primary" id="create-first-food">${icon('plus', 18)} 新建食物</button></div>`, true)
+  const dialog = openModal(`记录${mealNames[meal]}`, foods.length ? `<div class="form"><label class="search-field"><span class="sr-only">搜索食物</span>${icon('search', 20)}<input id="food-search" type="search" placeholder="搜索食物或品牌" autocomplete="off"></label><div id="food-results" class="picker-list"></div><button class="sheet-link" id="vision-food-from-picker">${icon('camera', 18)} 拍包装并记录</button><button class="sheet-link" id="create-food-from-picker">${icon('plus', 18)} 新建食物</button></div>` : `<div class="empty compact minimal"><div class="empty-icon">${icon('archive', 24)}</div><h3>食物库还是空的</h3><p>先创建一种食物。</p><button class="secondary" id="vision-food-from-picker">${icon('camera', 18)} 拍包装并记录</button><button class="primary" id="create-first-food">${icon('plus', 18)} 新建食物</button></div>`, true)
   dialog.querySelector('#vision-food-from-picker')?.addEventListener('click', () => { dialog.close(); openFoodVisionWorkflow(recordDate, meal) })
   if (!foods.length) {
     dialog.querySelector('#create-first-food')?.addEventListener('click', () => { dialog.close(); void showFoodForm() })
@@ -1382,14 +1455,14 @@ async function showFoodLibrary(query = ''): Promise<void> {
   const foods = await db.foods.orderBy('name').toArray()
   let currentQuery = query
   let searchTimer: number | undefined
-  const dialog = openModal('食物库', `<div class="toolbar"><label class="search-field"><span class="sr-only">搜索食物库</span>${icon('search', 19)}<input id="library-search" type="search" value="${esc(query)}" placeholder="搜索食物"></label><button class="icon-btn add-button" id="new-food" aria-label="新建食物">${icon('plus')}</button></div><div class="food-library-actions"><button class="secondary compact-action" id="food-vision-import">${icon('camera', 17)} 拍包装录入</button><button class="secondary compact-action" id="food-import-open">${icon('upload', 17)} 导入文件</button></div><div class="library-list"></div>`, foods.length > 0)
+  const dialog = openModal('食物库', `<div class="toolbar"><label class="search-field"><span class="sr-only">搜索食物库</span>${icon('search', 20)}<input id="library-search" type="search" value="${esc(query)}" placeholder="搜索食物"></label><button class="icon-btn add-button" id="new-food" aria-label="新建食物">${icon('plus')}</button></div><div class="food-library-actions"><button class="secondary compact-action" id="food-vision-import">${icon('camera', 18)} 拍包装录入</button><button class="secondary compact-action" id="food-import-open">${icon('upload', 18)} 导入文件</button></div><div class="library-list"></div>`, foods.length > 0)
   dialog.classList.add('food-library-sheet')
   const list = dialog.querySelector<HTMLElement>('.library-list')!
   const draw = (nextQuery: string) => {
     currentQuery = nextQuery
     const normalized = nextQuery.trim().toLocaleLowerCase()
     const filtered = foods.filter((food) => `${food.name} ${food.brand ?? ''}`.toLocaleLowerCase().includes(normalized))
-    list.innerHTML = filtered.length ? filtered.map((food) => `<article><button class="library-main" data-edit-food="${food.id}"><span><strong>${esc(food.name)}</strong>${food.brand ? `<small>${esc(food.brand)}</small>` : ''}<p>${formatEnergyInputValue(food.calories)} kcal / ${formatNumber(food.referenceGrams)}g</p>${food.servingGrams === undefined ? '' : `<small class="food-serving-note">1 份 ${formatNumber(food.servingGrams)} g</small>`}</span>${icon('chevron', 17)}</button><button class="icon-btn row-delete" data-delete-food="${food.id}" aria-label="删除 ${esc(food.name)}">${icon('trash', 17)}</button></article>`).join('') : normalized ? '<div class="library-empty"><h3>没有匹配的食物</h3><p>换个关键词试试。</p><button class="text-btn compact-action" id="clear-food-search">清除搜索</button></div>' : '<div class="library-empty"><h3>还没有食物</h3><p>拍包装录入，或手动新建。</p></div>'
+    list.innerHTML = filtered.length ? filtered.map((food) => `<article><button class="library-main" data-edit-food="${food.id}"><span><strong>${esc(food.name)}</strong>${food.brand ? `<small>${esc(food.brand)}</small>` : ''}<p>${formatEnergyInputValue(food.calories)} kcal / ${formatNumber(food.referenceGrams)}g</p>${food.servingGrams === undefined ? '' : `<small class="food-serving-note">1 份 ${formatNumber(food.servingGrams)} g</small>`}</span>${icon('chevron', 18)}</button><button class="icon-btn row-delete" data-delete-food="${food.id}" aria-label="删除 ${esc(food.name)}">${icon('trash', 18)}</button></article>`).join('') : normalized ? '<div class="library-empty"><h3>没有匹配的食物</h3><p>换个关键词试试。</p><button class="text-btn compact-action" id="clear-food-search">清除搜索</button></div>' : '<div class="library-empty"><h3>还没有食物</h3><p>拍包装录入，或手动新建。</p></div>'
     list.querySelector('#clear-food-search')?.addEventListener('click', () => { window.clearTimeout(searchTimer); dialog.querySelector<HTMLInputElement>('#library-search')!.value = ''; draw('') })
     list.querySelectorAll<HTMLButtonElement>('[data-edit-food]').forEach((button) => button.addEventListener('click', () => { const food = foods.find((item) => item.id === button.dataset.editFood); dialog.close(); void showFoodForm(food) }))
     list.querySelectorAll<HTMLButtonElement>('[data-delete-food]').forEach((button) => button.addEventListener('click', async () => {
@@ -1476,6 +1549,8 @@ function showImportPreview(preview: ImportPreview, existing: Food[]): void {
 }
 
 async function renderWorkoutPage(): Promise<void> {
+  const view = document.querySelector<HTMLElement>('#view')!
+  const viewVersion = view.dataset.renderVersion
   if (pelvicTimerState && pelvicTimerState.status !== 'completed') { renderPelvicFloorTimer(); return }
   if (showWorkoutHistory) { await renderWorkoutHistory(); return }
   if (workoutEditorOpen) {
@@ -1497,11 +1572,11 @@ async function renderWorkoutPage(): Promise<void> {
   const latestCardio = [...cardioSessions].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]
   const dailyPlanRoutine = pelvicPlanRoutine(selectedPelvicPlanLevel(getPelvicFloorPlanProgress(allPelvicSessions)))
   const recentWorkouts = (await db.workouts.toArray()).filter((item) => item.finishedAt).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt)).slice(0, 4)
-  const view = document.querySelector<HTMLElement>('#view')!
-  view.innerHTML = `<section class="context-row"><button type="button" id="workout-date-picker-open" class="date-control fitlog-date-trigger">${icon('calendar', 17)}<span>训练日期 · ${datePickerLabel(workoutDate).split(' · ')[0]}</span></button><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section>
+  if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
+  view.innerHTML = `<section class="context-row"><button type="button" id="workout-date-picker-open" class="date-control fitlog-date-trigger">${icon('calendar', 18)}<span>训练日期 · ${datePickerLabel(workoutDate).split(' · ')[0]}</span></button><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section>
     <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">无氧训练</h2></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('dumbbell', 20)}</span><div><h3>力量训练</h3><p>记录动作与组数</p></div></div><p class="training-card-summary">${openWorkout ? `正在记录 · ${strengthExercises} 个动作 · ${strengthSets} 组` : todayWorkouts.length ? `今日 ${strengthExercises} 个动作 · ${strengthSets} 组` : '今天还没有力量训练'}</p><button class="primary training-card-action" id="start-workout">${openWorkout ? '继续训练' : '开始力量训练'}</button></div></section>
-    <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">有氧训练</h2><button class="text-btn" id="cardio-history">历史记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('activity', 20)}</span><div><h3>有氧记录</h3><p>楼梯机 · 跑步机</p></div></div>${cardioSessions.length ? `<div class="training-card-summary"><span>${cardioSessions.length === 1 ? '今日 1 次' : `今日 ${cardioSessions.length} 次`}</span><strong>${formatNumber(cardioMinutes)} <small>分钟</small></strong><span>${cardioSessions.length === 1 ? [getCardioActivityLabel(cardioSessions[0]!), ...formatCardioMetrics(cardioSessions[0]!)].join(' · ') : `最近：${getCardioActivityLabel(latestCardio!)}`}</span></div>` : '<p class="training-card-summary">今天还没有有氧训练</p>'}<button class="primary training-card-action" id="add-cardio">${cardioSessions.length ? '再记一次' : '记录训练'}</button>${latestCardio ? `<button class="training-card-link" data-cardio-id="${latestCardio.id}">最近：${getCardioActivityLabel(latestCardio)} · ${formatNumber(latestCardio.durationMinutes)} 分钟 ${icon('chevron', 15)}</button>` : ''}</div></section>
-    <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">凯格尔训练</h2><button class="text-btn" id="pelvic-floor-history">训练记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('leaf', 20)}</span><div><h3>今日训练 · ${dailyPlanRoutine.name}</h3><p>渐进计划 · 耐力控制与快速脉冲</p></div></div><p class="training-card-summary">${pelvicSessions.length ? `今日已完成 ${pelvicSessions.length} 次 · 累计 ${pelvicSeconds} 秒` : `${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</p><button class="primary training-card-action" id="start-pelvic-floor">开始训练</button></div></section><section class="section-head"><div><h2>最近力量训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 17)}</button>`).join('')}</div>`
+    <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">有氧训练</h2><button class="text-btn" id="cardio-history">历史记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('activity', 20)}</span><div><h3>有氧记录</h3><p>楼梯机 · 跑步机</p></div></div>${cardioSessions.length ? `<div class="training-card-summary"><span>${cardioSessions.length === 1 ? '今日 1 次' : `今日 ${cardioSessions.length} 次`}</span><strong>${formatNumber(cardioMinutes)} <small>分钟</small></strong><span>${cardioSessions.length === 1 ? [getCardioActivityLabel(cardioSessions[0]!), ...formatCardioMetrics(cardioSessions[0]!)].join(' · ') : `最近：${getCardioActivityLabel(latestCardio!)}`}</span></div>` : '<p class="training-card-summary">今天还没有有氧训练</p>'}<button class="primary training-card-action" id="add-cardio">${cardioSessions.length ? '再记一次' : '记录训练'}</button>${latestCardio ? `<button class="training-card-link" data-cardio-id="${latestCardio.id}">最近：${getCardioActivityLabel(latestCardio)} · ${formatNumber(latestCardio.durationMinutes)} 分钟 ${icon('chevron', 16)}</button>` : ''}</div></section>
+    <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">凯格尔训练</h2><button class="text-btn" id="pelvic-floor-history">训练记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('leaf', 20)}</span><div><h3>今日训练 · ${dailyPlanRoutine.name}</h3><p>渐进计划 · 耐力控制与快速脉冲</p></div></div><p class="training-card-summary">${pelvicSessions.length ? `今日已完成 ${pelvicSessions.length} 次 · 累计 ${pelvicSeconds} 秒` : `${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</p><button class="primary training-card-action" id="start-pelvic-floor">开始训练</button></div></section><section class="section-head"><div><h2>最近力量训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 18)}</button>`).join('')}</div>`
   view.querySelector('#workout-date-picker-open')?.addEventListener('click', () => showBusinessDatePicker('选择训练日期', workoutDate, date => { workoutDate = date; currentWorkout = undefined; workoutEditorOpen = false; void render().catch(fail) }))
   view.querySelector('#exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
   view.querySelector('#workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
@@ -1539,9 +1614,7 @@ function showCardioForm(session?: CardioSession): void {
     syncType()
   }))
   syncType()
-  const openJournal = () => { const editor = formElement.querySelector<HTMLElement>('.journal-editor'); if (editor) { editor.hidden = false; editor.querySelector('textarea')?.focus() }; formElement.querySelector('[data-add-journal]')?.setAttribute('hidden', '') }
-  formElement.querySelector('[data-add-journal]')?.addEventListener('click', openJournal)
-  formElement.querySelector('[data-edit-journal]')?.addEventListener('click', openJournal)
+  bindJournalDisclosure(formElement)
   formElement.addEventListener('submit', async (event) => {
     event.preventDefault()
     const form = new FormData(event.currentTarget as HTMLFormElement)
@@ -1826,6 +1899,20 @@ function renderWorkoutEditor(workout: Workout): void {
   bindWorkoutEditor(workout)
 }
 
+function bindJournalDisclosure(root: ParentNode): void {
+  root.querySelectorAll<HTMLElement>('[data-journal]').forEach(section => {
+    const editor = section.querySelector<HTMLElement>('.journal-editor')!
+    const button = section.querySelector<HTMLButtonElement>('[data-add-journal], [data-edit-journal]')!
+    const caption = button.textContent!
+    button.setAttribute('aria-expanded', 'false'); button.setAttribute('aria-controls', editor.querySelector('textarea')!.id)
+    button.addEventListener('click', () => {
+      editor.hidden = !editor.hidden
+      button.setAttribute('aria-expanded', String(!editor.hidden)); button.textContent = editor.hidden ? caption : '收起日志'
+      if (!editor.hidden) { animateMotion(editor, 'disclosure'); editor.querySelector('textarea')?.focus() }
+    })
+  })
+}
+
 function trainingJournalHtml(note: string | undefined, id: string): string {
   return note
     ? `<section class="training-journal" data-journal><div class="journal-summary"><strong>训练日志</strong><button type="button" class="text-btn" data-edit-journal>编辑</button></div><p class="journal-copy">${esc(note)}</p><label class="note-field journal-editor" hidden>训练日志<textarea id="${id}" rows="3" maxlength="2000" placeholder="记录身体感受、动作质量或主观状态">${esc(note)}</textarea></label></section>`
@@ -1833,7 +1920,7 @@ function trainingJournalHtml(note: string | undefined, id: string): string {
 }
 
 function workoutExerciseHtml(exercise: WorkoutExercise): string {
-  return `<article class="exercise-card" data-workout-exercise="${exercise.id}"><div class="exercise-head"><h3>${esc(exercise.exerciseName)}</h3><button class="icon-btn quiet danger" data-remove-exercise="${exercise.id}" aria-label="移除 ${esc(exercise.exerciseName)}">${icon('trash', 17)}</button></div><div class="sets"><div class="set-header"><span>组</span><span>重量 <small>kg</small></span><span>次数</span><span></span></div>${exercise.sets.map((set, index) => `<div class="set-row" data-set="${set.id}"><span>${index + 1}</span><input aria-label="第${index + 1}组重量" data-field="weightKg" type="number" inputmode="decimal" min="0" step="0.5" value="${set.weightKg === undefined ? '' : formatNumber(set.weightKg)}" placeholder="—"><input aria-label="第${index + 1}组次数" data-field="reps" type="number" inputmode="numeric" min="1" step="1" value="${set.reps || ''}" placeholder="—"><button aria-label="删除第${index + 1}组" class="icon-btn quiet danger" data-remove-set="${set.id}">${icon('x', 17)}</button><input class="set-note" aria-label="第${index + 1}组备注" data-field="note" placeholder="本组备注（可选）" value="${esc(set.note)}"></div>`).join('')}</div><button class="text-btn add-set" data-add-set="${exercise.id}">${icon('plus', 17)} 添加一组</button></article>`
+  return `<article class="exercise-card" data-workout-exercise="${exercise.id}"><div class="exercise-head"><h3>${esc(exercise.exerciseName)}</h3><button class="icon-btn quiet danger" data-remove-exercise="${exercise.id}" aria-label="移除 ${esc(exercise.exerciseName)}">${icon('trash', 18)}</button></div><div class="sets"><div class="set-header"><span>组</span><span>重量 <small>kg</small></span><span>次数</span><span></span></div>${exercise.sets.map((set, index) => `<div class="set-row" data-set="${set.id}"><span>${index + 1}</span><input aria-label="第${index + 1}组重量" data-field="weightKg" type="number" inputmode="decimal" min="0" step="0.5" value="${set.weightKg === undefined ? '' : formatNumber(set.weightKg)}" placeholder="—"><input aria-label="第${index + 1}组次数" data-field="reps" type="number" inputmode="numeric" min="1" step="1" value="${set.reps || ''}" placeholder="—"><button aria-label="删除第${index + 1}组" class="icon-btn quiet danger" data-remove-set="${set.id}">${icon('x', 18)}</button><input class="set-note" aria-label="第${index + 1}组备注" data-field="note" placeholder="本组备注（可选）" value="${esc(set.note)}"></div>`).join('')}</div><button class="text-btn add-set" data-add-set="${exercise.id}">${icon('plus', 18)} 添加一组</button></article>`
 }
 
 function workoutSetSummary(set: WorkoutSet): string {
@@ -1846,9 +1933,7 @@ function bindWorkoutEditor(workout: Workout): void {
     try { await flushWorkoutAutosave(workout); currentWorkout = undefined; workoutEditorOpen = false; document.body.classList.remove('immersive'); await render() } catch (error) { fail(error) }
   })
   view.querySelector('#add-exercise')?.addEventListener('click', () => void showExercisePicker(workout))
-  const openJournal = () => { const editor = view.querySelector<HTMLElement>('.journal-editor'); if (editor) { editor.hidden = false; editor.querySelector('textarea')?.focus() }; view.querySelector('[data-add-journal]')?.setAttribute('hidden', '') }
-  view.querySelector('[data-add-journal]')?.addEventListener('click', openJournal)
-  view.querySelector('[data-edit-journal]')?.addEventListener('click', openJournal)
+  bindJournalDisclosure(view)
   view.querySelector<HTMLTextAreaElement>('#workout-note')?.addEventListener('input', (event) => { workout.note = (event.target as HTMLTextAreaElement).value.trim() || undefined; scheduleWorkoutSave(workout) })
   view.querySelectorAll<HTMLButtonElement>('[data-add-set]').forEach((button) => button.addEventListener('click', () => {
     const exercise = workout.exercises.find((item) => item.id === button.dataset.addSet)!
@@ -1905,7 +1990,7 @@ function scheduleWorkoutSave(workout: Workout): void {
 
 async function showExercisePicker(workout: Workout): Promise<void> {
   const exercises = await db.exercises.orderBy('name').toArray()
-  const dialog = openModal('添加动作', `<div class="form"><label class="search-field"><span class="sr-only">搜索动作</span>${icon('search', 19)}<input id="exercise-search" type="search" placeholder="搜索动作"></label><div id="exercise-results" class="picker-list"></div><button class="sheet-link" id="quick-exercise">${icon('plus', 18)} 创建新动作</button></div>`, true)
+  const dialog = openModal('添加动作', `<div class="form"><label class="search-field"><span class="sr-only">搜索动作</span>${icon('search', 20)}<input id="exercise-search" type="search" placeholder="搜索动作"></label><div id="exercise-results" class="picker-list"></div><button class="sheet-link" id="quick-exercise">${icon('plus', 18)} 创建新动作</button></div>`, true)
   const draw = (query = '') => {
     const matches = exercises.filter((item) => item.name.toLocaleLowerCase().includes(query.toLocaleLowerCase()))
     dialog.querySelector('#exercise-results')!.innerHTML = matches.map((exercise) => `<button class="picker-item" data-exercise="${exercise.id}"><strong>${esc(exercise.name)}</strong></button>`).join('') || '<p class="muted">没有匹配动作</p>'
@@ -1922,7 +2007,7 @@ async function showExercisePicker(workout: Workout): Promise<void> {
 
 async function showExerciseLibrary(): Promise<void> {
   const exercises = await db.exercises.orderBy('name').toArray()
-  const dialog = openModal('动作库', `<button class="primary full-btn" id="new-exercise">${icon('plus', 18)} 新建动作</button><div class="library-list">${exercises.length ? exercises.map((exercise) => `<article><button class="library-main" data-edit-exercise="${exercise.id}"><span><strong>${esc(exercise.name)}</strong>${exercise.notes ? `<p>${esc(exercise.notes)}</p>` : ''}</span>${icon('chevron', 17)}</button><button class="icon-btn row-delete" data-delete-exercise="${exercise.id}" aria-label="删除 ${esc(exercise.name)}">${icon('trash', 17)}</button></article>`).join('') : '<div class="library-empty"><h3>还没有动作</h3><p>新建一个动作，开始记录训练。</p></div>'}</div>`, exercises.length > 0)
+  const dialog = openModal('动作库', `<button class="primary full-btn" id="new-exercise">${icon('plus', 18)} 新建动作</button><div class="library-list">${exercises.length ? exercises.map((exercise) => `<article><button class="library-main" data-edit-exercise="${exercise.id}"><span><strong>${esc(exercise.name)}</strong>${exercise.notes ? `<p>${esc(exercise.notes)}</p>` : ''}</span>${icon('chevron', 18)}</button><button class="icon-btn row-delete" data-delete-exercise="${exercise.id}" aria-label="删除 ${esc(exercise.name)}">${icon('trash', 18)}</button></article>`).join('') : '<div class="library-empty"><h3>还没有动作</h3><p>新建一个动作，开始记录训练。</p></div>'}</div>`, exercises.length > 0)
   dialog.querySelector('#new-exercise')?.addEventListener('click', () => { dialog.close(); void showExerciseForm() })
   dialog.querySelectorAll<HTMLButtonElement>('[data-edit-exercise]').forEach((button) => button.addEventListener('click', () => { dialog.close(); void showExerciseForm(exercises.find((item) => item.id === button.dataset.editExercise)) }))
   dialog.querySelectorAll<HTMLButtonElement>('[data-delete-exercise]').forEach((button) => button.addEventListener('click', async () => { if (!await confirmAction('删除这个动作？', '历史训练会保留，此操作不会改变过去的训练记录。')) return; try { await db.exercises.delete(button.dataset.deleteExercise!); dialog.close(); toast('已删除'); void showExerciseLibrary() } catch (error) { fail(error) } }))
@@ -1934,13 +2019,15 @@ async function showExerciseForm(exercise?: Exercise, afterSave?: (value: Exercis
 }
 
 async function renderWorkoutHistory(): Promise<void> {
+  const view = document.querySelector<HTMLElement>('#view')!
+  const viewVersion = view.dataset.renderVersion
   document.body.classList.remove('immersive')
   const workouts = (await db.workouts.toArray()).filter((item) => item.finishedAt).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt))
-  const view = document.querySelector<HTMLElement>('#view')!
+  if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
   const completedFeedback = justFinishedWorkout && workouts.some((item) => item.id === justFinishedWorkout?.id)
     ? `<div class="workout-complete-banner" role="status">${icon('check', 20)}<span><strong>本次训练已完成</strong><small>${justFinishedWorkout.exercises.length} 个动作 · ${justFinishedWorkout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组已记录</small></span></div>` : ''
   justFinishedWorkout = undefined
-  view.innerHTML = `${completedFeedback}<div class="section-head history-head"><div><h2>历史训练</h2><span>${workouts.length} 次训练</span></div><button class="text-btn" id="close-history">返回</button></div><div class="history-list">${workouts.length ? workouts.map((workout) => `<button class="history-card" data-workout="${workout.id}"><div class="history-card-title"><strong>${formatShortDate(workout.date)}</strong><span>${workout.exercises.length} 个动作 · ${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组${workout.note ? ' · 有日志' : ''}</span></div><div class="history-details">${workout.exercises.map((item) => `<div><strong>${esc(item.exerciseName)}</strong><small>${item.sets.map(workoutSetSummary).join(' · ') || '暂无组数'}</small></div>`).join('')}</div>${icon('chevron', 17)}</button>`).join('') : `<div class="empty minimal"><div class="empty-icon">${icon('activity', 24)}</div><h3>还没有训练历史</h3><p>完成力量训练后，在这里回顾记录。</p></div>`}</div>`
+  view.innerHTML = `${completedFeedback}<div class="section-head history-head"><div><h2>历史训练</h2><span>${workouts.length} 次训练</span></div><button class="text-btn" id="close-history">返回</button></div><div class="history-list">${workouts.length ? workouts.map((workout) => `<button class="history-card" data-workout="${workout.id}"><div class="history-card-title"><strong>${formatShortDate(workout.date)}</strong><span>${workout.exercises.length} 个动作 · ${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组${workout.note ? ' · 有日志' : ''}</span></div><div class="history-details">${workout.exercises.map((item) => `<div><strong>${esc(item.exerciseName)}</strong><small>${item.sets.map(workoutSetSummary).join(' · ') || '暂无组数'}</small></div>`).join('')}</div>${icon('chevron', 18)}</button>`).join('') : `<div class="empty minimal"><div class="empty-icon">${icon('activity', 24)}</div><h3>还没有训练历史</h3><p>完成力量训练后，在这里回顾记录。</p></div>`}</div>`
   view.querySelector('#close-history')?.addEventListener('click', () => { showWorkoutHistory = false; void renderWorkoutPage().catch(fail) })
   view.querySelectorAll<HTMLButtonElement>('[data-workout]').forEach((button) => button.addEventListener('click', async () => { try { currentWorkout = await db.workouts.get(button.dataset.workout!); workoutEditorOpen = true; showWorkoutHistory = false; await renderWorkoutPage() } catch (error) { fail(error) } }))
 }
@@ -1992,7 +2079,7 @@ async function showWorkoutTemplateManager(query = ''): Promise<void> {
   const templates = sortTemplates(await db.workoutTemplates.toArray())
   const exerciseIds = [...new Set(templates.flatMap((template) => template.exercises.map((item) => item.exerciseId).filter((id): id is string => Boolean(id))))]
   const existingIds = new Set((await db.exercises.bulkGet(exerciseIds)).filter((item): item is Exercise => Boolean(item)).map((item) => item.id))
-  const dialog = openModal('训练模板', `<div class="toolbar"><label class="search-field"><span class="sr-only">搜索训练模板</span>${icon('search', 19)}<input id="workout-template-search" type="search" value="${esc(query)}" placeholder="搜索模板"></label><button class="icon-btn add-button" id="new-workout-template" aria-label="新建训练模板">${icon('plus')}</button></div><div class="template-manager-list"></div>`, templates.length > 0)
+  const dialog = openModal('训练模板', `<div class="toolbar"><label class="search-field"><span class="sr-only">搜索训练模板</span>${icon('search', 20)}<input id="workout-template-search" type="search" value="${esc(query)}" placeholder="搜索模板"></label><button class="icon-btn add-button" id="new-workout-template" aria-label="新建训练模板">${icon('plus')}</button></div><div class="template-manager-list"></div>`, templates.length > 0)
   const draw = (value: string) => {
     const normalized = value.trim().toLocaleLowerCase()
     const filtered = templates.filter((item) => item.name.toLocaleLowerCase().includes(normalized))
@@ -2079,12 +2166,12 @@ async function showWorkoutTemplateEditor(source?: WorkoutTemplate): Promise<void
 }
 
 function workoutTemplateExerciseEditorHtml(exercise: WorkoutTemplateExercise, index: number, count: number, missing: boolean): string {
-  return `<article class="exercise-card template-exercise" data-template-exercise="${exercise.id}"><div class="exercise-head"><div><h3>${esc(exercise.exerciseName)}</h3>${missing ? '<small class="warning-text">动作已删除，将使用名称快照</small>' : ''}</div><div class="reorder-actions"><button type="button" data-template-move="${exercise.id}" data-direction="-1" ${index === 0 ? 'disabled' : ''} aria-label="上移">↑</button><button type="button" data-template-move="${exercise.id}" data-direction="1" ${index === count - 1 ? 'disabled' : ''} aria-label="下移">↓</button><button type="button" class="icon-btn quiet danger" data-template-remove-exercise="${exercise.id}" aria-label="删除动作">${icon('trash', 17)}</button></div></div><div class="sets"><div class="set-header"><span>组</span><span>重量 <small>kg</small></span><span>次数</span><span></span></div>${exercise.sets.map((set, setIndex) => `<div class="set-row" data-template-set-row="${set.id}"><span>${setIndex + 1}</span><input data-template-set="weightKg" type="number" inputmode="decimal" min="0" step="0.5" value="${set.weightKg === undefined ? '' : formatNumber(set.weightKg)}" placeholder="—"><input data-template-set="reps" type="number" inputmode="numeric" min="1" step="1" value="${set.reps || ''}" placeholder="—"><button type="button" class="icon-btn quiet danger" data-template-remove-set="${set.id}" aria-label="删除第${setIndex + 1}组">${icon('x', 17)}</button><input class="set-note" data-template-set="note" value="${esc(set.note)}" placeholder="本组备注（可选）"></div>`).join('')}</div><button type="button" class="text-btn add-set" data-template-add-set="${exercise.id}">${icon('plus', 17)} 添加一组</button><label class="compact-label">动作备注<textarea data-template-exercise-note="${exercise.id}" rows="2" placeholder="可选">${esc(exercise.note)}</textarea></label></article>`
+  return `<article class="exercise-card template-exercise" data-template-exercise="${exercise.id}"><div class="exercise-head"><div><h3>${esc(exercise.exerciseName)}</h3>${missing ? '<small class="warning-text">动作已删除，将使用名称快照</small>' : ''}</div><div class="reorder-actions"><button type="button" data-template-move="${exercise.id}" data-direction="-1" ${index === 0 ? 'disabled' : ''} aria-label="上移">↑</button><button type="button" data-template-move="${exercise.id}" data-direction="1" ${index === count - 1 ? 'disabled' : ''} aria-label="下移">↓</button><button type="button" class="icon-btn quiet danger" data-template-remove-exercise="${exercise.id}" aria-label="删除动作">${icon('trash', 18)}</button></div></div><div class="sets"><div class="set-header"><span>组</span><span>重量 <small>kg</small></span><span>次数</span><span></span></div>${exercise.sets.map((set, setIndex) => `<div class="set-row" data-template-set-row="${set.id}"><span>${setIndex + 1}</span><input data-template-set="weightKg" type="number" inputmode="decimal" min="0" step="0.5" value="${set.weightKg === undefined ? '' : formatNumber(set.weightKg)}" placeholder="—"><input data-template-set="reps" type="number" inputmode="numeric" min="1" step="1" value="${set.reps || ''}" placeholder="—"><button type="button" class="icon-btn quiet danger" data-template-remove-set="${set.id}" aria-label="删除第${setIndex + 1}组">${icon('x', 18)}</button><input class="set-note" data-template-set="note" value="${esc(set.note)}" placeholder="本组备注（可选）"></div>`).join('')}</div><button type="button" class="text-btn add-set" data-template-add-set="${exercise.id}">${icon('plus', 18)} 添加一组</button><label class="compact-label">动作备注<textarea data-template-exercise-note="${exercise.id}" rows="2" placeholder="可选">${esc(exercise.note)}</textarea></label></article>`
 }
 
 async function showWorkoutTemplateExercisePicker(draft: WorkoutTemplate): Promise<void> {
   const exercises = await db.exercises.orderBy('name').toArray()
-  const dialog = openModal('添加模板动作', `<label class="search-field">${icon('search', 19)}<input id="template-exercise-search" type="search" placeholder="搜索动作"></label><div id="template-exercise-results" class="picker-list"></div>`, true)
+  const dialog = openModal('添加模板动作', `<label class="search-field">${icon('search', 20)}<input id="template-exercise-search" type="search" placeholder="搜索动作"></label><div id="template-exercise-results" class="picker-list"></div>`, true)
   const draw = (query = '') => {
     const matches = exercises.filter((item) => item.name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
     dialog.querySelector('#template-exercise-results')!.innerHTML = matches.map((exercise) => `<button class="picker-item" data-pick-template-exercise="${exercise.id}"><strong>${esc(exercise.name)}</strong></button>`).join('') || '<p class="muted">没有匹配动作</p>'
@@ -2152,7 +2239,7 @@ async function showDietTemplateManager(query = ''): Promise<void> {
     const goal = template.nutritionGoal?.calories === undefined ? '' : ` · 目标 ${formatEnergyInputValue(template.nutritionGoal.calories)} kcal`
     summaries.set(template.id, `${template.items.length} 项 · ${formatEnergyInputValue(kcal)} kcal${goal}${missing ? ` · ${missing} 项使用快照` : ''}`)
   }))
-  const dialog = openModal('饮食模板', `<div class="toolbar"><label class="search-field">${icon('search', 19)}<input id="diet-template-search" type="search" value="${esc(query)}" placeholder="搜索模板"></label><button class="icon-btn add-button" id="new-diet-template" aria-label="新建饮食模板">${icon('plus')}</button></div><div class="template-manager-list"></div>`, templates.length > 0)
+  const dialog = openModal('饮食模板', `<div class="toolbar"><label class="search-field">${icon('search', 20)}<input id="diet-template-search" type="search" value="${esc(query)}" placeholder="搜索模板"></label><button class="icon-btn add-button" id="new-diet-template" aria-label="新建饮食模板">${icon('plus')}</button></div><div class="template-manager-list"></div>`, templates.length > 0)
   const draw = (value: string) => {
     const normalized = value.trim().toLocaleLowerCase(); const filtered = templates.filter((item) => item.name.toLocaleLowerCase().includes(normalized))
     dialog.querySelector('.template-manager-list')!.innerHTML = filtered.length ? filtered.map((template) => `<article class="manager-card"><button class="manager-main" data-edit-diet-template="${template.id}"><strong>${esc(template.name)}</strong><span>${esc(summaries.get(template.id))}</span></button><div class="manager-actions"><button data-apply-diet-template="${template.id}">添加</button><button data-duplicate-diet-template="${template.id}">复制</button><button class="danger" data-delete-diet-template="${template.id}">删除</button></div></article>`).join('') : `<div class="library-empty"><h3>${normalized ? '没有匹配的饮食模板' : '还没有饮食模板'}</h3><p>${normalized ? '换个关键词试试。' : '轻触上方加号，创建常用饮食组合。'}</p></div>`
@@ -2179,7 +2266,7 @@ async function showDietTemplateEditor(source?: DietTemplate): Promise<void> {
     const data = new FormData(form); draft.name = valueOf(data, 'name'); draft.description = valueOf(data, 'description').trim() || undefined; draft.nutritionGoal = nutritionGoalFromForm(data)
   }
   const draw = () => {
-    dialog.querySelector('#diet-template-editor')!.innerHTML = `<form id="diet-template-form" class="form template-editor"><label>模板名称 *<input name="name" value="${esc(draft.name)}" placeholder="训练日早餐" required></label><label>说明<textarea name="description" rows="2" placeholder="可选">${esc(draft.description)}</textarea></label>${nutritionGoalFields(draft.nutritionGoal)}<div class="template-editor-items">${draft.items.map((item, index) => `<article class="diet-template-item" data-diet-template-item="${item.id}"><div><strong>${esc(item.foodName)}</strong>${item.brand ? `<small>${esc(item.brand)}</small>` : ''}${missingIds.has(item.id) ? '<small class="warning-text">食物已删除，将使用营养快照</small>' : ''}</div><label><input data-diet-grams type="number" inputmode="decimal" min="0.1" step="0.1" value="${item.grams}"><span>g</span></label><div class="reorder-actions"><button type="button" data-diet-move="${item.id}" aria-label="上移食物" data-direction="-1" ${index === 0 ? 'disabled' : ''}>↑</button><button type="button" data-diet-move="${item.id}" aria-label="下移食物" data-direction="1" ${index === draft.items.length - 1 ? 'disabled' : ''}>↓</button><button type="button" class="icon-btn quiet danger" data-remove-diet-item="${item.id}" aria-label="移除食物">${icon('trash', 17)}</button></div></article>`).join('') || '<p class="muted padded">还没有食物</p>'}</div><button type="button" class="secondary" id="add-diet-template-food">${icon('plus', 18)} 添加食物</button><button class="primary" type="submit">保存模板</button></form>`
+    dialog.querySelector('#diet-template-editor')!.innerHTML = `<form id="diet-template-form" class="form template-editor"><label>模板名称 *<input name="name" value="${esc(draft.name)}" placeholder="训练日早餐" required></label><label>说明<textarea name="description" rows="2" placeholder="可选">${esc(draft.description)}</textarea></label>${nutritionGoalFields(draft.nutritionGoal)}<div class="template-editor-items">${draft.items.map((item, index) => `<article class="diet-template-item" data-diet-template-item="${item.id}"><div><strong>${esc(item.foodName)}</strong>${item.brand ? `<small>${esc(item.brand)}</small>` : ''}${missingIds.has(item.id) ? '<small class="warning-text">食物已删除，将使用营养快照</small>' : ''}</div><label><input data-diet-grams type="number" inputmode="decimal" min="0.1" step="0.1" value="${item.grams}"><span>g</span></label><div class="reorder-actions"><button type="button" data-diet-move="${item.id}" aria-label="上移食物" data-direction="-1" ${index === 0 ? 'disabled' : ''}>↑</button><button type="button" data-diet-move="${item.id}" aria-label="下移食物" data-direction="1" ${index === draft.items.length - 1 ? 'disabled' : ''}>↓</button><button type="button" class="icon-btn quiet danger" data-remove-diet-item="${item.id}" aria-label="移除食物">${icon('trash', 18)}</button></div></article>`).join('') || '<p class="muted padded">还没有食物</p>'}</div><button type="button" class="secondary" id="add-diet-template-food">${icon('plus', 18)} 添加食物</button><button class="primary" type="submit">保存模板</button></form>`
     bind()
   }
   const bind = () => {
@@ -2196,7 +2283,7 @@ async function showDietTemplateEditor(source?: DietTemplate): Promise<void> {
 
 async function showDietTemplateFoodPicker(draft: DietTemplate): Promise<void> {
   const foods = await db.foods.orderBy('name').toArray()
-  const dialog = openModal('添加模板食物', `<label class="search-field">${icon('search', 19)}<input id="diet-template-food-search" type="search" placeholder="搜索食物或品牌"></label><div id="diet-template-food-results" class="picker-list"></div>`, true)
+  const dialog = openModal('添加模板食物', `<label class="search-field">${icon('search', 20)}<input id="diet-template-food-search" type="search" placeholder="搜索食物或品牌"></label><div id="diet-template-food-results" class="picker-list"></div>`, true)
   const draw = (query = '') => {
     const normalized = query.trim().toLocaleLowerCase(); const matches = foods.filter((food) => `${food.name} ${food.brand ?? ''}`.toLocaleLowerCase().includes(normalized))
     dialog.querySelector('#diet-template-food-results')!.innerHTML = matches.map((food) => `<button class="picker-item" data-pick-diet-food="${food.id}"><span><strong>${esc(food.name)}</strong>${food.brand ? `<small>${esc(food.brand)}</small>` : ''}</span><em>${formatEnergyInputValue(food.calories)} kcal / ${formatNumber(food.referenceGrams)}g</em></button>`).join('') || '<p class="muted">食物库中没有匹配项</p>'
@@ -2213,6 +2300,8 @@ async function saveDayAsDietTemplate(logs: FoodLog[]): Promise<void> {
 }
 
 async function renderWeightPage(withProgressTabs = false): Promise<void> {
+  const view = document.querySelector<HTMLElement>('#view')!
+  const viewVersion = view.dataset.renderVersion
   const today = getLocalDateString()
   const weights = await db.weights.orderBy('date').reverse().toArray()
   const selectedWeight = weights.find((item) => item.date === weightDate)
@@ -2225,11 +2314,11 @@ async function renderWeightPage(withProgressTabs = false): Promise<void> {
   const monthCutoff = new Date(); monthCutoff.setDate(monthCutoff.getDate() - 29)
   const monthWeights = weights.filter((item) => item.date >= getLocalDateString(monthCutoff))
   const delta = monthWeights.length > 1 && latest ? latest.weightKg - monthWeights.at(-1)!.weightKg : undefined
-  const view = document.querySelector<HTMLElement>('#view')!
+  if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
   const heroLabel = isToday ? heroWeight === latest && !selectedWeight ? '最新体重' : '今日体重' : `${formatShortDate(weightDate)} 体重`
   const changeText = isToday && heroWeight ? `<span class="weight-change">${delta === undefined ? '记录更多数据后显示 30 天变化' : `${delta > 0 ? '+' : ''}${formatNumber(delta)} kg · 30天`}</span>` : ''
-  view.innerHTML = `${withProgressTabs ? progressTabsHtml() : ''}<section class="weight-hero"><p>${heroWeight ? heroLabel : '体重记录'}</p>${heroWeight ? `<div class="hero-number"><strong>${formatNumber(heroWeight.weightKg)}</strong><span>kg</span></div>${changeText}` : `<div class="empty-inline">这一天还没有体重记录</div>`}<button class="primary record-weight" id="record-weight">${icon(selectedWeight ? 'edit' : 'plus', 18)} ${selectedWeight ? '修改体重' : '记录体重'}</button></section><section class="chart-card"><div class="section-head"><div><h2>体重趋势</h2><span>${weightRange === 'all' ? '全部记录' : `最近 ${weightRange} 天`}</span></div></div>${chartWeights.length > 1 ? '<div class="chart-wrap"><canvas id="weight-chart"></canvas></div>' : `<div class="trend-placeholder"><span class="empty-icon">${icon('activity', 23)}</span><p>${chartWeights.length === 1 ? '再记录一次体重后即可查看趋势' : '记录体重后会显示趋势图'}</p></div>`}<div class="segmented" aria-label="体重图表范围"><button data-range="30" class="${weightRange === '30' ? 'active' : ''}">30天</button><button data-range="90" class="${weightRange === '90' ? 'active' : ''}">90天</button><button data-range="all" class="${weightRange === 'all' ? 'active' : ''}">全部</button></div></section><section class="section-head"><div><h2>历史记录</h2><span>${weights.length} 条</span></div></section><div class="weight-list">${weights.map((item) => `<article class="weight-row"><button data-edit-weight="${item.id}"><span>${formatShortDate(item.date)}</span><strong>${formatNumber(item.weightKg)} <small>kg</small></strong></button><button class="icon-btn row-delete" data-delete-weight="${item.id}" aria-label="删除 ${formatShortDate(item.date)} 的体重">${icon('trash', 17)}</button></article>`).join('') || `<div class="empty minimal"><div class="empty-icon">${icon('scale', 24)}</div><h3>还没有体重记录</h3><p>记录第一次体重，开始观察长期趋势。</p></div>`}</div>`
-  if (withProgressTabs) bindProgressTabs(view)
+  const retainedTabs = setTabbedViewHtml(view, `${withProgressTabs ? progressTabsHtml() : ''}<section class="weight-hero"><p>${heroWeight ? heroLabel : '体重记录'}</p>${heroWeight ? `<div class="hero-number"><strong>${formatNumber(heroWeight.weightKg)}</strong><span>kg</span></div>${changeText}` : `<div class="empty-inline">这一天还没有体重记录</div>`}<button class="primary record-weight" id="record-weight">${icon(selectedWeight ? 'edit' : 'plus', 18)} ${selectedWeight ? '修改体重' : '记录体重'}</button></section><section class="chart-card"><div class="section-head"><div><h2>体重趋势</h2><span>${weightRange === 'all' ? '全部记录' : `最近 ${weightRange} 天`}</span></div></div>${chartWeights.length > 1 ? '<div class="chart-wrap"><canvas id="weight-chart"></canvas></div>' : `<div class="trend-placeholder"><span class="empty-icon">${icon('activity', 23)}</span><p>${chartWeights.length === 1 ? '再记录一次体重后即可查看趋势' : '记录体重后会显示趋势图'}</p></div>`}<div class="segmented" aria-label="体重图表范围"><button data-range="30" class="${weightRange === '30' ? 'active' : ''}">30天</button><button data-range="90" class="${weightRange === '90' ? 'active' : ''}">90天</button><button data-range="all" class="${weightRange === 'all' ? 'active' : ''}">全部</button></div></section><section class="section-head"><div><h2>历史记录</h2><span>${weights.length} 条</span></div></section><div class="weight-list">${weights.map((item) => `<article class="weight-row"><button data-edit-weight="${item.id}"><span>${formatShortDate(item.date)}</span><strong>${formatNumber(item.weightKg)} <small>kg</small></strong></button><button class="icon-btn row-delete" data-delete-weight="${item.id}" aria-label="删除 ${formatShortDate(item.date)} 的体重">${icon('trash', 18)}</button></article>`).join('') || `<div class="empty minimal"><div class="empty-icon">${icon('scale', 24)}</div><h3>还没有体重记录</h3><p>记录第一次体重，开始观察长期趋势。</p></div>`}</div>`)
+  if (withProgressTabs && !retainedTabs) bindProgressTabs(view)
   view.querySelector('#record-weight')?.addEventListener('click', () => showWeightForm(weightDate, selectedWeight?.weightKg))
   view.querySelectorAll<HTMLButtonElement>('[data-range]').forEach((button) => button.addEventListener('click', () => {
     weightRange = button.dataset.range as typeof weightRange
@@ -2266,7 +2355,7 @@ async function showSettings(): Promise<void> {
   let persistText = '浏览器不支持'
   try { if (navigator.storage?.persist) persistText = await navigator.storage.persist() ? '已授权' : '未授权' } catch { persistText = '未授权' }
   const lastBackup = formatBackupTime(localStorage.getItem(LAST_BACKUP_KEY))
-  const dialog = openModal('备份与恢复', `<section class="settings-section"><h3>数据</h3><div class="settings-group"><button id="export-backup"><span class="setting-icon">${icon('download', 18)}</span><span><strong>导出完整备份</strong><small>上次导出：<b id="last-backup">${esc(lastBackup)}</b></small></span>${icon('chevron', 17)}</button><button id="restore-backup"><span class="setting-icon">${icon('upload', 18)}</span><span><strong>恢复完整备份</strong><small>从备份文件覆盖当前数据</small></span>${icon('chevron', 17)}</button><input id="backup-file" type="file" accept=".json,application/json" hidden></div></section><section class="settings-section"><h3>存储</h3><div class="data-safety"><div class="setting-icon">${icon('archive', 18)}</div><div><strong>数据保存在当前设备。清除 Safari 网站数据或更换设备前，请先导出备份。</strong><p>本地数据库 · 持久化存储：${persistText}</p></div></div></section>`)
+  const dialog = openModal('备份与恢复', `<section class="settings-section"><h3>数据</h3><div class="settings-group"><button id="export-backup"><span class="setting-icon">${icon('download', 18)}</span><span><strong>导出完整备份</strong><small>上次导出：<b id="last-backup">${esc(lastBackup)}</b></small></span>${icon('chevron', 18)}</button><button id="restore-backup"><span class="setting-icon">${icon('upload', 18)}</span><span><strong>恢复完整备份</strong><small>从备份文件覆盖当前数据</small></span>${icon('chevron', 18)}</button><input id="backup-file" type="file" accept=".json,application/json" hidden></div></section><section class="settings-section"><h3>存储</h3><div class="data-safety"><div class="setting-icon">${icon('archive', 18)}</div><div><strong>数据保存在当前设备。清除 Safari 网站数据或更换设备前，请先导出备份。</strong><p>本地数据库 · 持久化存储：${persistText}</p></div></div></section>`)
   dialog.querySelector('#export-backup')?.addEventListener('click', async () => { try { const backup = await exportBackup(); const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `fitlog-backup-${getLocalDateString()}.json`; link.click(); URL.revokeObjectURL(link.href); const exportedAt = new Date().toISOString(); localStorage.setItem(LAST_BACKUP_KEY, exportedAt); const label = dialog.querySelector('#last-backup'); if (label) label.textContent = formatBackupTime(exportedAt); toast('备份已导出') } catch (error) { fail(error) } })
   const fileInput = dialog.querySelector<HTMLInputElement>('#backup-file')!
   dialog.querySelector('#restore-backup')?.addEventListener('click', () => fileInput.click())
@@ -2298,7 +2387,9 @@ function routeQuickLaunch(event?: HashChangeEvent): void {
 
 async function start(): Promise<void> {
   const initialIntent = consumeQuickLaunch(window.location, window.history)
+  retireLegacyVideoSearchStorage()
   setupMobileViewport()
+  setupMotionInteractions()
   document.addEventListener('click', (event) => {
     const target = event.target instanceof Element ? event.target : null
     document.querySelectorAll<HTMLDetailsElement>('details.row-menu[open]').forEach((menu) => {
