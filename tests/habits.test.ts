@@ -1,8 +1,8 @@
 import 'fake-indexeddb/auto'
 import Dexie from 'dexie'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { FitLogDatabase } from '../src/db/database'
-import { createHabit, deleteUnusedHabit, getActiveHabits, getHabitCheckInsBetween, getHabitCheckInsByDate, reorderHabits, setHabitActive, toggleHabitCheckIn, updateHabit, validateHabitInput } from '../src/services/habitService'
+import { createHabit, deleteHabitWithHistory, deleteUnusedHabit, getActiveHabits, getHabitCheckInsBetween, getHabitCheckInsByDate, reorderHabits, setHabitActive, toggleHabitCheckIn, updateHabit, validateHabitInput } from '../src/services/habitService'
 import { exportBackup, restoreBackup, validateBackup } from '../src/services/backupService'
 import { getLocalDateString } from '../src/utils/date'
 
@@ -124,5 +124,29 @@ describe('V5 → V6 与备份', () => {
     backup.data.habitCheckIns.push({ id: 'bad', habitId: backup.data.habits[0]!.id, date: '2026-02-30', completedAt: stamp, createdAt: stamp, updatedAt: stamp })
     await expect(restoreBackup(backup, db)).rejects.toThrow('date')
     expect(await db.habits.count()).toBe(1)
+  })
+})
+
+
+describe('manual permanent deletion', () => {
+  it('deletes all owned records atomically; unrelated records remain', async () => {
+    const db=database(), a=await createHabit({name:'A'},db), b=await createHabit({name:'B'},db)
+    for (const date of ['2026-09-27','2026-09-28']) await toggleHabitCheckIn(a.id,date,db)
+    await toggleHabitCheckIn(b.id,'2026-09-27',db)
+    await deleteHabitWithHistory(a.id,db,2)
+    expect(await db.habits.get(a.id)).toBeUndefined();expect(await db.habitCheckIns.where('habitId').equals(a.id).count()).toBe(0)
+    expect(await db.habits.get(b.id)).toBeDefined();expect(await db.habitCheckIns.count()).toBe(1)
+  })
+  it('injected Habit deletion failure rolls back already deleted check-ins', async () => {
+    const db=database(), a=await createHabit({name:'A'},db);await toggleHabitCheckIn(a.id,'2026-09-27',db)
+    const before=await exportBackup(db), injected=vi.spyOn(db.habits,'delete').mockRejectedValueOnce(new Error('injected'))
+    await expect(deleteHabitWithHistory(a.id,db)).rejects.toThrow('injected');injected.mockRestore()
+    expect((await exportBackup(db)).data).toEqual(before.data)
+  })
+  it('missing Habit and stale count abort without deleting data', async () => {
+    const db=database(), a=await createHabit({name:'A'},db);await toggleHabitCheckIn(a.id,'2026-09-27',db)
+    await expect(deleteHabitWithHistory('missing',db)).rejects.toThrow()
+    await expect(deleteHabitWithHistory(a.id,db,0)).rejects.toThrow('重新确认')
+    expect(await db.habits.count()).toBe(1);expect(await db.habitCheckIns.count()).toBe(1)
   })
 })

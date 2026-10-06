@@ -116,3 +116,7 @@ Calendar category Food uses one fork path; the same category primitive owns grid
 Special-diet notes use quiet Fresh Green existing text/secondary controls and grouped editable rows; no warning/discipline design. Keep ordinary meal records as Food's main content. Meal/day estimates are contextual and never modify intake or target presentation. Reuse the shared Sheet for edit/photo subview, no private keyboard/viewport coordinator. Calendar category icon/legend/details share existing glyph geometry, with special diet prioritized inside max4 visible markers.
 
 Video cards are application DOM, not model HTML.16:9 stable thumbnails,3-line title, secondary channel,44px actions; long copy wraps without orphan actions. Active official playback needs minimum200×200, source Referer and unobstructed controls. Show loading/failure outside the iframe. One active player per Sheet, removed on switch/close/Clear; all artifacts memory-only. See VIDEO_SEARCH and AI_ARCHITECTURE for transport/data boundaries.
+
+## Push-to-talk and manual Habit danger actions
+
+Voice uses the existing composer mic geometry and shared selected/focus rules. Compact recording/timer and transcribing status sit next to composer; no large disclosure panel or private viewport logic. TTS has one quiet >=44px stop action. Static Voice privacy belongs in settings, without an app-specific startup acknowledgement. Habit editor keeps shared quiet danger below state controls; irreversible count confirmation uses the shared danger dialog. No new palette or primary geometry.

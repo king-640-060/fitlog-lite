@@ -1,0 +1,4 @@
+{
+  "fixtureNote": "Synthetic frozen fixture following the official 2026-10-06 Web-Search-Pro example; not a captured real provider response.",
+  "choices": [{"message": {"role": "assistant", "content": "[杠铃俯身划船教学](https://m.bilibili.com/video/BV1B7411m7LV/?share_source=copy)", "tool_calls": [{"type":"search_intent","search_intent":[{"query":"杠铃俯身划船 动作教学"}]}, {"type":"search_result","search_result":[{"link":"https://www.bilibili.com/video/BV1B7411m7LV","title":"杠铃俯身划船动作教学","content":"合成教学摘要","media":"哔哩哔哩","icon":"https://example.invalid/icon","refer":"ref_1"},{"link":"https://bilibili.com/video/BV1GJ411x7h7/","title":"杠铃划船示范","media":"哔哩哔哩","refer":"ref_2"}]}]}}]
+}

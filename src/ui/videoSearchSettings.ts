@@ -50,7 +50,7 @@ export function mountVideoSearchSettings(host: HTMLElement, dialog: HTMLDialogEl
         ${compatible && activeProfile ? `<div class="video-settings-panel" data-reuse-panel><div class="video-reuse-heading"><div><span class="video-panel-eyebrow">当前使用</span><strong class="video-settings-model">${escapeHtml(aiChatModelLabel(activeProfile))}</strong><small>复用当前 AI 配置</small></div><span class="video-credential-state">${icon('check', 16)} 可复用</span></div><button class="text-btn video-quiet-action" type="button" data-bil-source="separate">使用单独的搜索 Key ${icon('chevron', 14)}</button></div>` : '<p class="ai-note">当前 AI 配置无法直接复用，请填写国内搜索 Key。</p>'}
         <div class="video-standalone-panel" data-standalone-panel><label class="video-field">国内搜索 Key<input type="password" name="bilibiliKey" autocomplete="new-password" autocapitalize="off" spellcheck="false" placeholder="${settings.bilibiliKey ? '已保存；留空则保持不变' : '粘贴智谱 Key'}"></label>${compatible ? '<button class="text-btn video-quiet-action" type="button" data-bil-source="reuse-profile">改回复用当前 AI 配置</button>' : ''}</div>
         <p class="ai-note">通过智谱联网搜索查找 B站公开视频，不读取地区或 VPN 状态。</p>
-        <p class="ai-note" data-provider-error="bilibili" hidden></p><p class="video-editor-status" role="status"></p><button class="primary" type="button" data-provider-save="bilibili">保存配置</button>
+        <p class="ai-note" data-provider-error="bilibili" hidden></p><p class="video-editor-status" role="status"></p><button class="primary" type="button" data-provider-save="bilibili">保存配置</button><button class="secondary" type="button" data-provider-test="bilibili">测试 B站搜索</button>
       </section>
       <section class="video-settings-section video-provider-editor" data-provider-section="youtube" hidden aria-label="YouTube凭据"><button class="text-btn" type="button" data-provider-back>${icon('chevron', 16)} 返回视频设置</button>
         <label class="video-field">API Key<input type="password" name="videoKey" autocomplete="new-password" autocapitalize="off" spellcheck="false" placeholder="${settings.key ? '已保存；留空则保持不变' : '粘贴 YouTube 搜索 Key'}"></label>
@@ -65,6 +65,7 @@ export function mountVideoSearchSettings(host: HTMLElement, dialog: HTMLDialogEl
   const policy = form.querySelector<HTMLSelectElement>('[name=policy]')!
   const home = form.querySelector<HTMLElement>('[data-video-home]')!, body = dialog.querySelector<HTMLElement>('.modal-body')!
   const errors: Partial<Record<VideoProviderId, string>> = {}
+  let domesticDiagnostics: { requests: number; candidateLinks: number; validVideos: number } | undefined
   let editor: VideoProviderId | undefined, homeScroll = 0
   const valid = () => !controller.signal.aborted && form.isConnected
   const updateStatus = () => {
@@ -80,11 +81,11 @@ export function mountVideoSearchSettings(host: HTMLElement, dialog: HTMLDialogEl
       row.classList.toggle('is-disabled', !inputs[provider].checked)
       row.querySelectorAll<HTMLElement>('[data-provider-detail]').forEach(element => element.setAttribute('aria-hidden', String(!inputs[provider].checked)))
       row.querySelector<HTMLElement>('.video-provider-model')!.textContent = provider === 'bilibili' && source === 'reuse-profile' && activeProfile ? aiChatModelLabel(activeProfile) : provider === 'bilibili' ? '单独的搜索 Key' : '独立 API Key'
-      row.querySelector<HTMLElement>('.video-provider-mode')!.textContent = provider === 'bilibili' && source === 'reuse-profile' ? '复用当前 AI 配置' : '保存在当前设备'
+      row.querySelector<HTMLElement>('.video-provider-mode')!.textContent = provider === 'bilibili' && domesticDiagnostics ? `请求成功 · 候选 ${domesticDiagnostics.candidateLinks} · 有效 ${domesticDiagnostics.validVideos}` : provider === 'bilibili' && source === 'reuse-profile' ? '复用当前 AI 配置' : '保存在当前设备'
       row.setAttribute('aria-label', `${providerNames[provider]}配置，${target.textContent}`)
     }
     const successes = enabled.filter(provider => statuses[provider] === 'success').length
-    status.textContent = !enabled.length ? '未启用视频来源 · 请先启用至少一个视频来源。' : successes === enabled.length ? '视频搜索可用' : successes ? '部分来源可用' : enabled.every(provider => statuses[provider] === 'failed') ? '测试失败' : '已启用 · 保存并测试以检查连接'
+    status.textContent = domesticDiagnostics && !domesticDiagnostics.validVideos && enabled.length === 1 && enabled[0] === 'bilibili' && statuses.bilibili === 'success' ? '搜索服务已连接，但没有解析到可用 B站视频' : !enabled.length ? '未启用视频来源 · 请先启用至少一个视频来源。' : successes === enabled.length ? '视频搜索可用' : successes ? '部分来源可用' : enabled.every(provider => statuses[provider] === 'failed') ? '测试失败' : '已启用 · 保存并测试以检查连接'
   }
   const syncVisibility = () => {
     const both = inputs.bilibili.checked && inputs.youtube.checked
@@ -101,7 +102,7 @@ export function mountVideoSearchSettings(host: HTMLElement, dialog: HTMLDialogEl
     // Source switches remain authoritative even if an inactive field has an unsaved draft.
     if ((inputs.youtube.checked || credentialProvider === 'youtube') && youtubeInput.value.trim()) { settings.save(youtubeInput.value); statuses.youtube = 'configured' }
     else if (credentialProvider === 'youtube' && !settings.key) settings.save('')
-    if (source === 'separate' && (inputs.bilibili.checked || credentialProvider === 'bilibili') && domesticInput.value.trim()) { settings.saveBilibiliKey(domesticInput.value); statuses.bilibili = 'configured' }
+    if (source === 'separate' && (inputs.bilibili.checked || credentialProvider === 'bilibili') && domesticInput.value.trim()) { settings.saveBilibiliKey(domesticInput.value); domesticDiagnostics = undefined; statuses.bilibili = 'configured' }
     else if (source === 'separate' && credentialProvider === 'bilibili' && !settings.bilibiliKey) settings.saveBilibiliKey('')
     settings.setCredentialSource(source)
     for (const provider of providers) settings.setEnabled(provider, inputs[provider].checked)
@@ -124,7 +125,7 @@ export function mountVideoSearchSettings(host: HTMLElement, dialog: HTMLDialogEl
   const leave = () => { controller.abort(); dialog.removeEventListener('cancel', cancel); back() }
   const saveEditor = (provider: VideoProviderId) => {
     const notice = form.querySelector<HTMLElement>(`[data-provider-section="${provider}"] .video-editor-status`)!
-    notice.textContent = ''
+    notice.textContent = ''; delete notice.dataset.state
     try { save(provider); showHome() }
     catch (error) { notice.textContent = safeAiError(error) }
   }
@@ -141,30 +142,35 @@ export function mountVideoSearchSettings(host: HTMLElement, dialog: HTMLDialogEl
   for (const input of Object.values(inputs)) input.addEventListener('change', syncVisibility)
   policy.addEventListener('change', syncVisibility)
   host.querySelectorAll<HTMLElement>('[data-bil-source]').forEach(button => button.addEventListener('click', () => {
-    source = button.dataset.bilSource as 'reuse-profile' | 'separate'
+    source = button.dataset.bilSource as 'reuse-profile' | 'separate'; domesticDiagnostics = undefined
     statuses.bilibili = source === 'reuse-profile' && compatible || source === 'separate' && settings.bilibiliKey ? 'configured' : 'unconfigured'
     syncVisibility()
   }))
   host.querySelector('#video-save-only')!.addEventListener('click', () => { if (!busy) try { save() } catch (error) { status.textContent = safeAiError(error) } })
   host.querySelector('#video-remove-key')?.addEventListener('click', () => { settings.remove(); leave() })
-  form.addEventListener('submit', async event => {
-    event.preventDefault(); if (busy || !valid()) return
-    if (editor) { saveEditor(editor); return }
+  const testProviders = async (only?: VideoProviderId) => {
+    if (busy || !valid()) return
     try {
-      save()
-      const enabled = providers.filter(provider => inputs[provider].checked)
+      save(only)
+      const enabled = only ? [only] : providers.filter(provider => inputs[provider].checked)
       if (!enabled.length) return
-      if (!settings.acknowledgedV2) { status.textContent = '请先确认视频搜索隐私说明。'; return }
+      if (!settings.acknowledgedV2) { status.textContent = '请先返回视频设置确认隐私说明。'; if (editor) { const notice=form.querySelector<HTMLElement>(`[data-provider-section="${editor}"] .video-editor-status`)!; notice.textContent=status.textContent; notice.dataset.state='error' } return }
       busy = true
       form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLButtonElement>('input,select,button:not(#video-settings-back)').forEach(control => { control.disabled = true })
       status.textContent = '正在测试…'
+      if (editor) { const notice=form.querySelector<HTMLElement>(`[data-provider-section="${editor}"] .video-editor-status`)!; notice.textContent = '正在测试…'; notice.dataset.state='busy' }
       for (const provider of enabled) delete errors[provider]
       await Promise.all(enabled.map(async provider => {
         try {
-          if (provider === 'bilibili') await new ZhipuBilibiliSearchProvider(settings, () => {
+          if (provider === 'bilibili') {
+            domesticDiagnostics = undefined
+            const domestic = new ZhipuBilibiliSearchProvider(settings, () => {
             if (source === 'reuse-profile' && compatible && activeProfile) return { key: profiles!.key(activeProfile.id), baseUrl: activeProfile.baseUrl || BILIBILI_BASE_URL }
             return settings.bilibiliKey ? { key: settings.bilibiliKey, baseUrl: BILIBILI_BASE_URL } : undefined
-          }, fetch, secrets).search('cable face pull exercise tutorial', 1, controller.signal)
+          }, fetch, secrets)
+            await domestic.search('杠铃俯身划船', 3, controller.signal)
+            domesticDiagnostics = domestic.lastDiagnostics
+          }
           else await new YouTubeVideoSearchProvider(settings, fetch, secrets).search('cable face pull exercise tutorial', 1, controller.signal)
           if (!valid()) return
           settings.setStatus('success', provider); statuses[provider] = 'success'
@@ -173,14 +179,21 @@ export function mountVideoSearchSettings(host: HTMLElement, dialog: HTMLDialogEl
           settings.setStatus('failed', provider); statuses[provider] = 'failed'
           errors[provider] = safeAiError(error)
         }
-        if (valid()) updateStatus()
+        if (valid()) {
+          updateStatus()
+          const notice = form.querySelector<HTMLElement>(`[data-provider-section="${provider}"] .video-editor-status`)!
+          notice.dataset.state = errors[provider] ? 'error' : 'success'
+          notice.textContent = errors[provider] ?? (provider === 'bilibili' && domesticDiagnostics ? `${domesticDiagnostics.validVideos ? '连接成功' : '搜索服务已连接，但没有解析到可用 B站视频'} · 请求 ${domesticDiagnostics.requests} 次 · 候选链接 ${domesticDiagnostics.candidateLinks} · 有效 B站视频 ${domesticDiagnostics.validVideos}` : '连接成功')
+        }
       }))
-    } catch (error) { if (valid()) status.textContent = safeAiError(error) }
+    } catch (error) { if (valid()) { status.textContent = safeAiError(error); if (editor) { const notice=form.querySelector<HTMLElement>(`[data-provider-section="${editor}"] .video-editor-status`)!; notice.textContent=status.textContent; notice.dataset.state='error' } } }
     finally {
       busy = false
       if (valid()) form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLButtonElement>('input,select,button:not(#video-settings-back)').forEach(control => { control.disabled = false })
     }
-  })
+  }
+  form.addEventListener('submit', event => { event.preventDefault(); if (editor) saveEditor(editor); else void testProviders() })
+  host.querySelector('[data-provider-test=bilibili]')!.addEventListener('click', () => { void testProviders('bilibili') })
   syncVisibility()
   dialog.addEventListener('close', () => { controller.abort(); dialog.removeEventListener('cancel', cancel) }, { once: true })
 }

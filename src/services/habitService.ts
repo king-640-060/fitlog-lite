@@ -100,6 +100,17 @@ export async function deleteUnusedHabit(id: string, database: FitLogDatabase = d
   })
 }
 
+/** Manual destructive UI only; a changed confirmation count requires another review. */
+export async function deleteHabitWithHistory(id: string, database: FitLogDatabase = db, expectedCount?: number): Promise<void> {
+  await database.transaction('rw', database.habits, database.habitCheckIns, async () => {
+    if (!await database.habits.get(id)) throw new Error('找不到习惯')
+    const records = await database.habitCheckIns.where('habitId').equals(id).toArray()
+    if (expectedCount !== undefined && records.length !== expectedCount) throw new Error('打卡记录已变化，请重新确认删除')
+    await database.habitCheckIns.bulkDelete(records.map(record => record.id))
+    await database.habits.delete(id)
+  })
+}
+
 /** Desired state preserves the existing unique habit/date identity and schedule semantics. */
 export async function setHabitCheckInState(habitId: string, date: string, completed: boolean, database: FitLogDatabase = db): Promise<boolean> {
   validateHabitDate(date)

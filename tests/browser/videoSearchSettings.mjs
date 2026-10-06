@@ -16,14 +16,14 @@ try {
         localStorage.setItem('fitlog-video-search-config-v2', JSON.stringify({ version: 2, enabled: { bilibili: true, youtube: false }, policy: 'auto', bilibiliStatus: 'unconfigured', youtubeStatus: 'unconfigured', bilibiliCredentialSource: 'reuse-profile' }))
       })
       const page = await context.newPage(), errors = [], states = [], calls = { bilibili: 0, youtube: 0 }, auth = [], toggleMetrics = []
-      let youtubeFail = false, holdBilibili = false, releaseBilibili
+      let emptyBilibili = false, youtubeFail = false, holdBilibili = false, releaseBilibili
       page.setDefaultTimeout(15000); page.on('pageerror', error => errors.push(error.message))
       await page.route('https://open.bigmodel.cn/**', async route => {
         if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': '*' } })
         calls.bilibili++; auth.push(route.request().headers().authorization)
         assert.equal(route.request().postDataJSON().model, 'web-search-pro')
         if (holdBilibili) await new Promise(resolve => { releaseBilibili = resolve })
-        try { await route.fulfill({ json: { results: [{ title: '面拉教学', url: 'https://www.bilibili.com/video/BV1xx411c7mD' }] } }) } catch {}
+        try { await route.fulfill({ json: emptyBilibili ? {choices:[{message:{content:'没有视频'}}]} : {choices:[{message:{content:'[面拉教学](https://m.bilibili.com/video/BV1xx411c7mD/)',tool_calls:[{search_result:[{title:'面拉教学',link:'https://www.bilibili.com/video/BV1xx411c7mD'}]}]}}]} }) } catch {}
       })
       await page.route('https://www.googleapis.com/youtube/v3/search?**', async route => {
         if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': '*' } })
@@ -115,7 +115,7 @@ try {
       await page.locator('[data-bil-source=separate]').click()
       assert.equal(await page.locator('[name=bilibiliKey]').isVisible(), true)
       assert.equal(await page.locator('[data-reuse-panel]').isVisible(), false); await audit('standalone-expanded')
-      await page.locator('[name=bilibiliKey]').fill('synthetic-domestic-key'); await saveEditor('bilibili')
+      await page.locator('[name=bilibiliKey]').fill('x'.repeat(4097)); const beforeInvalid=calls.bilibili; await page.locator('[data-provider-test=bilibili]').click(); assert.match(await page.locator('[data-provider-section=bilibili] .video-editor-status').innerText(),/格式/); assert.equal(calls.bilibili,beforeInvalid); await page.locator('[name=bilibiliKey]').fill('synthetic-domestic-key'); await saveEditor('bilibili')
       assert.equal((await config()).bilibiliCredentialSource, 'separate'); assert.equal(await page.locator('[name=bilibiliKey]').inputValue(), '')
       await test(); assert.equal(auth.at(-1), 'Bearer synthetic-domestic-key'); assert.equal(calls.youtube, 0)
       await edit('bilibili'); await page.locator('[data-bil-source=reuse-profile]').click(); await saveEditor('bilibili')
@@ -123,6 +123,8 @@ try {
       assert.equal(await page.evaluate(() => localStorage.getItem('fitlog-video-search-bilibili-key-v2')), 'synthetic-domestic-key')
       await test(); assert.equal(auth.at(-1), 'Bearer synthetic-ai-key'); assert.equal(calls.youtube, 0)
       assert.equal(await page.locator('[data-provider-status=bilibili] strong').innerText(), '已连接'); await audit('bilibili-connected')
+      await edit('bilibili'); const beforeTest=calls.bilibili; await page.locator('[data-provider-test=bilibili]').click(); await page.waitForFunction(()=>!document.querySelector('[data-provider-test=bilibili]').disabled); assert.equal(calls.bilibili,beforeTest+1); assert.match(await page.locator('[data-provider-section=bilibili] .video-editor-status').innerText(),/连接成功.*候选链接.*有效 B站视频 1/); assert.equal(await page.locator('[data-provider-section=bilibili] .video-editor-status').getAttribute('data-state'),'success'); await audit('diagnostics'); await page.locator('[data-provider-section=bilibili] [data-provider-back]').click();
+      emptyBilibili=true; const beforeEmpty=calls.bilibili; await test(); assert.equal(calls.bilibili,beforeEmpty+3); assert.match(await page.locator('.video-config-status').innerText(),/搜索服务已连接，但没有解析到可用 B站视频/); await audit('empty-diagnostics'); emptyBilibili=false; await test()
       await page.locator('[name=enableYoutube]').check(); assert.equal(await page.locator('[data-policy-picker]').isVisible(), true)
       assert.equal(await page.locator('[name=videoKey]').isVisible(), false)
       await edit('youtube'); await audit('youtube-editor')

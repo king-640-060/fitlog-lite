@@ -1,4 +1,5 @@
 import { AiError, assertNoKnownSecrets } from '../ai/security'
+import { videoQueryVariants } from './trainingVideoIntent'
 
 export const VIDEO_CONFIG_KEY = 'fitlog-video-search-config-v1'
 export const VIDEO_CONFIG_KEY_V2 = 'fitlog-video-search-config-v2'
@@ -85,11 +86,12 @@ export function bilibiliWatchUrl(id: string): string { if (!validBilibiliId(id))
 export function bilibiliEmbedUrl(id: string): string { if (!validBilibiliId(id)) throw new AiError('bilibili_id', 'B站视频 ID 无效'); return `https://player.bilibili.com/player.html?${new URLSearchParams({ bvid: id, autoplay: '0', poster: '1', danmaku: '0' })}` }
 export function extractBilibiliVideoId(value: unknown): string | undefined {
   if (typeof value !== 'string' || value.length > 500) return undefined
-  try { const url = new URL(value); if (url.protocol !== 'https:' || (url.hostname !== 'www.bilibili.com' && url.hostname !== 'bilibili.com')) return undefined; const match = /^\/video\/(BV[0-9A-Za-z]{10})\/?$/.exec(url.pathname); return match?.[1] } catch { return undefined }
+  try { const url = new URL(value); if (url.protocol !== 'https:' || url.username || url.password || url.port || !['www.bilibili.com', 'bilibili.com', 'm.bilibili.com'].includes(url.hostname)) return undefined; const match = /^\/video\/(BV[0-9A-Za-z]{10})\/?$/.exec(url.pathname); return match?.[1] } catch { return undefined }
 }
+export function normalizeBilibiliVideoUrl(value: unknown): string | undefined { const id = extractBilibiliVideoId(value); return id ? bilibiliWatchUrl(id) : undefined }
 export function validateVideoQuery(query: string, limit: number, secrets: readonly string[] = []): string {
   const value = query.trim(); assertNoKnownSecrets(value, secrets)
-  if (!value || value.length > 120 || !Number.isInteger(limit) || limit < 1 || limit > 5 || /(?:https?:|www\.|@|\d|[\r\n\x00-\x1f]|API.?Key|token|密码|体重|公斤|饮食|热量|健康记录|私人备注|病史|诊断|weight|bodyweight|calorie|medical|diagnos|private|health|diet|kg)/i.test(value)) throw new AiError('invalid_arguments', '仅填写训练动作与技术关键词（最多 120 字），结果数量为 1–5')
+  if (!value || value.length > 120 || !Number.isInteger(limit) || limit < 1 || limit > 5 || /(?:https?:|javascript:|data:|www\.|@|[\r\n\x00-\x1f]|API.?Key|token|密码|体重|公斤|饮食|热量|健康记录|私人备注|病史|诊断|不舒服|疼痛|受伤|术后|weight|bodyweight|calorie|medical|diagnos|private|health|diet|kg|injury|pain)/i.test(value)) throw new AiError('invalid_arguments', '仅填写训练动作与技术关键词（最多 120 字），结果数量为 1–5')
   return value
 }
 const object = (value: unknown): Record<string, unknown> => value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
@@ -120,18 +122,62 @@ export class YouTubeVideoSearchProvider implements VideoSearchProvider {
 }
 type ZhipuCredential = { key: string; baseUrl?: string }
 function normalizeBaseUrl(value: string): string { return value.trim().replace(/\/$/, '') }
-function zhipuResults(raw: unknown, limit: number, secrets: readonly string[]): VideoSearchResult[] {
-  assertNoKnownSecrets(raw, secrets); const found: VideoSearchResult[] = [], seen = new Set<string>()
-  const visit = (value: unknown): void => { if (found.length >= limit || !value || typeof value !== 'object') return; if (Array.isArray(value)) { value.slice(0, 80).forEach(visit); return } const entry = value as Record<string, unknown>; const url = [entry.url, entry.link, entry.source, entry.web_url].find((item): item is string => typeof item === 'string'); const id = extractBilibiliVideoId(url); if (id && !seen.has(id)) { const title = [entry.title, entry.name, entry.content].find((item): item is string => typeof item === 'string' && Boolean(item.trim())) ?? `B站训练视频 ${id}`; const channel = [entry.author, entry.site_name, entry.source].find((item): item is string => typeof item === 'string' && Boolean(item.trim())) ?? '哔哩哔哩'; seen.add(id); found.push({ id, title: title.replace(/\\s+/g, ' ').slice(0, 240), channel: channel.slice(0, 100), thumbnailUrl: '', provider: 'bilibili', providerLabel: 'B站', watchUrl: bilibiliWatchUrl(id), embedUrl: bilibiliEmbedUrl(id) }) } Object.values(entry).slice(0, 40).forEach(visit) }
-  visit(raw); return found
+export interface BilibiliCandidates { videos: VideoSearchResult[]; candidateLinks: number; validVideos: number }
+export function extractBilibiliCandidates(raw: unknown, limit = 3, secrets: readonly string[] = []): BilibiliCandidates {
+  const encoded = JSON.stringify(raw)
+  if (!encoded || new TextEncoder().encode(encoded).byteLength > 128 * 1024) throw new AiError('video_response_limit', '视频服务响应过大或为空')
+  assertNoKnownSecrets(encoded, secrets)
+  const videos: VideoSearchResult[] = [], seen = new Set<string>(), links = new Set<string>()
+  let visited = 0
+  const add = (url: string, title?: string, channel?: string) => {
+    links.add(url)
+    const canonical = normalizeBilibiliVideoUrl(url), id = canonical && extractBilibiliVideoId(canonical)
+    if (!id || seen.has(id)) return
+    seen.add(id)
+    if (videos.length >= Math.min(5, limit)) return
+    const safeText = (value: string) => value.replace(/<[^>]*>/g, '').replace(/https?:\/\/\S+/g, '').replace(/\s+/g, ' ').trim()
+    videos.push({ id, title: safeText(title ?? '').slice(0, 160) || `B站训练视频 ${id}`, channel: safeText(channel ?? '哔哩哔哩').slice(0, 80), thumbnailUrl: '', provider: 'bilibili', providerLabel: 'B站', watchUrl: canonical!, embedUrl: bilibiliEmbedUrl(id) })
+  }
+  const text = (value: string, title?: string, channel?: string) => {
+    if (/<(?:iframe|script)\b/i.test(value)) return
+    const decoded = value.slice(0, 8192).replace(/\\\//g, '/').replace(/\\u002f/gi, '/').replace(/&amp;/g, '&')
+    for (const match of decoded.matchAll(/\[([^\]\n]{1,240})\]\((https?:\/\/[^\s<>"'()]{1,500})\)/g)) add(match[2]!, match[1], channel)
+    for (const match of decoded.matchAll(/https?:\/\/[^\s<>"'()\]，。；]{1,500}/g)) add(match[0].replace(/[.,;]+$/, ''), title, channel)
+  }
+  const visit = (value: unknown, depth = 0, title?: string, channel?: string): void => {
+    if (++visited > 1500 || depth > 12) return
+    if (typeof value === 'string') { text(value, title, channel); return }
+    if (Array.isArray(value)) { value.slice(0, 80).forEach(item => visit(item, depth + 1, title, channel)); return }
+    if (!value || typeof value !== 'object') return
+    const entry = value as Record<string, unknown>
+    const name = [entry.title, entry.name].find((item): item is string => typeof item === 'string') ?? title
+    const author = [entry.author, entry.media, entry.site_name].find((item): item is string => typeof item === 'string') ?? channel
+    Object.values(entry).slice(0, 40).forEach(item => visit(item, depth + 1, name, author))
+  }
+  visit(raw)
+  return { videos, candidateLinks: links.size, validVideos: seen.size }
 }
 export class ZhipuBilibiliSearchProvider implements VideoSearchProvider {
+  lastDiagnostics?: { requests: number; candidateLinks: number; validVideos: number }
   private readonly settings: VideoSearchSettings; private readonly credential: () => ZhipuCredential | undefined; private readonly fetcher: typeof fetch; private readonly secrets: () => readonly string[]; private readonly timeoutMs: number
   constructor(settings: VideoSearchSettings, credential: () => ZhipuCredential | undefined, fetcher: typeof fetch = fetch, secrets: () => readonly string[] = () => [], timeoutMs = 12000) { this.settings = settings; this.credential = credential; this.fetcher = fetcher; this.secrets = secrets; this.timeoutMs = timeoutMs }
   async search(query: string, limit = 3, signal?: AbortSignal): Promise<VideoSearchResult[]> {
     if (!this.settings.acknowledgedV2) throw new AiError('video_privacy', '请先确认新版训练视频搜索隐私说明。'); const credential = this.credential(); if (!credential?.key) throw new AiError('video_not_configured', '国内视频搜索尚未配置。'); const value = validateVideoQuery(query, limit, [...this.secrets(), credential.key])
-    const controller = new AbortController(); let expired = false; const abort = () => controller.abort(); signal?.addEventListener('abort', abort, { once: true }); const timer = setTimeout(() => { expired = true; abort() }, this.timeoutMs)
-    try { const response = await this.fetcher.call(globalThis, `${normalizeBaseUrl(credential.baseUrl ?? BILIBILI_BASE_URL)}/chat/completions`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${credential.key}` }, credentials: 'omit', cache: 'no-store', redirect: 'error', referrerPolicy: 'strict-origin-when-cross-origin', signal: controller.signal, body: JSON.stringify({ model: 'web-search-pro', stream: false, temperature: 0.1, messages: [{ role: 'user', content: `${value} 教学，优先返回 B站视频页面。` }] }) }); return zhipuResults(await readJson(response, controller), limit, [...this.secrets(), credential.key]) }
+    const controller = new AbortController(); let expired = false; const abort = () => controller.abort(); signal?.addEventListener('abort', abort, { once: true }); if (signal?.aborted) abort(); const timer = setTimeout(() => { expired = true; abort() }, this.timeoutMs)
+    this.lastDiagnostics = undefined
+    try {
+      const diagnostics = { requests: 0, candidateLinks: 0, validVideos: 0 }
+      for (const variant of videoQueryVariants(value)) {
+        if (controller.signal.aborted) throw new DOMException('Aborted', 'AbortError')
+        diagnostics.requests++
+        const response = await this.fetcher.call(globalThis, `${normalizeBaseUrl(credential.baseUrl ?? BILIBILI_BASE_URL)}/chat/completions`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${credential.key}` }, credentials: 'omit', cache: 'no-store', redirect: 'error', referrerPolicy: 'strict-origin-when-cross-origin', signal: controller.signal, body: JSON.stringify({ model: 'web-search-pro', stream: false, temperature: 0.1, messages: [{ role: 'user', content: `搜索 ${variant} 的训练动作教学。只返回与动作直接相关的 B站公开视频，优先 canonical https://www.bilibili.com/video/BV... 链接。不要搜索页、专栏、用户主页或非视频页面。` }] }) })
+        const parsed = extractBilibiliCandidates(await readJson(response, controller), limit, [...this.secrets(), credential.key])
+        diagnostics.candidateLinks += parsed.candidateLinks; diagnostics.validVideos += parsed.validVideos
+        this.lastDiagnostics = { ...diagnostics }
+        if (parsed.videos.length) return parsed.videos
+      }
+      return []
+    }
     catch (error) { if (controller.signal.aborted) throw new AiError(expired ? 'video_timeout' : 'aborted', expired ? '国内视频搜索等待过久，已停止。' : '已停止视频搜索。'); if (error instanceof AiError) throw error; throw new AiError('video_network', '无法连接国内视频搜索服务，请检查 API 地址、网络或 CORS 设置。') }
     finally { clearTimeout(timer); signal?.removeEventListener('abort', abort) }
   }

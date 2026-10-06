@@ -15,8 +15,6 @@ export interface SpeechOptions {
   onError: (message: string, code: string) => void
 }
 export const SPEECH_UNSUPPORTED = '当前浏览器不支持网页语音识别，可以使用系统键盘听写。'
-export const VOICE_PRIVACY_KEY = 'fitlog-ai-voice-privacy-ack-v1'
-export const VOICE_PRIVACY_TEXT = '语音会由当前浏览器或系统提供的语音识别服务处理。FitLog 不保存录音；识别后的文字会按正常 AI 流程发送给你配置的 AI 服务。'
 export function speechErrorMessage(code: string): string {
   if (code === 'not-allowed' || code === 'service-not-allowed') return '没有麦克风权限，请在系统设置中允许后重试。'
   if (code === 'audio-capture') return '当前无法使用麦克风，请检查设备或系统权限。'
@@ -38,6 +36,7 @@ export class SpeechRecognitionService {
   private options?: SpeechOptions
   private generation = 0
   private disposed = false
+  private finalText = () => ''
   private readonly constructorType: RecognitionConstructor | undefined
   constructor(constructorType: RecognitionConstructor | undefined = browserRecognition()) { this.constructorType = constructorType; this.state = constructorType ? 'idle' : 'unsupported' }
   get active(): boolean { return ['starting', 'listening', 'stopping'].includes(this.state) }
@@ -51,6 +50,7 @@ export class SpeechRecognitionService {
     this.options = options
     if (!this.constructorType) { this.setState('unsupported'); options.onError(SPEECH_UNSUPPORTED, 'unsupported'); return }
     const generation = ++this.generation, segments = new Map<number, string>()
+    this.finalText = () => [...segments.entries()].sort(([a], [b]) => a - b).map(([, value]) => value).join('').trim()
     const current = () => !this.disposed && generation === this.generation
     const fail = (code: string) => {
       if (!current()) return
@@ -83,13 +83,15 @@ export class SpeechRecognitionService {
   }
   stop(): void {
     if (!this.active || !this.recognition) return
-    this.setState('stopping')
-    try { this.recognition.stop() } catch { this.abort(); this.setState('error'); this.options?.onError(speechErrorMessage('unknown'), 'unknown') }
+    const text = this.finalText(), options = this.options
+    this.abort()
+    if (text) options?.onFinal(text); else options?.onError(speechErrorMessage('no-speech'), 'no-speech')
   }
   abort(): void {
     ++this.generation
     const recognition = this.recognition; this.detach()
     try { recognition?.abort() } catch { /* invalidated callbacks cannot publish */ }
+    this.finalText = () => ''
     this.setState(this.constructorType ? 'idle' : 'unsupported')
   }
   dispose(): void { this.abort(); this.disposed = true; this.options = undefined }

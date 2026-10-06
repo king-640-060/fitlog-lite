@@ -21,6 +21,7 @@ try { for (const [width,height] of sizes) {
    await new Promise((resolve,reject)=>{const t=d.transaction(Object.keys(data),'readwrite');for(const [name,rows] of Object.entries(data)){const s=t.objectStore(name);s.clear();for(const row of rows)s.put(row)}t.oncomplete=resolve;t.onerror=()=>reject(t.error)});d.close()
   },data)
   const nav = async tab => {await page.locator(`[data-tab=${tab}]`).click();await page.waitForTimeout(100);await page.evaluate(()=>scrollTo(0,0))}
+  const selectPlan = async view => {await page.locator(`[data-plan-view=${view}]`).click();await page.waitForFunction(view=>document.querySelector(`[data-plan-view=${view}]`)?.getAttribute('aria-selected')==='true',view)}
   const close = async () => {await page.locator('dialog [data-close]').click();await page.waitForFunction(()=>!document.querySelector('dialog[open]'))}
   const capture = async name => {
    await page.waitForTimeout(220)
@@ -65,19 +66,19 @@ try { for (const [width,height] of sizes) {
      const read=node=>{const s=getComputedStyle(node);return Object.fromEntries(['backgroundColor','color','borderColor','minHeight','borderRadius','padding','fontSize'].map(k=>[k,s[k]]))}
      const actual=read(e),expected=read(reference);reference.remove();return {actual,expected,primary:e.classList.contains('primary'),secondary:e.classList.contains('secondary')}
     })
-    assert.ok(styling.primary&&!styling.secondary);assert.deepEqual(styling.actual,styling.expected);assert.ok(parseFloat(styling.actual.minHeight)>=44)
+    assert.ok(styling.primary&&!styling.secondary);assert.deepEqual(styling.actual,styling.expected);assert.ok(parseFloat(styling.actual.minHeight)>=44, JSON.stringify({width,styling}))
     planEmptyStyles.push(styling.actual)
    }
   }
   await nav('today');assert.ok(await page.locator('#today-plan-add').evaluate(e=>e.classList.contains('secondary')&&!e.classList.contains('primary')))
   await nav('plan');await createState(true);await capture('plan-empty')
   await page.locator('#plan-empty-add').click();assert.equal(await page.locator('[name=date]').inputValue(),date);await close()
-  for(const view of ['upcoming','inbox']){await page.locator(`[data-plan-view=${view}]`).click();await createState(true);await page.locator('#plan-empty-add').click();assert.equal(await page.locator('[name=date]').inputValue(),'');await close();await capture('plan-'+view+'-empty')}
+  for(const view of ['upcoming','inbox']){await selectPlan(view);await createState(true);await page.locator('#plan-empty-add').click();assert.equal(await page.locator('[name=date]').inputValue(),'');await close();await capture('plan-'+view+'-empty')}
   const task={...fixture.tasks[0],title:'今晚整理明天的计划',date,tagIds:[]}
   const future=await page.evaluate(()=>{const d=new Date();d.setDate(d.getDate()+1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`})
   await put({tasks:[task,{...task,id:'future',date:future},{...task,id:'inbox',date:undefined}],taskTags:fixture.taskTags})
-  for(const view of ['today','upcoming','inbox']){await page.locator(`[data-plan-view=${view}]`).click();await createState(false);await capture('plan-'+view+'-populated')}
-  await page.locator('[data-plan-view=today]').click();await page.locator('#plan-tag-filter').click();await page.locator('[data-filter-tag="tag-old"]').click();await createState(true);await capture('plan-filtered-empty');await page.locator('#plan-tag-filter-clear').click();await createState(false)
+  for(const view of ['today','upcoming','inbox']){await selectPlan(view);await createState(false);await capture('plan-'+view+'-populated')}
+  await selectPlan('today');await page.locator('#plan-tag-filter').click();await page.locator('[data-filter-tag="tag-old"]').click();await createState(true);await capture('plan-filtered-empty');await page.locator('#plan-tag-filter-clear').click();await createState(false)
   await put({tasks:[{...task,completedAt:'2026-10-03T00:00:00Z'}]});await nav('today');await nav('plan');await createState(false);await capture('plan-completed-only')
   const geometry = async selector => page.locator(selector).evaluateAll(elements=>elements.map(e=>{const r=e.getBoundingClientRect(),c=e.closest('.training-card,.today-card'),b=c.getBoundingClientRect(),s=getComputedStyle(c),a=getComputedStyle(e);return {height:r.height,width:r.width,innerWidth:b.width-parseFloat(s.paddingLeft)-parseFloat(s.paddingRight)-parseFloat(s.borderLeftWidth)-parseFloat(s.borderRightWidth),rightGap:b.right-parseFloat(s.paddingRight)-parseFloat(s.borderRightWidth)-r.right,minHeight:a.minHeight,radius:a.borderRadius,padding:a.padding,whiteSpace:a.whiteSpace,primary:e.classList.contains('primary'),secondary:e.classList.contains('secondary')}}))
   const actionGeometry = async selector => {const result=await geometry(selector);assert.ok(result.length);for(const g of result){assert.ok(g.height>=44);assert.ok(g.width<g.innerWidth);assert.ok(Math.abs(g.rightGap)<1.5);assert.equal(g.whiteSpace,'nowrap')}return result}
@@ -124,7 +125,7 @@ try { for (const [width,height] of sizes) {
    await page.addStyleTag({content:`html { font-size:${scale}%; }`})
    await todayWorkout(true);await capture(`font${scale}-today`);await workoutCheck(`font${scale}-workout`);await nav('plan');await createState(false);await capture(`font${scale}-plan-populated`)
    await put({tasks:[]});await nav('today');await nav('plan');await createState(true);await capture(`font${scale}-plan-empty`)
-   for(const view of ['upcoming','inbox']){await page.locator(`[data-plan-view=${view}]`).click();await createState(true);await capture(`font${scale}-plan-${view}-empty`)}
+   for(const view of ['upcoming','inbox']){await selectPlan(view);await createState(true);await capture(`font${scale}-plan-${view}-empty`)}
    await page.locator('[data-plan-view=today]').click()
    await management(`font${scale}-management`)
    await put({tasks:[task]})

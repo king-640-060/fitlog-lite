@@ -7,7 +7,7 @@ try { for(const [width,height] of (prod?[[390,844],[430,932]]:[[320,812],[375,81
  const context=await browser.newContext({viewport:{width,height},isMobile:true,hasTouch:true,timezoneId:'Asia/Shanghai',serviceWorkers:'block'})
  await context.addInitScript(()=>{
   const p={id:'stream-test',name:'合成流式',protocol:'openai-chat-completions',baseUrl:'https://mock-stream.invalid/v1',model:'chat-model',visionModel:'image-model',toolCapability:'supported',createdAt:'',updatedAt:''}
-  localStorage.setItem('fitlog-ai-profiles-v1',JSON.stringify([p]));localStorage.setItem('fitlog-ai-active-profile-v1',p.id);localStorage.setItem('fitlog-ai-key-v1:'+p.id,'synthetic-stream-key');localStorage.setItem('fitlog-ai-privacy-ack-v1','1');localStorage.setItem('fitlog-ai-voice-privacy-ack-v1','1')
+  localStorage.setItem('fitlog-ai-profiles-v1',JSON.stringify([p]));localStorage.setItem('fitlog-ai-active-profile-v1',p.id);localStorage.setItem('fitlog-ai-key-v1:'+p.id,'synthetic-stream-key');localStorage.setItem('fitlog-ai-privacy-ack-v1','1');localStorage.setItem('fitlog-ai-voice-privacy-ack-v1','1');localStorage.setItem('fitlog-voice-config-v1',JSON.stringify({version:1,mode:'browser'}))
   class Speech {start(){this.onstart?.();window.__speech=this}abort(){}stop(){}}
   window.SpeechRecognition=Speech;window.webkitSpeechRecognition=undefined
   window.__requests=[];window.__mode='normal';window.__streams=[]

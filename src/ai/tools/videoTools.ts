@@ -4,5 +4,5 @@ export const videoTools = [defineTool<{ query: string; limit?: number }>('search
   const provider = env.videoSearch! as DetailedVideoSearchProvider
   const outcome = typeof provider.searchDetailed === 'function' ? await provider.searchDetailed(args.query, args.limit ?? 3, env.signal) : { videos: await provider.search(args.query, args.limit ?? 3, env.signal), notices: [] }
   env.onVideos?.(outcome.videos, outcome.notices)
-  return { source: 'FitLog provider routing', videos: outcome.videos.map(({ id, title, channel, publishedAt, provider, providerLabel }) => ({ id, title, channel, publishedAt, provider, providerLabel })), count: outcome.videos.length, ranking: 'provider relevance; not a quality endorsement', ...(outcome.notices.length ? { notices: outcome.notices } : {}) }
+  return { videos: outcome.videos.map(({ id, title, channel, provider }) => ({ id, title: title.slice(0, 160), channel: channel.slice(0, 80), provider })), count: outcome.videos.length, ...(outcome.notices.length ? { notices: outcome.notices } : {}) }
 })]

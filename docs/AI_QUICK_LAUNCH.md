@@ -2,7 +2,7 @@
 
 ## Shipped app capabilities
 
-Voice is an input method for the existing assistant. Final text now receives an incremental streamed assistant response through the same `engine.send → chatStream` path as typed and quick-launch text. Stop/close cancel it; unfinished output remains UI-only and does not enter finalized history. Probes and packaging Vision remain nonstreaming. Open normal FitLog → AI 助手 → Mic, acknowledge first voice use, speak, then recognition end auto-sends final text. Normal AI entry stays text-first. No wake word, background mic, voice backend, audio attachment, new Provider/key or direct business write.
+Primary Voice now uses app-owned getUserMedia/MediaRecorder, immediate track release, one official dedicated STT and final-text submission through the existing engine. Explicit training-video text can use the conservative no-chat READ fast path; other text retains incremental chatStream. Voice-originated final replies use system TTS with quiet Stop. No app voice acknowledgement blocker, background listening, auto restart, audio persistence or direct business writes. See AI_ARCHITECTURE.md for current endpoint/limits/key reuse and compatibility fallback.
 
 The app-side quick-launch contract is implemented. **An independent iPhone Home Screen “FitLog AI” launcher and one-tap-to-listen are Pending**, with no verified same-storage path in this environment. No physical iPhone was accessible. App-side tests do not establish launcher safety.
 
@@ -23,25 +23,11 @@ Prompts are untrusted user text. They never become HTML, tool commands, direct D
 
 Busy auto-send preserves text and says “上一条请求还在处理中。”; completion of the old request does not auto-send the draft. No profile retains composer text and offers existing connection UI. Missing AI privacy acknowledgement retains text; explicit acknowledgement may continue the same unchanged pending prompt. Editing cancels that pending auto-send. Drafts survive in-page close/reopen in memory, including visits to settings, but reload clears them. No prompt/draft is written to localStorage, sessionStorage, logs, analytics, Backup or Sync. URL fragments still exist in the launching surface/history until consumed; launchers must not persist them or place credentials in them.
 
-## Speech implementation and lifecycle
+## Voice implementation / privacy / activation
 
-`src/services/speechRecognitionService.ts` is the browser API boundary. Feature detect `SpeechRecognition`, then `webkitSpeechRecognition`. Use `lang=zh-CN`, `continuous=false`, `interimResults=true`, `maxAlternatives=1`. State: idle, starting, listening, stopping, unsupported, error. No dependency or vendor-specific speech integration.
+VoiceCaptureController owns recording/request cleanup; SpeechRecognitionService is only explicitly selected browser compatibility, manual Stop aborts instead of waiting. Primary short recordings detect supported MP4/WebM, convert to WAV in memory and use official Zhipu glm-asr-2512 with30sec limit. AI Settings → Voice names the receiving service and holds static privacy text; VoiceConfigV1/optional independent key are device-only, outside DB/Backup/Sync. Reuse references the compatible current credential without copying it. Legacy voice acknowledgement is unused/preserved. System mic permission remains.
 
-Interim and already-final partial segments are status text only. Result indices replace earlier versions; aggregate final text once at `onend`. A session generation invalidates late/double callbacks. No speech/error means no send; fixed Chinese errors hide browser diagnostic details. Manual Mic Stop calls `stop()` and final/end may send once. Manual Send aborts recognition and sends only current composer text. Existing typed text and final voice combine with a newline; an oversized combined draft stays available to edit. Close/dispose, nonvisible document and pagehide abort, never send. All recognition handlers and lifecycle listeners are detached; no restart or retry.
-
-Voice never focuses the textarea; an existing text focus is blurred before start. Error/blocked final text is not automatically focused. Listening has a quiet static dot/status; no decorative animation. The existing shared Sheet owns Safe Area/viewport and independent conversation scrolling. At 320px a two-row composer keeps Camera/Mic/Send and a usable 16px textarea; larger screens use one row. AI busy disables Mic. Speech/privacy controls have 44px touch targets and keyboard focus remains accessible.
-
-Unsupported copy: “当前浏览器不支持网页语音识别，可以使用系统键盘听写。” Ordinary text Send remains available. Browser/system speech may require network, OS Siri settings or microphone permission; support detection does not guarantee successful recognition.
-
-## Privacy and activation
-
-First-use disclosure (also AI Settings → 隐私说明):
-
-> 语音会由当前浏览器或系统提供的语音识别服务处理。FitLog 不保存录音；识别后的文字会按正常 AI 流程发送给你配置的 AI 服务。
-
-Only `fitlog-ai-voice-privacy-ack-v1=1` is persisted, device-local and separate from AI/Vision acknowledgements. It is excluded from the business DB, Backup and Sync. FitLog neither captures a MediaStream nor creates audio files/Blobs/ObjectURLs nor uploads audio to the AI Provider. The browser/system's processing must not be called guaranteed local-only or offline. Only final text enters normal in-memory AI history; browser/provider retention is outside FitLog's control.
-
-App Mic is an explicit gesture. On first use it shows acknowledgement, then starts from that gesture. Quick Voice without acknowledgement shows “开始语音”, never silently listens. Without active user activation, show “准备好后开始说话” / “开始说话”. `navigator.userActivation` is only an auxiliary signal: an attempted automatic start may still be denied; return quietly to the start button. Explicit user permission denial explains system microphone settings. No repeated permission requests/automatic retries. Physical daily launch tap count remains Pending.
+App Mic is an explicit gesture. Quick Voice without activation offers 准备好后开始说话 / 开始说话; denial never retries. Existing AI data privacy is still enforced. All tracks stop on Stop/cancel/close/Clear/settings/hidden/pagehide/errors before STT/AI. Audio is memory-only; real CORS/codecs/mic-indicator behavior remains Pending. Voice does not focus textarea; the existing320px composer and shared Sheet lifecycle remain.
 
 ## iPhone launcher and storage gate
 
@@ -64,7 +50,7 @@ No physical device result is claimed by this release. Real SpeechRecognition, ph
 
 ## Verification and future native contract
 
-Unit: quickLaunch, speechRecognition, aiVoiceInput plus complete existing suite. Browser: aiVoice uses synthetic SpeechRecognition/Provider events in isolated contexts, local 320×812 / 375×812 / 390×844 / 430×932, production 390/430. Existing Assistant, Dual Model, Food Vision, Interaction, Shared Date Picker and GitHub Sync suites remain release gates. The same synthetic persistent production profile is compared across deployment with all 14 stores/15 frozen historical rows, without reseeding after release. No DB migration: fitlog-lite-db, Dexie V7/14 stores, Backup V7, Restore V1–V7, Sync Envelope V1, AI Config/System Prompt V1.
+Unit: quickLaunch, speechRecognition, aiVoiceInput plus complete existing suite. Browser: aiVoice uses synthetic SpeechRecognition/Provider events in isolated contexts, local 320×812 / 375×812 / 390×844 / 430×932, production 390/430. Existing Assistant, Dual Model, Food Vision, Interaction, Shared Date Picker and GitHub Sync suites remain release gates. The same synthetic persistent production profile is compared across deployment with all 14 stores/15 frozen historical rows, without reseeding after release. No DB migration: fitlog-lite-db, Dexie V10/18 stores, Backup V10, Restore V1–V10, Sync Envelope V1, AI Config/System Prompt V1.
 
 If guaranteed separate icon/Siri/Action Button/lock screen is needed later, design a thin native companion/App Intent in a new round. It must first guarantee a safe data-context boundary, hand off only ephemeral user text through this contract, retain the same Provider and proposal checks, and accurately report activation limits. This release adds no Xcode project or native integration.
 

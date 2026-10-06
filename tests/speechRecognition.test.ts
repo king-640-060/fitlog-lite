@@ -17,7 +17,7 @@ describe('finite browser speech lifecycle',()=>{
     r.results([['今天',true],['如何',false]]);r.results([['今天',true],['蛋白质还差多少',true]])
     expect(options.onFinal).not.toHaveBeenCalled();const end=r.onend!;end();end();expect(options.onFinal).toHaveBeenCalledExactlyOnceWith('今天蛋白质还差多少');expect(r.onresult).toBeNull();expect(service.state).toBe('idle')
   })
-  it('manual stop waits for final/end',()=>{service.start(options);const r=MockRecognition.last;service.stop();expect(service.state).toBe('stopping');expect(r.stop).toHaveBeenCalledOnce();r.results([['一句话',true]]);r.onend?.();expect(options.onFinal).toHaveBeenCalledExactlyOnceWith('一句话')})
+  it('manual stop aborts immediately and sends only already-final text once',()=>{service.start(options);const r=MockRecognition.last;r.results([['一句话',true],['临时',false]]);const end=r.onend!;service.stop();expect(service.state).toBe('idle');expect(r.abort).toHaveBeenCalledOnce();expect(r.stop).not.toHaveBeenCalled();end();expect(options.onFinal).toHaveBeenCalledExactlyOnceWith('一句话')})
   it('abort, background/close disposal and old callbacks cannot publish or corrupt a new session',()=>{
     service.start(options);const old=MockRecognition.last;old.results([['不发送',true]]);const end=old.onend!,result=old.onresult!;service.abort();expect(old.abort).toHaveBeenCalledOnce();service.start(options);end();result({results:[],resultIndex:0});expect(service.state).toBe('listening');expect(options.onFinal).not.toHaveBeenCalled();service.dispose();MockRecognition.last.onend?.();expect(options.onFinal).not.toHaveBeenCalled();expect(MockRecognition.last.onerror).toBeNull();service.start(options);expect(service.state).toBe('idle')
   })
