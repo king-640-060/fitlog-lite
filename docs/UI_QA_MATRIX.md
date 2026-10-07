@@ -121,8 +121,12 @@ voiceMode covers4 widths320/375/390/430 × fonts100/120/140 locally and producti
 
 ## Retirement / motion release gate inventory
 
-Required19 suites (none skipped): uiQualityAudit, uiSemanticConsistency, interactionStabilization, mobileLayout, sharedDatePicker, githubSyncSafety, aiAssistant, aiVoice, voiceMode, aiStreaming, aiDualModelRouting, foodVision, nutritionGauge, nutritionTemplates, foodServing, dietEvents, trainingJournal, habitDeletion, motionPolish. The removed feature suites are deleted. ProductionAssets and legacy persistent-profile preservation are additional release checks.
+Required20 suites (none skipped): uiQualityAudit, uiSemanticConsistency, interactionStabilization, mobileLayout, sharedDatePicker, githubSyncSafety, aiAssistant, aiVoice, voiceMode, aiStreaming, aiDualModelRouting, foodVision, nutritionGauge, nutritionTemplates, foodServing, dietEvents, trainingJournal, habitDeletion, motionPolish, habitEditorLayout. The removed feature suites are deleted. ProductionAssets and legacy persistent-profile preservation are additional release checks.
 
 Run320/375/390/430 with fonts100/120/140. motionPolish covers normal/reduced preferences, retained navigation/tabs,20 rapid main-tab changes and20 Sheet cycles, Task/Habit persistence, Calendar Today/selected semantics, one-time streamed message entrance and recording-only feedback. Existing full suites retain Food Rail, journals, settings, privacy, rollback and business coverage. Inspect before/mid/final screenshots and the20 named product surfaces. No real provider, hardware Safari or original installed PWA claim from mocks.
 
 The same old production persistent profile must retain all18-store logical snapshots and AI/Voice metadata+keys while only six retired device keys disappear. Never clear/reseed/Restore/reinstall it. Production identity includes HTML,JS,CSS,SW, online/offline cold boots and both application/report-only deployments. Physical iPhone Safari and Original installed PWA stay Pending without direct evidence.
+
+## Habit editor flow regression (2026-10-07)
+
+Add habitEditorLayout to the release inventory (20 suites). All320×812/375×812/390×844/430×932, fonts100/120/140%, normal/reduced: actual Management→Habit Manager→New, Today direct create and edit of a UI-created Habit. Assert static Save52px/15px, zero overlap with visible fields/fieldset/target/state across0/25/50/75/100% body scroll, invariant body-relative Save position, reachable Safe Area bottom, shared keyboard mock open/close, stable large frame, restored nonzero manager scroll and20 editor/back cycles without locks/styles/duplicate form. Review390/100 top/middle/bottom and320/140 top/bottom. Physical iPhone Safari remains Pending until owner retest.

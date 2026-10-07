@@ -128,6 +128,7 @@ Read `LATEST_DEV_REPORT.md` for verified versions, test counts, deployment statu
 - Single-meal photos use the active profile's existing Vision route/key, independent strict JSON parser and disclosure. Local Canvas re-encoding strips metadata. At most2 images, memory-only; review and “使用这个估算” only fill a draft, explicit Save persists contextual fields. Day scope forbids photo estimates; converting a photo meal to day clears its range/value. Packaging label transcription remains separate and strict.
 - Calendar's independent sixth special-diet marker stays visible among at most4 icons, with accurate overflow; Food marker/intake stays independent. Nutrition READ context is bounded and permission-gated; no estimates are summed into actual values.
 
+- Habit Manager/Editor use the existing large Sheet frame; Save stays in normal static form flow after planning, before state/danger actions. Preserve parent scroll on Back and start each editor at the top; no sticky/fixed Save or private viewport compensation.
 - Manual Habit deletion is quiet danger in the editor, with actual check-in count and irreversible confirmation. Keep deleteUnusedHabit protection; deleteHabitWithHistory removes definition and every owned check-in in one two-store transaction with rollback and stale-count guard. Deactivation preserves history. No AI permanent-delete tool.
 
 ## Voice and quick launch contract

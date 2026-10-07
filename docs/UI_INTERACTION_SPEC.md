@@ -265,3 +265,7 @@ New user/assistant text enters .88→1/+3px once; subsequent stream tokens and r
 Reduced motion suppresses CSS decoration and explicit Web Animations, including cancellation if the preference changes. State remains readable without animation. No scroll-handler decoration or infinite RAF.
 
 Research: public [Douyin](https://www.douyin.com/jingxuan/sy) and [Bilibili](https://www.bilibili.com/) were attempted; automated access did not provide reliable mobile interaction evidence. Public [GUI Challenges](https://github.com/argyleink/gui-challenges), [switch](https://web.dev/articles/building/a-switch-component), [tabs](https://web.dev/articles/building/a-tabs-component) and [toast](https://web.dev/articles/building/a-toast-component) references informed native state ownership, small local feedback, short transitions and reduced-motion opt-outs. No brand palette, copied code, custom drag, spring, glow, 3D, confetti or countup was adopted.
+
+## Habit editor save flow
+
+Habit Manager and Editor share the existing large Sheet frame so a short/empty manager cannot constrain the editor viewport. Preserve shared subview motion, keyboard/Safe Area ownership and manager scroll on return; each editor starts at the top. Save is an ordinary static-flow action after planning and before existing Habit state/danger controls, never sticky/fixed/absolute. Keep primary/full-btn,52px minimum and15px radius. Do not copy this rule onto unrelated editors.

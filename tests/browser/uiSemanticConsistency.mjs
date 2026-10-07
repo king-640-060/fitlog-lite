@@ -20,7 +20,7 @@ try { for (const [width,height] of sizes) {
    const d=await new Promise(resolve=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>resolve(q.result)})
    await new Promise((resolve,reject)=>{const t=d.transaction(Object.keys(data),'readwrite');for(const [name,rows] of Object.entries(data)){const s=t.objectStore(name);s.clear();for(const row of rows)s.put(row)}t.oncomplete=resolve;t.onerror=()=>reject(t.error)});d.close()
   },data)
-  const nav = async tab => {await page.locator(`[data-tab=${tab}]`).click();await page.waitForTimeout(100);await page.evaluate(()=>scrollTo(0,0))}
+  const nav = async tab => {await page.locator(`[data-tab=${tab}]`).click();await page.waitForTimeout(100);await page.evaluate(async()=>{await Promise.all(document.querySelector('#view').getAnimations().map(a=>a.finished.catch(()=>{})));scrollTo(0,0)})}
   const selectPlan = async view => {await page.locator(`[data-plan-view=${view}]`).click();await page.waitForFunction(view=>document.querySelector(`[data-plan-view=${view}]`)?.getAttribute('aria-selected')==='true',view)}
   const close = async () => {await page.locator('dialog [data-close]').click();await page.waitForFunction(()=>!document.querySelector('dialog[open]'))}
   const capture = async name => {

@@ -340,7 +340,8 @@ async function refreshTodayHabitCard(): Promise<void> {
 }
 
 async function showHabitManager(openCreate = false): Promise<void> {
-  const dialog = openModal('习惯管理', '<div id="habit-manager-body"></div>')
+  // Manager and editor share the existing large frame, never freeze an empty manager's short height.
+  const dialog = openModal('习惯管理', '<div id="habit-manager-body"></div>', true)
   dialog.classList.add('habit-sheet')
   const body = dialog.querySelector<HTMLElement>('#habit-manager-body')!
   const scroll = dialog.querySelector<HTMLElement>('.modal-body')!
