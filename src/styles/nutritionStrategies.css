@@ -6,7 +6,7 @@
 .strategy-title { margin: 0 0 10px; color: var(--text-primary); font-size: 1.05rem; line-height: 1.45; overflow-wrap: anywhere; }
 .strategy-list, .strategy-choices { display: grid; gap: var(--card-gap); min-width: 0; }
 .strategy-choices { margin-top: 10px; }
-.strategy-choice, .strategy-variant-card, .strategy-template-card, .strategy-saved { display: grid; gap: 7px; min-width: 0; padding: 14px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); color: var(--text-primary); text-align: left; }
+.strategy-choice, .strategy-variant-card, .strategy-saved { display: grid; gap: 7px; min-width: 0; padding: 14px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); color: var(--text-primary); text-align: left; }
 .strategy-choice { width: 100%; align-content: start; align-items: stretch; justify-content: stretch; font-weight: 400; }
 .strategy-choice[aria-pressed=true] { background: var(--accent-soft); border-color: var(--accent-mid); }
 .strategy-variant-name { display: block; min-width: 0; font-size: .95rem; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
@@ -17,17 +17,11 @@
 .strategy-saved { background: var(--surface-soft); }
 .strategy-saved > span:first-child, .strategy-saved small { overflow-wrap: anywhere; color: var(--text-secondary); font-size: .8rem; }
 .strategy-preview, .strategy-activation-preview { margin: 0; color: var(--text-secondary); font-size: .8rem; line-height: 1.55; overflow-wrap: anywhere; }
-.strategy-template-open { display: grid; gap: 6px; width: 100%; min-width: 0; min-height: 44px; padding: 0; border: 0; border-radius: 0; color: var(--text-primary); background: transparent; text-align: left; }
-.strategy-template-open > strong { min-width: 0; font-size: 1rem; line-height: 1.45; overflow-wrap: anywhere; }
-.strategy-template-open > span { font-size: .78rem; color: var(--text-secondary); line-height: 1.4; }
 .strategy-phase { padding-top: 10px; border-top: 1px solid var(--divider); }
 .strategy-phase h3 { font-size: .8rem; }
 .strategy-phase p { margin: 5px 0 9px; color: var(--text-secondary); font-size: .76rem; line-height: 1.5; }
 .strategy-weight { display: grid; gap: 5px; color: var(--text-secondary); font-size: .8rem; line-height: 1.5; overflow-wrap: anywhere; }
 .strategy-weight strong { color: var(--text-primary); font-weight: 600; }
-.strategy-empty { display: grid; gap: 7px; padding: 16px 0 4px; }
-.strategy-empty h3 { margin: 0; }
-.strategy-empty p { margin: 0; color: var(--text-secondary); font-size: .85rem; line-height: 1.5; }
 .strategy-archive summary { display: flex; align-items: center; min-height: 44px; color: var(--text-secondary); font-size: .85rem; }
 .strategy-links { display: grid; gap: 6px; padding-top: 8px; border-top: 1px solid var(--divider); }
 .nutrition-strategy .sheet-link { min-width: 0; min-height: 44px; white-space: nowrap; }

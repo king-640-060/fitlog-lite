@@ -1,4 +1,4 @@
-import { icon } from './icons'
+import { managerToolbarHtml, managerListHtml, managerRowHtml, managerEmptyHtml, managerSectionHtml } from './managerPrimitives'
 import type { ManagedSurfaceContext } from './managementWorkspace'
 import { animateMotion, stabilizeSheetSubview } from './motion'
 import type { NutritionGoal, NutritionTarget, NutritionStrategyPhase, NutritionStrategyVariant } from '../db/types'
@@ -75,18 +75,19 @@ export async function showNutritionStrategyPicker(ui: StrategyUi, date: string, 
 
 export async function showNutritionStrategyManager(ui: StrategyUi, back?: ()=>void): Promise<void> {
   if(ui.surface&&!ui.surface.alive)return
-  const dialog=ui.openModal('营养模板',`<div class="nutrition-strategy" id="strategy-manager"><p role="status" class="strategy-note">正在读取营养模板…</p></div>`)
+  const dialog=ui.openModal('营养模板',`<div class="manager-surface" id="strategy-manager"><p role="status" class="strategy-note">正在读取营养模板…</p></div>`)
   const managerRoot=dialog.querySelector<HTMLElement>('#strategy-manager')!
   try{
     const [templates,phases]=await Promise.all([db.nutritionStrategyTemplates.orderBy('updatedAt').reverse().toArray(),db.nutritionStrategyPhases.orderBy('startDate').reverse().toArray()])
     const active=phases.find(p=>!p.endDate),current=templates.find(t=>t.id===active?.templateId)
     const counts=new Map((await db.nutritionStrategyVariants.toArray()).reduce<Array<[string,number]>>((a,v)=>{const pair=a.find(p=>p[0]===v.templateId);if(pair)pair[1]++;else a.push([v.templateId,1]);return a},[]))
-    const row=(t:typeof templates[number])=>`<article class="strategy-template-card"><button type="button" class="strategy-template-open manager-row" data-strategy-detail="${ui.esc(t.id)}"><strong>${ui.esc(t.name)}</strong><span>${counts.get(t.id)??0} 个日方案${t.archivedAt?' · 已归档':phases.some(p=>p.templateId===t.id)?' · 曾使用':' · 尚未启用'}</span>${icon('chevron',18)}</button></article>`
-    const currentHtml=current&&active?`<section><p class="strategy-section-label">当前使用</p><article class="strategy-template-card"><button type="button" class="strategy-template-open manager-row" data-strategy-detail="${ui.esc(current.id)}"><strong>${ui.esc(current.name)}</strong><span>${counts.get(current.id)??0} 个日方案 · 每天手动选择</span>${icon('chevron',18)}</button>${await phaseHtml(ui,active,current.name)}</article></section>`:''
+    const row=(t:typeof templates[number])=>managerRowHtml(ui.esc(t.name), `${counts.get(t.id)??0} 个日方案${t.id===current?.id&&active?` · 当前使用 · ${ui.esc(active.startDate)} 起`:t.archivedAt?' · 已归档':phases.some(p=>p.templateId===t.id)?' · 曾使用':' · 尚未启用'}`, `data-strategy-detail="${ui.esc(t.id)}"`)
+    const currentHtml=current&&active?managerSectionHtml('当前使用',managerListHtml(row(current))):''
     if(!isOpen(dialog)||!managerRoot.isConnected)return
     if (!ui.surface) setSheetVariant(dialog,templates.length>2?'large':'content')
     const available=templates.filter(t=>t.id!==current?.id&&!t.archivedAt),archived=templates.filter(t=>t.archivedAt)
-    dialog.querySelector('#strategy-manager')!.innerHTML=`${back?'<button type="button" class="sheet-link" id="strategy-manager-back">返回当日目标</button>':''}<p class="strategy-note">一个模板包含多个日目标方案，每天选择一个。切换模板不改写已保存目标。</p><div class="manager-toolbar"><span>${templates.length} 个模板</span><button type="button" class="text-btn manager-create" id="strategy-create" aria-label="新建营养模板" ${templates.length?'':'hidden'}>+ 新建</button></div>${templates.length?`${currentHtml}${available.length?`<section><h3>${current?'其他模板':'可用模板'}</h3><div class="strategy-list">${available.map(row).join('')}</div></section>`:''}${archived.length?`<details class="strategy-archive"><summary>已归档 · ${archived.length}</summary><div class="strategy-list">${archived.map(row).join('')}</div></details>`:''}`:'<div class="strategy-empty"><h3>还没有营养模板</h3><p>把训练日、休息日等目标放在同一模板中，每天选一个。</p><button type="button" class="primary" id="strategy-empty-create" aria-label="新建营养模板">新建营养模板</button></div>'}${errorHtml()}`
+    dialog.querySelector('#strategy-manager')!.innerHTML=`${back?'<button type="button" class="sheet-link" id="strategy-manager-back">返回当日目标</button>':''}${managerToolbarHtml(`${templates.length} 个模板`,'strategy-create','营养模板',!templates.length)}<p class="manager-section-note">一个模板包含多个日目标方案，每天选择一个。切换模板不改写已保存目标。</p>${templates.length?`${currentHtml}${available.length?managerSectionHtml(current?'其他模板':'可用模板',managerListHtml(available.map(row).join(''))):''}${archived.length?`<details class="strategy-archive manager-section"><summary>已归档 · ${archived.length}</summary>${managerListHtml(archived.map(row).join(''))}</details>`:''}`:managerEmptyHtml('营养模板','把训练日、休息日等目标放在同一模板中，每天选一个。','strategy-empty-create')}${errorHtml()}`
+
     ui.surface?.restoreScroll()
     dialog.querySelector('#strategy-empty-create')?.addEventListener('click',()=>showNutritionStrategyEditor(ui,undefined,back))
     dialog.querySelector('#strategy-create')!.addEventListener('click',()=>showNutritionStrategyEditor(ui,undefined,back))
@@ -114,7 +115,7 @@ export function showNutritionStrategyEditor(ui: StrategyUi, source?: StrategyDra
   const draft: StrategyDraft=source?structuredClone(source):{name:'',variants:[]}
   const initialDraft = JSON.stringify(draft)
   if(ui.surface&&!ui.surface.alive)return
-  const dialog=ui.openModal(copy?'复制为新模板':source?'编辑营养模板':'新建营养模板',`<div class="nutrition-strategy"><div id="strategy-editor-root"><button type="button" class="sheet-link" id="strategy-editor-back">返回模板管理</button><form id="strategy-template-form" class="form"><label>模板名称<input name="name" maxlength="80" value="${ui.esc(draft.name)}" placeholder="例如：减脂策略 V1" required></label><section><div class="strategy-editor-heading"><h3>日方案</h3><span id="strategy-variant-count"></span></div><p class="strategy-note">可以自定义名称；每天从这些方案中选一个。</p><div class="strategy-list" id="strategy-editor-variants"></div></section><button type="button" class="secondary full-btn" id="strategy-add-variant">添加日方案</button>${errorHtml()}<button type="submit" class="primary full-btn" id="strategy-save">保存营养模板</button><p class="strategy-note">保存后不会自动启用，也不会改变已保存的每日目标。</p></form></div><div id="strategy-variant-subview" hidden></div></div>`,true)
+  const dialog=ui.openModal(copy?'复制为新模板':source?'编辑营养模板':'新建营养模板',`<div class="nutrition-strategy"><div id="strategy-editor-root"><button type="button" class="sheet-link" id="strategy-editor-back">返回模板管理</button><form id="strategy-template-form" class="form manager-editor"><label>模板名称<input name="name" maxlength="80" value="${ui.esc(draft.name)}" placeholder="例如：减脂策略 V1" required></label><section><div class="strategy-editor-heading"><h3>日方案</h3><span id="strategy-variant-count"></span></div><p class="strategy-note">可以自定义名称；每天从这些方案中选一个。</p><div class="strategy-list" id="strategy-editor-variants"></div></section><button type="button" class="secondary full-btn" id="strategy-add-variant">添加日方案</button>${errorHtml()}<button type="submit" class="primary full-btn" id="strategy-save">保存营养模板</button><p class="strategy-note">保存后不会自动启用，也不会改变已保存的每日目标。</p></form></div><div id="strategy-variant-subview" hidden></div></div>`,true)
   const root=dialog.querySelector<HTMLElement>('#strategy-editor-root')!,sub=dialog.querySelector<HTMLElement>('#strategy-variant-subview')!,form=dialog.querySelector<HTMLFormElement>('#strategy-template-form')!
   let returnFromVariant: (()=>void)|undefined,busy=false
   const syncName=()=>{draft.name=(form.elements.namedItem('name') as HTMLInputElement).value}

@@ -385,18 +385,12 @@ html[data-input-modality="keyboard"] .pelvic-specialty:focus-visible { border-co
 .quantity-input { position: static !important; display: flex; align-items: baseline; gap: 10px; margin-top: 5px; color: var(--text-secondary); }
 .quantity-input input { min-height: 62px; padding: 4px 12px; font-size: 2.25rem; font-weight: 700; letter-spacing: -.03em; }
 .quantity-input b { font-size: 1rem; }
-.picker-list, .library-list { display: grid; }
+.picker-list { display: grid; }
 .picker-item { display: grid; grid-template-columns: minmax(0, 1fr) minmax(70px, 95px); align-items: center; gap: 12px; min-height: 62px; padding: 10px 2px; border: 0; border-bottom: 1px solid var(--divider); border-radius: 0; background: transparent; text-align: left; }
 .picker-item span { display: grid; min-width: 0; gap: 3px; overflow-wrap: anywhere; }
 .picker-item em { overflow-wrap: anywhere; text-align: right; }
 .picker-item small, .picker-item em { color: var(--text-secondary); font-size: .78rem; font-style: normal; }
 .toolbar { display: grid; grid-template-columns: minmax(0, 1fr) 44px; gap: 8px; margin-bottom: 10px; }
-.library-list { max-height: none; overflow: visible; }
-.library-list article { display: grid; grid-template-columns: minmax(0, 1fr) 44px; align-items: center; border-bottom: 1px solid var(--divider); }
-.library-main { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 66px; padding: 9px 2px; border: 0; background: transparent; text-align: left; }
-.library-main > span { min-width: 0; overflow-wrap: anywhere; }
-.library-main small { display: block; margin-top: 2px; color: var(--text-secondary); }
-.library-main p { margin: 4px 0 0; color: var(--text-secondary); font-size: .78rem; }
 .muted { color: var(--text-secondary); }
 .padded { padding: 20px; text-align: center; }
 .import-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
@@ -565,7 +559,7 @@ html[data-input-modality="keyboard"] .calendar-day-danger .danger-button:focus-v
 .restore-counts { display: grid; gap: 4px; margin-bottom: 16px; }
 .restore-counts p { display: flex; justify-content: space-between; margin: 0; padding: 9px 2px; border-bottom: 1px solid var(--divider); }
 .warning { margin: 16px 0; padding: 13px; border-radius: 13px; background: var(--danger-soft); color: var(--danger); font-size: .88rem; line-height: 1.5; }
-.template-picker, .template-list, .template-manager-list, .template-editor-items { display: grid; gap: 10px; }
+.template-picker, .template-list, .template-editor-items { display: grid; gap: 10px; }
 .template-picker-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-top: 6px; }
 .template-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 15px; border: 1px solid var(--border); border-radius: 18px; background: var(--surface); }
 .template-card > div { min-width: 0; }
@@ -575,13 +569,6 @@ html[data-input-modality="keyboard"] .calendar-day-danger .danger-button:focus-v
 .soft-warning { display: grid; gap: 7px; margin: 0; background: var(--accent-soft); color: var(--text-primary); }
 .soft-warning span { color: var(--text-secondary); }
 .soft-warning .primary { margin-top: 4px; }
-.manager-card { overflow: hidden; border: 1px solid var(--border); border-radius: 17px; background: var(--surface); }
-.manager-main { display: grid; width: 100%; gap: 5px; min-height: 68px; padding: 12px 14px; border: 0; border-radius: 0; background: transparent; text-align: left; }
-.manager-main span, .manager-main small { color: var(--text-secondary); font-size: .78rem; }
-.manager-actions { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--divider); }
-.manager-actions button { min-height: 44px; border: 0; border-right: 1px solid var(--divider); border-radius: 0; padding: 0 8px; background: transparent; color: var(--accent-strong); font-size: .78rem; font-weight: 700; }
-.manager-actions button:last-child { border-right: 0; }
-.manager-actions button.danger { color: var(--danger); }
 .warning-text { display: block; margin-top: 3px; color: var(--danger) !important; font-size: .73rem; line-height: 1.4; }
 /* Today activity hierarchy */
 .today-card { display: grid; gap: var(--card-gap); padding: 14px var(--card-padding); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface);  }
@@ -616,28 +603,9 @@ html[data-input-modality="keyboard"] .calendar-day-danger .danger-button:focus-v
 .today-habit-summary { margin: 0; color: var(--text-secondary); font-size: .76rem; }
 /* Habit management and editing */
 .habit-sheet .modal-body { padding-bottom: calc(18px + env(safe-area-inset-bottom)); }
-.habit-manager { display: grid; gap: var(--group-gap); }
-.habit-manager-toolbar { display: flex; min-height: 44px; align-items: center; justify-content: space-between; gap: 8px; color: var(--text-secondary); font-size: .83rem; }
-.habit-manager-toolbar > div { display: flex; align-items: center; gap: 10px; }
-.habit-manager-toolbar .text-btn { min-height: 44px; padding: 0 3px; font-size: .82rem; }
-.habit-manager-toolbar [hidden] { display: none; }
-.habit-manager-section { display: grid; gap: 8px; }
-.habit-manager-section h3, .habit-editor-section h3, .habit-status-section h3 { margin: 0; color: var(--text-secondary); font-size: .79rem; font-weight: 650; }
-.habit-manager-group { overflow: hidden; border: 1px solid var(--border); border-radius: 17px; background: var(--surface); }
-.habit-manager-row + .habit-manager-row { border-top: 1px solid var(--divider); }
-.habit-manager-row-main { display: flex; width: 100%; min-width: 0; min-height: 66px; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border: 0; border-radius: 0; background: transparent; text-align: left; }
-.habit-manager-row-main > span, .habit-manager-row.is-reordering .habit-manager-row-main { display: grid; min-width: 0; gap: 4px; }
-.habit-manager-row-main strong { overflow-wrap: anywhere; font-size: .93rem; line-height: 1.3; }
-.habit-manager-row-main small { color: var(--text-secondary); font-size: .75rem; line-height: 1.3; }
-.habit-manager-row-main .icon { flex: 0 0 auto; color: var(--text-tertiary); }
-.habit-manager-row.is-reordering { display: flex; align-items: center; }
+.habit-editor-section h3, .habit-status-section h3 { margin: 0; color: var(--text-secondary); font-size: .79rem; font-weight: 650; }
 .habit-reorder-actions { display: flex; flex: 0 0 auto; gap: 2px; padding-right: 5px; }
 .habit-reorder-actions button { min-width: 44px; min-height: 44px; padding: 0; border: 0; background: transparent; color: var(--accent-strong); font-size: 1.1rem; }
-.habit-manager-empty-line { margin: 0; padding: 18px 14px; color: var(--text-secondary); font-size: .83rem; }
-.habit-manager-empty { display: grid; justify-items: start; gap: 8px; padding: 24px 4px; }
-.habit-manager-empty strong { font-size: 1rem; }
-.habit-manager-empty p { margin: 0; color: var(--text-secondary); font-size: .83rem; line-height: 1.45; }
-.habit-manager-empty .secondary { margin-top: 8px; }
 .habit-editor { display: grid; gap: var(--section-gap); padding-bottom: 12px; }
 .habit-editor-back { justify-self: start; min-height: 44px; padding: 0 4px; border: 0; background: transparent; color: var(--accent-strong); font-size: .83rem; font-weight: 650; }
 .habit-editor-section { display: grid; gap: 8px; }
@@ -917,12 +885,7 @@ body.keyboard-open .bottom-nav { display: none; }
 
 /* Food owns its form grid; shared grid-form semantics stay intact. */
 .compact-action, .context-actions .text-btn, .training-section-head .text-btn { white-space: nowrap; }
-.food-library-actions { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-2); margin-bottom: var(--section-gap); }
-.food-library-actions button { min-width: 0; padding-inline: var(--space-2); font-size: .84rem; }
 .food-import-choices { display: grid; gap: var(--field-gap); }
-.library-empty { display: grid; justify-items: start; gap: var(--space-2); padding: var(--card-padding) 2px; }
-.library-empty h3 { margin: 0; color: var(--text-primary); }
-.library-empty p { margin: 0; color: var(--text-secondary); font-size: .84rem; line-height: 1.5; }
 .food-form { grid-template-columns: minmax(0, 1fr); gap: var(--field-gap); }
 .food-energy-group { display: grid; gap: var(--space-1); }
 .food-macro-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2); margin-block: var(--space-1); }
@@ -930,9 +893,6 @@ body.keyboard-open .bottom-nav { display: none; }
 .food-form .food-macro-grid input { padding-inline: var(--space-2) 25px; }
 .food-form .food-macro-grid label > span { right: var(--space-2); }
 .food-form > .primary { min-height: 48px; }
-@media (max-width: 370px) {
-  .food-library-actions button { gap: var(--space-1); font-size: .8rem; }
-}
 
 /* Scoped Food input convenience and Today navigation layout. */
 .food-quantity-mode { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
