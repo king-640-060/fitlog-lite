@@ -139,3 +139,15 @@ Research: public [Douyin](https://www.douyin.com/jingxuan/sy) and [Bilibili](htt
 ## Habit editor save flow
 
 Habit Manager and Editor share the existing large Sheet frame so a short/empty manager cannot constrain the editor viewport. Preserve shared subview motion, keyboard/Safe Area ownership and manager scroll on return; each editor starts at the top. Save is an ordinary static-flow action after planning and before existing Habit state/danger controls, never sticky/fixed/absolute. Keep primary/full-btn,52px minimum and15px radius. Do not copy this rule onto unrelated editors.
+
+## Persistent Management Workspace (2026-10-07)
+
+The topbar Management entry creates one large primary native dialog, owned by `src/ui/managementWorkspace.ts`. Hub → all twelve managers/settings → editors/subviews → Back retain the exact dialog, handle, header, close and modal-body nodes. Only inner content animates with existing subview/back motion; ordinary route changes keep top/height within2px, ideally0. Never close/reopen Hub to imitate Back or call a child standalone openModal from this path.
+
+`ManagedSurfaceContext` supplies existing renderers with the persistent host/dialog, mount/navigation stack, title/Back target, scroll restoration and route disposal. Standalone Food/Today entries use the same renderer and keep their own parent meaning. Navigation stores UI nodes, title, query/subview and scroll only; services/DB remain authoritative. Saving reloads current service data, then restores the existing query and a valid scroll position. Every New editor starts at0; X closes every level, releases route resources and the shared lock, and the next topbar entry starts at Hub0.
+
+Hub is 管理与设置 without Back. Level2 titles: 食物库 / 动作库 / 训练模板 / 饮食模板 / 营养模板 / 习惯 / 导入数据 / 备份与恢复 / GitHub 同步 / AI 设置 / 版本诊断 / 关于 FitLog Lite. A shared44×44 header Back names its actual parent in aria-label and pops one level; X always exits the workspace. Internal body Back controls are replaced visually by this header in managed paths. Temporary existing danger/Restore confirmations may overlay the same parent; they never replace it. AI → Voice → Back returns AI, then Hub.
+
+All six entity managers use `.manager-toolbar`: search or count/status plus visible `+ 新建`, with complete 新建X aria-label and44px target. Empty states contain a brief title, one explanatory sentence and one primary 新建X; hide/remove the equivalent toolbar entry. Use 新建X / 编辑X / 保存X for long-lived entities; 添加 means placing an existing item into a meal/workout/template. Rows contain name, metadata and chevron and open the entity destination; quiet confirmed deletion belongs to the editor. Habit Level2 is 习惯, never 习惯管理.
+
+Preserve Habit large-frame/static Save52px/15px/full-width/2px top padding and zero field overlap. No sticky/fixed/absolute actions. Preserve DBV10/IndexedDB100/18stores, BackupV10/RestoreV1–V10, Sync/envelopeV1, AIConfigV1/VoiceConfigV1 and permanently retired Video status. Route cleanup aborts AI/Vision/Sync/diagnostic requests, file-read callbacks and timers without resetting business storage. Physical Safari/original installed PWA remain separate evidence.

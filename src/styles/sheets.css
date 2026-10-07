@@ -15,3 +15,33 @@
 .sheet[data-sheet-variant="assistant"] .modal-body { padding: 0 16px 8px; overflow: hidden; }
 .sheet-footer { flex: 0 0 auto; padding: 12px 18px; border-top: 1px solid var(--divider); background: var(--surface-elevated); }
 @media (prefers-reduced-motion: reduce) { .sheet { animation: none; } }
+
+/* One persistent frame for the entire Management route stack. */
+.management-workspace .modal-head { gap: 8px; }
+.management-workspace .modal-head h2 { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.workspace-back { flex: 0 0 44px; width: 44px; height: 44px; }
+.workspace-back svg { transform: rotate(180deg); }
+.workspace-back[hidden] { display: none; }
+.management-workspace .habit-editor-back,
+.management-workspace #import-back,
+.management-workspace #ai-settings-back,
+.management-workspace #voice-settings-back,
+.management-workspace [id^="strategy-"][id$="-back"] { display: none; }
+.manager-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; min-width: 0; }
+.manager-toolbar > :first-child { flex: 1; min-width: 0; }
+.manager-toolbar .manager-create { flex: 0 0 auto; min-height: 44px; white-space: nowrap; }
+.manager-create[hidden] { display: none; }
+.manager-empty { padding: 20px 8px; text-align: center; }
+.manager-empty p { color: var(--text-secondary); margin: 8px 0 16px; }
+.manager-empty .primary { min-height: 44px; }
+.manager-row { display: flex; align-items: center; width: 100%; min-height: 64px; gap: 12px; text-align: left; }
+.manager-row > span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.manager-row small { display: block; color: var(--text-secondary); }
+.manager-row > svg { flex: 0 0 18px; }
+.manager-toolbar.toolbar { display: flex; }
+.manager-main.manager-row, .strategy-template-open.manager-row { display: grid; grid-template-columns: minmax(0, 1fr) 18px; }
+.manager-main.manager-row > :not(svg), .strategy-template-open.manager-row > :not(svg) { grid-column: 1; }
+.manager-main.manager-row > svg, .strategy-template-open.manager-row > svg { grid-column: 2; grid-row: 1 / span 3; align-self: center; }
+.management-workspace .food-vision button[id$="-back"], .management-workspace #vision-back-images { display: none; }
+.manager-editor-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.manager-editor-actions .text-btn { white-space: nowrap; }

@@ -1,3 +1,4 @@
+import { createManagementWorkspace, type ManagedSurfaceContext } from './ui/managementWorkspace'
 import { retireLegacyVideoSearchStorage } from './services/retiredVideoStorage'
 import { animateMotion, setupMotionInteractions, stabilizeSheetSubview } from './ui/motion'
 import { dietEventsHtml, bindDietEvents, type DietEventUi } from './ui/dietEvents'
@@ -197,6 +198,16 @@ async function flushWorkoutAutosave(workout?: Workout): Promise<void> {
   await workoutAutosave.flush(workout)
 }
 
+function managementModal(surface: ManagedSurfaceContext) {
+  return (title: string, body: string, wide = false): HTMLDialogElement => {
+    const dialog = surface.open(title, body, wide); bindNumericPresentation(dialog); return dialog
+  }
+}
+function mountManagementModal(surface: ManagedSurfaceContext | undefined, title: string, body: string, wide = false): HTMLDialogElement {
+  return surface ? managementModal(surface)(title, body, wide) : openModal(title, body, wide)
+}
+function leaveStandalone(dialog: HTMLDialogElement, surface?: ManagedSurfaceContext): void { if (!surface) dialog.close() }
+
 function openModal(title: string, body: string, wide = false): HTMLDialogElement { const dialog = openSheet(esc(title), body, icon('x'), wide); bindNumericPresentation(dialog); return dialog }
 
 function showBusinessDatePicker(title: string, date: string, commit: (date: string) => void): void {
@@ -302,7 +313,7 @@ function todayHabitCardHtml(habits: Habit[], checkIns: HabitCheckIn[], date: str
   const checked = new Set(checkIns.map((item) => item.habitId))
   const count = habits.filter((habit) => checked.has(habit.id)).length
   const weekday = ((new Date(`${date}T12:00:00`).getDay() + 6) % 7) + 1
-  return `<section class="today-card today-activity-card today-habits-card" id="today-habits"><div class="card-heading today-activity-head"><div><span class="card-icon habit-icon">${icon('check', 20)}</span><h2>习惯</h2></div><button class="text-btn" id="today-habits-manage">管理 ${icon('chevron', 16)}</button></div>${habits.length ? `<div class="today-habit-list">${habits.map((habit) => `<button class="today-habit-row" type="button" data-habit-toggle="${esc(habit.id)}" aria-pressed="${checked.has(habit.id)}"><span class="habit-check-indicator" aria-hidden="true">${icon('check', 16)}</span><span class="habit-row-name">${esc(habit.name)}</span>${habit.weekdays?.includes(weekday) ? '<small class="habit-planned-badge">计划</small>' : ''}</button>`).join('')}</div><p class="today-habit-summary" id="today-habit-summary">${habitTodaySummary(count)}</p>` : '<div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">还没有习惯</strong><span class="today-activity-meta">完成时轻触打卡即可</span></div><button class="secondary today-activity-action" id="today-habit-create">创建习惯</button></div>'}</section>`
+  return `<section class="today-card today-activity-card today-habits-card" id="today-habits"><div class="card-heading today-activity-head"><div><span class="card-icon habit-icon">${icon('check', 20)}</span><h2>习惯</h2></div><button class="text-btn" id="today-habits-manage">管理 ${icon('chevron', 16)}</button></div>${habits.length ? `<div class="today-habit-list">${habits.map((habit) => `<button class="today-habit-row" type="button" data-habit-toggle="${esc(habit.id)}" aria-pressed="${checked.has(habit.id)}"><span class="habit-check-indicator" aria-hidden="true">${icon('check', 16)}</span><span class="habit-row-name">${esc(habit.name)}</span>${habit.weekdays?.includes(weekday) ? '<small class="habit-planned-badge">计划</small>' : ''}</button>`).join('')}</div><p class="today-habit-summary" id="today-habit-summary">${habitTodaySummary(count)}</p>` : '<div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">还没有习惯</strong><span class="today-activity-meta">完成时轻触打卡即可</span></div><button class="secondary today-activity-action" id="today-habit-create">新建习惯</button></div>'}</section>`
 }
 
 function bindTodayHabitCard(root: ParentNode, date: string): void {
@@ -339,17 +350,20 @@ async function refreshTodayHabitCard(): Promise<void> {
   bindTodayHabitCard(card, date)
 }
 
-async function showHabitManager(openCreate = false): Promise<void> {
+async function showHabitManager(openCreate = false, surface?: ManagedSurfaceContext): Promise<void> {
   // Manager and editor share the existing large frame, never freeze an empty manager's short height.
-  const dialog = openModal('习惯管理', '<div id="habit-manager-body"></div>', true)
+  if (surface && !surface.alive) return
+  const dialog = mountManagementModal(surface, '习惯', '<div id="habit-manager-body"></div>', true)
   dialog.classList.add('habit-sheet')
   const body = dialog.querySelector<HTMLElement>('#habit-manager-body')!
   const scroll = dialog.querySelector<HTMLElement>('.modal-body')!
   let mounted = false, managerScroll = 0
   const setScreen = (title: string, html: string) => {
-    const back = title === '习惯管理'
+    const back = title === '习惯'
+    if (surface && mounted && !back && dialog.querySelector('h2')!.textContent !== title) surface.subview(title, body)
+    if (surface && back && dialog.querySelector('h2')!.textContent !== title) surface.back()
     const navigate = mounted && dialog.querySelector('h2')!.textContent !== title
-    if (mounted) { if (dialog.querySelector('h2')!.textContent === '习惯管理') managerScroll = scroll.scrollTop; stabilizeSheetSubview(dialog) }
+    if (mounted) { if (dialog.querySelector('h2')!.textContent === '习惯') managerScroll = scroll.scrollTop; stabilizeSheetSubview(dialog) }
     dialog.querySelector('h2')!.textContent = title
     body.innerHTML = html
     scroll.scrollTop = back ? managerScroll : 0
@@ -359,11 +373,11 @@ async function showHabitManager(openCreate = false): Promise<void> {
   let reorderMode = false
   const manager = async () => {
     const all = await db.habits.orderBy('sortOrder').toArray()
-    if (!dialog.isConnected) return
+    if (!dialog.isConnected || !body.isConnected) return
     const active = all.filter((habit) => habit.active)
     const inactive = all.filter((habit) => !habit.active)
     const row = (habit: Habit, index: number, list: Habit[]) => `<div class="habit-manager-row${reorderMode && habit.active ? ' is-reordering' : ''}">${reorderMode && habit.active ? `<span class="habit-manager-row-main"><strong>${esc(habit.name)}</strong><small>${esc(habitPlanText(habit))}</small></span><span class="habit-reorder-actions"><button type="button" data-habit-move="${esc(habit.id)}" data-direction="-1" aria-label="上移 ${esc(habit.name)}" ${index === 0 ? 'disabled' : ''}>↑</button><button type="button" data-habit-move="${esc(habit.id)}" data-direction="1" aria-label="下移 ${esc(habit.name)}" ${index === list.length - 1 ? 'disabled' : ''}>↓</button></span>` : `<button type="button" class="habit-manager-row-main" data-habit-edit="${esc(habit.id)}" aria-label="编辑 ${esc(habit.name)}"><span><strong>${esc(habit.name)}</strong><small>${esc(habitPlanText(habit))}${habit.active ? '' : ' · 已停用'}</small></span>${icon('chevron', 18)}</button>`}</div>`
-    setScreen('习惯管理', `<div class="habit-manager"><div class="habit-manager-toolbar"><span>${reorderMode ? '调整顺序' : `已启用 ${active.length} 项`}</span><div><button type="button" class="text-btn" id="habit-reorder" ${active.length < 2 ? 'hidden' : ''}>${reorderMode ? '完成' : '调整顺序'}</button>${reorderMode ? '' : '<button type="button" class="text-btn" id="habit-new">+ 新建</button>'}</div></div>${all.length ? `<section class="habit-manager-section"><h3>习惯</h3><div class="habit-manager-group">${active.length ? active.map((habit, index) => row(habit, index, active)).join('') : '<p class="habit-manager-empty-line">还没有启用的习惯</p>'}</div></section>${inactive.length ? `<section class="habit-manager-section"><h3>已停用</h3><div class="habit-manager-group">${inactive.map((habit, index) => row(habit, index, inactive)).join('')}</div></section>` : ''}` : '<div class="habit-manager-empty"><strong>还没有习惯</strong><p>创建一个需要时轻触打卡的习惯。</p><button type="button" class="primary" id="habit-empty-new">新建习惯</button></div>'}</div>`)
+    setScreen('习惯', `<div class="habit-manager"><div class="habit-manager-toolbar manager-toolbar"><span>${reorderMode ? '调整顺序' : `已启用 ${active.length} 项`}</span><div><button type="button" class="text-btn" id="habit-reorder" ${active.length < 2 ? 'hidden' : ''}>${reorderMode ? '完成' : '调整顺序'}</button>${reorderMode || !all.length ? '' : '<button type="button" class="text-btn manager-create" aria-label="新建习惯" id="habit-new">+ 新建</button>'}</div></div>${all.length ? `<section class="habit-manager-section"><h3>习惯</h3><div class="habit-manager-group">${active.length ? active.map((habit, index) => row(habit, index, active)).join('') : '<p class="habit-manager-empty-line">还没有启用的习惯</p>'}</div></section>${inactive.length ? `<section class="habit-manager-section"><h3>已停用</h3><div class="habit-manager-group">${inactive.map((habit, index) => row(habit, index, inactive)).join('')}</div></section>` : ''}` : '<div class="habit-manager-empty"><strong>还没有习惯</strong><p>新建一个需要时轻触打卡的习惯。</p><button type="button" class="primary" id="habit-empty-new" aria-label="新建习惯">新建习惯</button></div>'}</div>`)
     body.querySelector('#habit-new')?.addEventListener('click', () => void editor())
     body.querySelector('#habit-empty-new')?.addEventListener('click', () => void editor())
     body.querySelector('#habit-reorder')?.addEventListener('click', () => { reorderMode = !reorderMode; void manager() })
@@ -378,8 +392,8 @@ async function showHabitManager(openCreate = false): Promise<void> {
   }
   const editor = async (habit?: Habit) => {
     const hasHistory = habit ? Boolean(await db.habitCheckIns.where('habitId').equals(habit.id).first()) : false
-    if (!dialog.isConnected) return
-    setScreen(habit ? '编辑习惯' : '新建习惯', `<form id="habit-form" class="habit-editor"><button type="button" class="habit-editor-back" id="habit-form-back">‹ 习惯管理</button><section class="habit-editor-section"><h3>基本信息</h3><div class="habit-editor-group"><label class="habit-editor-field">名称<input name="name" maxlength="40" required value="${esc(habit?.name ?? '')}" placeholder="例如：肩颈拉伸"></label><label class="habit-editor-field">说明（可选）<textarea name="note" rows="2" placeholder="可填写简短提示">${esc(habit?.note ?? '')}</textarea></label></div></section><section class="habit-editor-section"><h3>计划（可选）</h3><div class="habit-editor-group"><fieldset class="habit-weekdays"><legend>每周计划日</legend><div class="habit-weekday-grid">${habitWeekdayLabels.map((label, index) => `<label class="habit-weekday-option"><input type="checkbox" name="weekday" value="${index + 1}" aria-label="星期${label}" ${habit?.weekdays?.includes(index + 1) ? 'checked' : ''}><span aria-hidden="true">${label}</span></label>`).join('')}</div><p id="habit-free-note" class="habit-plan-note" ${habit?.weekdays?.length ? 'hidden' : ''}>不选择计划日 = 自由打卡</p></fieldset><label class="habit-target-row"><span>周目标</span><span class="habit-target-value" id="habit-target-value">${habit?.targetPerWeek ? `每周 ${habit.targetPerWeek} 次` : '不设置'}</span>${icon('chevron', 16)}<select name="targetPerWeek" aria-label="周目标"><option value="">不设置</option>${Array.from({ length: 7 }, (_, index) => `<option value="${index + 1}" ${habit?.targetPerWeek === index + 1 ? 'selected' : ''}>${index + 1} 次</option>`).join('')}</select></label><p class="habit-plan-note">计划仅用于提示和回顾，不限制其他日期打卡。</p></div></section><div class="habit-editor-actions"><button class="primary full-btn" type="submit">保存习惯</button></div>${habit ? `<section class="habit-status-section"><h3>习惯状态</h3><button type="button" id="habit-active-toggle">${habit.active ? '停用习惯' : '重新启用'}</button>${hasHistory ? '<p>如果只是暂时不再执行，建议停用以保留历史。</p>' : ''}<button type="button" id="habit-delete" class="text-btn danger">删除习惯</button></section>` : ''}</form>`)
+    if (!dialog.isConnected || !body.isConnected) return
+    setScreen(habit ? '编辑习惯' : '新建习惯', `<form id="habit-form" class="habit-editor"><button type="button" class="habit-editor-back" id="habit-form-back">‹ 习惯</button><section class="habit-editor-section"><h3>基本信息</h3><div class="habit-editor-group"><label class="habit-editor-field">名称<input name="name" maxlength="40" required value="${esc(habit?.name ?? '')}" placeholder="例如：肩颈拉伸"></label><label class="habit-editor-field">说明（可选）<textarea name="note" rows="2" placeholder="可填写简短提示">${esc(habit?.note ?? '')}</textarea></label></div></section><section class="habit-editor-section"><h3>计划（可选）</h3><div class="habit-editor-group"><fieldset class="habit-weekdays"><legend>每周计划日</legend><div class="habit-weekday-grid">${habitWeekdayLabels.map((label, index) => `<label class="habit-weekday-option"><input type="checkbox" name="weekday" value="${index + 1}" aria-label="星期${label}" ${habit?.weekdays?.includes(index + 1) ? 'checked' : ''}><span aria-hidden="true">${label}</span></label>`).join('')}</div><p id="habit-free-note" class="habit-plan-note" ${habit?.weekdays?.length ? 'hidden' : ''}>不选择计划日 = 自由打卡</p></fieldset><label class="habit-target-row"><span>周目标</span><span class="habit-target-value" id="habit-target-value">${habit?.targetPerWeek ? `每周 ${habit.targetPerWeek} 次` : '不设置'}</span>${icon('chevron', 16)}<select name="targetPerWeek" aria-label="周目标"><option value="">不设置</option>${Array.from({ length: 7 }, (_, index) => `<option value="${index + 1}" ${habit?.targetPerWeek === index + 1 ? 'selected' : ''}>${index + 1} 次</option>`).join('')}</select></label><p class="habit-plan-note">计划仅用于提示和回顾，不限制其他日期打卡。</p></div></section><div class="habit-editor-actions"><button class="primary full-btn" type="submit">保存习惯</button></div>${habit ? `<section class="habit-status-section"><h3>习惯状态</h3><button type="button" id="habit-active-toggle">${habit.active ? '停用习惯' : '重新启用'}</button>${hasHistory ? '<p>如果只是暂时不再执行，建议停用以保留历史。</p>' : ''}<button type="button" id="habit-delete" class="text-btn danger">删除习惯</button></section>` : ''}</form>`)
     body.querySelector('#habit-form-back')?.addEventListener('click', () => { reorderMode = false; void manager() })
     const weekdays = body.querySelectorAll<HTMLInputElement>('[name="weekday"]')
     weekdays.forEach((input) => input.addEventListener('change', () => { body.querySelector<HTMLElement>('#habit-free-note')!.hidden = [...weekdays].some((day) => day.checked) }))
@@ -851,22 +865,27 @@ async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> 
 }
 
 function showManagementHub(): void {
-  const dialog = openModal('管理与设置', '<div id="management-hub"></div>')
+  const surface = createManagementWorkspace(esc)
+  const dialog = managementModal(surface)('管理与设置', '<div id="management-hub"></div>', true)
   const view = dialog.querySelector<HTMLElement>('#management-hub')!
   const row = (id: string, iconName: IconName, title: string, detail: string) => `<button id="${id}"><span class="setting-icon">${icon(iconName, 18)}</span><span><strong>${title}</strong><small>${detail}</small></span>${icon('chevron', 18)}</button>`
-  view.innerHTML = `<section class="settings-section"><h3>内容与模板</h3><div class="settings-group">${row('more-food-library', 'utensils', '食物库', '管理食物与营养数据')}${row('more-exercise-library', 'dumbbell', '动作库', '管理力量训练动作')}${row('more-workout-templates', 'activity', '训练模板', '管理常用训练组合')}${row('more-diet-templates', 'archive', '饮食模板', '管理常用饮食组合')}${row('more-nutrition-strategies', 'leaf', '营养模板', '多个日目标方案与使用阶段')}</div></section><section class="settings-section"><h3>个人管理</h3><div class="settings-group">${row('more-habits', 'leaf', '习惯', '创建、排序与停用打卡习惯')}</div></section><section class="settings-section"><h3>数据与备份</h3><div class="settings-group">${row('more-import', 'upload', '导入数据', '从表格或数据文件导入食物')}${row('more-backup', 'download', '备份与恢复', '导出或恢复完整本地数据')}${row('more-github-sync', 'archive', 'GitHub 同步', esc(githubSyncDetail()))}</div><p class="settings-section-note" role="note">数据保存在当前设备。更换设备或清除浏览器数据前，请先备份。</p></section><section class="settings-section"><h3>应用</h3><div class="settings-group">${row('more-ai-settings', 'sparkles', 'AI 设置', esc(aiSettingsDetail()))}${row('more-diagnostics', 'info', '版本诊断', '查看 App build、SW 状态与更新')}${row('more-about', 'info', '关于 FitLog Lite', 'FitLog Lite · 本地优先')}</div></section>`
-  view.querySelector('#more-food-library')?.addEventListener('click', () => void showFoodLibrary())
-  view.querySelector('#more-exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
-  view.querySelector('#more-workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
-  view.querySelector('#more-diet-templates')?.addEventListener('click', () => void showDietTemplateManager())
-  view.querySelector('#more-habits')?.addEventListener('click', () => void showHabitManager())
-  view.querySelector('#more-import')?.addEventListener('click', () => void db.foods.orderBy('name').toArray().then(foods => showFoodImportChooser(foods)).catch(fail))
-  view.querySelector('#more-backup')?.addEventListener('click', () => void showSettings().catch(fail))
-  view.querySelector('#more-nutrition-strategies')?.addEventListener('click', () => { void showNutritionStrategyManager(nutritionStrategyUi()).catch(fail) })
-  view.querySelector('#more-github-sync')?.addEventListener('click', () => { void flushWorkoutAutosave().then(() => showGitHubSync({ openModal, esc, toast, restored: async () => { workoutAutosave.cancel(); currentWorkout = undefined; workoutEditorOpen = false; await render() } })).catch(fail) })
-  view.querySelector('#more-ai-settings')?.addEventListener('click', () => showAiSettings({ openModal, esc, changed: () => aiAssistant.settingsChanged() }, aiAssistant.profiles))
-  view.querySelector('#more-diagnostics')?.addEventListener('click', () => showPwaDiagnostics(pwaRuntime, {
-    openModal, esc,
+  view.innerHTML = `<section class="settings-section"><h3>内容与模板</h3><div class="settings-group">${row('more-food-library', 'utensils', '食物库', '管理食物与营养数据')}${row('more-exercise-library', 'dumbbell', '动作库', '管理力量训练动作')}${row('more-workout-templates', 'activity', '训练模板', '管理常用训练组合')}${row('more-diet-templates', 'archive', '饮食模板', '管理常用饮食组合')}${row('more-nutrition-strategies', 'leaf', '营养模板', '管理营养目标方案')}</div></section><section class="settings-section"><h3>个人管理</h3><div class="settings-group">${row('more-habits', 'leaf', '习惯', '管理打卡习惯与计划')}</div></section><section class="settings-section"><h3>数据与备份</h3><div class="settings-group">${row('more-import', 'upload', '导入数据', '从文件导入食物数据')}${row('more-backup', 'download', '备份与恢复', '导出或恢复本地数据')}${row('more-github-sync', 'archive', 'GitHub 同步', esc(githubSyncDetail()))}</div><p class="settings-section-note" role="note">数据保存在当前设备。更换设备或清除浏览器数据前，请先备份。</p></section><section class="settings-section"><h3>应用</h3><div class="settings-group">${row('more-ai-settings', 'sparkles', 'AI 设置', esc(aiSettingsDetail()))}${row('more-diagnostics', 'info', '版本诊断', '查看版本、更新与 Service Worker 状态')}${row('more-about', 'info', '关于 FitLog Lite', '应用信息与版本说明')}</div></section>`
+  surface.onResume(() => {
+    view.querySelector('#more-github-sync small')!.textContent = githubSyncDetail()
+    view.querySelector('#more-ai-settings small')!.textContent = aiSettingsDetail()
+  })
+  view.querySelector('#more-food-library')?.addEventListener('click', () => surface.navigate('食物库', surface => showFoodLibrary('', surface)))
+  view.querySelector('#more-exercise-library')?.addEventListener('click', () => surface.navigate('动作库', surface => showExerciseLibrary(surface)))
+  view.querySelector('#more-workout-templates')?.addEventListener('click', () => surface.navigate('训练模板', surface => showWorkoutTemplateManager('', surface)))
+  view.querySelector('#more-diet-templates')?.addEventListener('click', () => surface.navigate('饮食模板', surface => showDietTemplateManager('', surface)))
+  view.querySelector('#more-habits')?.addEventListener('click', () => surface.navigate('习惯', surface => showHabitManager(false, surface)))
+  view.querySelector('#more-import')?.addEventListener('click', () => surface.navigate('导入数据', surface => db.foods.orderBy('name').toArray().then(foods => showFoodImportChooser(foods, '', surface)).catch(fail)))
+  view.querySelector('#more-backup')?.addEventListener('click', () => surface.navigate('备份与恢复', surface => showSettings(surface).catch(fail)))
+  view.querySelector('#more-nutrition-strategies')?.addEventListener('click', () => surface.navigate('营养模板', surface => { return showNutritionStrategyManager(nutritionStrategyUi(surface)).catch(fail) }))
+  view.querySelector('#more-github-sync')?.addEventListener('click', () => surface.navigate('GitHub 同步', surface => { return flushWorkoutAutosave().then(() => { if (!surface.alive) return; showGitHubSync({ surface, openModal: managementModal(surface), esc, toast, restored: async () => { workoutAutosave.cancel(); currentWorkout = undefined; workoutEditorOpen = false; await render() } }) }).catch(fail) }))
+  view.querySelector('#more-ai-settings')?.addEventListener('click', () => surface.navigate('AI 设置', surface => showAiSettings({ surface, openModal: managementModal(surface), esc, changed: () => aiAssistant.settingsChanged() }, aiAssistant.profiles)))
+  view.querySelector('#more-diagnostics')?.addEventListener('click', () => surface.navigate('版本诊断', surface => showPwaDiagnostics(pwaRuntime, {
+    surface, openModal: managementModal(surface), esc,
     confirm: () => confirmAction('更新应用？', '已保存的本地记录会保留。应用将重新打开，当前 AI 对话会结束。', '确认更新', false),
     blockReason: dialog => updateBlockReason({
       otherDialog: Array.from(document.querySelectorAll<HTMLDialogElement>('dialog[open]')).some(open => open !== dialog),
@@ -877,8 +896,8 @@ function showManagementHub(): void {
       aiProposal: aiAssistant.proposals.all.some(proposal => proposal.status === 'pending' || proposal.status === 'processing'),
     }),
     drainWrites: async () => { await flushWorkoutAutosave(); await db.transaction('r', db.tables, async () => {}) },
-  }))
-  view.querySelector('#more-about')?.addEventListener('click', () => { openModal('应用信息', `<div class="about-card"><span class="brand-mark large">${icon('leaf', 30)}</span><h2>FitLog Lite</h2><p>一款轻盈、安静的本地个人健康记录工具。</p><small>饮食 · 力量训练 · 体重 · 凯格尔训练</small></div>`) })
+  })))
+  view.querySelector('#more-about')?.addEventListener('click', () => surface.navigate('关于 FitLog Lite', surface => { managementModal(surface)('关于 FitLog Lite', `<div class="about-card"><span class="brand-mark large">${icon('leaf', 30)}</span><h2>FitLog Lite</h2><p>一款轻盈、安静的本地个人健康记录工具。</p><small>饮食 · 力量训练 · 体重 · 凯格尔训练</small></div>`) }))
 }
 
 async function renderCalendarOverview(withProgressTabs = false): Promise<void> {
@@ -1392,8 +1411,8 @@ function nutritionGoalFromForm(data: FormData): NutritionGoal | undefined {
   })
 }
 
-function nutritionStrategyUi() {
-  return { openModal, esc, goalFields: nutritionGoalFields, goalFromForm: nutritionGoalFromForm,
+function nutritionStrategyUi(surface?: ManagedSurfaceContext) {
+  return { surface, openModal: surface ? managementModal(surface) : openModal, esc, goalFields: nutritionGoalFields, goalFromForm: nutritionGoalFromForm,
     manual: showManualNutritionTargetForm, changed: render, toast, confirm: confirmAction }
 }
 function showNutritionTargetForm(date: string, target?: NutritionTarget): void {
@@ -1417,8 +1436,8 @@ function showManualNutritionTargetForm(date: string, target?: NutritionTarget): 
   })
 }
 
-function openFoodVisionWorkflow(date: string, meal?: MealType): void {
-  showFoodVisionImport({ openModal, esc, profiles: aiAssistant.profiles, openSettings: () => showAiSettings({ openModal, esc, changed: () => aiAssistant.settingsChanged() }, aiAssistant.profiles), onFinish: logged => { if (!logged) void showFoodLibrary() }, onSaved: async (_food, logged) => { toast(logged ? meal ? '已记录' : '已加入食物库并记录饮食' : '已加入食物库'); if (activeTab === 'food') await renderFoodPage(); else if (activeTab === 'today') await renderTodayPage() } }, { date, meal })
+function openFoodVisionWorkflow(date: string, meal?: MealType, surface?: ManagedSurfaceContext): void {
+  showFoodVisionImport({ surface, openModal: surface ? managementModal(surface) : openModal, esc, profiles: aiAssistant.profiles, openSettings: () => showAiSettings({ surface, openModal: surface ? managementModal(surface) : openModal, esc, changed: () => aiAssistant.settingsChanged() }, aiAssistant.profiles), onFinish: logged => { if (!logged) void showFoodLibrary('', surface) }, onSaved: async (_food, logged) => { toast(logged ? meal ? '已记录' : '已加入食物库并记录饮食' : '已加入食物库'); if (activeTab === 'food') await renderFoodPage(); else if (activeTab === 'today') await renderTodayPage() } }, { date, meal })
 }
 
 async function showAddFoodLog(meal: MealType): Promise<void> {
@@ -1452,39 +1471,42 @@ async function showAddFoodLog(meal: MealType): Promise<void> {
   dialog.querySelector<HTMLInputElement>('#food-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
 }
 
-async function showFoodLibrary(query = ''): Promise<void> {
+async function showFoodLibrary(query = '', surface?: ManagedSurfaceContext): Promise<void> {
   const foods = await db.foods.orderBy('name').toArray()
   let currentQuery = query
   let searchTimer: number | undefined
-  const dialog = openModal('食物库', `<div class="toolbar"><label class="search-field"><span class="sr-only">搜索食物库</span>${icon('search', 20)}<input id="library-search" type="search" value="${esc(query)}" placeholder="搜索食物"></label><button class="icon-btn add-button" id="new-food" aria-label="新建食物">${icon('plus')}</button></div><div class="food-library-actions"><button class="secondary compact-action" id="food-vision-import">${icon('camera', 18)} 拍包装录入</button><button class="secondary compact-action" id="food-import-open">${icon('upload', 18)} 导入文件</button></div><div class="library-list"></div>`, foods.length > 0)
+  if (surface && !surface.alive) return
+  const dialog = mountManagementModal(surface, '食物库', `<div class="toolbar manager-toolbar"><label class="search-field"><span class="sr-only">搜索食物库</span>${icon('search', 20)}<input id="library-search" type="search" value="${esc(query)}" placeholder="搜索食物"></label><button class="text-btn manager-create" id="new-food" aria-label="新建食物">+ 新建</button></div><div class="food-library-actions"><button class="secondary compact-action" id="food-vision-import">${icon('camera', 18)} 拍包装录入</button><button class="secondary compact-action" id="food-import-open">${icon('upload', 18)} 导入文件</button></div><div class="library-list"></div>`, foods.length > 0)
   dialog.classList.add('food-library-sheet')
   const list = dialog.querySelector<HTMLElement>('.library-list')!
   const draw = (nextQuery: string) => {
     currentQuery = nextQuery
     const normalized = nextQuery.trim().toLocaleLowerCase()
     const filtered = foods.filter((food) => `${food.name} ${food.brand ?? ''}`.toLocaleLowerCase().includes(normalized))
-    list.innerHTML = filtered.length ? filtered.map((food) => `<article><button class="library-main" data-edit-food="${food.id}"><span><strong>${esc(food.name)}</strong>${food.brand ? `<small>${esc(food.brand)}</small>` : ''}<p>${formatEnergyInputValue(food.calories)} kcal / ${formatNumber(food.referenceGrams)}g</p>${food.servingGrams === undefined ? '' : `<small class="food-serving-note">1 份 ${formatNumber(food.servingGrams)} g</small>`}</span>${icon('chevron', 18)}</button><button class="icon-btn row-delete" data-delete-food="${food.id}" aria-label="删除 ${esc(food.name)}">${icon('trash', 18)}</button></article>`).join('') : normalized ? '<div class="library-empty"><h3>没有匹配的食物</h3><p>换个关键词试试。</p><button class="text-btn compact-action" id="clear-food-search">清除搜索</button></div>' : '<div class="library-empty"><h3>还没有食物</h3><p>拍包装录入，或手动新建。</p></div>'
+    list.innerHTML = filtered.length ? filtered.map((food) => `<article><button class="library-main" data-edit-food="${food.id}"><span><strong>${esc(food.name)}</strong>${food.brand ? `<small>${esc(food.brand)}</small>` : ''}<p>${formatEnergyInputValue(food.calories)} kcal / ${formatNumber(food.referenceGrams)}g</p>${food.servingGrams === undefined ? '' : `<small class="food-serving-note">1 份 ${formatNumber(food.servingGrams)} g</small>`}</span>${icon('chevron', 18)}</button></article>`).join('') : normalized ? '<div class="library-empty"><h3>没有匹配的食物</h3><p>换个关键词试试。</p><button class="text-btn compact-action" id="clear-food-search">清除搜索</button></div>' : '<div class="library-empty"><h3>还没有食物</h3><p>拍包装录入，或手动新建。</p><button class="primary" id="empty-new-food" aria-label="新建食物">新建食物</button></div>'
     list.querySelector('#clear-food-search')?.addEventListener('click', () => { window.clearTimeout(searchTimer); dialog.querySelector<HTMLInputElement>('#library-search')!.value = ''; draw('') })
-    list.querySelectorAll<HTMLButtonElement>('[data-edit-food]').forEach((button) => button.addEventListener('click', () => { const food = foods.find((item) => item.id === button.dataset.editFood); dialog.close(); void showFoodForm(food) }))
-    list.querySelectorAll<HTMLButtonElement>('[data-delete-food]').forEach((button) => button.addEventListener('click', async () => {
-      if (!await confirmAction('删除这个食物？', '历史饮食记录会保留，此操作不会改变过去的营养数据。')) return
-      try { await db.foods.delete(button.dataset.deleteFood!); dialog.close(); toast('已删除'); void showFoodLibrary(currentQuery).catch(fail) } catch (error) { fail(error) }
-    }))
+    list.querySelectorAll<HTMLButtonElement>('[data-edit-food]').forEach((button) => button.addEventListener('click', () => { const food = foods.find((item) => item.id === button.dataset.editFood); leaveStandalone(dialog, surface); void showFoodForm(food, surface) }))
+
   }
-  draw(query)
+  dialog.querySelector<HTMLButtonElement>('#new-food')!.hidden = !foods.length
+  list.addEventListener('click', event => { if ((event.target as Element).closest('#empty-new-food')) void showFoodForm(undefined, surface) })
+  draw(dialog.querySelector<HTMLInputElement>('#library-search')!.value)
   dialog.querySelector<HTMLInputElement>('#library-search')?.addEventListener('input', (event) => {
     window.clearTimeout(searchTimer)
     const value = (event.target as HTMLInputElement).value
     searchTimer = window.setTimeout(() => draw(value), 120)
   })
-  dialog.addEventListener('close', () => window.clearTimeout(searchTimer), { once: true })
-  dialog.querySelector('#food-vision-import')?.addEventListener('click', () => { const date = activeTab === 'food' ? foodDate : getLocalDateString(); dialog.close(); openFoodVisionWorkflow(date) })
-  dialog.querySelector('#new-food')?.addEventListener('click', () => { dialog.close(); void showFoodForm() })
-  dialog.querySelector('#food-import-open')?.addEventListener('click', () => showFoodImportChooser(foods, currentQuery))
+  if (surface) { surface.onDispose(() => window.clearTimeout(searchTimer)); surface.onSuspend(() => window.clearTimeout(searchTimer)) }
+  else dialog.addEventListener('close', () => window.clearTimeout(searchTimer), { once: true })
+  dialog.querySelector('#food-vision-import')?.addEventListener('click', () => { const date = activeTab === 'food' ? foodDate : getLocalDateString(); leaveStandalone(dialog, surface); openFoodVisionWorkflow(date, undefined, surface) })
+  dialog.querySelector('#new-food')?.addEventListener('click', () => { leaveStandalone(dialog, surface); void showFoodForm(undefined, surface) })
+  dialog.querySelector('#food-import-open')?.addEventListener('click', () => showFoodImportChooser(foods, currentQuery, surface))
+  surface?.restoreScroll()
 }
 
-function showFoodImportChooser(foods: Food[], query = ''): void {
-  const dialog = openModal('导入食物', `<div class="food-import-choices"><button class="secondary compact-action" id="import-csv">${icon('upload', 18)} 表格文件（CSV）</button><button class="secondary compact-action" id="import-json">${icon('upload', 18)} 数据文件（JSON）</button><input id="import-file" type="file" hidden><button class="text-btn compact-action" id="import-back">返回食物库</button></div>`)
+function showFoodImportChooser(foods: Food[], query = '', surface?: ManagedSurfaceContext): void {
+  if (surface && !surface.alive) return
+  const dialog = mountManagementModal(surface, '导入数据', `<div class="food-import-choices"><button class="secondary compact-action" id="import-csv">${icon('upload', 18)} 表格文件（CSV）</button><button class="secondary compact-action" id="import-json">${icon('upload', 18)} 数据文件（JSON）</button><input id="import-file" type="file" hidden><button class="text-btn compact-action" id="import-back">返回食物库</button></div>`)
   dialog.querySelector('#import-back')?.addEventListener('click', () => void showFoodLibrary(query))
   const fileInput = dialog.querySelector<HTMLInputElement>('#import-file')!
   dialog.querySelector('#import-csv')?.addEventListener('click', () => { fileInput.accept = '.csv,text/csv'; fileInput.click() })
@@ -1493,12 +1515,13 @@ function showFoodImportChooser(foods: Food[], query = ''): void {
     const file = fileInput.files?.[0]; if (!file) return
     try {
       const text = await file.text()
+      if (!fileInput.isConnected || !dialog.open) return
       const isCsv = file.name.toLocaleLowerCase().endsWith('.csv')
       const csvResult = isCsv ? parseFoodCsv(text) : undefined
       const rows = csvResult?.rows ?? parseFoodJson(text)
       const preview = buildImportPreview(rows, foods)
       if (csvResult) preview.errors.push(...csvResult.parseErrors)
-      dialog.close(); showImportPreview(preview, foods)
+      leaveStandalone(dialog, surface); showImportPreview(preview, foods, surface)
     } catch (error) { fail(error) }
   })
 }
@@ -1507,8 +1530,10 @@ function foodFields(food?: Food): string {
   return `<form id="food-form" class="form food-form"><label>食物名称 *<input name="name" value="${esc(food?.name)}" placeholder="鸡胸肉" required></label><label>品牌<input name="brand" value="${esc(food?.brand)}" placeholder="可选"></label><label>基准重量 *<input name="referenceGrams" type="number" inputmode="decimal" min="0.1" step="0.1" value="${food?.referenceGrams ?? 100}" required><span>g</span></label><div class="food-energy-group"><label>能量 *<div class="energy-input-row"><input name="calories" type="number" inputmode="decimal" min="0" step="any" value="${food?.calories ?? ''}" placeholder="165" required><select name="energyUnit" aria-label="能量单位"><option value="kcal">kcal</option><option value="kJ">kJ</option></select></div></label><p id="food-energy-preview" class="food-energy-preview"></p></div><div class="food-macro-grid" role="group" aria-label="宏量营养"><label>蛋白质<input name="protein" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.protein ?? ''}"><span>g</span></label><label>碳水<input name="carbs" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.carbs ?? ''}"><span>g</span></label><label>脂肪<input name="fat" type="number" inputmode="decimal" min="0" step="0.1" value="${food?.fat ?? ''}"><span>g</span></label></div><label>每份克数（可选）<input name="servingGrams" type="number" inputmode="decimal" min="${Number.MIN_VALUE}" step="any" value="${food?.servingGrams ?? ''}" placeholder="150"><span>g</span></label><button class="primary compact-action" type="submit">保存食物</button></form>`
 }
 
-async function showFoodForm(food?: Food): Promise<void> {
-  const dialog = openModal(food ? '编辑食物' : '新建食物', foodFields(food))
+async function showFoodForm(food?: Food, surface?: ManagedSurfaceContext): Promise<void> {
+  if (surface && !surface.alive) return
+  const dialog = mountManagementModal(surface, food ? '编辑食物' : '新建食物', foodFields(food) + (food ? '<button type="button" class="text-btn danger" id="delete-food">删除食物</button>' : ''))
+  dialog.querySelector('#delete-food')?.addEventListener('click', async () => { if (!food || !await confirmAction('删除这个食物？', '历史饮食记录会保留，此操作不会改变过去的营养数据。')) return; try { await db.foods.delete(food.id); leaveStandalone(dialog, surface); toast('已删除'); await showFoodLibrary('', surface) } catch (error) { fail(error) } })
   const energyInput = dialog.querySelector<HTMLInputElement>('[name=calories]')!, energyUnit = dialog.querySelector<HTMLSelectElement>('[name=energyUnit]')!
   const energyEditor = bindEnergyEditor(energyInput, energyUnit, food?.calories)
   const updateEnergyPreview = () => { const node = dialog.querySelector('#food-energy-preview')!; try { const kcal = energyEditor.kcal ?? 0; node.textContent = energyInput.value.trim() ? `${formatEnergyInputValue(kcal)} kcal · ${formatEnergyInputValue(kcalToKj(kcal))} kJ` : '填写包装能量，保存时统一为 kcal' } catch { node.textContent = '请填写有效能量' } }
@@ -1519,14 +1544,15 @@ async function showFoodForm(food?: Food): Promise<void> {
     event.preventDefault(); const data = new FormData(event.currentTarget as HTMLFormElement)
     try {
       await saveFood({ name: valueOf(data, 'name'), brand: valueOf(data, 'brand'), referenceGrams: Number(valueOf(data, 'referenceGrams')), servingGrams: valueOf(data, 'servingGrams') as unknown as number, calories: energyEditor.kcal ?? NaN, protein: valueOf(data, 'protein') as unknown as number, carbs: valueOf(data, 'carbs') as unknown as number, fat: valueOf(data, 'fat') as unknown as number }, food?.id)
-      dialog.close(); toast('已保存'); await renderFoodPage(); void showFoodLibrary()
+      leaveStandalone(dialog, surface); toast('已保存'); if (!surface) await renderFoodPage(); void showFoodLibrary('', surface)
     } catch (error) { fail(error) }
   })
 }
 
-function showImportPreview(preview: ImportPreview, existing: Food[]): void {
+function showImportPreview(preview: ImportPreview, existing: Food[], surface?: ManagedSurfaceContext): void {
   const duplicateSet = new Set(preview.duplicateIndexes)
-  const dialog = openModal('导入预览', `<div class="import-summary"><div><strong>${preview.valid.length - preview.duplicateIndexes.length}</strong><span>有效</span></div><div><strong>${preview.errors.length}</strong><span>错误</span></div><div><strong>${preview.duplicateIndexes.length}</strong><span>重复</span></div></div>${preview.errors.length ? `<details><summary>查看错误行</summary><ul class="error-list">${preview.errors.map((error) => `<li>第 ${error.row} 行：${esc(error.reason)}</li>`).join('')}</ul></details>` : ''}<div class="form"><fieldset><legend>重复项处理</legend><label class="radio"><input type="radio" name="duplicate" value="skip" checked>跳过重复项</label><label class="radio"><input type="radio" name="duplicate" value="overwrite">覆盖已有食物</label></fieldset><button class="primary" id="confirm-import" ${preview.valid.length ? '' : 'disabled'}>确认导入</button></div>`)
+  if (surface && !surface.alive) return
+  const dialog = mountManagementModal(surface, '导入预览', `<div class="import-summary"><div><strong>${preview.valid.length - preview.duplicateIndexes.length}</strong><span>有效</span></div><div><strong>${preview.errors.length}</strong><span>错误</span></div><div><strong>${preview.duplicateIndexes.length}</strong><span>重复</span></div></div>${preview.errors.length ? `<details><summary>查看错误行</summary><ul class="error-list">${preview.errors.map((error) => `<li>第 ${error.row} 行：${esc(error.reason)}</li>`).join('')}</ul></details>` : ''}<div class="form"><fieldset><legend>重复项处理</legend><label class="radio"><input type="radio" name="duplicate" value="skip" checked>跳过重复项</label><label class="radio"><input type="radio" name="duplicate" value="overwrite">覆盖已有食物</label></fieldset><button class="primary" id="confirm-import" ${preview.valid.length ? '' : 'disabled'}>确认导入</button></div>`)
   dialog.querySelector('#confirm-import')?.addEventListener('click', async () => {
     const mode = dialog.querySelector<HTMLInputElement>('input[name="duplicate"]:checked')!.value
     try {
@@ -1544,7 +1570,7 @@ function showImportPreview(preview: ImportPreview, existing: Food[]): void {
           const now = new Date().toISOString(); const created = { ...input, id: crypto.randomUUID(), createdAt: now, updatedAt: now }; await db.foods.add(created); resolved.set(key, created); imported += 1
         }
       })
-      dialog.close(); toast(`成功导入 ${imported} 条，跳过 ${skipped} 条。`); void showFoodLibrary()
+      leaveStandalone(dialog, surface); toast(`成功导入 ${imported} 条，跳过 ${skipped} 条。`); void showFoodLibrary('', surface)
     } catch (error) { fail(error) }
   })
 }
@@ -2006,17 +2032,29 @@ async function showExercisePicker(workout: Workout): Promise<void> {
   dialog.querySelector('#quick-exercise')?.addEventListener('click', () => { dialog.close(); void showExerciseForm(undefined, async (exercise) => { workout.exercises.push({ id: crypto.randomUUID(), exerciseId: exercise.id, exerciseName: exercise.name, sets: [] }); renderWorkoutEditor(workout); scheduleWorkoutSave(workout) }) })
 }
 
-async function showExerciseLibrary(): Promise<void> {
+async function showExerciseLibrary(surface?: ManagedSurfaceContext): Promise<void> {
   const exercises = await db.exercises.orderBy('name').toArray()
-  const dialog = openModal('动作库', `<button class="primary full-btn" id="new-exercise">${icon('plus', 18)} 新建动作</button><div class="library-list">${exercises.length ? exercises.map((exercise) => `<article><button class="library-main" data-edit-exercise="${exercise.id}"><span><strong>${esc(exercise.name)}</strong>${exercise.notes ? `<p>${esc(exercise.notes)}</p>` : ''}</span>${icon('chevron', 18)}</button><button class="icon-btn row-delete" data-delete-exercise="${exercise.id}" aria-label="删除 ${esc(exercise.name)}">${icon('trash', 18)}</button></article>`).join('') : '<div class="library-empty"><h3>还没有动作</h3><p>新建一个动作，开始记录训练。</p></div>'}</div>`, exercises.length > 0)
-  dialog.querySelector('#new-exercise')?.addEventListener('click', () => { dialog.close(); void showExerciseForm() })
-  dialog.querySelectorAll<HTMLButtonElement>('[data-edit-exercise]').forEach((button) => button.addEventListener('click', () => { dialog.close(); void showExerciseForm(exercises.find((item) => item.id === button.dataset.editExercise)) }))
-  dialog.querySelectorAll<HTMLButtonElement>('[data-delete-exercise]').forEach((button) => button.addEventListener('click', async () => { if (!await confirmAction('删除这个动作？', '历史训练会保留，此操作不会改变过去的训练记录。')) return; try { await db.exercises.delete(button.dataset.deleteExercise!); dialog.close(); toast('已删除'); void showExerciseLibrary() } catch (error) { fail(error) } }))
+  if (surface && !surface.alive) return
+  const dialog = mountManagementModal(surface, '动作库', `<div class="manager-toolbar"><label class="search-field"><span class="sr-only">搜索动作库</span>${icon('search', 20)}<input id="exercise-library-search" type="search" placeholder="搜索动作"></label><button class="text-btn manager-create" id="new-exercise" aria-label="新建动作" ${exercises.length ? '' : 'hidden'}>+ 新建</button></div><div class="library-list"></div>`, exercises.length > 0)
+  const list = dialog.querySelector<HTMLElement>('.library-list')!
+  const edit = (exercise?: Exercise) => { leaveStandalone(dialog, surface); void showExerciseForm(exercise, undefined, surface) }
+  const draw = (query: string) => {
+    const normalized = query.trim().toLocaleLowerCase(), filtered = exercises.filter(exercise => `${exercise.name} ${exercise.notes ?? ''}`.toLocaleLowerCase().includes(normalized))
+    list.innerHTML = filtered.length ? filtered.map(exercise => `<article><button class="library-main manager-row" data-edit-exercise="${exercise.id}"><span><strong>${esc(exercise.name)}</strong><small>${esc(exercise.notes || '力量训练动作')}</small></span>${icon('chevron', 18)}</button></article>`).join('') : normalized ? '<div class="library-empty"><h3>没有匹配的动作</h3><p>换个关键词试试。</p></div>' : '<div class="manager-empty"><h3>还没有动作</h3><p>新建常用动作，方便记录力量训练。</p><button class="primary" id="empty-new-exercise" aria-label="新建动作">新建动作</button></div>'
+    list.querySelector('#empty-new-exercise')?.addEventListener('click', () => edit())
+    list.querySelectorAll<HTMLButtonElement>('[data-edit-exercise]').forEach(button => button.addEventListener('click', () => edit(exercises.find(exercise => exercise.id === button.dataset.editExercise))))
+  }
+  const search = dialog.querySelector<HTMLInputElement>('#exercise-library-search')!
+  draw(search.value); search.addEventListener('input', () => draw(search.value))
+  dialog.querySelector('#new-exercise')!.addEventListener('click', () => edit())
+  surface?.restoreScroll()
 }
 
-async function showExerciseForm(exercise?: Exercise, afterSave?: (value: Exercise) => void | Promise<void>): Promise<void> {
-  const dialog = openModal(exercise ? '编辑动作' : '新建动作', `<form id="exercise-form" class="form"><label>动作名称 *<input name="name" value="${esc(exercise?.name)}" placeholder="杠铃卧推" required></label><label>备注<textarea name="notes" rows="3" placeholder="可选">${esc(exercise?.notes)}</textarea></label><button class="primary" type="submit">保存动作</button></form>`)
-  dialog.querySelector<HTMLFormElement>('#exercise-form')?.addEventListener('submit', async (event) => { event.preventDefault(); const data = new FormData(event.currentTarget as HTMLFormElement); try { const saved = await saveExercise(valueOf(data, 'name'), valueOf(data, 'notes'), exercise?.id); dialog.close(); toast('已保存'); if (afterSave) await afterSave(saved); else void showExerciseLibrary() } catch (error) { fail(error) } })
+async function showExerciseForm(exercise?: Exercise, afterSave?: (value: Exercise) => void | Promise<void>, surface?: ManagedSurfaceContext): Promise<void> {
+  if (surface && !surface.alive) return
+  const dialog = mountManagementModal(surface, exercise ? '编辑动作' : '新建动作', `<form id="exercise-form" class="form"><label>动作名称 *<input name="name" value="${esc(exercise?.name)}" placeholder="杠铃卧推" required></label><label>备注<textarea name="notes" rows="3" placeholder="可选">${esc(exercise?.notes)}</textarea></label><button class="primary" type="submit">保存动作</button>${exercise ? '<button class="text-btn danger" id="delete-exercise" type="button">删除动作</button>' : ''}</form>`)
+  dialog.querySelector<HTMLFormElement>('#exercise-form')!.addEventListener('submit', async event => { event.preventDefault(); const data = new FormData(event.currentTarget as HTMLFormElement); try { const saved = await saveExercise(valueOf(data, 'name'), valueOf(data, 'notes'), exercise?.id); leaveStandalone(dialog, surface); toast('已保存'); if (afterSave) await afterSave(saved); else void showExerciseLibrary(surface) } catch (error) { fail(error) } })
+  dialog.querySelector('#delete-exercise')?.addEventListener('click', async () => { if (!exercise || !await confirmAction('删除这个动作？', '历史训练会保留，此操作不会改变过去的训练记录。')) return; try { await db.exercises.delete(exercise.id); leaveStandalone(dialog, surface); toast('已删除'); await showExerciseLibrary(surface) } catch (error) { fail(error) } })
 }
 
 async function renderWorkoutHistory(): Promise<void> {
@@ -2076,29 +2114,33 @@ async function launchWorkoutTemplate(template: WorkoutTemplate, dialog?: HTMLDia
   } catch (error) { fail(error) }
 }
 
-async function showWorkoutTemplateManager(query = ''): Promise<void> {
+async function showWorkoutTemplateManager(query = '', surface?: ManagedSurfaceContext): Promise<void> {
   const templates = sortTemplates(await db.workoutTemplates.toArray())
   const exerciseIds = [...new Set(templates.flatMap((template) => template.exercises.map((item) => item.exerciseId).filter((id): id is string => Boolean(id))))]
   const existingIds = new Set((await db.exercises.bulkGet(exerciseIds)).filter((item): item is Exercise => Boolean(item)).map((item) => item.id))
-  const dialog = openModal('训练模板', `<div class="toolbar"><label class="search-field"><span class="sr-only">搜索训练模板</span>${icon('search', 20)}<input id="workout-template-search" type="search" value="${esc(query)}" placeholder="搜索模板"></label><button class="icon-btn add-button" id="new-workout-template" aria-label="新建训练模板">${icon('plus')}</button></div><div class="template-manager-list"></div>`, templates.length > 0)
+  if (surface && !surface.alive) return
+  const dialog = mountManagementModal(surface, '训练模板', `<div class="toolbar manager-toolbar"><label class="search-field"><span class="sr-only">搜索训练模板</span>${icon('search', 20)}<input id="workout-template-search" type="search" value="${esc(query)}" placeholder="搜索模板"></label><button class="text-btn manager-create" id="new-workout-template" aria-label="新建训练模板">+ 新建</button></div><div class="template-manager-list"></div>`, templates.length > 0)
   const draw = (value: string) => {
     const normalized = value.trim().toLocaleLowerCase()
     const filtered = templates.filter((item) => item.name.toLocaleLowerCase().includes(normalized))
     dialog.querySelector('.template-manager-list')!.innerHTML = filtered.length ? filtered.map((template) => {
       const missing = template.exercises.filter((item) => item.exerciseId && !existingIds.has(item.exerciseId)).length
-      return `<article class="manager-card"><button class="manager-main" data-edit-workout-template="${template.id}"><strong>${esc(template.name)}</strong><span>${template.exercises.length} 个动作 · ${template.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${missing ? `<small class="warning-text">${missing} 个动作已从动作库删除，仍可使用快照</small>` : ''}</button><div class="manager-actions"><button data-start-workout-template="${template.id}">开始</button><button data-duplicate-workout-template="${template.id}">复制</button><button class="danger" data-delete-workout-template="${template.id}">删除</button></div></article>`
-    }).join('') : `<div class="library-empty"><h3>${normalized ? '没有匹配的训练模板' : '还没有训练模板'}</h3><p>${normalized ? '换个关键词试试。' : '轻触上方加号，创建常用训练组合。'}</p></div>`
-    bindWorkoutTemplateManagerActions(dialog, templates)
+      return `<article class="manager-card"><button class="manager-main manager-row" data-edit-workout-template="${template.id}"><strong>${esc(template.name)}</strong><span>${template.exercises.length} 个动作 · ${template.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${missing ? `<small class="warning-text">${missing} 个动作已从动作库删除，仍可使用快照</small>` : ''}${icon('chevron', 18)}</button></article>`
+    }).join('') : `<div class="library-empty"><h3>${normalized ? '没有匹配的训练模板' : '还没有训练模板'}</h3><p>${normalized ? '换个关键词试试。' : '新建常用训练组合，方便以后使用。'}</p>${!templates.length ? '<button class="primary" id="empty-new-workout-template" aria-label="新建训练模板">新建训练模板</button>' : ''}</div>`
+    bindWorkoutTemplateManagerActions(dialog, templates, surface)
   }
-  draw(query)
+  draw(dialog.querySelector<HTMLInputElement>('#workout-template-search')!.value)
   dialog.querySelector<HTMLInputElement>('#workout-template-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
-  dialog.querySelector('#new-workout-template')?.addEventListener('click', () => { dialog.close(); void showWorkoutTemplateEditor() })
+  dialog.querySelector<HTMLButtonElement>('#new-workout-template')!.hidden = !templates.length
+  dialog.querySelector('.template-manager-list')!.addEventListener('click', event => { if ((event.target as Element).closest('#empty-new-workout-template')) void showWorkoutTemplateEditor(undefined, surface) })
+  dialog.querySelector('#new-workout-template')?.addEventListener('click', () => { leaveStandalone(dialog, surface); void showWorkoutTemplateEditor(undefined, surface) })
+  surface?.restoreScroll()
 }
 
-function bindWorkoutTemplateManagerActions(dialog: HTMLDialogElement, templates: WorkoutTemplate[]): void {
+function bindWorkoutTemplateManagerActions(dialog: HTMLDialogElement, templates: WorkoutTemplate[], surface?: ManagedSurfaceContext): void {
   dialog.querySelectorAll<HTMLButtonElement>('[data-edit-workout-template]').forEach((button) => button.addEventListener('click', () => {
     const template = templates.find((item) => item.id === button.dataset.editWorkoutTemplate)
-    if (template) { dialog.close(); void showWorkoutTemplateEditor(template) }
+    if (template) { leaveStandalone(dialog, surface); void showWorkoutTemplateEditor(template, surface) }
   }))
   dialog.querySelectorAll<HTMLButtonElement>('[data-start-workout-template]').forEach((button) => button.addEventListener('click', () => {
     const template = templates.find((item) => item.id === button.dataset.startWorkoutTemplate)
@@ -2107,21 +2149,23 @@ function bindWorkoutTemplateManagerActions(dialog: HTMLDialogElement, templates:
   dialog.querySelectorAll<HTMLButtonElement>('[data-duplicate-workout-template]').forEach((button) => button.addEventListener('click', async () => {
     const template = templates.find((item) => item.id === button.dataset.duplicateWorkoutTemplate)
     if (!template) return
-    try { await db.workoutTemplates.add(duplicateWorkoutTemplate(template)); dialog.close(); toast('模板已复制'); await showWorkoutTemplateManager() } catch (error) { fail(error) }
+    try { await db.workoutTemplates.add(duplicateWorkoutTemplate(template)); leaveStandalone(dialog, surface); toast('模板已复制'); await showWorkoutTemplateManager('', surface) } catch (error) { fail(error) }
   }))
   dialog.querySelectorAll<HTMLButtonElement>('[data-delete-workout-template]').forEach((button) => button.addEventListener('click', async () => {
     if (!await confirmAction('删除训练模板？', '只删除模板，历史训练不会受影响。')) return
-    try { await db.workoutTemplates.delete(button.dataset.deleteWorkoutTemplate!); dialog.close(); toast('模板已删除，历史训练未受影响'); await showWorkoutTemplateManager() } catch (error) { fail(error) }
+    try { await db.workoutTemplates.delete(button.dataset.deleteWorkoutTemplate!); leaveStandalone(dialog, surface); toast('模板已删除，历史训练未受影响'); await showWorkoutTemplateManager('', surface) } catch (error) { fail(error) }
   }))
 }
 
-async function showWorkoutTemplateEditor(source?: WorkoutTemplate): Promise<void> {
+async function showWorkoutTemplateEditor(source?: WorkoutTemplate, surface?: ManagedSurfaceContext): Promise<void> {
+  const editing = source ? Boolean(await db.workoutTemplates.get(source.id)) : false
   const draft = source ? structuredClone(source) : { id: crypto.randomUUID(), name: '', exercises: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
   const exerciseIds = draft.exercises.map((item) => item.exerciseId).filter((id): id is string => Boolean(id))
   const existingIds = new Set((await db.exercises.bulkGet(exerciseIds)).filter((item): item is Exercise => Boolean(item)).map((item) => item.id))
-  const dialog = openModal(source?.createdAt ? '编辑训练模板' : '新建训练模板', '<div id="workout-template-editor"></div>', true)
+  if (surface && !surface.alive) return
+  const dialog = mountManagementModal(surface, editing ? '编辑训练模板' : '新建训练模板', '<div id="workout-template-editor"></div>', true)
   const draw = () => {
-    dialog.querySelector('#workout-template-editor')!.innerHTML = `<form id="workout-template-form" class="form template-editor"><label>模板名称 *<input name="name" value="${esc(draft.name)}" placeholder="推举训练" required></label><label>说明<textarea name="description" rows="2" placeholder="可选">${esc(draft.description)}</textarea></label><div class="template-editor-items">${draft.exercises.map((exercise, index) => workoutTemplateExerciseEditorHtml(exercise, index, draft.exercises.length, Boolean(exercise.exerciseId && !existingIds.has(exercise.exerciseId)))).join('') || '<p class="muted padded">还没有动作</p>'}</div><button type="button" class="secondary" id="add-template-exercise">${icon('plus', 18)} 添加动作</button><button class="primary" type="submit">保存模板</button></form>`
+    dialog.querySelector('#workout-template-editor')!.innerHTML = `<form id="workout-template-form" class="form template-editor"><label>模板名称 *<input name="name" value="${esc(draft.name)}" placeholder="推举训练" required></label><label>说明<textarea name="description" rows="2" placeholder="可选">${esc(draft.description)}</textarea></label><div class="template-editor-items">${draft.exercises.map((exercise, index) => workoutTemplateExerciseEditorHtml(exercise, index, draft.exercises.length, Boolean(exercise.exerciseId && !existingIds.has(exercise.exerciseId)))).join('') || '<p class="muted padded">还没有动作</p>'}</div><button type="button" class="secondary" id="add-template-exercise">${icon('plus', 18)} 添加动作</button><button class="primary" type="submit">保存训练模板</button></form>`
     bindNumericPresentation(dialog)
     bindWorkoutTemplateEditor()
   }
@@ -2157,29 +2201,35 @@ async function showWorkoutTemplateEditor(source?: WorkoutTemplate): Promise<void
       if (index < 0 || next < 0 || next >= draft.exercises.length) return
       const [moved] = draft.exercises.splice(index, 1); draft.exercises.splice(next, 0, moved!); draw()
     }))
-    form.querySelector('#add-template-exercise')?.addEventListener('click', () => { syncText(); dialog.close(); void showWorkoutTemplateExercisePicker(draft) })
+    form.querySelector('#add-template-exercise')?.addEventListener('click', () => { syncText(); leaveStandalone(dialog, surface); void showWorkoutTemplateExercisePicker(draft, surface) })
     form.addEventListener('submit', async (event) => {
       event.preventDefault(); syncText()
-      try { await saveWorkoutTemplate(draft); dialog.close(); toast('训练模板已保存'); await showWorkoutTemplateManager() } catch (error) { fail(error) }
+      try { await saveWorkoutTemplate(draft); leaveStandalone(dialog, surface); toast('训练模板已保存'); await showWorkoutTemplateManager('', surface) } catch (error) { fail(error) }
     })
   }
   draw()
+  if (editing && source) {
+    const actions = document.createElement('div'); actions.className = 'manager-editor-actions'
+    actions.innerHTML = `<button class="text-btn" data-start-workout-template="${source.id}">开始训练</button><button class="text-btn" data-duplicate-workout-template="${source.id}">复制为新模板</button><button class="text-btn danger" data-delete-workout-template="${source.id}">删除训练模板</button>`
+    dialog.querySelector('.modal-body')!.append(actions); bindWorkoutTemplateManagerActions(dialog, [source], surface)
+  }
 }
 
 function workoutTemplateExerciseEditorHtml(exercise: WorkoutTemplateExercise, index: number, count: number, missing: boolean): string {
   return `<article class="exercise-card template-exercise" data-template-exercise="${exercise.id}"><div class="exercise-head"><div><h3>${esc(exercise.exerciseName)}</h3>${missing ? '<small class="warning-text">动作已删除，将使用名称快照</small>' : ''}</div><div class="reorder-actions"><button type="button" data-template-move="${exercise.id}" data-direction="-1" ${index === 0 ? 'disabled' : ''} aria-label="上移">↑</button><button type="button" data-template-move="${exercise.id}" data-direction="1" ${index === count - 1 ? 'disabled' : ''} aria-label="下移">↓</button><button type="button" class="icon-btn quiet danger" data-template-remove-exercise="${exercise.id}" aria-label="删除动作">${icon('trash', 18)}</button></div></div><div class="sets"><div class="set-header"><span>组</span><span>重量 <small>kg</small></span><span>次数</span><span></span></div>${exercise.sets.map((set, setIndex) => `<div class="set-row" data-template-set-row="${set.id}"><span>${setIndex + 1}</span><input data-template-set="weightKg" type="number" inputmode="decimal" min="0" step="0.5" value="${set.weightKg === undefined ? '' : formatNumber(set.weightKg)}" placeholder="—"><input data-template-set="reps" type="number" inputmode="numeric" min="1" step="1" value="${set.reps || ''}" placeholder="—"><button type="button" class="icon-btn quiet danger" data-template-remove-set="${set.id}" aria-label="删除第${setIndex + 1}组">${icon('x', 18)}</button><input class="set-note" data-template-set="note" value="${esc(set.note)}" placeholder="本组备注（可选）"></div>`).join('')}</div><button type="button" class="text-btn add-set" data-template-add-set="${exercise.id}">${icon('plus', 18)} 添加一组</button><label class="compact-label">动作备注<textarea data-template-exercise-note="${exercise.id}" rows="2" placeholder="可选">${esc(exercise.note)}</textarea></label></article>`
 }
 
-async function showWorkoutTemplateExercisePicker(draft: WorkoutTemplate): Promise<void> {
+async function showWorkoutTemplateExercisePicker(draft: WorkoutTemplate, surface?: ManagedSurfaceContext): Promise<void> {
   const exercises = await db.exercises.orderBy('name').toArray()
-  const dialog = openModal('添加模板动作', `<label class="search-field">${icon('search', 20)}<input id="template-exercise-search" type="search" placeholder="搜索动作"></label><div id="template-exercise-results" class="picker-list"></div>`, true)
+  if (surface && !surface.alive) return
+  const dialog = mountManagementModal(surface, '添加模板动作', `<label class="search-field">${icon('search', 20)}<input id="template-exercise-search" type="search" placeholder="搜索动作"></label><div id="template-exercise-results" class="picker-list"></div>`, true)
   const draw = (query = '') => {
     const matches = exercises.filter((item) => item.name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
     dialog.querySelector('#template-exercise-results')!.innerHTML = matches.map((exercise) => `<button class="picker-item" data-pick-template-exercise="${exercise.id}"><strong>${esc(exercise.name)}</strong></button>`).join('') || '<p class="muted">没有匹配动作</p>'
     dialog.querySelectorAll<HTMLButtonElement>('[data-pick-template-exercise]').forEach((button) => button.addEventListener('click', () => {
       const exercise = exercises.find((item) => item.id === button.dataset.pickTemplateExercise)!
       draft.exercises.push({ id: crypto.randomUUID(), exerciseId: exercise.id, exerciseName: exercise.name, sets: [{ id: crypto.randomUUID(), reps: 10 }] })
-      dialog.close(); void showWorkoutTemplateEditor(draft)
+      leaveStandalone(dialog, surface); void showWorkoutTemplateEditor(draft, surface)
     }))
   }
   draw(); dialog.querySelector<HTMLInputElement>('#template-exercise-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
@@ -2230,7 +2280,7 @@ async function applySelectedDietTemplate(template: DietTemplate, dialog?: HTMLDi
   } catch (error) { fail(error) }
 }
 
-async function showDietTemplateManager(query = ''): Promise<void> {
+async function showDietTemplateManager(query = '', surface?: ManagedSurfaceContext): Promise<void> {
   const templates = sortTemplates(await db.dietTemplates.toArray())
   const summaries = new Map<string, string>()
   await Promise.all(templates.map(async (template) => {
@@ -2240,34 +2290,40 @@ async function showDietTemplateManager(query = ''): Promise<void> {
     const goal = template.nutritionGoal?.calories === undefined ? '' : ` · 目标 ${formatEnergyInputValue(template.nutritionGoal.calories)} kcal`
     summaries.set(template.id, `${template.items.length} 项 · ${formatEnergyInputValue(kcal)} kcal${goal}${missing ? ` · ${missing} 项使用快照` : ''}`)
   }))
-  const dialog = openModal('饮食模板', `<div class="toolbar"><label class="search-field">${icon('search', 20)}<input id="diet-template-search" type="search" value="${esc(query)}" placeholder="搜索模板"></label><button class="icon-btn add-button" id="new-diet-template" aria-label="新建饮食模板">${icon('plus')}</button></div><div class="template-manager-list"></div>`, templates.length > 0)
+  if (surface && !surface.alive) return
+  const dialog = mountManagementModal(surface, '饮食模板', `<div class="toolbar manager-toolbar"><label class="search-field"><span class="sr-only">搜索饮食模板</span>${icon('search', 20)}<input id="diet-template-search" type="search" value="${esc(query)}" placeholder="搜索模板"></label><button class="text-btn manager-create" id="new-diet-template" aria-label="新建饮食模板">+ 新建</button></div><div class="template-manager-list"></div>`, templates.length > 0)
   const draw = (value: string) => {
     const normalized = value.trim().toLocaleLowerCase(); const filtered = templates.filter((item) => item.name.toLocaleLowerCase().includes(normalized))
-    dialog.querySelector('.template-manager-list')!.innerHTML = filtered.length ? filtered.map((template) => `<article class="manager-card"><button class="manager-main" data-edit-diet-template="${template.id}"><strong>${esc(template.name)}</strong><span>${esc(summaries.get(template.id))}</span></button><div class="manager-actions"><button data-apply-diet-template="${template.id}">添加</button><button data-duplicate-diet-template="${template.id}">复制</button><button class="danger" data-delete-diet-template="${template.id}">删除</button></div></article>`).join('') : `<div class="library-empty"><h3>${normalized ? '没有匹配的饮食模板' : '还没有饮食模板'}</h3><p>${normalized ? '换个关键词试试。' : '轻触上方加号，创建常用饮食组合。'}</p></div>`
-    bindDietTemplateManagerActions(dialog, templates)
+    dialog.querySelector('.template-manager-list')!.innerHTML = filtered.length ? filtered.map((template) => `<article class="manager-card"><button class="manager-main manager-row" data-edit-diet-template="${template.id}"><strong>${esc(template.name)}</strong><span>${esc(summaries.get(template.id))}</span></button>${icon('chevron', 18)}</article>`).join('') : `<div class="library-empty"><h3>${normalized ? '没有匹配的饮食模板' : '还没有饮食模板'}</h3><p>${normalized ? '换个关键词试试。' : '新建常用饮食组合，方便以后使用。'}</p>${!templates.length ? '<button class="primary" id="empty-new-diet-template" aria-label="新建饮食模板">新建饮食模板</button>' : ''}</div>`
+    bindDietTemplateManagerActions(dialog, templates, surface)
   }
-  draw(query); dialog.querySelector<HTMLInputElement>('#diet-template-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
-  dialog.querySelector('#new-diet-template')?.addEventListener('click', () => { dialog.close(); void showDietTemplateEditor() })
+  draw(dialog.querySelector<HTMLInputElement>('#diet-template-search')!.value); dialog.querySelector<HTMLInputElement>('#diet-template-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
+  dialog.querySelector<HTMLButtonElement>('#new-diet-template')!.hidden = !templates.length
+  dialog.querySelector('.template-manager-list')!.addEventListener('click', event => { if ((event.target as Element).closest('#empty-new-diet-template')) void showDietTemplateEditor(undefined, surface) })
+  dialog.querySelector('#new-diet-template')?.addEventListener('click', () => { leaveStandalone(dialog, surface); void showDietTemplateEditor(undefined, surface) })
+  surface?.restoreScroll()
 }
 
-function bindDietTemplateManagerActions(dialog: HTMLDialogElement, templates: DietTemplate[]): void {
-  dialog.querySelectorAll<HTMLButtonElement>('[data-edit-diet-template]').forEach((button) => button.addEventListener('click', () => { const template = templates.find((item) => item.id === button.dataset.editDietTemplate); if (template) { dialog.close(); void showDietTemplateEditor(template) } }))
+function bindDietTemplateManagerActions(dialog: HTMLDialogElement, templates: DietTemplate[], surface?: ManagedSurfaceContext): void {
+  dialog.querySelectorAll<HTMLButtonElement>('[data-edit-diet-template]').forEach((button) => button.addEventListener('click', () => { const template = templates.find((item) => item.id === button.dataset.editDietTemplate); if (template) { leaveStandalone(dialog, surface); void showDietTemplateEditor(template, surface) } }))
   dialog.querySelectorAll<HTMLButtonElement>('[data-apply-diet-template]').forEach((button) => button.addEventListener('click', () => { const template = templates.find((item) => item.id === button.dataset.applyDietTemplate); if (template) void applySelectedDietTemplate(template, dialog) }))
-  dialog.querySelectorAll<HTMLButtonElement>('[data-duplicate-diet-template]').forEach((button) => button.addEventListener('click', async () => { const template = templates.find((item) => item.id === button.dataset.duplicateDietTemplate); if (!template) return; try { await db.dietTemplates.add(duplicateDietTemplate(template)); dialog.close(); toast('模板已复制'); await showDietTemplateManager() } catch (error) { fail(error) } }))
-  dialog.querySelectorAll<HTMLButtonElement>('[data-delete-diet-template]').forEach((button) => button.addEventListener('click', async () => { if (!await confirmAction('删除饮食模板？', '只删除模板，历史饮食记录不会受影响。')) return; try { await db.dietTemplates.delete(button.dataset.deleteDietTemplate!); dialog.close(); toast('模板已删除，历史记录未受影响'); await showDietTemplateManager() } catch (error) { fail(error) } }))
+  dialog.querySelectorAll<HTMLButtonElement>('[data-duplicate-diet-template]').forEach((button) => button.addEventListener('click', async () => { const template = templates.find((item) => item.id === button.dataset.duplicateDietTemplate); if (!template) return; try { await db.dietTemplates.add(duplicateDietTemplate(template)); leaveStandalone(dialog, surface); toast('模板已复制'); await showDietTemplateManager('', surface) } catch (error) { fail(error) } }))
+  dialog.querySelectorAll<HTMLButtonElement>('[data-delete-diet-template]').forEach((button) => button.addEventListener('click', async () => { if (!await confirmAction('删除饮食模板？', '只删除模板，历史饮食记录不会受影响。')) return; try { await db.dietTemplates.delete(button.dataset.deleteDietTemplate!); leaveStandalone(dialog, surface); toast('模板已删除，历史记录未受影响'); await showDietTemplateManager('', surface) } catch (error) { fail(error) } }))
 }
 
-async function showDietTemplateEditor(source?: DietTemplate): Promise<void> {
+async function showDietTemplateEditor(source?: DietTemplate, surface?: ManagedSurfaceContext): Promise<void> {
+  const editing = source ? Boolean(await db.dietTemplates.get(source.id)) : false
   const draft: DietTemplate = source ? structuredClone(source) : { id: crypto.randomUUID(), name: '', items: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
   const resolved = await resolveDietTemplateFoods(draft)
   const missingIds = new Set(resolved.filter((item) => item.missing).map((item) => item.item.id))
-  const dialog = openModal(source?.createdAt ? '编辑饮食模板' : '新建饮食模板', '<div id="diet-template-editor"></div>', true)
+  if (surface && !surface.alive) return
+  const dialog = mountManagementModal(surface, editing ? '编辑饮食模板' : '新建饮食模板', '<div id="diet-template-editor"></div>', true)
   const syncText = () => {
     const form = dialog.querySelector<HTMLFormElement>('#diet-template-form'); if (!form) return
     const data = new FormData(form); draft.name = valueOf(data, 'name'); draft.description = valueOf(data, 'description').trim() || undefined; draft.nutritionGoal = nutritionGoalFromForm(data)
   }
   const draw = () => {
-    dialog.querySelector('#diet-template-editor')!.innerHTML = `<form id="diet-template-form" class="form template-editor"><label>模板名称 *<input name="name" value="${esc(draft.name)}" placeholder="训练日早餐" required></label><label>说明<textarea name="description" rows="2" placeholder="可选">${esc(draft.description)}</textarea></label>${nutritionGoalFields(draft.nutritionGoal)}<div class="template-editor-items">${draft.items.map((item, index) => `<article class="diet-template-item" data-diet-template-item="${item.id}"><div><strong>${esc(item.foodName)}</strong>${item.brand ? `<small>${esc(item.brand)}</small>` : ''}${missingIds.has(item.id) ? '<small class="warning-text">食物已删除，将使用营养快照</small>' : ''}</div><label><input data-diet-grams type="number" inputmode="decimal" min="0.1" step="0.1" value="${item.grams}"><span>g</span></label><div class="reorder-actions"><button type="button" data-diet-move="${item.id}" aria-label="上移食物" data-direction="-1" ${index === 0 ? 'disabled' : ''}>↑</button><button type="button" data-diet-move="${item.id}" aria-label="下移食物" data-direction="1" ${index === draft.items.length - 1 ? 'disabled' : ''}>↓</button><button type="button" class="icon-btn quiet danger" data-remove-diet-item="${item.id}" aria-label="移除食物">${icon('trash', 18)}</button></div></article>`).join('') || '<p class="muted padded">还没有食物</p>'}</div><button type="button" class="secondary" id="add-diet-template-food">${icon('plus', 18)} 添加食物</button><button class="primary" type="submit">保存模板</button></form>`
+    dialog.querySelector('#diet-template-editor')!.innerHTML = `<form id="diet-template-form" class="form template-editor"><label>模板名称 *<input name="name" value="${esc(draft.name)}" placeholder="训练日早餐" required></label><label>说明<textarea name="description" rows="2" placeholder="可选">${esc(draft.description)}</textarea></label>${nutritionGoalFields(draft.nutritionGoal)}<div class="template-editor-items">${draft.items.map((item, index) => `<article class="diet-template-item" data-diet-template-item="${item.id}"><div><strong>${esc(item.foodName)}</strong>${item.brand ? `<small>${esc(item.brand)}</small>` : ''}${missingIds.has(item.id) ? '<small class="warning-text">食物已删除，将使用营养快照</small>' : ''}</div><label><input data-diet-grams type="number" inputmode="decimal" min="0.1" step="0.1" value="${item.grams}"><span>g</span></label><div class="reorder-actions"><button type="button" data-diet-move="${item.id}" aria-label="上移食物" data-direction="-1" ${index === 0 ? 'disabled' : ''}>↑</button><button type="button" data-diet-move="${item.id}" aria-label="下移食物" data-direction="1" ${index === draft.items.length - 1 ? 'disabled' : ''}>↓</button><button type="button" class="icon-btn quiet danger" data-remove-diet-item="${item.id}" aria-label="移除食物">${icon('trash', 18)}</button></div></article>`).join('') || '<p class="muted padded">还没有食物</p>'}</div><button type="button" class="secondary" id="add-diet-template-food">${icon('plus', 18)} 添加食物</button><button class="primary" type="submit">保存饮食模板</button></form>`
     bind()
   }
   const bind = () => {
@@ -2276,19 +2332,25 @@ async function showDietTemplateEditor(source?: DietTemplate): Promise<void> {
     form.querySelectorAll<HTMLInputElement>('[data-diet-grams]').forEach((input) => input.addEventListener('input', () => { const item = draft.items.find((value) => value.id === input.closest<HTMLElement>('[data-diet-template-item]')?.dataset.dietTemplateItem); if (item) item.grams = Number(input.value) }))
     form.querySelectorAll<HTMLButtonElement>('[data-remove-diet-item]').forEach((button) => button.addEventListener('click', () => { syncText(); draft.items = draft.items.filter((item) => item.id !== button.dataset.removeDietItem); draw() }))
     form.querySelectorAll<HTMLButtonElement>('[data-diet-move]').forEach((button) => button.addEventListener('click', () => { syncText(); const index = draft.items.findIndex((item) => item.id === button.dataset.dietMove); const next = index + Number(button.dataset.direction); if (index < 0 || next < 0 || next >= draft.items.length) return; const [moved] = draft.items.splice(index, 1); draft.items.splice(next, 0, moved!); draw() }))
-    form.querySelector('#add-diet-template-food')?.addEventListener('click', () => { syncText(); dialog.close(); void showDietTemplateFoodPicker(draft) })
-    form.addEventListener('submit', async (event) => { event.preventDefault(); syncText(); try { await saveDietTemplate(draft); dialog.close(); toast('饮食模板已保存'); await showDietTemplateManager() } catch (error) { fail(error) } })
+    form.querySelector('#add-diet-template-food')?.addEventListener('click', () => { syncText(); leaveStandalone(dialog, surface); void showDietTemplateFoodPicker(draft, surface) })
+    form.addEventListener('submit', async (event) => { event.preventDefault(); syncText(); try { await saveDietTemplate(draft); leaveStandalone(dialog, surface); toast('饮食模板已保存'); await showDietTemplateManager('', surface) } catch (error) { fail(error) } })
   }
   draw()
+  if (editing && source) {
+    const actions = document.createElement('div'); actions.className = 'manager-editor-actions'
+    actions.innerHTML = `<button class="text-btn" data-apply-diet-template="${source.id}">添加到饮食</button><button class="text-btn" data-duplicate-diet-template="${source.id}">复制为新模板</button><button class="text-btn danger" data-delete-diet-template="${source.id}">删除饮食模板</button>`
+    dialog.querySelector('.modal-body')!.append(actions); bindDietTemplateManagerActions(dialog, [source], surface)
+  }
 }
 
-async function showDietTemplateFoodPicker(draft: DietTemplate): Promise<void> {
+async function showDietTemplateFoodPicker(draft: DietTemplate, surface?: ManagedSurfaceContext): Promise<void> {
   const foods = await db.foods.orderBy('name').toArray()
-  const dialog = openModal('添加模板食物', `<label class="search-field">${icon('search', 20)}<input id="diet-template-food-search" type="search" placeholder="搜索食物或品牌"></label><div id="diet-template-food-results" class="picker-list"></div>`, true)
+  if (surface && !surface.alive) return
+  const dialog = mountManagementModal(surface, '添加模板食物', `<label class="search-field">${icon('search', 20)}<input id="diet-template-food-search" type="search" placeholder="搜索食物或品牌"></label><div id="diet-template-food-results" class="picker-list"></div>`, true)
   const draw = (query = '') => {
     const normalized = query.trim().toLocaleLowerCase(); const matches = foods.filter((food) => `${food.name} ${food.brand ?? ''}`.toLocaleLowerCase().includes(normalized))
     dialog.querySelector('#diet-template-food-results')!.innerHTML = matches.map((food) => `<button class="picker-item" data-pick-diet-food="${food.id}"><span><strong>${esc(food.name)}</strong>${food.brand ? `<small>${esc(food.brand)}</small>` : ''}</span><em>${formatEnergyInputValue(food.calories)} kcal / ${formatNumber(food.referenceGrams)}g</em></button>`).join('') || '<p class="muted">食物库中没有匹配项</p>'
-    dialog.querySelectorAll<HTMLButtonElement>('[data-pick-diet-food]').forEach((button) => button.addEventListener('click', () => { const food = foods.find((item) => item.id === button.dataset.pickDietFood)!; draft.items.push(dietTemplateItemFromFood(food, 100)); dialog.close(); void showDietTemplateEditor(draft) }))
+    dialog.querySelectorAll<HTMLButtonElement>('[data-pick-diet-food]').forEach((button) => button.addEventListener('click', () => { const food = foods.find((item) => item.id === button.dataset.pickDietFood)!; draft.items.push(dietTemplateItemFromFood(food, 100)); leaveStandalone(dialog, surface); void showDietTemplateEditor(draft, surface) }))
   }
   draw(); dialog.querySelector<HTMLInputElement>('#diet-template-food-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
 }
@@ -2352,21 +2414,23 @@ function showWeightForm(date: string, value?: number): void {
   dialog.querySelector<HTMLFormElement>('#weight-sheet-form')?.addEventListener('submit', async (event) => { event.preventDefault(); try { await upsertWeight(date, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'weight')); dialog.close(); toast('已保存'); await render() } catch (error) { fail(error) } })
 }
 
-async function showSettings(): Promise<void> {
+async function showSettings(surface?: ManagedSurfaceContext): Promise<void> {
   let persistText = '浏览器不支持'
   try { if (navigator.storage?.persist) persistText = await navigator.storage.persist() ? '已授权' : '未授权' } catch { persistText = '未授权' }
   const lastBackup = formatBackupTime(localStorage.getItem(LAST_BACKUP_KEY))
-  const dialog = openModal('备份与恢复', `<section class="settings-section"><h3>数据</h3><div class="settings-group"><button id="export-backup"><span class="setting-icon">${icon('download', 18)}</span><span><strong>导出完整备份</strong><small>上次导出：<b id="last-backup">${esc(lastBackup)}</b></small></span>${icon('chevron', 18)}</button><button id="restore-backup"><span class="setting-icon">${icon('upload', 18)}</span><span><strong>恢复完整备份</strong><small>从备份文件覆盖当前数据</small></span>${icon('chevron', 18)}</button><input id="backup-file" type="file" accept=".json,application/json" hidden></div></section><section class="settings-section"><h3>存储</h3><div class="data-safety"><div class="setting-icon">${icon('archive', 18)}</div><div><strong>数据保存在当前设备。清除 Safari 网站数据或更换设备前，请先导出备份。</strong><p>本地数据库 · 持久化存储：${persistText}</p></div></div></section>`)
+  if (surface && !surface.alive) return
+  const dialog = mountManagementModal(surface, '备份与恢复', `<section class="settings-section"><h3>数据</h3><div class="settings-group"><button id="export-backup"><span class="setting-icon">${icon('download', 18)}</span><span><strong>导出完整备份</strong><small>上次导出：<b id="last-backup">${esc(lastBackup)}</b></small></span>${icon('chevron', 18)}</button><button id="restore-backup"><span class="setting-icon">${icon('upload', 18)}</span><span><strong>恢复完整备份</strong><small>从备份文件覆盖当前数据</small></span>${icon('chevron', 18)}</button><input id="backup-file" type="file" accept=".json,application/json" hidden></div></section><section class="settings-section"><h3>存储</h3><div class="data-safety"><div class="setting-icon">${icon('archive', 18)}</div><div><strong>数据保存在当前设备。清除 Safari 网站数据或更换设备前，请先导出备份。</strong><p>本地数据库 · 持久化存储：${persistText}</p></div></div></section>`)
   dialog.querySelector('#export-backup')?.addEventListener('click', async () => { try { const backup = await exportBackup(); const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `fitlog-backup-${getLocalDateString()}.json`; link.click(); URL.revokeObjectURL(link.href); const exportedAt = new Date().toISOString(); localStorage.setItem(LAST_BACKUP_KEY, exportedAt); const label = dialog.querySelector('#last-backup'); if (label) label.textContent = formatBackupTime(exportedAt); toast('备份已导出') } catch (error) { fail(error) } })
   const fileInput = dialog.querySelector<HTMLInputElement>('#backup-file')!
   dialog.querySelector('#restore-backup')?.addEventListener('click', () => fileInput.click())
-  fileInput.addEventListener('change', async () => { const file = fileInput.files?.[0]; if (!file) return; try { const backup = validateBackup(JSON.parse(await file.text())); dialog.close(); showRestorePreview(backup) } catch (error) { fail(error) } })
+  fileInput.addEventListener('change', async () => { const file = fileInput.files?.[0]; if (!file) return; try { const backup = validateBackup(JSON.parse(await file.text())); if (!fileInput.isConnected || !dialog.open) return; leaveStandalone(dialog, surface); showRestorePreview(backup, surface) } catch (error) { fail(error) } })
 }
 
-function showRestorePreview(backup: ValidatedBackup): void {
+function showRestorePreview(backup: ValidatedBackup, surface?: ManagedSurfaceContext): void {
   const counts = [{ label: '特殊饮食', count: backup.data.dietEvents.length }, { label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '力量训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }, { label: '训练模板', count: backup.data.workoutTemplates.length }, { label: '饮食模板', count: backup.data.dietTemplates.length }, { label: '营养目标', count: backup.data.nutritionTargets.length }, { label: '凯格尔训练', count: backup.data.pelvicFloorSessions.length }, { label: '有氧训练', count: backup.data.cardioSessions.length }, { label: '习惯', count: backup.data.habits.length }, { label: '习惯打卡', count: backup.data.habitCheckIns.length }, { label: '任务', count: backup.data.tasks.length }, { label: '标签', count: backup.data.taskTags.length }, { label: '营养模板', count: backup.data.nutritionStrategyTemplates.length }, { label: '营养日方案', count: backup.data.nutritionStrategyVariants.length }, { label: '营养阶段', count: backup.data.nutritionStrategyPhases.length }]
-  const dialog = openModal('确认恢复备份', `<div class="restore-counts">${counts.map((item) => `<p><span>${item.label}</span><strong>${item.count}</strong></p>`).join('')}</div><div class="warning">恢复将清除当前所有数据，并替换为该备份。</div><button class="danger-button full-btn" id="confirm-restore">继续恢复</button>`)
-  dialog.querySelector('#confirm-restore')?.addEventListener('click', async () => { if (!await confirmAction('覆盖当前全部数据？', '恢复会清除当前数据并替换为备份内容，此操作无法撤销。', '恢复备份')) return; try { await restoreBackup(backup); dialog.close(); currentWorkout = undefined; workoutEditorOpen = false; toast('恢复完成'); await render() } catch (error) { fail(error) } })
+  if (surface && !surface.alive) return
+  const dialog = mountManagementModal(surface, '确认恢复备份', `<div class="restore-counts">${counts.map((item) => `<p><span>${item.label}</span><strong>${item.count}</strong></p>`).join('')}</div><div class="warning">恢复将清除当前所有数据，并替换为该备份。</div><button class="danger-button full-btn" id="confirm-restore">继续恢复</button>`)
+  dialog.querySelector('#confirm-restore')?.addEventListener('click', async () => { if (!await confirmAction('覆盖当前全部数据？', '恢复会清除当前数据并替换为备份内容，此操作无法撤销。', '恢复备份')) return; try { await restoreBackup(backup); surface ? surface.close() : dialog.close(); currentWorkout = undefined; workoutEditorOpen = false; toast('恢复完成'); await render() } catch (error) { fail(error) } })
 }
 
 let assistantHandle: AiAssistantHandle | undefined

@@ -1,8 +1,11 @@
+import type { ManagedSurfaceContext } from './managementWorkspace'
 import { appBuild, localBuild, publicUrl, workerInfo, type WorkerInfo } from '../pwa/diagnostics'
 import { PwaRuntime } from '../pwa/runtime'
 import '../styles/pwa.css'
 
 interface DiagnosticsUi {
+  surface?: ManagedSurfaceContext
+
   openModal: (title: string, body: string) => HTMLDialogElement
   esc: (value: unknown) => string
   confirm: () => Promise<boolean>
@@ -41,16 +44,19 @@ export function showPwaDiagnostics(runtime: PwaRuntime, ui: DiagnosticsUi): void
     if (!busy) status.textContent = available ? '新版本已准备好，确认后更新。' : !navigator.onLine ? '当前离线，已缓存的应用仍可使用。' : '当前没有已准备好的更新。'
   }
   const unsubscribe = runtime.subscribe(() => void draw())
-  dialog.addEventListener('close', () => { closed = true; revision++; unsubscribe() }, { once: true })
+  const cleanup = () => { closed = true; revision++; unsubscribe(); requests.abort() }
+  const requests = new AbortController()
+  if (ui.surface) ui.surface.onDispose(cleanup); else dialog.addEventListener('close', cleanup, { once: true })
   check.addEventListener('click', async () => {
     if (busy) return
     busy = true; check.disabled = true; status.textContent = '正在检查更新…'
     await runtime.check(true)
     try {
-      const response = await fetch(`${import.meta.env.BASE_URL}build-info.json`, { cache: 'no-store', signal: AbortSignal.timeout(5000), credentials: 'omit' })
+      const response = await fetch(`${import.meta.env.BASE_URL}build-info.json`, { cache: 'no-store', signal: AbortSignal.any([requests.signal, AbortSignal.timeout(5000)]), credentials: 'omit' })
       const value = await response.json()
       deployment = /^[a-f0-9]{40}$/.test(value.build) ? value.build : '不可用'
     } catch { deployment = '网络不可用' }
+    if (closed) return
     busy = false; check.disabled = false; await draw()
   })
   apply.addEventListener('click', async () => {

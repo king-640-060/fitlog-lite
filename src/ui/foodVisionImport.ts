@@ -1,3 +1,4 @@
+import type { ManagedSurfaceContext } from './managementWorkspace'
 import { bindNumericPresentation } from './numericPresentation'
 import { aiModelRouteLabel } from './aiUiHelpers'
 import type { Food, MealType } from '../db/types'
@@ -19,6 +20,7 @@ import { getLocalDateString } from '../utils/date'
 import { icon } from './icons'
 
 export interface FoodVisionImportUi {
+  surface?: ManagedSurfaceContext
   openModal: (title: string, body: string, wide?: boolean) => HTMLDialogElement
   esc: (value: unknown) => string
   openSettings: () => void
@@ -38,6 +40,8 @@ export function showFoodVisionImport(ui: FoodVisionImportUi, context: { date: st
   let stepGeneration = 0
   const scrollBody = dialog.querySelector<HTMLElement>('.modal-body')!
   const renderStep = (title: string, html: string) => {
+    ui.surface?.subview(title, host)
+    ui.surface?.setBackTarget(() => { const back = host.querySelector<HTMLButtonElement>('button[id$="-back"],#vision-back-images'); if (back) back.click(); else ui.surface!.back() })
     const heading = dialog.querySelector('h2'); if (heading) heading.textContent = title
     const currentStep = ++stepGeneration
     host.innerHTML = html; bindNumericPresentation(host); scrollBody.scrollTop = 0
@@ -47,8 +51,9 @@ export function showFoodVisionImport(ui: FoodVisionImportUi, context: { date: st
   let controller: AbortController | undefined, generation = 0, busy = false, pending: FoodVisionWrite | undefined, savedFood: Food | undefined, netGrams: number | undefined, acknowledged = visionPrivacyAcknowledged(), reviewWasEdited = false
   const errorText = (error: unknown) => error instanceof AiError && error.code === 'vision_unsupported' ? '当前图片模型不支持图片识别，请在 AI 设置选择其它图片模型。' : error instanceof AiError ? safeAiError(error) : error instanceof Error ? error.message : '操作未完成，请重试'
   const status = (message: string) => { const node = host.querySelector<HTMLElement>('.vision-status'); if (node) node.textContent = message }
-  dialog.addEventListener('close', () => { generation++; stepGeneration++; controller?.abort(); pending?.cancel(); images = []; sources = []; extraction = undefined }, { once: true })
-  const bindSettings = () => host.querySelector('#vision-settings')?.addEventListener('click', () => { dialog.close(); ui.openSettings() })
+  const cleanup = () => { generation++; stepGeneration++; controller?.abort(); pending?.cancel(); images = []; sources = []; extraction = undefined }
+  if (ui.surface) { ui.surface.onDispose(cleanup); ui.surface.onSuspend(() => controller?.abort()) } else dialog.addEventListener('close', cleanup, { once: true })
+  const bindSettings = () => host.querySelector('#vision-settings')?.addEventListener('click', () => { if(!ui.surface)dialog.close(); ui.openSettings() })
   const setBusy = (value: boolean) => { busy = value; host.querySelectorAll<HTMLButtonElement | HTMLInputElement | HTMLSelectElement>('button, input, select').forEach(node => { if (node.id !== 'vision-stop') node.disabled = value }); const stop = host.querySelector<HTMLElement>('#vision-stop'); if (stop) stop.hidden = !value }
   const selectedImages = () => images.filter((image): image is PreparedVisionImage => !!image)
   const canAnalyze = () => !!images[0] && !!profiles.active && profiles.active.visionCapability !== 'unsupported'
@@ -140,7 +145,7 @@ export function showFoodVisionImport(ui: FoodVisionImportUi, context: { date: st
     renderStep('记录饮食', `<button type="button" class="text-btn" id="vision-quantity-back">${existing ? '返回已保存食物' : '返回核对'}</button><p class="vision-note">${esc(input.name)} · 实际吃下后再记录</p><form id="vision-intake-form" class="form"><label>记录日期<button type="button" class="date-picker-trigger" id="vision-date">${esc(datePickerLabel(intake.date))}</button></label><label>餐次<select name="meal" required><option value="">请选择餐次</option><option value="unclassified" ${intake.meal === 'unclassified' ? 'selected' : ''}>未分类</option>${mealTypes.map(meal => `<option value="${meal}" ${intake.meal === meal ? 'selected' : ''}>${mealNames[meal]}</option>`).join('')}</select></label><label>实际吃了多少 *<input name="grams" type="number" inputmode="decimal" min="0.000001" step="any" value="${esc(intake.grams)}" required><span>g</span></label>${netGrams ? `<button type="button" class="secondary" id="vision-whole-package">整包 ${formatNumber(netGrams)} g</button>` : ''}<p class="vision-energy" id="vision-intake-energy">填写克数后显示本地计算预览</p><p class="vision-status" role="status"></p><button class="primary" type="submit">预览${existing ? '饮食记录' : '保存并记录'}</button></form><div id="vision-date-picker" hidden></div>`)
     const form = host.querySelector<HTMLFormElement>('form')!, dateHost = host.querySelector<HTMLElement>('#vision-date-picker')!
     const capture = () => { const data = new FormData(form); intake = { ...intake, meal: String(data.get('meal') ?? ''), grams: String(data.get('grams') ?? '') } }
-    host.querySelector('#vision-date')?.addEventListener('click', () => { capture(); form.hidden = true; host.querySelector<HTMLElement>('#vision-quantity-back')!.hidden = true; dateHost.hidden = false; const picker = mountDatePicker(dateHost, { value: intake.date, onConfirm: date => { intake.date = date!; form.querySelector('#vision-date')!.textContent = datePickerLabel(date!); picker.destroy(); dateHost.hidden = true; form.hidden = false; host.querySelector<HTMLElement>('#vision-quantity-back')!.hidden = false }, onCancel: () => { picker.destroy(); dateHost.hidden = true; form.hidden = false; host.querySelector<HTMLElement>('#vision-quantity-back')!.hidden = false } }); dialog.addEventListener('close', () => picker.destroy(), { once: true }) })
+    host.querySelector('#vision-date')?.addEventListener('click', () => { capture(); form.hidden = true; host.querySelector<HTMLElement>('#vision-quantity-back')!.hidden = true; dateHost.hidden = false; const picker = mountDatePicker(dateHost, { value: intake.date, onConfirm: date => { intake.date = date!; form.querySelector('#vision-date')!.textContent = datePickerLabel(date!); picker.destroy(); dateHost.hidden = true; form.hidden = false; host.querySelector<HTMLElement>('#vision-quantity-back')!.hidden = false }, onCancel: () => { picker.destroy(); dateHost.hidden = true; form.hidden = false; host.querySelector<HTMLElement>('#vision-quantity-back')!.hidden = false } }); if(ui.surface)ui.surface.onDispose(() => picker.destroy());else dialog.addEventListener('close', () => picker.destroy(), { once: true }) })
     host.querySelector('#vision-quantity-back')?.addEventListener('click', () => { capture(); if (existing) done(existing); else review() })
     host.querySelector('#vision-whole-package')?.addEventListener('click', () => { form.querySelector<HTMLInputElement>('[name=grams]')!.value = formatNumber(netGrams!); form.dispatchEvent(new Event('input')) })
     form.addEventListener('input', () => { const grams = Number(new FormData(form).get('grams')); host.querySelector('#vision-intake-energy')!.textContent = Number.isFinite(grams) && grams > 0 ? `${formatEnergyInputValue(calculateNutrition(input, grams).calories)} kcal · ${(['protein','carbs','fat'] as const).map(key => `${{protein:'蛋白质',carbs:'碳水',fat:'脂肪'}[key]} ${calculateNutrition(input, grams)[key] === undefined ? '未知' : `${formatNumber(calculateNutrition(input, grams)[key]!)} g`}`).join(' · ')}` : '填写克数后显示本地计算预览' })
@@ -151,7 +156,7 @@ export function showFoodVisionImport(ui: FoodVisionImportUi, context: { date: st
     setBusy(true)
     try {
       const duplicates = existing || choice ? [] : await findVisionDuplicates(input)
-      if (!dialog.isConnected) return
+      if (!host.isConnected || !dialog.open) return
       if (duplicates.length) {
         const summary = (food: FoodVisionWrite['food']) => `${formatEnergyInputValue(food.calories)} kcal / ${formatNumber(food.referenceGrams)} g · P ${food.protein === undefined ? '未知' : formatNumber(food.protein)} / C ${food.carbs === undefined ? '未知' : formatNumber(food.carbs)} / F ${food.fat === undefined ? '未知' : formatNumber(food.fat)}`
         renderStep('选择同名食物处理方式', `<h3>食物库已有同名食物</h3><p>${esc(input.name)} · ${esc(input.brand)}</p><p>识别：${esc(summary(input))}</p>${duplicates.map((food, i) => `<section class="vision-label-source"><p>当前：${esc(summary(food))}</p><button class="secondary full-btn" type="button" data-use-existing="${i}">使用已有</button><button class="secondary full-btn" type="button" data-update-existing="${i}">更新已有食物</button></section>`).join('')}<button class="secondary full-btn" type="button" id="vision-save-new">另存为新食物</button><button class="text-btn" type="button" id="vision-duplicate-back">返回核对</button>`)
@@ -182,7 +187,7 @@ export function showFoodVisionImport(ui: FoodVisionImportUi, context: { date: st
   const done = (food: Food, logged = false) => {
     renderStep('已保存', `<section class="vision-done"><h3>${logged ? '食物与饮食记录已保存' : '食物已保存'}</h3><p>${esc(food.name)}</p><p class="vision-note">${logged ? `${esc(intake.date)} · ${intakeMealName(intake.meal === 'unclassified' ? undefined : intake.meal as MealType)} · ${esc(intake.grams)} g` : '已加入食物库，可按实际吃下的克数记录饮食。'}</p>${logged ? '' : '<button class="primary full-btn" type="button" id="vision-continue-log">继续记录饮食</button>'}<button class="secondary full-btn" id="vision-finish" type="button">完成</button><p class="vision-status" role="status"></p></section>`)
     host.querySelector('#vision-continue-log')?.addEventListener('click', () => quantity(food, savedFood ?? food))
-    host.querySelector('#vision-finish')?.addEventListener('click', () => { dialog.close(); ui.onFinish?.(logged) })
+    host.querySelector('#vision-finish')?.addEventListener('click', () => { if(!ui.surface)dialog.close(); ui.onFinish?.(logged) })
   }
   choose()
 }

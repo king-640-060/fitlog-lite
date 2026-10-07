@@ -1,29 +1,44 @@
+import type { ManagedSurfaceContext } from './managementWorkspace'
 import { connectDefaultGitHubSync, githubSyncSetupHtml } from './githubSyncSetup'
 import { GitHubSyncError } from '../services/githubSyncService'
 import { GitHubManualSync, type SyncInspection } from '../services/githubManualSync'
 import { exportBackup } from '../services/backupService'
-interface SyncUI { openModal: (title: string, html: string) => HTMLDialogElement; esc: (value: string) => string; toast: (message: string) => void; restored: () => Promise<void> }
+interface SyncUI {
+  surface?: ManagedSurfaceContext
+ openModal: (title: string, html: string) => HTMLDialogElement; esc: (value: string) => string; toast: (message: string) => void; restored: () => Promise<void> }
 let session: GitHubManualSync | undefined
-const service = () => session ??= new GitHubManualSync(localStorage)
+let activeRequestSignal: AbortSignal | undefined, requestRunning = false
+// Keep the existing app-memory password session; only the current UI job owns cancellation.
+const service = () => session ??= new GitHubManualSync(localStorage, undefined, (input, init) => fetch(input, { ...init, signal: AbortSignal.any([...(init?.signal ? [init.signal] : []), ...(activeRequestSignal ? [activeRequestSignal] : [])]) }))
 export function githubSyncDetail(): string {
   try { const sync = service(); return sync.config ? sync.state.lastSyncedAt ? `上次同步：${new Date(sync.state.lastSyncedAt).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}` : '已连接 · 尚未同步' : '手动备份到私人 GitHub 仓库' } catch { return '手动备份到私人 GitHub 仓库' }
 }
 if (typeof window !== 'undefined') window.addEventListener('pagehide', () => session?.lock())
 export function showGitHubSync(ui: SyncUI): void {
+  const requests = new AbortController()
   const sync = service(), esc = ui.esc, dialog = ui.openModal('GitHub 同步', '<div class="github-sync" id="github-sync-body"></div>'), root = dialog.querySelector<HTMLElement>('#github-sync-body')!
   let busy = false
-  const connected = () => dialog.isConnected && dialog.open
+  const connected = () => root.isConnected && dialog.open && !closed
+  let closed = false
+  if (ui.surface) ui.surface.onDispose(() => { closed = true; requests.abort() })
+  else dialog.addEventListener('close', () => { closed = true; requests.abort() }, { once: true })
   const bind = (id: string, callback: () => unknown) => root.querySelector(`#${id}`)?.addEventListener('click', callback)
-  const screen = (html: string) => { if (!connected()) return; root.innerHTML = `${html}<p class="sync-status" id="sync-message" role="status"></p>`; dialog.querySelector('.modal-body')!.scrollTop = 0 }
-  const message = (text: string) => { const node = root.querySelector('#sync-message'); if (node) node.textContent = text }
+  const screen = (html: string) => { if (!connected()) return; if (ui.surface && root.childElementCount) { const title = /<h3>([^<]+)<\/h3>/.exec(html)?.[1]; if (title) ui.surface.subview(title, root) } root.innerHTML = `${html}<p class="sync-status" id="sync-message" role="status"></p>`; dialog.querySelector('.modal-body')!.scrollTop = 0 }
+  const message = (text: string) => { if (!connected()) return; const node = root.querySelector('#sync-message'); if (node) node.textContent = text }
   const run = async (callback: () => Promise<void>) => {
-    if (busy) return; busy = true
+    if (!connected() || busy) return
+    if (requestRunning) { message('同步正在进行，请稍候'); return }
+    const job = new AbortController()
+    ui.surface?.onDispose(() => job.abort()); ui.surface?.onSuspend(() => job.abort())
+    busy = true; requestRunning = true; activeRequestSignal = AbortSignal.any([requests.signal, job.signal])
     root.querySelectorAll<HTMLButtonElement>('button').forEach(button => { button.disabled = true }); message('正在处理，请稍候…')
-    try { await callback() } catch (error) { message(error instanceof Error ? error.message : '操作未完成，请重试。'); if (error instanceof GitHubSyncError && error.code === 'conflict' && connected()) { const retry = document.createElement('button'); retry.className = 'secondary full-btn'; retry.textContent = '重新检查同步状态'; retry.addEventListener('click', () => void begin(true)); root.append(retry) } }
-    finally { busy = false; root.querySelectorAll<HTMLButtonElement>('button').forEach(button => { button.disabled = false }) }
+    try { await callback() } catch (error) { if (job.signal.aborted || requests.signal.aborted) return; message(error instanceof Error ? error.message : '操作未完成，请重试。'); if (error instanceof GitHubSyncError && error.code === 'conflict' && connected()) { const retry = document.createElement('button'); retry.className = 'secondary full-btn'; retry.textContent = '重新检查同步状态'; retry.addEventListener('click', () => void begin(true)); root.append(retry) } }
+    finally { busy = false; requestRunning = false; activeRequestSignal = undefined; if (connected()) root.querySelectorAll<HTMLButtonElement>('button').forEach(button => { button.disabled = false }) }
   }
   const passwordFields = (create: boolean) => `<label>数据密码<input type="password" name="password" autocomplete="${create ? 'new-password' : 'current-password'}" required ${create ? 'minlength="12"' : ''}></label>${create ? '<label>确认数据密码<input type="password" name="confirmation" autocomplete="new-password" minlength="12" required></label>' : ''}`
   const status = (note = '尚未检查本机与 GitHub 的变化') => {
+    if (!connected()) return
+    ui.surface?.returnTo('GitHub 同步')
     const config = sync.config!
     screen(`<p class="sync-note">FitLog 会先在这台设备加密完整备份，再上传到你的私人 GitHub 仓库。</p><dl class="sync-details"><div><dt>状态</dt><dd>已连接</dd></div><div><dt>仓库</dt><dd>${esc(config.owner)} / ${esc(config.repo)}</dd></div><div><dt>同步文件</dt><dd>fitlog/latest.enc.json</dd></div><div><dt>上次同步</dt><dd>${sync.state.lastSyncedAt ? esc(new Date(sync.state.lastSyncedAt!).toLocaleString('zh-CN')) : '尚未同步'}</dd></div><div><dt>本机状态</dt><dd>${esc(note)}</dd></div></dl><button class="primary full-btn" id="sync-now">立即同步</button><button class="secondary full-btn" id="sync-check">从 GitHub 检查/恢复</button><p class="sync-note">GitHub Token 只保存在这台设备。数据密码不会保存；换设备恢复时需要再次输入。</p><button class="text-btn" id="sync-disconnect">断开 GitHub</button>`)
     bind('sync-now', () => void begin(false)); bind('sync-check', () => void begin(true)); bind('sync-disconnect', () => {
@@ -65,6 +80,7 @@ export function showGitHubSync(ui: SyncUI): void {
   const prepare = async (checkOnly: boolean) => {
     if (!connected()) return
     const remote = await sync.checkRemote()
+    if (!connected()) return
     if (sync.unlocked && remote) { await handle(await sync.inspect(), undefined, checkOnly); return }
     const create = !remote
     screen(`<h3>${create ? '创建第一份加密备份' : '发现已有 GitHub 备份'}</h3><p class="sync-note">${create ? '密码至少 12 个字符。' : ''}这是 FitLog 数据加密密码，不是 GitHub 密码。FitLog 不保存它；以后换设备恢复时仍需要这个密码。忘记后无法解密远程备份。</p><form class="form" id="sync-password-form">${passwordFields(create)}<button class="primary" type="submit">${create ? '继续' : '解锁并检查'}</button></form><button class="secondary full-btn" id="sync-cancel">取消</button>`)
@@ -77,12 +93,15 @@ export function showGitHubSync(ui: SyncUI): void {
   }
   const begin = (checkOnly: boolean) => run(() => prepare(checkOnly))
   const setup = () => {
+    if (!connected()) return
+    ui.surface?.returnTo('GitHub 同步')
     screen(githubSyncSetupHtml())
     root.querySelector<HTMLFormElement>('#sync-connect-form')!.addEventListener('submit', event => {
       event.preventDefault()
       const form = new FormData(event.currentTarget as HTMLFormElement)
       void run(async () => {
         await connectDefaultGitHubSync(sync, String(form.get('token')))
+        if (!connected()) return
         // Continue the explicit setup action in the same sheet, without nesting run().
         await prepare(false)
       })

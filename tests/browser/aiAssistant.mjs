@@ -59,7 +59,7 @@ for (const [width,height] of sizes) {
   await page.locator('#ai-list-models').click(); await page.waitForFunction(() => document.querySelector('.ai-status')?.textContent.includes('手动填写'))
   await layout('settings'); await page.locator('#ai-save-only').click()
   await page.locator('[data-edit]').click(); assert.equal(await page.locator('[name=apiKey]').inputValue(),''); assert.equal(await page.locator('[name=apiKey]').getAttribute('placeholder'),'已保存；留空则保持不变')
-  await page.locator('#ai-settings-back').click(); await close()
+  await page.locator('#ai-settings-back:visible,[data-workspace-back]:visible').click(); await close()
   await page.evaluate(async () => {
     localStorage.setItem('fitlog-github-sync-token-v1','synthetic-github-token')
     const db = await new Promise((resolve,reject) => { const request=indexedDB.open('fitlog-lite-db');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error) })
@@ -133,7 +133,7 @@ for (const [width,height] of sizes) {
   assert.equal(requests.at(-1).url,'https://mock-fitlog-b.invalid/v1/chat/completions'); assert.equal(requests.at(-1).body.model,'model-B'); assert.equal(requests.at(-1).auth,'Bearer synthetic-private-key-B'); assert.equal(requests.at(-1).body.tools,undefined)
   assert.ok((await page.locator('.ai-capability-notice').innerText()).includes('当前只能普通聊天'))
   await layout('chat-only')
-  await page.locator('#ai-assistant-settings').click(); await page.locator('#ai-manage-profiles').click(); await page.locator('[data-activate]').first().click(); await page.locator('#ai-settings-back').click(); await page.locator('#ai-permissions-open').click(); await page.locator('[data-scope=weight]').uncheck(); await close(); await open()
+  await page.locator('#ai-assistant-settings').click(); await page.locator('#ai-manage-profiles').click(); await page.locator('[data-activate]').first().click(); await page.locator('#ai-settings-back:visible,[data-workspace-back]:visible').click(); await page.locator('#ai-permissions-open').click(); await page.locator('[data-scope=weight]').uncheck(); await close(); await open()
   await send('越权读取体重', [response('',[call('get_weight_trend',{start:'2026-09-29',end:'2026-10-02'},'denied')]),response('未授权体重数据。')])
   assert.equal(requests.at(-1).body.tools.some(tool=>tool.function.name==='get_weight_trend'),false)
   assert.equal(JSON.parse(requests.at(-1).body.messages.find(message=>message.role==='tool').content).error,'permission_denied')

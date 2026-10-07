@@ -1,3 +1,4 @@
+import type { ManagedSurfaceContext } from './managementWorkspace'
 import { animateMotion, stabilizeSheetSubview } from './motion'
 import { VOICE_PRIVACY_TEXT } from '../services/voiceTranscriptionService'
 import { mountVoiceSettings } from './voiceSettings'
@@ -13,7 +14,9 @@ import { safeAiError } from '../ai/security'
 import type { AiProviderProfile, AiScope } from '../ai/types'
 import { icon } from './icons'
 
-export interface AiSettingsUi { openModal: (title: string, body: string, wide?: boolean) => HTMLDialogElement; esc: (value: unknown) => string; changed?: () => void }
+export interface AiSettingsUi {
+  surface?: ManagedSurfaceContext
+ openModal: (title: string, body: string, wide?: boolean) => HTMLDialogElement; esc: (value: unknown) => string; changed?: () => void }
 export const AI_SCOPE_LABELS: Record<AiScope, string> = { food: '饮食', training: '训练', weight: '体重', plan: '计划', habit: '习惯', nutritionTargets: '营养目标' }
 export const AI_PRIVACY_TEXT = 'AI 功能会把你的提问，以及完成当前请求所需的 FitLog 数据发送给你配置的 AI 服务商。FitLog 不会自动上传整个数据库。'
 export const AI_CREDENTIAL_TEXT = 'API Key 只保存在当前设备浏览器。本模式适用于你自己的私人 FitLog；同源脚本和浏览器环境理论上能够访问该凭据。'
@@ -28,14 +31,24 @@ export function showAiSettings(ui: AiSettingsUi, profiles = new AiProfiles(), in
   const dialog = ui.openModal('AI 设置', '<div id="ai-settings"></div>', true)
   dialog.classList.add('ai-settings-sheet')
   const host = dialog.querySelector<HTMLElement>('#ai-settings')!, esc = ui.esc
-  let controller: AbortController | undefined, generation = 0
-  const changed = () => ui.changed?.()
+  let controller: AbortController | undefined
+  let refreshOverview = false
+  const changed = () => { refreshOverview = true; ui.changed?.() }
   let mounted = false, overviewScroll = 0
   const body = dialog.querySelector<HTMLElement>('.modal-body')!
   const prepare = (back: boolean) => { if (mounted) { if (dialog.querySelector('h2')!.textContent === 'AI 设置') overviewScroll = body.scrollTop; stabilizeSheetSubview(dialog) } return mounted ? (back ? 'back' as const : 'subview' as const) : undefined }
-  const view = (html: string, title = 'AI 设置') => { const motion = dialog.querySelector('h2')!.textContent !== title ? prepare(title === 'AI 设置') : undefined; controller?.abort(); controller = undefined; generation++; host.innerHTML = html; dialog.querySelector('h2')!.textContent = title; body.scrollTop = title === 'AI 设置' ? overviewScroll : 0; mounted = true; if (motion) animateMotion(host, motion) }
-  dialog.addEventListener('close', () => { generation++; controller?.abort() }, { once: true })
-  const voiceSettings = () => { const motion = prepare(false); controller?.abort(); generation++; mountVoiceSettings(host, dialog, overview, profiles); body.scrollTop = 0; mounted = true; if (motion) animateMotion(host, motion) }
+  const view = (html: string, title = 'AI 设置') => {
+    const motion = dialog.querySelector('h2')!.textContent !== title ? prepare(title === 'AI 设置') : undefined
+    if (ui.surface && mounted && title !== dialog.querySelector('h2')!.textContent) ui.surface.subview(title, host)
+    controller?.abort(); controller = undefined
+    host.innerHTML = html
+    dialog.querySelector('h2')!.textContent = ui.surface && !mounted ? 'AI 设置' : title
+    body.scrollTop = title === 'AI 设置' ? overviewScroll : 0
+    mounted = true; if (motion) animateMotion(host, motion)
+  }
+  const cleanup = () => { controller?.abort() }
+  if (ui.surface) { ui.surface.onDispose(cleanup); ui.surface.onSuspend(() => controller?.abort()) } else dialog.addEventListener('close', cleanup, { once: true })
+  const voiceSettings = () => { const motion = prepare(false); controller?.abort(); ui.surface?.subview('语音', host); mountVoiceSettings(host, dialog, ui.surface ? () => ui.surface!.back() : overview, profiles); body.scrollTop = 0; mounted = true; if (motion) animateMotion(host, motion) }
   const privacy = () => {
     view(`<button class="text-btn" id="ai-settings-back">${icon('chevron', 16)} 返回</button><section class="ai-privacy-details"><h3>数据如何使用</h3><p>${AI_PRIVACY_TEXT}</p><h3>设备上的凭据</h3><p>${AI_CREDENTIAL_TEXT}</p><h3>语音输入</h3><p>${VOICE_PRIVACY_TEXT}</p><h3>包装图片</h3><p>${VISION_PRIVACY_TEXT}</p><p>${VISION_PROVIDER_PRIVACY_TEXT}</p></section>`, 'AI 隐私说明')
     host.querySelector('#ai-settings-back')!.addEventListener('click', overview)
@@ -53,7 +66,9 @@ export function showAiSettings(ui: AiSettingsUi, profiles = new AiProfiles(), in
     host.querySelectorAll<HTMLButtonElement>('[data-edit]').forEach(button => button.addEventListener('click', () => editor(profiles.profiles.find(profile => profile.id === button.dataset.edit))))
     host.querySelectorAll<HTMLButtonElement>('[data-activate]').forEach(button => button.addEventListener('click', () => { profiles.activate(button.dataset.activate!); changed(); management() }))
   }
+  ui.surface?.onResume(() => { if (refreshOverview && profiles.active) { const scroll = body.scrollTop; overview(); body.scrollTop = scroll } })
   const overview = () => {
+    refreshOverview = false
     if (mounted) stabilizeSheetSubview(dialog)
     setSheetVariant(dialog, 'content')
     const active = profiles.active
@@ -73,7 +88,6 @@ export function showAiSettings(ui: AiSettingsUi, profiles = new AiProfiles(), in
     const form = host.querySelector<HTMLFormElement>('form')!, status = host.querySelector<HTMLElement>('.ai-status')!, base = form.querySelector<HTMLInputElement>('[name=baseUrl]')!, preset = form.querySelector<HTMLSelectElement>('[name=preset]')!, model = form.querySelector<HTMLInputElement>('[name=model]')!, modelSelect = form.querySelector<HTMLSelectElement>('#ai-model-select')!, note = form.querySelector<HTMLElement>('#ai-model-note')!, manual = form.querySelector<HTMLButtonElement>('#ai-manual-model')!
     const vision = form.querySelector<HTMLInputElement>('[name=visionModel]')!, visionSelect = form.querySelector<HTMLSelectElement>('#ai-vision-model-select')!, visionField = form.querySelector<HTMLElement>('#ai-vision-field')!, visionNote = form.querySelector<HTMLElement>('#ai-vision-model-note')!, visionManual = form.querySelector<HTMLButtonElement>('#ai-manual-vision-model')!
     const independent = () => form.querySelector<HTMLInputElement>('[name=imageRouting]:checked')!.value === 'separate'
-    const viewGeneration = generation
     // One editor-session cache, shared by both selectors; no request on expansion.
     let models: string[] | undefined, modelsFailed = false
     const populate = (input: HTMLInputElement, select: HTMLSelectElement, helper: HTMLElement, manualButton: HTMLButtonElement, image = false) => {
@@ -105,8 +119,9 @@ export function showAiSettings(ui: AiSettingsUi, profiles = new AiProfiles(), in
     }
     const test = async (mode: 'all' | 'connection' | 'tools' | 'vision' | 'models') => {
       const current = ++operation, token = new AbortController(); controller?.abort(); controller = token
+      ui.surface?.onDispose(() => token.abort()); ui.surface?.onSuspend(() => token.abort())
       let capturedSignature = '', capturedChat = '', capturedVision = '', visionFailed = false
-      const valid = () => dialog.isConnected && generation === viewGeneration && operation === current && !token.signal.aborted && capturedSignature === signature()
+      const valid = () => dialog.isConnected && form.isConnected && operation === current && !token.signal.aborted && capturedSignature === signature()
       const errorMessage = (error: unknown) => error instanceof Error && error.message === 'privacy' ? '请先勾选“我知道了”' : safeAiError(error)
       try {
         ack(); if ((mode === 'all' || mode === 'vision') && independent() && !vision.value.trim()) throw new AiError('invalid_profile', '请选择或填写图片模型 ID')
@@ -145,8 +160,8 @@ export function showAiSettings(ui: AiSettingsUi, profiles = new AiProfiles(), in
           advice.querySelector('p')!.textContent = testedVision === 'unsupported' ? '当前模型不接受图片输入，可以为图片识别单独选择另一个模型。' : '图片识别未通过，可以为图片识别单独选择另一个模型。'
         }
         if (mode === 'all' && valid()) status.textContent = '配置已保存。各项能力可以独立使用。'
-      } catch (error) { if (dialog.isConnected && generation === viewGeneration && operation === current) status.textContent = errorMessage(error) }
-      finally { if (generation === viewGeneration && operation === current) { busy(false); if (controller === token) controller = undefined } }
+      } catch (error) { if (dialog.isConnected && form.isConnected && operation === current) status.textContent = errorMessage(error) }
+      finally { if (operation === current) { busy(false); if (controller === token) controller = undefined } }
     }
     const resetModels = () => { models = undefined; modelsFailed = false; displayModels() }
     preset.addEventListener('change', () => { if (preset.value === 'zhipu') base.value = ZHIPU_BASE_URL; else if (base.value === ZHIPU_BASE_URL) base.value = ''; form.querySelector<HTMLElement>('[data-base-url]')!.hidden = preset.value === 'zhipu'; resetModels() })
@@ -165,10 +180,11 @@ export function showAiSettings(ui: AiSettingsUi, profiles = new AiProfiles(), in
     form.querySelector('#ai-save-only')!.addEventListener('click', () => { try { save(); overview() } catch (error) { status.textContent = error instanceof Error && error.message === 'privacy' ? '请先勾选“我知道了”' : safeAiError(error) } })
     host.querySelector('#ai-settings-back')!.addEventListener('click', () => profiles.active ? overview() : management())
     form.querySelector('#ai-delete-profile')?.addEventListener('click', () => {
-      view('<h3>删除这份 AI 配置？</h3><p class="ai-note">将移除此设备的配置和 API Key。</p><button class="danger-button full-btn" id="ai-confirm-delete">确认删除配置</button><button class="secondary full-btn" id="ai-cancel-delete">取消</button>')
+      view('<h3>删除这份 AI 配置？</h3><p class="ai-note">将移除此设备的配置和 API Key。</p><button class="danger-button full-btn" id="ai-confirm-delete">确认删除配置</button><button class="secondary full-btn" id="ai-cancel-delete">取消</button>', '删除 AI 配置')
       host.querySelector('#ai-confirm-delete')!.addEventListener('click', () => { profiles.delete(existing!.id); changed(); overview() }); host.querySelector('#ai-cancel-delete')!.addEventListener('click', () => editor(existing))
     })
   }
-  dialog.addEventListener('cancel', event => { if (profiles.active && dialog.querySelector('h2')!.textContent !== 'AI 设置') { event.preventDefault(); overview() } })
+  const events = new AbortController(); ui.surface?.onDispose(() => events.abort())
+  dialog.addEventListener('cancel', event => { if (!ui.surface && profiles.active && dialog.querySelector('h2')!.textContent !== 'AI 设置') { event.preventDefault(); overview() } }, { signal: events.signal })
   if (initialView === 'voice') voiceSettings(); else overview()
 }
