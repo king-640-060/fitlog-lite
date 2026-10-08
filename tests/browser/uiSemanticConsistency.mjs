@@ -89,7 +89,7 @@ try { for (const [width,height] of sizes) {
    assert.equal(await page.locator('.today-calorie-gauge .calorie-gauge-center strong').innerText(),String(Math.round(actual)))
    assert.ok(await page.locator('.today-calorie-gauge .goal-ring').evaluate((e,state)=>e.classList.contains(state),state))
    assert.ok((await page.locator('.today-calorie-layout .calorie-gauge-caption').innerText()).includes(status))
-   assert.equal(await page.locator('.today-macros > div').count(),3)
+   assert.equal(await page.locator('.today-macros > .macro-nutrition-summary > .nutrition-metric').count(),3)
    assert.ok((await page.locator('.today-calorie-gauge').getAttribute('aria-label')).includes(`今日摄入 ${Math.round(actual)} kcal`))
    assert.equal(await page.locator('.today-calorie-gauge svg').getAttribute('aria-hidden'),'true')
    if(goal===undefined)assert.ok(!(await page.locator('.today-calorie-layout').innerText()).includes('0%'))

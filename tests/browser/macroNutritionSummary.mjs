@@ -1,0 +1,52 @@
+// Today + Food shared summary, selected-date facts, live freshness and single meal entry.
+// All writes are confined to fresh synthetic contexts; no personal storage or providers.
+import assert from 'node:assert/strict'
+import fs from 'node:fs/promises'
+const {chromium}=await import(process.env.FITLOG_PLAYWRIGHT_MODULE)
+const base=process.env.FITLOG_QA_URL||'http://127.0.0.1:5184/fitlog-lite/',prod=base.includes('github.io')
+const matrix=prod?[[375,812,100,'light'],[320,812,200,'light'],[430,932,140,'dark'],[844,390,140,'dark']]:[...[320,375,390,430].flatMap(w=>[100,120,140,200].flatMap(s=>['light','dark'].map(c=>[w,932,s,c]))),...[480,844].flatMap(w=>[100,140].flatMap(s=>['light','dark'].map(c=>[w,w===844?390:932,s,c])))]
+const browser=await chromium.launch({headless:true,executablePath:process.env.FITLOG_CHROME}),receipts=[]
+const date='2026-10-09',past='2026-10-08',stamp='2026-10-09T00:00:00Z'
+try{for(const[width,height,scale,colorScheme]of matrix){
+ const context=await browser.newContext({viewport:{width,height},colorScheme,reducedMotion:scale>=140?'reduce':'no-preference',isMobile:true,hasTouch:true,timezoneId:'Asia/Shanghai',serviceWorkers:'block'})
+ try{
+ const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(12000)
+ await page.clock.install({time:new Date('2026-10-09T07:24:00+08:00')});await page.goto(base,{waitUntil:'networkidle'});await page.waitForSelector('#open-management')
+ const write=async data=>page.evaluate(async data=>{const d=await new Promise((r,j)=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)});await new Promise((r,j)=>{const t=d.transaction(Object.keys(data),'readwrite');for(const[name,rows]of Object.entries(data)){const s=t.objectStore(name);s.clear();for(const row of rows)s.put(row)}t.oncomplete=r;t.onerror=()=>j(t.error)});d.close()},data)
+ const logs=Array.from({length:20},(_,i)=>({id:'macro-'+i,date,meal:'breakfast',foodName:'全麦脆麦片和非常长的蛋白粉食物名称 '+i,grams:100,referenceGrams:100,caloriesPerReference:i?0:1890.123,proteinPerReference:i?0:159.8,carbsPerReference:i?0:218.7,fatPerReference:i?0:45.5,totalCalories:i?0:1890.123,totalProtein:i?0:159.8,totalCarbs:i?0:218.7,totalFat:i?0:45.5,createdAt:stamp,updatedAt:stamp}))
+ const target={id:'target',date,calories:2200,protein:159,carbs:216,fat:50,createdAt:stamp,updatedAt:stamp}
+ const weight={id:'weight',date,weightKg:86.4,createdAt:stamp,updatedAt:stamp}
+ const reload=async()=>{await page.reload({waitUntil:'networkidle'});await page.addStyleTag({content:`html{font-size:${scale}%}`});await page.waitForSelector('.macro-nutrition-summary')}
+ const tab=async name=>{await page.locator(`[data-tab=${name}]`).click();await page.waitForSelector(name==='today'?'.nutrition-today-card .macro-nutrition-summary':'.food-nutrition-hero .macro-nutrition-summary')}
+ const inspect=async surface=>page.locator(surface==='today'?'.nutrition-today-card':'.food-nutrition-hero').evaluate(root=>{
+   const summary=root.querySelector('.macro-nutrition-summary'),cells=[...summary.children],bad=[]
+   for(const e of root.querySelectorAll('*')){if(!e.getClientRects().length||e instanceof SVGElement)continue;const r=e.getBoundingClientRect(),c=getComputedStyle(e);if(r.left<-.5||r.right>innerWidth+.5)bad.push('bounds '+e.className);if(e.scrollWidth>e.clientWidth+1)bad.push('clipped '+e.className);if(e.matches('.macro-label,.macro-value,.macro-target,.macro-per-kg')&&(c.textOverflow==='ellipsis'||parseFloat(c.fontSize)<12))bad.push('text '+e.className)}
+   const boxes=cells.map(e=>e.getBoundingClientRect()),horizontal=boxes.every(r=>Math.abs(r.top-boxes[0].top)<1),vertical=boxes.every(r=>Math.abs(r.left-boxes[0].left)<1)
+   for(const cell of cells){const children=[...cell.children];for(let i=1;i<children.length;i++)if(children[i].getBoundingClientRect().top<children[i-1].getBoundingClientRect().bottom-.5)bad.push('overlap')}
+   const hierarchy=cells.map(e=>['.macro-value','.macro-target','.macro-per-kg'].map(s=>e.querySelector(s)?parseFloat(getComputedStyle(e.querySelector(s)).fontSize):0))
+   const colors=cells.map(e=>getComputedStyle(e.querySelector('.macro-value')).color)
+   const rgb=s=>s.match(/[\d.]+/g).slice(0,3).map(Number),lum=s=>rgb(s).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4}).reduce((n,v,i)=>n+v*[.2126,.7152,.0722][i],0),bg=getComputedStyle(summary).backgroundColor
+   const contrast=[...summary.querySelectorAll('.macro-label,.macro-value,.macro-target,.macro-per-kg')].map(e=>{const a=lum(getComputedStyle(e).color),b=lum(bg);return(Math.max(a,b)+.05)/(Math.min(a,b)+.05)})
+   return {bad,horizontal,vertical,colors,hierarchy,contrast,html:summary.outerHTML,ratios:[...summary.querySelectorAll('.macro-per-kg')].map(e=>e.textContent),targets:[...summary.querySelectorAll('.macro-target')].map(e=>e.textContent),amounts:[...summary.querySelectorAll('.macro-value')].map(e=>e.textContent),cellSurfaces:cells.map(e=>getComputedStyle(e).backgroundColor),overflow:document.documentElement.scrollWidth>innerWidth+1,repeatedBadges:summary.querySelectorAll('.metric-excess').length}
+ })
+ await write({foodLogs:logs,nutritionTargets:[target],weights:[weight]});await reload()
+ let today
+ for(const surface of ['today','food']){await tab(surface);const state=await inspect(surface);assert.deepEqual(state.bad,[],`${width}/${scale}/${colorScheme}/${surface}`);assert.equal(state.overflow,false);assert.ok(state.horizontal||state.vertical,'never two plus orphan');if(scale===100)assert.ok(state.horizontal,'normal phones use three columns');assert.equal(new Set(state.colors).size,1);assert.ok(state.hierarchy.every(([a,b,c])=>a>b&&b>c),'consumed > target > ratio hierarchy');assert.ok(state.cellSurfaces.every(c=>c==='rgba(0, 0, 0, 0)'));assert.ok(Math.min(...state.contrast)>=4.5,JSON.stringify(state.contrast));assert.deepEqual(state.ratios,['1.85 g/kg','2.53 g/kg','0.53 g/kg']);assert.deepEqual(state.amounts,['159.8g','218.7g','45.5g']);assert.deepEqual(state.targets,['/ 159g','/ 216g','/ 50g']);assert.equal(state.repeatedBadges,0);if(surface==='today')today=state;else assert.equal(state.html,today.html)
+   if(width===375&&scale===100&&colorScheme==='light'||width===320&&scale===200&&colorScheme==='light'||width===430&&scale===140&&colorScheme==='dark'||width===844&&scale===140&&colorScheme==='dark')await page.locator('.macro-nutrition-summary').screenshot({path:`/tmp/macro-summary-${prod?'prod':'local'}-${width}-${scale}-${colorScheme}-${surface}.png`})
+ }
+ assert.equal(await page.locator('.meal-more').count(),0);assert.equal(await page.locator('[data-meal-section=breakfast] [data-toggle-meal]').count(),1);await page.locator('[data-meal-section=breakfast] .food-meal-summary').click();assert.equal(await page.locator('.meal-log-list .food-row').count(),20);assert.equal(await page.locator('.meal-log-list').isVisible(),true)
+ await page.locator('.meal-log-list [data-edit-log]').last().click();await page.locator('#edit-log-form input[name=grams]').fill('150');await page.locator('#edit-log-form [type=submit]').click();await page.waitForFunction(()=>!document.querySelector('dialog[open]'));assert.equal(await page.locator('.meal-log-list').isVisible(),true);assert.equal(await page.locator('.meal-log-list .food-row').count(),20);await page.locator('.meal-collapse').click();assert.equal(await page.locator('.meal-log-list').isVisible(),false)
+ // A second live app changes the weight while each surface remains mounted.
+ const peer=await context.newPage();await peer.clock.install({time:new Date('2026-10-09T07:24:00+08:00')});await peer.goto(base,{waitUntil:'networkidle'});await peer.waitForSelector('#today-record-weight')
+ for(const[surface,kg,expected]of[['today','80','2.00 g/kg'],['food','100','1.60 g/kg']]){await tab(surface);await peer.locator('[data-tab=today]').click();await peer.locator('#today-record-weight').click();await peer.locator('#weight-sheet-form input').fill(kg);await peer.locator('#weight-sheet-form [type=submit]').click();await peer.waitForFunction(()=>!document.querySelector('dialog[open]'));await page.waitForFunction(expected=>document.querySelector('.protein .macro-per-kg')?.textContent===expected,expected)}
+ await peer.close()
+ await write({weights:[{...weight,date:past}],foodLogs:logs});await reload();for(const surface of ['today','food']){await tab(surface);assert.equal(await page.locator('.macro-per-kg').count(),0)}
+ // Historical date uses its own snapshots and weight, never today's.
+ await write({foodLogs:[...logs,{...logs[0],id:'past-log',date:past,totalProtein:80,totalCarbs:160,totalFat:40}],nutritionTargets:[target,{...target,id:'past-target',date:past}],weights:[weight,{...weight,id:'past-weight',date:past,weightKg:80}]});await reload();await tab('food');await page.locator(`.food-date-item[data-food-date="${past}"]`).click();await page.waitForFunction(past=>document.querySelector('.macro-nutrition-summary')?.dataset.macroDate===past,past);assert.deepEqual(await page.locator('.macro-per-kg').allTextContents(),['1.00 g/kg','2.00 g/kg','0.50 g/kg']);await tab('today');assert.deepEqual(await page.locator('.macro-per-kg').allTextContents(),['1.85 g/kg','2.53 g/kg','0.53 g/kg'])
+ await write({foodLogs:[{...logs[0],totalProtein:1234.5,totalCarbs:9999.9,totalFat:999.9}]});await reload();for(const surface of ['today','food']){await tab(surface);const state=await inspect(surface);assert.deepEqual(state.bad,[],'long values '+JSON.stringify({width,scale,surface}));assert.equal(state.overflow,false);assert.ok(state.horizontal||state.vertical)}
+ await write({foodLogs:[{...logs[0],totalFat:undefined}]});await reload();for(const surface of ['today','food']){await tab(surface);assert.equal(await page.locator('.macro-per-kg').count(),2);assert.equal(await page.locator('.fat .macro-per-kg').count(),0)}
+ assert.deepEqual(errors,[]);const receipt={width,height,scale,colorScheme,sharedExactHtml:true,ratiosAndTargets:true,noWeightHidden:true,unknownMacroHidden:true,historicalDate:true,liveCrossPageWeight:true,all20Editable:true,singleMealEntry:true,largeValues:true,noOverflowOverlapOrOrphan:true,textContrast45:true,errors,physicalIPhone:'Pending'};receipts.push(receipt);console.log(JSON.stringify(receipt))
+ }finally{await context.close()}
+}
+await fs.writeFile(`/tmp/macro-summary-${prod?'prod':'local'}-receipt.json`,JSON.stringify(receipts,null,2))
+}finally{await browser.close()}

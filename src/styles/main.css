@@ -656,14 +656,6 @@ html[data-input-modality="keyboard"] .calendar-day-danger .danger-button:focus-v
 .today-calorie-layout .calorie-gauge-caption { min-width: 0; justify-items: start; gap: 7px; text-align: left; line-height: 1.35; overflow-wrap: anywhere; }
 .today-calorie-layout .calorie-gauge-caption strong { font-size: .9rem; }
 .today-progress { height: 7px; }
-.nutrition-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
-.nutrition-tiles > .nutrition-metric { display: grid; align-content: start; gap: 3px; min-width: 0; padding: 7px 9px; border-radius: 11px; }
-.nutrition-tiles .macro-label { color: var(--text-secondary); font-size: .69rem; }
-.nutrition-tiles .macro-value { min-width: 0; font-size: .76rem; line-height: 1.2; overflow-wrap: anywhere; }
-.nutrition-tiles .nutrition-metric > small { color: var(--text-secondary); font-size: .65rem; line-height: 1.25; overflow-wrap: anywhere; }
-.nutrition-tiles .protein { background: var(--accent-soft); color: var(--accent-strong); }
-.nutrition-tiles .carbs { background: var(--carbs-soft); color: #916a18; }
-.nutrition-tiles .fat { background: var(--fat-soft); color: #a85e4a; }
 /* Progress tabs and templates */
 .page-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-bottom: 1px solid var(--border); }
 .page-tabs button { position: relative; min-height: 44px; border: 0; border-radius: 0; background: transparent; color: var(--text-secondary); font-size: .86rem; font-weight: 650; }

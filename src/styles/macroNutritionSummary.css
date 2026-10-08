@@ -1,0 +1,30 @@
+/* A single neutral surface; all three cells either share a row or stack together.
+   The text-derived threshold uses rem so user font scaling participates in fallback. */
+.macro-nutrition-summary {
+  display: flex;
+  flex-wrap: wrap;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  min-width: 0;
+}
+.macro-nutrition-summary .nutrition-metric {
+  flex-grow: 1;
+  flex-basis: clamp(0px, calc((var(--macro-row-min) - 100%) * 999), 100%);
+  min-width: 0;
+  max-width: 100%;
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 10px 8px;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+.macro-nutrition-summary .macro-label { color: var(--text-secondary); font-size: .8rem; font-weight: 600; }
+.macro-nutrition-summary .macro-label::before { content: ''; display: inline-block; width: 3px; height: .75em; margin-right: 5px; border-radius: 2px; background: var(--accent-mid); }
+.macro-nutrition-summary .carbs .macro-label::before { background: var(--carbs); }
+.macro-nutrition-summary .fat .macro-label::before { background: var(--fat); }
+.macro-nutrition-summary .macro-value { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
+.macro-nutrition-summary .macro-target { font-size: .8rem; font-weight: 400; color: var(--text-secondary); }
+.macro-nutrition-summary .macro-per-kg { font-size: .75rem; font-weight: 400; color: var(--text-secondary); }
+.macro-nutrition-summary :is(.macro-label,.macro-value,.macro-target,.macro-per-kg) { white-space: nowrap; overflow-wrap: normal; }

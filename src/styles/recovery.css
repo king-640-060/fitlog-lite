@@ -42,23 +42,17 @@
 .meal-preview { display: flex; align-items: center; min-width: 0; gap: 8px; overflow: visible; white-space: normal; }
 .meal-preview-names { display: flex; flex: 1; min-width: 0; flex-wrap: wrap; gap: 2px; align-items: baseline; }
 .meal-preview-name { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.meal-more { flex: 0 0 auto; min-width: 44px; min-height: 44px; padding: 4px 8px; border-color: var(--border); border-radius: var(--radius-sm); background: var(--surface-soft); color: var(--accent-strong); white-space: nowrap; font-size: .8rem; }
 .meal-macros { display: flex; flex-wrap: wrap; gap: 2px 8px; overflow: visible; white-space: normal; }
 .meal-macros > span { white-space: nowrap; }
 .meal-log-list .food-row-main { flex-wrap: wrap; gap: 6px; }
 .meal-log-list .food-row-main > span:first-child { width: 100%; }
 .meal-log-list .food-row-main > span:first-child strong { white-space: normal; overflow-wrap: anywhere; }
 .meal-collapse { min-height: 44px; }
-.nutrition-tiles { grid-template-columns: repeat(auto-fit,minmax(min(100%,var(--nutrition-column-min,5.6rem)),1fr)); }
-.nutrition-tiles .macro-value, .nutrition-tiles .macro-per-kg { white-space: nowrap; overflow-wrap: normal; }
-.nutrition-tiles .macro-per-kg { color: var(--text-secondary); }
 /* Busy is distinct from unavailable; all primary loading controls retain the shared lime. */
 .primary[aria-busy=true] { opacity: 1; background: var(--accent); color: var(--accent-ink); }
 .primary[aria-busy=true]::after { content: '…'; margin-left: 8px; }
 @media (prefers-color-scheme: dark) {
   :root { color-scheme: dark; --bg:#171d18; --surface:#222b24; --surface-soft:#2b362c; --surface-elevated:#283129; --text-primary:#edf2e8; --text-secondary:#bec9bb; --text-tertiary:#a9b6a6; --border:#435043; --divider:rgba(221,235,212,.14); --overlay:rgba(0,0,0,.55); --accent-strong:#c0d98c; --accent-mid:#b1ca78; --accent-soft:#35442b; --carbs-soft:#443b25; --fat-soft:#49322c; --danger:#f0a399; --danger-soft:#4a302c; }
-  .nutrition-tiles .carbs { color:#f0d395; }
-  .nutrition-tiles .fat { color:#f2b5a4; }
   .meal-symbol.lunch { background:var(--carbs-soft); color:#f0d395; border-color:var(--border); }
   .meal-symbol.dinner { background:var(--surface-soft); color:var(--text-secondary); border-color:var(--border); }
   .meal-symbol.snack { background:var(--fat-soft); color:#f2b5a4; border-color:var(--border); }
@@ -69,7 +63,7 @@
 .food-completion-strip { display: flex; flex-wrap: wrap; }
 .food-completion-summary { flex: 1 1 12rem; }
 .food-completion-summary p { display: flex; flex-wrap: wrap; gap: 3px 8px; }
-.food-completion-summary p > span, .nutrition-tiles .nutrition-metric > small { white-space: nowrap; overflow-wrap: normal; }
+.food-completion-summary p > span { white-space: nowrap; overflow-wrap: normal; }
 .food-completion-strip > button { flex: 0 0 auto; max-width: none; margin-left: auto; white-space: nowrap; }
 .recovery-trend h4 { margin: 16px 0 8px; font-size: .9rem; }
 .water-bars i { background: var(--accent-mid); }
