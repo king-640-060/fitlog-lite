@@ -1,68 +1,115 @@
 # FitLog Lite Development Report
 
-## Latest production round — Management Visual System Unification (2026-10-07)
+## Latest production round — Food density / durable Sleep and Water Recovery (2026-10-08)
 
-- START_COMMIT: `e6fa3cd1b2a12a6caf5d55493a7a4028d5ba5b59`. Clean main/status/branch/pull/log confirmed; origin/main rechecked before publishing.
-- APPLICATION_COMMIT: `d03e694521251966e992a22b008986282eb804ed`.
-- Application Actions: https://github.com/king-640-060/fitlog-lite/actions/runs/37600160369 — completed success including Pages deploy.
-- END_COMMIT: report-only commit containing this file. Exact SHA and final Actions/assets/offline receipts are external and in the final response, avoiding self-reference.
+- START_COMMIT: `4b26eb21b537199b1fe8e5c4b3bf6fd2e07e7302`. Clean main, status/branch/pull/log confirmed; origin/main rechecked before publishing.
+- APPLICATION_COMMIT: `f2d18f57c09e600f81c15edea5fa2e2df9272e82`.
+- Application Actions: https://github.com/king-640-060/fitlog-lite/actions/runs/37724313332 — completed success, including typecheck/tests/build/Pages deployment.
+- END_COMMIT: report-only commit containing this file. Exact final SHA, Actions and asset/offline receipts are external and returned to the user, avoiding self-reference.
 - Production: https://king-640-060.github.io/fitlog-lite/.
 
-## Architecture and verified behavior
+## Implemented behavior
 
-The existing `src/ui/managementWorkspace.ts` controller is unchanged. Persistent large primary native Sheet, Hub→Manager→Editor, exact dialog/header/body identity, Back/X, scroll/query restoration and route cleanup remain authoritative. This round was classified partially implemented: shared toolbar names existed, but library/template/Habit/Nutrition used separate list/card/empty visual systems.
+Classified Food summaries/primary completion as partially implemented; same-date g/kg and dedicated persisted Recovery were not implemented. Changes stay within the requested Food/Today/Progress scope and necessary data compatibility.
 
-New pure Vanilla HTML helpers in `src/ui/managerPrimitives.ts` and shared CSS in `src/styles/primitives.css` provide the single visual grammar for all six entity managers, including standalone entries. No framework/dependency or observer/listener/animation loop was added.
+Food previews show all names for1–3 foods, otherwise first3 with an independent44px `+N` button. Only names ellipsize; the counter remains complete. Expand all actual editable rows in place, then collapse at the bottom. Long names,20 foods and enlarged numbers remain bounded. Separators stay inside name components instead of occupying their own lines.
 
-Shared inventory: manager-surface; manager-toolbar/main/actions/create; manager-utilities; manager-results; manager-section/title/note; manager-list; manager-row/main/copy/title/meta/trailing; manager-empty/title/copy/action; manager-no-results; manager-editor and manager-danger-zone. Food, Exercise, Workout Templates, Diet Templates, Nutrition Templates and Habit all use shared toolbar/list/row/empty helpers. Existing library-list/template-manager-list/habit-manager names remain only where business/test selectors still need them; duplicate visual CSS was removed from main.css, sheets.css and nutritionStrategies.css.
+Food macro tiles show g/kg only from the selected local date's latest valid WeightLog. No historical fallback.164/86=1.91,252/86=2.93,52/86=0.60 g/kg. Incomplete macro snapshots hide the corresponding ratio. Today/Food share existing calorie SVG and macro primitives; responsive columns and intact value/unit tokens preserve four-digit macros/five-digit calories without changing canonical facts. 帮我补齐 uses the existing primary lime class, shared press/focus and a lime loading state with duplicate-click protection.
 
-Food retains neutral packaging-photo/import utilities below Toolbar. Habit retains active/inactive shared sections and explicit reorder controls in row trailing slots; Create hides while reordering. Nutrition has a short unboxed explanatory note below Toolbar; current status/start date is row metadata. Detailed phase/weight history remains in the existing detail view through the editor. Template apply/start/copy/delete remain in editors. No business semantics changed.
+Today and Progress → Trend now share 恢复与习惯. 开始睡眠 creates one unique active session; 我醒了 saves absolute endTime, computed durationMinutes and local wake recordDate. Both surfaces read the same persisted tables through Dexie liveQuery. The display derives elapsed time from wall clock with a30-second UI timer only; no periodic DB writes or timer-engine rewrite. Background/reload/page switches/midnight retain the session. History supports correction and confirmed delete; active sleep supports correction/cancellation. Inverted/future edits fail without mutation; >24h warns and remains active. Absolute timestamps preserve elapsed duration across offsets/DST; captured historical local dates are not recalculated on timezone travel.
 
-Toolbar Create is quiet `+ 新建`,44px with full 新建X accessible labels. Search labels remain accessible and editable fonts>=16px. True entity-empty has one48px primary create and hides the duplicate toolbar action. Search no-results uses quiet shared copy and optional clear, never an empty-state primary. Shared neutral warm lists use1px border/17px radius/no shadow. Row minimum66px,12px14px padding,18px chevron, .93rem/700 title and .75rem metadata. Longer metadata/fonts wrap naturally.
+Recovery offers7/30-day sleep-duration and water bar charts plus full daily text data. Multiple completed episodes sum per wake date; missing dates are unknown and excluded from sleep averages. Mean sleep/wake clocks use circular means of each day's longest episode. Achieved count uses an explicit8h reference over the whole7/30 calendar window. Water2500ml is an explicit reference, not an inferred individualized goal.
 
-Editor audit reuses existing forms and full-width primary Save. Food/Exercise/template deletion occupies a separated bottom quiet danger zone; optional apply/copy controls stay separate. Habit basic→planning→Save→state/danger and its static Save2px top padding/52px height/15px radius remain unchanged; maximum overlap0px.
+Water250/500/custom actions append independent records with UUID, local date and absolute timestamp. Daily totals sum only that date. Six-second exact-id Undo is inline in the water card so it cannot float over another action. History supports date selection, individual amount edit and confirmed deletion. Sleep/Water history→editor→date retain one existing native Sheet, shared date-picker, header Back/X, parent nodes/scroll and cleanup. Save remains static primary with busy/inline validation.
+
+Responsive numeric/action layouts cover320–480px,140% text,844px landscape and dark preference. Dark semantic surface/ink/macro tokens keep the existing lime primary. Management Workspace controller, AI/Voice/provider logic, existing PWA architecture and retired Video status remain unchanged. No new dependency/framework/backend.
+
+## Data compatibility
+
+- Stable `fitlog-lite-db`: DexieV11 / IndexedDB110 /20 stores. Explicit additive migration creates empty sleepSessions and waterLogs; all18 prior stores/indexes/rows/snapshots preserved.
+- Unique activeKey index and transactional sleep start enforce one active across two connections. Water records never replace another drink.
+- BackupV11 / RestoreV1–V11: validate new fields/ids/unique active/time consistency before atomic20-store replacement. Old Backup1–10 normalizes new arrays to empty.
+- Encrypted GitHub Sync/envelopeV1 and device-only AIConfigV1/VoiceConfigV1 unchanged. New records participate in canonical hashes, preview counts, full backup/upload/restore and existing conflict protection. No credentials enter Backup/Sync.
+- Frozen older fixtures unchanged; added frozenV11 active/completed sleep and water. No real-user storage reset/reseed/Restore.
 
 ## Automated Verification
 
 - npm run typecheck: PASS.
-- npm test: **648 tests /58 files PASS**.
-- npm run build: PASS, including clean application Pages build local:false. Existing Vite >500kB chunk advisory remains.
+- npm test: **672 tests /59 files PASS**, including24 new Recovery/nutrition/preservation cases.
+- npm run build: PASS, including clean application Pages build `local:false`. Existing Vite >500kB chunk advisory remains informational.
 - git diff --check: PASS.
-- Complete browser release inventory: **22/22 PASS** — managementVisualConsistency, managementWorkspace, habitEditorLayout, motionPolish, uiQualityAudit, uiSemanticConsistency, interactionStabilization, mobileLayout, sharedDatePicker, githubSyncSafety, aiAssistant, aiVoice, voiceMode, aiStreaming, aiDualModelRouting, foodVision, nutritionGauge, nutritionTemplates, foodServing, dietEvents, trainingJournal, habitDeletion. All21 previous suites retained; no skips, removed assertions or increased timeouts.
-- New visual suite local **24/24** contexts:320×812/375×812/390×844/430×932 × fonts100/120/140 × normal/reduced motion. Each seeds>=2 entities per manager and uses six independent empty contexts. Search no-result, shared geometry, single create, bounds, direct Food/Today entries and20 full six-manager Workspace rounds pass in every context. No page errors or horizontal overflow.
-- Toolbar height46–53.359375px across font sizes; Create44px. Baseline row66–78.578125px, padding14px each side, divider1px, list17px radius,18px chevron. Within each context, six-manager toolbar/row/padding/title/meta/chevron deltas are **0px**. Empty CTA48px/12px radius/16px inline padding and shared font; geometry delta0px.
-- Existing managementWorkspace local24/24 and habitEditorLayout24/24 pass: identity, Back/X, search/scroll/Save, request cancellation, keyboard/Safe Area mocks, static Habit Save and overlap0. Existing motion/quality/semantic/mobile and business suites pass.
-- Existing mobileLayout selectors follow shared utilities/empty/no-results. Nutrition Templates retains its phase/weight assertions through the existing detail path after the Level2 density change; no assertions were removed.
+- Complete browser inventory: **23/23 final PASS** — foodRecovery, managementWorkspace, managementVisualConsistency, habitEditorLayout, motionPolish, uiQualityAudit, uiSemanticConsistency, interactionStabilization, mobileLayout, sharedDatePicker, githubSyncSafety, aiAssistant, aiVoice, voiceMode, aiStreaming, aiDualModelRouting, foodVision, nutritionGauge, nutritionTemplates, foodServing, dietEvents, trainingJournal, habitDeletion. No suite/assertion removed or existing timeout increased.
+- foodRecovery **35/35** local contexts:320/375/390/430 ×100/120/140% ×normal/reduced (24); dark320/360/430/480/844-landscape ×100/140% (10); light844-landscape140% (1).20 long names/+17/expand/collapse, same-day ratios, large numbers, primary completion, durable active/global state,456-minute wake-day completion, correction to396, same-Sheet history/date Back, cancel, >24h, water Undo/custom/edit/delete and7/30 charts all pass. No page errors/horizontal overflow/critical clipping.
+- Existing UI quality141 states at each of4 widths, font/landscape checks; shared SVG/tile gauge, management identity/Back/X/scroll/query and Habit static Save52px/15px/overlap0 pass.
+- Unit migration/reopen/populate preserve all frozenV10 rows/indexes, unique start across connections, absolute DST duration, future/inverted edits, missing-day/circular statistics, frozenV11 reopen, Backup11/encryptedV1 round trip, malformed validation and injected atomic rollback pass.
+- Additional pwaUpgrade: reconstructed real33798a7 V7 bundle retains original index-DGXlZzHp.js identity. Same-origin old→new SW waiting, selected-image preservation,14 legacy stores/15 rows plus synthetic AI, additive110/20 upgrade and offline cold new page PASS. Optional prior-prompt mode was not selected.
 
 ### Visual review and retained failures
 
-390/100 six populated and six empty screenshots, four search no-result screenshots and320/140 screenshots saved. Populated/empty contact sheets and blurred contact sheets inspected side by side: common toolbar rhythm, surface, row padding, text hierarchy, trailing chevron and empty CTA are visible across six managers. Food utilities, Nutrition note and Habit grouping occupy defined slots.320/140 toolbar and content remain bounded without module-specific breakpoints; main slot shrinks, actions remain nowrap.
+Inspected actual320/140 light,390/100 dark and844/140 landscape Food/Recovery cards: complete independent counts, intact large values/units/g/kg, shared lime CTA and readable contrast. Early review fixed orphan separators and same-Sheet history navigation. Full matrix exposed floating water Undo intercepting 自定义; moved feedback into normal card flow and reran all35 contexts plus complete release inventory against final frozen assets.
 
-Early smoke found helper test syntax and an async direct Food-entry binding race; corrected the test syntax and waited for actual content readiness. Computed140% geometry exposed status/search toolbar height divergence; fixed the shared scalable toolbar rule before freezing assets. Final smoke and full24 matrix pass. Early smoke logs retained. Complete22 suites ran against one frozen built preview; source assets were not rebuilt mid-run.
+Initial githubSyncSafety failed because its global h3 selector also matched the legitimate new Today headings. Scoped the same assertion to the active dialog, added active sleep/water fixtures to strengthen full20-store upload/restore, then reran all4 widths successfully without changing application assets. Initial failure and final rerun retained explicitly in the23-suite receipt. Earlier smoke/harness failures and screenshots retained; none were hidden by skipping checks or increasing timeouts.
 
 ## Production Verification
 
-Application Actions/Pages succeeded. Production managementVisualConsistency **4/4** targeted contexts:390/100 and320/140 × normal/reduced motion, with independent empty contexts,20 six-manager rounds, direct entries and all shared geometry checks. Production managementWorkspace **12/12** contexts:390/430 × fonts100/120/140 × normal/reduced, with identity/Back/X/state/cancellation and20 switching rounds. No overflow/page errors; Habit overlap0.
+Application Actions/Pages succeeded. foodRecovery **4/4** production contexts:390/100 light normal,320/140 light reduced,390/100 dark reduced,844/140 dark landscape. Same full feature assertions pass. nutritionGauge390/430 with fonts100/120/140, managementWorkspace **12/12** identity/Back/X/state/cancellation contexts, and githubSyncSafety390/430 full20-store two-device encryption/conflict/offline mocks pass. No page errors/overflow; management frame deltas0 and Habit overlap0.
 
-productionAssets PASS against clean application dist: build meta/build-info local:false, exact JS/CSS byte lengths and SHA256, exact SW bytes/precache, five-tab/AI/GitHub entry smoke. Application data preservation/offline PASS using the same isolated persistent synthetic Chrome profile already containing22 immutable legacyV10 fixture rows and synthetic AI/Voice settings. This round captured baseline without clearing/reseeding that profile.18-store business hash `5566fc3e8df752b2ffd2a68a93c6db5bbef9051fd817b7fb63e9d04d2d9934c7` and configuration hash `be24fdaaad958fe42cfbfc2de052a846400e6401221282531f636669b7361dcf` remain identical. Offline new-page cold boot succeeds and independent App/SW build identities equal APPLICATION_COMMIT.
+productionAssets PASS against clean application dist: exact JS/CSS bytes/SHA256, HTML/build-info `local:false`, exact SW/precache, five main tabs and AI/Sync entry smoke. Same existing isolated persistent synthetic production profile captured before release without clearing/reseeding. V10→V11 preserves22 legacy rows and18-store hash `5566fc3e8df752b2ffd2a68a93c6db5bbef9051fd817b7fb63e9d04d2d9934c7`; AI/Voice config hash `be24fdaaad958fe42cfbfc2de052a846400e6401221282531f636669b7361dcf` unchanged. New stores empty after upgrade;20-store hash `9c2df75ef30db6923c19e48a588aaa77f25d053d80f005917fc36b6ad251eab6`. Offline new-page cold boot and independent App/SW identities both equal APPLICATION_COMMIT.
 
-Report-only END repeats Actions/Pages, exact production asset identity and the same profile data/config/offline/App/SW checks. Final receipts are external.
+Report-only END repeats Actions/Pages, exact asset identity, same persistent-profile20-store/config/offline checks and App/SW identity. Final receipts are external.
 
-## Data compatibility and changed files
+## Changed files and evidence
 
-DB DexieV10/IndexedDB100/18 stores, BackupV10/RestoreV1–V10, SyncV1/envelopeV1, AIConfigV1 and VoiceConfigV1 unchanged. No domain service/schema/Backup/Restore/credential/PWA architecture change; no historical snapshot rewrite or real-user storage reset/restore/reseed. All automated writes use isolated synthetic contexts. Training Video Search stays permanently retired.
+Application36 files:
 
-Application15 files: src/ui/managerPrimitives.ts (new), src/main.ts, src/ui/nutritionStrategies.ts, src/styles/primitives.css, src/styles/main.css, src/styles/sheets.css, src/styles/nutritionStrategies.css; AGENTS.md, docs/UI_INTERACTION_SPEC.md, docs/INTERACTION_VISUAL_SYSTEM.md, docs/UI_QA_MATRIX.md; tests/browser/managementVisualConsistency.mjs (new), tests/browser/mobileLayout.mjs, tests/browser/nutritionTemplates.mjs, tests/browser/README.md. END changes only LATEST_DEV_REPORT.md.
+- `AGENTS.md`
+- `docs/INTERACTION_VISUAL_SYSTEM.md`
+- `docs/UI_INTERACTION_SPEC.md`
+- `docs/UI_QA_MATRIX.md`
+- `src/db/database.ts`
+- `src/db/types.ts`
+- `src/main.ts`
+- `src/services/backupService.ts`
+- `src/services/recoveryService.ts`
+- `src/styles/recovery.css`
+- `src/ui/githubSync.ts`
+- `src/ui/recovery.ts`
+- `src/utils/recovery.ts`
+- `src/utils/syncDataHash.ts`
+- `tests/aiProposals.test.ts`
+- `tests/browser/README.md`
+- `tests/browser/foodRecovery.mjs`
+- `tests/browser/githubSyncSafety.mjs`
+- `tests/browser/pwaUpgrade.mjs`
+- `tests/browser/recoveryPreservation.mjs`
+- `tests/cardio.test.ts`
+- `tests/core.test.ts`
+- `tests/dietEvents.test.ts`
+- `tests/fixtures/legacyV11Data.json`
+- `tests/fixtures/legacyV11Database.ts`
+- `tests/foodMeals.test.ts`
+- `tests/foodServing.test.ts`
+- `tests/foodVisionImport.test.ts`
+- `tests/habits.test.ts`
+- `tests/nutritionStrategies.test.ts`
+- `tests/phase2.test.ts`
+- `tests/phase3.test.ts`
+- `tests/recovery.test.ts`
+- `tests/tasks.test.ts`
+- `tests/videoRetirement.test.ts`
+- `tests/voiceMode.test.ts`
 
-Evidence: external workspace `artifacts/management-visual-system-2026-10-07` contains before/after inventory, complete local22 gate logs/receipt, local24 and production4 visual receipts, Workspace production12 logs, screenshots/contact sheets, retained smoke logs, Actions and assets/data/offline receipts.
+
+END changes only LATEST_DEV_REPORT.md. Evidence is in external workspace `artifacts/food-recovery-2026-10-08`:36-file inventory/diff, local23 receipt/logs, retained failures, local35 and production4 Recovery receipts/screenshots, production four-suite logs,672 unit/typecheck/build, V7 PWA upgrade, Actions/assets and baseline/application/final persistent-profile offline receipts.
 
 ## Manual Device Verification
 
 - Physical iPhone Safari: **Pending**.
 - Original installed PWA: **Pending**.
-- Physical keyboard/Safe Area/browser chrome and real-provider AI/Voice behavior are not established by Chromium mocks.
-- No confirmed unresolved implementation defect. Existing build chunk advisory remains informational.
+- Physical OS kill/reopen, timezone travel, native time controls, keyboard/Safe Area/browser chrome and dark preference require device retest. Chromium reload/offline/mock provider tests do not establish these physical results.
+- Real-provider AI/Voice not changed or newly verified.
+- No confirmed unresolved implementation defect. Existing large-bundle advisory remains informational.
 
 ## ChatGPT Baseline
 
-Read AGENTS and this report; actual main wins. Preserve Persistent Management Workspace navigation and shared managerPrimitives/CSS visual grammar across all six entity managers and direct entries. Domain differences fill utilities/note/metadata/section/trailing slots. Keep one primary empty create and quiet populated toolbar Create/no-results. Preserve Habit static Save52px/15px/2px/overlap0. Preserve data/config versions and retired Video. Next release requires all22 browser suites plus production exact assets and persistent profile data/offline evidence. Keep automated, production and physical verification separate.
+Read AGENTS and this report; actual main wins. Food uses independent +N and same-selected-date-only g/kg. Today/Trend share durable sleep/water state, one active absolute-time session and wake-date history; no timer DB writes. Keep reference labels, honest missing-day/circular statistics, independent water rows and unobstructed inline Undo. Preserve stable V11/110/20, Backup11/Restore1–11, Sync/envelope1 and AI/Voice device config1. Keep existing management primitives/navigation and retired Video. Next release requires all23 browser gates, exact production assets and same-profile data/offline evidence. Separate automated, production and physical verification.
