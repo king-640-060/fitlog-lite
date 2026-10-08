@@ -1,115 +1,125 @@
 # FitLog Lite Development Report
 
-## Latest production round — AI Catalog Writes + Recovery UX/Visual Integration (2026-10-08)
+## Latest production round — Unified Daily Records Experience (2026-10-08)
 
-- START_COMMIT: `82acb386a4ba9f6a6cf64c5256477bf3c22a8aea`. Clean main; status/branch/ff-only pull/log confirmed at start, origin/main rechecked before publishing.
-- APPLICATION_COMMIT: `0a412dccb4b89513ad6b90ebcb38cf03b7a638a2`.
-- Application Actions: https://github.com/king-640-060/fitlog-lite/actions/runs/37749297442 — completed success, including typecheck/tests/build/Pages deployment.
-- END_COMMIT: the report-only commit containing this file. Exact final SHA, Actions and final production asset/offline receipts are external and returned to the user, avoiding self-reference.
+- START_COMMIT: `039d3b41b0bfe6a20bc5fcb90b12afbc79a8f2dc`. Clean main; status/branch/ff-only pull/log confirmed at start and remote main rechecked before publication.
+- APPLICATION_COMMIT: `c37f9fc3cecd7faa4b94598f46e1aa0eb809e43f`.
+- Application Actions: https://github.com/king-640-060/fitlog-lite/actions/runs/37762704866 — completed success, including typecheck/tests/build/Pages.
+- END_COMMIT: the report-only commit containing this file. Exact final SHA, final Actions and final asset/data/offline receipts are external and returned to the user to avoid self-reference.
 - Production: https://king-640-060.github.io/fitlog-lite/.
 
-## Initial classification and implemented behavior
+## Audit and integrated contract
 
-AI catalog writes were not implemented; recovery customization/ranges/Today integration were partially implemented. Existing Proposal safety, services, local wake/DST semantics and Today card primitives were reused.
+The initial implementation had six Calendar categories capped at four visible markers, five base detail categories, bars/default average blocks and water Undo inside the card. Today/Recovery and existing Week/Month services already persisted valid facts. `docs/DAILY_RECORDS_UX_CONTRACT.md` was established before implementation: Today owns frequent actions, Calendar actual category presence, Detail complete saved facts, Trend labelled time variation and Reports daily/period facts. All five surfaces now share date semantics and presentation primitives. No unrelated module redesign.
 
-### Confirmed AI Catalog writes
+### Bounded shared facts and live ownership
 
-`search_catalog` is a bounded kind-permission READ tool, max10, returning real IDs and nested definitions. Five registered PROPOSAL tools support explicit create/update: `propose_food`, `propose_exercise`, `propose_workout_template`, `propose_diet_template`, `propose_nutrition_strategy`. They use memory-only AiProposals, one explicit user confirmation, existing validators/services, permission rechecks, duplicate-confirm guards and final transactional source-fingerprint checks. Changed data rejects with “数据已变化，请重新生成建议。” No model confirmation, arbitrary table access, direct factual sessions or destructive tools.
+`dailyRecordsSummary.ts` reads existing date/recordDate indexes within one readonly transaction. Calendar reads all42 displayed dates including adjacent months, Detail/Day Report one date, Reports the selected natural period excluding future dates, Recovery only its7/30/90 range plus independent active-key lookup. Habit definitions use referenced IDs; period reports may read the small definition catalog for preserved planned-habit coverage. No whole-history scan of business records or shadow database. Existing write services remain authoritative.
 
-Food requires user-supplied name/referenceGrams/kcal; missing macros remain undefined. Partial edits preserve omitted brand/serving/macros; saved FoodLogs remain unchanged. Normalized duplicate creation/rename is refused; explicit real ID disambiguates legacy same-name records without blocking unchanged-name edits. Exercise name/notes use saveExercise in workoutService (no separate exerciseService exists), with optional injected database preserving manual defaults. Workout nested exercise/set and Diet item edits merge by real nested ID, retaining omitted content. Removal/order require explicit complete operations. Workout may include explicitly requested new Exercises; Diet may include explicitly requested new Foods. Each composite creates children and template within one transaction and one confirmation. Diet fallbacks are locally generated from actual/planned validated Food, never model-authored JSON. Nutrition tools edit template definitions/ordered variants only; missing goals stay unset, other variants remain, no activation/phase/daily-target writes.
+`recoveryDayFacts` sums completed sessions by saved local wake recordDate and WaterLogs by date. Missing is undefined, never fabricated zero. Active sleep is excluded from completed markers/lines/reports. Multiple episodes/water entries sum, actual historical inactive HabitCheckIns remain facts. FoodLog/Workout snapshots are not recalculated from current libraries. Day Sheet and Day Report use the same nine-group renderer and facts.
 
-Preview cards show operation/type/name/write count and concise summaries. Expandable human-readable before/after includes child fields, notes, Food brand/serving and template facts; no raw JSON. Tool prompts remain bounded schema descriptions, visible tool labels concise. Success marks proposal saved. `observeManagerCatalog` disposes liveQuery on route cleanup; visible clean managers refresh within the original workspace frame, preserving query/scroll/navigation. Suspended editors keep unsaved drafts, manager refreshes on Back, deferred rendering guards navigation races. Existing workspace controller/frame/Sheet lifecycle unchanged.
+Owned liveQuery subscriptions refresh Calendar grid, open Day Sheet, Today/Trend and Reports. Date/route/Sheet cleanup unsubscribes; stale async navigation cannot open a wrong-date Sheet. Shared group patching keeps the exact Sheet, date, native disclosure openness, unchanged nodes, scroll, focus and drafts. No-op visibility reads do not replace Today nodes.
 
-### Water reference / objective Recovery
+### Compact shared Action Toast
 
-`fitlog-water-reference-v1` is device-only `{referenceMl:number|null}`. Absent/invalid reads2500 without autowrite. Integer1–100000 is accepted; explicit null means unset. 修改参考值 opens existing shared small Sheet with Save/Unset/Cancel, separate from 自定义记录. Current-page event and same-origin storage event refresh mounted cards without reload; cleanup on unmount. UI shows actual total plus optional 每日参考值, without ratio/percentage. WaterLog/history/edit/delete/undo remain independent; preference never enters DB, Backup, Restore or Sync.
+Removed the card-flow water Undo block. One shared compact Action Toast uses existing tokens/motion, quiet border and44px Undo; new feedback replaces old feedback. Three rapid +250/+500/+250 writes produce three independent WaterLogs and1000 ml; Undo captures the latest successful exact ID, guarded against duplicates. Failure remains visible and retryable, never a false success. Stable number geometry preserves card height including0→250.
 
-Sleep achievement fields/constants/logic/tests/docs were removed. Only average completed duration, circular average start/end and recorded-day count remain, with actual daily facts. No fixed goal line or judgment UI. Existing absolute elapsed/DST and captured local wake dates retained. Recovery summary/range accepts7|30|90, including today and prior6/29/89 local dates. Completed episodes sum per day, clock means use each day's longest episode. Multiple water entries sum; missing is undefined/未记录 rather than zero. Safe data-derived chart scales handle empty data. Equal range segments share selected styles.90-day plots scroll only inside a bounded chart,24px per day; daily text disclosure remains complete.7/30 retain simple fit-to-card charts.
+The manual popover uses the top layer and the shared Sheet viewport event, accounts for navigation/Safe Area/keyboard and avoids current foreground controls. When a native modal opens, the same toast joins its subtree so Undo is interactive rather than modal-inert; close moves it safely back. Owned focus/close/animation/scroll handlers and timer dispose when feedback is replaced/removed. Regression actually clicks Undo with the custom-water editor open and retains the unsaved123 draft.
 
-### Today visual integration
+### Shared labelled recovery lines and existing Reports
 
-Sleep/Water now use the same today-card/today-activity-card/header/leading badge/icon/h2/history-chevron/content/meta/compact CTA primitives. No Recovery panel or duplicate group heading. Sleep retains empty/active/completed facts and primary lime at shared compact44px geometry. Water uses actual total, optional reference, explicit reference editor and +250/+500/自定义记录 group. Quiet token-based borders/background and shared10px spacing, no independent tinted block or private primary colors. Shared CTA geometry is separate from primary emphasis/states.
+Sleep/Water share `recoveryLineChart.ts` SVG geometry: actual7/30/90 local dates, marker and default numeric value for every actual point, missing dates split paths, actual zero retained. Data-derived scales, label-sized spacing and gutters expand internal width before labels collide or clip.30/90 and enlarged-font ranges scroll only within chart regions, never the body. No new dependency, target line, judgment or hidden labels. Complete daily facts remain expandable. Default Trend averages were removed.
 
-Actual screenshot crops at390/100: Sleep214→123px; Water224→175px. At320/140: Sleep231→187px; Water346→343px, retaining readable wrapping and the new reference editor rather than compressing text. These crop dimensions round geometric heights outward. Enlarged text can increase height. Images include all five Training/Weight/Habit/Sleep/Water cards as actual long-page capture and a labelled contact sheet, plus320/140,320/200,dark,7/30/90,reference editor,proposals and five refreshed managers. They are Chromium screenshots, not physical-device photographs.
+Existing Reports now has Day/Week/Month. Day uses selected-date shared picker and the same complete detail renderer. Week retained all prior functionality. Month adds objective sleep average duration/circular mean bedtime/wake/recorded days, water 有记录日平均/recorded days/total. Averages use only actual recorded dates; sleep duration sums episodes first, clock means use each day's longest episode. Missing dates do not become zero. No sleep/water score, achievement or health judgment.
 
-## Data compatibility
+### Nine-category Calendar and complete details
 
-- Stable fitlog-lite-db: Dexie11 / IndexedDB110 /20 stores. No migration/schema/index/entity-store/DB-name change.
-- Backup11 / Restore1–11; Sync/envelope1; device-only AIConfig1/VoiceConfig1 unchanged.
-- No dependency, timer engine, Backup/Restore/Sync implementation or frozen fixture changes. FoodLog/Workout/daily-target historical snapshots remain immutable.
-- Water reference and AI transport/proposal/chat remain excluded from business serialization. No user DB clearing/reseeding/Restore/reinstall.
+Order: food / strength / cardio / pelvic / weight / dietEvent / habit / sleep / water. Fixed3×3 slots; absent slots empty, all actual icons visible, no +N, no cell kcal/progress. Nine shared-icon legend entries wrap. Seven date targets remain44px at320 through existing small-screen margin bleed; cells104px at100% and140px at200%, growing with text. Adjacent-month records are fully read and open the correct month/date.
+
+Nine native disclosures contain every saved FoodLog (unknown macros stay unknown, original per100g snapshots), Workout/action/set/reps/optional load/legacy saved RPE/notes, Cardio type/speed/incline/duration, Kegel facts, WeightLogs, editable DietEvents/independent estimates, historical actual HabitCheckIns, all completed sleep instants/durations and all water amounts/timestamps. Missing load is 重量未记录, never fabricated0. Strength editor/execution still does not expose RPE; complete saved day facts are the explicit exception. Normal mobile rows align summary/details; small widths/enlarged fonts stack accessibly, without truncation.
+
+`clearDayRecords` implementation stays unchanged: FoodLogs, DietEvents, NutritionTargets, Workouts, CardioSessions, PelvicFloorSessions, Weights only. Action/confirmation explicitly name the scope. Sleep/Water/Habit/Tasks are preserved in an actual clear regression.
+
+## Compatibility and preservation
+
+- Dexie11 / IndexedDB110 /20 stores; same DB name/schema/indexes, no migration or storage clearing.
+- Backup11 / Restore1–11; Sync/envelope1; device-only AIConfig1/VoiceConfig1/WaterReference1 unchanged. Video remains retired.
+- No Backup/Restore/Sync/AI implementation, frozen fixture, dependency, timer-engine or business service write change. Offline core and historical snapshots preserved.
+- No personal browser profile accessed, no reinstall/Restore/reseed as an upgrade remedy. All writable tests use separate invented data.
 
 ## Automated verification
 
 | Gate | Result |
 | --- | --- |
 | npm run typecheck | PASS |
-| npm test | PASS —705 tests /62 files; previous675 retained +20 catalog +10 preference/range tests |
+| npm test | PASS —717 tests /63files; all705 retained plus12 new assertions |
 | npm run build | PASS — clean application build and CI build; existing bundle-size advisory only |
 | git diff --check | PASS |
-| Full release browser inventory | PASS —25 suites: all previous24 plus catalogRecovery |
-| Final focused source rerun | PASS —catalogRecovery,aiAssistant,aiStreaming after child-detail preview/legacy-name-ID fixes |
+| Existing full browser release inventory | PASS —all25 retained |
+| New dailyRecordsExperience | PASS —65 unique local contexts |
+| Final shared-toast rerun | PASS —full35-context foodRecovery and aiAssistant |
+| Integrated stress | PASS —20 full cross-surface cycles locally and on production |
+| Production targeted | PASS —five suites listed below |
 
-All25 gates are listed in docs/UI_QA_MATRIX.md and external accepted receipt. managementWorkspace's initial serial process was interrupted to execute all four fresh width shards; raw exit13/log retained. Complete union is24 distinct320/375/390/430 ×100/120/140% ×normal/reduced cases,419 identity checks and20 navigation rounds each. Original assertions/loops/timeout unchanged; default unsharded matrix unchanged. No skips/deleted assertions/timeout extensions. Observer preserves the original dialog/title/body geometry (0 position/height delta), queries, scroll, draft return and disposal.
+Existing25: catalogRecovery, aiAssistant, aiStreaming, managementWorkspace, managementVisualConsistency, foodRecovery, macroNutritionSummary, habitEditorLayout, motionPolish, uiQualityAudit, uiSemanticConsistency, interactionStabilization, mobileLayout, sharedDatePicker, githubSyncSafety, aiVoice, voiceMode, aiDualModelRouting, foodVision, nutritionGauge, nutritionTemplates, foodServing, dietEvents, trainingJournal, habitDeletion. New26th: dailyRecordsExperience. Obsolete four-marker/bar assertions were updated to stronger nine-slot/labelled-line assertions, never skipped/deleted or given longer timeouts. Workspace's four fresh width shards retain all24 unique contexts, original assertions and20 rounds each.
 
-New catalogRecovery has6 local contexts:390/100 light,320/140 light,320/200 light,430/140 dark,390/100 dark and844/140 dark landscape; normal/reduced motion. It checks shared headers/icons/CTA, bounded body/chart,60 range transitions each, reference default/save/unset/cancel/cross-tab without changing WaterLogs, five actual confirmed catalog writes and already-open managers refreshing in another tab with same frame/query/scroll, and unsaved Food draft preserved through a live write. No page errors. Unit coverage includes cancellation, missing facts/unknown macros, partial edits, immutable FoodLog, real references, one confirmation/repeat guard, both composite rollback paths, stale data, permission/model refusal and objective local-day/DST boundaries. Existing675 tests retain data preservation/reopen/migration/Backup compatibility coverage.
+Daily local matrix:320/375/390/430 ×100/120/140/200% ×light/dark ×normal/reduced (64), plus844×390 dark landscape140% reduced. All nine categories/details, adjacent dates, visible SVG labels/BBoxes/gaps/large/equal values, chart-only scrolling, real add/undo/edit/sleep finish/habit check-in, cross-tab same-Sheet identity/open groups/focus/scroll, keyboard Undo/draft and original clear scope pass. Twenty continuous Calendar/month/expand-all/Trend7,30,90/Day/Month/Today/add/undo rounds have no page errors/locks/overflow.
 
-Earlier synthetic fixture/selector failures were corrected (notify Dexie via fixture reload; precise assistant/record selectors), then rerun. Browser testing found and fixed90-day chart intrinsic body overflow and shared compact primary geometry. Failures/retries are retained externally.
+Early development failures, source corrections and raw rerun logs are external. Browser testing found and fixed internal chart width/label gutters, no-op DOM replacement, foreground viewport placement and native modal-inert Undo. Fixture/API/selector corrections retained the original tests. Serial Workspace runs were replaced with complete fresh four-shard unions, not a partial pass. Two final local tests hit404 while a rebuild replaced the preview directory; full HabitDeletion and full FoodRecovery reruns passed on the stable preview, without assertion/timeout changes. Final65-case matrix passes the finished source; the later landscape-only rerun adds screenshots without changing assertions.
 
-## Production verification (application commit)
+## Visual evidence
 
-All five production targeted suites PASS: catalogRecovery(6 contexts),aiAssistant(390/430),foodRecovery(4),macroNutritionSummary(4),managementVisualConsistency(4). Existing Today/Food shared macros, selected-date facts, many-food edit/expand and recovery history flows remain covered. Same six catalog contexts verify320/140,200%,dark,reduced,landscape,actual5-tool writes,live manager refresh and60 range switches. No real provider request or personal business fixture used.
+External delivery contains15 scene screenshots/contact sheet: nine/single/empty Calendar; collapsed/all-expanded/no-recovery Detail; Sleep and Water7/30/90; compact Toast; Day/Month Reports. All-expanded complete evidence additionally captures each of the nine actual open group nodes and assembles them; an actual scrollable Sheet viewport cannot honestly be represented as an unclipped child-element screenshot. Individual originals remain available.
 
-Exact productionAssets PASS: HTML/build-info `0a412dccb4b89513ad6b90ebcb38cf03b7a638a2`, JS/CSS exact bytes/SHA256, exact SW bytes/precache,5 tabs,AI Settings,GitHub Sync entry; no page errors.
+Actual contact sheet and raw320/140,320/200 dark,390/100,430/140 dark and844/140 dark landscape screenshots were inspected. Calendar has seven reachable columns and all nine fixed slots, neutral shared detail cards, readable large-font wrapping, visible point values and quiet feedback outside the water card. Viewport crops of long30/90 charts are intentional internal scroll; SVG text bounds/non-overlap are separately verified for every point. Images are Chromium evidence, not physical-device photos.
 
-- JS `index-BmrSBdpk.js`: 809127 bytes; SHA256 `b1c31a7bd740d6f195a846a0778740a42c5c4fc665ba5a0faa20bea0a82e875c`.
-- CSS `index-CwmxJJQE.css`: 123106 bytes; SHA256 `14dfa2a5ddc7840788abf3acbe9671ab5c97d8fbf2d7704415a4ad5428675ace`.
+## Production verification — application deployment
 
-Same pre-existing isolated synthetic production profile reused without clearing/reseeding/Restore:22 records,110/20. Before/application all20-store hash `9c2df75ef30db6923c19e48a588aaa77f25d053d80f005917fc36b6ad251eab6`; prior18-store hash `5566fc3e8df752b2ffd2a68a93c6db5bbef9051fd817b7fb63e9d04d2d9934c7`; AI/Voice config hash `be24fdaaad958fe42cfbfc2de052a846400e6401221282531f636669b7361dcf`. Hashes/rows/store list/config keys identical. Missing water preference remains absent (no default autowrite). Offline cold NEW page boots exact application App/SW commit, same hashes/config. Final report-only deployment must repeat exact assets and this same-profile/offline check; final receipts are external because this report precedes END.
+All five suites PASS on the actual production URL: dailyRecordsExperience(5 targeted contexts with20 stress rounds), catalogRecovery(6), foodRecovery(4), macroNutritionSummary(4), dietEvents(2). They cover320/140,320/200 dark,reduced,landscape,complete day facts,all ranges/recorded-day reports,Today/Food same macros and existing AI Catalog/reference/manager behavior. No real provider call or personal business fixture used.
+
+Exact productionAssets PASS: HTML/build-info/application App and SW identity, JS/CSS bytes/SHA256, exact SW/precache, all5 tabs, AI settings and GitHub Sync entry; no page errors.
+
+- `index-Jxv4wstI.js`: 819293 bytes; SHA256 `0ff76db8579132ad487451f6e411ba7e7c81834353c6e94f9f63ca1a3a665dbb`.
+- `index-D2Lt30Vp.css`: 123692 bytes; SHA256 `418e748cb4ad979418e245015a13fcfd73e209748c6f7c8e2494834e2fd88e67`.
+
+Same pre-existing isolated synthetic production profile:22 rows,110/20. Baseline/application all20-store hash `9c2df75ef30db6923c19e48a588aaa77f25d053d80f005917fc36b6ad251eab6`; old18-store hash `5566fc3e8df752b2ffd2a68a93c6db5bbef9051fd817b7fb63e9d04d2d9934c7`; AI/Voice config hash `be24fdaaad958fe42cfbfc2de052a846400e6401221282531f636669b7361dcf`. Rows/store lists/config keys/hashes identical, absent water preference stays absent. Offline NEW page boots exact application App/SW and the same hashes. Report-only END deployment repeats exact assets and this same-profile/offline guard; final receipts and exact END SHA are external because this file precedes END.
+
+## Physical / remaining verification
+
+- iPhone Safari: Pending —no new physical-device evidence.
+- Original installed PWA: Pending —no original-device evidence or duplicate install; Chromium/synthetic offline checks are separate.
+- No known unresolved product-code blocker. Real keyboard/WebKit/Safe Area and installed storage continuity require those physical follow-ups and are not claimed Verified.
 
 ## Actual modified files
 
 - `AGENTS.md`
-- `docs/AI_ARCHITECTURE.md`
+- `docs/DAILY_RECORDS_UX_CONTRACT.md`
 - `docs/INTERACTION_VISUAL_SYSTEM.md`
 - `docs/UI_INTERACTION_SPEC.md`
 - `docs/UI_QA_MATRIX.md`
-- `src/ai/proposals.ts`
-- `src/ai/systemPrompt.ts`
-- `src/ai/toolRegistry.ts`
-- `src/ai/tools/catalogTools.ts`
-- `src/ai/tools/readTools.ts`
 - `src/main.ts`
-- `src/services/waterReferenceConfig.ts`
-- `src/services/workoutService.ts`
+- `src/services/dailyRecordsSummary.ts`
+- `src/services/reportService.ts`
 - `src/styles/main.css`
 - `src/styles/recovery.css`
-- `src/ui/aiAssistant.ts`
-- `src/ui/aiUiHelpers.ts`
-- `src/ui/icons.ts`
-- `src/ui/nutritionStrategies.ts`
-- `src/ui/observeManagerCatalog.ts`
+- `src/ui/actionToast.ts`
+- `src/ui/calendarPage.ts`
+- `src/ui/dayDetail.ts`
 - `src/ui/recovery.ts`
+- `src/ui/recoveryLineChart.ts`
+- `src/ui/recoveryReport.ts`
+- `src/ui/sheetController.ts`
 - `src/utils/recovery.ts`
-- `tests/aiCatalog.test.ts`
+- `src/utils/reporting.ts`
 - `tests/browser/README.md`
 - `tests/browser/catalogRecovery.mjs`
+- `tests/browser/dailyRecordsExperience.mjs`
+- `tests/browser/dietEvents.mjs`
 - `tests/browser/foodRecovery.mjs`
-- `tests/browser/managementWorkspace.mjs`
-- `tests/recovery.test.ts`
-- `tests/waterReference.test.ts`
-- `LATEST_DEV_REPORT.md` — report-only END commit.
-
-External evidence: workspace artifacts/ai-catalog-recovery-2026-10-08 contains the62-item DELIVERY_REPORT.md, application patch/inventory, raw/accepted gates, retained interrupted/failure/retry evidence, unit/type/build logs, matrix receipts, before/after and production screenshots, Actions/assets and baseline/application/final preservation/offline receipts. Exact final SHA/END Actions/assets are in external final receipt.
-
-## Manual verification and limits
-
-- Physical iPhone Safari: **Pending**.
-- Original installed PWA: **Pending**.
-- Real provider catalog tool calls: **Pending**; mocks verify app protocol/safety/UI, not vendor CORS/model compatibility or response quality.
-- Browser font/dark/reduced/landscape/Safe Area checks are automated Chromium evidence; they do not verify physical Safari/OS scaling/original installed-PWA update.
-- No confirmed unresolved implementation defect. Existing Vite large-chunk advisory remains informational. Source fingerprint invalidation deliberately covers relevant whole catalogs, so unrelated same-catalog changes can conservatively expire a proposal.
-
-## ChatGPT baseline
-
-Read AGENTS and this report; actual main wins. AI can READ bounded real catalog IDs and PROPOSE create/update Food/Exercise/Workout/Diet/Nutrition template definitions. One user confirmation, existing services, strict patches/source guards and composite atomic writes. No automatic phase activation or historical rewrite. Water reference is device-only2500 default or integer/null, never backup/sync; factual total only. Sleep is objective facts only; Recovery7/30/90 actual local days,90 chart-only scrolling. Sleep/Water are ordinary shared Today activity cards. Preserve existing Today/Food shared MacroNutritionSummary, Management Workspace lifecycle and all compatibility contracts. Next release requires all25 browser suites plus exact production assets and same-profile preservation/offline verification. Physical Safari/original PWA/real provider remain separate Pending evidence.
+- `tests/browser/foodServing.mjs`
+- `tests/calendarVisual.test.ts`
+- `tests/dailyRecordsSummary.test.ts`
+- `tests/dayDetail.test.ts`
+- `tests/dayRecords.test.ts`
+- `tests/dietEvents.test.ts`
+- `LATEST_DEV_REPORT.md` (report-only END).
