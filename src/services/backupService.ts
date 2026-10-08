@@ -1,5 +1,6 @@
+import { validateSleepSession, validateWaterLog } from '../utils/recovery'
 import { validateDietEvent } from './dietEventService'
-import type { BackupData, BackupDataV10 } from '../db/types'
+import type { BackupData, BackupDataV11 } from '../db/types'
 import { db, type FitLogDatabase } from '../db/database'
 import { isMealType } from '../utils/foodMeals'
 import { getCardioActivityType } from '../utils/cardio'
@@ -9,7 +10,7 @@ import { validateTaskInput } from './taskService'
 type UnknownRecord = Record<string, unknown>
 
 const storeLabels = {
-  dietEvents: '特殊饮食', foods: '食物', foodLogs: '饮食记录', exercises: '动作', workouts: '训练记录', weights: '体重记录',
+  sleepSessions: '睡眠', waterLogs: '饮水', dietEvents: '特殊饮食', foods: '食物', foodLogs: '饮食记录', exercises: '动作', workouts: '训练记录', weights: '体重记录',
   workoutTemplates: '训练模板', dietTemplates: '饮食模板', nutritionTargets: '营养目标', pelvicFloorSessions: '凯格尔训练', cardioSessions: '有氧训练', habits: '习惯', habitCheckIns: '习惯打卡', tasks: '任务', taskTags: '标签', nutritionStrategyTemplates: '营养模板', nutritionStrategyVariants: '营养日方案', nutritionStrategyPhases: '营养阶段',
 } as const
 
@@ -336,20 +337,26 @@ function validateHabitCheckIn(record: UnknownRecord, index: number): string {
 
 export interface ValidatedBackup {
   app: 'FitLog Lite'
-  schemaVersion: 10
+  schemaVersion: 11
   exportedAt: string
-  data: BackupDataV10['data']
+  data: BackupDataV11['data']
 }
 
 export function validateBackup(value: unknown): ValidatedBackup {
   if (!value || typeof value !== 'object') throw new Error('备份文件格式不正确')
   const backup = value as Partial<BackupData>
-  if (backup.app !== 'FitLog Lite' || (backup.schemaVersion !== 1 && backup.schemaVersion !== 2 && backup.schemaVersion !== 3 && backup.schemaVersion !== 4 && backup.schemaVersion !== 5 && backup.schemaVersion !== 6 && backup.schemaVersion !== 7 && backup.schemaVersion !== 8 && backup.schemaVersion !== 9 && backup.schemaVersion !== 10)) throw new Error('不是兼容的 FitLog Lite 备份')
+  if (backup.app !== 'FitLog Lite' || (backup.schemaVersion !== 1 && backup.schemaVersion !== 2 && backup.schemaVersion !== 3 && backup.schemaVersion !== 4 && backup.schemaVersion !== 5 && backup.schemaVersion !== 6 && backup.schemaVersion !== 7 && backup.schemaVersion !== 8 && backup.schemaVersion !== 9 && backup.schemaVersion !== 10 && backup.schemaVersion !== 11)) throw new Error('不是兼容的 FitLog Lite 备份')
   if (!backup.data || typeof backup.data !== 'object' || Array.isArray(backup.data)) throw new Error('备份 data 必须是 object')
-  const data = backup.data as Partial<BackupDataV10['data']>
+  const data = backup.data as Partial<BackupDataV11['data']>
   timestamp(backup.exportedAt, '备份 exportedAt')
   const keys = ['foods', 'foodLogs', 'exercises', 'workouts', 'weights'] as const
   for (const key of keys) if (!Array.isArray(backup.data[key])) throw new Error(`备份缺少 ${key} 数据`)
+  const sleepSessions = backup.schemaVersion >= 11 ? data.sleepSessions : []
+  const waterLogs = backup.schemaVersion >= 11 ? data.waterLogs : []
+  if (!Array.isArray(sleepSessions) || !Array.isArray(waterLogs)) throw new Error('备份缺少睡眠或饮水数据')
+  validateIds(sleepSessions, 'sleepSessions').forEach(validateSleepSession)
+  if (sleepSessions.filter(s => !s.endTime).length > 1) throw new Error('只能有一条进行中的睡眠记录')
+  validateIds(waterLogs, 'waterLogs').forEach(validateWaterLog)
   const dietEvents = backup.schemaVersion >= 10 ? data.dietEvents : []
   if (!Array.isArray(dietEvents)) throw new Error('备份缺少 dietEvents 数据')
   validateIds(dietEvents, 'dietEvents').forEach(validateDietEvent)
@@ -483,20 +490,21 @@ export function validateBackup(value: unknown): ValidatedBackup {
     if (variant && variant.templateId !== selection.templateId) throw new Error('每日目标的日方案来源无效')
   }
   return {
-    app: 'FitLog Lite', schemaVersion: 10, exportedAt: backup.exportedAt!,
+    app: 'FitLog Lite', schemaVersion: 11, exportedAt: backup.exportedAt!,
     data: {
       foods: backup.data.foods, foodLogs: backup.data.foodLogs, exercises: backup.data.exercises,
       workouts: backup.data.workouts, weights: backup.data.weights,
       workoutTemplates, dietTemplates,
-      dietEvents, nutritionTargets, pelvicFloorSessions, cardioSessions, habits, habitCheckIns, tasks, taskTags, nutritionStrategyTemplates, nutritionStrategyVariants, nutritionStrategyPhases,
+      sleepSessions, waterLogs, dietEvents, nutritionTargets, pelvicFloorSessions, cardioSessions, habits, habitCheckIns, tasks, taskTags, nutritionStrategyTemplates, nutritionStrategyVariants, nutritionStrategyPhases,
     },
   } as ValidatedBackup
 }
 
-export async function exportBackup(database: FitLogDatabase = db): Promise<BackupDataV10> {
+export async function exportBackup(database: FitLogDatabase = db): Promise<BackupDataV11> {
   return database.transaction('r', database.tables, async () => ({
-    app: 'FitLog Lite' as const, schemaVersion: 10 as const, exportedAt: new Date().toISOString(),
+    app: 'FitLog Lite' as const, schemaVersion: 11 as const, exportedAt: new Date().toISOString(),
     data: {
+      sleepSessions: await database.sleepSessions.toArray(), waterLogs: await database.waterLogs.toArray(),
       dietEvents: await database.dietEvents.toArray(),
       foods: await database.foods.toArray(), foodLogs: await database.foodLogs.toArray(), exercises: await database.exercises.toArray(),
       workouts: await database.workouts.toArray(), weights: await database.weights.toArray(),
@@ -514,8 +522,10 @@ export async function exportBackup(database: FitLogDatabase = db): Promise<Backu
 
 export async function restoreBackup(backup: BackupData | unknown, database: FitLogDatabase = db): Promise<void> {
   const validated = validateBackup(backup)
-  await database.transaction('rw', [database.dietEvents, database.foods, database.foodLogs, database.exercises, database.workouts, database.weights, database.workoutTemplates, database.dietTemplates, database.nutritionTargets, database.pelvicFloorSessions, database.cardioSessions, database.habits, database.habitCheckIns, database.tasks, database.taskTags, database.nutritionStrategyTemplates, database.nutritionStrategyVariants, database.nutritionStrategyPhases], async () => {
-    await Promise.all([database.dietEvents.clear(), database.foods.clear(), database.foodLogs.clear(), database.exercises.clear(), database.workouts.clear(), database.weights.clear(), database.workoutTemplates.clear(), database.dietTemplates.clear(), database.nutritionTargets.clear(), database.pelvicFloorSessions.clear(), database.cardioSessions.clear(), database.habits.clear(), database.habitCheckIns.clear(), database.tasks.clear(), database.taskTags.clear(), database.nutritionStrategyTemplates.clear(), database.nutritionStrategyVariants.clear(), database.nutritionStrategyPhases.clear()])
+  await database.transaction('rw', [database.sleepSessions, database.waterLogs, database.dietEvents, database.foods, database.foodLogs, database.exercises, database.workouts, database.weights, database.workoutTemplates, database.dietTemplates, database.nutritionTargets, database.pelvicFloorSessions, database.cardioSessions, database.habits, database.habitCheckIns, database.tasks, database.taskTags, database.nutritionStrategyTemplates, database.nutritionStrategyVariants, database.nutritionStrategyPhases], async () => {
+    await Promise.all([database.sleepSessions.clear(), database.waterLogs.clear(), database.dietEvents.clear(), database.foods.clear(), database.foodLogs.clear(), database.exercises.clear(), database.workouts.clear(), database.weights.clear(), database.workoutTemplates.clear(), database.dietTemplates.clear(), database.nutritionTargets.clear(), database.pelvicFloorSessions.clear(), database.cardioSessions.clear(), database.habits.clear(), database.habitCheckIns.clear(), database.tasks.clear(), database.taskTags.clear(), database.nutritionStrategyTemplates.clear(), database.nutritionStrategyVariants.clear(), database.nutritionStrategyPhases.clear()])
+    await database.sleepSessions.bulkAdd(validated.data.sleepSessions)
+    await database.waterLogs.bulkAdd(validated.data.waterLogs)
     await database.dietEvents.bulkAdd(validated.data.dietEvents)
     await database.foods.bulkAdd(validated.data.foods)
     await database.foodLogs.bulkAdd(validated.data.foodLogs)

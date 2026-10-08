@@ -341,7 +341,7 @@ export interface BackupDataV9 extends BackupBase {
   data: BackupDataV8['data']
 }
 
-export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6 | BackupDataV7 | BackupDataV8 | BackupDataV9 | BackupDataV10
+export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6 | BackupDataV7 | BackupDataV8 | BackupDataV9 | BackupDataV10 | BackupDataV11
 
 /** Context only: estimates never contribute to canonical FoodLog nutrition. */
 export interface DietEvent {
@@ -352,4 +352,28 @@ export interface DietEvent {
 export interface BackupDataV10 extends BackupBase {
   schemaVersion: 10
   data: BackupDataV9['data'] & { dietEvents: DietEvent[] }
+}
+
+/** Absolute instants; completed sessions retain the local wake-date at finish/edit. */
+export interface SleepSession {
+  id: string
+  startTime: string
+  endTime?: string
+  durationMinutes?: number
+  recordDate?: string
+  activeKey?: 'active'
+  createdAt: string
+  updatedAt: string
+}
+export interface WaterLog {
+  id: string
+  date: string
+  timestamp: string
+  amountMl: number
+  createdAt: string
+  updatedAt: string
+}
+export interface BackupDataV11 extends BackupBase {
+  schemaVersion: 11
+  data: BackupDataV10['data'] & { sleepSessions: SleepSession[]; waterLogs: WaterLog[] }
 }

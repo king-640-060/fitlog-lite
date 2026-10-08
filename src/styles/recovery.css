@@ -1,0 +1,84 @@
+/* Shared factual recovery cards; controls reuse primary/secondary primitives. */
+.recovery-section { min-width: 0; margin-top: var(--section-gap); }
+.recovery-section > h2, .trend-domain-heading { margin-bottom: var(--field-gap); font-size: 1.08rem; }
+[data-recovery-root] { display: grid; gap: var(--field-gap); min-width: 0; }
+.recovery-card { min-width: 0; margin: 0; }
+.recovery-card .card-heading { flex-wrap: wrap; gap: 8px; }
+.recovery-card h3, .recovery-trend h3 { margin: 0; font-size: .98rem; }
+.recovery-copy { display: grid; gap: 8px; margin: 12px 0; color: var(--text-secondary); font-size: .85rem; }
+.recovery-copy > strong { color: var(--text-primary); font-size: 1rem; }
+.recovery-number { white-space: nowrap; font-variant-numeric: tabular-nums; font-size: .85rem; }
+.recovery-copy > .recovery-number { width: max-content; max-width: 100%; }
+.recovery-secondary { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px; margin-top: 8px; }
+.recovery-secondary .text-btn { white-space: nowrap; font-size: .8rem; }
+.recovery-warning { margin: 0; color: var(--danger); line-height: 1.5; }
+.water-total { margin: 12px 0 4px; }
+.water-total strong { font-size: 1.5rem; color: var(--text-primary); }
+.water-actions { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,6.4rem),1fr)); gap: 8px; margin-top: 12px; }
+.water-actions button { min-width: 0; padding-inline: 8px; white-space: nowrap; }
+.recovery-statistics { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,10rem),1fr)); gap: 12px; }
+.recovery-statistics dt { color: var(--text-secondary); font-size: .75rem; }
+.recovery-statistics dd { margin: 6px 0 0; font-size: .9rem; white-space: nowrap; }
+.recovery-note { color: var(--text-secondary); font-size: .78rem; line-height: 1.5; overflow-wrap: anywhere; }
+.recovery-trend .section-head { flex-wrap: wrap; gap: 8px; }
+.sleep-bars { display: flex; align-items: stretch; height: 150px; gap: 3px; padding-top: 8px; border-bottom: 1px solid var(--border); }
+.sleep-bar-column { position: relative; display: flex; flex: 1; min-width: 0; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 22px; }
+.sleep-bar-column i { width: 85%; min-width: 1px; background: var(--accent-mid); border-radius: 3px 3px 0 0; }
+.sleep-bar-column small { position: absolute; bottom: 2px; font-size: .58rem; color: var(--text-secondary); }
+.sleep-bar-column:nth-child(2n) small { visibility: hidden; }
+.recovery-daily > summary { min-height: 44px; padding-block: 12px; color: var(--accent-strong); font-size: .85rem; }
+.recovery-daily p { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 0; padding: 10px 0; border-top: 1px solid var(--divider); font-size: .78rem; }
+.recovery-daily p > span { white-space: nowrap; }
+.recovery-history-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; border-bottom: 1px solid var(--divider); }
+.recovery-history-row > button:first-child { display: grid; min-width: 0; gap: 6px; padding: 12px 0; border: 0; background: transparent; text-align: left; }
+.recovery-history-row strong, .recovery-history-row span { overflow-wrap: anywhere; }
+.recovery-history-row span { color: var(--text-secondary); font-size: .78rem; }
+.recovery-history-row > .text-btn { white-space: nowrap; }
+[data-recovery-error] { color: var(--danger); font-size: .85rem; }
+.water-undo { max-width: calc(100vw - 24px); }
+.water-undo .text-btn { min-height: 44px; padding: 4px 8px; white-space: nowrap; color: inherit; }
+
+/* Descriptions may truncate; independent counters, amounts and actions may not. */
+.meal-preview { display: flex; align-items: center; min-width: 0; gap: 8px; overflow: visible; white-space: normal; }
+.meal-preview-names { display: flex; flex: 1; min-width: 0; flex-wrap: wrap; gap: 2px; align-items: baseline; }
+.meal-preview-name { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.meal-more { flex: 0 0 auto; min-width: 44px; min-height: 44px; padding: 4px 8px; border-color: var(--border); border-radius: var(--radius-sm); background: var(--surface-soft); color: var(--accent-strong); white-space: nowrap; font-size: .8rem; }
+.meal-macros { display: flex; flex-wrap: wrap; gap: 2px 8px; overflow: visible; white-space: normal; }
+.meal-macros > span { white-space: nowrap; }
+.meal-log-list .food-row-main { flex-wrap: wrap; gap: 6px; }
+.meal-log-list .food-row-main > span:first-child { width: 100%; }
+.meal-log-list .food-row-main > span:first-child strong { white-space: normal; overflow-wrap: anywhere; }
+.meal-collapse { min-height: 44px; }
+.nutrition-tiles { grid-template-columns: repeat(auto-fit,minmax(min(100%,var(--nutrition-column-min,5.6rem)),1fr)); }
+.nutrition-tiles .macro-value, .nutrition-tiles .macro-per-kg { white-space: nowrap; overflow-wrap: normal; }
+.nutrition-tiles .macro-per-kg { color: var(--text-secondary); }
+/* Busy is distinct from unavailable; all primary loading controls retain the shared lime. */
+.primary[aria-busy=true] { opacity: 1; background: var(--accent); color: var(--accent-ink); }
+.primary[aria-busy=true]::after { content: '…'; margin-left: 8px; }
+@media (prefers-color-scheme: dark) {
+  :root { color-scheme: dark; --bg:#171d18; --surface:#222b24; --surface-soft:#2b362c; --surface-elevated:#283129; --text-primary:#edf2e8; --text-secondary:#bec9bb; --text-tertiary:#a9b6a6; --border:#435043; --divider:rgba(221,235,212,.14); --overlay:rgba(0,0,0,.55); --accent-strong:#c0d98c; --accent-mid:#b1ca78; --accent-soft:#35442b; --carbs-soft:#443b25; --fat-soft:#49322c; --danger:#f0a399; --danger-soft:#4a302c; }
+  .nutrition-tiles .carbs { color:#f0d395; }
+  .nutrition-tiles .fat { color:#f2b5a4; }
+  .meal-symbol.lunch { background:var(--carbs-soft); color:#f0d395; border-color:var(--border); }
+  .meal-symbol.dinner { background:var(--surface-soft); color:var(--text-secondary); border-color:var(--border); }
+  .meal-symbol.snack { background:var(--fat-soft); color:#f2b5a4; border-color:var(--border); }
+}
+.food-calorie-row, .today-calorie-layout { display: flex; flex-wrap: wrap; }
+.food-calorie-row .calorie-gauge-caption, .today-calorie-layout .calorie-gauge-caption { flex: 1 1 max-content; }
+.calorie-gauge-caption > strong { white-space: nowrap; overflow-wrap: normal; }
+.food-completion-strip { display: flex; flex-wrap: wrap; }
+.food-completion-summary { flex: 1 1 12rem; }
+.food-completion-summary p { display: flex; flex-wrap: wrap; gap: 3px 8px; }
+.food-completion-summary p > span, .nutrition-tiles .nutrition-metric > small { white-space: nowrap; overflow-wrap: normal; }
+.food-completion-strip > button { flex: 0 0 auto; max-width: none; margin-left: auto; white-space: nowrap; }
+.recovery-trend h4 { margin: 16px 0 8px; font-size: .9rem; }
+.water-bars i { background: var(--accent-mid); }
+
+.meal-preview-name + .meal-preview-name::before { content: '· '; }
+.recovery-history-tokens { display: flex; flex-wrap: wrap; gap: 4px 8px; }
+.recovery-history-tokens > span { white-space: nowrap; overflow-wrap: normal; }
+.recovery-history-row strong.recovery-history-tokens > span { color: var(--text-primary); font-size: inherit; }
+
+/* Undo occupies normal card flow so it never floats over another action. */
+.water-undo { position: static; transform: none; animation: none; width: max-content; max-width: 100%; margin-top: 12px; flex-wrap: wrap; box-shadow: none; }
+.water-undo > span { white-space: nowrap; }

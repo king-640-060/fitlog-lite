@@ -1,3 +1,5 @@
+import { mountRecovery, recoverySlotHtml, type RecoveryUi } from './ui/recovery'
+import { latestValidDayWeight, macroPerKg } from './utils/recovery'
 import { managerToolbarHtml, managerSearchHtml, managerListHtml, managerRowHtml, managerEmptyHtml, managerNoResultsHtml, managerUtilitiesHtml, managerSectionHtml } from './ui/managerPrimitives'
 import { createManagementWorkspace, type ManagedSurfaceContext } from './ui/managementWorkspace'
 import { retireLegacyVideoSearchStorage } from './services/retiredVideoStorage'
@@ -17,6 +19,7 @@ import './styles/plan.css'
 import './styles/ai.css'
 import './styles/foodVision.css'
 import './styles/nutritionStrategies.css'
+import './styles/recovery.css'
 import { showNutritionStrategyPicker, showNutritionStrategyManager } from './ui/nutritionStrategies'
 import { bindEnergyEditor } from './ui/energyEditor'
 import { showFoodVisionImport } from './ui/foodVisionImport'
@@ -78,6 +81,8 @@ const pwaRuntime = new PwaRuntime()
 type Tab = 'today' | 'plan' | 'food' | 'workout' | 'progress'
 type ProgressView = 'trend' | 'calendar' | 'reports'
 type PlanView = 'today' | 'upcoming' | 'inbox'
+let recoveryDispose: (() => void) | undefined
+function recoveryUi(): RecoveryUi { return { esc, openModal, confirm: confirmAction, fail } }
 let activeTab: Tab = 'today'
 let renderedTab: Tab | undefined
 let rootRenderVersion = 0
@@ -247,6 +252,7 @@ function chooseNutritionTargetConflict(): Promise<'preserve' | 'replace' | undef
 }
 
 async function render(): Promise<void> {
+  recoveryDispose?.(); recoveryDispose = undefined
   const renderVersion = String(++rootRenderVersion)
   const sameTab = renderedTab === activeTab
   const navigation = renderedTab !== undefined && renderedTab !== activeTab
@@ -490,11 +496,11 @@ async function renderTodayPage(): Promise<void> {
   if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
   view.innerHTML = `
     ${todayPlanCardHtml(todayTasks, taskTags)}
-    <section class="today-card nutrition-today-card"><div class="card-heading"><div><span class="card-icon nutrition-icon">${icon('utensils', 20)}</span><h2>今日饮食</h2></div><button class="text-btn" id="today-food-details">查看详情 ${icon('chevron', 16)}</button></div><div class="today-calorie-layout">${calorieGaugeHtml(totals.calories, target?.calories, 'today')}</div><div class="today-macros nutrition-tiles">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein)}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs)}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat)}</div></section>
+    <section class="today-card nutrition-today-card"><div class="card-heading"><div><span class="card-icon nutrition-icon">${icon('utensils', 20)}</span><h2>今日饮食</h2></div><button class="text-btn" id="today-food-details">查看详情 ${icon('chevron', 16)}</button></div><div class="today-calorie-layout">${calorieGaugeHtml(totals.calories, target?.calories, 'today')}</div><div class="today-macros nutrition-tiles" style="${nutritionTileStyle(totals, target)}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein)}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs)}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat)}</div></section>
     <section class="today-card today-activity-card workout-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon workout-icon">${icon('dumbbell', 20)}</span><h2>训练</h2></div><button class="text-btn" id="today-workout-details">查看训练 ${icon('chevron', 16)}</button></div><div class="today-training-row today-strength-row"><strong>无氧</strong><div class="today-strength-status${openWorkout ? '' : ' today-activity-body'}"><span>${workouts.length ? ['力量训练', `${strengthExercises} 个动作`, `${strengthSets} 组`, ...(openWorkout ? ['记录中'] : [])].map(metric => `<span class="today-training-token">${esc(metric)}</span>`).join(' · ') : '今天还没有力量训练'}</span>${openWorkout ? '<button class="primary today-workout-action" id="today-workout">继续力量训练</button>' : '<button class="secondary today-activity-action" id="today-workout">记录训练</button>'}</div></div><div class="today-training-row"><strong>有氧</strong><span>${cardioSessions.length === 1 ? [getCardioActivityLabel(cardioSessions[0]!), `${formatNumber(cardioMinutes)} 分钟`, ...formatCardioMetrics(cardioSessions[0]!)].map(metric => `<span class="today-training-token">${esc(metric)}</span>`).join(' · ') : cardioSessions.length ? `有氧训练 · ${cardioSessions.length} 次 · 共 ${formatNumber(cardioMinutes)} 分钟` : '今天还没有有氧训练'}</span></div></section>
     <section class="today-card today-activity-card weight-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon weight-icon">${icon('scale', 20)}</span><h2>体重</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 16)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(weightState.status)}</strong><span class="today-activity-meta">${esc(weightState.meta)}</span></div><button class="secondary today-activity-action" id="today-record-weight">${esc(weightState.action)}</button></div></section>
     <section class="today-card today-activity-card pelvic-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon pelvic-icon">${icon('leaf', 20)}</span><h2>凯格尔训练</h2></div><button class="text-btn" id="today-pelvic-history">训练记录 ${icon('chevron', 16)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(pelvicState.status)}</strong><span class="today-activity-meta">${esc(pelvicState.meta)}</span></div><button class="secondary today-activity-action" id="today-pelvic">${esc(pelvicState.action)}</button></div></section>
-    ${todayHabitCardHtml(habits, habitCheckIns, today)}`
+    ${todayHabitCardHtml(habits, habitCheckIns, today)}${recoverySlotHtml()}`
   view.querySelector('#today-food-details')?.addEventListener('click', () => { activeTab = 'food'; foodDate = today; void render().catch(fail) })
   view.querySelector('#today-workout-details')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = false; void render().catch(fail) })
   view.querySelector('#today-workout')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = openWorkout; workoutEditorOpen = Boolean(openWorkout); showWorkoutHistory = false; void render().then(() => { if (!openWorkout) window.scrollTo({ top: 0, behavior: 'instant' }) }).catch(fail) })
@@ -504,6 +510,7 @@ async function renderTodayPage(): Promise<void> {
   view.querySelector('#today-pelvic-history')?.addEventListener('click', () => void showPelvicFloorHistory())
   bindTodayPlanCard(view)
   bindTodayHabitCard(view, today)
+  recoveryDispose?.(); recoveryDispose = mountRecovery(view.querySelector('[data-recovery-root]')!, recoveryUi())
 }
 
 /** Keep tab controls connected so reversible CSS transitions survive content replacement. */
@@ -536,6 +543,7 @@ function bindProgressTabs(root: ParentNode = document): void {
 }
 
 async function renderProgressPage(): Promise<void> {
+  recoveryDispose?.(); recoveryDispose = undefined
   if (progressView === 'trend') { await renderWeightPage(true); return }
   if (progressView === 'calendar') { await renderCalendarOverview(true); return }
   await renderReportsPage()
@@ -1020,15 +1028,19 @@ function calorieGaugeHtml(actual: number, goal: number | undefined, surface: 'to
   const status = goalStatusText(actual, goal, 'kcal')
   const intake = surface === 'today' ? '今日摄入' : '当日摄入'
   const description = `${intake} ${amount} kcal，${goal === undefined ? status : `目标 ${formatEnergyInputValue(goal)} kcal，${status}`}`
-  return `<div class="calorie-gauge${surface === 'today' ? ' today-calorie-gauge' : ''}" data-progress-key="calories" data-actual="${actual}" ${goal === undefined ? '' : `data-goal="${goal}"`} role="img" aria-label="${description}">${ringSvgHtml(actual, goal, 'large', previous)}<div class="calorie-gauge-center"><strong data-count-from="${previous?.actual ?? 0}" data-count-to="${actual}">${amount}</strong><small>kcal</small></div></div><div class="calorie-gauge-caption">${surface === 'food' ? '<span>当日摄入</span>' : ''}${goal === undefined ? (surface === 'food' ? '<strong>按自己的节奏</strong>' : '') : `<strong>目标 ${formatEnergyInputValue(goal)} kcal</strong>`}<span class="${getGoalProgress(actual, goal).state === 'above' ? 'metric-excess' : ''}">${status}</span></div>`
+  return `<div class="calorie-gauge${surface === 'today' ? ' today-calorie-gauge' : ''}" data-progress-key="calories" data-actual="${actual}" ${goal === undefined ? '' : `data-goal="${goal}"`} role="img" aria-label="${description}">${ringSvgHtml(actual, goal, 'large', previous)}<div class="calorie-gauge-center"><strong style="font-size:min(${surface === 'today' ? 1.2 : 1.65}rem, ${(surface === 'today' ? 70 : 88) / (amount.length * .63)}px)" data-count-from="${previous?.actual ?? 0}" data-count-to="${actual}">${amount}</strong><small>kcal</small></div></div><div class="calorie-gauge-caption">${surface === 'food' ? '<span>当日摄入</span>' : ''}${goal === undefined ? (surface === 'food' ? '<strong>按自己的节奏</strong>' : '') : `<strong>目标 ${formatEnergyInputValue(goal)} kcal</strong>`}<span class="${getGoalProgress(actual, goal).state === 'above' ? 'metric-excess' : ''}">${status}</span></div>`
 }
 
-function nutritionMetricHtml(key: string, label: string, actual: number, target: number | undefined, previous?: PreviousRingValue): string {
+function nutritionTileStyle(totals: {protein:number;carbs:number;fat:number}, target?: NutritionGoal): string {
+  const width=Math.max(...(['protein','carbs','fat'] as const).map(key=>(target?.[key]===undefined?`${formatNumber(totals[key])}g`:`${formatNumber(totals[key])} / ${formatNumber(target[key])}g`).length))
+  return `--nutrition-column-min:max(5.6rem,calc(${width * .46}rem + 18px))`
+}
+function nutritionMetricHtml(key: string, label: string, actual: number, target: number | undefined, previous?: PreviousRingValue, perKg?: string): string {
   const progress = getGoalProgress(actual, target)
   const amount = target === undefined ? `${formatNumber(actual)}g` : `${formatNumber(actual)} / ${formatNumber(target)}g`
   const status = progress.state === 'above' ? `<small class="metric-excess">+${formatNumber(progress.excess)}g</small>` : progress.state === 'reached' ? '<small>已达目标</small>' : progress.state === 'unset' ? '<small>未设目标</small>' : ''
   void previous
-  return `<div class="nutrition-metric ${key} ${progress.state}" role="group" data-progress-key="${key}" data-actual="${actual}" ${target === undefined ? '' : `data-goal="${target}"`} aria-label="${label} ${amount} ${goalStatusText(actual, target, 'g')}"><span class="macro-label">${label}</span><strong class="macro-value" aria-hidden="true">${amount}</strong>${status}</div>`
+  return `<div class="nutrition-metric ${key} ${progress.state}" role="group" data-progress-key="${key}" data-actual="${actual}" ${target === undefined ? '' : `data-goal="${target}"`} aria-label="${label} ${amount} ${goalStatusText(actual, target, 'g')} ${perKg??''}"><span class="macro-label">${label}</span><strong class="macro-value" aria-hidden="true">${amount}</strong>${perKg ? `<small class="macro-per-kg">${perKg}</small>` : ''}${status}</div>`
 }
 
 
@@ -1040,16 +1052,16 @@ function foodMealSectionHtml(group: FoodMealGroup, isToday: boolean, expanded = 
   const meal = group.meal
   const key = meal ?? 'unclassified'
   const count = group.logs.length
-  const macro = `蛋白质 ${formatNumber(group.protein)}g · 碳水 ${formatNumber(group.carbs)}g · 脂肪 ${formatNumber(group.fat)}g`
+  const macro = `<span>蛋白质 ${formatNumber(group.protein)}g</span><span>碳水 ${formatNumber(group.carbs)}g</span><span>脂肪 ${formatNumber(group.fat)}g</span>`
   const preview = count
-    ? `${group.logs.slice(0, 3).map((log) => esc(log.foodName)).join(' · ')}${count > 3 ? ` · 另有 ${count - 3} 项` : ''}`
-    : `${isToday ? '今天' : '这天'}还没有记录${group.name}`
+    ? `<span class="meal-preview-names">${group.logs.slice(0, 3).map(log => `<span class="meal-preview-name">${esc(log.foodName)}</span>`).join('')}</span>${count > 3 ? `<button type="button" class="meal-more" data-toggle-meal="${key}" aria-label="展开${group.name}全部 ${count} 项记录" aria-expanded="${expanded}">+${count - 3}</button>` : ''}`
+    : `<span>${isToday ? '今天' : '这天'}还没有记录${group.name}</span>`
   const mealIcon: Record<MealType, IconName> = { breakfast: 'sunrise', lunch: 'sun', dinner: 'moon', snack: 'snack' }
   return `<section class="food-meal ${count ? 'has-logs' : 'is-empty'}" data-meal-section="${key}">
     <div class="food-meal-head"><button class="food-meal-summary" ${count ? `data-toggle-meal="${key}" aria-expanded="${expanded}"` : meal ? `data-add-meal="${meal}"` : ''} ${count || meal ? '' : 'disabled'} aria-label="${count ? `查看${group.name} ${count} 项记录` : `记录${group.name}`}"><span class="meal-symbol ${key}" aria-hidden="true">${icon(meal ? mealIcon[meal] : 'archive', 18)}</span><span class="meal-title"><strong>${group.name}</strong>${count ? `<small>${count} 项 · ${formatEnergyInputValue(group.calories)} kcal</small>` : ''}</span></button>${meal ? `<button class="meal-record" data-add-meal="${meal}">记录 ${icon('chevron', 16)}</button>` : '<span class="meal-unclassified-note">待整理</span>'}</div>
     ${count ? `<p class="meal-macros">${macro}</p>` : ''}
-    <p class="meal-preview">${preview}</p>
-    ${count ? `<div class="meal-log-list" ${expanded ? '' : 'hidden'}>${group.logs.map(foodLogRowHtml).join('')}<button type="button" class="text-btn danger compact-action meal-clear" data-clear-meal="${key}">清空本餐记录</button></div>` : ''}
+    <div class="meal-preview">${preview}</div>
+    ${count ? `<div class="meal-log-list" ${expanded ? '' : 'hidden'}>${group.logs.map(foodLogRowHtml).join('')}<button type="button" class="text-btn compact-action meal-collapse" data-collapse-meal="${key}">收起</button><button type="button" class="text-btn danger compact-action meal-clear" data-clear-meal="${key}">清空本餐记录</button></div>` : ''}
   </section>`
 }
 
@@ -1259,16 +1271,19 @@ async function renderFoodPage(): Promise<void> {
   const requestedDate = foodDate
   const requestVersion = ++foodContentVersion
   const view = document.querySelector<HTMLElement>('#view')!
-  const [logs, target, dietEvents] = await Promise.all([
+  const [logs, target, dietEvents, dayWeights] = await Promise.all([
     db.foodLogs.where('date').equals(requestedDate).sortBy('createdAt'),
     db.nutritionTargets.where('date').equals(requestedDate).first(),
     db.dietEvents.where('date').equals(requestedDate).sortBy('createdAt'),
+    db.weights.where('date').equals(requestedDate).toArray(),
   ])
   if (activeTab !== 'food' || !view.isConnected || !isCurrentFoodRender(requestVersion, foodContentVersion, requestedDate, foodDate)) return
   const totals = logs.reduce((sum, log) => ({
     calories: sum.calories + log.totalCalories,
     protein: sum.protein + (log.totalProtein ?? 0), carbs: sum.carbs + (log.totalCarbs ?? 0), fat: sum.fat + (log.totalFat ?? 0),
   }), { calories: 0, protein: 0, carbs: 0, fat: 0 })
+  const dayWeight = latestValidDayWeight(dayWeights, requestedDate)
+  const perKg = (key: 'protein' | 'carbs' | 'fat') => macroPerKg(totals[key], dayWeight, logs.every(log => log[({ protein: 'totalProtein', carbs: 'totalCarbs', fat: 'totalFat' } as const)[key]] !== undefined))
   const hasMacros = logs.some((log) => log.totalProtein !== undefined || log.totalCarbs !== undefined || log.totalFat !== undefined) || Boolean(target)
   const isToday = requestedDate === getLocalDateString()
   const previous = new Map<string, PreviousRingValue>()
@@ -1281,7 +1296,7 @@ async function renderFoodPage(): Promise<void> {
   const completionStrip = target ? foodCompletionStripHtml(requestedDate, getNutritionCompletionSummary(target, logs)) : ''
   const expandedMeals = new Set(Array.from(view.querySelectorAll<HTMLButtonElement>('.food-content-body[data-food-date="' + requestedDate + '"] [data-toggle-meal][aria-expanded="true"]'), button => button.dataset.toggleMeal))
   const slotHtml = `<div class="food-content-body" data-food-date="${requestedDate}">
-    <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 16)}</button></div><div class="food-calorie-row">${calorieGaugeHtml(totals.calories, calorieTarget, 'food', previous.get('calories'))}</div><div class="macros nutrition-tiles ${hasMacros ? '' : 'is-empty'}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'))}</div>${target?.strategySelection ? `<p class="strategy-food-source">${esc(target.strategySelection.templateName)} · ${esc(target.strategySelection.variantName)}</p>` : ''}${completionStrip}</section>
+    <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">热量</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 16)}</button></div><div class="food-calorie-row">${calorieGaugeHtml(totals.calories, calorieTarget, 'food', previous.get('calories'))}</div><div class="macros nutrition-tiles ${hasMacros ? '' : 'is-empty'}" style="${nutritionTileStyle(totals,target)}">${nutritionMetricHtml('protein', '蛋白质', totals.protein, target?.protein, previous.get('protein'), perKg('protein'))}${nutritionMetricHtml('carbs', '碳水', totals.carbs, target?.carbs, previous.get('carbs'), perKg('carbs'))}${nutritionMetricHtml('fat', '脂肪', totals.fat, target?.fat, previous.get('fat'), perKg('fat'))}</div>${target?.strategySelection ? `<p class="strategy-food-source">${esc(target.strategySelection.templateName)} · ${esc(target.strategySelection.variantName)}</p>` : ''}${completionStrip}</section>
     ${dietEventsHtml(dietEvents, esc)}
     <section class="food-meals-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '按餐次记录，更清楚'}</span></div>${logs.length ? '<button class="food-save-template" id="save-day-diet-template" type="button" aria-label="将当天饮食保存为模板">保存为模板</button>' : ''}</section>
     <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday, expandedMeals.has(group.meal ?? 'unclassified'))).join('')}</div></div>`
@@ -1321,11 +1336,13 @@ function bindFoodHeader(): void {
 }
 
 function bindFoodContent(slot: HTMLElement, target: NutritionTarget | undefined, logs: FoodLog[]): void {
-  slot.querySelector('#food-completion-open')?.addEventListener('click', () => void showNutritionCompletion(slot.dataset.foodDate!))
+  slot.querySelector<HTMLButtonElement>('#food-completion-open')?.addEventListener('click', async event => { const button=event.currentTarget as HTMLButtonElement;if(button.disabled)return;button.disabled=true;button.setAttribute('aria-busy','true');try{await showNutritionCompletion(slot.dataset.foodDate!)}catch(error){fail(error)}finally{button.disabled=false;button.removeAttribute('aria-busy')} })
   slot.querySelector('#save-day-diet-template')?.addEventListener('click', () => void saveDayAsDietTemplate(logs))
   slot.querySelector('[data-edit-nutrition-target]')?.addEventListener('click', () => showNutritionTargetForm(foodDate, target))
   slot.querySelectorAll<HTMLButtonElement>('[data-add-meal]').forEach((button) => button.addEventListener('click', () => { const meal = button.dataset.addMeal; if (isMealType(meal)) void showAddFoodLog(meal) }))
-  slot.querySelectorAll<HTMLButtonElement>('[data-toggle-meal]').forEach((button) => button.addEventListener('click', () => { const list = button.closest('.food-meal')?.querySelector<HTMLElement>('.meal-log-list'); if (!list) return; list.hidden = !list.hidden; button.setAttribute('aria-expanded', String(!list.hidden)) }))
+  const setMealExpanded = (section: Element, expanded: boolean) => { const list=section.querySelector<HTMLElement>('.meal-log-list');if(!list)return;list.hidden=!expanded;section.querySelectorAll('[data-toggle-meal]').forEach(b=>b.setAttribute('aria-expanded',String(expanded))) }
+  slot.querySelectorAll<HTMLButtonElement>('[data-toggle-meal]').forEach(button=>button.addEventListener('click',()=>{const section=button.closest('.food-meal')!;setMealExpanded(section,Boolean(section.querySelector<HTMLElement>('.meal-log-list')!.hidden))}))
+  slot.querySelectorAll<HTMLButtonElement>('[data-collapse-meal]').forEach(button=>button.addEventListener('click',()=>{const section=button.closest('.food-meal')!;setMealExpanded(section,false);section.querySelector<HTMLButtonElement>('.food-meal-summary')?.focus({preventScroll:true})}))
   slot.querySelectorAll<HTMLButtonElement>('[data-clear-meal]').forEach(button => button.addEventListener('click', async () => {
     const date = slot.dataset.foodDate!, meal = isMealType(button.dataset.clearMeal) ? button.dataset.clearMeal : undefined
     const name = meal ? mealNames[meal] : '未分类', selected = logs.filter(log => meal === undefined ? !isMealType(log.meal) : log.meal === meal)
@@ -1350,8 +1367,8 @@ function bindFoodContent(slot: HTMLElement, target: NutritionTarget | undefined,
 }
 
 function foodCompletionStripHtml(date: string, summary: NutritionCompletionSummary): string {
-  const metrics = completionKeys.filter((key) => summary.target[key] !== undefined).map((key) => `${completionLabels[key]}${completionGapText(summary, key)}`).join(' · ')
-  return `<div class="food-completion-strip"><div class="food-completion-summary"><strong>剩余目标</strong><p>${esc(metrics)}</p>${summary.nothingToComplete ? `<span>${summary.uncertainKeys.length ? '可确定的目标暂无需要补齐的部分' : '当前没有需要补齐的目标'}</span>` : ''}</div>${summary.nothingToComplete ? '' : `<button type="button" class="secondary" id="food-completion-open">${completionDateLabel(date, getLocalDateString(), true)}</button>`}</div>`
+  const metrics = completionKeys.filter((key) => summary.target[key] !== undefined).map((key) => `<span>${esc(completionLabels[key] + completionGapText(summary, key))}</span>`).join('')
+  return `<div class="food-completion-strip"><div class="food-completion-summary"><strong>剩余目标</strong><p>${metrics}</p>${summary.nothingToComplete ? `<span>${summary.uncertainKeys.length ? '可确定的目标暂无需要补齐的部分' : '当前没有需要补齐的目标'}</span>` : ''}</div>${summary.nothingToComplete ? '' : `<button type="button" class="primary" id="food-completion-open">${completionDateLabel(date, getLocalDateString(), true)}</button>`}</div>`
 }
 
 async function showNutritionCompletion(date: string): Promise<void> {
@@ -2381,7 +2398,9 @@ async function renderWeightPage(withProgressTabs = false): Promise<void> {
   if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
   const heroLabel = isToday ? heroWeight === latest && !selectedWeight ? '最新体重' : '今日体重' : `${formatShortDate(weightDate)} 体重`
   const changeText = isToday && heroWeight ? `<span class="weight-change">${delta === undefined ? '记录更多数据后显示 30 天变化' : `${delta > 0 ? '+' : ''}${formatNumber(delta)} kg · 30天`}</span>` : ''
-  const retainedTabs = setTabbedViewHtml(view, `${withProgressTabs ? progressTabsHtml() : ''}<section class="weight-hero"><p>${heroWeight ? heroLabel : '体重记录'}</p>${heroWeight ? `<div class="hero-number"><strong>${formatNumber(heroWeight.weightKg)}</strong><span>kg</span></div>${changeText}` : `<div class="empty-inline">这一天还没有体重记录</div>`}<button class="primary record-weight" id="record-weight">${icon(selectedWeight ? 'edit' : 'plus', 18)} ${selectedWeight ? '修改体重' : '记录体重'}</button></section><section class="chart-card"><div class="section-head"><div><h2>体重趋势</h2><span>${weightRange === 'all' ? '全部记录' : `最近 ${weightRange} 天`}</span></div></div>${chartWeights.length > 1 ? '<div class="chart-wrap"><canvas id="weight-chart"></canvas></div>' : `<div class="trend-placeholder"><span class="empty-icon">${icon('activity', 23)}</span><p>${chartWeights.length === 1 ? '再记录一次体重后即可查看趋势' : '记录体重后会显示趋势图'}</p></div>`}<div class="segmented" aria-label="体重图表范围"><button data-range="30" class="${weightRange === '30' ? 'active' : ''}">30天</button><button data-range="90" class="${weightRange === '90' ? 'active' : ''}">90天</button><button data-range="all" class="${weightRange === 'all' ? 'active' : ''}">全部</button></div></section><section class="section-head"><div><h2>历史记录</h2><span>${weights.length} 条</span></div></section><div class="weight-list">${weights.map((item) => `<article class="weight-row"><button data-edit-weight="${item.id}"><span>${formatShortDate(item.date)}</span><strong>${formatNumber(item.weightKg)} <small>kg</small></strong></button><button class="icon-btn row-delete" data-delete-weight="${item.id}" aria-label="删除 ${formatShortDate(item.date)} 的体重">${icon('trash', 18)}</button></article>`).join('') || `<div class="empty minimal"><div class="empty-icon">${icon('scale', 24)}</div><h3>还没有体重记录</h3><p>记录第一次体重，开始观察长期趋势。</p></div>`}</div>`)
+  const retainedTabs = setTabbedViewHtml(view, `${withProgressTabs ? progressTabsHtml() + '<h2 class="trend-domain-heading">身体趋势</h2>' : ''}<section class="weight-hero"><p>${heroWeight ? heroLabel : '体重记录'}</p>${heroWeight ? `<div class="hero-number"><strong>${formatNumber(heroWeight.weightKg)}</strong><span>kg</span></div>${changeText}` : `<div class="empty-inline">这一天还没有体重记录</div>`}<button class="primary record-weight" id="record-weight">${icon(selectedWeight ? 'edit' : 'plus', 18)} ${selectedWeight ? '修改体重' : '记录体重'}</button></section><section class="chart-card"><div class="section-head"><div><h2>体重趋势</h2><span>${weightRange === 'all' ? '全部记录' : `最近 ${weightRange} 天`}</span></div></div>${chartWeights.length > 1 ? '<div class="chart-wrap"><canvas id="weight-chart"></canvas></div>' : `<div class="trend-placeholder"><span class="empty-icon">${icon('activity', 23)}</span><p>${chartWeights.length === 1 ? '再记录一次体重后即可查看趋势' : '记录体重后会显示趋势图'}</p></div>`}<div class="segmented" aria-label="体重图表范围"><button data-range="30" class="${weightRange === '30' ? 'active' : ''}">30天</button><button data-range="90" class="${weightRange === '90' ? 'active' : ''}">90天</button><button data-range="all" class="${weightRange === 'all' ? 'active' : ''}">全部</button></div></section>${withProgressTabs ? recoverySlotHtml() : ''}<section class="section-head"><div><h2>历史记录</h2><span>${weights.length} 条</span></div></section><div class="weight-list">${weights.map((item) => `<article class="weight-row"><button data-edit-weight="${item.id}"><span>${formatShortDate(item.date)}</span><strong>${formatNumber(item.weightKg)} <small>kg</small></strong></button><button class="icon-btn row-delete" data-delete-weight="${item.id}" aria-label="删除 ${formatShortDate(item.date)} 的体重">${icon('trash', 18)}</button></article>`).join('') || `<div class="empty minimal"><div class="empty-icon">${icon('scale', 24)}</div><h3>还没有体重记录</h3><p>记录第一次体重，开始观察长期趋势。</p></div>`}</div>`)
+  recoveryDispose?.(); recoveryDispose = undefined
+  if (withProgressTabs) recoveryDispose = mountRecovery(view.querySelector('[data-recovery-root]')!, recoveryUi(), true)
   if (withProgressTabs && !retainedTabs) bindProgressTabs(view)
   view.querySelector('#record-weight')?.addEventListener('click', () => showWeightForm(weightDate, selectedWeight?.weightKg))
   view.querySelectorAll<HTMLButtonElement>('[data-range]').forEach((button) => button.addEventListener('click', () => {
@@ -2428,7 +2447,7 @@ async function showSettings(surface?: ManagedSurfaceContext): Promise<void> {
 }
 
 function showRestorePreview(backup: ValidatedBackup, surface?: ManagedSurfaceContext): void {
-  const counts = [{ label: '特殊饮食', count: backup.data.dietEvents.length }, { label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '力量训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }, { label: '训练模板', count: backup.data.workoutTemplates.length }, { label: '饮食模板', count: backup.data.dietTemplates.length }, { label: '营养目标', count: backup.data.nutritionTargets.length }, { label: '凯格尔训练', count: backup.data.pelvicFloorSessions.length }, { label: '有氧训练', count: backup.data.cardioSessions.length }, { label: '习惯', count: backup.data.habits.length }, { label: '习惯打卡', count: backup.data.habitCheckIns.length }, { label: '任务', count: backup.data.tasks.length }, { label: '标签', count: backup.data.taskTags.length }, { label: '营养模板', count: backup.data.nutritionStrategyTemplates.length }, { label: '营养日方案', count: backup.data.nutritionStrategyVariants.length }, { label: '营养阶段', count: backup.data.nutritionStrategyPhases.length }]
+  const counts = [{ label: '睡眠', count: backup.data.sleepSessions.length }, { label: '饮水', count: backup.data.waterLogs.length }, { label: '特殊饮食', count: backup.data.dietEvents.length }, { label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '力量训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }, { label: '训练模板', count: backup.data.workoutTemplates.length }, { label: '饮食模板', count: backup.data.dietTemplates.length }, { label: '营养目标', count: backup.data.nutritionTargets.length }, { label: '凯格尔训练', count: backup.data.pelvicFloorSessions.length }, { label: '有氧训练', count: backup.data.cardioSessions.length }, { label: '习惯', count: backup.data.habits.length }, { label: '习惯打卡', count: backup.data.habitCheckIns.length }, { label: '任务', count: backup.data.tasks.length }, { label: '标签', count: backup.data.taskTags.length }, { label: '营养模板', count: backup.data.nutritionStrategyTemplates.length }, { label: '营养日方案', count: backup.data.nutritionStrategyVariants.length }, { label: '营养阶段', count: backup.data.nutritionStrategyPhases.length }]
   if (surface && !surface.alive) return
   const dialog = mountManagementModal(surface, '确认恢复备份', `<div class="restore-counts">${counts.map((item) => `<p><span>${item.label}</span><strong>${item.count}</strong></p>`).join('')}</div><div class="warning">恢复将清除当前所有数据，并替换为该备份。</div><button class="danger-button full-btn" id="confirm-restore">继续恢复</button>`)
   dialog.querySelector('#confirm-restore')?.addEventListener('click', async () => { if (!await confirmAction('覆盖当前全部数据？', '恢复会清除当前数据并替换为备份内容，此操作无法撤销。', '恢复备份')) return; try { await restoreBackup(backup); surface ? surface.close() : dialog.close(); currentWorkout = undefined; workoutEditorOpen = false; toast('恢复完成'); await render() } catch (error) { fail(error) } })

@@ -47,7 +47,7 @@ describe('reviewed food packaging writes', () => {
   })
   it('exports only ordinary V7 Food/FoodLog values, retains all 14 stores and restores snapshots unchanged', async () => {
     const database = setup(); const result = await new FoodVisionWrite(input, actual, database).confirm()
-    const backup = await exportBackup(database); expect(backup.schemaVersion).toBe(10); expect(database.verno).toBe(10); expect(Object.keys(backup.data)).toHaveLength(18)
+    const backup = await exportBackup(database); expect(backup.schemaVersion).toBe(11); expect(database.verno).toBe(11); expect(Object.keys(backup.data)).toHaveLength(20)
     expect(JSON.stringify(backup)).not.toMatch(/data:image|evidence|food-label|visionCapability|apiKey|extraction/)
     const target = setup(); await restoreBackup(backup, target)
     expect(await target.foodLogs.get(result.log!.id)).toEqual(result.log); expect(await target.foods.get(result.food.id)).toEqual(result.food)

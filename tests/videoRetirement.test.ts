@@ -47,7 +47,7 @@ describe('retired external search boundary', () => {
     expect(JSON.parse(await env.registry.execute(aiCall('search_training_videos', { query: '深蹲' }))).error).toBe('unknown_tool')
     expect(await snapshot()).toBe(before)
     const afterBackup = await exportBackup(env.database)
-    expect(afterBackup.data).toEqual(beforeBackup.data); expect(afterBackup.schemaVersion).toBe(10); expect(canonicalSyncData(afterBackup.data)).toBe(beforeSync)
+    expect(afterBackup.data).toEqual(beforeBackup.data); expect(afterBackup.schemaVersion).toBe(11); expect(canonicalSyncData(afterBackup.data)).toBe(beforeSync)
     // Backup and Sync serialize these same business rows; neither may import device cleanup.
     for (const file of ['src/services/backupService.ts', 'src/services/githubSyncService.ts']) expect(readFileSync(file, 'utf8')).not.toContain('retiredVideoStorage')
   })
