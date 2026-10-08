@@ -1,10 +1,10 @@
 /* Shared factual recovery cards; controls reuse primary/secondary primitives. */
 .recovery-section { min-width: 0; margin-top: var(--section-gap); }
 .recovery-section > h2, .trend-domain-heading { margin-bottom: var(--field-gap); font-size: 1.08rem; }
-[data-recovery-root] { display: grid; gap: var(--field-gap); min-width: 0; }
+[data-recovery-root] { display: grid; gap: var(--today-card-gap,var(--field-gap)); min-width: 0; }
 .recovery-card { min-width: 0; margin: 0; }
 .recovery-card .card-heading { flex-wrap: wrap; gap: 8px; }
-.recovery-card h3, .recovery-trend h3 { margin: 0; font-size: .98rem; }
+.recovery-trend h3 { margin: 0; font-size: .98rem; }
 .recovery-copy { display: grid; gap: 8px; margin: 12px 0; color: var(--text-secondary); font-size: .85rem; }
 .recovery-copy > strong { color: var(--text-primary); font-size: 1rem; }
 .recovery-number { white-space: nowrap; font-variant-numeric: tabular-nums; font-size: .85rem; }
@@ -76,3 +76,24 @@
 /* Undo occupies normal card flow so it never floats over another action. */
 .water-undo { position: static; transform: none; animation: none; width: max-content; max-width: 100%; margin-top: 12px; flex-wrap: wrap; box-shadow: none; }
 .water-undo > span { white-space: nowrap; }
+
+/* Recovery joins Today activity primitives; this file owns only domain details. */
+.recovery-section { margin-top: 0; }
+.recovery-icon { background: var(--surface-soft); color: var(--accent-strong); }
+.recovery-card .water-total { margin: 0; }
+.recovery-card .water-total .recovery-number { font-size: inherit; }
+.water-actions { margin-top: 0; }
+.recovery-ranges { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); width: min(100%,18rem); }
+.recovery-ranges button { min-width: 0; min-height: 44px; }
+.recovery-chart-scroll { min-width: 0; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+.recovery-chart-long .sleep-bars { min-width: 2160px; }
+.recovery-chart-long .sleep-bar-column { min-width: 21px; }
+.recovery-chart-long .sleep-bar-column small { visibility: visible; }
+@media (max-width: 24rem) {
+  .recovery-card .today-activity-body { display: flex; flex-wrap: wrap; }
+  .recovery-card .today-activity-copy { flex: 1 1 9rem; }
+  .recovery-card .today-activity-body > button { flex: 0 0 auto; }
+}
+
+.ai-catalog-details > summary { min-height: 44px; padding-block: 12px; color: var(--accent-strong); }
+.recovery-trend { min-width: 0; max-width: 100%; }

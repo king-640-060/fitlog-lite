@@ -573,7 +573,7 @@ html[data-input-modality="keyboard"] .calendar-day-danger .danger-button:focus-v
 /* Today activity hierarchy */
 .today-card { display: grid; gap: var(--card-gap); padding: 14px var(--card-padding); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface);  }
 .today-card .full-btn { min-height: 46px; }
-.today-dashboard { gap: 10px !important; }
+.today-dashboard { --today-card-gap: 10px; gap: var(--today-card-gap) !important; }
 .today-dashboard .nutrition-today-card { gap: 12px; padding: 15px 16px 13px; border-color: var(--border); border-radius: var(--radius-md);  }
 .today-dashboard .nutrition-today-card .card-heading h2 { font-size: 1.1rem; }
 .today-dashboard .workout-today-card, .today-dashboard .weight-today-card { gap: 8px; padding: 12px 14px;  }
@@ -590,7 +590,8 @@ html[data-input-modality="keyboard"] .calendar-day-danger .danger-button:focus-v
 .today-activity-copy { display: grid; min-width: 0; gap: 3px; }
 .today-activity-status { color: var(--text-primary); font-size: .97rem; font-weight: 700; }
 .today-activity-meta { color: var(--text-secondary); font-size: .75rem; line-height: 1.35; }
-.today-dashboard .today-activity-action { min-height: 44px; padding: 0 11px; border: 0; border-radius: 12px; background: var(--accent-soft); color: var(--accent-strong); font-size: .78rem; font-weight: 700; white-space: nowrap; }
+.today-activity-card .today-activity-action { min-height: 44px; padding: 0 11px; border: 0; border-radius: 12px; font-size: .78rem; font-weight: 700; white-space: nowrap; }
+.today-activity-card .today-activity-action:not(.primary) { background: var(--accent-soft); color: var(--accent-strong); }
 .today-dashboard .pelvic-today-card .pelvic-icon { background: #ecefe1; color: #727e48; }
 .today-dashboard .today-habits-card .habit-icon { background: var(--surface-soft); color: var(--accent-strong); }
 .today-habit-list { display: grid; border-top: 1px solid var(--divider); }

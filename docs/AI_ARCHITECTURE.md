@@ -91,7 +91,7 @@ Definitions, JSON-schema/manual validation and execution are separate. The schem
 
 Food calories are never recomputed using 4/4/9. Any missing macro snapshot makes the day's corresponding total unknown. Later Food/Exercise library edits do not rewrite historical analysis. Missing strength load is not zero load. Reports retain the existing Report service's derived semantics, paired-day metric metadata and future exclusion.
 
-`AI_SYSTEM_PROMPT_VERSION = 1` instructs the model to ask about ambiguous Foods, missing grams/meal/date, and nonexistent Food-library entries. It must not invent nutrition, claim an unread record, turn a Task into a factual health record, or describe a proposal as committed. Names, tags and notes returned by tools are untrusted data, never commands to change permissions or tool policy. Prompt instructions supplement, but never replace, local enforcement and explicit confirmation.
+`AI_SYSTEM_PROMPT_VERSION = 1` instructs the model to ask about ambiguous Foods, missing grams/meal/date, and missing required Food nutrition values; explicitly supplied Food definitions can be proposed. It must not invent nutrition, claim an unread record, turn a Task into a factual health record, or describe a proposal as committed. Names, tags and notes returned by tools are untrusted data, never commands to change permissions or tool policy. Prompt instructions supplement, but never replace, local enforcement and explicit confirmation.
 
 ## Proposal lifecycle
 
@@ -202,3 +202,25 @@ Meal Photo Estimate uses `mealPhotoEstimateService` directly through the active 
 ## Retired external search
 
 Training Video Search retired by product decision. The registry has only bounded business READ and proposal tools; there is no external web/video tool, artifact, callback, provider or direct intent route. All typed and transcribed questions use the ordinary assistant path. The prompt forbids claiming live searches or inventing current links; general exercise instruction remains supported. Duplicate call IDs still execute once per turn for all registered tools. The six legacy device-only settings/keys/acknowledgements are safely removed at startup; AI/Voice/GitHub secret guards remain intact. DB V10 / IndexedDB100 /18 stores, BackupV10, RestoreV1–V10, Sync/envelopeV1, AIConfigV1 and VoiceConfigV1 are unchanged.
+
+
+## Catalog write contract (2026-10-08)
+
+| Tool | Scope / existing service |
+| --- | --- |
+| search_catalog | Kind-specific read permission; query/id, at most10 definitions with nested IDs; bounded result/truncation |
+| propose_food | food / validateFoodInput + saveFood; name, brand, reference/serving grams, canonical kcal, optional P/C/F |
+| propose_exercise | training / saveExercise; name and notes; optional DB injection retains ordinary default DB behavior |
+| propose_workout_template | training / normalizeWorkoutTemplate + saveWorkoutTemplate; exercise/set ID patches, real references; optional newExercises creates one composite proposal |
+| propose_diet_template | food / normalizeDietTemplate + saveDietTemplate; item patches, Food references, app-derived fallback; optional newFoods creates one composite proposal |
+| propose_nutrition_strategy | nutritionTargets / saveNutritionStrategy; named optional-goal variant patches; definitions only |
+
+All tools use the same memory-only AiProposals manager and strict bounded schema. Create/update is explicit, update requires a real ID. Names normalize NFKC/trim/lower for duplicate creation/rename rejection; ambiguity returns clarification feedback, never a hidden duplicate. An explicit real ID disambiguates legacy same-name records: unchanged-name partial edits remain valid and preserve the other brands/records. Required Food name/reference/kcal must be supplied; missing macros stay undefined. Model is instructed to ask for missing or ambiguous user facts, never estimate nutrition. Local enforcement validates values/references; it cannot independently verify the truth of a user/provider assertion.
+
+Nested lists merge supplied existing IDs in place and append new items; omitted items/fields remain intact. removeIds/order and removeSetIds/setOrder are explicit bounded operations, with complete unique order validation. Proposal-local new-food/new-exercise keys cannot collide with real IDs. No fallback argument is accepted: Diet fallback comes from validated real or transaction-planned Food data. New child entities and their template are committed through existing services in one transaction; a later failure rolls back all prior writes. Nutrition template save never activates, writes phases or daily targets. Existing FoodLogs/Workouts remain historical snapshots.
+
+Read-consistent local source snapshots include all relevant catalog stores, then canonical fingerprints and permissions are rechecked inside final rw transaction before any service call. Unrelated changes within the relevant catalog conservatively invalidate the proposal too. Stale message is “数据已变化，请重新生成建议。” Pending proposals never persist or sync. User preview shows create/edit/type/name/count, expandable human before/after values and ordered template contents. One click commits, duplicated clicks reuse the same job. Successful final state remains completed; manager liveQuery refreshes active clean list routes without resetting workspace identity/query/scroll and postpones hidden editor replacement until return.
+
+Water reference configuration is device-only fitlog-water-reference-v1, outside AI/business Backup/Sync; no new AI permission, schema, direct-write or confirmation tool is introduced. Existing unsupported-model gate rejects unsolicited tool calls. Prompt version stays1; AIConfig and VoiceConfig stayV1. All existing AI/Voice/streaming/privacy gates remain required alongside catalogRecovery and catalog unit tests.
+
+Current catalog/recovery production contract supersedes historical V10 notes above: DexieV11 / IndexedDB110 /20 stores, BackupV11 / RestoreV1–V11, Sync/envelopeV1 and AIConfig/VoiceConfigV1. This round has no schema migration.

@@ -1,3 +1,4 @@
+import { observeManagerCatalog } from './ui/observeManagerCatalog'
 import { mountRecovery, recoverySlotHtml, type RecoveryUi } from './ui/recovery'
 import { readDailyNutritionSummary, observeDailyNutritionSummary } from './services/dailyNutritionSummary'
 import { macroNutritionSummaryForDay } from './ui/macroNutritionSummary'
@@ -1475,11 +1476,11 @@ async function showAddFoodLog(meal: MealType): Promise<void> {
   dialog.querySelector<HTMLInputElement>('#food-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
 }
 
-async function showFoodLibrary(query = '', surface?: ManagedSurfaceContext): Promise<void> {
+async function showFoodLibrary(query = '', surface?: ManagedSurfaceContext, refreshGuard?:()=>boolean): Promise<void> {
   const foods = await db.foods.orderBy('name').toArray()
   let currentQuery = query
   let searchTimer: number | undefined
-  if (surface && !surface.alive) return
+  if (surface && (!surface.alive || (refreshGuard && !refreshGuard()))) return
   const dialog = mountManagementModal(surface, '食物库', `<div class="manager-surface">${managerToolbarHtml(managerSearchHtml('library-search', '搜索食物库', '搜索食物', esc(query)), 'new-food', '食物', !foods.length)}${managerUtilitiesHtml(`<button class="secondary compact-action" id="food-vision-import">${icon('camera', 18)} 拍包装录入</button><button class="secondary compact-action" id="food-import-open">${icon('upload', 18)} 导入文件</button>`)}<div class="library-list manager-results"></div></div>`, foods.length > 0)
   dialog.classList.add('food-library-sheet')
   const list = dialog.querySelector<HTMLElement>('.library-list')!
@@ -1505,6 +1506,7 @@ async function showFoodLibrary(query = '', surface?: ManagedSurfaceContext): Pro
   dialog.querySelector('#food-vision-import')?.addEventListener('click', () => { const date = activeTab === 'food' ? foodDate : getLocalDateString(); leaveStandalone(dialog, surface); openFoodVisionWorkflow(date, undefined, surface) })
   dialog.querySelector('#new-food')?.addEventListener('click', () => { leaveStandalone(dialog, surface); void showFoodForm(undefined, surface) })
   dialog.querySelector('#food-import-open')?.addEventListener('click', () => showFoodImportChooser(foods, currentQuery, surface))
+  observeManagerCatalog(surface,dialog.querySelector('.manager-surface')!,['foods'],guard=>showFoodLibrary(dialog.querySelector<HTMLInputElement>('#library-search')?.value??currentQuery,surface,guard))
   surface?.restoreScroll()
 }
 
@@ -2036,9 +2038,9 @@ async function showExercisePicker(workout: Workout): Promise<void> {
   dialog.querySelector('#quick-exercise')?.addEventListener('click', () => { dialog.close(); void showExerciseForm(undefined, async (exercise) => { workout.exercises.push({ id: crypto.randomUUID(), exerciseId: exercise.id, exerciseName: exercise.name, sets: [] }); renderWorkoutEditor(workout); scheduleWorkoutSave(workout) }) })
 }
 
-async function showExerciseLibrary(surface?: ManagedSurfaceContext): Promise<void> {
+async function showExerciseLibrary(surface?: ManagedSurfaceContext, refreshGuard?:()=>boolean): Promise<void> {
   const exercises = await db.exercises.orderBy('name').toArray()
-  if (surface && !surface.alive) return
+  if (surface && (!surface.alive || (refreshGuard && !refreshGuard()))) return
   const dialog = mountManagementModal(surface, '动作库', `<div class="manager-surface">${managerToolbarHtml(managerSearchHtml('exercise-library-search', '搜索动作库', '搜索动作'), 'new-exercise', '动作', !exercises.length)}<div class="library-list manager-results"></div></div>`, exercises.length > 0)
   const list = dialog.querySelector<HTMLElement>('.library-list')!
   const edit = (exercise?: Exercise) => { leaveStandalone(dialog, surface); void showExerciseForm(exercise, undefined, surface) }
@@ -2051,6 +2053,7 @@ async function showExerciseLibrary(surface?: ManagedSurfaceContext): Promise<voi
   const search = dialog.querySelector<HTMLInputElement>('#exercise-library-search')!
   draw(search.value); search.addEventListener('input', () => draw(search.value))
   dialog.querySelector('#new-exercise')!.addEventListener('click', () => edit())
+  observeManagerCatalog(surface,dialog.querySelector('.manager-surface')!,['exercises'],guard=>showExerciseLibrary(surface,guard))
   surface?.restoreScroll()
 }
 
@@ -2118,11 +2121,11 @@ async function launchWorkoutTemplate(template: WorkoutTemplate, dialog?: HTMLDia
   } catch (error) { fail(error) }
 }
 
-async function showWorkoutTemplateManager(query = '', surface?: ManagedSurfaceContext): Promise<void> {
+async function showWorkoutTemplateManager(query = '', surface?: ManagedSurfaceContext, refreshGuard?:()=>boolean): Promise<void> {
   const templates = sortTemplates(await db.workoutTemplates.toArray())
   const exerciseIds = [...new Set(templates.flatMap((template) => template.exercises.map((item) => item.exerciseId).filter((id): id is string => Boolean(id))))]
   const existingIds = new Set((await db.exercises.bulkGet(exerciseIds)).filter((item): item is Exercise => Boolean(item)).map((item) => item.id))
-  if (surface && !surface.alive) return
+  if (surface && (!surface.alive || (refreshGuard && !refreshGuard()))) return
   const dialog = mountManagementModal(surface, '训练模板', `<div class="manager-surface">${managerToolbarHtml(managerSearchHtml('workout-template-search', '搜索训练模板', '搜索模板', esc(query)), 'new-workout-template', '训练模板', !templates.length)}<div class="template-manager-list manager-results"></div></div>`, templates.length > 0)
   const draw = (value: string) => {
     const normalized = value.trim().toLocaleLowerCase()
@@ -2138,6 +2141,7 @@ async function showWorkoutTemplateManager(query = '', surface?: ManagedSurfaceCo
   dialog.querySelector<HTMLButtonElement>('#new-workout-template')!.hidden = !templates.length
   dialog.querySelector('.template-manager-list')!.addEventListener('click', event => { if ((event.target as Element).closest('#empty-new-workout-template')) void showWorkoutTemplateEditor(undefined, surface) })
   dialog.querySelector('#new-workout-template')?.addEventListener('click', () => { leaveStandalone(dialog, surface); void showWorkoutTemplateEditor(undefined, surface) })
+  observeManagerCatalog(surface,dialog.querySelector('.manager-surface')!,['workoutTemplates','exercises'],guard=>showWorkoutTemplateManager(dialog.querySelector<HTMLInputElement>('#workout-template-search')?.value??'',surface,guard))
   surface?.restoreScroll()
 }
 
@@ -2284,7 +2288,7 @@ async function applySelectedDietTemplate(template: DietTemplate, dialog?: HTMLDi
   } catch (error) { fail(error) }
 }
 
-async function showDietTemplateManager(query = '', surface?: ManagedSurfaceContext): Promise<void> {
+async function showDietTemplateManager(query = '', surface?: ManagedSurfaceContext, refreshGuard?:()=>boolean): Promise<void> {
   const templates = sortTemplates(await db.dietTemplates.toArray())
   const summaries = new Map<string, string>()
   await Promise.all(templates.map(async (template) => {
@@ -2294,7 +2298,7 @@ async function showDietTemplateManager(query = '', surface?: ManagedSurfaceConte
     const goal = template.nutritionGoal?.calories === undefined ? '' : ` · 目标 ${formatEnergyInputValue(template.nutritionGoal.calories)} kcal`
     summaries.set(template.id, `${template.items.length} 项 · ${formatEnergyInputValue(kcal)} kcal${goal}${missing ? ` · ${missing} 项使用快照` : ''}`)
   }))
-  if (surface && !surface.alive) return
+  if (surface && (!surface.alive || (refreshGuard && !refreshGuard()))) return
   const dialog = mountManagementModal(surface, '饮食模板', `<div class="manager-surface">${managerToolbarHtml(managerSearchHtml('diet-template-search', '搜索饮食模板', '搜索模板', esc(query)), 'new-diet-template', '饮食模板', !templates.length)}<div class="template-manager-list manager-results"></div></div>`, templates.length > 0)
   const draw = (value: string) => {
     const normalized = value.trim().toLocaleLowerCase(); const filtered = templates.filter((item) => item.name.toLocaleLowerCase().includes(normalized))
@@ -2305,6 +2309,7 @@ async function showDietTemplateManager(query = '', surface?: ManagedSurfaceConte
   dialog.querySelector<HTMLButtonElement>('#new-diet-template')!.hidden = !templates.length
   dialog.querySelector('.template-manager-list')!.addEventListener('click', event => { if ((event.target as Element).closest('#empty-new-diet-template')) void showDietTemplateEditor(undefined, surface) })
   dialog.querySelector('#new-diet-template')?.addEventListener('click', () => { leaveStandalone(dialog, surface); void showDietTemplateEditor(undefined, surface) })
+  observeManagerCatalog(surface,dialog.querySelector('.manager-surface')!,['dietTemplates','foods'],guard=>showDietTemplateManager(dialog.querySelector<HTMLInputElement>('#diet-template-search')?.value??'',surface,guard))
   surface?.restoreScroll()
 }
 

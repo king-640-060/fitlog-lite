@@ -1,3 +1,4 @@
+import type { CatalogPreview } from '../ai/tools/catalogTools'
 import type { AiProposal } from '../ai/proposals'
 import type { AiUsage, AiProviderProfile } from '../ai/types'
 import { getVisionModel } from '../ai/modelRouting'
@@ -32,6 +33,7 @@ function nutrients(value: Record<string, unknown> = {}): string {
 /** App-calculated fields only; IDs remain transport details, never the product preview. */
 export function aiProposalPreviewLines(proposal: AiProposal): string[] {
   const preview = proposal.preview as Record<string, unknown>, lines: string[] = []
+  if (preview.catalog === true) return (proposal.preview as CatalogPreview).summary
   if (typeof preview.date === 'string') lines.push(preview.date)
   if (typeof preview.meal === 'string') lines.push(mealNames[preview.meal as keyof typeof mealNames] ?? '未分餐')
   if (Array.isArray(preview.items)) for (const item of preview.items as Record<string, unknown>[]) lines.push(`${item.foodName}${item.brand ? ` · ${item.brand}` : ''} · ${formatNumber(Number(item.grams))} g\n${nutrients(item)}`)

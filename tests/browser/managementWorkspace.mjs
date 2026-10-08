@@ -4,11 +4,14 @@ import fs from 'node:fs/promises'
 const {chromium}=await import(process.env.FITLOG_PLAYWRIGHT_MODULE)
 const base=process.env.FITLOG_QA_URL||'http://127.0.0.1:5183/fitlog-lite/',prod=base.includes('github.io'),receipts=[]
 const sizes=process.env.FITLOG_WORKSPACE_SMOKE?[[390,844]]:prod?[[390,844],[430,932]]:[[320,812],[375,812],[390,844],[430,932]]
+const shardWidth=Number(process.env.FITLOG_WORKSPACE_WIDTH||0)
+if(shardWidth&&!sizes.some(([w])=>w===shardWidth))throw new Error('Invalid workspace shard width')
+const shardSizes=shardWidth?sizes.filter(([w])=>w===shardWidth):sizes
 const scales=process.env.FITLOG_WORKSPACE_SMOKE?[100]:[100,120,140],modes=process.env.FITLOG_WORKSPACE_SMOKE?[false]:[false,true]
 const entries=[['food-library','食物库'],['exercise-library','动作库'],['workout-templates','训练模板'],['diet-templates','饮食模板'],['nutrition-strategies','营养模板'],['habits','习惯'],['import','导入数据'],['backup','备份与恢复'],['github-sync','GitHub 同步'],['ai-settings','AI 设置'],['diagnostics','版本诊断'],['about','关于 FitLog Lite']]
 const creates=[['food-library','食物'],['exercise-library','动作'],['workout-templates','训练模板'],['diet-templates','饮食模板'],['nutrition-strategies','营养模板'],['habits','习惯']]
 const browser=await chromium.launch({headless:true,executablePath:process.env.FITLOG_CHROME})
-try{for(const [width,height]of sizes)for(const scale of scales)for(const reduced of modes){
+try{for(const [width,height]of shardSizes)for(const scale of scales)for(const reduced of modes){
  const context=await browser.newContext({viewport:{width,height},isMobile:true,hasTouch:true,timezoneId:'Asia/Shanghai',serviceWorkers:'block',reducedMotion:reduced?'reduce':'no-preference'})
  try{
  const page=await context.newPage(),errors=[],failedRequests=[];page.on('requestfailed',request=>failedRequests.push(request.url()));page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(12000)
@@ -75,4 +78,4 @@ try{for(const [width,height]of sizes)for(const scale of scales)for(const reduced
  await open();await click('#more-import');await check('导入数据');await page.locator('#import-file').setInputFiles({name:'late.json',mimeType:'application/json',buffer:Buffer.from('[]')});await close();await page.evaluate(()=>{finishImportRead();File.prototype.text=originalFileText});await page.waitForTimeout(80);assert.equal(await page.locator('dialog').count(),0)
  assert.deepEqual(errors,[]);const receipt={width,height,scale,reduced,identityChecks,maxPrimary,maxTopDelta,maxHeightDelta,levels:12,sixManagers:true,emptySingleCreate:true,hubScroll,managerScroll,queryRestored:true,saveRefresh:true,newScroll:0,stressRounds:20,habit,residual,closeAtAllDepths:true,listenersBefore,listenersAfter,closedModelRequest:true,closedSyncRequest:true,backAbortsRequests:true,closedFileRead:true,confirmationPreservesParent:true,errors,physicalSafari:'Pending',originalInstalledPwa:'Pending'};receipts.push(receipt);console.log(JSON.stringify(receipt))
  }finally{await context.close()}
-}await fs.writeFile(`/tmp/management-${prod?'prod':'local'}-receipt.json`,JSON.stringify(receipts,null,2))}finally{await browser.close()}
+}await fs.writeFile(`/tmp/management-${prod?'prod':'local'}${shardWidth?'-'+shardWidth:''}-receipt.json`,JSON.stringify(receipts,null,2))}finally{await browser.close()}

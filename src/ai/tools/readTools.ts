@@ -41,7 +41,7 @@ export const readTools: AiTool[] = [
     if (!normalized) throw new AiError('invalid_arguments', '请填写食物搜索词')
     const found = await env.database.foods.filter(food => `${food.name} ${food.brand ?? ''}`.normalize('NFKC').toLocaleLowerCase().includes(normalized)).toArray()
     const sorted = found.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN') || (a.brand ?? '').localeCompare(b.brand ?? '', 'zh-CN') || a.id.localeCompare(b.id))
-    return { count: found.length, truncated: found.length > limit, foods: sorted.slice(0, limit).map(({ id, name, brand, referenceGrams, calories, protein, carbs, fat, updatedAt }) => ({ id, name, brand, referenceGrams, calories, protein, carbs, fat, updatedAt })) }
+    return { count: found.length, truncated: found.length > limit, foods: sorted.slice(0, limit).map(({ id, name, brand, referenceGrams, servingGrams, calories, protein, carbs, fat, updatedAt }) => ({ id, name, brand, referenceGrams, servingGrams, calories, protein, carbs, fat, updatedAt })) }
   }),
   defineTool<{ date: string }>('get_nutrition_day', '读取当日饮食与目标', 'READ', ['food', 'nutritionTargets'], objectSchema({ date: dateSchema }), ({ date }, env) => nutritionDay(date, env)),
   defineTool<RangeArgs>('get_nutrition_range', '读取饮食区间摘要', 'READ', ['food', 'nutritionTargets'], rangeSchema, async ({ start, end }, env) => {

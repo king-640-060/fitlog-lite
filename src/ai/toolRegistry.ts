@@ -1,6 +1,7 @@
 import type { AiToolCall, AiToolDefinition } from './types'
 import type { AiTool, AiToolEnvironment } from './tools/types'
 import { readTools } from './tools/readTools'
+import { catalogTools } from './tools/catalogTools'
 import { proposalTools } from './tools/proposalTools'
 import { validateAiArguments } from './tools/types'
 import { AI_LIMITS, AiError, assertNoKnownSecrets, boundedToolResult } from './security'
@@ -9,7 +10,7 @@ export class AiToolRegistry {
   private readonly tools: Map<string, AiTool>
   private readonly environment: AiToolEnvironment
   private readonly secrets: () => readonly string[]
-  constructor(environment: AiToolEnvironment, secrets: () => readonly string[] = () => [], tools: AiTool[] = [...readTools, ...proposalTools]) { this.environment = environment; this.secrets = secrets; this.tools = new Map(tools.map(tool => [tool.name, tool])) }
+  constructor(environment: AiToolEnvironment, secrets: () => readonly string[] = () => [], tools: AiTool[] = [...readTools, ...proposalTools, ...catalogTools]) { this.environment = environment; this.secrets = secrets; this.tools = new Map(tools.map(tool => [tool.name, tool])) }
   private allowed(tool: AiTool): boolean { const permissions = this.environment.permissions(); return tool.scopes.every(scope => permissions.read[scope]) && (tool.kind === 'READ' || permissions.writeProposals) }
   definitions(): AiToolDefinition[] { return [...this.tools.values()].filter(tool => this.allowed(tool)).map(tool => ({ type: 'function', function: { name: tool.name, description: `${tool.label}。${tool.kind === 'PROPOSAL' ? '只生成待确认建议，绝不直接写入。' : '只读取当前已保存的事实。'}`, parameters: tool.schema as unknown as Record<string, unknown> } })) }
   label(name: string): string { return this.tools.get(name)?.label ?? '处理工具请求' }

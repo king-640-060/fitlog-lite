@@ -2,8 +2,9 @@ import { liveQuery } from 'dexie'
 import { db } from '../db/database'
 import type { SleepSession, WaterLog } from '../db/types'
 import { startSleep, finishSleep, editSleep, deleteSleep, addWater, editWater, deleteWater } from '../services/recoveryService'
-import { formatSleepDuration, localClock, recoverySummary, SLEEP_REFERENCE_MINUTES, WATER_REFERENCE_ML } from '../utils/recovery'
+import { formatSleepDuration, localClock, recoverySummary } from '../utils/recovery'
 import { getLocalDateString, formatShortDate } from '../utils/date'
+import { readWaterReference, saveWaterReference, observeWaterReference } from '../services/waterReferenceConfig'
 import { icon } from './icons'
 import { animateMotion, stabilizeSheetSubview } from './motion'
 import { mountDatePicker } from './datePicker'
@@ -13,17 +14,17 @@ export interface RecoveryUi {
   confirm(title:string,copy:string):Promise<boolean>
   fail(error:unknown):void
 }
-export function recoverySlotHtml():string { return '<section class="recovery-section" aria-label="恢复与习惯"><h2>恢复与习惯</h2><div data-recovery-root></div></section>' }
+export function recoverySlotHtml():string { return '<section class="recovery-section" aria-label="恢复"><div data-recovery-root></div></section>' }
 export function mountRecovery(root:HTMLElement,ui:RecoveryUi,trends=false):()=>void {
-  let days:7|30=7,disposed=false,renderedDate='',sleep:SleepSession[]=[],water:WaterLog[]=[],pending=false
+  let days:7|30|90=7,disposed=false,renderedDate='',sleep:SleepSession[]=[],water:WaterLog[]=[],pending=false
   const redraw=()=>{
     if(disposed||!root.isConnected)return
     const today=getLocalDateString(),active=sleep.find(s=>!s.endTime),finished=sleep.filter(s=>s.recordDate===today&&s.endTime),minutes=finished.reduce((n,s)=>n+s.durationMinutes!,0)
     renderedDate=today
     const activeMinutes=active?Math.max(0,(Date.now()-Date.parse(active.startTime))/60000):0
-    const total=water.filter(w=>w.date===today).reduce((n,w)=>n+w.amountMl,0),percent=Math.round(total/WATER_REFERENCE_ML*100)
+    const total=water.filter(w=>w.date===today).reduce((n,w)=>n+w.amountMl,0),reference=readWaterReference()
     const undo=root.querySelector('.water-undo')
-    root.innerHTML=`<section class="today-card recovery-card sleep-card"><div class="card-heading"><h3>睡眠</h3><button type="button" class="text-btn" data-sleep-history>历史记录</button></div><div class="recovery-copy"><strong data-sleep-state>${active?'睡眠记录中':finished.length?'今日睡眠':'今晚还未记录'}</strong>${active?`<span class="recovery-number">${localClock(active.startTime)} 开始</span><span data-sleep-elapsed class="recovery-number">已记录 ${formatSleepDuration(activeMinutes)}</span>${activeMinutes>1440?'<p class="recovery-warning">睡眠记录已持续超过24小时，请确认是否仍在记录。</p>':''}`:finished.length?`<span class="recovery-number">${formatSleepDuration(minutes)}</span>${finished.map(s=>`<span class="recovery-number">${localClock(s.startTime)} → ${localClock(s.endTime!)}</span>`).join('')}`:'<span>睡前开始，睡醒后结束。</span>'}</div><button type="button" class="primary full-btn" data-sleep-action ${pending?'disabled':''}>${active?'我醒了':'开始睡眠'}</button>${active?'<div class="recovery-secondary"><button type="button" class="text-btn" data-sleep-edit>修正开始时间</button><button type="button" class="text-btn danger" data-sleep-cancel>取消本次记录</button></div>':''}</section><section class="today-card recovery-card water-card"><div class="card-heading"><h3>饮水</h3><button type="button" class="text-btn" data-water-history>历史记录</button></div><p class="recovery-number water-total"><strong>${total}</strong> / ${WATER_REFERENCE_ML} ml</p><span class="recovery-number">${percent}% · 参考值</span><div class="water-actions"><button type="button" class="secondary" data-water-add="250">+250 ml</button><button type="button" class="secondary" data-water-add="500">+500 ml</button><button type="button" class="secondary" data-water-custom>自定义</button></div></section>${trends?trendHtml(sleep,water,today,days):''}`
+    root.innerHTML=`<section class="today-card today-activity-card recovery-card sleep-card"><div class="card-heading today-activity-head"><div><span class="card-icon recovery-icon">${icon('moon',20)}</span><h2>睡眠</h2></div><button type="button" class="text-btn" data-sleep-history>历史记录 ${icon('chevron',16)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status" data-sleep-state>${active?'睡眠记录中':finished.length?'今日睡眠':'今晚还未记录'}</strong>${active?`<span class="today-activity-meta recovery-number">${localClock(active.startTime)} 开始</span><span data-sleep-elapsed class="today-activity-meta recovery-number">已记录 ${formatSleepDuration(activeMinutes)}</span>${activeMinutes>1440?'<p class="recovery-warning">睡眠记录已持续超过24小时，请确认是否仍在记录。</p>':''}`:finished.length?`<span class="today-activity-meta recovery-number">${formatSleepDuration(minutes)}</span>${finished.map(s=>`<span class="today-activity-meta recovery-number">${localClock(s.startTime)} → ${localClock(s.endTime!)}</span>`).join('')}`:'<span class="today-activity-meta">睡前开始，睡醒后结束。</span>'}</div><button type="button" class="primary today-activity-action" data-sleep-action ${pending?'disabled':''}>${active?'我醒了':'开始睡眠'}</button></div>${active?'<div class="recovery-secondary"><button type="button" class="text-btn" data-sleep-edit>修正开始时间</button><button type="button" class="text-btn danger" data-sleep-cancel>取消本次记录</button></div>':''}</section><section class="today-card today-activity-card recovery-card water-card"><div class="card-heading today-activity-head"><div><span class="card-icon recovery-icon">${icon('water',20)}</span><h2>饮水</h2></div><button type="button" class="text-btn" data-water-history>历史记录 ${icon('chevron',16)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status water-total">今日累计 <span class="recovery-number"><span data-water-total>${total}</span> ml</span></strong>${reference===null?'':`<span class="today-activity-meta" data-water-reference>每日参考值 ${reference} ml</span>`}</div><button type="button" class="text-btn" data-water-reference-edit>修改参考值</button></div><div class="water-actions"><button type="button" class="secondary today-activity-action" data-water-add="250">+250 ml</button><button type="button" class="secondary today-activity-action" data-water-add="500">+500 ml</button><button type="button" class="secondary today-activity-action" data-water-custom>自定义记录</button></div></section>${trends?trendHtml(sleep,water,today,days):''}`
     if(undo)root.querySelector('.water-card')!.append(undo)
     const action=root.querySelector<HTMLButtonElement>('[data-sleep-action]')!
     action.addEventListener('click',async()=>{
@@ -34,10 +35,12 @@ export function mountRecovery(root:HTMLElement,ui:RecoveryUi,trends=false):()=>v
     root.querySelector('[data-sleep-edit]')?.addEventListener('click',()=>active&&showSleepEditor(active,ui))
     root.querySelector('[data-sleep-history]')?.addEventListener('click',()=>showSleepHistory(ui))
     root.querySelector('[data-water-history]')?.addEventListener('click',()=>showWaterHistory(ui))
+    root.querySelector('[data-water-reference-edit]')?.addEventListener('click',()=>showWaterReference(ui))
     root.querySelector('[data-water-custom]')?.addEventListener('click',()=>showWaterEditor(undefined,ui))
     root.querySelectorAll<HTMLButtonElement>('[data-water-add]').forEach(b=>b.addEventListener('click',async()=>{if(b.disabled)return;b.disabled=true;try{const log=await addWater(Number(b.dataset.waterAdd));waterUndo(log,ui)}catch(e){ui.fail(e)}finally{if(b.isConnected)b.disabled=false}}))
-    root.querySelectorAll<HTMLButtonElement>('[data-recovery-days]').forEach(b=>b.addEventListener('click',()=>{days=Number(b.dataset.recoveryDays) as 7|30;redraw()}))
+    root.querySelectorAll<HTMLButtonElement>('[data-recovery-days]').forEach(b=>b.addEventListener('click',()=>{days=Number(b.dataset.recoveryDays) as 7|30|90;redraw()}))
   }
+  const stopReference=observeWaterReference(redraw)
   const subscription=liveQuery(()=>Promise.all([db.sleepSessions.orderBy('startTime').reverse().toArray(),db.waterLogs.toArray()])).subscribe({next:([s,w])=>{sleep=s;water=w;redraw()},error:ui.fail})
   // Wall-clock display only. Sleep is never advanced by database writes or a timer engine.
   const tick=window.setInterval(()=>{
@@ -47,11 +50,24 @@ export function mountRecovery(root:HTMLElement,ui:RecoveryUi,trends=false):()=>v
     if(active&&label){const m=Math.max(0,(Date.now()-Date.parse(active.startTime))/60000);if(m>1440&&!root.querySelector('.recovery-warning'))redraw();else label.textContent=`已记录 ${formatSleepDuration(m)}`}
   },30000)
   const visible=()=>{if(document.visibilityState==='visible')redraw()};document.addEventListener('visibilitychange',visible)
-  return()=>{disposed=true;subscription.unsubscribe();clearInterval(tick);document.removeEventListener('visibilitychange',visible)}
+  return()=>{disposed=true;stopReference();subscription.unsubscribe();clearInterval(tick);document.removeEventListener('visibilitychange',visible)}
 }
-function trendHtml(sleep:SleepSession[],water:WaterLog[],today:string,days:7|30):string {
-  const summary=recoverySummary(sleep,water,today,days),max=Math.max(SLEEP_REFERENCE_MINUTES,...summary.daily.map(d=>d.minutes??0))
-  return `<section class="chart-card recovery-trend"><div class="section-head"><h3>恢复趋势</h3><div class="segmented" aria-label="恢复趋势范围"><button type="button" data-recovery-days="7" class="${days===7?'active':''}">7天</button><button type="button" data-recovery-days="30" class="${days===30?'active':''}">30天</button></div></div><h4>睡眠</h4><dl class="recovery-statistics"><div><dt>平均睡眠</dt><dd>${summary.averageMinutes===undefined?'暂无记录':formatSleepDuration(summary.averageMinutes)}</dd></div><div><dt>平均入睡</dt><dd>${summary.averageStart??'暂无记录'}</dd></div><div><dt>平均起床</dt><dd>${summary.averageEnd??'暂无记录'}</dd></div><div><dt>达标天数 · 8小时参考</dt><dd>${summary.achievedDays} / ${days} 天</dd></div></dl><p class="recovery-note">近${days}天已记录 ${summary.recordedDays} 天。平均时长仅计算有记录的日期；入睡/起床均值取每天最长一段，按当前时区展示。</p><div class="sleep-bars" role="img" aria-label="每日睡眠柱状图，纵轴小时；完整数据见下方每日记录">${summary.daily.map(d=>`<span class="sleep-bar-column"><i style="height:${(d.minutes??0)/max*100}%"></i><small>${Number(d.date.slice(8))}</small></span>`).join('')}</div><p class="recovery-note">小时 · 图表上限 ${(max/60).toFixed(1)}</p><h4>饮水</h4><p class="recovery-note">每天独立累计 · 参考 ${WATER_REFERENCE_ML} ml</p><div class="sleep-bars water-bars" role="img" aria-label="每日饮水柱状图，纵轴毫升；完整数据见下方每日记录">${summary.daily.map(d=>`<span class="sleep-bar-column"><i style="height:${(d.waterMl??0)/Math.max(WATER_REFERENCE_ML,...summary.daily.map(x=>x.waterMl??0))*100}%"></i><small>${Number(d.date.slice(8))}</small></span>`).join('')}</div><p class="recovery-note">ml · 图表上限 ${Math.max(WATER_REFERENCE_ML,...summary.daily.map(d=>d.waterMl??0))}</p><details class="recovery-daily"><summary>每日睡眠与饮水</summary>${summary.daily.map(d=>`<p><span>${formatShortDate(d.date)}</span><span>${d.minutes===undefined?'睡眠未记录':formatSleepDuration(d.minutes)}</span><span>${d.waterMl===undefined?'饮水未记录':`${d.waterMl} ml`}</span></p>`).join('')}</details></section>`
+function trendHtml(sleep:SleepSession[],water:WaterLog[],today:string,days:7|30|90):string {
+  const summary=recoverySummary(sleep,water,today,days)
+  const chart=(kind:'sleep'|'water')=>{
+    const values=summary.daily.map(d=>kind==='sleep'?d.minutes:d.waterMl),maximum=Math.max(0,...values.map(v=>v??0))
+    if(!values.some(v=>v!==undefined))return '<p class="recovery-note recovery-chart-empty">此范围暂无记录</p>'
+    // A data-derived ceiling with a safe divisor; no physiological target line.
+    const step=kind==='sleep'?60:100,ceiling=Math.max(step,Math.ceil(maximum/step)*step)
+    return `<div class="recovery-chart-scroll${days===90?' recovery-chart-long':''}" tabindex="0" role="region" aria-label="每日${kind==='sleep'?'睡眠':'饮水'}图表${days===90?'，可横向滚动':''}"><div class="sleep-bars ${kind==='water'?'water-bars':''}" role="img" aria-label="每日事实柱状图，完整数据见下方每日记录">${summary.daily.map((d,i)=>`<span class="sleep-bar-column" title="${d.date} · ${values[i]===undefined?'未记录':kind==='sleep'?formatSleepDuration(values[i]!):`${values[i]} ml`}"><i style="height:${(values[i]??0)/ceiling*100}%"></i><small>${Number(d.date.slice(8))}</small></span>`).join('')}</div></div><p class="recovery-note">${kind==='sleep'?'小时':'ml'} · 图表上限 ${kind==='sleep'?(ceiling/60).toFixed(1):ceiling}</p>`
+  }
+  return `<section class="chart-card recovery-trend"><div class="section-head"><h3>恢复趋势</h3><div class="segmented recovery-ranges" aria-label="恢复趋势范围">${([7,30,90] as const).map(n=>`<button type="button" data-recovery-days="${n}" aria-pressed="${days===n}" class="${days===n?'active':''}">${n}天</button>`).join('')}</div></div><h4>睡眠</h4><dl class="recovery-statistics"><div><dt>平均睡眠</dt><dd>${summary.averageMinutes===undefined?'暂无记录':formatSleepDuration(summary.averageMinutes)}</dd></div><div><dt>平均入睡</dt><dd>${summary.averageStart??'暂无记录'}</dd></div><div><dt>平均起床</dt><dd>${summary.averageEnd??'暂无记录'}</dd></div><div><dt>有记录天数</dt><dd>${summary.recordedDays} 天</dd></div></dl><p class="recovery-note">近${days}天。平均时长仅计算有记录的日期；入睡/起床均值取每天最长一段，按当前时区展示。</p>${chart('sleep')}<h4>饮水</h4><p class="recovery-note">每天独立累计 · 仅展示实际记录</p>${chart('water')}<details class="recovery-daily"><summary>每日睡眠与饮水</summary>${summary.daily.map(d=>`<p><span>${formatShortDate(d.date)}</span><span>${d.minutes===undefined?'睡眠未记录':formatSleepDuration(d.minutes)}</span><span>${d.waterMl===undefined?'饮水未记录':`${d.waterMl} ml`}</span></p>`).join('')}</details></section>`
+}
+function showWaterReference(ui:RecoveryUi):void {
+  const value=readWaterReference(),dialog=ui.openModal('修改饮水参考值',`<form class="form" data-water-reference-form><label>每日参考值（ml）<input name="reference" type="number" inputmode="numeric" min="1" max="100000" step="1" required value="${value??''}" placeholder="例如：2000"></label><p class="recovery-note">仅影响此设备上的参考值展示，不改变饮水记录，也不进入备份或同步。</p><p role="alert" data-recovery-error hidden></p><button type="submit" class="primary">保存参考值</button><button type="button" class="secondary" data-water-reference-unset>不设置参考值</button><button type="button" class="text-btn" data-water-reference-cancel>取消</button></form>`)
+  bindSave(dialog,'[data-water-reference-form]',ui,async form=>{saveWaterReference(Number(new FormData(form).get('reference')))},()=>dialog.close())
+  dialog.querySelector('[data-water-reference-unset]')!.addEventListener('click',()=>{try{saveWaterReference(null);dialog.close()}catch(e){ui.fail(e)}})
+  dialog.querySelector('[data-water-reference-cancel]')!.addEventListener('click',()=>dialog.close())
 }
 function showSleepHistory(ui:RecoveryUi):void {
   const dialog=ui.openModal('睡眠记录','<div data-sleep-history-list><p>正在读取…</p></div>',true)

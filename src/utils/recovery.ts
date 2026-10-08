@@ -1,7 +1,5 @@
 import type { SleepSession, WaterLog, WeightLog } from '../db/types'
 import { getLocalDateString, shiftLocalDate } from './date'
-export const SLEEP_REFERENCE_MINUTES = 480
-export const WATER_REFERENCE_ML = 2500
 export function sleepMinutes(start: string, end: string): number {
   const a = Date.parse(start), b = Date.parse(end)
   if (!Number.isFinite(a) || !Number.isFinite(b) || b <= a) throw new Error('结束时间必须晚于开始时间')
@@ -35,10 +33,10 @@ export function averageClock(instants: string[]): string | undefined {
   const minute=Math.round(((Math.atan2(y,x)/(Math.PI*2)+1)%1)*1440)%1440
   return `${String(Math.floor(minute/60)).padStart(2,'0')}:${String(minute%60).padStart(2,'0')}`
 }
-export function recoverySummary(sleep: SleepSession[], water: WaterLog[], today: string, days: 7|30) {
+export function recoverySummary(sleep: SleepSession[], water: WaterLog[], today: string, days: 7|30|90) {
   const dates=Array.from({length:days},(_,i)=>shiftLocalDate(today,i-days+1))
   const daily=dates.map(date=>{const sessions=sleep.filter(s=>s.endTime&&s.recordDate===date);const drinks=water.filter(w=>w.date===date);return{date,sessions,minutes:sessions.length?sessions.reduce((n,s)=>n+s.durationMinutes!,0):undefined,waterMl:drinks.length?drinks.reduce((n,w)=>n+w.amountMl,0):undefined}})
   const recorded=daily.filter(d=>d.minutes!==undefined)
   const main=recorded.map(d=>[...d.sessions].sort((a,b)=>b.durationMinutes!-a.durationMinutes!||a.id.localeCompare(b.id))[0]!)
-  return {daily,recordedDays:recorded.length,averageMinutes:recorded.length?recorded.reduce((n,d)=>n+d.minutes!,0)/recorded.length:undefined,averageStart:averageClock(main.map(s=>s.startTime)),averageEnd:averageClock(main.map(s=>s.endTime!)),achievedDays:recorded.filter(d=>d.minutes!>=SLEEP_REFERENCE_MINUTES).length}
+  return {daily,recordedDays:recorded.length,averageMinutes:recorded.length?recorded.reduce((n,d)=>n+d.minutes!,0)/recorded.length:undefined,averageStart:averageClock(main.map(s=>s.startTime)),averageEnd:averageClock(main.map(s=>s.endTime!))}
 }

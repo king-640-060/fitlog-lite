@@ -164,6 +164,13 @@ export function showAiAssistant(engine: AiOrchestrator, ui: AiAssistantUi, optio
           const title = document.createElement('strong'); title.textContent = proposal.title
           const status = document.createElement('small'); status.textContent = aiProposalStatusLabels[proposal.status]; head.append(title, status); node.append(head); if (previousStatus) animateMotion(status, 'number')
           for (const line of aiProposalPreviewLines(proposal)) { const text = document.createElement('p'); text.textContent = line; node.append(text) }
+          const catalog = proposal.preview as {catalog?:boolean;details?:string[]}
+          if (catalog.catalog && catalog.details) {
+            const details = document.createElement('details'); details.className = 'ai-catalog-details'
+            const summary = document.createElement('summary'); summary.textContent = '查看写入详情'; details.append(summary)
+            for (const line of catalog.details) { const text = document.createElement('p'); text.textContent = line; details.append(text) }
+            node.append(details)
+          }
           if (proposal.message) { const note = document.createElement('p'); note.className = 'ai-note'; note.textContent = proposal.message; node.append(note) }
           if (proposal.status === 'pending' || proposal.status === 'processing') {
             const actions = document.createElement('div'); actions.className = 'ai-proposal-actions'

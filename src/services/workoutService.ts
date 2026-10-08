@@ -10,13 +10,13 @@ export function normalizeTrainingJournal(value: unknown): string | undefined {
   return text || undefined
 }
 
-export async function saveExercise(nameValue: unknown, notesValue?: unknown, id?: string): Promise<Exercise> {
+export async function saveExercise(nameValue: unknown, notesValue?: unknown, id?: string, database: FitLogDatabase = db): Promise<Exercise> {
   const name = requiredText(nameValue, '动作名称')
   const notes = String(notesValue ?? '').trim() || undefined
   const now = new Date().toISOString()
-  const existing = id ? await db.exercises.get(id) : undefined
+  const existing = id ? await database.exercises.get(id) : undefined
   const exercise: Exercise = { id: id ?? crypto.randomUUID(), name, notes, createdAt: existing?.createdAt ?? now, updatedAt: now }
-  await db.exercises.put(exercise)
+  await database.exercises.put(exercise)
   return exercise
 }
 
