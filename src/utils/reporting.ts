@@ -1,13 +1,17 @@
-import type { CardioSession, FoodLog, Habit, HabitCheckIn, NutritionTarget, PelvicFloorSession, WeightLog, Workout } from '../db/types'
+import type { DailyRecords } from '../services/dailyRecordsSummary'
+import { buildDailyRecords } from '../services/dailyRecordsSummary'
+import { recoveryRangeSummary } from './recovery'
+import type { DietEvent, SleepSession, WaterLog, CardioSession, FoodLog, Habit, HabitCheckIn, NutritionTarget, PelvicFloorSession, WeightLog, Workout } from '../db/types'
 import { pelvicFloorSessionDurationSeconds } from '../services/pelvicFloorService'
 import { getCardioActivityType } from './cardio'
 import { getLocalDateString, shiftLocalDate } from './date'
 
-export type ReportMode = 'week' | 'month'
+export type ReportMode = 'day' | 'week' | 'month'
 export interface ReportRange { start: string; end: string }
 export interface ReportDay { date: string; future: boolean }
 export interface ReportBucket extends ReportRange { label: string }
 export interface ReportSource {
+  sleepSessions?:SleepSession[]; waterLogs?:WaterLog[]; dietEvents?:DietEvent[]
   foodLogs: FoodLog[]; nutritionTargets: NutritionTarget[]; workouts: Workout[]; cardioSessions: CardioSession[]
   pelvicFloorSessions: PelvicFloorSession[]; weights: WeightLog[]; habits: Habit[]; habitCheckIns: HabitCheckIn[]
 }
@@ -20,6 +24,7 @@ export interface ReportSummary {
   pelvicSessions: number; pelvicMinutes: number
 }
 export interface ReportResult {
+  daily?:DailyRecords; recovery:ReturnType<typeof recoveryRangeSummary> & {waterRecordedDays:number;waterTotal?:number;waterAverage?:number}
   range: ReportRange; days: ReportDay[]; buckets: ReportBucket[]; training: ReportTrainingDay[]
   habits: ReportHabit[]; nutrition: Record<'calories' | 'protein' | 'carbs' | 'fat', ReportNutritionMetric>
   weights: WeightLog[]; summary: ReportSummary; empty: boolean; text: string
@@ -38,8 +43,9 @@ export function getMonthRange(anchor: string): ReportRange {
   const date = localDate(anchor)
   return { start: getLocalDateString(new Date(date.getFullYear(), date.getMonth(), 1, 12)), end: getLocalDateString(new Date(date.getFullYear(), date.getMonth() + 1, 0, 12)) }
 }
-export function getReportRange(mode: ReportMode, anchor: string): ReportRange { return mode === 'week' ? getWeekRange(anchor) : getMonthRange(anchor) }
+export function getReportRange(mode: ReportMode, anchor: string): ReportRange { return mode==='day'?{start:anchor,end:anchor}:mode === 'week' ? getWeekRange(anchor) : getMonthRange(anchor) }
 export function shiftReportPeriod(mode: ReportMode, anchor: string, offset: number): string {
+  if (mode === 'day') return shiftLocalDate(anchor,offset)
   if (mode === 'week') return shiftLocalDate(anchor, offset * 7)
   const date = localDate(anchor)
   return getLocalDateString(new Date(date.getFullYear(), date.getMonth() + offset, 1, 12))
@@ -105,6 +111,11 @@ export function aggregateReport(source: ReportSource, mode: ReportMode, anchor: 
     treadmillSessions: cardio.filter((item) => getCardioActivityType(item) === 'treadmill').length,
     pelvicSessions: pelvic.length, pelvicMinutes: round(pelvic.reduce((sum, item) => sum + pelvicFloorSessionDurationSeconds(item), 0) / 60),
   }
+  const sleep=(source.sleepSessions??[]).filter(s=>s.endTime&&eligible.has(s.recordDate!)),water=within(source.waterLogs??[]),dietEvents=within(source.dietEvents??[])
+  const recoveryFacts=recoveryRangeSummary(sleep,water,range.start,range.end<today?range.end:today),waterDays=recoveryFacts.daily.filter(d=>d.waterMl!==undefined)
+  const waterTotal=waterDays.length?waterDays.reduce((n,d)=>n+d.waterMl!,0):undefined
+  const recovery={...recoveryFacts,waterRecordedDays:waterDays.length,waterTotal,waterAverage:waterTotal===undefined?undefined:waterTotal/waterDays.length}
+  const daily=mode==='day'?buildDailyRecords({...source,sleepSessions:sleep,waterLogs:water,dietEvents},anchor):undefined
   const period = '本期'
   const sentences: string[] = []
   if (summary.trainingDays) sentences.push(`${period}共训练 ${summary.trainingDays} 天，其中有氧 ${round(summary.cardioMinutes)} 分钟`)
@@ -112,7 +123,9 @@ export function aggregateReport(source: ReportSource, mode: ReportMode, anchor: 
   if (summary.habitCheckIns) sentences.push(`习惯共完成 ${summary.habitCheckIns} 次`)
   if (weights.length >= 2) sentences.push(`体重从 ${weights[0]!.weightKg} kg 变化到 ${weights.at(-1)!.weightKg} kg`)
   else if (weights.length === 1) sentences.push(`体重记录 ${weights[0]!.weightKg} kg`)
-  return { range, days, buckets: mode === 'month' ? monthWeekBuckets(range) : [], training, habits, nutrition, weights, summary,
-    empty: !foodLogs.length && !workouts.length && !cardio.length && !pelvic.length && !weights.length && !checkIns.length,
+  if(recovery.recordedDays)sentences.push(`睡眠记录 ${recovery.recordedDays} 天`)
+  if(waterDays.length)sentences.push(`饮水记录 ${waterDays.length} 天，共 ${waterTotal} ml`)
+  return { daily,recovery,range, days, buckets: mode === 'month' ? monthWeekBuckets(range) : [], training, habits, nutrition, weights, summary,
+    empty: !foodLogs.length && !workouts.length && !cardio.length && !pelvic.length && !weights.length && !checkIns.length && !sleep.length && !water.length && !dietEvents.length,
     text: sentences.length ? `${sentences.join('。')}。` : '这段时间还没有记录。' }
 }

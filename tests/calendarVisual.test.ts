@@ -16,8 +16,10 @@ describe('calendar visual encoding', () => {
     expect(icon('stairs', 14)).toContain('M3 20h5v-5h5v-5h5V5h3')
     const all = { ...empty, weightKg: 70, pelvicFloorSessionCount: 1, cardioCount: 1, hasWorkout: true, foodLogCount: 1 }
     expect(getCalendarRecordCategories(all)).toEqual(['food', 'strength', 'cardio', 'pelvic', 'weight'])
-    expect(getCalendarVisibleMarkers(all)).toEqual({ visible: ['food', 'strength', 'cardio', 'pelvic'], hiddenCount: 1 })
+    expect(getCalendarVisibleMarkers(all)).toEqual({ visible: ['food', 'strength', 'cardio', 'pelvic', 'weight'], hiddenCount: 0 })
   })
+
+  it('never calls unknown intake zero when a target exists',()=>{const label=getCalendarDayAccessibleLabel(empty.date,{...empty,nutritionTarget:{id:'t',date:empty.date,protein:100,createdAt:'',updatedAt:''}});expect(label).toContain('目标 100 克蛋白质，摄入未记录');expect(label).not.toContain('0 / 100')})
 
   it('keeps selected and today separate from record categories in the accessible label', () => {
     const summary = { ...empty, foodLogCount: 1, calories: 350, hasWorkout: true, workoutCount: 1, cardioCount: 1, cardioMinutes: 25 }

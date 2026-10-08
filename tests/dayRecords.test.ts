@@ -90,7 +90,8 @@ describe('清空指定业务日期', () => {
       database.nutritionTargets.where('date').equals(otherDay).count(), database.foods.count(),
     ])).toEqual([1, 1, 1, 1, 1, 1, 1])
     const summaries = await loadMonthSummaries(2026, 8, database)
-    expect(summaries.has(day)).toBe(false)
+    expect(summaries.has(day)).toBe(true)
+    expect(hasDayRecords(summaries.get(day))).toBe(false)
     expect([...summaries.values()].filter(hasDayRecords)).toHaveLength(1)
     expect(summaries.get(otherDay)).toMatchObject({ foodLogCount: 1, workoutCount: 1, cardioCount: 1, pelvicFloorSessionCount: 1, weightKg: 72 })
   })

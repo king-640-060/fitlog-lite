@@ -33,10 +33,17 @@ export function averageClock(instants: string[]): string | undefined {
   const minute=Math.round(((Math.atan2(y,x)/(Math.PI*2)+1)%1)*1440)%1440
   return `${String(Math.floor(minute/60)).padStart(2,'0')}:${String(minute%60).padStart(2,'0')}`
 }
-export function recoverySummary(sleep: SleepSession[], water: WaterLog[], today: string, days: 7|30|90) {
-  const dates=Array.from({length:days},(_,i)=>shiftLocalDate(today,i-days+1))
-  const daily=dates.map(date=>{const sessions=sleep.filter(s=>s.endTime&&s.recordDate===date);const drinks=water.filter(w=>w.date===date);return{date,sessions,minutes:sessions.length?sessions.reduce((n,s)=>n+s.durationMinutes!,0):undefined,waterMl:drinks.length?drinks.reduce((n,w)=>n+w.amountMl,0):undefined}})
+export function recoveryDayFacts(sleep:SleepSession[],water:WaterLog[],date:string) {
+  const sessions=sleep.filter(s=>s.endTime&&s.recordDate===date),drinks=water.filter(w=>w.date===date)
+  return {date,sessions,drinks,minutes:sessions.length?sessions.reduce((n,s)=>n+s.durationMinutes!,0):undefined,waterMl:drinks.length?drinks.reduce((n,w)=>n+w.amountMl,0):undefined}
+}
+export function recoveryRangeSummary(sleep:SleepSession[],water:WaterLog[],start:string,end:string) {
+  const daily=[]
+  for(let date=start;date<=end;date=shiftLocalDate(date,1))daily.push(recoveryDayFacts(sleep,water,date))
   const recorded=daily.filter(d=>d.minutes!==undefined)
   const main=recorded.map(d=>[...d.sessions].sort((a,b)=>b.durationMinutes!-a.durationMinutes!||a.id.localeCompare(b.id))[0]!)
   return {daily,recordedDays:recorded.length,averageMinutes:recorded.length?recorded.reduce((n,d)=>n+d.minutes!,0)/recorded.length:undefined,averageStart:averageClock(main.map(s=>s.startTime)),averageEnd:averageClock(main.map(s=>s.endTime!))}
+}
+export function recoverySummary(sleep:SleepSession[],water:WaterLog[],today:string,days:7|30|90) {
+  return recoveryRangeSummary(sleep,water,shiftLocalDate(today,1-days),today)
 }

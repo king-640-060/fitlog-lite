@@ -21,11 +21,6 @@
 .recovery-statistics dd { margin: 6px 0 0; font-size: .9rem; white-space: nowrap; }
 .recovery-note { color: var(--text-secondary); font-size: .78rem; line-height: 1.5; overflow-wrap: anywhere; }
 .recovery-trend .section-head { flex-wrap: wrap; gap: 8px; }
-.sleep-bars { display: flex; align-items: stretch; height: 150px; gap: 3px; padding-top: 8px; border-bottom: 1px solid var(--border); }
-.sleep-bar-column { position: relative; display: flex; flex: 1; min-width: 0; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 22px; }
-.sleep-bar-column i { width: 85%; min-width: 1px; background: var(--accent-mid); border-radius: 3px 3px 0 0; }
-.sleep-bar-column small { position: absolute; bottom: 2px; font-size: .58rem; color: var(--text-secondary); }
-.sleep-bar-column:nth-child(2n) small { visibility: hidden; }
 .recovery-daily > summary { min-height: 44px; padding-block: 12px; color: var(--accent-strong); font-size: .85rem; }
 .recovery-daily p { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 0; padding: 10px 0; border-top: 1px solid var(--divider); font-size: .78rem; }
 .recovery-daily p > span { white-space: nowrap; }
@@ -35,8 +30,6 @@
 .recovery-history-row span { color: var(--text-secondary); font-size: .78rem; }
 .recovery-history-row > .text-btn { white-space: nowrap; }
 [data-recovery-error] { color: var(--danger); font-size: .85rem; }
-.water-undo { max-width: calc(100vw - 24px); }
-.water-undo .text-btn { min-height: 44px; padding: 4px 8px; white-space: nowrap; color: inherit; }
 
 /* Descriptions may truncate; independent counters, amounts and actions may not. */
 .meal-preview { display: flex; align-items: center; min-width: 0; gap: 8px; overflow: visible; white-space: normal; }
@@ -66,16 +59,12 @@
 .food-completion-summary p > span { white-space: nowrap; overflow-wrap: normal; }
 .food-completion-strip > button { flex: 0 0 auto; max-width: none; margin-left: auto; white-space: nowrap; }
 .recovery-trend h4 { margin: 16px 0 8px; font-size: .9rem; }
-.water-bars i { background: var(--accent-mid); }
 
 .meal-preview-name + .meal-preview-name::before { content: '· '; }
 .recovery-history-tokens { display: flex; flex-wrap: wrap; gap: 4px 8px; }
 .recovery-history-tokens > span { white-space: nowrap; overflow-wrap: normal; }
 .recovery-history-row strong.recovery-history-tokens > span { color: var(--text-primary); font-size: inherit; }
 
-/* Undo occupies normal card flow so it never floats over another action. */
-.water-undo { position: static; transform: none; animation: none; width: max-content; max-width: 100%; margin-top: 12px; flex-wrap: wrap; box-shadow: none; }
-.water-undo > span { white-space: nowrap; }
 
 /* Recovery joins Today activity primitives; this file owns only domain details. */
 .recovery-section { margin-top: 0; }
@@ -86,9 +75,6 @@
 .recovery-ranges { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); width: min(100%,18rem); }
 .recovery-ranges button { min-width: 0; min-height: 44px; }
 .recovery-chart-scroll { min-width: 0; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
-.recovery-chart-long .sleep-bars { min-width: 2160px; }
-.recovery-chart-long .sleep-bar-column { min-width: 21px; }
-.recovery-chart-long .sleep-bar-column small { visibility: visible; }
 @media (max-width: 24rem) {
   .recovery-card .today-activity-body { display: flex; flex-wrap: wrap; }
   .recovery-card .today-activity-copy { flex: 1 1 9rem; }
@@ -97,3 +83,17 @@
 
 .ai-catalog-details > summary { min-height: 44px; padding-block: 12px; color: var(--accent-strong); }
 .recovery-trend { min-width: 0; max-width: 100%; }
+
+.recovery-line-chart { display:block; width:100%; height:auto; overflow:visible; color:var(--accent-mid); }
+.recovery-line-path { fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.recovery-line-marker { fill:currentColor; stroke:var(--surface); stroke-width:1.5; }
+.recovery-line-axis { stroke:var(--border); stroke-width:1; }
+.recovery-point-value { fill:var(--text-primary); font-family:inherit; font-size:12px; font-weight:600; font-variant-numeric:tabular-nums; }
+.recovery-point-date { fill:var(--text-secondary); font-family:inherit; font-size:10px; }
+.recovery-trend h4 small { margin-left:4px; color:var(--text-secondary); font-size:.75rem; font-weight:400; }
+.recovery-report .recovery-statistics dd { white-space:normal; overflow-wrap:anywhere; }
+
+.water-total { display:flex; flex-wrap:wrap; gap:4px 8px; }
+.water-total > span { white-space:nowrap; }
+
+.water-total > .recovery-number { min-width:8ch; }

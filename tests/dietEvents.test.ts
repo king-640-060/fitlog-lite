@@ -30,7 +30,7 @@ describe('independent contextual DietEvent', () => {
     const after = (await exportBackup(d)).data; for (const key of Object.keys(v9)) expect(after[key as keyof typeof after]).toEqual(before[key as keyof typeof before])
     const summary = (await loadMonthSummaries(2026, 8, d)).get(date)!
     expect(summary.calories).toBe(100); expect(summary.foodLogCount).toBe(1); expect(summary.dietEvents).toHaveLength(1)
-    expect(getCalendarVisibleMarkers(summary)).toEqual({ visible: ['food','strength','cardio','dietEvent'], hiddenCount: 2 })
+    expect(getCalendarVisibleMarkers(summary)).toEqual({ visible: ['food','strength','cardio','pelvic','weight','dietEvent','habit'], hiddenCount: 0 })
     expect(getCalendarDayAccessibleLabel(date, summary)).toContain('放纵餐'); expect(getCalendarDayAccessibleLabel('2026-09-29', (await loadMonthSummaries(2026,8,d)).get('2026-09-29'))).toContain('放纵日')
   })
   it('event-only day has records but has no food intake/food marker; day title distinct', async () => {

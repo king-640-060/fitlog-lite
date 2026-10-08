@@ -1,31 +1,12 @@
 import { getMonthGridDays } from '../utils/calendarGrid'
 import { db, type FitLogDatabase } from '../db/database'
-import type { DietEvent, NutritionTarget } from '../db/types'
-import { pelvicFloorSessionDurationSeconds } from '../services/pelvicFloorService'
+import { readDailyRecordsRange, type DailyRecordsSummary } from '../services/dailyRecordsSummary'
 import { getLocalDateString } from '../utils/date'
 import { icon, type IconName } from './icons'
 export { getMonthGridDays } from '../utils/calendarGrid'
 export type { CalendarGridDay } from '../utils/calendarGrid'
 
-export interface CalendarDaySummary {
-  date: string
-  dietEvents?: DietEvent[]
-  foodLogCount: number
-  calories?: number
-  protein?: number
-  carbs?: number
-  fat?: number
-  nutritionTarget?: NutritionTarget
-  hasWorkout: boolean
-  workoutCount: number
-  setCount: number
-  cardioCount: number
-  cardioMinutes: number
-  pelvicFloorSessionCount: number
-  pelvicFloorContractions: number
-  pelvicFloorSeconds: number
-  weightKg?: number
-}
+export type CalendarDaySummary = DailyRecordsSummary
 
 interface RenderMonthCalendarOptions {
   year: number
@@ -43,80 +24,33 @@ export function getMonthBounds(year: number, month: number): { start: string; en
 }
 
 export async function loadMonthSummaries(year: number, month: number, database: FitLogDatabase = db): Promise<Map<string, CalendarDaySummary>> {
-  const { start, end } = getMonthBounds(year, month)
-  const [dietEvents, foodLogs, workouts, cardioSessions, weights, nutritionTargets, pelvicFloorSessions] = await Promise.all([
-    database.dietEvents.where('date').between(start, end, true, true).toArray(),
-    database.foodLogs.where('date').between(start, end, true, true).toArray(),
-    database.workouts.where('date').between(start, end, true, true).toArray(),
-    database.cardioSessions.where('date').between(start, end, true, true).toArray(),
-    database.weights.where('date').between(start, end, true, true).toArray(),
-    database.nutritionTargets.where('date').between(start, end, true, true).toArray(),
-    database.pelvicFloorSessions.where('date').between(start, end, true, true).toArray(),
-  ])
-  const summaries = new Map<string, CalendarDaySummary>()
-  const ensure = (date: string): CalendarDaySummary => {
-    const existing = summaries.get(date)
-    if (existing) return existing
-    const summary: CalendarDaySummary = {
-      date, foodLogCount: 0, hasWorkout: false, workoutCount: 0, setCount: 0, cardioCount: 0, cardioMinutes: 0,
-      pelvicFloorSessionCount: 0, pelvicFloorContractions: 0, pelvicFloorSeconds: 0,
-    }
-    summaries.set(date, summary)
-    return summary
-  }
-
-  for (const event of dietEvents) { const summary = ensure(event.date); (summary.dietEvents ??= []).push(event) }
-  for (const log of foodLogs) {
-    const summary = ensure(log.date)
-    summary.foodLogCount += 1
-    summary.calories = (summary.calories ?? 0) + log.totalCalories
-    if (log.totalProtein !== undefined) summary.protein = (summary.protein ?? 0) + log.totalProtein
-    if (log.totalCarbs !== undefined) summary.carbs = (summary.carbs ?? 0) + log.totalCarbs
-    if (log.totalFat !== undefined) summary.fat = (summary.fat ?? 0) + log.totalFat
-  }
-  for (const target of nutritionTargets) ensure(target.date).nutritionTarget = target
-  for (const workout of workouts) {
-    const summary = ensure(workout.date)
-    summary.hasWorkout = true
-    summary.workoutCount += 1
-    summary.setCount += workout.exercises.reduce((total, exercise) => total + exercise.sets.length, 0)
-  }
-  for (const session of cardioSessions) {
-    const summary = ensure(session.date)
-    summary.cardioCount += 1
-    summary.cardioMinutes += session.durationMinutes
-  }
-  for (const session of pelvicFloorSessions) {
-    const summary = ensure(session.date)
-    summary.pelvicFloorSessionCount += 1
-    summary.pelvicFloorContractions += session.completedRepetitions
-    summary.pelvicFloorSeconds += pelvicFloorSessionDurationSeconds(session)
-  }
-  for (const weight of weights) ensure(weight.date).weightKg = weight.weightKg
-
-  return summaries
+  const grid=getMonthGridDays(year,month)
+  return readDailyRecordsRange(grid[0]!.date,grid.at(-1)!.date,database)
 }
 
 export function hasDayRecords(summary?: CalendarDaySummary): boolean {
-  return Boolean(summary && ((summary.dietEvents?.length ?? 0) > 0 || summary.foodLogCount > 0 || summary.workoutCount > 0 || summary.cardioCount > 0 || summary.pelvicFloorSessionCount > 0 || summary.weightKg !== undefined))
+  return Boolean(summary && ((summary.dietEvents?.length ?? 0) > 0 || summary.foodLogCount > 0 || summary.workoutCount > 0 || summary.cardioCount > 0 || summary.pelvicFloorSessionCount > 0 || summary.weightKg !== undefined || (summary.habitCount??0)>0 || (summary.sleepCount??0)>0 || (summary.waterCount??0)>0))
 }
 
-export const calendarCategories = ['food', 'strength', 'cardio', 'pelvic', 'weight', 'dietEvent'] as const
+export const calendarCategories = ['food', 'strength', 'cardio', 'pelvic', 'weight', 'dietEvent', 'habit', 'sleep', 'water'] as const
 export type CalendarCategory = typeof calendarCategories[number]
 export const calendarCategoryLabels: Record<CalendarCategory, string> = {
-  food: '饮食', strength: '力量训练', cardio: '有氧训练', pelvic: '凯格尔训练', weight: '体重', dietEvent: '特殊饮食',
+  food: '饮食', strength: '力量训练', cardio: '有氧训练', pelvic: '凯格尔训练', weight: '体重', dietEvent: '特殊饮食', habit:'习惯', sleep:'睡眠', water:'饮水',
 }
 export const calendarLegendLabels: Record<CalendarCategory, string> = {
-  food: '饮食', strength: '力量', cardio: '有氧', pelvic: '凯格尔', weight: '体重', dietEvent: '放纵餐',
+  food: '饮食', strength: '力量', cardio: '有氧', pelvic: '凯格尔', weight: '体重', dietEvent: '特殊饮食', habit:'习惯', sleep:'睡眠', water:'饮水',
 }
 export const calendarCategoryIcons: Record<CalendarCategory, IconName> = {
-  food: 'fork', strength: 'dumbbell', cardio: 'stairs', pelvic: 'leaf', weight: 'scale', dietEvent: 'flame',
+  food: 'fork', strength: 'dumbbell', cardio: 'stairs', pelvic: 'leaf', weight: 'scale', dietEvent: 'flame', habit:'check', sleep:'moon', water:'water',
 }
 
 export function getCalendarRecordCategories(summary?: CalendarDaySummary): CalendarCategory[] {
   if (!summary) return []
   return calendarCategories.filter((category) => {
     switch (category) {
+      case 'habit': return (summary.habitCount??0)>0
+      case 'sleep': return (summary.sleepCount??0)>0
+      case 'water': return (summary.waterCount??0)>0
       case 'dietEvent': return Boolean(summary.dietEvents?.length)
       case 'food': return summary.foodLogCount > 0
       case 'strength': return summary.hasWorkout
@@ -128,10 +62,7 @@ export function getCalendarRecordCategories(summary?: CalendarDaySummary): Calen
 }
 
 export function getCalendarVisibleMarkers(summary?: CalendarDaySummary): { visible: CalendarCategory[]; hiddenCount: number } {
-  const categories = getCalendarRecordCategories(summary)
-  const visible = categories.slice(0, 4)
-  if (categories.includes('dietEvent') && !visible.includes('dietEvent')) visible[3] = 'dietEvent'
-  return { visible, hiddenCount: Math.max(0, categories.length - 4) }
+  return {visible:getCalendarRecordCategories(summary),hiddenCount:0}
 }
 
 function formatCompactNumber(value: number): string {
@@ -140,7 +71,8 @@ function formatCompactNumber(value: number): string {
 
 function nutritionLabel(actual: number | undefined, target: number | undefined, unit: string): string | undefined {
   if (actual === undefined && target === undefined) return undefined
-  if (target === undefined) return `${formatCompactNumber(actual ?? 0)} ${unit}`
+  if (actual === undefined) return `目标 ${formatCompactNumber(target!)} ${unit}，摄入未记录`
+  if (target === undefined) return `${formatCompactNumber(actual)} ${unit}`
   return `${formatCompactNumber(actual ?? 0)} / ${formatCompactNumber(target)} ${unit}`
 }
 
@@ -158,6 +90,9 @@ export function getCalendarDayAccessibleLabel(date: string, summary?: CalendarDa
     summary.hasWorkout ? `${summary.workoutCount} 次力量训练，${summary.setCount} 组` : undefined,
     summary.cardioCount ? `${summary.cardioCount} 次有氧训练，共 ${formatCompactNumber(summary.cardioMinutes)} 分钟` : undefined,
     summary.pelvicFloorSessionCount ? `${summary.pelvicFloorSessionCount} 次凯格尔训练，${summary.pelvicFloorContractions} 次收缩` : undefined,
+    summary.habitCount ? `${summary.habitCount} 次习惯打卡` : undefined,
+    summary.sleepCount ? `睡眠 ${formatCompactNumber((summary.sleepMinutes??0)/60)} 小时，${summary.sleepCount} 段` : undefined,
+    summary.waterCount ? `饮水 ${summary.waterMl} ml，${summary.waterCount} 次` : undefined,
     summary.weightKg === undefined ? undefined : `体重 ${formatCompactNumber(summary.weightKg)} 千克`,
   ].filter(Boolean)
   if (hasDayRecords(summary)) {
@@ -165,13 +100,6 @@ export function getCalendarDayAccessibleLabel(date: string, summary?: CalendarDa
     return `${label}${stateLabel}，有${categories}记录，${details.join('，')}`
   }
   return `${label}${stateLabel}，${details.length ? `${details.join('，')}，` : ''}无记录`
-}
-
-function calorieProgress(summary: CalendarDaySummary): number | undefined {
-  const target = summary.nutritionTarget?.calories
-  if (target === undefined) return undefined
-  if (target === 0) return (summary.calories ?? 0) > 0 ? 100 : 0
-  return Math.min(100, Math.max(0, ((summary.calories ?? 0) / target) * 100))
 }
 
 export function renderMonthCalendar({ year, month, selectedDate, summaries, onDateClick }: RenderMonthCalendarOptions): HTMLElement {
@@ -211,33 +139,16 @@ export function renderMonthCalendar({ year, month, selectedDate, summaries, onDa
     const details = document.createElement('span')
     details.className = 'calendar-day-details'
     details.setAttribute('aria-hidden', 'true')
-    const progress = summary?.foodLogCount ? calorieProgress(summary) : undefined
-    if (progress !== undefined) {
-      const track = document.createElement('i')
-      track.className = 'calendar-nutrition-progress'
-      track.style.setProperty('--progress', `${progress}%`)
-      details.append(track)
-    }
-    if (summary?.foodLogCount) {
-      const calories = document.createElement('small')
-      calories.className = 'calendar-calories'
-      calories.textContent = `${Math.round(summary.calories ?? 0)} kcal`
-      details.append(calories)
-    }
     const markers = document.createElement('span')
     markers.className = 'calendar-markers'
-    const markerData = getCalendarVisibleMarkers(summary)
-    for (const category of markerData.visible) {
-      const marker = document.createElement('span')
-      marker.className = `calendar-marker calendar-category-${category}`
-      marker.innerHTML = icon(calendarCategoryIcons[category], 8)
-      markers.append(marker)
-    }
-    if (markerData.hiddenCount) {
-      const overflow = document.createElement('span')
-      overflow.className = 'calendar-marker-overflow'
-      overflow.textContent = `+${markerData.hiddenCount}`
-      markers.append(overflow)
+    const present = new Set(getCalendarVisibleMarkers(summary).visible)
+    for (const category of calendarCategories) {
+      const slot=document.createElement('span');slot.className='calendar-marker-slot';slot.dataset.category=category
+      if(present.has(category)) {
+        const marker=document.createElement('span');marker.className=`calendar-marker calendar-category-${category}`
+        marker.innerHTML=icon(calendarCategoryIcons[category],12);slot.append(marker)
+      }
+      markers.append(slot)
     }
     details.append(markers)
     button.append(details)

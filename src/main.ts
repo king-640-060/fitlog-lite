@@ -1,3 +1,7 @@
+import { recoveryReportHtml } from './ui/recoveryReport'
+import { liveQuery } from 'dexie'
+import { readDailyRecords } from './services/dailyRecordsSummary'
+import { showActionToast } from './ui/actionToast'
 import { observeManagerCatalog } from './ui/observeManagerCatalog'
 import { mountRecovery, recoverySlotHtml, type RecoveryUi } from './ui/recovery'
 import { readDailyNutritionSummary, observeDailyNutritionSummary } from './services/dailyNutritionSummary'
@@ -6,7 +10,7 @@ import { managerToolbarHtml, managerSearchHtml, managerListHtml, managerRowHtml,
 import { createManagementWorkspace, type ManagedSurfaceContext } from './ui/managementWorkspace'
 import { retireLegacyVideoSearchStorage } from './services/retiredVideoStorage'
 import { animateMotion, setupMotionInteractions, stabilizeSheetSubview } from './ui/motion'
-import { dietEventsHtml, bindDietEvents, type DietEventUi } from './ui/dietEvents'
+import { dietEventsHtml, bindDietEvents, showDietEvent, type DietEventUi } from './ui/dietEvents'
 import { bindFoodQuantity, foodQuantityFields } from './ui/foodQuantity'
 import { bindNumericPresentation } from './ui/numericPresentation'
 import { setupInputModality } from './ui/inputModality'
@@ -62,8 +66,8 @@ import {
   resolveDietTemplateFoods, saveDietTemplate, saveWorkoutTemplate,
   sortTemplates, startWorkoutFromTemplate, workoutTemplateFromWorkout,
 } from './services/templateService'
-import { calendarCategories, calendarCategoryIcons, calendarLegendLabels, getCalendarDayAccessibleLabel, hasDayRecords, loadMonthSummaries, renderMonthCalendar, type CalendarDaySummary } from './ui/calendarPage'
-import { buildCalendarDayDetailRows } from './ui/dayDetail'
+import { calendarCategories, calendarCategoryIcons, calendarLegendLabels, getCalendarDayAccessibleLabel, loadMonthSummaries, renderMonthCalendar, type CalendarDaySummary } from './ui/calendarPage'
+import { dailyRecordsHtml, updateDailyRecordsHtml } from './ui/dayDetail'
 import { foodPagerLabel, foodRailDates, foodRailFocus, foodRailNeedsRecenter, isCurrentFoodRender, shouldCommitFoodDate, shouldShowFoodTodayShortcut } from './ui/foodPager'
 import { icon, type IconName } from './ui/icons'
 import { habitPlanText, habitTodaySummary, habitWeekdayLabels } from './ui/habitPresentation'
@@ -86,6 +90,8 @@ type ProgressView = 'trend' | 'calendar' | 'reports'
 type PlanView = 'today' | 'upcoming' | 'inbox'
 let nutritionDispose: (() => void) | undefined
 let recoveryDispose: (() => void) | undefined
+let recordsDispose: (() => void) | undefined
+let daySheetRequest=0
 function recoveryUi(): RecoveryUi { return { esc, openModal, confirm: confirmAction, fail } }
 let activeTab: Tab = 'today'
 let renderedTab: Tab | undefined
@@ -178,13 +184,7 @@ function formatBackupTime(value: string | null): string {
 function setupMobileViewport(): void { setupInputModality(); setupSheetViewport() }
 
 function toast(message: string, tone: 'normal' | 'error' = 'normal'): void {
-  document.querySelector('.toast')?.remove()
-  const element = document.createElement('div')
-  element.className = `toast ${tone === 'error' ? 'toast-error' : ''}`
-  element.innerHTML = `${icon(tone === 'error' ? 'x' : 'check', 18)}<span>${esc(message)}</span>`
-  element.setAttribute('role', 'status')
-  document.body.append(element)
-  window.setTimeout(() => { const exit = animateMotion(element, 'toast-exit'); if (exit) void exit.finished.then(() => element.remove(), () => element.remove()); else element.remove() }, 1900)
+  showActionToast(message, { tone })
 }
 
 function fail(error: unknown): void {
@@ -256,6 +256,7 @@ function chooseNutritionTargetConflict(): Promise<'preserve' | 'replace' | undef
 }
 
 async function render(): Promise<void> {
+  recordsDispose?.();recordsDispose=undefined
   nutritionDispose?.(); nutritionDispose = undefined
   recoveryDispose?.(); recoveryDispose = undefined
   const renderVersion = String(++rootRenderVersion)
@@ -560,6 +561,7 @@ function reportDateLabel(date: string): string {
 }
 
 function reportPeriodLabel(report: ReportResult): string {
+  if (reportMode === 'day') return reportDateLabel(report.range.start)
   if (reportMode === 'month') return `${report.range.start.slice(0, 4)}年${Number(report.range.start.slice(5, 7))}月`
   return `${reportDateLabel(report.range.start)}–${reportDateLabel(report.range.end)}`
 }
@@ -623,27 +625,41 @@ function reportNutritionHtml(report: ReportResult): string {
   return `<section class="report-section"><h2>饮食记录</h2><div class="report-nutrition-list">${rows}</div></section>`
 }
 
-async function renderReportsPage(): Promise<void> {
-  const view = document.querySelector<HTMLElement>('#view')!
-  const viewVersion = view.dataset.renderVersion
-  const today = getLocalDateString()
-  const report = await loadReport(reportMode, reportAnchorDate, today)
-  if (activeTab !== 'progress' || progressView !== 'reports') return
-  const current = getReportRange(reportMode, today)
-  const isCurrent = report.range.start === current.start
-  if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
-  const retainedTabs = setTabbedViewHtml(view, `${progressTabsHtml()}<div class="report-page"><div class="report-mode" role="group" aria-label="报告周期"><button data-report-mode="week" class="${reportMode === 'week' ? 'active' : ''}" aria-pressed="${reportMode === 'week'}">周报</button><button data-report-mode="month" class="${reportMode === 'month' ? 'active' : ''}" aria-pressed="${reportMode === 'month'}">月报</button></div><div class="report-period"><button id="report-previous" aria-label="${reportMode === 'week' ? '上一周' : '上个月'}">‹</button><strong>${reportPeriodLabel(report)}</strong><button id="report-next" aria-label="${reportMode === 'week' ? '下一周' : '下个月'}" ${isCurrent ? 'disabled' : ''}>›</button></div>${isCurrent ? '' : `<button class="report-return" id="report-return">回到本${reportMode === 'week' ? '周' : '月'}</button>`}${report.empty ? '<div class="report-empty">这段时间还没有记录。</div>' : `<div class="report-summary-grid"><div><strong>${report.summary.trainingDays}</strong><span>训练天数</span></div><div><strong>${formatNumber(report.summary.cardioMinutes)}</strong><span>有氧分钟</span></div><div><strong>${report.summary.foodDays}</strong><span>饮食记录天数</span></div><div><strong>${report.summary.habitCheckIns}</strong><span>习惯打卡次数</span></div></div>${reportTrainingHtml(report)}${reportWeightHtml(report)}${reportNutritionHtml(report)}`} ${reportHabitsHtml(report)}${report.empty ? '' : `<section class="report-section"><h2>本期摘要</h2><p class="report-note">${esc(report.text)}</p></section>`}</div>`)
-  if (!retainedTabs) bindProgressTabs(view)
-  view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach((button) => button.addEventListener('click', () => { reportMode = button.dataset.reportMode as ReportMode; void render().catch(fail) }))
-  view.querySelector('#report-previous')?.addEventListener('click', () => { reportAnchorDate = shiftReportPeriod(reportMode, reportAnchorDate, -1); void render().catch(fail) })
-  view.querySelector('#report-next')?.addEventListener('click', () => { if (isCurrent) return; reportAnchorDate = shiftReportPeriod(reportMode, reportAnchorDate, 1); void render().catch(fail) })
-  view.querySelector('#report-return')?.addEventListener('click', () => { reportAnchorDate = today; void render().catch(fail) })
+function reportBodyHtml(report:ReportResult):string {
+  if(reportMode==='day')return dailyRecordsHtml(report.daily!,esc)
+  return `${report.empty?'<div class="report-empty">这段时间还没有记录。</div>':`<div class="report-summary-grid"><div><strong>${report.summary.trainingDays}</strong><span>训练天数</span></div><div><strong>${formatNumber(report.summary.cardioMinutes)}</strong><span>有氧分钟</span></div><div><strong>${report.summary.foodDays}</strong><span>饮食记录天数</span></div><div><strong>${report.summary.habitCheckIns}</strong><span>习惯打卡次数</span></div></div>${reportTrainingHtml(report)}${reportWeightHtml(report)}${reportNutritionHtml(report)}`} ${reportHabitsHtml(report)}${recoveryReportHtml(report)}${report.empty?'':`<section class="report-section"><h2>本期摘要</h2><p class="report-note">${esc(report.text)}</p></section>`}`
+}
+function mountReportWeightChart(view:HTMLElement,report:ReportResult):void {
+  reportWeightChart?.destroy();reportWeightChart=undefined
   const canvas = view.querySelector<HTMLCanvasElement>('#report-weight-chart')
   if (canvas) {
     const style = getComputedStyle(document.documentElement)
     const color = style.getPropertyValue('--text-secondary').trim() || '#73818b'
     reportWeightChart = new Chart(canvas, { type: 'line', data: { labels: report.weights.map((item) => reportDateLabel(item.date)), datasets: [{ data: report.weights.map((item) => item.weightKg), borderColor: '#728e9f', backgroundColor: 'transparent', borderWidth: 2, tension: .18, pointRadius: 3, pointHoverRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color, maxTicksLimit: 5 } }, y: { grid: { color: '#edf0ed' }, ticks: { color, maxTicksLimit: 4 } } } } })
   }
+}
+async function renderReportsPage():Promise<void> {
+  const view=document.querySelector<HTMLElement>('#view')!,viewVersion=view.dataset.renderVersion,today=getLocalDateString(),mode=reportMode,anchor=reportAnchorDate
+  let report=await loadReport(mode,anchor,today)
+  if(activeTab!=='progress'||progressView!=='reports'||!view.isConnected||view.dataset.renderVersion!==viewVersion)return
+  const isCurrent=report.range.start===getReportRange(mode,today).start,period=mode==='day'?'天':mode==='week'?'周':'月'
+  const retainedTabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page"><div class="report-mode" role="group" aria-label="报告周期">${(['day','week','month'] as const).map(m=>`<button data-report-mode="${m}" class="${mode===m?'active':''}" aria-pressed="${mode===m}">${m==='day'?'日报':m==='week'?'周报':'月报'}</button>`).join('')}</div><div class="report-period"><button id="report-previous" aria-label="上一${period}">‹</button>${mode==='day'?`<button class="text-btn fitlog-date-trigger" id="report-date-picker">${reportPeriodLabel(report)}</button>`:`<strong>${reportPeriodLabel(report)}</strong>`}<button id="report-next" aria-label="下一${period}" ${isCurrent?'disabled':''}>›</button></div>${isCurrent?'':`<button class="report-return" id="report-return">${mode==='day'?'回到今天':'回到本'+period}</button>`}<div class="report-content">${reportBodyHtml(report)}</div></div>`)
+  if(!retainedTabs)bindProgressTabs(view)
+  view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach(b=>b.addEventListener('click',()=>{reportMode=b.dataset.reportMode as ReportMode;void render().catch(fail)}))
+  view.querySelector('#report-previous')?.addEventListener('click',()=>{reportAnchorDate=shiftReportPeriod(mode,anchor,-1);void render().catch(fail)})
+  view.querySelector('#report-next')?.addEventListener('click',()=>{if(isCurrent)return;reportAnchorDate=shiftReportPeriod(mode,anchor,1);void render().catch(fail)})
+  view.querySelector('#report-return')?.addEventListener('click',()=>{reportAnchorDate=today;void render().catch(fail)})
+  view.querySelector('#report-date-picker')?.addEventListener('click',()=>showBusinessDatePicker('选择日报日期',anchor,date=>{reportAnchorDate=date;void render().catch(fail)}))
+  mountReportWeightChart(view,report)
+  const signature=(r:ReportResult)=>JSON.stringify(r,(_k,v)=>v instanceof Set?[...v]:v)
+  let previous=signature(report)
+  const sub=liveQuery(()=>loadReport(mode,anchor,today)).subscribe({next:value=>{
+    const host=view.querySelector<HTMLElement>('.report-content');if(!host?.isConnected||view.dataset.renderVersion!==viewVersion)return
+    const next=signature(value);if(next===previous)return;previous=next;report=value
+    if(mode==='day')updateDailyRecordsHtml(host,dailyRecordsHtml(report.daily!,esc))
+    else {const y=scrollY;host.innerHTML=reportBodyHtml(report);mountReportWeightChart(view,report);window.scrollTo({top:y,behavior:'instant'})}
+  },error:fail})
+  recordsDispose=()=>sub.unsubscribe()
 }
 
 const taskToggleQueue = new Map<string, Promise<void>>()
@@ -918,18 +934,21 @@ function showManagementHub(): void {
 async function renderCalendarOverview(withProgressTabs = false): Promise<void> {
   const view = document.querySelector<HTMLElement>('#view')!
   const viewVersion = view.dataset.renderVersion
-  const summaries = await loadMonthSummaries(calendarYear, calendarMonth)
+  let summaries = await loadMonthSummaries(calendarYear, calendarMonth)
   if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
   const retainedTabs = setTabbedViewHtml(view, `${withProgressTabs ? progressTabsHtml() : ''}<section class="calendar-overview-head"><button class="icon-btn quiet calendar-prev" id="calendar-prev" aria-label="上个月">${icon('chevron', 20)}</button><div><strong>${calendarYear}年 ${calendarMonth + 1}月</strong><button class="text-btn" id="calendar-today">回到今天</button></div><button class="icon-btn quiet" id="calendar-next" aria-label="下个月">${icon('chevron', 20)}</button></section><div id="calendar-host"></div><section class="calendar-legend" aria-label="日历标记说明">${calendarCategories.map((category) => `<span class="calendar-legend-item"><i class="calendar-legend-icon calendar-category-${category}" aria-hidden="true">${icon(calendarCategoryIcons[category], 14)}</i><span>${calendarLegendLabels[category]}</span></span>`).join('')}</section>`)
   if (withProgressTabs && !retainedTabs) bindProgressTabs(view)
   const host = view.querySelector<HTMLElement>('#calendar-host')!
-  host.append(renderMonthCalendar({
-    year: calendarYear,
-    month: calendarMonth,
-    selectedDate: calendarSelectedDate,
-    summaries,
-    onDateClick: (date) => void handleCalendarDateClick(date, summaries.get(date), summaries),
-  }))
+  const year=calendarYear,month=calendarMonth
+  const draw=()=>{
+    const focused=host.querySelector<HTMLButtonElement>('.calendar-day:focus')?.dataset.date
+    host.replaceChildren(renderMonthCalendar({year,month,selectedDate:calendarSelectedDate,summaries,onDateClick:date=>void handleCalendarDateClick(date,summaries.get(date),summaries)}))
+    if(focused)host.querySelector<HTMLButtonElement>(`.calendar-day[data-date="${focused}"]`)?.focus({preventScroll:true})
+  }
+  draw()
+  let signature=JSON.stringify([...summaries])
+  const sub=liveQuery(()=>loadMonthSummaries(year,month)).subscribe({next:value=>{if(!host.isConnected||view.dataset.renderVersion!==viewVersion)return;const next=JSON.stringify([...value]);if(next===signature)return;signature=next;summaries=value;draw()},error:fail})
+  recordsDispose=()=>sub.unsubscribe()
   view.querySelector('#calendar-prev')?.addEventListener('click', () => { shiftCalendarMonth(-1); void render().catch(fail) })
   view.querySelector('#calendar-next')?.addEventListener('click', () => { shiftCalendarMonth(1); void render().catch(fail) })
   view.querySelector('#calendar-today')?.addEventListener('click', () => {
@@ -945,14 +964,15 @@ function shiftCalendarMonth(offset: number): void {
 }
 
 async function handleCalendarDateClick(date: string, summary?: CalendarDaySummary, summaries?: Map<string, CalendarDaySummary>): Promise<void> {
+  const request=++daySheetRequest
   calendarSelectedDate = date
   const selected = new Date(`${date}T12:00:00`)
   if (selected.getFullYear() !== calendarYear || selected.getMonth() !== calendarMonth) {
     calendarYear = selected.getFullYear()
     calendarMonth = selected.getMonth()
-    const summaries = await loadMonthSummaries(calendarYear, calendarMonth)
     await render()
-    await showCalendarDaySheet(date, summaries.get(date))
+    if(request!==daySheetRequest)return
+    await showCalendarDaySheet(date,request)
     return
   }
   document.querySelectorAll<HTMLButtonElement>('.calendar-day.selected').forEach((element) => {
@@ -963,40 +983,28 @@ async function handleCalendarDateClick(date: string, summary?: CalendarDaySummar
   selectedButton?.classList.add('selected')
   selectedButton?.setAttribute('aria-selected', 'true')
   selectedButton?.setAttribute('aria-label', getCalendarDayAccessibleLabel(date, summary, { selected: true, today: selectedButton.classList.contains('today') }))
-  await showCalendarDaySheet(date, summary)
+  await showCalendarDaySheet(date,request)
 }
 
 function dietEventUi(): DietEventUi { return { openModal, esc, profiles: aiAssistant.profiles, confirmDelete: (title, body) => confirmAction(title, body, '删除记录', true), changed: async () => { await render() } } }
 
-async function showCalendarDaySheet(date: string, summary?: CalendarDaySummary): Promise<void> {
-  const [cardioSessions, workouts, pelvicSessions, dietEvents] = await Promise.all([
-    getCardioSessionsByDate(date),
-    db.workouts.where('date').equals(date).toArray(),
-    db.pelvicFloorSessions.where('date').equals(date).toArray(),
-    db.dietEvents.where('date').equals(date).sortBy('createdAt'),
-  ])
-  const target = summary?.nutritionTarget
-  const rows = buildCalendarDayDetailRows(summary, workouts, cardioSessions, pelvicSessions)
-  const canClear = hasDayRecords(summary) || Boolean(target)
-  const detailHtml = rows.map((row) => `<article class="day-detail-row" role="group" aria-label="${esc(row.accessibleLabel)}"><div class="day-detail-label"><span class="day-detail-icon calendar-category-${row.key}" aria-hidden="true">${icon(calendarCategoryIcons[row.key], 16)}</span><span>${esc(row.label)}</span></div><div class="day-detail-content"><strong class="${row.empty ? 'is-empty' : ''}">${esc(row.primary)}</strong>${row.secondary.map((detail) => `<span>${esc(detail)}</span>`).join('')}</div></article>`).join('')
-  const dialog = openModal(formatHeaderDate(date), `<div class="calendar-day-sheet">${detailHtml}${dietEvents.length ? dietEventsHtml(dietEvents, esc, true) : ''}</div><section class="calendar-quick-record" aria-label="快捷记录"><h3>快捷记录</h3><div class="calendar-day-actions"><button id="calendar-day-food">${icon('utensils', 18)} 饮食</button><button id="calendar-day-workout">${icon('dumbbell', 18)} 训练</button><button id="calendar-day-weight">${icon('scale', 18)} 体重</button></div></section>${canClear ? '<div class="calendar-day-danger"><button id="calendar-clear-day" class="danger-button">清空当天记录</button></div>' : ''}`)
+async function showCalendarDaySheet(date: string,request=++daySheetRequest): Promise<void> {
+  const owner=document.querySelector('#calendar-host')
+  let records=await readDailyRecords(date)
+  if(request!==daySheetRequest||!owner?.isConnected)return
+  const dialog=openModal(formatHeaderDate(date),`<h3 class="daily-records-heading">当日记录</h3><div data-daily-records-host>${dailyRecordsHtml(records,esc,true)}</div><section class="calendar-quick-record" aria-label="快捷记录"><h3>快捷记录</h3><div class="calendar-day-actions"><button id="calendar-day-food">${icon('utensils',18)} 饮食</button><button id="calendar-day-workout">${icon('dumbbell',18)} 训练</button><button id="calendar-day-weight">${icon('scale',18)} 体重</button></div></section><div class="calendar-day-danger"><button id="calendar-clear-day" class="danger-button">清空饮食、训练与体重记录</button></div>`,true)
   dialog.classList.add('calendar-detail-sheet')
-  bindDietEvents(dialog, date, dietEvents, dietEventUi())
-  dialog.querySelector('#calendar-day-food')?.addEventListener('click', () => { dialog.close(); activeTab = 'food'; foodDate = date; void render().catch(fail) })
-  dialog.querySelector('#calendar-day-workout')?.addEventListener('click', () => { dialog.close(); activeTab = 'workout'; workoutDate = date; currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = false; void render().catch(fail) })
-  dialog.querySelector('#calendar-day-weight')?.addEventListener('click', () => {
-    dialog.close(); activeTab = 'progress'; progressView = 'trend'; weightDate = date
-    void render().then(() => showWeightForm(date, summary?.weightKg)).catch(fail)
-  })
-  dialog.querySelector('#calendar-clear-day')?.addEventListener('click', async () => {
-    const day = new Intl.DateTimeFormat('zh-CN', { month: 'long', day: 'numeric' }).format(new Date(`${date}T12:00:00`))
-    if (!await confirmAction(`清空 ${day} 的饮食、训练和体重记录？`, '将删除当天的饮食记录、特殊饮食备注、营养目标、无氧训练、有氧训练、凯格尔训练和体重记录。计划任务与习惯打卡不会受影响。删除后无法恢复。', '清空当天记录')) return
-    try {
-      await clearDayRecords(date)
-      dialog.close()
-      toast('当天记录已清空')
-      await render()
-    } catch (error) { fail(error) }
+  const host=dialog.querySelector<HTMLElement>('[data-daily-records-host]')!
+  host.addEventListener('click',event=>{const button=(event.target as Element).closest<HTMLElement>('[data-diet-event-edit]');if(button)showDietEvent(dietEventUi(),date,records.source.dietEvents.find(e=>e.id===button.dataset.dietEventEdit))})
+  const sub=liveQuery(()=>readDailyRecords(date)).subscribe({next:value=>{if(!dialog.open||!host.isConnected)return;records=value;updateDailyRecordsHtml(host,dailyRecordsHtml(records,esc,true))},error:fail})
+  dialog.addEventListener('close',()=>sub.unsubscribe(),{once:true})
+  dialog.querySelector('#calendar-day-food')?.addEventListener('click',()=>{dialog.close();activeTab='food';foodDate=date;void render().catch(fail)})
+  dialog.querySelector('#calendar-day-workout')?.addEventListener('click',()=>{dialog.close();activeTab='workout';workoutDate=date;currentWorkout=undefined;workoutEditorOpen=false;showWorkoutHistory=false;void render().catch(fail)})
+  dialog.querySelector('#calendar-day-weight')?.addEventListener('click',()=>{dialog.close();activeTab='progress';progressView='trend';weightDate=date;void render().then(()=>showWeightForm(date,records.summary.weightKg)).catch(fail)})
+  dialog.querySelector('#calendar-clear-day')?.addEventListener('click',async()=>{
+    const day=new Intl.DateTimeFormat('zh-CN',{month:'long',day:'numeric'}).format(new Date(date+'T12:00:00'))
+    if(!await confirmAction(`清空 ${day} 的饮食、训练和体重记录？`,'将删除当天饮食记录、特殊饮食备注、营养目标、力量训练、有氧训练、凯格尔训练和体重记录。睡眠、饮水、习惯打卡与计划任务保留。删除后无法恢复。','清空这些记录'))return
+    try{await clearDayRecords(date);toast('饮食、训练与体重记录已清空')}catch(error){fail(error)}
   })
 }
 

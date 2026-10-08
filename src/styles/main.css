@@ -472,21 +472,19 @@ html[data-input-modality="keyboard"] .workout-actions .danger-button:focus-visib
 .calendar-weekdays { padding: 0 1px 7px; }
 .calendar-weekdays span { color: var(--text-secondary); font-size: .68rem; font-weight: 650; text-align: center; }
 .calendar-grid { gap: 3px 2px; }
-.calendar-day { display: flex; min-width: 0; height: 74px; flex-direction: column; align-items: center; justify-content: flex-start; gap: 2px; overflow: hidden; padding: 3px 0 2px; border: 1px solid transparent; border-radius: 12px; background: transparent; text-align: center; }
-.calendar-day.outside-month { opacity: .32; }
-.calendar-day-number { position: relative; display: grid; width: 36px; height: 36px; flex: 0 0 36px; place-items: center; border-radius: 50%; color: var(--text-primary); font-size: .82rem; font-weight: 700; }
-.calendar-day.selected .calendar-day-number { background: var(--accent-soft); color: var(--accent-strong); }
-.calendar-day.today:not(.selected) .calendar-day-number { color: var(--accent-strong); }
-.calendar-day.today .calendar-day-number::after { position: absolute; bottom: 3px; left: 50%; width: 4px; height: 4px; transform: translateX(-50%); border-radius: 50%; background: var(--accent); content: ''; }
-.calendar-day.today.selected .calendar-day-number::after { background: var(--accent-mid); }
-.calendar-day-details { display: flex; min-width: 0; min-height: 25px; flex-direction: column; align-items: center; gap: 2px; }
-.calendar-calories { max-width: 100%; overflow: hidden; color: var(--accent-strong); font-size: .48rem; font-weight: 700; letter-spacing: -.03em; white-space: nowrap; }
-.calendar-nutrition-progress { position: relative; display: block; width: 75%; height: 3px; flex: 0 0 3px; overflow: hidden; border-radius: 99px; background: var(--border); }
-.calendar-nutrition-progress::after { position: absolute; inset: 0 auto 0 0; width: var(--progress); border-radius: inherit; background: var(--accent-mid); content: ""; }
-.calendar-markers { order: -1; display: flex; width: 100%; height: 10px; flex: 0 0 10px; align-items: center; justify-content: center; gap: 1px; white-space: nowrap; }
-.calendar-marker { display: grid; width: 7px; height: 10px; flex: 0 0 7px; place-items: center; color: var(--calendar-color); }
-.calendar-marker .icon { width: 8px; height: 8px; stroke-width: 2.3; }
-.calendar-marker-overflow { color: var(--text-secondary); font-size: .52rem; line-height: 1; font-variant-numeric: tabular-nums; }
+/* Date selection owns seven >=44px columns; facts occupy nine stable semantic slots. */
+.calendar-day { display:flex; min-width:44px; min-height:calc(68px + 2.25rem); height:auto; flex-direction:column; align-items:center; justify-content:flex-start; gap:6px; padding:6px 0; border:1px solid transparent; border-radius:12px; background:transparent; text-align:center; }
+.calendar-day.outside-month { opacity:.5; }
+.calendar-day-number { position:relative; display:grid; width:36px; min-height:max(36px,1.8rem); flex:0 0 auto; place-items:center; border-radius:50%; color:var(--text-primary); font-size:.82rem; font-weight:700; }
+.calendar-day.selected .calendar-day-number { background:var(--accent-soft); color:var(--accent-strong); }
+.calendar-day.today:not(.selected) .calendar-day-number { color:var(--accent-strong); }
+.calendar-day.today .calendar-day-number::after { position:absolute; bottom:2px; left:50%; width:4px; height:4px; transform:translateX(-50%); border-radius:50%; background:var(--accent); content:''; }
+.calendar-day.today.selected .calendar-day-number::after { background:var(--accent-mid); }
+.calendar-day-details { display:block; width:100%; min-width:0; }
+.calendar-markers { display:grid; grid-template-columns:repeat(3,12px); grid-template-rows:repeat(3,12px); justify-content:center; gap:2px; }
+.calendar-marker-slot, .calendar-marker { display:grid; width:12px; height:12px; place-items:center; }
+.calendar-marker { color:var(--calendar-color); }
+.calendar-marker .icon { width:12px; height:12px; stroke-width:1.9; }
 .calendar-category-food { --calendar-color: var(--accent-strong); --calendar-bg: var(--accent-soft); }
 .calendar-category-strength { --calendar-color: #426d67; --calendar-bg: #e7f0ee; }
 .calendar-category-cardio { --calendar-color: #946e2c; --calendar-bg: #fbf2df; }
@@ -500,16 +498,30 @@ html[data-input-modality="keyboard"] .workout-actions .danger-button:focus-visib
 .calendar-detail-sheet .modal-head [data-close] .icon { width: 18px; height: 18px; }
 html[data-input-modality="keyboard"] .calendar-detail-sheet .modal-head [data-close]:focus-visible { background: var(--surface-soft); }
 @media (hover: hover) and (pointer: fine) { .calendar-detail-sheet .modal-head [data-close]:hover { background: var(--surface-soft); } }
-.calendar-day-sheet { overflow: hidden; border: 1px solid color-mix(in srgb, var(--border) 58%, transparent); border-radius: 18px; background: var(--surface); }
-.day-detail-row { display: grid; grid-template-columns: 116px minmax(0, 1fr); align-items: center; gap: 9px; min-height: 68px; padding: 10px 12px; }
-.day-detail-row + .day-detail-row { border-top: 1px solid color-mix(in srgb, var(--divider) 42%, transparent); }
-.day-detail-label { display: flex; align-items: center; gap: 7px; min-width: 0; color: var(--text-primary); font-size: .92rem; font-weight: 650; white-space: nowrap; }
-.day-detail-icon { display: grid; width: 30px; height: 30px; flex: 0 0 30px; place-items: center; border-radius: 10px; background: var(--calendar-bg); color: var(--calendar-color); }
-.day-detail-icon .icon { width: 15px; height: 15px; stroke-width: 1.8; }
-.day-detail-content { display: grid; min-width: 0; gap: 4px; }
-.day-detail-content strong { color: var(--text-primary); font-size: 1.05rem; font-weight: 650; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
-.day-detail-content strong.is-empty { color: var(--text-secondary); font-size: .95rem; font-weight: 500; }
-.day-detail-content span { color: var(--text-secondary); font-size: .8rem; line-height: 1.35; word-break: keep-all; overflow-wrap: normal; }
+.calendar-day-sheet { container-type:inline-size; overflow: visible; border: 1px solid color-mix(in srgb, var(--border) 58%, transparent); border-radius: 18px; background: var(--surface); }
+ .day-detail-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 16px; align-items:center; gap:8px; min-height:68px; padding:12px; list-style:none; cursor:pointer; }
+.day-detail-row::-webkit-details-marker { display:none; }
+.day-detail-label { display:flex; align-items:center; gap:7px; min-width:0; color:var(--text-primary); font-size:.92rem; font-weight:650; overflow-wrap:anywhere; }
+.day-detail-icon { display:grid; width:30px; height:30px; flex:0 0 30px; place-items:center; border-radius:10px; background:var(--calendar-bg); color:var(--calendar-color); }
+.day-detail-icon .icon { width:15px; height:15px; stroke-width:1.8; }
+.day-detail-content { display:grid; min-width:0; gap:4px; }
+.day-detail-content strong { color:var(--text-primary); font-size:1.05rem; font-weight:650; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.day-detail-content strong.is-empty { color:var(--text-secondary); font-size:.95rem; font-weight:500; }
+.day-detail-content span { color:var(--text-secondary); font-size:.8rem; line-height:1.4; overflow-wrap:anywhere; }
+.daily-record-group + .daily-record-group { border-top:1px solid var(--divider); }
+.daily-record-content { padding:0 12px 12px; }
+.daily-record-item { padding:10px 0; border-top:1px solid var(--divider); font-size:.85rem; overflow-wrap:anywhere; }
+.daily-record-item > strong { font-weight:650; }
+.daily-record-item p { margin:4px 0 0; color:var(--text-secondary); font-size:.78rem; line-height:1.5; white-space:pre-wrap; }
+.daily-record-content .diet-events-detail { padding:0; border:0; }
+.daily-record-chevron { color:var(--text-tertiary); }
+.daily-record-group[open] > summary .daily-record-chevron { transform:rotate(90deg); }
+.daily-records-heading { margin:0 0 12px; font-size:1rem; }
+@container(max-width:20em) {
+  .day-detail-row { grid-template-columns:minmax(0,1fr) 16px; }
+  .day-detail-content { grid-column:1; }
+  .daily-record-chevron { grid-column:2; grid-row:1 / 3; }
+}
 .calendar-quick-record { margin-top: 17px; }
 .calendar-quick-record h3 { margin: 0 0 9px; color: var(--text-secondary); font-size: .79rem; font-weight: 650; }
 .calendar-day-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
@@ -730,7 +742,7 @@ body.keyboard-open .bottom-nav { display: none; }
 
 /* Period reports use quiet, independently scaled marks with text equivalents. */
 .report-page { display: grid; gap: 12px; min-width: 0; }
-.report-mode { display: grid; grid-template-columns: repeat(2, 1fr); padding: 3px; border-radius: 14px; background: var(--surface-soft); }
+.report-mode { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); padding: 3px; border-radius: 14px; background: var(--surface-soft); }
 .report-mode button { min-height: 44px; border: 0; background: transparent; color: var(--text-secondary); font-size: .85rem; }
 .report-mode button.active { background: var(--accent-soft); color: var(--accent-strong); box-shadow: none; }
 .report-period { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; text-align: center; }
@@ -924,9 +936,6 @@ body.keyboard-open .bottom-nav { display: none; }
 .meal-photo-review label { display: grid; gap: 6px; }
 .meal-photo-review input { font-size: 16px; }
 .meal-photo-review li { overflow-wrap: anywhere; }
-/* Keep four glyphs plus the context overflow count inside the existing day geometry. */
-.calendar-day-details { width: 100%; }
-.calendar-markers:has(.calendar-marker-overflow) { gap: 0; }
 
 /* State feedback preserves geometry and the independent Today marker. */
 .bottom-nav button::before { transition: background-color var(--motion-normal) var(--ease-standard); }
@@ -936,3 +945,11 @@ body.keyboard-open .bottom-nav { display: none; }
 .today-habit-row[aria-pressed=true] .habit-check-indicator > .icon { opacity: 1; transform: none; }
 .today-habit-row[aria-pressed=true] .habit-row-name { color: var(--accent-strong); }
 .habit-row-name, .habit-weekday-option > span { transition: color var(--motion-normal) var(--ease-standard), background-color var(--motion-normal) var(--ease-standard), border-color var(--motion-normal) var(--ease-standard); }
+
+.calendar-category-habit, .calendar-category-sleep, .calendar-category-water { --calendar-color:var(--accent-strong); --calendar-bg:var(--surface-soft); }
+/* Shared feedback uses existing viewport ownership and never enters business-card layout. */
+.action-toast { inset:auto auto calc(var(--bottom-nav-height) + 12px) 50%; margin:0; width:max-content; max-width:calc(100vw - 24px); min-height:44px; padding:4px 10px; flex-wrap:wrap; }
+.action-toast > span { flex:1 1 auto; overflow-wrap:anywhere; }
+.action-toast .text-btn { min-height:44px; padding:4px 8px; color:var(--accent-strong); white-space:nowrap; }
+.action-toast::backdrop { background:transparent; pointer-events:none; }
+body.keyboard-open .action-toast { top:calc(var(--sheet-offset-top,0px) + 8px); bottom:auto; }

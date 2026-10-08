@@ -25,16 +25,20 @@ const rows = (summary: CalendarDaySummary | undefined = empty, workouts: Workout
   buildCalendarDayDetailRows(summary, workouts, cardioSessions, pelvicSessions)
 
 describe('Calendar 日期详情统一信息模型', () => {
-  it('五类空状态共用相同的类别、主值、次级信息结构', () => {
+  it('九类空状态共用相同的类别、主值、次级信息结构', () => {
     const result = rows()
     expect(result.map(({ key, label, primary, secondary, empty: isEmpty }) => [key, label, primary, secondary, isEmpty])).toEqual([
       ['food', '饮食', '未记录', [], true],
-      ['strength', '无氧训练', '未训练', [], true],
-      ['cardio', '有氧训练', '未训练', [], true],
-      ['pelvic', '凯格尔训练', '未训练', [], true],
+      ['strength', '力量训练', '未记录', [], true],
+      ['cardio', '有氧训练', '未记录', [], true],
+      ['pelvic', '凯格尔训练', '未记录', [], true],
       ['weight', '体重', '未记录', [], true],
+      ['dietEvent','特殊饮食','未记录',[],true],
+      ['habit','习惯','未记录',[],true],
+      ['sleep','睡眠','未记录',[],true],
+      ['water','饮水','未记录',[],true],
     ])
-    expect(result.map((item) => item.accessibleLabel)).toEqual(['饮食，未记录', '无氧训练，未训练', '有氧训练，未训练', '凯格尔训练，未训练', '体重，未记录'])
+    expect(result.map((item) => item.accessibleLabel)).toEqual(['饮食，未记录','力量训练，未记录','有氧训练，未记录','凯格尔训练，未记录','体重，未记录','特殊饮食，未记录','习惯，未记录','睡眠，未记录','饮水，未记录'])
   })
 
   it('饮食和营养目标独立表达，包括只有目标与两者都有', () => {
@@ -68,9 +72,9 @@ describe('Calendar 日期详情统一信息模型', () => {
     expect(rows(empty, [], [], [pelvic('a', 235), pelvic('b', 240, '耐力保持')])[3]).toMatchObject({ primary: '2 次', secondary: ['累计 7:55'] })
   })
 
-  it('体重仅显示当日公斤值，所有数据齐全时仍只有五行', () => {
+  it('体重仅显示当日公斤值，所有数据齐全时完整九行', () => {
     const result = rows({ ...empty, foodLogCount: 1, calories: 2180, weightKg: 72.4 }, [workout('a', 3)], [cardio('a', 25)], [pelvic('a', 235)])
-    expect(result).toHaveLength(5)
+    expect(result).toHaveLength(9)
     expect(result[4]).toMatchObject({ primary: '72.4 kg', secondary: [], accessibleLabel: '体重，72.4 千克' })
   })
 })

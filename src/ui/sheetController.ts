@@ -29,7 +29,9 @@ export function setupSheetViewport(): () => void {
         else if (field.top < top) surface.scrollTop -= top - field.top
       }
     }
+    const changed = JSON.stringify(state) !== JSON.stringify(next)
     revealFocused = false; state = next
+    if (changed) document.dispatchEvent(new Event('fitlog-viewport-change'))
   }
   const schedule = () => { if (!frame) frame = requestAnimationFrame(update) }
   const visualScroll = () => { if (!state?.keyboardOpen && !editing()) return; schedule() }
