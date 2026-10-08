@@ -1,115 +1,87 @@
 # FitLog Lite Development Report
 
-## Latest production round — Food density / durable Sleep and Water Recovery (2026-10-08)
+## Latest production round — Today / Food shared macro summary (2026-10-08)
 
-- START_COMMIT: `4b26eb21b537199b1fe8e5c4b3bf6fd2e07e7302`. Clean main, status/branch/pull/log confirmed; origin/main rechecked before publishing.
-- APPLICATION_COMMIT: `f2d18f57c09e600f81c15edea5fa2e2df9272e82`.
-- Application Actions: https://github.com/king-640-060/fitlog-lite/actions/runs/37724313332 — completed success, including typecheck/tests/build/Pages deployment.
-- END_COMMIT: report-only commit containing this file. Exact final SHA, Actions and asset/offline receipts are external and returned to the user, avoiding self-reference.
+- START_COMMIT: `e9222c65888371de0625b71d1f026d0246fa43db`. Clean main; status/branch/pull/log confirmed and origin/main rechecked before publishing.
+- APPLICATION_COMMIT: `74b9ef27154554f033e1e4b69e2e9dcf9e543b76`.
+- Application Actions: https://github.com/king-640-060/fitlog-lite/actions/runs/37735754816 — completed success, including typecheck/tests/build/Pages deployment.
+- END_COMMIT: the report-only commit containing this file. Its exact final SHA, Actions and production asset/offline receipts are external and returned to the user, avoiding self-reference.
 - Production: https://king-640-060.github.io/fitlog-lite/.
 
 ## Implemented behavior
 
-Classified Food summaries/primary completion as partially implemented; same-date g/kg and dedicated persisted Recovery were not implemented. Changes stay within the requested Food/Today/Progress scope and necessary data compatibility.
+Classified as partially implemented: both pages previously shared only an individual metric helper, separately assembled three colored tiles; Today omitted g/kg, responsive auto-fit could leave Fat alone, and Food had a duplicate +N expand action.
 
-Food previews show all names for1–3 foods, otherwise first3 with an independent44px `+N` button. Only names ellipsize; the counter remains complete. Expand all actual editable rows in place, then collapse at the bottom. Long names,20 foods and enlarged numbers remain bounded. Separators stay inside name components instead of occupying their own lines.
+Today and Food now render the complete shared `macroNutritionSummaryForDay` / `macroNutritionSummaryHtml` primitive. Props include consumed/target Protein, Carbs and Fat, effectiveWeight and selectedDate, plus optional snapshot completeness. One neutral token-based container replaces three colored surfaces. Protein/Carbs/Fat retain that order. Name, prominent consumed value, secondary target and lighter g/kg use separate lines and distinct hierarchy. Main numbers share text ink; existing category tokens appear only in tiny lines. No duplicated cell excess/reached badges or macro rings/bars.
 
-Food macro tiles show g/kg only from the selected local date's latest valid WeightLog. No historical fallback.164/86=1.91,252/86=2.93,52/86=0.60 g/kg. Incomplete macro snapshots hide the corresponding ratio. Today/Food share existing calorie SVG and macro primitives; responsive columns and intact value/unit tokens preserve four-digit macros/five-digit calories without changing canonical facts. 帮我补齐 uses the existing primary lime class, shared press/focus and a lime loading state with duplicate-click protection.
+Normal phone fonts use three aligned columns. A content-derived rem threshold participates in font scaling and switches all three cells together to full-width rows when enlarged text or long numeric values need room; never two plus an orphan. No private viewport listeners, measurement loop, new framework/dependency or hardcoded color palette. Numeric/unit tokens remain intact. Light/dark and normal/reduced motion use the same shared component.
 
-Today and Progress → Trend now share 恢复与习惯. 开始睡眠 creates one unique active session; 我醒了 saves absolute endTime, computed durationMinutes and local wake recordDate. Both surfaces read the same persisted tables through Dexie liveQuery. The display derives elapsed time from wall clock with a30-second UI timer only; no periodic DB writes or timer-engine rewrite. Background/reload/page switches/midnight retain the session. History supports correction and confirmed delete; active sleep supports correction/cancellation. Inverted/future edits fail without mutation; >24h warns and remains active. Absolute timestamps preserve elapsed duration across offsets/DST; captured historical local dates are not recalculated on timezone travel.
+`readDailyNutritionSummary` reads FoodLogs, NutritionTarget and same-date WeightLogs in one read-only transaction. Both pages use that snapshot and the unchanged saved-food reducer/formatting, existing weight selection and ratio calculation. Only the selected local date's latest valid positive finite weight is eligible; no historical fallback. Ratios have exactly two decimals; missing same-day weight or incomplete dimension hides its g/kg. Dexie liveQuery refreshes still-mounted summaries after real writes from another app tab. Subscriptions unsubscribe on navigation/date/replacement; Today patches only its nutrition contents and retains existing navigation controls. Food retains its rail, selected date and same-date meal expansion.
 
-Recovery offers7/30-day sleep-duration and water bar charts plus full daily text data. Multiple completed episodes sum per wake date; missing dates are unknown and excluded from sleep averages. Mean sleep/wake clocks use circular means of each day's longest episode. Achieved count uses an explicit8h reference over the whole7/30 calendar window. Water2500ml is an explicit reference, not an inferred individualized goal.
+Remaining/excess uses the existing shared completion summary and calculation. Today shows this same information without a new CTA; Food retains editing targets, strategy provenance and the existing primary completion action. Calorie SVG/calculation, target/template application and historical facts remain unchanged.
 
-Water250/500/custom actions append independent records with UUID, local date and absolute timestamp. Daily totals sum only that date. Six-second exact-id Undo is inline in the water card so it cannot float over another action. History supports date selection, individual amount edit and confirmed deletion. Sleep/Water history→editor→date retain one existing native Sheet, shared date-picker, header Back/X, parent nodes/scroll and cleanup. Save remains static primary with busy/inline validation.
-
-Responsive numeric/action layouts cover320–480px,140% text,844px landscape and dark preference. Dark semantic surface/ink/macro tokens keep the existing lime primary. Management Workspace controller, AI/Voice/provider logic, existing PWA architecture and retired Video status remain unchanged. No new dependency/framework/backend.
+Food keeps the existing counted meal header as its single expand entry; the duplicate +N button/count is removed. One to three names remain visible; larger meals preview three names. Expansion shows every actual editable row, with bottom collapse and existing edit/delete/confirmed scoped clear. Today has no separate meal list or duplicate expand entry. No new navigation or redundant CTA.
 
 ## Data compatibility
 
-- Stable `fitlog-lite-db`: DexieV11 / IndexedDB110 /20 stores. Explicit additive migration creates empty sleepSessions and waterLogs; all18 prior stores/indexes/rows/snapshots preserved.
-- Unique activeKey index and transactional sleep start enforce one active across two connections. Water records never replace another drink.
-- BackupV11 / RestoreV1–V11: validate new fields/ids/unique active/time consistency before atomic20-store replacement. Old Backup1–10 normalizes new arrays to empty.
-- Encrypted GitHub Sync/envelopeV1 and device-only AIConfigV1/VoiceConfigV1 unchanged. New records participate in canonical hashes, preview counts, full backup/upload/restore and existing conflict protection. No credentials enter Backup/Sync.
-- Frozen older fixtures unchanged; added frozenV11 active/completed sleep and water. No real-user storage reset/reseed/Restore.
+- Stable `fitlog-lite-db`: DexieV11 / IndexedDB110 /20 stores, unchanged schema/indexes and database identity.
+- BackupV11 / RestoreV1–V11; encrypted GitHub Sync/envelopeV1; device-only AIConfigV1/VoiceConfigV1 unchanged.
+- No DB/Backup/Restore/Sync/AI/PWA implementation, migration, dependency or frozen production fixture changes in this round. Existing Recovery, strategy/template, serving, historical snapshot and offline behavior retained.
+- Shared summary reads do not write or recompute saved snapshots. No real user data clearing/reseeding/Restore/reinstall.
 
 ## Automated Verification
 
-- npm run typecheck: PASS.
-- npm test: **672 tests /59 files PASS**, including24 new Recovery/nutrition/preservation cases.
-- npm run build: PASS, including clean application Pages build `local:false`. Existing Vite >500kB chunk advisory remains informational.
-- git diff --check: PASS.
-- Complete browser inventory: **23/23 final PASS** — foodRecovery, managementWorkspace, managementVisualConsistency, habitEditorLayout, motionPolish, uiQualityAudit, uiSemanticConsistency, interactionStabilization, mobileLayout, sharedDatePicker, githubSyncSafety, aiAssistant, aiVoice, voiceMode, aiStreaming, aiDualModelRouting, foodVision, nutritionGauge, nutritionTemplates, foodServing, dietEvents, trainingJournal, habitDeletion. No suite/assertion removed or existing timeout increased.
-- foodRecovery **35/35** local contexts:320/375/390/430 ×100/120/140% ×normal/reduced (24); dark320/360/430/480/844-landscape ×100/140% (10); light844-landscape140% (1).20 long names/+17/expand/collapse, same-day ratios, large numbers, primary completion, durable active/global state,456-minute wake-day completion, correction to396, same-Sheet history/date Back, cancel, >24h, water Undo/custom/edit/delete and7/30 charts all pass. No page errors/horizontal overflow/critical clipping.
-- Existing UI quality141 states at each of4 widths, font/landscape checks; shared SVG/tile gauge, management identity/Back/X/scroll/query and Habit static Save52px/15px/overlap0 pass.
-- Unit migration/reopen/populate preserve all frozenV10 rows/indexes, unique start across connections, absolute DST duration, future/inverted edits, missing-day/circular statistics, frozenV11 reopen, Backup11/encryptedV1 round trip, malformed validation and injected atomic rollback pass.
-- Additional pwaUpgrade: reconstructed real33798a7 V7 bundle retains original index-DGXlZzHp.js identity. Same-origin old→new SW waiting, selected-image preservation,14 legacy stores/15 rows plus synthetic AI, additive110/20 upgrade and offline cold new page PASS. Optional prior-prompt mode was not selected.
+| Gate | Result |
+| --- | --- |
+| `npm run typecheck` | PASS |
+| `npm test` | PASS —675 tests /60 files |
+| `npm run build` | PASS — final clean application build and CI build |
+| Full browser inventory | PASS — all24 suites; none skipped |
+| New macroNutritionSummary | PASS —40 local contexts |
+| Existing foodRecovery | PASS —35 local contexts |
+| Existing nutritionGauge | PASS —4 widths ×66 states, shared SVG/macro HTML/styles |
 
-### Visual review and retained failures
+The24 suites are listed in docs/UI_QA_MATRIX.md and the external accepted-gates receipt. All previous23 remain required. New40 matrix:320/375/390/430 ×100/120/140/200% ×light/dark (32), plus480/844-landscape ×100/140% ×light/dark (8). Normal/reduced motion included. Assertions cover complete identical Today/Food summary HTML, aligned three columns at normal fonts, whole-group vertical fallback, font hierarchy, neutral cells/shared number ink, text contrast>=4.5:1, no overflow/clipping/overlap/orphan or repeated badges. Exact159.8/86.4=1.85,218.7/86.4=2.53,45.5/86.4=0.53 g/kg; no same-day weight; unknown Fat; independent historical80kg; cross-tab actual weight edits refreshing each mounted surface; large numbers;20 editable foods and one expand entry.
 
-Inspected actual320/140 light,390/100 dark and844/140 landscape Food/Recovery cards: complete independent counts, intact large values/units/g/kg, shared lime CTA and readable contrast. Early review fixed orphan separators and same-Sheet history navigation. Full matrix exposed floating water Undo intercepting 自定义; moved feedback into normal card flow and reran all35 contexts plus complete release inventory against final frozen assets.
-
-Initial githubSyncSafety failed because its global h3 selector also matched the legitimate new Today headings. Scoped the same assertion to the active dialog, added active sleep/water fixtures to strengthen full20-store upload/restore, then reran all4 widths successfully without changing application assets. Initial failure and final rerun retained explicitly in the23-suite receipt. Earlier smoke/harness failures and screenshots retained; none were hidden by skipping checks or increasing timeouts.
+The initial uiSemanticConsistency run expected three direct Today wrapper children. Its obsolete flat selector was updated to count three nutrient cells inside the complete shared container; the full suite retry PASS. Application assets were unchanged for the retry. Original failure and final retry are both retained. Early synthetic fixture failures (existing unique weight-date index; missing reference macro facts during actual edit) were corrected in fixtures and rerun; no schema or business logic changes.
 
 ## Production Verification
 
-Application Actions/Pages succeeded. foodRecovery **4/4** production contexts:390/100 light normal,320/140 light reduced,390/100 dark reduced,844/140 dark landscape. Same full feature assertions pass. nutritionGauge390/430 with fonts100/120/140, managementWorkspace **12/12** identity/Back/X/state/cancellation contexts, and githubSyncSafety390/430 full20-store two-device encryption/conflict/offline mocks pass. No page errors/overflow; management frame deltas0 and Habit overlap0.
+Application Actions success verified. Production browser suites all PASS:
 
-productionAssets PASS against clean application dist: exact JS/CSS bytes/SHA256, HTML/build-info `local:false`, exact SW/precache, five main tabs and AI/Sync entry smoke. Same existing isolated persistent synthetic production profile captured before release without clearing/reseeding. V10→V11 preserves22 legacy rows and18-store hash `5566fc3e8df752b2ffd2a68a93c6db5bbef9051fd817b7fb63e9d04d2d9934c7`; AI/Voice config hash `be24fdaaad958fe42cfbfc2de052a846400e6401221282531f636669b7361dcf` unchanged. New stores empty after upgrade;20-store hash `9c2df75ef30db6923c19e48a588aaa77f25d053d80f005917fc36b6ad251eab6`. Offline new-page cold boot and independent App/SW identities both equal APPLICATION_COMMIT.
+- macroNutritionSummary:4 contexts —375/100 light,320/200 light,430/140 dark,844/140 dark landscape; both pages, same-date/history/unknown/live refresh and20-food editing.
+- foodRecovery:4 contexts —390/100 light,320/140 light,390/100 dark,844/140 dark landscape; original persisted Sleep/Water and meal flows retained.
+- nutritionGauge:390/430 ×66 states each, shared SVG/cell markup/styles and no overflow/replay.
+- productionAssets: exact HTML build marker/build-info, JS/CSS byte hashes, exact SW bytes/precache, all five main tabs, AI Settings and GitHub Sync entry; no page errors.
 
-Report-only END repeats Actions/Pages, exact asset identity, same persistent-profile20-store/config/offline checks and App/SW identity. Final receipts are external.
+Application assets: JS `index-BYfeGKyM.js`,794352 bytes, SHA256 `0e28584709ef34798fa142a3f674a87ac4fb19838a1864380031dc0e561b6b59`; CSS `index-H4M02ugw.css`,122036 bytes, SHA256 `cc8ef2674ffa52de24ab93404e928203cd1d9e8b8d902ad985f21069eeab429c`. Report-only deployment assets are checked separately in external receipts.
 
-## Changed files and evidence
+The same pre-existing isolated synthetic production profile is reused without clearing/reseeding/Restore. Before/after application:V11/110/20,22 records; all20-store hash `9c2df75ef30db6923c19e48a588aaa77f25d053d80f005917fc36b6ad251eab6`; prior18-store hash `5566fc3e8df752b2ffd2a68a93c6db5bbef9051fd817b7fb63e9d04d2d9934c7`; AI/Voice config hash `be24fdaaad958fe42cfbfc2de052a846400e6401221282531f636669b7361dcf`. All unchanged. New page while offline boots the exact application App/SW SHA and preserves the same data/config hashes. This is isolated Chromium evidence, not personal-device verification. Repeat exact assets/data/offline checks after the report-only deployment.
 
-Application36 files:
+## Actual modified files
 
-- `AGENTS.md`
-- `docs/INTERACTION_VISUAL_SYSTEM.md`
-- `docs/UI_INTERACTION_SPEC.md`
-- `docs/UI_QA_MATRIX.md`
-- `src/db/database.ts`
-- `src/db/types.ts`
-- `src/main.ts`
-- `src/services/backupService.ts`
-- `src/services/recoveryService.ts`
-- `src/styles/recovery.css`
-- `src/ui/githubSync.ts`
-- `src/ui/recovery.ts`
-- `src/utils/recovery.ts`
-- `src/utils/syncDataHash.ts`
-- `tests/aiProposals.test.ts`
-- `tests/browser/README.md`
-- `tests/browser/foodRecovery.mjs`
-- `tests/browser/githubSyncSafety.mjs`
-- `tests/browser/pwaUpgrade.mjs`
-- `tests/browser/recoveryPreservation.mjs`
-- `tests/cardio.test.ts`
-- `tests/core.test.ts`
-- `tests/dietEvents.test.ts`
-- `tests/fixtures/legacyV11Data.json`
-- `tests/fixtures/legacyV11Database.ts`
-- `tests/foodMeals.test.ts`
-- `tests/foodServing.test.ts`
-- `tests/foodVisionImport.test.ts`
-- `tests/habits.test.ts`
-- `tests/nutritionStrategies.test.ts`
-- `tests/phase2.test.ts`
-- `tests/phase3.test.ts`
-- `tests/recovery.test.ts`
-- `tests/tasks.test.ts`
-- `tests/videoRetirement.test.ts`
-- `tests/voiceMode.test.ts`
+- `src/ui/macroNutritionSummary.ts` — complete shared renderer and snapshot mapping.
+- `src/services/dailyNutritionSummary.ts` — common read-only snapshot/live subscription.
+- `src/styles/macroNutritionSummary.css` — single neutral layout/hierarchy/responsive/token owner.
+- `src/main.ts` — Today + Food integration, freshness, shared remaining display and removal of duplicate meal +N.
+- `src/styles/main.css`, `src/styles/recovery.css` — remove obsolete colored/dynamic tile and +N ownership; retain unrelated rules.
+- `tests/macroNutritionSummary.test.ts` — saved precision/read preservation, same-date/unknown and two-connection refresh/cleanup.
+- `tests/browser/macroNutritionSummary.mjs` — complete new acceptance matrix.
+- `tests/browser/foodRecovery.mjs` — single existing meal header instead of duplicate +N assertion.
+- `tests/browser/uiSemanticConsistency.mjs` — shared-container descendant assertion.
+- `AGENTS.md`, `docs/UI_INTERACTION_SPEC.md`, `docs/INTERACTION_VISUAL_SYSTEM.md`, `docs/UI_QA_MATRIX.md` — replace obsolete tile/+N rules and maintain required24-suite inventory/matrix.
+- `LATEST_DEV_REPORT.md` — report-only END commit.
 
-
-END changes only LATEST_DEV_REPORT.md. Evidence is in external workspace `artifacts/food-recovery-2026-10-08`:36-file inventory/diff, local23 receipt/logs, retained failures, local35 and production4 Recovery receipts/screenshots, production four-suite logs,672 unit/typecheck/build, V7 PWA upgrade, Actions/assets and baseline/application/final persistent-profile offline receipts.
+Evidence: external workspace `artifacts/macro-summary-2026-10-08`:14-file application inventory/patch,24-suite raw and accepted receipts/logs, retained failures/retry,675-unit/typecheck/build, local/production matrices, screenshots, Actions/exact-assets and baseline/application/final same-profile preservation/offline receipts. Before screenshots use the START build; after full-card screenshots use the production APPLICATION build with identical synthetic facts. Side-by-side Today/Food comparisons and small/dark summary captures were visually inspected.
 
 ## Manual Device Verification
 
 - Physical iPhone Safari: **Pending**.
 - Original installed PWA: **Pending**.
-- Physical OS kill/reopen, timezone travel, native time controls, keyboard/Safe Area/browser chrome and dark preference require device retest. Chromium reload/offline/mock provider tests do not establish these physical results.
+- Real OS font scaling, native Safari CSS rendering/keyboard/Safe Area and original installed-PWA update require owner retest. Chromium font emulation/offline/mock provider results do not establish these physical results.
 - Real-provider AI/Voice not changed or newly verified.
-- No confirmed unresolved implementation defect. Existing large-bundle advisory remains informational.
+- No confirmed unresolved implementation defect. Existing large-bundle build advisory remains informational.
 
 ## ChatGPT Baseline
 
-Read AGENTS and this report; actual main wins. Food uses independent +N and same-selected-date-only g/kg. Today/Trend share durable sleep/water state, one active absolute-time session and wake-date history; no timer DB writes. Keep reference labels, honest missing-day/circular statistics, independent water rows and unobstructed inline Undo. Preserve stable V11/110/20, Backup11/Restore1–11, Sync/envelope1 and AI/Voice device config1. Keep existing management primitives/navigation and retired Video. Next release requires all23 browser gates, exact production assets and same-profile data/offline evidence. Separate automated, production and physical verification.
+Read AGENTS and this report; actual main wins. Today/Food use one complete MacroNutritionSummary and read-only same-date snapshot/live observation. One neutral container, three normal columns or all-three vertical fallback; consumed > target > g/kg; tiny category marks and one shared remaining area. g/kg exactly2 decimals, latest valid selected-date weight only, unknown dimensions hidden. Food has one counted header expand entry, no +N; all rows/edit/delete/clear remain. Preserve V11/110/20, Backup11/Restore1–11, Sync/envelope1, device AI/Voice1, existing Recovery/templates/servings/history/PWA. Next UI release requires all24 browser gates plus exact production assets and same-profile data/offline evidence. Keep automated, production and physical verification separate.
