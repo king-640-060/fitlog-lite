@@ -1,0 +1,12 @@
+.training-completion { width:min(100%,36rem); margin:auto; padding:clamp(24px,7vh,64px) 0 calc(24px + env(safe-area-inset-bottom)); display:grid; gap:16px; min-width:0; }
+.completion-mark { display:grid; place-items:center; width:48px; height:48px; border-radius:var(--radius-md); color:var(--accent-strong); background:var(--surface-soft); }
+.training-completion h2 { font-size:1.5rem; line-height:1.4; margin:0; overflow-wrap:anywhere; }
+.completion-kind,.completion-status { margin:0; color:var(--text-secondary); }
+.completion-summary { margin:8px 0; padding:16px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-md); }
+.completion-summary > div { display:flex; flex-wrap:wrap; gap:8px 16px; padding:10px 0; }
+.completion-summary > div + div { border-top:1px solid var(--divider); }
+.completion-summary dt { flex:1 1 7rem; color:var(--text-secondary); }
+.completion-summary dd { flex:1 1 9rem; min-width:0; margin:0; text-align:end; font-weight:600; font-variant-numeric:tabular-nums; white-space:pre-wrap; overflow-wrap:anywhere; }
+.completion-actions { display:grid; gap:12px; }
+.completion-notice { padding:12px; background:var(--surface-soft); border-radius:var(--control-radius); line-height:1.6; }
+.completion-error { color:var(--danger); overflow-wrap:anywhere; }

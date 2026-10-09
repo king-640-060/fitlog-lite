@@ -15,8 +15,12 @@ export function sessionFromPelvicFloorTimer(state: PelvicFloorTimerState, date: 
   }
 }
 
-export async function savePelvicFloorSession(session: PelvicFloorSession, database: FitLogDatabase = db): Promise<void> {
-  await database.pelvicFloorSessions.add(session)
+export async function savePelvicFloorSession(session: PelvicFloorSession, database: FitLogDatabase = db): Promise<PelvicFloorSession> {
+  return database.transaction('rw',database.pelvicFloorSessions,async()=>{
+    const existing=await database.pelvicFloorSessions.get(session.id)
+    if(existing){if(JSON.stringify(existing)!==JSON.stringify(session))throw new Error('训练记录身份冲突，请保留结果并重试');return existing}
+    await database.pelvicFloorSessions.add(session);return session
+  })
 }
 
 export async function deletePelvicFloorSession(id: string, database: FitLogDatabase = db): Promise<void> {

@@ -1,3 +1,4 @@
+import { resolveSleepBusinessDate, sleepQueryWindow } from '../utils/sleepBusinessDate'
 import { db, type FitLogDatabase } from '../db/database'
 import type { FoodLog, NutritionTarget, Workout, CardioSession, PelvicFloorSession, WeightLog, DietEvent, Habit, HabitCheckIn, SleepSession, WaterLog } from '../db/types'
 import { pelvicFloorSessionDurationSeconds } from './pelvicFloorService'
@@ -23,7 +24,8 @@ export async function readDailyRecordsSource(start: string, end: string, databas
     const result = {} as DailyRecordsSource
     for(const table of dailyRecordTables) {
       if(table==='habits')continue
-      const index=table==='sleepSessions'?'recordDate':'date'
+      if(table==='sleepSessions'){result.sleepSessions=start>end?[]:await readSleepBusinessRange(start,end,database);continue}
+      const index='date'
       ;(result as unknown as Record<string,unknown>)[table]=start>end?[]:await database.table(table).where(index).between(start,end,true,true).toArray()
     }
     const ids=[...new Set(result.habitCheckIns.map(c=>c.habitId))]
@@ -35,7 +37,7 @@ export function buildDailyRecords(source: DailyRecordsSource, date: string): Dai
   const day={} as DailyRecordsSource
   for(const table of dailyRecordTables) {
     if(table==='habits')continue
-    ;(day as unknown as Record<string,unknown>)[table]=(source[table] as Array<{date?:string;recordDate?:string;endTime?:string}>).filter(r=>table==='sleepSessions'?!!r.endTime&&r.recordDate===date:r.date===date)
+    ;(day as unknown as Record<string,unknown>)[table]=(source[table] as Array<{date?:string;recordDate?:string;endTime?:string}>).filter(r=>table==='sleepSessions'?!!r.endTime&&resolveSleepBusinessDate(r as SleepSession)===date:r.date===date)
   }
   day.habits=source.habits.filter(h=>day.habitCheckIns.some(c=>c.habitId===h.id))
   const food=day.foodLogs, recovery=recoveryDayFacts(day.sleepSessions,day.waterLogs,date)
@@ -52,7 +54,15 @@ export async function readDailyRecordsRange(start:string,end:string,database:Fit
 /** Recovery surfaces read only the current bounded range plus the independent active session. */
 export async function readRecoveryRecords(start:string,end:string,database:FitLogDatabase=db) {
   return database.transaction('r',database.sleepSessions,database.waterLogs,async()=>{
-    const [completed,active,water]=await Promise.all([database.sleepSessions.where('recordDate').between(start,end,true,true).toArray(),database.sleepSessions.where('activeKey').equals('active').toArray(),database.waterLogs.where('date').between(start,end,true,true).toArray()])
-    return {sleep:[...completed,...active],water}
+    const [completed,active,water]=await Promise.all([readSleepBusinessRange(start,end,database),database.sleepSessions.where('activeKey').equals('active').toArray(),database.waterLogs.where('date').between(start,end,true,true).toArray()])
+    const newest=await database.sleepSessions.where('recordDate').above('').reverse().first()
+    const recent=newest?.recordDate?await database.sleepSessions.where('recordDate').between(shiftLocalDate(newest.recordDate,-2),newest.recordDate,true,true).toArray():[]
+    const latestCompleted=recent.filter(s=>s.endTime).sort((a,b)=>Date.parse(b.endTime!)-Date.parse(a.endTime!))[0]
+    return {sleep:[...completed,...active],water,latestCompleted}
   })
+}
+
+export async function readSleepBusinessRange(start:string,end:string,database:FitLogDatabase=db):Promise<SleepSession[]> {
+  const [from,to]=sleepQueryWindow(start,end)
+  return (await database.sleepSessions.where('startTime').between(from,to,true,false).toArray()).filter(s=>!!s.endTime&&resolveSleepBusinessDate(s)>=start&&resolveSleepBusinessDate(s)<=end)
 }

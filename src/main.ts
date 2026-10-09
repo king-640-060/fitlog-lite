@@ -1,3 +1,7 @@
+import { historySubview } from './ui/recordHistory'
+import { mountWeightTrend } from './ui/weightTrend'
+import { createTrainingCompletion, type TrainingCompletion } from './ui/trainingCompletion'
+import './styles/trainingCompletion.css'
 import { recoveryReportHtml } from './ui/recoveryReport'
 import { liveQuery } from 'dexie'
 import { readDailyRecords } from './services/dailyRecordsSummary'
@@ -117,7 +121,7 @@ let weightChart: Chart | undefined
 let reportWeightChart: Chart | undefined
 let reportMode: ReportMode = 'week'
 let reportAnchorDate = getLocalDateString()
-let justFinishedWorkout: Workout | undefined
+let trainingCompletion: TrainingCompletion | undefined
 let pelvicTimerState: PelvicFloorTimerState | undefined
 let pelvicTimerDate = getLocalDateString()
 let pelvicTimerInterval: number | undefined
@@ -1592,6 +1596,7 @@ function showImportPreview(preview: ImportPreview, existing: Food[], surface?: M
 async function renderWorkoutPage(): Promise<void> {
   const view = document.querySelector<HTMLElement>('#view')!
   const viewVersion = view.dataset.renderVersion
+  if (trainingCompletion) { trainingCompletion.render(); return }
   if (pelvicTimerState && pelvicTimerState.status !== 'completed') { renderPelvicFloorTimer(); return }
   if (showWorkoutHistory) { await renderWorkoutHistory(); return }
   if (workoutEditorOpen) {
@@ -1609,14 +1614,12 @@ async function renderWorkoutPage(): Promise<void> {
   const pelvicSeconds = pelvicSessions.reduce((total, session) => total + pelvicFloorSessionDurationSeconds(session), 0)
   const strengthExercises = todayWorkouts.reduce((total, workout) => total + workout.exercises.length, 0)
   const strengthSets = todayWorkouts.reduce((total, workout) => total + workout.exercises.reduce((sum, exercise) => sum + exercise.sets.length, 0), 0)
-  const cardioMinutes = cardioSessions.reduce((total, session) => total + session.durationMinutes, 0)
-  const latestCardio = [...cardioSessions].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]
   const dailyPlanRoutine = pelvicPlanRoutine(selectedPelvicPlanLevel(getPelvicFloorPlanProgress(allPelvicSessions)))
   const recentWorkouts = (await db.workouts.toArray()).filter((item) => item.finishedAt).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt)).slice(0, 4)
   if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
   view.innerHTML = `<section class="context-row"><button type="button" id="workout-date-picker-open" class="date-control fitlog-date-trigger">${icon('calendar', 18)}<span>训练日期 · ${datePickerLabel(workoutDate).split(' · ')[0]}</span></button><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section>
     <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">无氧训练</h2></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('dumbbell', 20)}</span><div><h3>力量训练</h3><p>记录动作与组数</p></div></div><p class="training-card-summary">${openWorkout ? `正在记录 · ${strengthExercises} 个动作 · ${strengthSets} 组` : todayWorkouts.length ? `今日 ${strengthExercises} 个动作 · ${strengthSets} 组` : '今天还没有力量训练'}</p><button class="primary training-card-action" id="start-workout">${openWorkout ? '继续训练' : '开始力量训练'}</button></div></section>
-    <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">有氧训练</h2><button class="text-btn" id="cardio-history">历史记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('activity', 20)}</span><div><h3>有氧记录</h3><p>楼梯机 · 跑步机</p></div></div>${cardioSessions.length ? `<div class="training-card-summary"><span>${cardioSessions.length === 1 ? '今日 1 次' : `今日 ${cardioSessions.length} 次`}</span><strong>${formatNumber(cardioMinutes)} <small>分钟</small></strong><span>${cardioSessions.length === 1 ? [getCardioActivityLabel(cardioSessions[0]!), ...formatCardioMetrics(cardioSessions[0]!)].join(' · ') : `最近：${getCardioActivityLabel(latestCardio!)}`}</span></div>` : '<p class="training-card-summary">今天还没有有氧训练</p>'}<button class="primary training-card-action" id="add-cardio">${cardioSessions.length ? '再记一次' : '记录训练'}</button>${latestCardio ? `<button class="training-card-link" data-cardio-id="${latestCardio.id}">最近：${getCardioActivityLabel(latestCardio)} · ${formatNumber(latestCardio.durationMinutes)} 分钟 ${icon('chevron', 16)}</button>` : ''}</div></section>
+    <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">有氧训练</h2><button class="text-btn" id="cardio-history">历史记录</button></div>${cardioCardHtml(cardioSessions)}</section>
     <section class="training-category"><div class="training-section-head"><h2 class="training-category-label">凯格尔训练</h2><button class="text-btn" id="pelvic-floor-history">训练记录</button></div><div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('leaf', 20)}</span><div><h3>今日训练 · ${dailyPlanRoutine.name}</h3><p>渐进计划 · 耐力控制与快速脉冲</p></div></div><p class="training-card-summary">${pelvicSessions.length ? `今日已完成 ${pelvicSessions.length} 次 · 累计 ${pelvicSeconds} 秒` : `${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</p><button class="primary training-card-action" id="start-pelvic-floor">开始训练</button></div></section><section class="section-head"><div><h2>最近力量训练</h2><span>${recentWorkouts.length ? '轻触查看详情' : '完成训练后会显示在这里'}</span></div>${recentWorkouts.length ? '<button class="text-btn" id="history-workout">全部</button>' : ''}</section><div class="history-list">${recentWorkouts.map((workout) => `<button class="history-row" data-workout="${workout.id}"><span><strong>${formatShortDate(workout.date)}</strong><small>${workout.exercises.map((item) => esc(item.exerciseName)).slice(0, 2).join(' · ') || '无动作'}</small></span><span class="history-count">${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组</span>${icon('chevron', 18)}</button>`).join('')}</div>`
   view.querySelector('#workout-date-picker-open')?.addEventListener('click', () => showBusinessDatePicker('选择训练日期', workoutDate, date => { workoutDate = date; currentWorkout = undefined; workoutEditorOpen = false; void render().catch(fail) }))
   view.querySelector('#exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
@@ -1636,10 +1639,26 @@ async function renderWorkoutPage(): Promise<void> {
   view.querySelectorAll<HTMLButtonElement>('[data-workout]').forEach((button) => button.addEventListener('click', async () => { try { currentWorkout = await db.workouts.get(button.dataset.workout!); workoutEditorOpen = true; await renderWorkoutPage() } catch (error) { fail(error) } }))
 }
 
-function showCardioForm(session?: CardioSession): void {
+
+function cardioCardHtml(cardioSessions:CardioSession[]):string {
+ const cardioMinutes=cardioSessions.reduce((n,s)=>n+s.durationMinutes,0),latestCardio=[...cardioSessions].sort((a,b)=>b.createdAt.localeCompare(a.createdAt))[0]
+ return `<div class="training-card"><div class="training-card-title"><span class="training-card-icon">${icon('activity', 20)}</span><div><h3>有氧记录</h3><p>楼梯机 · 跑步机</p></div></div>${cardioSessions.length ? `<div class="training-card-summary"><span>${cardioSessions.length === 1 ? '今日 1 次' : `今日 ${cardioSessions.length} 次`}</span><strong>${formatNumber(cardioMinutes)} <small>分钟</small></strong><span>${cardioSessions.length === 1 ? [getCardioActivityLabel(cardioSessions[0]!), ...formatCardioMetrics(cardioSessions[0]!)].join(' · ') : `最近：${getCardioActivityLabel(latestCardio!)}`}</span></div>` : '<p class="training-card-summary">今天还没有有氧训练</p>'}<button class="primary training-card-action" id="add-cardio">${cardioSessions.length ? '再记一次' : '记录训练'}</button>${latestCardio ? `<button class="training-card-link" data-cardio-id="${latestCardio.id}">最近：${getCardioActivityLabel(latestCardio)} · ${formatNumber(latestCardio.durationMinutes)} 分钟 ${icon('chevron', 16)}</button>` : ''}</div>`
+}
+async function refreshCardioCard():Promise<void>{
+ const host=document.querySelector('#add-cardio')?.closest('.training-card');if(!host)return
+ const date=workoutDate,rows=await getCardioSessionsByDate(date);if(!host.isConnected||workoutDate!==date)return
+ const focused=host.contains(document.activeElement),template=document.createElement('div');template.innerHTML=cardioCardHtml(rows);const next=template.firstElementChild!;host.replaceWith(next)
+ if(focused&&document.documentElement.dataset.inputModality==='keyboard')next.querySelector<HTMLElement>('#add-cardio')?.focus({preventScroll:true})
+ next.querySelector('#add-cardio')!.addEventListener('click',()=>showCardioForm())
+ next.querySelector('[data-cardio-id]')?.addEventListener('click',()=>{const row=rows.find(s=>s.id===(next.querySelector<HTMLElement>('[data-cardio-id]')!.dataset.cardioId));if(row)showCardioForm(row)})
+}
+
+function showCardioForm(session?: CardioSession,parent?:HTMLDialogElement): void {
   const date = session?.date ?? workoutDate
   const selectedType = session ? getCardioActivityType(session) : 'stair_climber'
-  const dialog = openModal(session ? '编辑有氧训练' : '记录有氧训练', `<form id="cardio-form" class="form cardio-form"><p class="cardio-form-date">${formatHeaderDate(date)}</p><div class="cardio-type-group" role="group" aria-label="训练类型"><span>训练类型</span><div class="cardio-type-options">${(Object.keys(cardioActivityDefinitions) as CardioActivityType[]).map((type) => `<button type="button" data-cardio-type="${type}" aria-pressed="${selectedType === type}">${cardioActivityDefinitions[type].label}</button>`).join('')}</div></div><input type="hidden" name="activityType" value="${selectedType}"><label>时间<span class="cardio-input-wrap"><input name="duration" type="number" inputmode="decimal" min="0.01" step="any" value="${session?.durationMinutes ?? ''}" placeholder="25" required><span class="cardio-input-suffix">分钟</span></span></label><label>速度<span class="cardio-input-wrap unitless"><input name="speed" type="number" inputmode="decimal" min="0.01" step="any" value="${session?.speed ?? ''}" placeholder="6.5"></span></label><label data-cardio-incline>坡度<span class="cardio-input-wrap unitless"><input name="inclinePercent" type="number" inputmode="decimal" min="0" step="any" value="${session?.inclinePercent ?? ''}" placeholder="8"></span></label>${trainingJournalHtml(session?.note, 'cardio-note')}<div class="cardio-form-actions"><button class="primary" type="submit">${session ? '保存修改' : '保存记录'}</button>${session ? '<button class="danger-button" type="button" id="delete-cardio">删除记录</button>' : ''}</div></form>`)
+  const title=session?'编辑有氧训练':'记录有氧训练'
+  const html= `<form id="cardio-form" class="form cardio-form"><p class="cardio-form-date">${formatHeaderDate(date)}</p><div class="cardio-type-group" role="group" aria-label="训练类型"><span>训练类型</span><div class="cardio-type-options">${(Object.keys(cardioActivityDefinitions) as CardioActivityType[]).map((type) => `<button type="button" data-cardio-type="${type}" aria-pressed="${selectedType === type}">${cardioActivityDefinitions[type].label}</button>`).join('')}</div></div><input type="hidden" name="activityType" value="${selectedType}"><label>时间<span class="cardio-input-wrap"><input name="duration" type="number" inputmode="decimal" min="0.01" step="any" value="${session?.durationMinutes ?? ''}" placeholder="25" required><span class="cardio-input-suffix">分钟</span></span></label><label>速度<span class="cardio-input-wrap unitless"><input name="speed" type="number" inputmode="decimal" min="0.01" step="any" value="${session?.speed ?? ''}" placeholder="6.5"></span></label><label data-cardio-incline>坡度<span class="cardio-input-wrap unitless"><input name="inclinePercent" type="number" inputmode="decimal" min="0" step="any" value="${session?.inclinePercent ?? ''}" placeholder="8"></span></label>${trainingJournalHtml(session?.note, 'cardio-note')}<div class="cardio-form-actions"><button class="primary" type="submit">${session ? '保存修改' : '保存记录'}</button>${session ? '<button class="danger-button" type="button" id="delete-cardio">删除记录</button>' : ''}</div><p role="alert" data-cardio-error hidden></p></form>`
+  const dialog=parent??openModal(title,html),back=parent?historySubview(parent,title,html):()=>dialog.close()
   const formElement = dialog.querySelector<HTMLFormElement>('#cardio-form')!
   const syncType = () => {
     const type = formElement.querySelector<HTMLInputElement>('[name="activityType"]')!.value
@@ -1656,36 +1675,37 @@ function showCardioForm(session?: CardioSession): void {
   }))
   syncType()
   bindJournalDisclosure(formElement)
+  let saving=false
   formElement.addEventListener('submit', async (event) => {
-    event.preventDefault()
+    event.preventDefault();if(saving||!dialog.open||!formElement.isConnected)return;saving=true
+    const submit=formElement.querySelector<HTMLButtonElement>('[type=submit]')!;submit.disabled=true;submit.setAttribute('aria-busy','true')
     const form = new FormData(event.currentTarget as HTMLFormElement)
     const input = { date, activityType: valueOf(form, 'activityType') as CardioActivityType, durationMinutes: Number(valueOf(form, 'duration')), speed: optionalNumber(form, 'speed'), inclinePercent: optionalNumber(form, 'inclinePercent'), note: valueOf(form, 'note') }
     try {
       if (session) await updateCardioSession(session.id, input)
       else await saveCardioSession(input)
-      dialog.close(); toast('有氧训练记录已保存'); await renderWorkoutPage()
-    } catch (error) { fail(error) }
+      back();toast('有氧训练记录已保存');void refreshCardioCard().catch(fail)
+      if(!parent&&document.documentElement.dataset.inputModality==='keyboard')document.querySelector<HTMLElement>('#add-cardio')?.focus({preventScroll:true})
+    }catch(error){const message=formElement.querySelector<HTMLElement>('[data-cardio-error]')!;message.hidden=false;message.textContent=error instanceof Error?error.message:'保存失败，请重试'}finally{saving=false;submit.disabled=false;submit.removeAttribute('aria-busy')}
   })
   dialog.querySelector('#delete-cardio')?.addEventListener('click', async () => {
     if (!session) return
-    dialog.close()
+    if(saving)return
     if (!await confirmAction('删除这条有氧训练记录？', '删除后无法恢复。', '删除')) return
-    try { await deleteCardioSession(session.id); toast('有氧训练记录已删除'); await renderWorkoutPage() } catch (error) { fail(error) }
+    try { saving=true;await deleteCardioSession(session.id);back();toast('有氧训练记录已删除');void refreshCardioCard().catch(fail) } catch (error) { fail(error) } finally { saving=false }
   })
 }
 
 async function showCardioHistory(): Promise<void> {
-  const sessions = (await db.cardioSessions.toArray()).sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt))
-  const dialog = openModal('有氧训练历史', `<div class="cardio-history">${sessions.length ? sessions.map((session) => {
+  const dialog=openModal('有氧训练历史','<div data-cardio-history-root></div>'),host=dialog.querySelector<HTMLElement>('[data-cardio-history-root]')!
+  let sessions:CardioSession[]=[]
+  const sub=liveQuery(()=>db.cardioSessions.orderBy('date').reverse().toArray()).subscribe({next:rows=>{if(!dialog.open)return;sessions=rows;const body=dialog.querySelector<HTMLElement>('.modal-body')!,scroll=body.scrollTop;host.innerHTML=`<div class="cardio-history">${sessions.length ? sessions.map((session) => {
     const label = getCardioActivityLabel(session)
     const metrics = formatCardioMetrics(session).join(' · ')
     return `<button data-history-cardio="${session.id}" aria-label="编辑 ${formatShortDate(session.date)} ${label}，${formatNumber(session.durationMinutes)} 分钟${metrics ? `，${metrics}` : ''}"><span class="cardio-history-row"><span><strong>${formatShortDate(session.date)}</strong><small>${label}${session.note ? ' · 有日志' : ''}</small></span><span class="cardio-history-value"><strong>${formatNumber(session.durationMinutes)} <small>分钟</small></strong><small>${metrics}</small></span></span></button>`
-  }).join('') : '<div class="cardio-history-empty"><strong>还没有有氧训练记录</strong><p>记录楼梯机或跑步机的训练</p><button class="primary" id="history-add-cardio">记录训练</button></div>'}</div>`, true)
-  dialog.querySelector('#history-add-cardio')?.addEventListener('click', () => { dialog.close(); showCardioForm() })
-  dialog.querySelectorAll<HTMLButtonElement>('[data-history-cardio]').forEach((button) => button.addEventListener('click', () => {
-    const session = sessions.find((item) => item.id === button.dataset.historyCardio)
-    if (session) { dialog.close(); showCardioForm(session) }
-  }))
+  }).join('') : '<div class="cardio-history-empty"><strong>还没有有氧训练记录</strong><p>记录楼梯机或跑步机的训练</p><button class="primary" id="history-add-cardio">记录训练</button></div>'}</div>`;body.scrollTop=scroll},error:fail})
+  host.addEventListener('click',event=>{const button=(event.target as Element).closest<HTMLElement>('[data-history-cardio],#history-add-cardio');if(!button)return;const session=sessions.find(s=>s.id===button.dataset.historyCardio);showCardioForm(session,dialog)})
+  dialog.addEventListener('close',()=>sub.unsubscribe(),{once:true})
 }
 
 async function initializePelvicAudio(): Promise<void> {
@@ -1824,7 +1844,7 @@ function renderPelvicFloorTimer(): void {
   })
   view.querySelector('#pelvic-finish')?.addEventListener('click', async () => {
     if (!pelvicTimerState || !await confirmAction('结束凯格尔训练？', '将保存当前已完成的训练进度。', '结束并保存')) return
-    if (!pelvicTimerState || pelvicSessionSaving) return
+    if (!pelvicTimerState || pelvicSessionSaving || trainingCompletion) return
     pelvicTimerState = finishPelvicFloorTimer(pelvicTimerState, Date.now())
     await completePelvicFloorTimer('manual')
   })
@@ -1877,32 +1897,24 @@ function tickPelvicFloorTimer(): void {
   paintPelvicFloorTimer()
 }
 
+function returnFromTrainingCompletion(): void {
+  trainingCompletion=undefined;pelvicTimerState=undefined;pelvicTimerElements=undefined
+  currentWorkout=undefined;workoutEditorOpen=false;showWorkoutHistory=false
+  document.body.classList.remove('immersive');void render().catch(fail)
+}
 async function completePelvicFloorTimer(completionType: 'completed' | 'manual' = 'completed'): Promise<void> {
-  const state = pelvicTimerState
-  if (!state || state.status !== 'completed' || pelvicSessionSaving) return
-  pelvicSessionSaving = true
-  stopPelvicTimerVisuals()
-  await releasePelvicWakeLock()
-  try {
-    const session = sessionFromPelvicFloorTimer(state, pelvicTimerDate, completionType)
-    const isPlanCompletion = completionType === 'completed' && pelvicFloorPlanLevelFromId(session.routine?.id) !== undefined
-    const previousSessions = isPlanCompletion ? await db.pelvicFloorSessions.toArray() : []
-    const previousProgress = getPelvicFloorPlanProgress(previousSessions)
-    await savePelvicFloorSession(session)
-    if (isPlanCompletion) localStorage.removeItem(PELVIC_PLAN_LEVEL_KEY)
-    const updatedProgress = isPlanCompletion ? getPelvicFloorPlanProgress([...previousSessions, session]) : previousProgress
-    const unlocked = updatedProgress.unlockedLevels.find((level) => !previousProgress.unlockedLevels.includes(level))
-    pelvicTimerState = undefined
-    pelvicTimerElements = undefined
-    pelvicSessionSaving = false
-    document.body.classList.remove('immersive')
-    await render()
-    if (unlocked) {
-      const next = pelvicPlanRoutine(unlocked)
-      const dialog = openModal('训练完成', `<div class="pelvic-completion"><p>今天完成了${esc(state.routine.name)}训练。</p><strong>下一阶段已解锁</strong><span>${next.name} · ${pelvicRoutineMinutes(next)}</span><p>可以继续当前阶段，或在下次训练前选择新阶段。</p><button class="primary" data-completion-done>完成</button></div>`)
-      dialog.querySelector('[data-completion-done]')?.addEventListener('click', () => dialog.close())
-    } else toast(completionType === 'manual' ? '训练进度已保存' : '凯格尔训练已完成')
-  } catch (error) { pelvicSessionSaving = false; fail(error) }
+  const state=pelvicTimerState
+  if(!state||state.status!=='completed'||pelvicSessionSaving||trainingCompletion)return
+  pelvicSessionSaving=true;stopPelvicTimerVisuals();pelvicTimerInterval=undefined;pelvicTimerElements=undefined
+  void releasePelvicWakeLock();void pelvicAudioContext?.suspend().catch(()=>undefined)
+  const session=sessionFromPelvicFloorTimer(state,pelvicTimerDate,completionType)
+  let previousProgress:PelvicFloorPlanProgress|undefined
+  trainingCompletion=createTrainingCompletion({kind:'kegel',title:'凯格尔训练',manual:session.completionType==='manual',result:session,esc,
+    save:async result=>{if(!previousProgress)previousProgress=getPelvicFloorPlanProgress(await db.pelvicFloorSessions.toArray());return savePelvicFloorSession(result)},
+    summary:result=>[['训练方案',result.routine?.name??'基础训练'],['实际完成次数',`${result.completedRepetitions} / ${result.repetitions} 次`],['实际训练时长',`${pelvicFloorSessionDurationSeconds(result)} 秒`],['训练日期',result.date]],
+    afterSaved:async result=>{if(result.completionType!=='completed'||pelvicFloorPlanLevelFromId(result.routine?.id)===undefined)return;localStorage.removeItem(PELVIC_PLAN_LEVEL_KEY);const progress=getPelvicFloorPlanProgress(await db.pelvicFloorSessions.toArray());const unlocked=progress.unlockedLevels.find(level=>!previousProgress!.unlockedLevels.includes(level));return unlocked?`下一阶段已解锁 · ${pelvicPlanRoutine(unlocked).name}。下次训练可自行选择阶段。`:undefined},
+    returned:returnFromTrainingCompletion})
+  await trainingCompletion.save();pelvicSessionSaving=false
 }
 
 async function showPelvicFloorHistory(): Promise<void> {
@@ -2001,16 +2013,21 @@ function bindWorkoutEditor(workout: Workout): void {
     else if (field === 'weightKg') set.weightKg = input.value === '' ? undefined : Number(input.value)
     scheduleWorkoutSave(workout)
   }))
+  let finishing=false
   view.querySelector('#finish-workout')?.addEventListener('click', async () => {
+    if(finishing||trainingCompletion)return;finishing=true
     try {
-      await flushWorkoutAutosave(workout)
-      const normalized = normalizeWorkoutForSave(workout)
-      if (!normalized.exercises.length) throw new Error('请至少添加一个动作')
-      if (!await confirmAction('完成本次训练？', '完成后仍可从历史训练中查看和编辑。', '完成训练', false)) return
-      const finished = await finishWorkout(workout)
-      justFinishedWorkout = finished
-      workoutAutosave.cancel(); currentWorkout = undefined; showWorkoutHistory = true; toast('训练已完成'); await renderWorkoutPage()
-    } catch (error) { fail(error) }
+      const normalized=normalizeWorkoutForSave(workout)
+      if(!normalized.exercises.length)throw new Error('请至少添加一个动作')
+      if(!await confirmAction('完成本次训练？','完成后仍可查看和编辑本次记录。','完成训练',false))return
+      const captured=structuredClone(workout)
+      trainingCompletion=createTrainingCompletion({kind:'strength',title:'力量训练',result:captured,esc,
+        save:async result=>{await flushWorkoutAutosave(result);const saved=await finishWorkout(result);workoutAutosave.cancel();currentWorkout=undefined;workoutEditorOpen=false;return saved},
+        summary:result=>[['实际动作',`${result.exercises.length} 个动作`],['实际组数',`${result.exercises.reduce((n,e)=>n+e.sets.length,0)} 组`],['训练日期',result.date],...(result.note?[['训练日志',result.note] as [string,string]]:[])],
+        returned:returnFromTrainingCompletion,
+        view:result=>{const dialog=openModal('本次力量训练',`<div class="completion-record"><p>${formatHeaderDate(result.date)}</p>${result.exercises.map(e=>`<section><h3>${esc(e.exerciseName)}</h3>${e.sets.map((set,i)=>`<p>第${i+1}组 · ${workoutSetSummary(set)}${set.note?` · ${esc(set.note)}`:''}</p>`).join('')}</section>`).join('')}${result.note?`<p class="journal-copy">${esc(result.note)}</p>`:''}<button class="secondary full-btn" data-completion-record-back>返回完成页</button></div>`);dialog.querySelector('[data-completion-record-back]')!.addEventListener('click',()=>dialog.close())}})
+      await trainingCompletion.save()
+    }catch(error){fail(error)}finally{finishing=false}
   })
   view.querySelector('#history-workout')?.addEventListener('click', async () => {
     try { await flushWorkoutAutosave(workout); showWorkoutHistory = true; currentWorkout = undefined; workoutEditorOpen = false; await renderWorkoutPage() } catch (error) { fail(error) }
@@ -2078,9 +2095,7 @@ async function renderWorkoutHistory(): Promise<void> {
   document.body.classList.remove('immersive')
   const workouts = (await db.workouts.toArray()).filter((item) => item.finishedAt).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt))
   if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
-  const completedFeedback = justFinishedWorkout && workouts.some((item) => item.id === justFinishedWorkout?.id)
-    ? `<div class="workout-complete-banner" role="status">${icon('check', 20)}<span><strong>本次训练已完成</strong><small>${justFinishedWorkout.exercises.length} 个动作 · ${justFinishedWorkout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组已记录</small></span></div>` : ''
-  justFinishedWorkout = undefined
+  const completedFeedback = ''
   view.innerHTML = `${completedFeedback}<div class="section-head history-head"><div><h2>历史训练</h2><span>${workouts.length} 次训练</span></div><button class="text-btn" id="close-history">返回</button></div><div class="history-list">${workouts.length ? workouts.map((workout) => `<button class="history-card" data-workout="${workout.id}"><div class="history-card-title"><strong>${formatShortDate(workout.date)}</strong><span>${workout.exercises.length} 个动作 · ${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组${workout.note ? ' · 有日志' : ''}</span></div><div class="history-details">${workout.exercises.map((item) => `<div><strong>${esc(item.exerciseName)}</strong><small>${item.sets.map(workoutSetSummary).join(' · ') || '暂无组数'}</small></div>`).join('')}</div>${icon('chevron', 18)}</button>`).join('') : `<div class="empty minimal"><div class="empty-icon">${icon('activity', 24)}</div><h3>还没有训练历史</h3><p>完成力量训练后，在这里回顾记录。</p></div>`}</div>`
   view.querySelector('#close-history')?.addEventListener('click', () => { showWorkoutHistory = false; void renderWorkoutPage().catch(fail) })
   view.querySelectorAll<HTMLButtonElement>('[data-workout]').forEach((button) => button.addEventListener('click', async () => { try { currentWorkout = await db.workouts.get(button.dataset.workout!); workoutEditorOpen = true; showWorkoutHistory = false; await renderWorkoutPage() } catch (error) { fail(error) } }))
@@ -2380,57 +2395,17 @@ async function saveDayAsDietTemplate(logs: FoodLog[]): Promise<void> {
 }
 
 async function renderWeightPage(withProgressTabs = false): Promise<void> {
-  const view = document.querySelector<HTMLElement>('#view')!
-  const viewVersion = view.dataset.renderVersion
-  const today = getLocalDateString()
-  const weights = await db.weights.orderBy('date').reverse().toArray()
-  const selectedWeight = weights.find((item) => item.date === weightDate)
-  const latest = weights[0]
-  const isToday = weightDate === today
-  const heroWeight = isToday ? selectedWeight ?? latest : selectedWeight
-  const cutoff = new Date(); if (weightRange !== 'all') cutoff.setDate(cutoff.getDate() - Number(weightRange) + 1)
-  const cutoffString = weightRange === 'all' ? '' : getLocalDateString(cutoff)
-  const chartWeights = weights.filter((item) => weightRange === 'all' || item.date >= cutoffString).reverse()
-  const monthCutoff = new Date(); monthCutoff.setDate(monthCutoff.getDate() - 29)
-  const monthWeights = weights.filter((item) => item.date >= getLocalDateString(monthCutoff))
-  const delta = monthWeights.length > 1 && latest ? latest.weightKg - monthWeights.at(-1)!.weightKg : undefined
-  if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
-  const heroLabel = isToday ? heroWeight === latest && !selectedWeight ? '最新体重' : '今日体重' : `${formatShortDate(weightDate)} 体重`
-  const changeText = isToday && heroWeight ? `<span class="weight-change">${delta === undefined ? '记录更多数据后显示 30 天变化' : `${delta > 0 ? '+' : ''}${formatNumber(delta)} kg · 30天`}</span>` : ''
-  const retainedTabs = setTabbedViewHtml(view, `${withProgressTabs ? progressTabsHtml() + '<h2 class="trend-domain-heading">身体趋势</h2>' : ''}<section class="weight-hero"><p>${heroWeight ? heroLabel : '体重记录'}</p>${heroWeight ? `<div class="hero-number"><strong>${formatNumber(heroWeight.weightKg)}</strong><span>kg</span></div>${changeText}` : `<div class="empty-inline">这一天还没有体重记录</div>`}<button class="primary record-weight" id="record-weight">${icon(selectedWeight ? 'edit' : 'plus', 18)} ${selectedWeight ? '修改体重' : '记录体重'}</button></section><section class="chart-card"><div class="section-head"><div><h2>体重趋势</h2><span>${weightRange === 'all' ? '全部记录' : `最近 ${weightRange} 天`}</span></div></div>${chartWeights.length > 1 ? '<div class="chart-wrap"><canvas id="weight-chart"></canvas></div>' : `<div class="trend-placeholder"><span class="empty-icon">${icon('activity', 23)}</span><p>${chartWeights.length === 1 ? '再记录一次体重后即可查看趋势' : '记录体重后会显示趋势图'}</p></div>`}<div class="segmented" aria-label="体重图表范围"><button data-range="30" class="${weightRange === '30' ? 'active' : ''}">30天</button><button data-range="90" class="${weightRange === '90' ? 'active' : ''}">90天</button><button data-range="all" class="${weightRange === 'all' ? 'active' : ''}">全部</button></div></section>${withProgressTabs ? recoverySlotHtml() : ''}<section class="section-head"><div><h2>历史记录</h2><span>${weights.length} 条</span></div></section><div class="weight-list">${weights.map((item) => `<article class="weight-row"><button data-edit-weight="${item.id}"><span>${formatShortDate(item.date)}</span><strong>${formatNumber(item.weightKg)} <small>kg</small></strong></button><button class="icon-btn row-delete" data-delete-weight="${item.id}" aria-label="删除 ${formatShortDate(item.date)} 的体重">${icon('trash', 18)}</button></article>`).join('') || `<div class="empty minimal"><div class="empty-icon">${icon('scale', 24)}</div><h3>还没有体重记录</h3><p>记录第一次体重，开始观察长期趋势。</p></div>`}</div>`)
-  recoveryDispose?.(); recoveryDispose = undefined
-  if (withProgressTabs) recoveryDispose = mountRecovery(view.querySelector('[data-recovery-root]')!, recoveryUi(), true)
-  if (withProgressTabs && !retainedTabs) bindProgressTabs(view)
-  view.querySelector('#record-weight')?.addEventListener('click', () => showWeightForm(weightDate, selectedWeight?.weightKg))
-  view.querySelectorAll<HTMLButtonElement>('[data-range]').forEach((button) => button.addEventListener('click', () => {
-    weightRange = button.dataset.range as typeof weightRange
-    const nextCutoff = new Date()
-    if (weightRange !== 'all') nextCutoff.setDate(nextCutoff.getDate() - Number(weightRange) + 1)
-    const nextStart = weightRange === 'all' ? '' : getLocalDateString(nextCutoff)
-    const nextWeights = weights.filter((item) => item.date >= nextStart).reverse()
-    if (!weightChart || nextWeights.length < 2) { weightChart?.destroy(); weightChart = undefined; void renderWeightPage(withProgressTabs).catch(fail); return }
-    weightChart.data.labels = nextWeights.map((item) => formatShortDate(item.date))
-    weightChart.data.datasets[0]!.data = nextWeights.map((item) => item.weightKg)
-    weightChart.update()
-    view.querySelector('.chart-card .section-head span')!.textContent = weightRange === 'all' ? '全部记录' : `最近 ${weightRange} 天`
-    view.querySelectorAll<HTMLButtonElement>('[data-range]').forEach((item) => item.classList.toggle('active', item.dataset.range === weightRange))
-  }))
-  view.querySelectorAll<HTMLButtonElement>('[data-delete-weight]').forEach((button) => button.addEventListener('click', async () => { if (!await confirmAction('删除体重记录？', '删除后无法撤销。')) return; try { await db.weights.delete(button.dataset.deleteWeight!); toast('已删除'); await render() } catch (error) { fail(error) } }))
-  view.querySelectorAll<HTMLButtonElement>('[data-edit-weight]').forEach((button) => button.addEventListener('click', () => { const item = weights.find((weight) => weight.id === button.dataset.editWeight)!; showWeightForm(item.date, item.weightKg) }))
-  if (chartWeights.length > 1) {
-    const canvas = view.querySelector<HTMLCanvasElement>('#weight-chart')!
-    const styles = getComputedStyle(document.documentElement)
-    const weightColor = '#728e9f'
-    const muted = styles.getPropertyValue('--text-secondary').trim()
-    const grid = styles.getPropertyValue('--divider').trim()
-    weightChart = new Chart(canvas, { type: 'line', data: { labels: chartWeights.map((item) => formatShortDate(item.date)), datasets: [{ data: chartWeights.map((item) => item.weightKg), borderColor: weightColor, backgroundColor: 'transparent', fill: false, tension: 0.3, borderWidth: 2.3, pointRadius: 0, pointHoverRadius: 4, pointBackgroundColor: weightColor }] }, options: { responsive: true, maintainAspectRatio: false, animation: false, interaction: { intersect: false, mode: 'index' }, plugins: { legend: { display: false }, tooltip: { displayColors: false } }, scales: { x: { grid: { display: false }, border: { display: false }, ticks: { color: muted, maxTicksLimit: 5 } }, y: { border: { display: false }, ticks: { color: muted, callback: (value) => `${value}kg`, maxTicksLimit: 5 }, grid: { color: grid } } } } })
-  }
+  const view=document.querySelector<HTMLElement>('#view')!
+  const retainedTabs=setTabbedViewHtml(view,`${withProgressTabs?progressTabsHtml()+'<h2 class="trend-domain-heading">身体趋势</h2>':''}<div data-weight-module></div>${withProgressTabs?recoverySlotHtml():''}`)
+  recordsDispose?.();recordsDispose=mountWeightTrend(view.querySelector('[data-weight-module]')!,recoveryUi(),{date:weightDate,range:weightRange,rangeChanged:range=>{weightRange=range},record:showWeightForm})
+  recoveryDispose?.();recoveryDispose=undefined
+  if(withProgressTabs){recoveryDispose=mountRecovery(view.querySelector('[data-recovery-root]')!,recoveryUi(),true);if(!retainedTabs)bindProgressTabs(view)}
 }
 
 function showWeightForm(date: string, value?: number): void {
   const title = value === undefined ? date === getLocalDateString() ? '今日体重' : '记录体重' : '编辑体重'
   const dialog = openModal(title, `<form id="weight-sheet-form" class="form weight-sheet-form"><p>${formatHeaderDate(date)}</p><label class="weight-input"><span class="sr-only">体重（千克）</span><input name="weight" type="number" inputmode="decimal" min="0.1" step="0.1" value="${value ?? ''}" placeholder="72.4" required><b>kg</b></label><button class="primary" type="submit">保存</button></form>`)
-  dialog.querySelector<HTMLFormElement>('#weight-sheet-form')?.addEventListener('submit', async (event) => { event.preventDefault(); try { await upsertWeight(date, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'weight')); dialog.close(); toast('已保存'); await render() } catch (error) { fail(error) } })
+  dialog.querySelector<HTMLFormElement>('#weight-sheet-form')?.addEventListener('submit', async (event) => { event.preventDefault(); try { await upsertWeight(date, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'weight')); dialog.close(); toast('已保存'); if(activeTab!=='progress'||progressView!=='trend')await render() } catch (error) { fail(error) } })
 }
 
 async function showSettings(surface?: ManagedSurfaceContext): Promise<void> {

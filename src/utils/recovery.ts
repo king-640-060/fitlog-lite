@@ -1,3 +1,4 @@
+import { resolveSleepBusinessDate, sleepAttributionDates } from './sleepBusinessDate'
 import type { SleepSession, WaterLog, WeightLog } from '../db/types'
 import { getLocalDateString, shiftLocalDate } from './date'
 export function sleepMinutes(start: string, end: string): number {
@@ -8,6 +9,9 @@ export function sleepMinutes(start: string, end: string): number {
 export function validateSleepSession(value: unknown): asserts value is SleepSession {
   const r = value as SleepSession
   if (!r || typeof r.id !== 'string' || !r.id || !validInstant(r.startTime) || !validInstant(r.createdAt) || !validInstant(r.updatedAt)) throw new Error('睡眠记录格式不合法')
+  const attribution=[r.sleepNightDate,r.sleepNightDateSource,r.sleepStartLocalDate]
+  if(attribution.some(v=>v!==undefined)&&(!validDate(r.sleepNightDate)||!validDate(r.sleepStartLocalDate)||!['auto','manual'].includes(r.sleepNightDateSource??'')||!sleepAttributionDates(r.sleepStartLocalDate!).includes(r.sleepNightDate!)))throw new Error('睡眠所属夜晚必须为开始当天或前一晚')
+  if(r.sleepStartLocalDate){const offset=Date.parse(r.startTime)-Date.parse(r.sleepStartLocalDate+'T00:00:00Z');if(offset< -14*3600000||offset>=36*3600000)throw new Error('睡眠开始本地日期与真实时间不一致')}
   if (r.endTime === undefined) {
     if (r.activeKey !== 'active' || r.durationMinutes !== undefined || r.recordDate !== undefined) throw new Error('进行中的睡眠记录格式不合法')
   } else if (r.activeKey !== undefined || !validInstant(r.endTime) || r.durationMinutes !== sleepMinutes(r.startTime, r.endTime) || !validDate(r.recordDate)) throw new Error('已结束睡眠的日期或时长不合法')
@@ -34,7 +38,7 @@ export function averageClock(instants: string[]): string | undefined {
   return `${String(Math.floor(minute/60)).padStart(2,'0')}:${String(minute%60).padStart(2,'0')}`
 }
 export function recoveryDayFacts(sleep:SleepSession[],water:WaterLog[],date:string) {
-  const sessions=sleep.filter(s=>s.endTime&&s.recordDate===date),drinks=water.filter(w=>w.date===date)
+  const sessions=sleep.filter(s=>s.endTime&&resolveSleepBusinessDate(s)===date),drinks=water.filter(w=>w.date===date)
   return {date,sessions,drinks,minutes:sessions.length?sessions.reduce((n,s)=>n+s.durationMinutes!,0):undefined,waterMl:drinks.length?drinks.reduce((n,w)=>n+w.amountMl,0):undefined}
 }
 export function recoveryRangeSummary(sleep:SleepSession[],water:WaterLog[],start:string,end:string) {

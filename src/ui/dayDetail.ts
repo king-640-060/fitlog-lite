@@ -1,3 +1,5 @@
+import { sleepTimelineHtml } from './sleepTimeline'
+import { sleepNightLabel, resolveSleepBusinessDate } from '../utils/sleepBusinessDate'
 import type { DailyRecords } from '../services/dailyRecordsSummary'
 import { formatSleepDuration, localClock } from '../utils/recovery'
 import { dietEventTitle, dietEventEstimate } from '../services/dietEventService'
@@ -113,7 +115,7 @@ export function dailyRecordsHtml(records:DailyRecords,esc:(value:unknown)=>strin
     weight:s.weights.map(w=>detail(`${formatNumber(w.weightKg)} kg`,[w.date])).join(''),
     dietEvent:`<div class="diet-events-detail">${s.dietEvents.map(e=>`<article class="daily-record-item"><strong>${esc(dietEventTitle(e))}</strong><p>${esc(e.scope==='day'?'整天':mealNames[e.scope])}</p><p>${esc(dietEventEstimate(e))}</p>${e.note?`<p class="diet-event-note">${esc(e.note)}</p>`:''}${editable?`<button type="button" class="text-btn" data-diet-event-edit="${esc(e.id)}">编辑</button>`:''}</article>`).join('')}</div>`,
     habit:s.habitCheckIns.map(c=>detail(s.habits.find(h=>h.id===c.habitId)?.name??'已移除的习惯',[`${c.date} · 已打卡`,instant(c.completedAt)])).join(''),
-    sleep:s.sleepSessions.map(p=>detail(formatSleepDuration(p.durationMinutes!),[`${instant(p.startTime)} → ${instant(p.endTime!)}`,`醒来日期 ${p.recordDate}`])).join(''),
+    sleep:sleepTimelineHtml(s.sleepSessions,records.date,esc)+s.sleepSessions.map(p=>detail(formatSleepDuration(p.durationMinutes!),[`${instant(p.startTime)} → ${instant(p.endTime!)}`,`所属夜晚 ${sleepNightLabel(resolveSleepBusinessDate(p))}`])).join(''),
     water:s.waterLogs.map(w=>detail(`${w.amountMl} ml`,[instant(w.timestamp),`记录日期 ${w.date}`])).join(''),
   }
   return `<div class="calendar-day-sheet daily-records" data-record-date="${esc(records.date)}">${rows.map(r=>`<details class="daily-record-group" data-record-category="${r.key}"><summary class="day-detail-row" aria-label="${esc(r.accessibleLabel)}"><span class="day-detail-label"><span class="day-detail-icon calendar-category-${r.key}" aria-hidden="true">${icon(calendarCategoryIcons[r.key],16)}</span><span>${esc(r.label)}</span></span><span class="day-detail-content"><strong class="${r.empty?'is-empty':''}">${esc(r.primary)}</strong>${r.secondary.map(v=>`<span>${esc(v)}</span>`).join('')}</span><span class="daily-record-chevron" aria-hidden="true">${icon('chevron',16)}</span></summary><div class="daily-record-content">${r.empty?'<p class="report-note">当天未记录</p>':contents[r.key]}</div></details>`).join('')}</div>`

@@ -362,6 +362,9 @@ export interface SleepSession {
   durationMinutes?: number
   recordDate?: string
   activeKey?: 'active'
+  sleepNightDate?: string
+  sleepNightDateSource?: 'auto' | 'manual'
+  sleepStartLocalDate?: string
   createdAt: string
   updatedAt: string
 }

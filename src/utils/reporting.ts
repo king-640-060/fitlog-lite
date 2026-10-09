@@ -1,3 +1,4 @@
+import { resolveSleepBusinessDate } from './sleepBusinessDate'
 import type { DailyRecords } from '../services/dailyRecordsSummary'
 import { buildDailyRecords } from '../services/dailyRecordsSummary'
 import { recoveryRangeSummary } from './recovery'
@@ -111,7 +112,7 @@ export function aggregateReport(source: ReportSource, mode: ReportMode, anchor: 
     treadmillSessions: cardio.filter((item) => getCardioActivityType(item) === 'treadmill').length,
     pelvicSessions: pelvic.length, pelvicMinutes: round(pelvic.reduce((sum, item) => sum + pelvicFloorSessionDurationSeconds(item), 0) / 60),
   }
-  const sleep=(source.sleepSessions??[]).filter(s=>s.endTime&&eligible.has(s.recordDate!)),water=within(source.waterLogs??[]),dietEvents=within(source.dietEvents??[])
+  const sleep=(source.sleepSessions??[]).filter(s=>s.endTime&&eligible.has(resolveSleepBusinessDate(s))),water=within(source.waterLogs??[]),dietEvents=within(source.dietEvents??[])
   const recoveryFacts=recoveryRangeSummary(sleep,water,range.start,range.end<today?range.end:today),waterDays=recoveryFacts.daily.filter(d=>d.waterMl!==undefined)
   const waterTotal=waterDays.length?waterDays.reduce((n,d)=>n+d.waterMl!,0):undefined
   const recovery={...recoveryFacts,waterRecordedDays:waterDays.length,waterTotal,waterAverage:waterTotal===undefined?undefined:waterTotal/waterDays.length}
