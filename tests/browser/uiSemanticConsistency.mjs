@@ -119,7 +119,7 @@ try { for (const [width,height] of sizes) {
   const finished={...fixture.workouts[0],date},cardio={...fixture.cardioSessions[0],date},pelvic={...fixture.pelvicFloorSessions[0],date}
   await put({workouts:[finished],cardioSessions:[cardio],pelvicFloorSessions:[pelvic]});await workoutCheck('workout-one-completed');assert.equal(await page.locator('[data-cardio-id]').count(),1);assert.ok((await page.locator('#view').innerText()).includes('今日已完成 1 次'));await todayWorkout(false)
   await put({cardioSessions:[cardio,{...cardio,id:'second',createdAt:'2026-10-03T01:00:00Z'}]});await workoutCheck('workout-multiple');assert.ok((await page.locator('#view').innerText()).includes('今日 2 次'))
-  await put({workouts:[{...finished,id:'open',finishedAt:undefined}]});await workoutCheck('workout-open');assert.equal(await page.locator('#start-workout').innerText(),'继续训练');await todayWorkout(true);await capture('today-open-workout')
+  await put({workouts:[{...finished,id:'open',finishedAt:undefined}]});await workoutCheck('workout-open');assert.equal(await page.locator('#start-workout').innerText(),'继续力量训练');await todayWorkout(true);await capture('today-open-workout')
   await management('management-fresh')
   for(const scale of [120,140]){
    await page.addStyleTag({content:`html { font-size:${scale}%; }`})

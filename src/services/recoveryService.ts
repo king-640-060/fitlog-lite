@@ -20,6 +20,15 @@ export async function finishSleep(id:string,database:FitLogDatabase=db,now=new D
     validateSleepSession(saved);await database.sleepSessions.put(saved);return saved
   })
 }
+/** Completed backfill preserves real instants and never touches the active session. */
+export async function createCompletedSleep(startTime:string,endTime:string,database:FitLogDatabase=db,now=new Date(),attribution?:{source:'auto'|'manual';date?:string},id=crypto.randomUUID()):Promise<SleepSession> {
+  if(!Number.isFinite(Date.parse(startTime))||!Number.isFinite(Date.parse(endTime))||Date.parse(endTime)>now.getTime()||Date.parse(startTime)>now.getTime())throw new Error('睡眠时间必须有效且不能晚于当前时间')
+  const night=sleepAttribution(startTime)
+  if(attribution?.source==='manual'){if(!sleepAttributionDates(night.sleepStartLocalDate).includes(attribution.date??''))throw new Error('所属夜晚需为开始当天或前一晚');night.sleepNightDate=attribution.date!;night.sleepNightDateSource='manual'}
+  const stamp=now.toISOString(),record:SleepSession={id,startTime,endTime,durationMinutes:sleepMinutes(startTime,endTime),recordDate:getLocalDateString(new Date(endTime)),...night,createdAt:stamp,updatedAt:stamp}
+  validateSleepSession(record)
+  return database.transaction('rw',database.sleepSessions,async()=>{const old=await database.sleepSessions.get(id);if(old){if(old.startTime!==startTime||old.endTime!==endTime||old.sleepNightDate!==record.sleepNightDate)throw new Error('此记录已保存，请重新打开补录');return old}await database.sleepSessions.add(record);return record})
+}
 export async function editSleep(id:string,startTime:string,endTime:string|undefined,database:FitLogDatabase=db,now=new Date(),attribution?:{source:'auto'|'manual';date?:string}):Promise<SleepSession> {
   return database.transaction('rw',database.sleepSessions,async()=>{
     const record=await database.sleepSessions.get(id);if(!record)throw new Error('睡眠记录已不存在')

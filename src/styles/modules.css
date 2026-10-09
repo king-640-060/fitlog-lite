@@ -1,0 +1,58 @@
+/* One semantic size system. Enlarged text grows; layout, never type size, adapts. */
+:root { --weight:var(--accent-mid); --strength:var(--info); --cardio:var(--carbs); --pelvic:var(--accent-mid); --type-page:1.5rem; --type-module:1.0625rem; --type-metric:1.75rem; --type-unit:.9375rem; --type-body:.9375rem; --type-meta:.8125rem; --type-action:.875rem; --chart-height:11rem; --chart-sparse-height:8.5rem; --chart-axis-size:.8125rem; }
+.topbar h1,.today-topbar h1,.food-topbar h1 { font-size:var(--type-page); line-height:1.25; }
+.module-header { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--space-1) var(--space-2); min-width:0; }
+.module-title { display:flex; align-items:center; min-width:0; gap:var(--space-2); }
+.module-title h2 { margin:0; font-size:var(--type-module); line-height:1.4; overflow-wrap:anywhere; }
+.module-icon { display:grid; place-items:center; flex:0 0 32px; width:32px; height:32px; border-radius:var(--radius-sm); background:var(--surface-soft); color:var(--accent-strong); }
+.module-history { min-width:44px; font-size:var(--type-action); white-space:nowrap; }
+.trend-module { display:grid; min-width:0; gap:var(--field-gap); padding:var(--card-padding); border:1px solid var(--border); border-radius:var(--radius-md); background:var(--surface); }
+.trend-ranges { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); min-width:0; margin:0; }
+.trend-ranges button { min-width:0; min-height:44px; padding:8px 4px; font-size:var(--type-action); }
+.trend-actions { display:grid; gap:var(--space-1); min-width:0; }
+.trend-actions > .primary { width:100%; min-height:48px; padding:10px var(--space-3); font-size:var(--type-action); white-space:normal; }
+.trend-actions > .text-btn { justify-self:start; font-size:var(--type-action); }
+.trend-empty { margin:0; padding:var(--space-2) 0; color:var(--text-secondary); font-size:var(--type-body); line-height:1.5; }
+.chart-selection { min-height:0; padding:0; gap:var(--space-1); }
+.chart-selection > strong { display:block; font-size:var(--type-metric); font-weight:700; line-height:1.35; overflow-wrap:anywhere; }
+.chart-selection > span { font-size:var(--type-meta); line-height:1.5; }
+.trend-unit { color:var(--text-secondary); font-size:var(--type-unit); font-weight:500; }
+.trend-chart-shell { min-width:0; height:var(--chart-height); overflow-x:auto; overscroll-behavior-x:contain; }
+.trend-chart-shell.is-sparse { height:var(--chart-sparse-height); }
+.trend-chart-shell .weight-chart-canvas { height:100%; }
+.trend-chart-shell .recovery-line-chart { height:100%; width:100%; overflow:visible; }
+.recovery-interactive-chart { display:grid; gap:var(--field-gap); min-width:0; }
+.recovery-point-date { font-size:13px; }
+.recovery-point-label { fill:var(--text-secondary); font-family:inherit; font-size:13px; }
+.recovery-selection-line { stroke:var(--accent-mid); stroke-width:1; stroke-dasharray:3 4; opacity:.65; pointer-events:none; }
+.recovery-line-chart .is-selected .recovery-line-marker { r:6px; }
+.training-category { gap:0; }
+.training-card .module-header h2 { font-size:var(--type-module); }
+.training-card-summary { font-size:var(--type-body); line-height:1.5; }
+.training-card-summary strong { font-size:var(--type-metric); }
+.training-card-summary strong small { font-size:var(--type-unit); }
+.training-card-note { margin:0; color:var(--text-secondary); font-size:var(--type-meta); line-height:1.5; }
+.training-card-link { font-size:var(--type-meta); }
+.today-activity-head h2,.card-heading h2,.report-section h2 { font-size:var(--type-module); }
+.today-activity-head .text-btn { font-size:var(--type-action); }
+.today-activity-meta,.recovery-note,.report-note { font-size:var(--type-meta); }
+.today-activity-card .today-activity-action { font-size:var(--type-action); }
+.today-activity-head,.today-activity-body { display:flex; flex-wrap:wrap; }
+.today-activity-copy { flex:1 1 9rem; }
+.today-activity-body > button { flex:0 0 auto; }
+.report-summary-grid { grid-template-columns:repeat(auto-fit,minmax(min(100%,7rem),1fr)); gap:var(--space-2); }
+.report-summary-grid span { font-size:var(--type-meta); }
+.report-summary-grid strong { font-size:1.5rem; }
+.report-training-cells { grid-auto-flow:row; grid-template-columns:repeat(auto-fit,minmax(min(100%,3.8rem),1fr)); }
+.report-training-cell { height:auto; min-height:5rem; }
+.report-training-cell small { font-size:var(--type-meta); white-space:normal; overflow:visible; }
+.report-habit-weeks > div { grid-template-columns:4.5rem minmax(0,1fr) 2rem; }
+.report-nutrition-row small,.report-habit-weeks small,.report-habit-week-head small,.report-weight-single,.recovery-statistics dt { font-size:var(--type-meta); }
+.report-training-bar { background:var(--strength); }
+.report-training-row.cardio .report-training-bar { background:var(--cardio); }
+.report-training-row.pelvic .report-training-bar { background:var(--pelvic); }
+.report-weight-single i { background:var(--weight); }
+.report-nutrition-row.carbs .report-nutrition-track i { background:var(--carbs); }
+.report-nutrition-row.fat .report-nutrition-track i { background:var(--fat); }
+.water-record-options { display:grid; gap:var(--space-2); }
+.water-record-options .primary { min-height:48px; font-size:var(--type-body); }
