@@ -1,131 +1,151 @@
 # FitLog Lite Development Report
 
-## 1. Actual baseline / release identity
+## 一、代码身份
 
-Latest production round: Unified Experience & Visual Consistency, 2026-10-09.
+本轮：Professional Fitness Analytics & Visual Experience V3.1，2026-10-09。
 
-- START_COMMIT: `32b1de23591bb7c24677551b9791eb501a362d0e`. Clean main, branch/ff-only pull/log verified; origin/main rechecked unchanged before publication.
-- APPLICATION_COMMIT: `462c98ef4ebd8296187c66ae5b9a9c6619449c9c` —29 application files, including shared architecture, service, tests and durable rules.
-- Application Actions/Pages: https://github.com/king-640-060/fitlog-lite/actions/runs/37905790820 — success, including typecheck,760 units, build and deployment.
-- Production: https://king-640-060.github.io/fitlog-lite/.
-- END_COMMIT: the LATEST-only commit containing this report. Exact SHA and final CI/assets/data/offline receipts are external and returned to the user, avoiding self-reference.
+- START_COMMIT：`0cc5b81949d80e3954664dd7f82eec3849bd7879`；实际 clean main / ff-only / remote identity 已核对。
+- APPLICATION_COMMIT：`0fd9a954a2acb3d0dc486ef89d3c0c17efba66b1`。
+- Application Actions / Pages：https://github.com/king-640-060/fitlog-lite/actions/runs/37944366344 — success。
+- END_COMMIT / 最终 main：承载本报告的 LATEST-only 提交。精确 SHA、最终 Actions / assets / data / offline 回执在外部交付记录及最终回复中，避免提交自引用。
 
-## 2. Root causes
+## 二、设计基准
 
-Weight intersect-only tiny-dot hit detection required excessive precision. Recovery did not share bounded rendered-coordinate hit handling and sparse numeric feedback. Weight had duplicate hero/readout emphasis; Sleep/Water shared an outer group/range and lacked direct record actions. Strength history was distant while other training histories were nearby. Local typography and hardcoded Report chart colors caused inconsistent proportions/theme behavior. Sparse actual dates also collapsed against year-old observations, and the one-point SVG could repeat date labels at one position.
+用户实际提供 `/Users/zhaozhantian/Downloads/fitlog_coach_report_prototype_v3.html`，标题 V3，SHA256 `e67df680dc0240e5653ab62dffd5f1d4dee9ef8d993d4b4befa909e56fa6d2da`。未取得精确 V3.1 HTML。采用实际 V3 的报告/趋势/训练结构，并执行本轮文本明确要求的 V3.1 修正；不宣称精确 V3.1 一致性验收完成。
 
-## 3. Final structure
+开发前建立 `docs/PROFESSIONAL_FITNESS_REPORT_CONTRACT.md`。差异分类：已修复统一162px/点选/遮挡/习惯分母/报告结构；业务数据不同包括真实比较/PR/覆盖/未知字段；正式结构调整包括完整九类日报、真实历史编辑器、共享 tokens 和五个主导航；精确 V3.1 源文件及真机验收 Pending。详细实际截图对照见外部 `VISUAL_REVIEW.md` / `SCREENSHOTS.md`。
 
-Progress Trend now owns three independent sibling Weight/Sleep/Water modules. Each has shared header/icon/nearby History, one actual selected value/full date, chart, independent7/30/90(default30), then record actions. No body heading, duplicate Weight hero or Recovery outer card. Range/valid selection/internal scroll survive History and Calendar return; range changes reset latest, deleted points fall back latest. Domain-only saved-fact refresh prevents unrelated modules from remounting. Refresh owns visibility/midnight cleanup.
+## 三、专业力量分析
 
-Workout Strength/Cardio/Kegel use the same peer header and nearby History. Removed the distant recent Strength list; complete Strength history remains available. Cardio main label is 新增有氧记录. All three primary actions retain shared lime states.
+新增纯分析 `exercisePerformanceAnalysis.ts`，只读 `coachReportService.ts` 在一致性事务中读取周期事实、一次完整历史与自然周 Habit 上下文；无逐动作查询、缓存持久化或库/历史改写。
 
-## 4. Shared visual contract / components
+只纳入已完成且时间有效的 Workout；次数为正整数，已填外部负重有限且非负。缺负重保持未知，显式0合法。ID优先，谨慎精确规范化旧名称；不同ID/器械不合并，同名多ID的旧记录明确无法可靠比较。快照名称保留。
 
-`docs/UNIFIED_MODULE_VISUAL_HIERARCHY_CONTRACT.md` was established before implementation. Durable AGENTS/UI_INTERACTION_SPEC/INTERACTION_VISUAL_SYSTEM/UI_QA_MATRIX/TRAINING_RECOVERY_UX_CONTRACT now reference it.
+本期最新合格训练与此前最近具有共同次数/重量条件的训练比较，可跨周期；同日按真实时间戳排序，兼容 ISO 时区表示。按每个共同次数比较最佳重量、每个共同重量比较最佳次数，完整列出所有变化。60×8→65×8=+5kg/+8.33%；60×8→60×10=+2次；60×10→65×5只说明条件变化。混合升降不挑选单一增长。首次记录建立基准，无可比负重/身份明确未知。
 
-`trendModule.ts` supplies shared anatomy, independent state, factual dates and saved-fact refresh; `trendInteraction.ts` supplies bounded pointer handling/sparse collision rules; `weightChart.ts` supplies reusable Chart.js presentation/ownership; `modules.css` supplies semantic sizes. Existing recordHistory/Sheet/primary primitives remain authoritative.
+PR相对所有更早历史，分别判断最高已记录负重、同次数最佳负重、同重量最佳次数；平纪录/首次不称新PR，最高重量不称1RM。实际逐次/逐组明细保留缺负重、可选RPE/备注、有效/带负重/排除组数。
 
-Tokens: --type-page1.5rem(24px), --type-module1.0625rem(17px), --type-metric1.75rem(28px), --type-unit/body.9375rem(15px), --type-meta.8125rem(13px), --type-action.875rem(14px). Icon20px in32px existing soft surface; controls>=44px, main record actions>=48px. Shared existing card spacing/radius/surface. Chart height11rem, sparse8.5rem, axes.8125rem. Category aliases reuse accent-mid/info/carbs; no independent palette.
+## 四、增肌分析
 
-## 5. Actual trend interaction
+`trainingVolumeAnalysis.ts` 统计实际完成训练天/次（频率点与概览使用同一组真实完成日期，即使某次没有有效组）、有效记录组、带负重组及已知 Σkg×次数；单动作历史负荷与实际训练频率可读。无工作组/热身/肌群快照，明确不能称有效增肌组、跨动作评判质量或推断肌肉增长。
 
-Chart.js remains Weight's engine. Screen CSS coordinates are derived from rendered points; SVG uses ScreenCTM. Near-point/date-column taps accept bounded44px horizontal proximity and12px plot exterior tolerance, with12px natural drift; distant exterior/cancel/native scroll do not select. Pointer, mouse, keyboard/assistive activation update the actual value/date, selected marker and locator. Native horizontal and vertical touch scrolling are verified without hijacking gestures.
+## 五、减脂分析
 
-Weight8/9 and Water8/9 actual-coordinate touch changes observable readouts/highlights; equal-valued Water dates still move date/marker.1–3 actual observations use compact even spacing and collision-safe value/date labels; dense charts omit numeric clutter and scroll internally. Missing recovery dates split lines, never create zeros. Weight History→查看全部趋势 retains year-old facts, complete dates, selection and scrolling using a distinct owned canvas.
+读取真实有效体重首末、变化和覆盖，配合营养执行及同条件动作表现。没有有效体重/可比力量/完整营养时保留未知；体重变化不等于脂肪变化，记录低于目标不代表确认能量赤字，不推断TDEE、体脂或肌肉流失。
 
-## 6. Direct record actions
+## 六、运动营养
 
-Weight records/modifies Today through existing upsertWeight, guarded repeated submit and retained inline errors. Inspected historical points never become implicit write dates; explicit Calendar/history dates remain intact.
+热量/蛋白质/碳水/脂肪独立按完整、有限、非负的当天 FoodLog 快照汇总；部分记录日不伪造完整总量，明确零合法，无记录未知。平均值仅纳入有完整记录日期；目标比例仅使用相同完整日期的有效正目标，单列配对实际/目标/覆盖。历史目标/模板/独立kcal算法不变。
 
-Sleep Start/Woke reuse existing startSleep/finishSleep and unique active session. Backfill uses createCompletedSleep with real start/end, actual duration, wake metadata and captured automatic/manual night. Invalid/future/inverted inputs reject; repeated same-ID submit is idempotent and conflicting facts reject. It creates completed facts only and cannot mutate an active sleep. No inferred stages/quality.
+g/kg仅日报该本地日期最新有效体重与完整宏量计算，保留两位；不借用历史或默认体重。未来报告为空/未来语义，不显示0/周目标未完成。
 
-Water opens the shared lightweight Sheet with250/500/custom. Existing addWater/edit/delete and exact-ID Action Toast Undo remain. Writes use Today, independently of inspected points; custom Back retains the same Sheet.
+## 七、报告UI
 
-## 7. Data consistency / compatibility
+`coachReport.ts` / `coachReport.css`：日报保持全部九类真实记录与原有展开状态，补充真实营养及可比表现，不画一天趋势。周报：概览、动作比较/真实PR/历史趋势/明细、频率、体重、营养、习惯、恢复。月报：实际逐周次数/组数/负荷、历史表现、自然周Habit与覆盖。综合/力量/增肌/减脂共享同批分析，只调整阅读重点。
 
-Actual UI writes are checked in native IDB plus Today/Trend/History/Calendar/Day Detail/Day and Month Reports. Sleep uses the existing business-night resolver and bounded date reader. New completed backfills preserve factual timestamps and optional attribution through Backup/Sync. Frozen fixtures and prior tests remain.
+两格比较、完整日期、克制反馈、选中读数/定位线、44px动作入口、现有语义字体/主题 tokens；320及大字体以垂直布局降级，不强行缩字。保留周期导航/共享日期选择器/Calendar/业务入口。
 
-Unchanged: Dexie11, IDB110/20stores, Backup11/Restore1–11, Sync/envelope1, AIConfig1, VoiceConfig1, device-only WaterReference1, permanently retired Video. No schema/index/reset/startup rewrite or business nutrition algorithm changes.
+## 八、习惯打卡
 
-## 8. UI size / visual acceptance
+周报7天区分已打卡/计划日未打卡/非指定日/未来/尚未创建/历史计划未知。次数目标优先于星期计划，不编造每天必做。月报按自然周真实完成数/真实目标，3/3=100%；跨月周明确区分自然周与本月打卡。无目标不生成比例，不完整周不比例缩小目标。创建中途、计划变更或停用且无历史快照时不反推旧要求；保存的旧打卡始终保留。
 
-PASS:320/375/390/430 ×100/120/140/200 ×Light/Dark ×Normal/Reduced plus landscape =65 unique contexts. Unified, Training and Daily Records each ran the full65 matrix. Enlarged text grows/wraps, targets remain usable; dense charts own horizontal scroll, page stays bounded. Today and Reports retain their domain-specific content/actions while sharing semantic type sizes and theme tokens. Plan/Food/Management/Calendar/Sheet paths were also audited by retained gates.
+## 九、趋势修复
 
-Actual screenshot review fixed single-point date overlap, Food counted meal metadata clipping at320/200, Report training grid overflow, missing Weight token alias and duplicate main/all-history canvas identity. Empty/single histories remain compact/content-sized; long histories own body scroll. All-history actual observations stay distinguishable despite large date gaps. Tall original screenshots include fixed navigation at the current viewport position; scrolling and reserved bottom space are separately asserted.
+保留 Chart.js。`trendGeometry.ts` 统一真实日历间距、162px(100%)/rem缩放、固定Y标签、三层网格；Weight/Sleep/Water7/30/90与所有非空密度高度一致。缺失恢复日期拆线，不填0；稀疏点不重复数字。
 
-## 9. Training continuity
+真实坐标点选更新值/完整日期/标记/定位线，同值日期也可区分；共享 bounded pointer、自然滑移/cancel、native内部横滚与键盘。WebKit截图实际发现体重右端圆点半截和边缘日期半字，已修复。选中动作标签在小屏/大字体/旋转时保持完整可见；原生横向列表不被全局手势替代。Weight使用真实日历滚动轨道内的可见窗口画布，十年跨度/high DPR/200%不生成超宽位图；scroll/ResizeObserver/Chart均有dispose。动作同日观察共享日期X，完成时刻/键盘/明细区分，不伪造额外日期。
 
-Strength autosave/actual saved completion and full histories; Cardio draft/busy/single write/edit/delete; Kegel manual/natural completion, unlock notice, failed-save retry, absolute-time timer/pause/visibility/Wake Lock/audio cleanup remain covered. Nearby headers share primary styling without altering execution engines.
+## 十、训练页面
 
-## 10. Tests / regression
+Strength/Cardio/Kegel共用原有peer标题/就近History/primarylime及双真实摘要tiles。Strength动作/组数、有氧次数/累计分钟、Kegel阶段/当天完成来自实际记录。主动作文案/几何及实际编辑器/计时引擎不变。
+
+保留autosave、完成/失败重试、手动/自然Kegel完成、阶段解锁、绝对时间timer/pause/visibility/WakeLock/audio清理、有氧增改删、完整历史。训练体验/生命周期及原有服务测试作为保护证据。
+
+## 十一、底部导航
+
+五主页面实测：100%导航57px、页面reserve77px；120/140/200%分别约59.95/64.11/76.59px并随字号共享增长。34px Safe Area模拟只计入一次；验证独立末端viewport与最后内容可达。未发现异常跨页巨大空白，因此未添加猜测性nav覆盖。47px top/34px bottom原PWA视口模拟明确标为模拟，非真实安装验证。
+
+## 十二、视觉审查
+
+报告/统一体验/训练/日报各65显示组合：320/375/390/430×100/120/140/200×Light/Dark×Normal/Reduced，加844横屏。空/1/2/3/90点、真实坐标、独立range与all-history均检查。额外Chrome DPR3完整65组/十年跨度/旋转以及WebKit五组验证。原型和正式原图、并排缩略图、尺寸/SHA清单、逐项差异均保留，原始截图不编辑。全页fixednav位置与末端viewport证据分开。
+
+## 十三、测试
 
 | Gate | Result |
 | --- | --- |
 |npm run typecheck|PASS|
-|npm test|PASS —760 /65files;746 original retained +14 new|
-|TZ=UTC npm test|PASS —760 /65files|
-|npm run build|PASS —clean APP and CI; existing bundle-size advisory|
-|git diff START..APP --check|PASS|
-|Retained browser suites|PASS —all28 retained|
-|New unifiedExperience|PASS —29 total interaction suites, plus preservation/assets guards|
-|Unified/Training/Daily matrices|PASS —65 unique contexts each|
-|Integrated cycles|PASS —20 actual complete cycles per representative gate locally and production|
-|Lifecycle|PASS —actual Chart.js ownership1 when open/0 after exit, stable listener/timeout/interval/RAF counts, no lingering Sheet/focus/scroll-lock or duplicate writes|
-|Production targeted suites|PASS —8 interaction suites plus exact assets gate|
+|npm test|PASS —820 /66files；全部760原测试保留，新增60|
+|TZ=UTC npm test|PASS —820 /66files|
+|npm run build|PASS —Pages base；既有bundle-size advisory|
+|git diff --check|PASS|
+|Retained browser suites|PASS —29全部保留|
+|New coachReportExperience|PASS —30总互动套件，另有assets/preservation守卫|
+|Four full display matrices|PASS —65唯一组合各一组|
+|Actual coordinate / readonly cycles|PASS —20完整周期，20-store/config哈希一致|
+|Resources|PASS —Chrome liveChart开1/退出0；监听/timeout/interval/RAF/ResizeObserver稳定，Sheet/锁无残留；WebKit不将CDP内存测量冒充已测|
+|Production targeted|PASS —8原有互动+新coach、exactassets、同profile保存/新离线冷启动|
 
-Retained inventory: uiQualityAudit, uiSemanticConsistency, interactionStabilization, mobileLayout, sharedDatePicker, githubSyncSafety, aiAssistant, aiVoice, voiceMode, aiStreaming, aiDualModelRouting, foodVision, nutritionGauge, nutritionTemplates, foodServing, dietEvents, trainingJournal, habitDeletion, motionPolish, habitEditorLayout, managementWorkspace, managementVisualConsistency, foodRecovery, macroNutritionSummary, catalogRecovery, dailyRecordsExperience, trainingRecoveryExperience, trainingRecoveryLifecycle.
+生产互动回归使用 Playwright1.62.1 配套 Chrome for Testing151.0.7922.34。系统Chrome在本轮期间从154升级到155；首次与串行复测的冻结时间步骤出现加载/点击超时，原始日志归档。配套浏览器重新完整9套生产回归通过，未改App、超时或断言。Chrome155冻结时间自动化超时的根因尚未确认，作为测试环境限制披露；系统Chrome的exactassets及同profile/offline守卫通过。
 
-Obsolete hero/shared-range/old-label/bottom-list assertions were replaced by stronger peer/independent-range/factual-value/nearby-history assertions. No test deletion, skipped gate, timeout increase, frozen-fixture edit or new dependency. Actual coordinate tests do not call business interaction functions. Synthetic IDB fixture replacement reloads the app because arbitrary native writes bypass Dexie's observation cache; actual service writes are separately verified live. CDP raw canvas enumeration can retain destroyed nodes through automation handles; lifecycle asserts live Chart.js-owned canvases instead, while retaining independent timers/listeners/Sheet/data checks. Production test-process IPv4 routing preserves HTTPS origin/assertions and changes no app/global networking.
+原有浏览器库存：uiQualityAudit, uiSemanticConsistency, interactionStabilization, mobileLayout, sharedDatePicker, githubSyncSafety, aiAssistant, aiVoice, voiceMode, aiStreaming, aiDualModelRouting, foodVision, nutritionGauge, nutritionTemplates, foodServing, dietEvents, trainingJournal, habitDeletion, motionPolish, habitEditorLayout, managementWorkspace, managementVisualConsistency, foodRecovery, macroNutritionSummary, catalogRecovery, dailyRecordsExperience, trainingRecoveryExperience, trainingRecoveryLifecycle, unifiedExperience。
 
-## 11. Production / preservation
+旧稀疏高度/数字标签/旧训练 prose 断言更新为更强的共享162px、真实日期/读数/实际双摘要与boundedscroll证明；没有删除/skip、抬高timeout、修改冻结fixtures或引入App依赖。isolated synthetic fixture初始化与20轮只读循环明确分开；真实业务写入保留原有service/live刷新测试。全部最终日志见外部artifacts。
 
-Application CI/Pages success preceded production regressions. Exact HTML/build-info/App/JS/CSS/SW bytes/SHA/precache and five main views/AI settings/Sync entry pass.
+## 十四、数据保护
 
-Same existing dedicated synthetic production profile from the previous round was reused without reseeding. Baseline→APP all20-store contents,25rows,8device-config keys and versions compare equal. Entire data SHA256: `6448eeaacd97e099ef91416e1db77db3f683113b11662765ad48c8e9dc995799`; config SHA256: `609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34`. APP/SW identity both `462c98ef4ebd8296187c66ae5b9a9c6619449c9c`; new offline page cold boot passes with identical data/config. Final END identity/data/offline evidence is external after this report-only commit's CI/Pages.
+Dexie11 / IDB110 /20stores、Backup11 /Restore1–11、Sync/envelope1、AIConfig1、VoiceConfig1、WaterReference1与Video永久退休保持不变。DB/schema/index、Backup/Restore/Sync、历史快照和业务写服务未改。
 
-## 12. Screenshots / actual changes
+同上一轮专用合成productionprofile持续使用，无重新播种/删库：全部20-store25rows与8配置项逐内容对比，版本相同。Data SHA256：`6448eeaacd97e099ef91416e1db77db3f683113b11662765ad48c8e9dc995799`；config SHA256：`609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34`。Baseline→APP相等；更新App/SW至`0fd9a954a2acb3d0dc486ef89d3c0c17efba66b1`后，新页面offlinecoldboot通过且hash相同。END后最终重复验证回执在外部交付记录。用户原浏览器与真实设备存储未接触。
 
-Artifacts: `artifacts/unified-experience-2026-10-09/`.38 required original scenes, five contact sheets, screenshot-index with hashes, manifest and actual visual-review receipt. Includes ordinary/enlarged/small/dark/reduced/landscape, actual8/9 selection, sparse/dense/empty, direct-record/editor/timeline, training peers, Today/Reports and short/long History. Browser originals are unedited. Machine matrix/browser inventory/production logs/preservation receipts remain separately inspectable.
+## 十五、发布
 
-Actual changed files (29 application + this report =30):
+Application CI/Pages success：https://github.com/king-640-060/fitlog-lite/actions/runs/37944366344。生产：https://king-640-060.github.io/fitlog-lite/ 。exact HTML/build-info/App/JS/CSS/SW字节/SHA/precache、五主view/AIsettings/Sync入口通过。发布后报告/趋势/训练/Today/Food/Calendar/management针对性回归通过。生产测试的IPv4路由仅限自动化Chrome进程，HTTPSorigin不变，不改App/系统网络。此报告以单独LATEST-only提交；END Actions/assets/identity/data/offline将在其发布后独立检查。
+
+## 十六、Pending / ChatGPT Baseline
+
+- Automated analytics / UI / regression / resources：Verified。
+- Production APP / assets / same syntheticprofile / offline：Verified。
+- 精确V3.1 HTML一致性：Pending；当前真实来源V3加文本修正。
+- 实体iPhone Safari：Pending。
+- 原安装PWA：Pending。
+- 真实设备数据连续性：Pending。
+
+无已知未解决自动化产品缺陷。WebKit、模拟SafeArea或构建成功均不能替代真机证据；不要卸载原PWA/清除网站数据用于更新验证。
+
+下一轮从实际main/remote恢复，以当前code与本报告为准。继续保持共享专业报告纯分析、162px真实日历图表/Chart.js窗口画布/owneddispose、原有执行与数据版本。
+
+## 实际修改文件
+
+Application 31 files + LATEST-only report：
 
 - `AGENTS.md`
 - `docs/INTERACTION_VISUAL_SYSTEM.md`
+- `docs/PROFESSIONAL_FITNESS_REPORT_CONTRACT.md`
 - `docs/TRAINING_RECOVERY_UX_CONTRACT.md`
 - `docs/UI_INTERACTION_SPEC.md`
 - `docs/UI_QA_MATRIX.md`
 - `docs/UNIFIED_MODULE_VISUAL_HIERARCHY_CONTRACT.md`
 - `src/main.ts`
-- `src/services/recoveryService.ts`
-- `src/styles/main.css`
+- `src/services/coachReportService.ts`
+- `src/styles/coachReport.css`
 - `src/styles/modules.css`
-- `src/styles/plan.css`
-- `src/ui/recovery.ts`
+- `src/ui/coachReport.ts`
 - `src/ui/recoveryLineChart.ts`
+- `src/ui/recoveryReport.ts`
+- `src/ui/trendGeometry.ts`
 - `src/ui/trendInteraction.ts`
-- `src/ui/trendModule.ts`
 - `src/ui/weightChart.ts`
 - `src/ui/weightHistory.ts`
 - `src/ui/weightTrend.ts`
+- `src/utils/coachReportAnalysis.ts`
+- `src/utils/exercisePerformanceAnalysis.ts`
+- `src/utils/trainingVolumeAnalysis.ts`
 - `tests/browser/catalogRecovery.mjs`
-- `tests/browser/dailyRecordsExperience.mjs`
-- `tests/browser/foodRecovery.mjs`
-- `tests/browser/mobileLayout.mjs`
-- `tests/browser/trainingRecoveryExperience.mjs`
-- `tests/browser/trainingRecoveryLifecycle.mjs`
+- `tests/browser/coachReportExperience.mjs`
+- `tests/browser/coachReportPreservation.mjs`
+- `tests/browser/uiQualityAudit.mjs`
 - `tests/browser/uiSemanticConsistency.mjs`
 - `tests/browser/unifiedExperience.mjs`
-- `tests/browser/unifiedExperiencePreservation.mjs`
 - `tests/dailyRecordsSummary.test.ts`
+- `tests/exercisePerformanceAnalysis.test.ts`
 - `tests/unifiedExperience.test.ts`
-- `LATEST_DEV_REPORT.md`
-
-## 13. Pending / limits
-
-- Automated interaction, dimensions, data continuity, resources, CI/Pages and synthetic offline evidence: Verified.
-- Physical iPhone Safari: Pending.
-- Original installed PWA: Pending.
-- Real-device data continuity: Pending.
-
-No unresolved automated product defect. Browser emulation cannot substitute for device evidence. Do not uninstall the original PWA or clear website data for verification.
