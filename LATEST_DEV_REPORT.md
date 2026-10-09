@@ -1,138 +1,131 @@
 # FitLog Lite Development Report
 
-## Latest production round — Training & Recovery Experience Unification (2026-10-09)
+## 1. Actual baseline / release identity
 
-- START_COMMIT: `99d6187b4573793c9a373fb7cbc92b9173d8d500`. Clean main, branch/ff-only pull/log verified; remote baseline rechecked before publication.
-- APPLICATION_COMMIT: `9194390f0e3e45cdede5e2d87b453a4e73d08231`.
-- Application Actions: https://github.com/king-640-060/fitlog-lite/actions/runs/37883862104 — success, including746 tests/typecheck/build/Pages.
+Latest production round: Unified Experience & Visual Consistency, 2026-10-09.
+
+- START_COMMIT: `32b1de23591bb7c24677551b9791eb501a362d0e`. Clean main, branch/ff-only pull/log verified; origin/main rechecked unchanged before publication.
+- APPLICATION_COMMIT: `462c98ef4ebd8296187c66ae5b9a9c6619449c9c` —29 application files, including shared architecture, service, tests and durable rules.
+- Application Actions/Pages: https://github.com/king-640-060/fitlog-lite/actions/runs/37905790820 — success, including typecheck,760 units, build and deployment.
 - Production: https://king-640-060.github.io/fitlog-lite/.
-- END_COMMIT: the report-only commit containing this file. Exact SHA and final CI/assets/data/offline receipts are external and returned to the user to avoid self-reference.
+- END_COMMIT: the LATEST-only commit containing this report. Exact SHA and final CI/assets/data/offline receipts are external and returned to the user, avoiding self-reference.
 
-## Audit and shared architecture
+## 2. Root causes
 
-Established `docs/TRAINING_RECOVERY_UX_CONTRACT.md` before UI implementation. Existing Kegel engine, Strength autosave, Cardio services and nine-category daily facts were retained. Prior UI lacked explicit results, had distant Weight management, large recovery history frames, nonselectable lines and wake-date sleep aggregation.
+Weight intersect-only tiny-dot hit detection required excessive precision. Recovery did not share bounded rendered-coordinate hit handling and sparse numeric feedback. Weight had duplicate hero/readout emphasis; Sleep/Water shared an outer group/range and lacked direct record actions. Strength history was distant while other training histories were nearby. Local typography and hardcoded Report chart colors caused inconsistent proportions/theme behavior. Sparse actual dates also collapsed against year-old observations, and the one-point SVG could repeat date labels at one position.
 
-- `trainingCompletion.ts` / `trainingCompletion.css` share Completion Layout/Status/Summary/Actions for Kegel and Strength. Capture factual result once, saving/saved/error, disable repeated save, retain identity/result on retry, render actual successfully saved metrics, explicit Return; no automatic list jump or second unlock modal.
-- Kegel captures one Session ID before await; transaction reuses identical existing ID and rejects conflicting facts. Stop timer RAF/interval, release Wake Lock and suspend cue audio; preserve timer engine/absolute clock/pause/visibility/progression. Manual completion never unlocks; natural unlock is an inline notice. Actual duration follows saved start/end semantics, including existing pause accounting.
-- Strength flushes autosave then finishes the captured Workout; result shows actual saved actions/sets/date/optional subjective note, no inferred weight/score/time. View this saved record in the existing Sheet; return is explicit.
-- Cardio stays lightweight. Busy/error retain draft and same Sheet; successful save closes/back once and locally patches its card. Repeated submit is guarded; actual history edit/delete and focus return update summaries without full-page flashing.
-- `recordHistory.ts` shares content-sized History Sheet, Row, Meta, Actions, Empty State and same-Sheet editor/date Back. Weight/Sleep/Water use exact IDs, confirmed deletion, owned liveQuery, retained nodes/scroll/focus, in-place update and X cleanup. Cached detached parent nodes allow background writes during an editor without errors or lost drafts. Weight entry is near its summary; no bottom long list after Recovery.
-- `weightTrend.ts` retains Chart.js and shares precise readout/selection/keyboard/internal-scroll behavior with `recoveryLineChart.ts`. Latest valid default, selected radius,44px targets; same-range updates retain selection and focus, range changes reset. Missing recovery days split lines; one/empty point stays factual. Removed all default numeric point labels and the whole daily expansion list.
+## 3. Final structure
 
-## Sleep business dates and cross-surface facts
+Progress Trend now owns three independent sibling Weight/Sleep/Water modules. Each has shared header/icon/nearby History, one actual selected value/full date, chart, independent7/30/90(default30), then record actions. No body heading, duplicate Weight hero or Recovery outer card. Range/valid selection/internal scroll survive History and Calendar return; range changes reset latest, deleted points fall back latest. Domain-only saved-fact refresh prevents unrelated modules from remounting. Refresh owns visibility/midnight cleanup.
 
-`getSleepBusinessDate` / `resolveSleepBusinessDate` is the shared source. Local start00:00–05:59 belongs to the previous night;06:00–23:59 belongs to the start date. This is attribution, not an inferred sleep type.
+Workout Strength/Cardio/Kegel use the same peer header and nearby History. Removed the distant recent Strength list; complete Strength history remains available. Cardio main label is 新增有氧记录. All three primary actions retain shared lime states.
 
-| Local start | Business date |
-| --- | --- |
-|2026-10-10 02:00|2026-10-09|
-|2026-10-10 23:40|2026-10-10|
-|2026-10-09 23:30|2026-10-09|
-|2026-10-10 08:00|2026-10-10|
-|2026-10-10 14:00|2026-10-10|
-|2026-10-10 05:59|2026-10-09|
-|2026-10-10 06:00|2026-10-10|
+## 4. Shared visual contract / components
 
-Optional sleepNightDate/sleepNightDateSource/sleepStartLocalDate are captured on new records, stable through timezone travel and preserved by existing Backup11/parser/Restore/Sync1. No DB/schema/index change. Manual correction chooses captured start date or previous night, visibly explains its range, preserves true start/end including seconds/milliseconds, ID and createdAt; end-only edits retain attribution. Legacy recordDate remains wake metadata, never repurposed. Legacy rows are not rewritten at startup; their missing original timezone is disclosed and fallback uses current local start time. Actual time corrections use current local timezone and reject future/inverted times.
+`docs/UNIFIED_MODULE_VISUAL_HIERARCHY_CONTRACT.md` was established before implementation. Durable AGENTS/UI_INTERACTION_SPEC/INTERACTION_VISUAL_SYSTEM/UI_QA_MATRIX/TRAINING_RECOVERY_UX_CONTRACT now reference it.
 
-Existing startTime index reads a bounded guard window then resolves nights: Calendar42, Detail/Day Report one date, Recovery7/30/90, period Reports selected natural range. Latest completed Today sleep uses a separate bounded indexed lookup; active sleep is independent and excluded from completed totals. No all-history sleep scans on date surfaces. Calendar/Detail/Trend/Day/Month/History share this same aggregation, exact deletion and live ownership. Today shows recent completed sleep even when it belongs to yesterday, also alongside active sleep.
+`trendModule.ts` supplies shared anatomy, independent state, factual dates and saved-fact refresh; `trendInteraction.ts` supplies bounded pointer handling/sparse collision rules; `weightChart.ts` supplies reusable Chart.js presentation/ownership; `modules.css` supplies semantic sizes. Existing recordHistory/Sheet/primary primitives remain authoritative.
 
-`sleepTimeline.ts` shares actual chronological intervals/gaps/duration between History and Day Detail. Usual18:00→next12:00 bounds use calendar arithmetic across DST and extend for exceptional real times. Multiple actual intervals sum saved durations. No fabricated stages, REM, quality or score.
+Tokens: --type-page1.5rem(24px), --type-module1.0625rem(17px), --type-metric1.75rem(28px), --type-unit/body.9375rem(15px), --type-meta.8125rem(13px), --type-action.875rem(14px). Icon20px in32px existing soft surface; controls>=44px, main record actions>=48px. Shared existing card spacing/radius/surface. Chart height11rem, sparse8.5rem, axes.8125rem. Category aliases reuse accent-mid/info/carbs; no independent palette.
 
-## Regression and visual evidence
+## 5. Actual trend interaction
+
+Chart.js remains Weight's engine. Screen CSS coordinates are derived from rendered points; SVG uses ScreenCTM. Near-point/date-column taps accept bounded44px horizontal proximity and12px plot exterior tolerance, with12px natural drift; distant exterior/cancel/native scroll do not select. Pointer, mouse, keyboard/assistive activation update the actual value/date, selected marker and locator. Native horizontal and vertical touch scrolling are verified without hijacking gestures.
+
+Weight8/9 and Water8/9 actual-coordinate touch changes observable readouts/highlights; equal-valued Water dates still move date/marker.1–3 actual observations use compact even spacing and collision-safe value/date labels; dense charts omit numeric clutter and scroll internally. Missing recovery dates split lines, never create zeros. Weight History→查看全部趋势 retains year-old facts, complete dates, selection and scrolling using a distinct owned canvas.
+
+## 6. Direct record actions
+
+Weight records/modifies Today through existing upsertWeight, guarded repeated submit and retained inline errors. Inspected historical points never become implicit write dates; explicit Calendar/history dates remain intact.
+
+Sleep Start/Woke reuse existing startSleep/finishSleep and unique active session. Backfill uses createCompletedSleep with real start/end, actual duration, wake metadata and captured automatic/manual night. Invalid/future/inverted inputs reject; repeated same-ID submit is idempotent and conflicting facts reject. It creates completed facts only and cannot mutate an active sleep. No inferred stages/quality.
+
+Water opens the shared lightweight Sheet with250/500/custom. Existing addWater/edit/delete and exact-ID Action Toast Undo remain. Writes use Today, independently of inspected points; custom Back retains the same Sheet.
+
+## 7. Data consistency / compatibility
+
+Actual UI writes are checked in native IDB plus Today/Trend/History/Calendar/Day Detail/Day and Month Reports. Sleep uses the existing business-night resolver and bounded date reader. New completed backfills preserve factual timestamps and optional attribution through Backup/Sync. Frozen fixtures and prior tests remain.
+
+Unchanged: Dexie11, IDB110/20stores, Backup11/Restore1–11, Sync/envelope1, AIConfig1, VoiceConfig1, device-only WaterReference1, permanently retired Video. No schema/index/reset/startup rewrite or business nutrition algorithm changes.
+
+## 8. UI size / visual acceptance
+
+PASS:320/375/390/430 ×100/120/140/200 ×Light/Dark ×Normal/Reduced plus landscape =65 unique contexts. Unified, Training and Daily Records each ran the full65 matrix. Enlarged text grows/wraps, targets remain usable; dense charts own horizontal scroll, page stays bounded. Today and Reports retain their domain-specific content/actions while sharing semantic type sizes and theme tokens. Plan/Food/Management/Calendar/Sheet paths were also audited by retained gates.
+
+Actual screenshot review fixed single-point date overlap, Food counted meal metadata clipping at320/200, Report training grid overflow, missing Weight token alias and duplicate main/all-history canvas identity. Empty/single histories remain compact/content-sized; long histories own body scroll. All-history actual observations stay distinguishable despite large date gaps. Tall original screenshots include fixed navigation at the current viewport position; scrolling and reserved bottom space are separately asserted.
+
+## 9. Training continuity
+
+Strength autosave/actual saved completion and full histories; Cardio draft/busy/single write/edit/delete; Kegel manual/natural completion, unlock notice, failed-save retry, absolute-time timer/pause/visibility/Wake Lock/audio cleanup remain covered. Nearby headers share primary styling without altering execution engines.
+
+## 10. Tests / regression
 
 | Gate | Result |
 | --- | --- |
 |npm run typecheck|PASS|
-|npm test|PASS —746 /64 files;717 previous tests retained plus29 new|
-|TZ=UTC npm test|PASS —746 /64 files|
-|npm run build|PASS — clean application and CI; existing bundle-size advisory only|
-|git diff --check|PASS|
-|Full browser release inventory|PASS — all26 retained plus2 new,28 total|
-|Training matrix|PASS —65 unique contexts,4width×4font×2color×2motion plus landscape|
-|Daily Records matrix|PASS —65 unique contexts, all prior nine-category/data/clear/keyboard assertions|
-|Food Recovery|PASS — full35-context gate|
-|Integrated stress|PASS —20 full training/history/correction/trend/calendar/report cycles locally and production|
-|Resource lifecycle|PASS —20 manual cycles;0 RAF/interval, stable Window22/Document10 listeners after feedback settles|
-|Cross-page editor writes|PASS — same Sheet/parent lists and unsaved drafts retained|
-|Delete last record|PASS — three histories empty, Today/Trend/Calendar/Detail/Day/Month no stale facts|
+|npm test|PASS —760 /65files;746 original retained +14 new|
+|TZ=UTC npm test|PASS —760 /65files|
+|npm run build|PASS —clean APP and CI; existing bundle-size advisory|
+|git diff START..APP --check|PASS|
+|Retained browser suites|PASS —all28 retained|
+|New unifiedExperience|PASS —29 total interaction suites, plus preservation/assets guards|
+|Unified/Training/Daily matrices|PASS —65 unique contexts each|
+|Integrated cycles|PASS —20 actual complete cycles per representative gate locally and production|
+|Lifecycle|PASS —actual Chart.js ownership1 when open/0 after exit, stable listener/timeout/interval/RAF counts, no lingering Sheet/focus/scroll-lock or duplicate writes|
+|Production targeted suites|PASS —8 interaction suites plus exact assets gate|
 
-Browser inventory: uiQualityAudit, uiSemanticConsistency, interactionStabilization, mobileLayout, sharedDatePicker, githubSyncSafety, aiAssistant, aiVoice, voiceMode, aiStreaming, aiDualModelRouting, foodVision, nutritionGauge, nutritionTemplates, foodServing, dietEvents, trainingJournal, habitDeletion, motionPolish, habitEditorLayout, managementWorkspace, managementVisualConsistency, foodRecovery, macroNutritionSummary, catalogRecovery, dailyRecordsExperience, trainingRecoveryExperience, trainingRecoveryLifecycle.
+Retained inventory: uiQualityAudit, uiSemanticConsistency, interactionStabilization, mobileLayout, sharedDatePicker, githubSyncSafety, aiAssistant, aiVoice, voiceMode, aiStreaming, aiDualModelRouting, foodVision, nutritionGauge, nutritionTemplates, foodServing, dietEvents, trainingJournal, habitDeletion, motionPolish, habitEditorLayout, managementWorkspace, managementVisualConsistency, foodRecovery, macroNutritionSummary, catalogRecovery, dailyRecordsExperience, trainingRecoveryExperience, trainingRecoveryLifecycle.
 
-Obsolete wake/default-label/automatic-list-jump expectations were replaced with stronger business-night/shared-completion/selected-readout assertions. No gate skip, weaker assertion, increased timeout, dependency or frozen-fixture edit. Initial CI on9810431 found a synthetic multi-episode fixture relying on host timezone; its captured attribution is now explicit, the516-minute/two-episode assertions remain intact, full UTC tests pass and corrected CI deployed9194390. Initial failed run never deployed Pages. Several parallel production reloads hit the host network IPv6 reset/ERR_INTERNET_DISCONNECTED; direct IPv4 and the existing local proxy returned200. A test-process-only IPv4 resolver route then reran every affected full production suite with the same HTTPS URL, assertions and12s timeout; no app networking or global settings changed. Final focused resource checks wait for legitimate finite Toast disposal before comparing listener counts.
+Obsolete hero/shared-range/old-label/bottom-list assertions were replaced by stronger peer/independent-range/factual-value/nearby-history assertions. No test deletion, skipped gate, timeout increase, frozen-fixture edit or new dependency. Actual coordinate tests do not call business interaction functions. Synthetic IDB fixture replacement reloads the app because arbitrary native writes bypass Dexie's observation cache; actual service writes are separately verified live. CDP raw canvas enumeration can retain destroyed nodes through automation handles; lifecycle asserts live Chart.js-owned canvases instead, while retaining independent timers/listeners/Sheet/data checks. Production test-process IPv4 routing preserves HTTPS origin/assertions and changes no app/global networking.
 
-Actual27 scene screenshots/contact sheets were inspected, plus raw390/100,320/200 dark reduced,430/140 dark reduced and landscape. Fixed shared radius token, completion date wrapping, chronological interval order, Sleep row title/meta density and long Weight canvas intrinsic overflow. Short histories are content-sized, long histories own body scrolling; enlarged completion results grow vertically and remain scrollable. Long-element screenshots may include fixed navigation at the current viewport position; actual page scrolling and reserved bottom space are separately asserted. No claim of physical Safari from Chromium.
+## 11. Production / preservation
 
-External artifacts: training-recovery-2026-10-09/local/contact-all-27.png, contact-scenes-1/2/3.png, screenshot-manifest.txt, matrix-65.json, visual-review.json and individual originals. Final focus/background-draft fixes were verified on a stable build; final65 matrix includes focus retention. All final gate logs and receipts are external.
+Application CI/Pages success preceded production regressions. Exact HTML/build-info/App/JS/CSS/SW bytes/SHA/precache and five main views/AI settings/Sync entry pass.
 
-## Production application verification
+Same existing dedicated synthetic production profile from the previous round was reused without reseeding. Baseline→APP all20-store contents,25rows,8device-config keys and versions compare equal. Entire data SHA256: `6448eeaacd97e099ef91416e1db77db3f683113b11662765ad48c8e9dc995799`; config SHA256: `609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34`. APP/SW identity both `462c98ef4ebd8296187c66ae5b9a9c6619449c9c`; new offline page cold boot passes with identical data/config. Final END identity/data/offline evidence is external after this report-only commit's CI/Pages.
 
-All7 targeted production suites PASS: trainingRecoveryExperience(4 contexts,20 integrated cycles), trainingRecoveryLifecycle(20 resource cycles plus background writes and delete-last), dailyRecordsExperience(5), foodRecovery(4), catalogRecovery(6), macroNutritionSummary(4), uiQualityAudit. Existing AI/catalog/configuration, nutrition, nine-category facts, reports and Sheet functionality remain covered. Synthetic profiles and mocked providers only.
+## 12. Screenshots / actual changes
 
-Exact productionAssets PASS: HTML/build-info/App identity, JS/CSS byte lengths/SHA256, exact SW bytes/precache and identity asset, all5 tabs, AI Settings and GitHub Sync entry, no page errors.
+Artifacts: `artifacts/unified-experience-2026-10-09/`.38 required original scenes, five contact sheets, screenshot-index with hashes, manifest and actual visual-review receipt. Includes ordinary/enlarged/small/dark/reduced/landscape, actual8/9 selection, sparse/dense/empty, direct-record/editor/timeline, training peers, Today/Reports and short/long History. Browser originals are unedited. Machine matrix/browser inventory/production logs/preservation receipts remain separately inspectable.
 
-- `index-A3m4yDkr.js`: 835731 bytes; SHA256 `f7efc1803546a6e6596d34669ea9af80c5da9fddd18d8b53b9a9e917c29beb9b`.
-- `index-pkhjcYyA.css`: 126755 bytes; SHA256 `cd6b37197daf705581fbc0fedd411e9b5cf2fc87f3b7b53b0af6dbbb69fd3b7d`.
-
-One dedicated invented-data production profile was created before this release on the old production build and reused throughout this release, rather than claiming an unavailable older-round profile.25 actual fixture rows across20 stores remain unchanged; valid synthetic AI profile/key/Voice config and WaterReference2100 are retained with identical keys/hash.
-
-- All20-store hash: `6448eeaacd97e099ef91416e1db77db3f683113b11662765ad48c8e9dc995799`.
-- Config hash: `609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34`.
-- New offline page boots application App and controller `9194390f0e3e45cdede5e2d87b453a4e73d08231` and the same rows/config.
-- Report-only END repeats CI, exact resources, the same persistent-profile hashes and offline new-page identity. Exact final receipts live outside this self-referencing report.
-
-## Compatibility / Pending
-
-Verified automated and synthetic: Dexie11 / IndexedDB110 /20 stores, stable DB name/indexes; Backup11 / Restore1–11; Sync/envelope1; AIConfig1 / VoiceConfig1 / WaterReference1. New optional attribution survives actual encrypted roundtrip and hash validation; malformed restore rejects before write. Historical FoodLog/Workout snapshots and old Sleep timestamps unchanged; Video remains retired. No personal profile, original PWA, reinstall or real-data reset used.
-
-- Physical iPhone Safari: **Pending**.
-- Original installed PWA: **Pending**.
-- Real-device business data continuity: **Pending**.
-- No known unresolved product-code blocker after automated/production gates.
-
-## Actual changed files
-
-Application37 files plus this report,38 total:
+Actual changed files (29 application + this report =30):
 
 - `AGENTS.md`
-- `LATEST_DEV_REPORT.md`
-- `docs/DAILY_RECORDS_UX_CONTRACT.md`
 - `docs/INTERACTION_VISUAL_SYSTEM.md`
 - `docs/TRAINING_RECOVERY_UX_CONTRACT.md`
 - `docs/UI_INTERACTION_SPEC.md`
 - `docs/UI_QA_MATRIX.md`
-- `src/db/types.ts`
+- `docs/UNIFIED_MODULE_VISUAL_HIERARCHY_CONTRACT.md`
 - `src/main.ts`
-- `src/services/dailyRecordsSummary.ts`
-- `src/services/pelvicFloorService.ts`
 - `src/services/recoveryService.ts`
-- `src/services/weightService.ts`
-- `src/styles/recovery.css`
-- `src/styles/trainingCompletion.css`
-- `src/ui/dayDetail.ts`
-- `src/ui/recordHistory.ts`
+- `src/styles/main.css`
+- `src/styles/modules.css`
+- `src/styles/plan.css`
 - `src/ui/recovery.ts`
 - `src/ui/recoveryLineChart.ts`
-- `src/ui/sleepTimeline.ts`
-- `src/ui/trainingCompletion.ts`
+- `src/ui/trendInteraction.ts`
+- `src/ui/trendModule.ts`
+- `src/ui/weightChart.ts`
 - `src/ui/weightHistory.ts`
 - `src/ui/weightTrend.ts`
-- `src/utils/recovery.ts`
-- `src/utils/reporting.ts`
-- `src/utils/sleepBusinessDate.ts`
-- `tests/browser/README.md`
 - `tests/browser/catalogRecovery.mjs`
 - `tests/browser/dailyRecordsExperience.mjs`
 - `tests/browser/foodRecovery.mjs`
+- `tests/browser/mobileLayout.mjs`
 - `tests/browser/trainingRecoveryExperience.mjs`
 - `tests/browser/trainingRecoveryLifecycle.mjs`
-- `tests/browser/trainingRecoveryPreservation.mjs`
-- `tests/browser/uiQualityAudit.mjs`
+- `tests/browser/uiSemanticConsistency.mjs`
+- `tests/browser/unifiedExperience.mjs`
+- `tests/browser/unifiedExperiencePreservation.mjs`
 - `tests/dailyRecordsSummary.test.ts`
-- `tests/recovery.test.ts`
-- `tests/trainingRecovery.test.ts`
-- `tests/waterReference.test.ts`
+- `tests/unifiedExperience.test.ts`
+- `LATEST_DEV_REPORT.md`
 
-## ChatGPT Baseline
+## 13. Pending / limits
 
-Current application `9194390f0e3e45cdede5e2d87b453a4e73d08231`: shared explicit Kegel/Strength completion and lightweight guarded Cardio; nearby shared Weight/Sleep/Water histories; stable captured sleep business nights; actual interval timelines; selectable7/30/90 recovery and Chart.js weight interaction; no daily expansion list.746/64 units,28 browser gates,65 displays,27 inspected scenes and20 integrated cycles; production/synthetic preservation/offline verified. DB11/110/20,Backup11/Restore1–11,Sync1/config1 remain. Final main is the report-only commit containing this file; read Git first. Physical Safari/original PWA/real-device continuity Pending.
+- Automated interaction, dimensions, data continuity, resources, CI/Pages and synthetic offline evidence: Verified.
+- Physical iPhone Safari: Pending.
+- Original installed PWA: Pending.
+- Real-device data continuity: Pending.
+
+No unresolved automated product defect. Browser emulation cannot substitute for device evidence. Do not uninstall the original PWA or clear website data for verification.
