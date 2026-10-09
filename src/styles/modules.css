@@ -1,5 +1,5 @@
 /* One semantic size system. Enlarged text grows; layout, never type size, adapts. */
-:root { --weight:var(--accent-mid); --strength:var(--info); --cardio:var(--carbs); --pelvic:var(--accent-mid); --type-page:1.5rem; --type-module:1.0625rem; --type-metric:1.75rem; --type-unit:.9375rem; --type-body:.9375rem; --type-meta:.8125rem; --type-action:.875rem; --chart-height:11rem; --chart-sparse-height:8.5rem; --chart-axis-size:.8125rem; }
+:root { --weight:var(--accent-mid); --strength:var(--info); --cardio:var(--carbs); --pelvic:var(--accent-mid); --type-page:1.5rem; --type-module:1.0625rem; --type-metric:1.75rem; --type-unit:.9375rem; --type-body:.9375rem; --type-meta:.8125rem; --type-action:.875rem; --chart-height:10.125rem; --chart-sparse-height:var(--chart-height); --chart-axis-size:.8125rem; }
 .topbar h1,.today-topbar h1,.food-topbar h1 { font-size:var(--type-page); line-height:1.25; }
 .module-header { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--space-1) var(--space-2); min-width:0; }
 .module-title { display:flex; align-items:center; min-width:0; gap:var(--space-2); }
@@ -20,7 +20,7 @@
 .trend-chart-shell { min-width:0; height:var(--chart-height); overflow-x:auto; overscroll-behavior-x:contain; }
 .trend-chart-shell.is-sparse { height:var(--chart-sparse-height); }
 .trend-chart-shell .weight-chart-canvas { height:100%; }
-.trend-chart-shell .recovery-line-chart { height:100%; width:100%; overflow:visible; }
+.trend-chart-shell .recovery-line-chart { height:100%; width:100%; overflow:hidden; }
 .recovery-interactive-chart { display:grid; gap:var(--field-gap); min-width:0; }
 .recovery-point-date { font-size:13px; }
 .recovery-point-label { fill:var(--text-secondary); font-family:inherit; font-size:13px; }
@@ -56,3 +56,25 @@
 .report-nutrition-row.fat .report-nutrition-track i { background:var(--fat); }
 .water-record-options { display:grid; gap:var(--space-2); }
 .water-record-options .primary { min-height:48px; font-size:var(--type-body); }
+
+/* One plotting frame, fixed Y labels, actual-date internal scroll; no sparse height branch. */
+.trend-visual { min-width:0; padding:10px 6px 8px; background:var(--surface-soft); border:1px solid var(--border); border-radius:var(--control-radius); }
+.trend-visual-head { display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 8px; margin:0 6px 5px; font-size:var(--type-meta); color:var(--text-secondary); }
+.trend-visual-head b { color:var(--text-primary); font-weight:650; }
+.trend-plot-frame { display:grid; grid-template-columns:3.25rem minmax(0,1fr); height:var(--chart-height); min-width:0; }
+.trend-y-axis { position:relative; height:var(--chart-height); border-right:1px solid var(--divider); color:var(--text-secondary); font-size:var(--type-meta); font-variant-numeric:tabular-nums; }
+.trend-y-axis > span { position:absolute; right:5px; transform:translateY(-50%); white-space:nowrap; }
+.trend-chart-shell { overflow-y:hidden; touch-action:pan-x pan-y; scrollbar-width:thin; }
+.trend-chart-shell svg { max-width:none; overflow:hidden; touch-action:pan-x pan-y; }
+.trend-grid { stroke:var(--divider); stroke-width:1; pointer-events:none; }
+.trend-plot-help { margin:7px 6px 0; color:var(--text-secondary); font-size:var(--type-meta); line-height:1.5; }
+.training-summary-tiles { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; min-width:0; }
+.training-summary-tile { background:var(--surface-soft); border-radius:var(--control-radius); padding:10px 12px; min-width:0; }
+.training-summary-tile span { display:block; font-size:var(--type-meta); color:var(--text-secondary); }
+.training-summary-tile strong { display:block; margin-top:4px; font-size:1.125rem; line-height:1.4; overflow-wrap:anywhere; }
+.training-card-detail { margin:0; font-size:var(--type-meta); color:var(--text-secondary); line-height:1.6; overflow-wrap:anywhere; }
+@media(max-width:18rem){ .training-summary-tiles { grid-template-columns:minmax(0,1fr); } }
+
+/* Native full-date scroll track; Canvas stays viewport-sized even for decades of history/high DPR. */
+.weight-chart-track { position:relative; }
+.weight-chart-window { position:sticky; left:0; height:100%; }

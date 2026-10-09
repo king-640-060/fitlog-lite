@@ -3,7 +3,7 @@ export interface HitPoint { x:number; y:number }
 export function nearestTrendPoint(points:HitPoint[],x:number,y:number,plot:{top:number;bottom:number}):number|undefined {
   if(!points.length||y<plot.top-12||y>plot.bottom+12)return undefined
   let index=0
-  points.forEach((p,i)=>{if(Math.abs(p.x-x)<Math.abs(points[index]!.x-x))index=i})
+  points.forEach((p,i)=>{const dx=Math.abs(p.x-x),best=Math.abs(points[index]!.x-x);if(dx<best||Math.abs(dx-best)<.01&&Math.abs(p.y-y)<Math.abs(points[index]!.y-y))index=i})
   return Math.abs(points[index]!.x-x)<=44?index:undefined
 }
 /** Native scroll is authoritative. A small natural finger drift is still a tap. */

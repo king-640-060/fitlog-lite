@@ -49,7 +49,8 @@ try { for (const [width,height] of sizes) {
     const boundary=dialog?.getBoundingClientRect()||{left:0,right:innerWidth}
     for(const e of root.querySelectorAll('*')){
      if(!visible(e)||e.closest('.food-date-rail')||e.tagName==='CANVAS'||e.closest('.bottom-nav')&&!dialog)continue
-     const r=e.getBoundingClientRect(), css=getComputedStyle(e)
+     const r=e.getBoundingClientRect(), css=getComputedStyle(e), internal=e.closest('.trend-chart-shell')
+     if(internal){const b=internal.getBoundingClientRect(),c=getComputedStyle(internal);if(b.left<boundary.left-1||b.right>boundary.right+1||!['auto','scroll'].includes(c.overflowX)||c.overflowY!=='hidden')failures.push('unbounded chart scroll');if(e.matches('.recovery-line-hit')&&(r.width<43.5||r.height<43.5))failures.push('chart hit target');continue}
      if(r.left<boundary.left-1||r.right>boundary.right+1)failures.push('child bounds '+e.tagName+'.'+e.className)
      if(e.matches('button,a,summary,[role=button]') && (r.height<43.5||r.width<43.5))failures.push('target '+(e.id||e.textContent.slice(0,20))+':'+r.width+'x'+r.height)
      if(e.matches('button')&&!e.textContent.trim()&&!e.getAttribute('aria-label'))failures.push('missing accessible name '+e.id)

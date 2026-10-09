@@ -3,7 +3,10 @@ import { trendStates, trainingModuleHtml, selectRecordedTrend } from './ui/trend
 import { mountWeightTrend } from './ui/weightTrend'
 import { createTrainingCompletion, type TrainingCompletion } from './ui/trainingCompletion'
 import './styles/trainingCompletion.css'
-import { recoveryReportHtml } from './ui/recoveryReport'
+import { coachReportHtml, bindCoachPlots, exerciseHistoryHtml, type CoachState } from './ui/coachReport'
+import { loadCoachReport } from './services/coachReportService'
+import type { CoachFocus } from './utils/coachReportAnalysis'
+import './styles/coachReport.css'
 import { liveQuery } from 'dexie'
 import { readDailyRecords } from './services/dailyRecordsSummary'
 import { showActionToast } from './ui/actionToast'
@@ -58,7 +61,6 @@ import { upsertWeight } from './services/weightService'
 import { createHabit, deleteHabitWithHistory, deleteUnusedHabit, getActiveHabits, getHabitCheckInsByDate, reorderHabits, setHabitActive, toggleHabitCheckIn, updateHabit } from './services/habitService'
 import { createTask, deleteTask, getInboxTasks, getTasksByDate, getUpcomingTasks, sortTasksForPlan, toggleTaskCompletion, updateTask } from './services/taskService'
 import { createTaskTag, deleteTaskTag, getTaskTags, getTaskTagUsageCount, updateTaskTag } from './services/taskTagService'
-import { loadReport } from './services/reportService'
 import { deleteNutritionTarget, normalizeNutritionGoal, saveNutritionTarget } from './services/nutritionTargetService'
 import { deletePelvicFloorSession, pelvicFloorSessionDurationSeconds, savePelvicFloorSession, sessionFromPelvicFloorTimer } from './services/pelvicFloorService'
 import { getPelvicFloorPlanProgress, pelvicFloorPlanLevelFromId, pelvicFloorPlanLevels, pelvicFloorPlanRoutineId, type PelvicFloorPlanLevel, type PelvicFloorPlanProgress } from './services/pelvicFloorPlan'
@@ -118,7 +120,7 @@ let currentWorkout: Workout | undefined
 let workoutEditorOpen = false
 let showWorkoutHistory = false
 
-let reportWeightChart: Chart | undefined
+const coachState:CoachState={focus:'all',metric:'load'}
 let reportMode: ReportMode = 'week'
 let reportAnchorDate = getLocalDateString()
 let trainingCompletion: TrainingCompletion | undefined
@@ -141,7 +143,7 @@ const aiAssistant = new AiOrchestrator({
     else if (activeTab === 'plan' && proposal.domain === 'plan') await renderPlanPage()
     else if (activeTab === 'food' && ['food', 'nutritionTargets'].includes(proposal.domain)) await renderFoodPage()
     else if (activeTab === 'workout' && proposal.domain === 'training' && !workoutEditorOpen) await renderWorkoutPage()
-    else if (activeTab === 'progress' && proposal.domain !== 'plan') { reportWeightChart?.destroy(); reportWeightChart = undefined; await renderProgressPage() }
+    else if (activeTab === 'progress' && proposal.domain !== 'plan') { await renderProgressPage() }
   },
 })
 const app = document.querySelector<HTMLDivElement>('#app')!
@@ -273,8 +275,6 @@ async function render(): Promise<void> {
   foodHeaderEvents?.abort()
   foodRailEvents?.abort()
   foodContentVersion += 1
-  reportWeightChart?.destroy()
-  reportWeightChart = undefined
   document.body.classList.remove('immersive')
   const today = getLocalDateString()
   const hour = new Date().getHours()
@@ -569,100 +569,41 @@ function reportPeriodLabel(report: ReportResult): string {
   return `${reportDateLabel(report.range.start)}–${reportDateLabel(report.range.end)}`
 }
 
-function reportTrainingHtml(report: ReportResult): string {
-  const buckets = reportMode === 'week'
-    ? report.training.map((day, index) => ({ label: habitWeekdayLabels[index]!, days: [day] }))
-    : report.buckets.map((bucket) => ({ label: bucket.label, days: report.training.filter((day) => day.date >= bucket.start && day.date <= bucket.end) }))
-  const rows = [
-    { label: '力量', key: 'strengthSets' as const, unit: '组', className: 'strength' },
-    { label: '有氧', key: 'cardioMinutes' as const, unit: '分钟', className: 'cardio' },
-    { label: '凯格尔', key: 'pelvicMinutes' as const, unit: '分钟', className: 'pelvic' },
-  ]
-  const charts = rows.map((row) => {
-    const values = buckets.map((bucket) => bucket.days.reduce((sum, day) => sum + day[row.key], 0))
-    const maximum = Math.max(...values, 1)
-    return `<div class="report-training-row ${row.className}" role="group" aria-label="${row.label}训练节奏"><strong>${row.label}</strong><div class="report-training-cells">${buckets.map((bucket, index) => `<div class="report-training-cell ${bucket.days.every((day) => report.days.find((item) => item.date === day.date)?.future) ? 'future' : ''}" aria-label="${esc(bucket.label)}，${row.label} ${formatNumber(values[index]!)} ${row.unit}${bucket.days.every((day) => report.days.find((item) => item.date === day.date)?.future) ? '，未来日期' : ''}"><span class="report-training-bar" style="height:${values[index] ? Math.max(4, values[index]! / maximum * 46) : 2}px"></span><small>${esc(bucket.label)}</small></div>`).join('')}</div></div>`
-  }).join('')
-  const summary = report.summary
-  return `<section class="report-section"><h2>训练节奏</h2><div class="report-training-grid">${charts}</div><p class="report-note">力量训练 ${summary.strengthSessions} 次 · ${summary.strengthSets} 组；有氧训练 ${summary.cardioSessions} 次 · ${formatNumber(summary.cardioMinutes)} 分钟（楼梯机 ${summary.stairSessions} 次、跑步机 ${summary.treadmillSessions} 次）；凯格尔 ${summary.pelvicSessions} 次 · ${formatNumber(summary.pelvicMinutes)} 分钟。</p></section>`
-}
-
-function reportHabitsHtml(report: ReportResult): string {
-  if (!report.habits.length) return ''
-  const rows = report.habits.map(({ habit, dates, count }) => {
-    const trailing = reportMode === 'week' && habit.targetPerWeek ? `${count} / ${habit.targetPerWeek}` : reportMode === 'week' ? `${count} 次` : `本月 ${count} 次`
-    const visualization = reportMode === 'week'
-      ? `<div class="report-habit-days">${report.days.map(({ date, future }, index) => {
-        const done = dates.has(date), planned = habit.weekdays?.includes(index + 1)
-        return `<span class="report-habit-day ${done ? 'done' : ''} ${planned ? 'planned' : ''} ${future ? 'future' : ''}" aria-label="星期${habitWeekdayLabels[index]}，${reportDateLabel(date)}，${future ? '未来日期' : done ? '已打卡' : '未打卡'}">${done ? '✓' : '○'}</span>`
-      }).join('')}</div>`
-      : `<div class="report-habit-weeks">${report.buckets.map((bucket) => {
-        const completed = [...dates].filter((date) => date >= bucket.start && date <= bucket.end).length
-        const elapsed = report.days.filter((day) => day.date >= bucket.start && day.date <= bucket.end && !day.future).length
-        return `<div><small>${esc(bucket.label)}</small><span class="report-habit-week-track"><i style="width:${elapsed ? completed / elapsed * 100 : 0}%"></i></span><strong>${completed}</strong></div>`
-      }).join('')}</div>`
-    return `<article class="report-habit-row"><div class="report-habit-name"><strong>${esc(habit.name)}</strong><span>${trailing}</span></div>${visualization}${reportMode === 'month' && habit.targetPerWeek ? `<small class="report-note">周目标 ${habit.targetPerWeek} 次</small>` : ''}</article>`
-  }).join('')
-  return `<section class="report-section"><h2>习惯打卡</h2>${reportMode === 'week' ? `<div class="report-habit-week-head">${habitWeekdayLabels.map((label) => `<small>${label}</small>`).join('')}</div>` : ''}<div class="report-habit-list">${rows}</div></section>`
-}
-
-function reportWeightHtml(report: ReportResult): string {
-  const weights = report.weights
-  if (!weights.length) return `<section class="report-section"><h2>体重</h2><p class="report-note">暂无体重记录</p></section>`
-  if (weights.length === 1) return `<section class="report-section"><h2>体重</h2><div class="report-weight-single"><i></i><strong>${formatNumber(weights[0]!.weightKg)} kg</strong><span>${reportDateLabel(weights[0]!.date)} · 本期记录 1 次</span></div></section>`
-  const delta = weights.at(-1)!.weightKg - weights[0]!.weightKg
-  return `<section class="report-section"><h2>体重</h2><div class="report-weight-chart"><canvas id="report-weight-chart" role="img" aria-label="体重趋势，${formatNumber(weights[0]!.weightKg)} 到 ${formatNumber(weights.at(-1)!.weightKg)} 千克"></canvas></div><p class="report-note">${formatNumber(weights[0]!.weightKg)} → ${formatNumber(weights.at(-1)!.weightKg)} kg · ${delta > 0 ? '+' : ''}${formatNumber(delta)} kg</p></section>`
-}
-
-function reportNutritionHtml(report: ReportResult): string {
-  const labels = { calories: ['热量', 'kcal'], protein: ['蛋白质', 'g'], carbs: ['碳水', 'g'], fat: ['脂肪', 'g'] } as const
-  const rows = (Object.keys(labels) as (keyof typeof labels)[]).map((key) => {
-    const metric = report.nutrition[key], [label, unit] = labels[key]
-    if (metric.actual === undefined) return `<div class="report-nutrition-row"><strong>${label}</strong><span class="report-note">暂无记录</span></div>`
-    const paired = metric.target !== undefined && metric.target > 0
-    const format = key === 'calories' ? formatEnergyInputValue : formatNumber
-    const amount = `${format(metric.actual)}${paired ? ` / ${format(metric.target!)}` : ''} ${unit}`
-    const detail = paired ? `同日记录与目标 ${metric.matchedDays} 天` : `记录日平均 · ${metric.recordedDays} 天`
-    return `<div class="report-nutrition-row ${key}"><div><strong>${label}</strong><span>${amount}</span></div><div class="report-nutrition-track" role="img" aria-label="${label} ${amount}，${detail}"><i style="width:${paired ? Math.min(100, metric.actual / metric.target! * 100) : 100}%"></i></div><small>${detail}</small></div>`
-  }).join('')
-  return `<section class="report-section"><h2>饮食记录</h2><div class="report-nutrition-list">${rows}</div></section>`
-}
-
-function reportBodyHtml(report:ReportResult):string {
-  if(reportMode==='day')return dailyRecordsHtml(report.daily!,esc)
-  return `${report.empty?'<div class="report-empty">这段时间还没有记录。</div>':`<div class="report-summary-grid"><div><strong>${report.summary.trainingDays}</strong><span>训练天数</span></div><div><strong>${formatNumber(report.summary.cardioMinutes)}</strong><span>有氧分钟</span></div><div><strong>${report.summary.foodDays}</strong><span>饮食记录天数</span></div><div><strong>${report.summary.habitCheckIns}</strong><span>习惯打卡次数</span></div></div>${reportTrainingHtml(report)}${reportWeightHtml(report)}${reportNutritionHtml(report)}`} ${reportHabitsHtml(report)}${recoveryReportHtml(report)}${report.empty?'':`<section class="report-section"><h2>本期摘要</h2><p class="report-note">${esc(report.text)}</p></section>`}`
-}
-function mountReportWeightChart(view:HTMLElement,report:ReportResult):void {
-  reportWeightChart?.destroy();reportWeightChart=undefined
-  const canvas = view.querySelector<HTMLCanvasElement>('#report-weight-chart')
-  if (canvas) {
-    const style = getComputedStyle(document.documentElement)
-    const color = style.getPropertyValue('--text-secondary').trim()
-    reportWeightChart = new Chart(canvas, { type: 'line', data: { labels: report.weights.map((item) => reportDateLabel(item.date)), datasets: [{ data: report.weights.map((item) => item.weightKg), borderColor: style.getPropertyValue('--weight').trim(), backgroundColor: 'transparent', borderWidth: 2, tension: .18, pointRadius: 3, pointHoverRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color, font: { size: parseFloat(style.fontSize)*.8125 }, maxTicksLimit: 5 } }, y: { grid: { color: style.getPropertyValue('--divider').trim() }, ticks: { color, font: { size: parseFloat(style.fontSize)*.8125 }, maxTicksLimit: 4 } } } } })
-  }
-}
 async function renderReportsPage():Promise<void> {
   const view=document.querySelector<HTMLElement>('#view')!,viewVersion=view.dataset.renderVersion,today=getLocalDateString(),mode=reportMode,anchor=reportAnchorDate
-  let report=await loadReport(mode,anchor,today)
+  let data=await loadCoachReport(mode,anchor,today),report=data.report
   if(activeTab!=='progress'||progressView!=='reports'||!view.isConnected||view.dataset.renderVersion!==viewVersion)return
   const isCurrent=report.range.start===getReportRange(mode,today).start,period=mode==='day'?'天':mode==='week'?'周':'月'
-  const retainedTabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page"><div class="report-mode" role="group" aria-label="报告周期">${(['day','week','month'] as const).map(m=>`<button data-report-mode="${m}" class="${mode===m?'active':''}" aria-pressed="${mode===m}">${m==='day'?'日报':m==='week'?'周报':'月报'}</button>`).join('')}</div><div class="report-period"><button id="report-previous" aria-label="上一${period}">‹</button>${mode==='day'?`<button class="text-btn fitlog-date-trigger" id="report-date-picker">${reportPeriodLabel(report)}</button>`:`<strong>${reportPeriodLabel(report)}</strong>`}<button id="report-next" aria-label="下一${period}" ${isCurrent?'disabled':''}>›</button></div>${isCurrent?'':`<button class="report-return" id="report-return">${mode==='day'?'回到今天':'回到本'+period}</button>`}<div class="report-content">${reportBodyHtml(report)}</div></div>`)
+  const retainedTabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page"><div class="report-mode" role="group" aria-label="报告周期">${(['day','week','month'] as const).map(m=>`<button data-report-mode="${m}" class="${mode===m?'active':''}" aria-pressed="${mode===m}">${m==='day'?'日报':m==='week'?'周报':'月报'}</button>`).join('')}</div><div class="report-period"><button id="report-previous" aria-label="上一${period}">‹</button>${mode==='day'?`<button class="text-btn fitlog-date-trigger" id="report-date-picker">${reportPeriodLabel(report)}</button>`:`<strong>${reportPeriodLabel(report)}</strong>`}<button id="report-next" aria-label="下一${period}" ${isCurrent?'disabled':''}>›</button></div>${isCurrent?'':`<button class="report-return" id="report-return">${mode==='day'?'回到今天':'回到本'+period}</button>`}<div class="report-content">${coachReportHtml(data,coachState,mode,esc)}</div></div>`)
   if(!retainedTabs)bindProgressTabs(view)
   view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach(b=>b.addEventListener('click',()=>{reportMode=b.dataset.reportMode as ReportMode;void render().catch(fail)}))
   view.querySelector('#report-previous')?.addEventListener('click',()=>{reportAnchorDate=shiftReportPeriod(mode,anchor,-1);void render().catch(fail)})
   view.querySelector('#report-next')?.addEventListener('click',()=>{if(isCurrent)return;reportAnchorDate=shiftReportPeriod(mode,anchor,1);void render().catch(fail)})
   view.querySelector('#report-return')?.addEventListener('click',()=>{reportAnchorDate=today;void render().catch(fail)})
   view.querySelector('#report-date-picker')?.addEventListener('click',()=>showBusinessDatePicker('选择日报日期',anchor,date=>{reportAnchorDate=date;void render().catch(fail)}))
-  mountReportWeightChart(view,report)
-  const signature=(r:ReportResult)=>JSON.stringify(r,(_k,v)=>v instanceof Set?[...v]:v)
-  let previous=signature(report)
-  const sub=liveQuery(()=>loadReport(mode,anchor,today)).subscribe({next:value=>{
-    const host=view.querySelector<HTMLElement>('.report-content');if(!host?.isConnected||view.dataset.renderVersion!==viewVersion)return
-    const next=signature(value);if(next===previous)return;previous=next;report=value
-    if(mode==='day')updateDailyRecordsHtml(host,dailyRecordsHtml(report.daily!,esc))
-    else {const y=scrollY;host.innerHTML=reportBodyHtml(report);mountReportWeightChart(view,report);window.scrollTo({top:y,behavior:'instant'})}
+  const host=view.querySelector<HTMLElement>('.report-content')!,events=new AbortController()
+  let plotsDispose=bindCoachPlots(host,id=>{if(!id.startsWith('weight:'))coachState.point=id})
+  const draw=()=>{const y=scrollY;plotsDispose();host.innerHTML=coachReportHtml(data,coachState,mode,esc);plotsDispose=bindCoachPlots(host,id=>{if(!id.startsWith('weight:'))coachState.point=id});window.scrollTo({top:y,behavior:'instant'})}
+  host.addEventListener('click',e=>{
+    const button=(e.target as Element).closest<HTMLElement>('button');if(!button)return
+    if(button.dataset.coachFocus){coachState.focus=button.dataset.coachFocus as CoachFocus;draw()}
+    if(button.dataset.coachExercise){coachState.exercise=button.dataset.coachExercise;delete coachState.point;draw()}
+    if(button.dataset.coachChart){coachState.metric=button.dataset.coachChart as CoachState['metric'];draw()}
+    if(button.dataset.coachHistory){const group=data.analysis.groups.find(g=>g.key===button.dataset.coachHistory);if(group)openModal(group.name+' · 训练明细',exerciseHistoryHtml(group,esc))}
+  },{signal:events.signal})
+  const signature=(value:unknown)=>JSON.stringify(value,(_k,v)=>v instanceof Set?[...v]:v)
+  let previous=signature(data)
+  const sub=liveQuery(()=>loadCoachReport(mode,anchor,today)).subscribe({next:value=>{
+    if(!host.isConnected||view.dataset.renderVersion!==viewVersion)return
+    const next=signature(value);if(next===previous)return;previous=next;data=value;report=data.report
+    if(mode==='day'){
+      const facts=host.querySelector<HTMLElement>('.coach-day-facts')
+      const savedFacts=facts?.cloneNode(true) as HTMLElement|undefined
+      if(facts)updateDailyRecordsHtml(facts,dailyRecordsHtml(report.daily!,esc));const updated=facts??savedFacts;draw();if(updated)host.querySelector('.coach-day-facts')?.replaceWith(updated)
+    }else draw()
   },error:fail})
-  recordsDispose=()=>sub.unsubscribe()
+  recordsDispose=()=>{sub.unsubscribe();plotsDispose();events.abort()}
+
 }
 
 const taskToggleQueue = new Map<string, Promise<void>>()
@@ -1616,9 +1557,9 @@ async function renderWorkoutPage(): Promise<void> {
   const dailyPlanRoutine = pelvicPlanRoutine(selectedPelvicPlanLevel(getPelvicFloorPlanProgress(allPelvicSessions)))
   if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
   view.innerHTML = `<section class="context-row"><button type="button" id="workout-date-picker-open" class="date-control fitlog-date-trigger">${icon('calendar', 18)}<span>训练日期 · ${datePickerLabel(workoutDate).split(' · ')[0]}</span></button><div class="context-actions"><button class="text-btn" id="workout-templates">训练模板</button><button class="text-btn" id="exercise-library">动作库 ${icon('chevron', 16)}</button></div></section>
-    <section class="training-category">${trainingModuleHtml('力量训练','dumbbell','history-workout',`<p class="training-card-note">记录动作与组数</p><p class="training-card-summary">${openWorkout ? `正在记录 · ${strengthExercises} 个动作 · ${strengthSets} 组` : todayWorkouts.length ? `今日 ${strengthExercises} 个动作 · ${strengthSets} 组` : '今天还没有力量训练'}</p><button class="primary training-card-action" id="start-workout">${openWorkout ? '继续力量训练' : '开始力量训练'}</button>`)}</section>
+    <section class="training-category">${trainingModuleHtml('力量训练','dumbbell','history-workout',`<p class="training-card-note">记录动作与组数</p><div class="training-card-summary">${trainingSummaryTiles('动作数量',`${strengthExercises} 个动作`,'记录组数',`${strengthSets} 组`)}</div><p class="training-card-detail">${openWorkout?'正在记录':todayWorkouts.length?'当日已记录':'今天还没有力量训练'}${todayWorkouts.length?' · '+esc([...new Set(todayWorkouts.flatMap(w=>w.exercises.map(e=>e.exerciseName)))].join(' · ')):''}</p><button class="primary training-card-action" id="start-workout">${openWorkout ? '继续力量训练' : '开始力量训练'}</button>`)}</section>
     <section class="training-category">${cardioCardHtml(cardioSessions)}</section>
-    <section class="training-category">${trainingModuleHtml('凯格尔训练','leaf','pelvic-floor-history',`<p class="training-card-note">今日方案 · ${dailyPlanRoutine.name}</p><p class="training-card-summary">${pelvicSessions.length ? `今日已完成 ${pelvicSessions.length} 次 · 累计 ${pelvicSeconds} 秒` : `${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</p><button class="primary training-card-action" id="start-pelvic-floor">开始训练</button>`)}</section>`
+    <section class="training-category">${trainingModuleHtml('凯格尔训练','leaf','pelvic-floor-history',`<p class="training-card-note">今日方案 · ${dailyPlanRoutine.name}</p><div class="training-card-summary">${trainingSummaryTiles('当前方案',dailyPlanRoutine.name,'当日完成',`${pelvicSessions.length} 次`)}</div><p class="training-card-detail">${pelvicSessions.length?`累计 ${pelvicSeconds} 秒`: `${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</p><button class="primary training-card-action" id="start-pelvic-floor">开始训练</button>`)}</section>`
   view.querySelector('#workout-date-picker-open')?.addEventListener('click', () => showBusinessDatePicker('选择训练日期', workoutDate, date => { workoutDate = date; currentWorkout = undefined; workoutEditorOpen = false; void render().catch(fail) }))
   view.querySelector('#exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
   view.querySelector('#workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
@@ -1638,11 +1579,14 @@ async function renderWorkoutPage(): Promise<void> {
 }
 
 
+function trainingSummaryTiles(labelA:string,valueA:string,labelB:string,valueB:string):string {
+ return `<div class="training-summary-tiles"><div class="training-summary-tile"><span>${esc(labelA)}</span><strong>${esc(valueA)}</strong></div><div class="training-summary-tile"><span>${esc(labelB)}</span><strong>${esc(valueB)}</strong></div></div>`
+}
 function cardioCardHtml(cardioSessions:CardioSession[]):string {
  const cardioMinutes=cardioSessions.reduce((n,s)=>n+s.durationMinutes,0),latestCardio=[...cardioSessions].sort((a,b)=>b.createdAt.localeCompare(a.createdAt))[0]
- return trainingModuleHtml('有氧训练','activity','cardio-history',`<p class="training-card-note">楼梯机 · 跑步机</p>${cardioSessions.length ? `<div class="training-card-summary"><span>${cardioSessions.length === 1 ? '今日 1 次' : `今日 ${cardioSessions.length} 次`}</span><strong>${formatNumber(cardioMinutes)} <small>分钟</small></strong><span>${cardioSessions.length === 1 ? [getCardioActivityLabel(cardioSessions[0]!), ...formatCardioMetrics(cardioSessions[0]!)].join(' · ') : `最近：${getCardioActivityLabel(latestCardio!)}`}</span></div>` : '<p class="training-card-summary">今天还没有有氧训练</p>'}<button class="primary training-card-action" id="add-cardio">新增有氧记录</button>${latestCardio ? `<button class="training-card-link" data-cardio-id="${latestCardio.id}">最近：${getCardioActivityLabel(latestCardio)} · ${formatNumber(latestCardio.durationMinutes)} 分钟 ${icon('chevron', 16)}</button>` : ''}`)
-
+ return trainingModuleHtml('有氧训练','activity','cardio-history',`<p class="training-card-note">楼梯机 · 跑步机</p><div class="training-card-summary">${trainingSummaryTiles('当日记录',`${cardioSessions.length} 次`,'累计时长',`${formatNumber(cardioMinutes)} 分钟`)}</div><p class="training-card-detail">${latestCardio?esc([getCardioActivityLabel(latestCardio),...formatCardioMetrics(latestCardio)].join(' · ')):'今天还没有有氧训练'}</p><button class="primary training-card-action" id="add-cardio">新增有氧记录</button>${latestCardio?`<button class="training-card-link" data-cardio-id="${latestCardio.id}">最近：${getCardioActivityLabel(latestCardio)} · ${formatNumber(latestCardio.durationMinutes)} 分钟 ${icon('chevron',16)}</button>`:''}`)
 }
+
 async function refreshCardioCard():Promise<void>{
  const host=document.querySelector('#add-cardio')?.closest('.training-card');if(!host)return
  const date=workoutDate,rows=await getCardioSessionsByDate(date);if(!host.isConnected||workoutDate!==date)return
