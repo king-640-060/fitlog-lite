@@ -4,7 +4,7 @@ import { afterEach, expect, it } from 'vitest'
 import { FitLogDatabase } from '../src/db/database'
 import type { Food } from '../src/db/types'
 import { calorieBudgetHtml } from '../src/ui/calorieBudget'
-import { remainingNutritionGoalsHtml } from '../src/ui/remainingNutritionGoals'
+import { remainingNutritionGoalsHtml, remainingNutritionSummaryHtml } from '../src/ui/remainingNutritionGoals'
 import { macroNutritionSummaryForDay } from '../src/ui/macroNutritionSummary'
 import { completeNutrition, getNutritionCompletionSummary } from '../src/utils/nutritionCompletion'
 import { readDailyNutritionSummary } from '../src/services/dailyNutritionSummary'
@@ -27,3 +27,11 @@ it('shared snapshot renders unknown dimension, same-date latest weight, exact ra
 it('report has four complete structural tracks and retains all statistical evidence in details',()=>{const m={actual:123.4,target:150,pairedActual:100,achievement:66.67,completeDays:3,partialDays:2,matchedDays:1,gkg:1.85},html=nutritionHtml({calories:m,protein:m,carbs:{...m,target:undefined},fat:{...m,actual:undefined}},4,7);expect(html.match(/class="coach-nutrient /g)).toHaveLength(4);expect(html.match(/class="coach-meter"/g)).toHaveLength(4);for(const text of ['3 天','部分记录 2 天','同日配对 1 天','66.7%','1.85 g/kg','无同日有效目标比例','数据不完整','查看统计口径'])expect(html).toContain(text)})
 
 it('nonfinite legacy macro snapshots remain unknown without fabricated g/kg',()=>{const day={date,logs:[{id:'invalid',date,foodName:'legacy',grams:100,referenceGrams:100,caloriesPerReference:100,totalCalories:100,totalProtein:NaN,totalCarbs:20,totalFat:-1,createdAt:stamp,updatedAt:stamp}],target:undefined,totals:{calories:100,protein:NaN,carbs:20,fat:-1},effectiveWeight:75};const html=macroNutritionSummaryForDay(day);expect(html.match(/class="macro-value" aria-hidden="true">数据不完整/g)).toHaveLength(2);expect(html).toContain('0.27 g/kg');expect(html).not.toContain('NaNg');expect(html).not.toContain('-1g')})
+
+it('approved remaining anatomy shares four canonical facts and distinct Today/Food controls',()=>{
+  const summary=getNutritionCompletionSummary({calories:2000,protein:10,fat:0},[{id:'x',date,foodName:'unknown',grams:100,referenceGrams:100,caloriesPerReference:2000,totalCalories:2000,totalProtein:20,createdAt:stamp,updatedAt:stamp}])
+  const today=remainingNutritionSummaryHtml(date,summary,'today'),food=remainingNutritionSummaryHtml(date,summary,'food')
+  for(const html of [today,food]){expect(html.match(/data-gap-text=/g)).toHaveLength(4);for(const state of ['已达目标','已超 10 g','未设置目标','数据不完整'])expect(html).toContain(`data-gap-text="${state}"`)}
+  expect(today.match(/class="goal-mini-dot /g)).toHaveLength(4);expect(today.match(/<button/g)).toHaveLength(1);expect(today.indexOf('data-today-completion')).toBeLessThan(today.indexOf('goal-mini-grid'));expect(today).toContain('remaining-compact');expect(today).toContain('超 10 g')
+  expect(food).toContain('gap-grid');expect(food).toContain('remaining-actions');expect(food.match(/class="text-btn remaining-action"/g)).toHaveLength(2);expect(food).not.toContain('goal-mini-dot')
+})

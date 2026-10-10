@@ -20,18 +20,38 @@
 .budget-meta { display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 10px; }
 .today-calorie-layout,.food-calorie-row { display:block; }
 .food-nutrition-hero,.today-dashboard .nutrition-today-card { background:linear-gradient(125deg,var(--surface),color-mix(in srgb,var(--accent-soft) 65%,var(--surface))); }
-.food-completion-strip { display:grid; grid-template-columns:minmax(0,1fr); gap:4px; min-width:0; margin-top:12px; }
-.food-remaining { padding:12px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); }
-.today-remaining { padding:10px 0 0; border:0; border-top:1px solid var(--divider); background:transparent; }
-.today-remaining > button { justify-self:end; padding-inline:0; font-size:.8125rem; }
-.food-completion-summary { display:grid; gap:8px; min-width:0; }
-.food-completion-summary > strong { font-size:.8125rem; }
-.remaining-goals-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
-.remaining-goal { display:grid; gap:4px; min-width:0; }
-.remaining-goal > span { color:var(--text-secondary); font-size:.75rem; }
-.remaining-goal > strong { font-size:.8125rem; line-height:1.45; overflow-wrap:anywhere; }
-.completion-entry-actions { display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end; }
-.completion-entry-actions button { font-size:.8125rem; }
+/* Compare design/reference/v4.2/FitLog_V4_2_Prototype.html before changing this anatomy.
+   Keep scalable text/full values and the shared 44px control minimum. */
+.food-completion-strip { display:grid; grid-template-columns:minmax(0,1fr); gap:9px; min-width:0; padding:11px 12px; background:var(--surface-soft); border:1px solid var(--border); border-radius:16px; box-shadow:none; }
+/* The local gutter expands only this standalone card; siblings retain their original bounds. */
+.food-content-body { width:calc(100% + 2px); margin-inline:-1px; padding-inline:1px; }
+.food-remaining { margin-inline:-1px; }
+.today-remaining { margin-top:12px; padding:10px 12px 12px; gap:8px; }
+.remaining-heading { display:flex; align-items:baseline; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+.food-completion-strip .remaining-title { margin:0; font-size:.8125rem; font-weight:740; letter-spacing:0; line-height:1.3; }
+.remaining-caption,.goal-compact-heading small { font-size:.625rem; color:var(--text-secondary); line-height:1.45; }
+.goal-compact-top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.goal-compact-heading { display:grid; gap:2px; min-width:0; }
+.goal-compact-heading small { line-height:1.35; }
+.food-completion-strip .remaining-compact-action { min-height:44px; display:flex; align-items:center; gap:7px; border:0; background:transparent; color:var(--accent-strong); padding:0 3px 0 10px; font-weight:750; font-size:.75rem; white-space:nowrap; flex:0 0 auto; }
+.remaining-compact-action span { font-size:1.25rem; font-weight:400; line-height:1; }
+.remaining-goals-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; }
+.remaining-goal { display:grid; align-content:center; gap:3px; min-width:0; padding:8px 9px; background:var(--surface); border:1px solid var(--border); border-radius:9px; }
+.goal-mini-item { display:flex; flex-direction:column; justify-content:center; min-height:47px; gap:4px; padding:6px 9px; }
+.goal-mini-label { display:flex; align-items:center; gap:5px; font-size:.625rem; line-height:1.15; color:var(--text-secondary); }
+.goal-mini-dot { display:inline-block; width:5px; height:5px; flex:0 0 5px; border-radius:50%; background:var(--accent-mid); }
+.goal-mini-dot.protein { background:var(--protein); }
+.goal-mini-dot.carbs { background:var(--carbs); }
+.goal-mini-dot.fat { background:var(--fat); }
+.gap-item small { font-size:.625rem; color:var(--text-secondary); line-height:1.25; }
+.remaining-goal strong { margin:0; font-size:.75rem; line-height:1.35; font-weight:690; letter-spacing:0; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
+.goal-mini-item strong { font-weight:730; line-height:1.3; }
+.remaining-goal.is-above strong { color:var(--danger); }
+.remaining-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
+.food-completion-strip .remaining-action { border:1px solid var(--border); border-radius:10px; min-height:44px; min-width:0; background:var(--surface); color:var(--accent-strong); font-size:.75rem; font-weight:700; padding:0 7px; display:flex; align-items:center; justify-content:center; gap:5px; white-space:normal; overflow-wrap:anywhere; }
+.remaining-action span:last-child { font-size:1.0625rem; font-weight:450; }
+@media(max-width:355px) { .food-content-body { width:calc(100% + 10px); margin-inline:-5px; padding-inline:5px; } .food-remaining { margin-inline:-5px; } .nutrition-today-card [data-today-remaining] { width:calc(100% + 14px); margin-inline:-7px; } .today-remaining { padding:9px; } .goal-mini-item { padding:6px 7px; } .goal-mini-item strong { font-size:.6875rem; } }
+@media(prefers-color-scheme:dark) { .food-completion-strip { background:linear-gradient(135deg,var(--surface),color-mix(in srgb,var(--surface-soft) 75%,var(--surface))); } }
 .today-dashboard .pelvic-today-card .pelvic-icon { background:var(--carbs-soft); color:var(--carbs); }
 @media(max-width:25rem) { .budget-head { gap:8px; } }
 

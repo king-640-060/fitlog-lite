@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 const pw=await import(process.env.FITLOG_PLAYWRIGHT_MODULE),engine=process.env.FITLOG_V4_ENGINE||'chromium',base=process.env.FITLOG_QA_URL||'http://127.0.0.1:5186/fitlog-lite/',prod=base.includes('github.io')
-const dir=path.resolve('../../artifacts/v4-2-2026-10-10',process.env.FITLOG_V4_CAPTURE_BEFORE?'before':prod?'prod':engine==='webkit'?'webkit':'local');await fs.mkdir(dir,{recursive:true})
+const dir=path.resolve(process.env.FITLOG_QA_ARTIFACT_ROOT||'../../artifacts/v4-2-2026-10-10',process.env.FITLOG_QA_ARTIFACT_ROOT?`v4-flows-${process.env.FITLOG_V4_CAPTURE_BEFORE?'before':prod?'prod':engine==='webkit'?'webkit':'local'}`:process.env.FITLOG_V4_CAPTURE_BEFORE?'before':prod?'prod':engine==='webkit'?'webkit':'local');await fs.mkdir(dir,{recursive:true})
 const matrix=prod||engine==='webkit'?[[390,100,'light','no-preference'],[320,140,'light','reduce'],[320,200,'dark','reduce'],[430,140,'dark','reduce'],[844,140,'dark','reduce']]:[...[320,375,390,430].flatMap(w=>[100,120,140,200].flatMap(s=>['light','dark'].flatMap(c=>['no-preference','reduce'].map(m=>[w,s,c,m])))),[844,140,'dark','reduce']]
 const cases=process.env.FITLOG_V4_SMOKE?[[390,100,'light','no-preference']]:matrix.filter(x=>(!process.env.FITLOG_V4_WIDTH||x[0]===Number(process.env.FITLOG_V4_WIDTH))&&(!process.env.FITLOG_V4_CASE||x.join('-')===process.env.FITLOG_V4_CASE))
 const browser=await pw[engine].launch({headless:true,...(engine==='chromium'?{executablePath:process.env.FITLOG_CHROME}:{})}),receipts=[]

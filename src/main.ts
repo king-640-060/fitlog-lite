@@ -1,7 +1,7 @@
 import { openNutritionCompletionSheet, type CompletionMode } from './ui/nutritionCompletionSheet'
 import { openMealEntry } from './ui/mealEntry'
 import { calorieBudgetHtml } from './ui/calorieBudget'
-import { remainingNutritionGoalsHtml } from './ui/remainingNutritionGoals'
+import { remainingNutritionSummaryHtml } from './ui/remainingNutritionGoals'
 import { historySubview } from './ui/recordHistory'
 import { trendStates, trainingModuleHtml, selectRecordedTrend } from './ui/trendModule'
 import { mountWeightTrend } from './ui/weightTrend'
@@ -1199,7 +1199,8 @@ async function renderFoodPage(): Promise<void> {
   const completionStrip = foodCompletionStripHtml(requestedDate, getNutritionCompletionSummary(target ?? {}, logs))
   const expandedMeals = new Set(Array.from(view.querySelectorAll<HTMLButtonElement>('.food-content-body[data-food-date="' + requestedDate + '"] [data-toggle-meal][aria-expanded="true"]'), button => button.dataset.toggleMeal))
   const slotHtml = `<div class="food-content-body" data-food-date="${requestedDate}">
-    <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">饮食总览</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 16)}</button></div><div class="food-calorie-row">${calorieGaugeHtml(totals.calories, calorieTarget, 'food', previous.get('calories'))}</div><div class="macros" data-macro-summary-host>${macroNutritionSummaryForDay(nutrition)}</div>${target?.strategySelection ? `<p class="strategy-food-source">${esc(target.strategySelection.templateName)} · ${esc(target.strategySelection.variantName)}</p>` : ''}${completionStrip}</section>
+    <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">饮食总览</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 16)}</button></div><div class="food-calorie-row">${calorieGaugeHtml(totals.calories, calorieTarget, 'food', previous.get('calories'))}</div><div class="macros" data-macro-summary-host>${macroNutritionSummaryForDay(nutrition)}</div>${target?.strategySelection ? `<p class="strategy-food-source">${esc(target.strategySelection.templateName)} · ${esc(target.strategySelection.variantName)}</p>` : ''}</section>
+    ${completionStrip}
     ${dietEventsHtml(dietEvents, esc)}
     <section class="food-meals-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '按餐次记录，更清楚'}</span></div>${logs.length ? '<button class="food-save-template" id="save-day-diet-template" type="button" aria-label="将当天饮食保存为模板">保存为模板</button>' : ''}</section>
     <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday, expandedMeals.has(group.meal ?? 'unclassified'))).join('')}</div></div>`
@@ -1271,7 +1272,7 @@ function bindFoodContent(slot: HTMLElement, target: NutritionTarget | undefined,
 }
 
 function foodCompletionStripHtml(date: string, summary: NutritionCompletionSummary, showAction = true): string {
-  return `<div class="food-completion-strip ${showAction ? 'food-remaining' : 'today-remaining'}"><div class="food-completion-summary"><strong>剩余目标</strong>${remainingNutritionGoalsHtml(summary)}</div>${summary.nothingToComplete ? '' : showAction ? '<div class="completion-entry-actions"><button type="button" class="text-btn compact-action" id="food-completion-open">智能补齐</button><button type="button" class="text-btn compact-action" id="food-completion-custom">指定食物</button></div>' : `<button type="button" class="text-btn compact-action" data-today-completion="${date}">去补齐 ${icon('chevron', 16)}</button>`}</div>`
+  return remainingNutritionSummaryHtml(date, summary, showAction ? 'food' : 'today')
 }
 
 async function showNutritionCompletion(date: string, mode: CompletionMode = 'smart'): Promise<void> {
