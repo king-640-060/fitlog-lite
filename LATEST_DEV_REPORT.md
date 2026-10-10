@@ -1,97 +1,92 @@
 # FitLog Lite Development Report
 
-本轮：V4.2.1 上线后视觉与交互一致性精确修复，2026-10-10。
+本轮：V4.2.1「剩余目标」原型定向还原，2026-10-10。仅修改 Today/Food 两个组件及其必要相邻容器。
 
 ## 代码身份与发布
 
-- START_COMMIT：`98abbddffa8c3321b0f12222306360adcc678b6b`。开发前实际 fetch、clean main、ff-only 与远程身份核对完成。
-- APPLICATION_COMMIT：`3253648b5b79bc9e495c34cd30a16295261dd99b`。
-- Application GitHub Actions / Pages：[38025229385](https://github.com/king-640-060/fitlog-lite/actions/runs/38025229385)，success。
-- END_COMMIT：承载本报告的 LATEST-only 提交，避免提交自引用。精确 SHA、最终 Actions、生产 assets/data/offline 回执保存在外部 DELIVERY.md 及最终回复。
-- 正式环境：https://king-640-060.github.io/fitlog-lite/ 。Application 线上定向套件、资源字节身份与同一个既有合成 profile 的数据保留核查均完成后才形成此报告；END 发布后再验证。
+- START_COMMIT：`bc0cbe1225898661414b10ed19b730a5f6f0109a`。开发前及提交前实际 fetch、main/remote 身份核对完成。
+- APPLICATION_COMMIT：`0f4c9d10f7202c651993b1dd1ef8c6a527739ddb`。
+- Application Actions / Pages：[38031469258](https://github.com/king-640-060/fitlog-lite/actions/runs/38031469258)，success；CI typecheck/test/build/deploy 均通过。
+- END_COMMIT：承载本报告的 LATEST-only 提交，避免提交自引用。完整 SHA、最终 Actions 和生产资源/data/offline 回执记录在外部 `artifacts/v421-remaining-reference-2026-10-10/DELIVERY.md` 及最终回复。END 发布后继续核查。
+- 正式环境：<https://king-640-060.github.io/fitlog-lite/>。
 
-## 设计来源与证据边界
+## 找回并固定真实设计基准
 
-完整读取 V4.2.1 用户指令、AGENTS、此前最新报告、UI_INTERACTION_SPEC、INTERACTION_VISUAL_SYSTEM 与 V4.2 合同，定向检查七处问题及相邻区域。原始 V4.2 ZIP/HTML 仍可读取；本轮重新实际打开并操作原型，未用旧版替代。
+已在既有交付目录 `artifacts/v4-2-2026-10-10/prototype/FitLog_V4_2_Prototype.html` 找到原型，实际校验、运行、切换 Today/Food/主题，并检查实际 DOM、最终 CSS cascade 及355px规则。没有重新要求用户上传，也没有用文字推测代替。
 
+- HTML SHA256：`aa8d37f0509035970eb3a26be056eec619066ba308cf5bc8f5911d2458d24687`，与用户提供值完全一致。
 - ZIP SHA256：`7e9b64b701fc38d89d4ee08849bcdd3e238e86f6ffcdc9eb2ec9a10c52174dde`。
-- HTML SHA256：`aa8d37f0509035970eb3a26be056eec619066ba308cf5bc8f5911d2458d24687`。
-- 初始附件只有指令；回归期间用户补传四张真实 iPhone 修复前截图，已全部实际读取并保留原图/哈希，确认饮食摘要拥挤、报告说明空白、特殊饮食/餐食间距问题。截图没有今日页或新版发布后证据；浏览器使用合成资料与不同视口，不能宣称同设备逐像素一致或新版真机验收。
-- 先在 START 构建复现并保存五组修复前原图/几何，再实施。新增 `docs/V4_2_1_VISUAL_REPAIR_CONTRACT.md`，同步耐久交互规则、视觉规范与 QA 矩阵。
+- 原始 HTML 原字节保存于 [design/reference/v4.2/FitLog_V4_2_Prototype.html](design/reference/v4.2/FitLog_V4_2_Prototype.html)，没有修改内容。
+- [参考说明](design/reference/v4.2/README.md)记录来源、SHA、运行方法和验收边界。AGENTS/UI规范/视觉规范/修复合同明确：后续涉及此设计必须先运行并对照原型，禁止用纯文字网格替代或重复索要相同附件。
+- 新增单元和浏览器 SHA256 guard，原型只作为视觉参考；没有将其演示数据、模拟计算或优化器引入生产。
 
-## 七项修正及原因
+## 实际修改
 
-1. **饮食日记录摘要**：原先在右窄列串联完整实际宏量与目标。折叠改为实际 kcal、记录数及已保存目标提示；展开采用明确 actual/target 四项 dl 网格，再保留原有全部逐食物克数、营养及每参考量历史快照。只有目标没有饮食记录时仍可查看目标；未知、未记录、未设置分别表达。保持九类共享 native disclosure 与辅助读屏信息，长名称转义，大数值与 200% 字体不丢失。
-2. **报告统计说明空白**：实测34px来自全局 details 的16px margin、父 grid 的12px gap及 note 的6px margin。新增局部 footer 布局，将详情及说明纳入同一6px节奏，移除该详情冗余 margin；展开自然撑开，无固定裁剪。营养四卡和完整统计口径未删改。
-3. **特殊饮食／今日饮食交界**：原 .diet-events 上下20px margin 与 .food-content-body 12px gap叠加至32px。移除冗余 margin，由 body gap统一负责12px；餐食标题允许合理换行。空态入口、真实特殊记录编辑、保存模板及四个紧凑餐次保留。9999kcal特殊估算测试证明实际摄入仍1619kcal。
-4. **今日剩余目标**：共享真实 remainingNutritionGoals 渲染和计算，但明确 Today透明紧凑两列四项 + 单个轻量「去补齐」，Food安静边框卡 + 智能/指定两入口。清除 main/recovery/nutritionBudget 的旧互相覆盖样式，由共享基础和两页面变体负责。未设、达标、超额、记录不完整事实一致。
-5. **今日力量／有氧**：采用相同 type/status/metadata + 右侧 compact action 结构。普通「记录训练」「记录有氧」secondary；现有「继续力量训练」primary并打开原记录。新增有氧入口复用原表单和服务，明确捕获本地 Today，避免沿用 Workout 的历史日期；成功后即时刷新 Today。有氧历史记录原内容不变。
-6. **今日睡眠**：idle「开始睡眠」secondary，active「我醒了」primary；保持既有服务、进行中唯一性、开始/结束/编辑/取消/历史与忙锁，补全 pending rerender 的 aria-busy。趋势睡眠语义未改。
-7. **今日同级操作**：训练/体重/凯格尔/睡眠的 compact action 共享同一几何与全局状态，44px最小高度、右对齐、共同字体/padding/radius。饮水保持同一 secondary primitive 及现有快捷记录组合，历史轻量、危险安静；没有导航或布局重设计。
+- `src/ui/remainingNutritionGoals.ts`：同一个纯渲染组件，保留现有 completionGapText/getNutritionCompletionSummary 的四项独立事实。Today恢复四个边框 mini-card、5px营养色点、标题右侧去补齐；Food恢复标题、四个数据格和底部两个等宽边框按钮。紧凑文字仅缩短前缀；完整语义保留在 canonical属性和可访问名称中。无目标/已达标仍可通过原有服务查看解释，不会生成虚假方案或写历史。
+- `src/main.ts`：两页复用上述组件；Food剩余卡片移到营养总览之后，成为独立 sibling。原日期捕获、点击处理、补齐算法、预览/确认记录与实时刷新保持。
+- `src/styles/nutritionBudget.css`：局部恢复原型背景、边框、圆角、padding、6px格间距、7px双按钮间距与字号/字重层级。局部 gutter恢复剩余卡片宽度，同时保留其他Food卡片的横向 bounds；Today小屏 host恢复原型留白。没有重做其他页面或已完成模块。
+- 测试：新增 `tests/browser/remainingPrototype.mjs` / `tests/designReference.test.ts`；更新 `tests/v4Nutrition.test.ts` 的组件与完整状态断言；`tests/browser/v421Consistency.mjs` 从过时透明/同HTML断言改为原型结构及同canonical事实断言，其他回归断言保留；`tests/browser/v4FoodPlanToday.mjs` 仅增加独立 artifact目录配置；同步 `tests/browser/README.md`。
+- 文档：更新 `AGENTS.md`、`docs/UI_INTERACTION_SPEC.md`、`docs/INTERACTION_VISUAL_SYSTEM.md`、`docs/UI_QA_MATRIX.md`、`docs/V4_2_1_VISUAL_REPAIR_CONTRACT.md`；新增原始 HTML 和参考 README；本文件记录最终验证。
 
-## 自动化结果
+## 原型与正式版实际视觉对照
 
-| Gate | Result |
-| --- | --- |
-| npm run typecheck | PASS |
-| npm test | PASS：844 tests / 67 files；原841全部保留，新增3 |
-| npm run build | PASS：clean APPLICATION Pages build；仅既有bundle-size advisory |
-| git diff --check | PASS |
-| 原31 browser UI suites | 全部PASS，原完整矩阵/周期保留，没有删除、skip或降低断言 |
-| 新 v421Consistency | PASS：65显示组合；追加390完整16组及代表交互回归 |
-| WebKit | PASS：五个定向显示组合及实际表单操作；不是实体iPhone证据 |
-| PWA升级 | PASS：冻结旧V7→V11、实际START V11→APPLICATION V11 |
+同一 Chromium/WebKit、相同视口/系统字体/主题、等价合成实际记录与目标；保留每页原始截图及 DOM/computed-style JSON。原始字体100%对照未改变原型样式；字号放大用临时浏览器等比放大原型固定像素文字，HTML文件始终未变。
 
-65组合：320/375/390/430px ×100/120/140/200%字号 ×浅/深 ×normal/reduced，加844px横屏。原31覆盖连续饮食、指定补齐、全报告/训练/趋势、20完整周期、Sheet/监听/图表/计时/焦点/滚动锁、AI、JSON恢复、同步冲突及旧记录；未缩减为 smoke。
+实际打开检查了390浅色/深色、320放大字体及发布后截图。`visual-comparison.html`提供33组线上原图对照；`comparison-390-100-light.png`、`comparison-390-100-dark.png`、`comparison-320-200-dark.png`是原图对照页截图，不是修图。完整逐项记录见外部 `VISUAL_REVIEW.md`。
 
-新增覆盖相同剩余事实不同密度、展开全部保存营养与目标、target-only天、统计自然展开/间距、特殊空/已记录/编辑、正确Today有氧17.125分钟及历史行不变、Strength原记录继续、Sleep开始/结束。真实IndexedDB写锁期间重复点击Sleep只生成一行，pending disabled/aria-busy完整；长名称含HTML字符及极大值在320px/200%下完整安全显示。页面及弹层无横向溢出/截断，模拟键盘/SafeArea由原完整套件保护。
+|390px/100%|原型|正式版|结论|
+|---|---|---|---|
+|Today容器|324×172px|324×176px|宽度一致；44px触摸高度使总高+4px|
+|Today四格|146×47px|146×47px|四格边框/营养色点/右侧入口恢复|
+|Food独立容器|360×207.265625px|360×208.265625px|宽度一致；按钮触摸高度使总高+1px|
+|Food四格|164×49.6875px|164×49.6875px|两列四格一致|
+|格间距/容器圆角|6px/16px|6px/16px|一致|
+|双按钮间距/圆角|7px/10px|7px/10px|等宽同排，尺寸规则一致|
+|浅色容器/小格/边框|#f8f8f2/#fffefa/#e9e8df|同一现有Token|一致|
+|主标题/数值字号|13px/12px|13px/12px|层级及对应字重一致|
 
-开发中测试失败与修正日志保留：结构改变后的旧可见文本断言更新至展开数据；新增测试状态文案及 immersive editor 退出顺序修正。没有删除原数据/业务/布局约束来取绿。
+明确保留差异，不能宣称完全逐像素一致：
 
-## 几何证据
+- 控件最小44px，原型Today40/Food43px；不降低触摸可访问性。
+- 正式版既有整数kcal格式保留；示例原型306.1kcal显示为正式306kcal，实际存储/算法未改变。
+- 浅色辅助文字保留现有更高对比度 #697369；原型 #737c73。深色克制渐变复用现有surface Token，端点约一个蓝色通道差异，没有新增调色体系。
+- 放大字体保留完整数值/单位换行，不使用原型的省略号裁切。两列四项、全部按钮和状态仍可读、无重叠/溢出。
+- 320/375/390/430手机宽度下两个组件宽度与原型一致。844横屏保留现有外层布局：原型Today378/Food414px，正式550/586px；内部组件规则和可用性通过，未改全局页面布局。
+- 真实缺失、未设、达标、超额四项状态保留；不能照搬演示版筛掉无目标项的行为。
 
-| 区域 | START | APPLICATION |
-| --- | ---: | ---: |
-| 统计详情末尾 → 底部说明 | 34px | 6px |
-| 营养主区 → 特殊饮食 | 32px | 12px |
-| 特殊饮食 → 今日饮食标题 | 32px | 12px |
-| 今日饮食标题 → 餐次 | 12px | 12px |
+## Automated Verification
 
-65组合：报告四卡最大宽差0、高差0、同行进度条基线差0；Today五个同级普通操作右边界差0，最小高度44px。390px/100%折叠饮食行高度141.53→87.81px；320px/200%深色299.14→191.66px，展开全部值仍保留。
+|Gate|结果|
+|---|---|
+|npm run typecheck|PASS|
+|npm test|PASS：846 tests /68 files；原844保留，新增2|
+|npm run build|PASS：clean APPLICATION Pages构建；只有既有chunk-size advisory|
+|git diff --check|PASS|
+|remainingPrototype|Chromium33 + WebKit33，全部PASS；原型SHA、实际DOM/几何/色点/按钮/边框/字体/完整状态/无裁切及真实入口/预览不写入|
+|v421Consistency|完整65组合PASS；保留其他六项修复的所有断言；WebKit5 PASS|
+|v4FoodPlanToday|完整65组合PASS：连续添加、重复提交、历史日期、严格候选、未知/无可行方案、preview不写入、未来只读、即时跨页事实、任务同步、报告几何；WebKit5 PASS|
+|macroNutritionSummary|完整40组合PASS：三宏量/gkg/未知/同日体重/跨页实时一致/大数值/大量食物/历史日期/对比度|
+|foodRecovery|完整35组合PASS：餐次、旧记录、恢复/饮水/睡眠操作与布局|
+|uiQualityAudit|完整4宽度及既有字号/横屏/弹层/键盘/备份恢复/同步入口/AI mock交互gate PASS|
+|PWA升级|真实冻结V7→V11、实际START V11→APPLICATION V11，PASS；保护草稿/图片/待确认提案/其他client/取消/单次reload与离线冷启动|
 
-## 生产与数据保护
+原有测试保留，没有删除、skip或降低断言来获得通过。本轮执行受影响的上述6个UI套件及PWA/生产资源/数据保护；未宣称重新执行全仓其他未受影响套件。WebKit浮点字体13.200001与13.2px仅以0.001px表示精度比较；布局/状态断言保持。第一次并发生产浏览器出现ERR_NETWORK_IO_SUSPENDED/加载超时；并发质量gate出现Vision mock超时。失败日志保留为attempt1；减少并发后完整默认范围重新执行通过，未修改生产逻辑或验收条件。
 
-APP生产八项全部PASS：productionAssets、v421Consistency、foodServing、foodRecovery、macroNutritionSummary、dailyRecordsExperience、coachReportExperience、uiSemanticConsistency。首次线上测试有三组遇到系统网络变化/断网/DNS拒绝连接，原日志保留；连接恢复后全部完整重跑PASS，没有删断言或降低范围。五组线上V4.2.1代表条件含320px/200%/深色和横屏，实际查看Today/Food/Report全页及滚动后局部原图，六张对照已使用真实部署APP原图。
+## Production Verification
 
-clean APP生产资源与本地字节一致：index-BSL54vJc.js（873710字节，SHA256 a31dca8cec0c287cba4f9d406b8e7fdde92a81c3366baaf5cfc2f32ca78e82fd）、index-Cx5siiDL.css（148001字节，5356d1ca81fdbf68946ffbd1f106ce99db537f9286e5020cd2271f0a9c3c04bd）。build-info/App/SW均3253648；SW精确字节和precache匹配。END发布后重新核对其对应clean资源。
+- APPLICATION线上 remainingPrototype33、v421Consistency5、v4FoodPlanToday5 全PASS；截图来自真实生产URL的独立合成上下文。
+- Production HTML/build-info/SW/precache与本地clean APPLICATION精确一致；JS/CSS字节与SHA256全部匹配。
+- 同一个上一轮既有专用合成生产profile，不清空、不重建、不重播：20stores/25rows及8项配置在START与APPLICATION哈希完全一致。
+- Store SHA256：`6448eeaacd97e099ef91416e1db77db3f683113b11662765ad48c8e9dc995799`。
+- Config SHA256：`609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34`。
+- APPLICATION App/SW均指向0f4c9d1，真实离线冷启动PASS；END之后再次验证身份、资源、同profile数据及离线。
 
-同一个既有合成生产 profile 继续使用，没有清库或重新播种：DB110、20stores、25rows及8配置项逐内容哈希与 START baseline 一致。
+## 数据版本与 Manual Device Verification
 
-- allStoreHash：`6448eeaacd97e099ef91416e1db77db3f683113b11662765ad48c8e9dc995799`。
-- configHash：`609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34`。
+Dexie11 / IndexedDB110 /20stores；Backup11 / Restore1–11；GitHub Sync/encrypted envelope1。数据库、备份协议、恢复、同步、AI/Voice配置与算法均未改变，无迁移、清空或历史快照重算。没有读取或清空用户真实浏览器。
 
-APP App/SW身份一致及离线冷启动后哈希仍一致。END使用同一profile再次核查。隔离合成资料与用户真实浏览器不同；线上自动化IPv4路由仅限测试Chrome，HTTPS origin不变。
+实体iPhone Safari、原有主屏幕PWA、真实键盘/SafeArea和个人设备历史连续性：**Pending**。四张此前真机图片是修复前证据，不能当作本轮发布后的设备验收。当前自动化范围没有未解决的功能/视觉结构问题；上文差异明确记录，不用测试绿色替代实际视觉核对。
 
-Dexie11 / IDB110 /20stores、Backup11 /Restore1–11、Sync/envelope1、AIConfig1、VoiceConfig1、WaterReference1与Video永久退休均不变。无迁移、历史快照重算、配置重置或删库；DB/Backup/Restore/Sync/AI业务源文件未改，营养补齐/目标/gkg算法和V3.1报告/趋势/执行引擎未改。旧冻结fixtures未修改。
+## ChatGPT Baseline
 
-## 截图与文件
-
-外部目录：`/Users/zhaozhantian/Documents/Codex/2026-09-24/files-pasted-by-the-user-king/artifacts/v4-2-1-2026-10-10`。
-
-保存 prototype/reference、before、local65、webkit5、prod5原图；today/food/report/food-detail/report-expanded/sleep-active 六张前后对照、320px/200%深色原图裁切、SCREENSHOTS.md、VISUAL_REVIEW.md、geometry.json、完整日志、verification-ledger.json及preservation baseline/APP/END。END精确身份/Actions/assets见外部 DELIVERY.md。
-
-实际Application18文件清单见外部 CHANGED_FILES.md，另加本报告的 LATEST-only END：
-
-- 页面/组件：src/main.ts、src/ui/dayDetail.ts、src/ui/coachReport.ts、src/ui/recovery.ts。
-- CSS：src/styles/main.css、nutritionBudget.css、coachReport.css、recovery.css。
-- 测试：tests/browser/v421Consistency.mjs、v4Preservation.mjs、README.md、tests/dailyRecordsSummary.test.ts、dayDetail.test.ts。
-- 规范：AGENTS.md、docs/UI_INTERACTION_SPEC.md、INTERACTION_VISUAL_SYSTEM.md、UI_QA_MATRIX.md、V4_2_1_VISUAL_REPAIR_CONTRACT.md。
-
-## Pending 与下一轮基线
-
-- 四张用户真实iPhone修复前截图：已读取，结构问题已对照；新版相同设备复测仍Pending。
-- 实体iPhone Safari、用户原安装主屏幕PWA、用户真实设备数据连续性：Pending。
-
-自动化没有已知未解决产品缺陷；WebKit、模拟键盘/SafeArea及浏览器PWA证据不能冒充物理设备。不要卸载原PWA或清除网站数据进行验收。
-
-下一轮重新实际检查 main/remote，承载本报告的 END 为发布身份。V4.2.1七项精确修复合同优先于过时视觉规则；保留原V4.2真实连续录入/指定补齐、V3.1分析/趋势/执行、数据库/备份/同步与原有所有回归门禁。
+Application0f4c9d10f7202c651993b1dd1ef8c6a527739ddb；最终main为承载本报告的LATEST-only END。V4.2.1剩余目标已恢复：Today四个边框小卡/色点/标题右侧去补齐，Food独立四格卡/底部两个等宽边框补齐按钮；共享真实事实与原服务。不可改原型SHA aa8d37f0509035970eb3a26be056eec619066ba308cf5bc8f5911d2458d24687，参考在design/reference/v4.2，任何相关后续先运行并对照。其他V4.2.1修复保持。846/68、相关6套件、Chromium/WebKit原型对照、真实PWA升级及生产数据/资源验证通过；物理Safari/原PWA仍Pending。外部证据根：artifacts/v421-remaining-reference-2026-10-10。
