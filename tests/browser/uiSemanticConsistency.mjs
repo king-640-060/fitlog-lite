@@ -86,31 +86,12 @@ try { for (const [width,height] of sizes) {
   const gauge = async (actual,goal,state,status) => {
    await put({foodLogs:actual?[{...fixture.foodLogs[0],date,totalCalories:actual}]:[],nutritionTargets:goal===undefined?[]:[{...fixture.nutritionTargets[0],date,calories:goal}]})
    await nav('today')
-   assert.equal(await page.locator('.today-calorie-gauge .calorie-gauge-center strong').innerText(),String(Math.round(actual)))
-   assert.ok(await page.locator('.today-calorie-gauge .goal-ring').evaluate((e,state)=>e.classList.contains(state),state))
-   assert.ok((await page.locator('.today-calorie-layout .calorie-gauge-caption').innerText()).includes(status))
-   assert.equal(await page.locator('.today-macros > .macro-nutrition-summary > .nutrition-metric').count(),3)
-   assert.ok((await page.locator('.today-calorie-gauge').getAttribute('aria-label')).includes(`今日摄入 ${Math.round(actual)} kcal`))
-   assert.equal(await page.locator('.today-calorie-gauge svg').getAttribute('aria-hidden'),'true')
-   if(goal===undefined)assert.ok(!(await page.locator('.today-calorie-layout').innerText()).includes('0%'))
-   else assert.ok((await page.locator('.today-calorie-layout').innerText()).includes(`目标 ${goal} kcal`))
-   if(state==='above'||state==='reached')assert.equal(Number(await page.locator('.today-calorie-gauge .ring-main').getAttribute('stroke-dashoffset')),0)
-   if(state==='above')assert.ok(Number(await page.locator('.today-calorie-gauge .ring-outer').getAttribute('stroke-dashoffset'))<55*280*Math.PI/180)
-   await capture('today-'+state)
-   const ringStyle = async selector => page.locator(selector).evaluate(e=>{const s=getComputedStyle(e),root=getComputedStyle(document.documentElement);return {stroke:s.stroke,opacity:Number(s.opacity),dash:s.strokeDasharray,strokeWidth:s.strokeWidth,border:root.getPropertyValue('--border').trim(),neutral:root.getPropertyValue('--text-tertiary').trim(),accent:root.getPropertyValue('--accent-mid').trim()}})
-   const todayTrack=await ringStyle('.today-calorie-gauge .ring-track')
-   const active=await ringStyle('.today-calorie-gauge .ring-main')
-   // SVG CSS colors normalize to rgb; compare against a probe using the actual theme token.
-   const tokenColor = async token => page.evaluate(token=>{const e=document.createElement('span');e.style.color=`var(${token})`;document.body.append(e);const value=getComputedStyle(e).color;e.remove();return value},token)
-   assert.equal(active.stroke,await tokenColor('--accent-mid'))
-   if(state==='unset'){assert.ok(todayTrack.opacity>.55);assert.equal(todayTrack.stroke,await tokenColor('--text-tertiary'));assert.notEqual(todayTrack.stroke,await tokenColor('--border'));assert.equal(todayTrack.dash,'3px, 7px');assert.equal(todayTrack.strokeWidth,'6px')}
-   else {assert.equal(todayTrack.stroke,await tokenColor('--border'));assert.equal(todayTrack.opacity,.55)}
-   const todaySvg=await page.locator('.today-calorie-gauge svg').innerHTML()
-   await nav('food');assert.equal(await page.locator('.food-nutrition-hero .calorie-gauge svg').innerHTML(),todaySvg);assert.equal(await page.locator('.food-nutrition-hero .calorie-gauge-center strong').innerText(),String(Math.round(actual)));await capture('food-'+state)
-   const foodTrack=await ringStyle('.food-nutrition-hero .calorie-gauge .ring-track')
-   if(state==='unset'){assert.equal(foodTrack.opacity,.65);assert.equal(foodTrack.stroke,await tokenColor('--text-tertiary'));assert.equal(foodTrack.dash,'3px, 7px');assert.equal(foodTrack.strokeWidth,todayTrack.strokeWidth);assert.notEqual(foodTrack.opacity,todayTrack.opacity)}
-   else assert.deepEqual(foodTrack,todayTrack)
-   ringStyles.push({state,today:todayTrack,food:foodTrack,active})
+   const read=async root=>page.locator(root+' .calorie-budget').evaluate(e=>{const css=getComputedStyle(e.querySelector('.budget-track'));return{actual:e.querySelector('.budget-number strong').textContent,state:e.className,aria:e.getAttribute('aria-label'),text:e.textContent,main:e.querySelector('.budget-track i').style.width,over:e.querySelector('.budget-over-track i')?.style.width,bar:e.querySelector('.budget-bar-row').outerHTML,track:css.backgroundColor,svg:e.querySelectorAll('svg').length}})
+   const a=await read('.nutrition-today-card');assert.equal(a.actual,String(Math.round(actual)));assert.ok(a.state.includes(state));assert.equal(a.svg,0);assert.ok(a.aria.includes(`今日摄入 ${Math.round(actual)} kcal`));assert.ok(a.text.includes(status));assert.equal(await page.locator('.today-macros .nutrition-metric').count(),3)
+   assert.ok(Math.abs(parseFloat(a.main)-(goal===undefined?0:goal<=0?(actual>0?100:0):Math.min(100,actual/goal*100)))<.001)
+   if(goal===undefined)assert.ok(!a.text.includes('0%'));else assert.ok(a.text.includes(`目标 ${goal} kcal`))
+   if(state==='above'){assert.ok(a.over);assert.ok(Math.abs(parseFloat(a.over)-(goal>0?Math.min(100,(actual-goal)/goal*100):100))<.001)}else assert.equal(a.over,undefined)
+   await capture('today-'+state);await nav('food');const b=await read('.food-nutrition-hero');assert.equal(b.actual,a.actual);assert.equal(b.bar,a.bar);assert.equal(b.track,a.track);assert.equal(b.svg,0);assert.ok(b.aria.includes(`当日摄入 ${Math.round(actual)} kcal`));await capture('food-'+state);ringStyles.push({state,today:a,food:b,sharedHorizontalBudget:true})
   }
   await gauge(0,undefined,'unset','尚未设置目标');await todayWorkout(false);await capture('today-no-open')
   await gauge(840,1800,'below','47%');await gauge(1800,1800,'reached','已达目标');await gauge(2100,1800,'above','高于目标 300 kcal');await gauge(0,0,'zero','目标为 0')

@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict'
 import fs from 'node:fs/promises'
 import path from 'node:path'
-const {chromium}=await import(process.env.FITLOG_PLAYWRIGHT_MODULE),base=process.env.FITLOG_QA_URL||'http://127.0.0.1:5184/fitlog-lite/',mode=base.includes('github.io')?'prod':'local',dir=path.resolve('../../artifacts/coach-report-v3-1-2026-10-09/retained-unified',mode)
+const {chromium}=await import(process.env.FITLOG_PLAYWRIGHT_MODULE),base=process.env.FITLOG_QA_URL||'http://127.0.0.1:5184/fitlog-lite/',mode=base.includes('github.io')?'prod':'local',dir=path.resolve(process.env.FITLOG_QA_ARTIFACT_ROOT?path.join(process.env.FITLOG_QA_ARTIFACT_ROOT,'unifiedExperience'):'../../artifacts/coach-report-v3-1-2026-10-09/retained-unified',mode)
 await fs.mkdir(dir,{recursive:true});const fixture=JSON.parse(await fs.readFile(new URL('../fixtures/legacyV11Data.json',import.meta.url))),receipts=[]
 const matrix=[...[320,375,390,430].flatMap(w=>[100,120,140,200].flatMap(s=>['light','dark'].flatMap(c=>[false,true].map(r=>[w,w===430?932:w===390?844:812,s,c,r])))),[844,390,140,'dark',true]]
 const cases=(process.env.FITLOG_UNIFIED_SMOKE?[[390,844,100,'light',false],[320,812,200,'dark',true]]:mode==='prod'?[[390,844,100,'light',false],[320,812,200,'dark',true],[430,932,140,'dark',true],[844,390,140,'dark',true]]:matrix).filter(([w])=>!process.env.FITLOG_UNIFIED_WIDTH||w===Number(process.env.FITLOG_UNIFIED_WIDTH))

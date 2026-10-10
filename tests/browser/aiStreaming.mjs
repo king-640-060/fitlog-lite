@@ -23,6 +23,7 @@ try { for(const [width,height] of (prod?[[390,844],[430,932]]:[[320,812],[375,81
    if(mode==='tool'&&body.messages.at(-1).role==='user')timers.push(setTimeout(()=>push({tool_calls:[{index:0,id:'context',type:'function',function:{name:'get_current_context',arguments:'{'}}]}),150))
    else if(mode==='secret'){timers.push(setTimeout(()=>push({content:'安全 synthetic-stream-'}),150));timers.push(setTimeout(()=>push({content:'key 不应显示'}),300))}
    else if(mode==='scroll')for(let n=0;n<18;n++)timers.push(setTimeout(()=>push({content:`第${n+1}段：`+'连续内容，用于验证滚动位置。'.repeat(24)+'\n'}),(n+1)*120))
+   else if(mode==='held'){} // The first assertion owns delivery, so load cannot erase the thinking state.
    else {timers.push(setTimeout(()=>push({content:'首段中文'}),150));timers.push(setTimeout(()=>push({content:'，继续显示。'}),300))}
    return new Response(stream,{headers:{'Content-Type':'text/event-stream'}})
   }
@@ -33,10 +34,10 @@ try { for(const [width,height] of (prod?[[390,844],[430,932]]:[[320,812],[375,81
  const idle=()=>page.waitForFunction(()=>!document.querySelector('#ai-send').hidden)
  const finish=async()=>{await page.waitForFunction(()=>__streams.at(-1).text);await page.evaluate(()=>window.__streams.at(-1).done())}
  const clear=async()=>{await idle();await page.locator('#ai-clear-chat').click();await page.waitForFunction(()=>!document.querySelector('.ai-assistant .ai-user'))}
- await send('首段测试');await page.getByText('正在思考…',{exact:true}).waitFor();await page.waitForFunction(()=>document.querySelector('.ai-assistant .ai-assistant p')?.textContent==='首段中文')
+ await send('首段测试','held');await page.getByText('正在思考…',{exact:true}).waitFor();await page.evaluate(()=>__streams.at(-1).push({content:'首段中文'}));await page.waitForFunction(()=>document.querySelector('.ai-assistant .ai-assistant p')?.textContent==='首段中文')
  assert.equal(await page.locator('#ai-stop').isVisible(),true);assert.equal(await page.locator('#ai-mic').isDisabled(),true);assert.equal(await page.locator('#ai-food-camera').isDisabled(),true)
  await page.screenshot({path:`/tmp/stream-${prod?'prod':'local'}-${width}-partial.png`})
- const bubble=await page.locator('.ai-conversation .ai-assistant').elementHandle();await page.waitForFunction(()=>document.querySelector('.ai-conversation .ai-assistant p')?.textContent==='首段中文，继续显示。')
+ const bubble=await page.locator('.ai-conversation .ai-assistant').elementHandle();await page.evaluate(()=>__streams.at(-1).push({content:'，继续显示。'}));await page.waitForFunction(()=>document.querySelector('.ai-conversation .ai-assistant p')?.textContent==='首段中文，继续显示。')
  assert.equal(await bubble.evaluate(e=>e===document.querySelector('.ai-conversation .ai-assistant')),true)
  assert.equal(await page.locator('.ai-conversation').getAttribute('aria-live'),'off');assert.equal(await page.locator('.ai-conversation .ai-assistant').getAttribute('aria-live'),'off')
  assert.equal(await page.evaluate(()=>__requests.at(-1).stream),true);assert.equal(await page.evaluate(()=>__requests.at(-1).model),'chat-model');assert.equal(await page.evaluate(()=>__requests.at(-1).stream_options),undefined)

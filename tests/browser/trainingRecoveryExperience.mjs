@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 const {chromium}=await import(process.env.FITLOG_PLAYWRIGHT_MODULE)
-const base=process.env.FITLOG_QA_URL||'http://127.0.0.1:5184/fitlog-lite/',mode=base.includes('github.io')?'prod':'local',dir=path.resolve('../../artifacts/unified-experience-2026-10-09/training-recovery',mode),receipts=[]
+const base=process.env.FITLOG_QA_URL||'http://127.0.0.1:5184/fitlog-lite/',mode=base.includes('github.io')?'prod':'local',dir=path.resolve(process.env.FITLOG_QA_ARTIFACT_ROOT?path.join(process.env.FITLOG_QA_ARTIFACT_ROOT,'trainingRecoveryExperience'):'../../artifacts/unified-experience-2026-10-09/training-recovery',mode),receipts=[]
 await fs.mkdir(dir,{recursive:true})
 const fixture=JSON.parse(await fs.readFile(new URL('../fixtures/legacyV11Data.json',import.meta.url)))
 const full=[...[320,375,390,430].flatMap(w=>[100,120,140,200].flatMap(s=>['light','dark'].flatMap(c=>[false,true].map(r=>[w,w===430?932:w===390?844:812,s,c,r])))),[844,390,140,'dark',true]]

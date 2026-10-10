@@ -27,47 +27,30 @@ try{for(const width of widths){
     const root=surface==='today'?'.nutrition-today-card':'.food-nutrition-hero'
     await page.waitForFunction(({root,actual})=>Number(document.querySelector(root+' .calorie-gauge')?.dataset.actual)===actual,{root,actual})
     const checks=await page.locator(root).evaluate(root=>{
-     const gauge=root.querySelector('.calorie-gauge'),svg=gauge.querySelector('svg'),main=svg.querySelector('.ring-main'),track=svg.querySelector('.ring-track'),outer=svg.querySelector('.ring-outer'),r=svg.getBoundingClientRect(),center={x:r.left+r.width/2,y:r.top+r.height/2},inner=43*r.width/120
-     const rect=e=>{const r=e.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom}}
-     const visible=e=>e.getBoundingClientRect().width>0&&e.getBoundingClientRect().height>0
-     const failures=[]
-     for(const e of root.querySelectorAll('*')){
-      if(!visible(e))continue
-      const b=e.getBoundingClientRect(),c=getComputedStyle(e)
-      if(b.left<0||b.right>innerWidth+1)failures.push('bounds '+e.className)
-      if(e.scrollWidth>e.clientWidth+1 && !(e instanceof SVGElement))failures.push('clipped '+e.className)
-      if(c.animationName!=='none'||c.transitionProperty==='stroke-dashoffset')failures.push('animation '+e.className)
-     }
-     for(const e of gauge.querySelectorAll('.calorie-gauge-center strong,.calorie-gauge-center small')){
-      const b=e.getBoundingClientRect()
-      for(const x of [b.left,b.right])for(const y of [b.top,b.bottom])if(Math.hypot(x-center.x,y-center.y)>inner+1)failures.push('text touches arc '+e.tagName+':'+Math.hypot(x-center.x,y-center.y)+'>'+inner)
-     }
-     const css=e=>{const c=getComputedStyle(e);return {stroke:c.stroke,strokeWidth:c.strokeWidth,linecap:c.strokeLinecap,opacity:c.opacity,animation:c.animationName,transition:c.transitionDuration}}
-     const tileStyle=e=>{const c=getComputedStyle(e);return {radius:c.borderRadius,padding:c.padding,color:c.color,background:c.backgroundColor,label:getComputedStyle(e.querySelector('.macro-label')).fontSize,value:getComputedStyle(e.querySelector('.macro-value')).fontSize}}
-     return {failures,svg:svg.innerHTML,span:svg.dataset.arcSpan,circles:svg.querySelectorAll('circle').length,paths:svg.querySelectorAll('path').length,mainLength:main.getTotalLength(),mainOffset:Number(main.getAttribute('stroke-dashoffset')),mainOpacity:main.getAttribute('stroke-opacity'),main:css(main),track:css(track),outer:css(outer),outerLength:outer.getTotalLength(),outerOffset:Number(outer.getAttribute('stroke-dashoffset')),tiles:[...root.querySelectorAll('.nutrition-metric')].map(e=>({html:e.outerHTML,style:tileStyle(e),aria:e.getAttribute('aria-label'),state:e.className})),macroDonuts:root.querySelectorAll('.nutrition-metric svg').length,centerText:gauge.querySelector('strong').textContent,aria:gauge.getAttribute('aria-label'),documentOverflow:document.documentElement.scrollWidth>innerWidth+1}
+     const gauge=root.querySelector('.calorie-budget'),track=gauge.querySelector('.budget-track'),main=track.querySelector('i'),outer=gauge.querySelector('.budget-over-track'),bad=[]
+     for(const e of root.querySelectorAll('*')){if(!e.getClientRects().length||e instanceof SVGElement||e.classList.contains('sr-only'))continue;const r=e.getBoundingClientRect(),c=getComputedStyle(e);if(r.left<-.5||r.right>innerWidth+.5)bad.push('bounds '+e.className);if(e.scrollWidth>e.clientWidth+1)bad.push('clipped '+e.className);if(c.animationName!=='none')bad.push('animation '+e.className)}
+     const styles=[...root.querySelectorAll('.nutrition-metric')].map(e=>{const c=getComputedStyle(e);return{radius:c.borderRadius,padding:c.padding,color:c.color,background:c.backgroundColor,label:getComputedStyle(e.querySelector('.macro-label')).fontSize,value:getComputedStyle(e.querySelector('.macro-value')).fontSize}})
+     return{bad,bar:gauge.querySelector('.budget-bar-row').outerHTML,main:parseFloat(main.style.width),outer:outer?parseFloat(outer.querySelector('i').style.width):0,excessWidth:outer?outer.getBoundingClientRect().width/gauge.querySelector('.budget-bar-row').getBoundingClientRect().width:0,width:track.getBoundingClientRect().width,budgetWidth:gauge.getBoundingClientRect().width,height:track.getBoundingClientRect().height,actual:gauge.querySelector('.budget-number strong').textContent,aria:gauge.getAttribute('aria-label'),meta:gauge.querySelector('.budget-meta').textContent,styles,tiles:[...root.querySelectorAll('.nutrition-metric')].map(e=>e.outerHTML),svg:root.querySelectorAll('.calorie-budget svg,.nutrition-metric svg').length,overflow:document.documentElement.scrollWidth>innerWidth+1}
     })
-    if(checks.failures.length)await page.screenshot({path:`/tmp/nutrition-gauge-failure-${width}-${scale}-${surface}-${name}.png`})
-    assert.deepEqual(checks.failures,[],`${width}/${scale}/${surface}/${name}`);assert.equal(checks.documentOverflow,false)
-    assert.equal(checks.span,'280');assert.equal(checks.circles,0);assert.equal(checks.paths,4);assert.equal(checks.macroDonuts,0);assert.equal(checks.tiles.length,3)
+    if(checks.bad.length)await page.screenshot({path:`/tmp/nutrition-gauge-failure-${width}-${scale}-${surface}-${name}.png`})
+    assert.deepEqual(checks.bad,[],`${width}/${scale}/${surface}/${name}`);assert.equal(checks.overflow,false);assert.equal(checks.svg,0);assert.equal(checks.tiles.length,3)
     assert.equal(await page.locator(root+' .nutrition-metric[role=group][aria-label]').count(),3)
-    assert.equal(checks.centerText,String(Math.round(actual)));assert.ok(checks.aria.includes(`${Math.round(actual)} kcal`));assert.equal(checks.main.strokeWidth,'6px');assert.equal(checks.main.linecap,'round');assert.equal(checks.outer.strokeWidth,'3px')
+    assert.equal(checks.actual,String(Math.round(actual)));assert.ok(checks.aria.includes(`${Math.round(actual)} kcal`));assert.equal(checks.height,10);assert.ok(checks.width>=checks.budgetWidth*.8)
     const fraction=goal===undefined?0:goal<=0?(actual>0?1:0):Math.min(actual/goal,1)
-    assert.ok(Math.abs(checks.mainOffset-checks.mainLength*(1-fraction))<.05,'progress maps only to available arc')
-    assert.equal(checks.mainOpacity,fraction>0?'1':'0')
-    if(goal===undefined){assert.ok(checks.aria.includes('尚未设置目标'));assert.ok(!checks.aria.includes('0%'));assert.equal(checks.track.opacity,surface==='today'?'0.85':'0.65')}
+    assert.ok(Math.abs(checks.main-fraction*100)<.001,'bounded budget progress')
+    if(goal===undefined){assert.ok(checks.aria.includes('尚未设置目标'));assert.ok(!checks.meta.includes('%'))}
     const excess=goal===undefined||actual<=goal?0:goal>0?Math.min((actual-goal)/goal,1):1
-    assert.ok(Math.abs(checks.outerOffset-checks.outerLength*(1-excess))<.05)
-    if(actual>goal){assert.ok(checks.aria.includes('高于目标'));assert.equal(checks.outer.opacity,'1')}
-    const styles=checks.tiles.map(t=>t.style)
-    if(surface==='today'){todaySvg=checks.svg;todayTiles=checks.tiles.map(t=>t.html);todayStyles=styles}
-    else{assert.equal(checks.svg,todaySvg);assert.deepEqual(checks.tiles.map(t=>t.html),todayTiles);assert.deepEqual(styles,todayStyles)}
+    assert.ok(Math.abs(checks.outer-excess*100)<.001)
+    if(actual>goal){assert.ok(checks.aria.includes('高于目标'));assert.ok(Math.abs(checks.excessWidth-.13)<.005,'separate restrained excess track')}
+    if(surface==='today'){todaySvg=checks.bar;todayTiles=checks.tiles;todayStyles=checks.styles}
+    else{assert.equal(checks.bar,todaySvg);assert.deepEqual(checks.tiles,todayTiles);assert.deepEqual(checks.styles,todayStyles)}
     await page.locator(root).screenshot({path:`/tmp/nutrition-gauge-${prod?'prod':'local'}-${width}-${scale}-${surface}-${name}.png`})
     states.push({scale,surface,name})
    }
   }
   // A normal view rerender must not start an SVG/count animation.
   await page.locator('[data-tab=today]').click();assert.equal(await page.locator('.calorie-gauge').evaluate(e=>e.getAnimations({subtree:true}).length),0)
-  assert.deepEqual(errors,[]);receipts.push({width,states:states.length,fonts:[100,120,140],arcSpan:280,mainStroke:6,outerStroke:3,macroDonuts:0,sharedSvgAndTiles:true,noOverflowOrTextArcOverlap:true,noReplay:true,errors})
+  assert.deepEqual(errors,[]);receipts.push({width,states:states.length,fonts:[100,120,140],horizontalBudget:true,mainHeight:10,excessTrackRatio:.13,macroDonuts:0,sharedSvgAndTiles:true,noOverflowOrClipping:true,noReplay:true,errors})
   console.log(JSON.stringify(receipts.at(-1)))
  }finally{await context.close()}
 }

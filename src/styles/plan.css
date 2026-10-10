@@ -108,3 +108,18 @@
 .plan-task-check[aria-pressed=true] .icon { opacity: 1; transform: none; }
 .plan-task-copy strong { transition: color var(--motion-normal) var(--ease-standard); }
 .plan-tag-picker > button.selected { background: var(--accent-soft); color: var(--accent-strong); }
+/* V4.2 keeps the same task/date semantics and one create entry. */
+.plan-tabs { border:0; gap:4px; padding:4px; background:var(--surface-soft); border-radius:13px; }
+.plan-tabs button { border-radius:10px; transition:background-color var(--motion-fast) var(--ease-standard),color var(--motion-fast) var(--ease-standard); }
+.plan-tabs button.active { background:var(--surface); }
+.plan-tabs button::after { display:none; }
+.plan-overview { display:grid; gap:10px; padding:14px; border:1px solid var(--border); border-radius:var(--radius-md); background:linear-gradient(125deg,var(--surface),color-mix(in srgb,var(--accent-soft) 55%,var(--surface))); }
+.plan-overview > div:first-child { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:6px; font-size:.875rem; }
+.plan-overview span { color:var(--text-secondary); font-size:.8125rem; }
+.plan-progress-track { height:6px; border-radius:8px; background:var(--border); overflow:hidden; }
+.plan-progress-track i { display:block; height:100%; background:var(--accent-mid); border-radius:inherit; }
+.plan-task-check > span { border-radius:8px; }
+.plan-task-row.is-complete .plan-task-copy strong { text-decoration:line-through; }
+.plan-task-main time { color:var(--accent-strong); font-weight:650; }
+
+.today-plan-summary { margin:0 0 8px; color:var(--text-secondary); font-size:var(--type-meta); line-height:1.5; }

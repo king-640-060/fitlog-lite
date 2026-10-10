@@ -44,7 +44,7 @@ const verifyMigration=(before,after)=>{
 }
 const seed=async page=>page.evaluate(async fixture=>{
  const d=await new Promise(resolve=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>resolve(q.result)})
- await new Promise((resolve,reject)=>{const t=d.transaction([...d.objectStoreNames],'readwrite');for(const name of d.objectStoreNames){const s=t.objectStore(name);s.clear();for(const row of fixture[name])s.put(row)}t.oncomplete=resolve;t.onerror=()=>reject(t.error)});d.close()
+ await new Promise((resolve,reject)=>{const t=d.transaction([...d.objectStoreNames],'readwrite');for(const name of d.objectStoreNames){if(!(name in fixture)&&!['nutritionStrategyTemplates','nutritionStrategyVariants','nutritionStrategyPhases','dietEvents','sleepSessions','waterLogs'].includes(name))throw Error('Unexpected unfixtured store: '+name);const s=t.objectStore(name);s.clear();for(const row of fixture[name]??[])s.put(row)}t.oncomplete=resolve;t.onerror=()=>reject(t.error)});d.close()
  const profile={id:'pwa-synthetic',preset:'zhipu',name:'智谱 · glm-4.5',protocol:'openai-chat-completions',baseUrl:'https://mock-pwa.invalid/v1',model:'glm-5.3-flash',visionModel:'glm-5.3-flash',toolCapability:'supported',visionCapability:'supported',createdAt:'',updatedAt:''}
  localStorage.setItem('fitlog-ai-profiles-v1',JSON.stringify([profile]));localStorage.setItem('fitlog-ai-active-profile-v1',profile.id);localStorage.setItem('fitlog-ai-key-v1:'+profile.id,'synthetic-pwa-key');localStorage.setItem('fitlog-ai-privacy-ack-v1','1')
 },fixture)
@@ -61,7 +61,7 @@ try{
    let replies=[]
    await page.route('https://mock-pwa.invalid/**',async route=>{await route.fulfill({json:{choices:[{message:replies.shift()??{content:'Synthetic reply'}}]}})})
    await open(page);await seed(page);await page.reload({waitUntil:'networkidle'});await page.waitForSelector('#open-management')
-   const before=await read(page);assert.equal(before.version,70);assert.equal(Object.keys(before.records).length,14);assert.equal(Object.values(before.records).flat().length,15)
+   const before=await read(page);assert.equal(before.version,mode==='legacy'?70:110);assert.equal(Object.keys(before.records).length,mode==='legacy'?14:20);assert.equal(Object.values(before.records).flat().length,15)
    // Keep an actual unsaved selected image in memory during the deployment.
    await page.locator('[data-tab=food]').click();await page.locator('#food-library').click();await page.locator('#food-vision-import').click()
    const png=Buffer.from(await page.evaluate(()=>{const c=document.createElement('canvas');c.width=32;c.height=32;return c.toDataURL('image/png').split(',')[1]}),'base64')
@@ -118,7 +118,7 @@ try{
    assert.equal(await page.locator('meta[name=fitlog-build]').getAttribute('content'),expected);verifyMigration(before,await read(page));assert.equal(await workerBuild(page),expected)
    await diagnostics(page);assert.equal(await page.locator('[data-diagnostic=Registration]').innerText(),'已注册');assert.ok((await page.locator('[data-diagnostic=Active]').innerText()).includes(expected));await close(page)
    const current=await read(page)
-   receipts.push({mode,build:expected,waiting:true,selectedImagePreserved:true,aiDraftBlocked:mode==='prompt',pendingProposalBlocked:mode==='prompt',otherClientBlocked:mode==='prompt',cancelPreserved:mode==='prompt',singleConfirmedReload:mode==='prompt',dbVersion:current.version,stores:Object.keys(current.records).length,legacyStoresPreserved:14,newStrategyStoresEmpty:true,newDietEventStoreEmpty:true,newRecoveryStoresEmpty:true,rows:15,businessAndAiHash:hash(before),offlineColdBoot:true,physicalSafari:'Pending',physicalInstalledPwa:'Pending'})
+   receipts.push({mode,baselineDbVersion:before.version,baselineStores:Object.keys(before.records).length,build:expected,waiting:true,selectedImagePreserved:true,aiDraftBlocked:mode==='prompt',pendingProposalBlocked:mode==='prompt',otherClientBlocked:mode==='prompt',cancelPreserved:mode==='prompt',singleConfirmedReload:mode==='prompt',dbVersion:current.version,stores:Object.keys(current.records).length,legacyStoresPreserved:14,newStrategyStoresEmpty:true,newDietEventStoreEmpty:true,newRecoveryStoresEmpty:true,rows:15,businessAndAiHash:hash(before),offlineColdBoot:true,physicalSafari:'Pending',physicalInstalledPwa:'Pending'})
   }finally{await context.close()}
  }
  console.log(JSON.stringify(receipts,null,2))

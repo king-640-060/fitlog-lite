@@ -45,6 +45,7 @@ for (const [width,height] of sizes) {
     assert.equal(await page.evaluate(()=>document.activeElement?.classList.contains('sheet-focus-anchor')),true,`${name} first focus`)
     assert.equal(await page.locator('[data-close]').evaluate(e=>getComputedStyle(e).outlineStyle),'none')
     await page.waitForTimeout(220)
+    await page.locator('dialog').evaluate(e=>Promise.allSettled(e.getAnimations({subtree:true}).filter(a=>a.effect?.getTiming().iterations!==Infinity).map(a=>a.finished)))
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`${name} overflow`)
     assert.equal(await page.locator('.modal-body').evaluate(e=>e.scrollWidth<=e.clientWidth),true)
     const smallInputs=await page.locator('.sheet input:not([type=hidden]):not([type=checkbox]):not([type=radio]),.sheet textarea,.sheet select').evaluateAll(es=>es.filter(e=>e.getClientRects().length&&parseFloat(getComputedStyle(e).fontSize)<16).length);assert.equal(smallInputs,0)
@@ -53,6 +54,7 @@ for (const [width,height] of sizes) {
     // 20 native inner up/down scrolls, with toolbar-only VisualViewport movements. No editing focus.
     const scrollSurface=page.locator(name.startsWith('assistant')?'.ai-conversation':'.modal-body')
     await scrollSurface.evaluate(e=>{const fixture=document.createElement('section');fixture.dataset.scrollFixture='true';fixture.textContent='合成长内容滚动检查';fixture.style.height='2400px';e.append(fixture)})
+    // Wait for actual Sheet transitions; a fixed sleep can sample fractional transforms under load.
     const geometry = await page.locator('dialog').evaluate(e=>({top:e.getBoundingClientRect().top,bottom:e.getBoundingClientRect().bottom}))
     const background = await page.evaluate(()=>({y:scrollY,top:document.body.style.top}));await page.evaluate(()=>{window.__viewportWrites=0;window.__viewportObserver=new MutationObserver(rows=>__viewportWrites+=rows.length);__viewportObserver.observe(document.documentElement,{attributes:true,attributeFilter:['style']})})
     for(let n=0;n<20;n++){

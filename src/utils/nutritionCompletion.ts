@@ -56,7 +56,8 @@ export function getNutritionCompletionSummary(target: NutritionGoal, logs: reado
 interface State { grams: number[]; added: number[]; count: number; score: number; key: string }
 
 /** Finite deterministic beam search. Calories and each macro are independent dimensions. */
-export function completeNutrition(target: NutritionGoal, logs: readonly FoodLog[], foods: readonly Food[], excludedFoodIds: ReadonlySet<string> = new Set()): NutritionCompletionResult {
+export function completeNutrition(target: NutritionGoal, logs: readonly FoodLog[], foods: readonly Food[], excludedFoodIds: ReadonlySet<string> = new Set(), allowedFoodIds?: ReadonlySet<string>): NutritionCompletionResult {
+  if (allowedFoodIds && allowedFoodIds.size > completionBounds.maxFoods) throw new Error('一次最多指定 4 种食物')
   const summary = getNutritionCompletionSummary(target, logs)
   const result: NutritionCompletionResult = { ...summary, excludedFoodCount: 0, plans: [] }
   if (summary.nothingToComplete) return result
@@ -69,6 +70,7 @@ export function completeNutrition(target: NutritionGoal, logs: readonly FoodLog[
   }, 0) + Math.max(0, count - 1) * .0004
   const baseline = objective(keys.map(() => 0), 0)
   const eligible = foods.filter((food) => {
+    if (allowedFoodIds && !allowedFoodIds.has(food.id)) return false
     if (excludedFoodIds.has(food.id)) return false
     const valid = finite(food.referenceGrams) && food.referenceGrams > 0 && finite(food.calories)
       && completionKeys.every((key) => food[key] === undefined || (finite(food[key]) && Number.isFinite(food[key]! / food.referenceGrams * completionBounds.maxFoodGrams)))

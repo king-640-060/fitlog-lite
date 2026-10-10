@@ -52,10 +52,22 @@
 .coach-meter i { height:100%; display:block; background:var(--accent-mid); border-radius:inherit; }
 .coach-weekly-training > div { display:grid; gap:3px; font-size:var(--type-meta); padding:8px 0; border-bottom:1px solid var(--divider); }
 .coach-weekly-training small { color:var(--text-secondary); }
-.coach-nutrition { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-.coach-nutrient { min-width:0; display:grid; gap:4px; }
-.coach-nutrient > div:first-child { display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px; font-size:var(--type-body); }
-.coach-nutrient small { color:var(--text-secondary); font-size:var(--type-meta); line-height:1.6; }
+.coach-nutrition { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-rows:1fr; gap:9px; }
+.coach-nutrient { min-width:0; display:grid; grid-template-rows:auto auto minmax(3em,1fr) 7px 1.5em; gap:8px; padding:13px; border:1px solid var(--border); border-radius:15px; background:var(--surface); }
+.coach-nutrient-name { font-size:.8125rem; color:var(--text-secondary); }
+.coach-nutrient-actual { display:flex; flex-wrap:wrap; gap:3px 5px; align-items:baseline; min-width:0; }
+.coach-nutrient-actual b { font-size:1.6875rem; font-weight:800; line-height:1.2; overflow-wrap:anywhere; }
+.coach-nutrient small,.coach-nutrient-target { font-size:.75rem; color:var(--text-secondary); line-height:1.5; }
+.coach-nutrient-target { display:grid; gap:3px; align-content:start; overflow-wrap:anywhere; }
+.coach-nutrient .coach-meter { height:7px; margin:0; }
+.coach-nutrient.protein .coach-meter i { background:var(--protein); }
+.coach-nutrient.carbs .coach-meter i { background:var(--carbs); }
+.coach-nutrient.fat .coach-meter i { background:var(--fat); }
+.coach-nutrient-status { font-size:.75rem; line-height:1.5; white-space:nowrap; color:var(--text-secondary); }
+.coach-nutrition-details { font-size:var(--type-meta); line-height:1.6; }
+.coach-nutrition-details summary { min-height:44px; padding-block:10px; }
+.coach-nutrition-details p { margin:4px 0; color:var(--text-secondary); }
+.coach-nutrition-details > div + div { margin-top:10px; }
 .coach-history article { padding:10px 0; border-bottom:1px solid var(--divider); }
 .coach-history h3 { font-size:var(--type-body); }
 .coach-history li { font-size:var(--type-body); line-height:1.7; overflow-wrap:anywhere; }

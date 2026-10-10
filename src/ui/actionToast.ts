@@ -21,7 +21,7 @@ export function showActionToast(message:string,options:ActionToastOptions={}):vo
     const nav=document.querySelector<HTMLElement>('.bottom-nav')?.getBoundingClientRect()
     const bottom=keyboard?top-8+(parseFloat(style.getPropertyValue('--sheet-viewport-height'))||innerHeight)-8:Math.min(innerHeight-8,nav?.height?nav.top-8:innerHeight-8)
     const bounds=element.getBoundingClientRect(),blocked:Array<[number,number]>=[]
-    const controls=(dialog??document).querySelectorAll<HTMLElement>(dialog?'button,input:not([type=checkbox]):not([type=radio]),textarea':'.water-card,button,input:not([type=checkbox]):not([type=radio]),textarea')
+    const controls=(dialog??document).querySelectorAll<HTMLElement>(dialog?'button,input,textarea':'.water-card,button,input,textarea')
     for(const control of controls){if(control.closest('.action-toast'))continue;const r=control.getBoundingClientRect();if(r.width&&r.height&&r.right>bounds.left&&r.left<bounds.right&&r.bottom>top&&r.top<bottom)blocked.push([Math.max(top,r.top-32),Math.min(bottom,r.bottom+32)])}
     blocked.sort((a,b)=>a[0]-b[0]);let cursor=top;const gaps:Array<[number,number]>=[]
     for(const [a,b]of blocked){if(a>cursor)gaps.push([cursor,a]);cursor=Math.max(cursor,b)}if(cursor<bottom)gaps.push([cursor,bottom])

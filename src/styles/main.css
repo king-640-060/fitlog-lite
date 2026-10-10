@@ -12,28 +12,30 @@
   --motion-recording: 1300ms;
   --ease-standard: cubic-bezier(.2, 0, 0, 1);
   --ease-emphasized: cubic-bezier(.2, .8, .2, 1);
-  --bg: #f5f4ec;
-  --surface: #fffef8;
-  --surface-soft: #f1f3e8;
-  --surface-elevated: #fffef9;
-  --text-primary: #223026;
-  --text-secondary: #687168;
-  --text-tertiary: #7e897e;
-  --accent: #b8dc4b;
-  --accent-hover: #a8ce42;
-  --accent-pressed: #98bd39;
-  --accent-ink: #243127;
-  --accent-strong: #5c7429;
-  --accent-mid: #7f9a34;
-  --accent-soft: #eef6d5;
-  --carbs: #e8b957;
-  --carbs-soft: #fbf2d8;
-  --fat: #e58d75;
-  --fat-soft: #fbe9e3;
-  --info: #7f9670;
-  --danger: #b95850;
-  --danger-soft: #f8e9e7;
-  --border: #e4e6dc;
+  --bg: #f5f2eb;
+  --surface: #fffefa;
+  --surface-soft: #f8f8f2;
+  --surface-elevated: #fffefa;
+  --text-primary: #282e28;
+  --text-secondary: #697369;
+  --text-tertiary: #697369;
+  --accent: #52723b;
+  --accent-hover: #486532;
+  --accent-pressed: #3e582b;
+  --accent-ink: #ffffff;
+  --accent-strong: #52723b;
+  --accent-mid: #6e8b43;
+  --accent-soft: #e9f0dc;
+  --protein: #6f98a3;
+  --protein-soft: #e9f2f4;
+  --carbs: #c29757;
+  --carbs-soft: #f7eddd;
+  --fat: #b57f70;
+  --fat-soft: #f8ece7;
+  --info: #6f98a3;
+  --danger: #a65840;
+  --danger-soft: #f8ece7;
+  --border: #e9e8df;
   --divider: rgba(34, 48, 38, 0.075);
   --overlay: rgba(34, 48, 38, 0.24);
   --shadow-soft: 0 2px 10px rgba(38, 70, 51, .035);
@@ -73,7 +75,7 @@ body::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='620' height='820' viewBox='0 0 620 820'%3E%3Cg fill='none' stroke='%236d7950' stroke-opacity='.03' stroke-width='1'%3E%3Cpath d='M680 65C410 20 530 245 345 320S245 570 680 645'/%3E%3Cpath d='M680 95C440 55 555 255 373 341S275 548 680 681'/%3E%3Cpath d='M680 129C470 92 583 268 406 368S311 544 680 719'/%3E%3Cpath d='M680 166C504 130 610 283 441 396S349 548 680 760'/%3E%3C/g%3E%3C/svg%3E"),
-    radial-gradient(ellipse at 94% 3%, rgba(184, 220, 75, .05), transparent 42%),
+    radial-gradient(ellipse at 94% 3%, rgba(110, 139, 67, .035), transparent 42%),
     radial-gradient(ellipse at 4% 68%, rgba(192, 174, 119, .035), transparent 48%);
   background-size: 620px 820px, 100% 100%, 100% 100%;
   background-position: right -125px top 25px, center, center;
@@ -940,8 +942,8 @@ body.keyboard-open .bottom-nav { display: none; }
 
 .calendar-category-habit, .calendar-category-sleep, .calendar-category-water { --calendar-color:var(--accent-strong); --calendar-bg:var(--surface-soft); }
 /* Shared feedback uses existing viewport ownership and never enters business-card layout. */
-.action-toast { inset:auto auto calc(var(--bottom-nav-height) + 12px) 50%; margin:0; width:max-content; max-width:calc(100vw - 24px); min-height:44px; padding:4px 10px; flex-wrap:wrap; }
+.action-toast { pointer-events:none; inset:auto auto calc(var(--bottom-nav-height) + 12px) 50%; margin:0; width:max-content; max-width:calc(100vw - 24px); min-height:44px; padding:4px 10px; flex-wrap:wrap; }
 .action-toast > span { flex:1 1 auto; overflow-wrap:anywhere; }
-.action-toast .text-btn { min-height:44px; padding:4px 8px; color:var(--accent-strong); white-space:nowrap; }
+.action-toast .text-btn { pointer-events:auto; min-height:44px; padding:4px 8px; color:var(--accent-strong); white-space:nowrap; }
 .action-toast::backdrop { background:transparent; pointer-events:none; }
 body.keyboard-open .action-toast { top:calc(var(--sheet-offset-top,0px) + 8px); bottom:auto; }

@@ -37,7 +37,7 @@
 .primary[aria-busy=true] { opacity: 1; background: var(--accent); color: var(--accent-ink); }
 .primary[aria-busy=true]::after { content: '…'; margin-left: 8px; }
 @media (prefers-color-scheme: dark) {
-  :root { color-scheme: dark; --bg:#171d18; --surface:#222b24; --surface-soft:#2b362c; --surface-elevated:#283129; --text-primary:#edf2e8; --text-secondary:#bec9bb; --text-tertiary:#a9b6a6; --border:#435043; --divider:rgba(221,235,212,.14); --overlay:rgba(0,0,0,.55); --accent-strong:#c0d98c; --accent-mid:#b1ca78; --accent-soft:#35442b; --carbs-soft:#443b25; --fat-soft:#49322c; --danger:#f0a399; --danger-soft:#4a302c; }
+  :root { color-scheme:dark; --bg:#171c19; --surface:#222923; --surface-soft:#29332c; --surface-elevated:#29332c; --text-primary:#f0f0e9; --text-secondary:#b2bdb3; --text-tertiary:#b2bdb3; --border:#3c493c; --divider:rgba(221,235,212,.14); --overlay:rgba(0,0,0,.55); --accent:#9fb97a; --accent-hover:#b8d68d; --accent-pressed:#8ba766; --accent-ink:#171c19; --accent-strong:#b8d68d; --accent-mid:#9fb97a; --accent-soft:#30412a; --protein:#95b8c1; --protein-soft:#293e44; --carbs:#d5ae76; --carbs-soft:#493d2f; --fat:#d3a090; --fat-soft:#493731; --info:#95b8c1; --danger:#e2a28b; --danger-soft:#493731; }
   .meal-symbol.lunch { background:var(--carbs-soft); color:#f0d395; border-color:var(--border); }
   .meal-symbol.dinner { background:var(--surface-soft); color:var(--text-secondary); border-color:var(--border); }
   .meal-symbol.snack { background:var(--fat-soft); color:#f2b5a4; border-color:var(--border); }

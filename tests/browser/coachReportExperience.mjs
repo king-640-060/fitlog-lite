@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import {createHash} from 'node:crypto'
-const pw=await import(process.env.FITLOG_PLAYWRIGHT_MODULE),engine=process.env.FITLOG_COACH_ENGINE||'chromium',base=process.env.FITLOG_QA_URL||'http://127.0.0.1:5184/fitlog-lite/',production=base.includes('github.io'),dir=path.resolve('../../artifacts/coach-report-v3-1-2026-10-09',production?'prod':engine==='webkit'?'webkit':'local')
+const pw=await import(process.env.FITLOG_PLAYWRIGHT_MODULE),engine=process.env.FITLOG_COACH_ENGINE||'chromium',base=process.env.FITLOG_QA_URL||'http://127.0.0.1:5184/fitlog-lite/',production=base.includes('github.io'),dir=path.resolve(process.env.FITLOG_QA_ARTIFACT_ROOT?path.join(process.env.FITLOG_QA_ARTIFACT_ROOT,'coachReportExperience'):'../../artifacts/coach-report-v3-1-2026-10-09',production?'prod':engine==='webkit'?'webkit':'local')
 await fs.mkdir(dir,{recursive:true});const fixture=JSON.parse(await fs.readFile(new URL('../fixtures/legacyV11Data.json',import.meta.url))),receipts=[]
 const matrix=[...[320,375,390,430].flatMap(w=>[100,120,140,200].flatMap(s=>['light','dark'].flatMap(c=>[false,true].map(r=>[w,w===430?932:w===390?844:812,s,c,r])))),[844,390,140,'dark',true]]
 const samples=[[390,844,100,'light',false],[320,812,200,'dark',true],[844,390,140,'dark',true],...(process.env.FITLOG_COACH_VISUAL_REVIEW?[[375,812,100,'light',false],[430,932,140,'dark',true]]:[])]
