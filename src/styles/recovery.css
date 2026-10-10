@@ -45,11 +45,6 @@
 .food-calorie-row, .today-calorie-layout { display: flex; flex-wrap: wrap; }
 .food-calorie-row .calorie-gauge-caption, .today-calorie-layout .calorie-gauge-caption { flex: 1 1 max-content; }
 .calorie-gauge-caption > strong { white-space: nowrap; overflow-wrap: normal; }
-.food-completion-strip { display: flex; flex-wrap: wrap; }
-.food-completion-summary { flex: 1 1 12rem; }
-.food-completion-summary p { display: flex; flex-wrap: wrap; gap: 3px 8px; }
-.food-completion-summary p > span { white-space: nowrap; overflow-wrap: normal; }
-.food-completion-strip > button { flex: 0 0 auto; max-width: none; margin-left: auto; white-space: nowrap; }
 .recovery-trend h4 { margin: 16px 0 8px; font-size: .9rem; }
 
 .meal-preview-name + .meal-preview-name::before { content: '· '; }

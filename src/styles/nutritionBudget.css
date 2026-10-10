@@ -20,7 +20,10 @@
 .budget-meta { display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 10px; }
 .today-calorie-layout,.food-calorie-row { display:block; }
 .food-nutrition-hero,.today-dashboard .nutrition-today-card { background:linear-gradient(125deg,var(--surface),color-mix(in srgb,var(--accent-soft) 65%,var(--surface))); }
-.food-completion-strip { display:grid; grid-template-columns:minmax(0,1fr); gap:4px; padding:12px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); }
+.food-completion-strip { display:grid; grid-template-columns:minmax(0,1fr); gap:4px; min-width:0; margin-top:12px; }
+.food-remaining { padding:12px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); }
+.today-remaining { padding:10px 0 0; border:0; border-top:1px solid var(--divider); background:transparent; }
+.today-remaining > button { justify-self:end; padding-inline:0; font-size:.8125rem; }
 .food-completion-summary { display:grid; gap:8px; min-width:0; }
 .food-completion-summary > strong { font-size:.8125rem; }
 .remaining-goals-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
@@ -29,9 +32,6 @@
 .remaining-goal > strong { font-size:.8125rem; line-height:1.45; overflow-wrap:anywhere; }
 .completion-entry-actions { display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end; }
 .completion-entry-actions button { font-size:.8125rem; }
-.today-strength-row { display:block; }
-.today-strength-status { min-width:0; align-items:center; gap:8px; }
-.today-activity-card :is(.today-activity-action,.today-workout-action) { min-width:5.75rem; min-height:44px; padding:0 11px; border:0; border-radius:12px; font-size:.78rem; font-weight:700; justify-self:end; }
 .today-dashboard .pelvic-today-card .pelvic-icon { background:var(--carbs-soft); color:var(--carbs); }
 @media(max-width:25rem) { .budget-head { gap:8px; } }
 
@@ -77,5 +77,4 @@
 
 .meal-log-list .food-row-main strong { white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere; }
 
-.today-activity-card .today-activity-action { margin-inline-start:auto; }
 .meal-preview-name + .meal-preview-name::before { content:'· '; }

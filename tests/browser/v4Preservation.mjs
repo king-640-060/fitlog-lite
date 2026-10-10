@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import {createHash} from 'node:crypto'
 import path from 'node:path'
 const {chromium}=await import(process.env.FITLOG_PLAYWRIGHT_MODULE)
-const phase=process.argv[2],dir=path.resolve('../../artifacts/v4-2-2026-10-10'),profile=path.resolve('../../.qa-profiles/training-recovery-2026-10-09'),url='https://king-640-060.github.io/fitlog-lite/'
+const phase=process.argv[2],dir=path.resolve(process.env.FITLOG_PRESERVATION_ARTIFACT_ROOT||'../../artifacts/v4-2-2026-10-10'),profile=path.resolve('../../.qa-profiles/training-recovery-2026-10-09'),url='https://king-640-060.github.io/fitlog-lite/'
 await fs.mkdir(dir,{recursive:true})
 const context=await chromium.launchPersistentContext(profile,{headless:true,executablePath:process.env.FITLOG_CHROME,viewport:{width:390,height:844},timezoneId:'Asia/Shanghai'})
 try{
@@ -15,7 +15,7 @@ try{
  const hash=v=>createHash('sha256').update(JSON.stringify(v)).digest('hex')
  const receipt=async()=>{const d=await capture();assert.equal(d.version,110);assert.equal(d.stores.length,20);return{version:d.version,stores:d.stores,allStoreHash:hash(d.rows),configHash:hash(d.config),configKeys:Object.keys(d.config),counts:Object.fromEntries(Object.entries(d.rows).map(([n,r])=>[n,r.length]))}}
  let result=await receipt()
- if(phase==='baseline'){assert.equal(await page.locator('meta[name=fitlog-build]').getAttribute('content'),'953a61d25b305939f35ddbaa6ca618d35adf55fa');await fs.writeFile(path.join(dir,'preservation-baseline.json'),JSON.stringify(result,null,2))}
+ if(phase==='baseline'){assert.equal(await page.locator('meta[name=fitlog-build]').getAttribute('content'),process.env.FITLOG_PRESERVATION_BASELINE||'953a61d25b305939f35ddbaa6ca618d35adf55fa');await fs.writeFile(path.join(dir,'preservation-baseline.json'),JSON.stringify(result,null,2))}
  else{
   const before=JSON.parse(await fs.readFile(path.join(dir,'preservation-baseline.json')));assert.deepEqual(result,before)
   const expected=JSON.parse(await fs.readFile('dist/build-info.json')).build

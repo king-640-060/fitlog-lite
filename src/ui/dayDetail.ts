@@ -41,11 +41,6 @@ export function buildCalendarDayDetailRows(
   pelvicSessions: PelvicFloorSession[],
 ): CalendarDayDetailRow[] {
   const target = summary?.nutritionTarget
-  const macros = [
-    summary?.protein === undefined ? undefined : `蛋白质\u00a0${formatNumber(summary.protein)}g`,
-    summary?.carbs === undefined ? undefined : `碳水\u00a0${formatNumber(summary.carbs)}g`,
-    summary?.fat === undefined ? undefined : `脂肪\u00a0${formatNumber(summary.fat)}g`,
-  ].filter((value): value is string => Boolean(value))
   const spokenMacros = [
     summary?.protein === undefined ? undefined : `蛋白质 ${formatNumber(summary.protein)} 克`,
     summary?.carbs === undefined ? undefined : `碳水 ${formatNumber(summary.carbs)} 克`,
@@ -60,7 +55,7 @@ export function buildCalendarDayDetailRows(
   const targetLine = targetDetails.length ? `目标 ${targetDetails.join(' · ')}` : undefined
   const foodRecorded = Boolean(summary?.foodLogCount)
   const foodPrimary = foodRecorded ? `${formatEnergyInputValue(summary?.calories ?? 0)} kcal` : '未记录'
-  const foodSecondary = [...(foodRecorded && macros.length ? [macros.join(' · ')] : []), ...(targetLine ? [targetLine] : [])]
+  const foodSecondary = [...(foodRecorded ? [`${summary!.foodLogCount} 项记录`] : []), ...(targetLine ? ['已保存营养目标'] : [])]
   const food = row('food', '饮食', foodPrimary, foodSecondary, !foodRecorded)
   food.accessibleLabel = ['饮食', foodRecorded ? `${formatEnergyInputValue(summary?.calories ?? 0)} 千卡` : '未记录', ...(foodRecorded ? spokenMacros : []), ...(targetLine ? [targetLine.replace('kcal', '千卡').replaceAll('g', '克')] : [])].join('，')
 
@@ -107,8 +102,13 @@ export function dailyRecordsHtml(records:DailyRecords,esc:(value:unknown)=>strin
   const detail=(title:string,lines:string[])=>`<article class="daily-record-item"><strong>${esc(title)}</strong>${lines.map(line=>`<p>${esc(line)}</p>`).join('')}</article>`
   const instant=(value:string)=>`${new Date(value).toLocaleDateString('zh-CN')} ${localClock(value)}`
   const macro=(v:number|undefined)=>v===undefined?'未知':`${formatNumber(v)}g`
+  const nutritionGrid = (kind:'actual'|'target') => {
+    const values = kind==='actual' ? records.summary : records.summary.nutritionTarget
+    const fields = [['calories','热量','kcal'],['protein','蛋白质','g'],['carbs','碳水','g'],['fat','脂肪','g']] as const
+    return `<section class="daily-nutrition-facts" data-daily-nutrition="${kind}"><h4>${kind==='actual'?'实际摄入':'保存的营养目标'}</h4><dl class="daily-nutrition-grid">${fields.map(([key,label,unit])=>{const value=values?.[key];return `<div><dt>${label}</dt><dd>${value===undefined?kind==='target'?'未设置':records.summary.foodLogCount?'数据不完整':'未记录':`<span>${esc(key==='calories'?formatEnergyInputValue(value):formatNumber(value))}</span> <small>${unit}</small>`}</dd></div>`}).join('')}</dl></section>`
+  }
   const contents:Record<CalendarCategory,string>={
-    food:s.foodLogs.map(l=>detail(`${l.meal?mealNames[l.meal]:'未分类'} · ${l.foodName}${l.brand?' · '+l.brand:''}`,[`${formatNumber(l.grams)} g · ${formatEnergyInputValue(l.totalCalories)} kcal`,`蛋白质 ${macro(l.totalProtein)} · 碳水 ${macro(l.totalCarbs)} · 脂肪 ${macro(l.totalFat)}`,`保存的每${formatNumber(l.referenceGrams)}g快照：${formatEnergyInputValue(l.caloriesPerReference)} kcal · 蛋白质 ${macro(l.proteinPerReference)} · 碳水 ${macro(l.carbsPerReference)} · 脂肪 ${macro(l.fatPerReference)}`])).join(''),
+    food:nutritionGrid('actual')+nutritionGrid('target')+s.foodLogs.map(l=>detail(`${l.meal?mealNames[l.meal]:'未分类'} · ${l.foodName}${l.brand?' · '+l.brand:''}`,[`${formatNumber(l.grams)} g · ${formatEnergyInputValue(l.totalCalories)} kcal`,`蛋白质 ${macro(l.totalProtein)} · 碳水 ${macro(l.totalCarbs)} · 脂肪 ${macro(l.totalFat)}`,`保存的每${formatNumber(l.referenceGrams)}g快照：${formatEnergyInputValue(l.caloriesPerReference)} kcal · 蛋白质 ${macro(l.proteinPerReference)} · 碳水 ${macro(l.carbsPerReference)} · 脂肪 ${macro(l.fatPerReference)}`])).join(''),
     strength:s.workouts.map((w,i)=>detail(`第${i+1}次训练${w.finishedAt?'':' · 记录中'}`,[`${w.exercises.length} 个动作`,...(w.note?[w.note]:[])])+w.exercises.map(e=>detail(e.exerciseName,e.sets.length?e.sets.map((set,j)=>`第${j+1}组 · ${set.reps}次 · ${set.weightKg===undefined?'重量未记录':formatNumber(set.weightKg)+' kg'}${set.rpe===undefined?'':' · RPE '+formatNumber(set.rpe)}${set.note?' · '+set.note:''}`):['组数未记录'])).join('')).join(''),
     cardio:s.cardioSessions.map(c=>detail(getCardioActivityLabel(c),[`${formatNumber(c.durationMinutes)} 分钟`,...formatCardioMetrics(c),...(c.note?[c.note]:[])])).join(''),
     pelvic:s.pelvicFloorSessions.map(p=>detail(p.routine?.name??'基础训练',[`${duration(pelvicFloorSessionDurationSeconds(p))} · ${p.completedRepetitions} 次收缩`,`${instant(p.startedAt)} → ${instant(p.finishedAt)}`,...p.phases.map(phase=>`${({prepare:'准备',contract:'收缩',hold:'保持',release:'释放',relax:'放松',rest:'休息'} as const)[phase.type]} ${phase.durationSeconds} 秒`),`记录方式：${p.completionType==='manual'?'手动结束':'完成'}`])).join(''),
@@ -118,7 +118,7 @@ export function dailyRecordsHtml(records:DailyRecords,esc:(value:unknown)=>strin
     sleep:sleepTimelineHtml(s.sleepSessions,records.date,esc)+s.sleepSessions.map(p=>detail(formatSleepDuration(p.durationMinutes!),[`${instant(p.startTime)} → ${instant(p.endTime!)}`,`所属夜晚 ${sleepNightLabel(resolveSleepBusinessDate(p))}`])).join(''),
     water:s.waterLogs.map(w=>detail(`${w.amountMl} ml`,[instant(w.timestamp),`记录日期 ${w.date}`])).join(''),
   }
-  return `<div class="calendar-day-sheet daily-records" data-record-date="${esc(records.date)}">${rows.map(r=>`<details class="daily-record-group" data-record-category="${r.key}"><summary class="day-detail-row" aria-label="${esc(r.accessibleLabel)}"><span class="day-detail-label"><span class="day-detail-icon calendar-category-${r.key}" aria-hidden="true">${icon(calendarCategoryIcons[r.key],16)}</span><span>${esc(r.label)}</span></span><span class="day-detail-content"><strong class="${r.empty?'is-empty':''}">${esc(r.primary)}</strong>${r.secondary.map(v=>`<span>${esc(v)}</span>`).join('')}</span><span class="daily-record-chevron" aria-hidden="true">${icon('chevron',16)}</span></summary><div class="daily-record-content">${r.empty?'<p class="report-note">当天未记录</p>':contents[r.key]}</div></details>`).join('')}</div>`
+  return `<div class="calendar-day-sheet daily-records" data-record-date="${esc(records.date)}">${rows.map(r=>`<details class="daily-record-group" data-record-category="${r.key}"><summary class="day-detail-row" aria-label="${esc(r.accessibleLabel)}"><span class="day-detail-label"><span class="day-detail-icon calendar-category-${r.key}" aria-hidden="true">${icon(calendarCategoryIcons[r.key],16)}</span><span>${esc(r.label)}</span></span><span class="day-detail-content"><strong class="${r.empty?'is-empty':''}">${esc(r.primary)}</strong>${r.secondary.map(v=>`<span>${esc(v)}</span>`).join('')}</span><span class="daily-record-chevron" aria-hidden="true">${icon('chevron',16)}</span></summary><div class="daily-record-content">${r.key==='food'?contents.food:r.empty?'<p class="report-note">当天未记录</p>':contents[r.key]}</div></details>`).join('')}</div>`
 }
 
 /** Patch changed groups only; keep the Sheet, other nodes, expanded categories, scroll and focus. */

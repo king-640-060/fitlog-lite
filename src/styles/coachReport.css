@@ -64,7 +64,9 @@
 .coach-nutrient.carbs .coach-meter i { background:var(--carbs); }
 .coach-nutrient.fat .coach-meter i { background:var(--fat); }
 .coach-nutrient-status { font-size:.75rem; line-height:1.5; white-space:nowrap; color:var(--text-secondary); }
-.coach-nutrition-details { font-size:var(--type-meta); line-height:1.6; }
+.coach-nutrition-footer { display:grid; gap:6px; min-width:0; }
+.coach-nutrition-footer .coach-note { margin:0; }
+.coach-nutrition-details { margin:0; font-size:var(--type-meta); line-height:1.6; }
 .coach-nutrition-details summary { min-height:44px; padding-block:10px; }
 .coach-nutrition-details p { margin:4px 0; color:var(--text-secondary); }
 .coach-nutrition-details > div + div { margin-top:10px; }

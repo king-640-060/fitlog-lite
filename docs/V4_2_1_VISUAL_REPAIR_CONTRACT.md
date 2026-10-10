@@ -1,0 +1,21 @@
+# V4.2.1 precise visual and interaction repair
+
+## Inputs and scope
+
+Remote main verified98abbddffa8c3321b0f12222306360adcc678b6b on2026-10-10. Read the full supplied repair instructions and required project documents. Actual approved V4.2 HTML remains aa8d37f0509035970eb3a26be056eec619066ba308cf5bc8f5911d2458d24687; operated again in an isolated browser. The initial attachment contained instruction text only. During regression, the user supplied four physical iPhone BEFORE screenshots; all four were read and confirm crowded folded Food macros/targets, excessive report disclosure/note space and the Food special-diet/meal boundaries. They do not contain Today or post-release device evidence. Browser before/after images use invented records; comparison validates the corresponding structure, not identical-device pixel geometry or physical acceptance.
+
+## Seven fixes and ownership
+
+1. Day Detail and Day Report share folded Food actual kcal/count/saved-goal indication, without complete macro/goal prose in a narrow right column. Native disclosure retains structured four-dimensional actual/goal dl grids and all saved per-food snapshots. No records stays unrecorded even with goals; unknown remains unknown. Other eight categories keep shared primary/secondary/native disclosure grammar.
+2. Nutrition report footer groups the native statistical disclosure and explanatory note with one6px rhythm. Measure original34px: details global16px margin-bottom + section12px gap + note6px margin-top. Remove margin locally, not globally; expanded content naturally sizes. Keep four cards and progress tracks unchanged.
+3. Food body owns12px spacing. Special-diet margin0 replaces20px top/bottom: original32px boundaries become12px. Empty action stays44px; saved notes/edit/template and four compact meal entries remain. Estimates never enter actual intake.
+4. One remaining-goals renderer/data/state, two explicit density modifiers in nutritionBudget.css: Food quiet bordered surface with two text actions; Today transparent two-column/four-item summary, top divider, zero inline padding and one quiet completion action when applicable. Remove obsolete conflicting rules from main.css/recovery.css; no new calculator.
+5. Today Strength/Cardio use identical activity-body/copy/status/meta/action slots, right44px secondary controls; open Strength retains primary continuation. Today Cardio passes captured today directly to existing showCardioForm; it never reads the previous Workout view's date for this entry. Saved new cardio refreshes Today through existing render; historical records stay untouched.
+6. Only Today Sleep idle start becomes secondary, active finish primary. Preserve busy/disabled/aria-busy, start/finish/editor/cancel/history and Trend primary semantics.
+7. Today action primitive owns minimum width/44px height/padding/radius/font/right alignment. Ordinary Strength/Cardio/Weight/Kegel/Sleep/Water actions share existing secondary states; ongoing continuation/finish may be primary; histories lightweight, danger explicit. No new palette/interaction/viewport engine.
+
+## Verification and preservation
+
+Retain every841 preceding unit and31 UI browser suites. Add focused disclosure-data protection units and v421Consistency full65 matrix (four widths×four fonts×two themes×two motion plus landscape), before/after originals/geometries and actual existing-service interactions. Measure report closed/open gaps, card widths/heights/within-row bars, Food empty/saved boundaries, remaining density/data, peer action rectangles and historical-date isolation. Check long data,200% fonts, no viewport overflow, all targets44px. Existing suites continue keyboard/SafeArea/PWA/backup/restore/sync/continuous-meal/strict-completion/lifecycle protection.
+
+Dexie11/IDB110/20stores, Backup11/Restore1–11, Sync/envelope1, device configs and retiredVideo unchanged. No schema/service/algorithm/history migration. Continue the same dedicated synthetic production profile without clearing/reseeding; hash all stores/config before, APP and END; verify exact assets/App/SW/offline. Release APP→CI/Pages→production→LATEST-only END→final identity/data/offline. Physical Safari/original PWA/personal-device continuity Pending until actual device evidence.

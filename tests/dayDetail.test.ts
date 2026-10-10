@@ -43,13 +43,15 @@ describe('Calendar 日期详情统一信息模型', () => {
 
   it('饮食和营养目标独立表达，包括只有目标与两者都有', () => {
     expect(rows({ ...empty, nutritionTarget: { id: 'target', date: empty.date, calories: 2300, createdAt: at, updatedAt: at } })[0]).toMatchObject({
-      primary: '未记录', secondary: ['目标 2300 kcal'],
+      primary: '未记录', secondary: ['已保存营养目标'],
     })
     const food = rows({ ...empty, foodLogCount: 1, calories: 2180, protein: 145, carbs: 220, fat: 68 })[0]!
     expect(food.primary).toBe('2180 kcal')
-    expect(food.secondary[0]?.replaceAll('\u00a0', ' ')).toBe('蛋白质 145g · 碳水 220g · 脂肪 68g')
+    expect(food.secondary).toEqual(['1 项记录'])
+    expect(food.accessibleLabel).toContain('碳水 220 克')
+    expect(food.accessibleLabel).toContain('脂肪 68 克')
     expect(food.accessibleLabel).toContain('蛋白质 145 克')
-    expect(rows({ ...empty, foodLogCount: 1, calories: 2180, nutritionTarget: { id: 'target', date: empty.date, calories: 2300, createdAt: at, updatedAt: at } })[0]?.secondary).toEqual(['目标 2300 kcal'])
+    expect(rows({ ...empty, foodLogCount: 1, calories: 2180, nutritionTarget: { id: 'target', date: empty.date, calories: 2300, createdAt: at, updatedAt: at } })[0]?.secondary).toEqual(['1 项记录', '已保存营养目标'])
   })
 
   it('力量只显示动作和组数，单次及多次都不显示 elapsed duration 或旧 RPE', () => {
