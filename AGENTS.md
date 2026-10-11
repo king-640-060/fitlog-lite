@@ -48,6 +48,10 @@ current code
 
 Always sync and inspect Git before trusting a recorded commit value; `LATEST_DEV_REPORT.md` is a maintained snapshot, while the repository remains the source of truth.
 
+### ChatGPT × Codex collaboration
+
+Follow [ChatGPT × Codex collaboration and delivery workflow](docs/CHAT_CODEX_WORKFLOW.md) for ChatGPT → Codex requirement analysis, applicable visual prototypes, confirmed implementation, delivery receipts and independent acceptance. Read it when restoring this workflow in a new chat, following the context loading order above. It is the primary long-term source for the collaboration process; existing business, data preservation, engineering, release and design contracts remain binding and take priority over process convenience. Do not request confirmation again for already authorized work.
+
 ## Inspection rule
 
 Do NOT scan the entire repository by default.
