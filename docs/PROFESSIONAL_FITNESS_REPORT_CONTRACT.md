@@ -29,3 +29,10 @@ Training keeps real execution engines, shared primary actions and history; proto
 ## Release acceptance
 
 Retain all prior units/browser suites and frozen fixtures. Add analysis qualification/matching/PR/missing/target boundary tests,65 display contexts, prototype/production original screenshots, actual-coordinate tests and20 integrated read-only cycles with resource/data hashes. No schema changes: Dexie11/IDB110/20stores, Backup11/Restore1–11, Sync/envelope1, AI/Voice/WaterReference1, retired Video. Application CI/Pages then exact production assets, existing synthetic-profile hashes/offline; LATEST-only END then final repeat. Physical iPhone Safari/original installed PWA/real-device continuity are Pending absent actual device evidence.
+
+
+## 2026-10-11 联合交付补充
+
+[营养周期排程合同](NUTRITION_CYCLE_SCHEDULE.md)新增两个计划业务表，当前 Dexie12 / IDB120 /22表、Backup12 /Restore1–12；既有报告计算及历史快照不变。日报完整记录增加第十类 Task.date 日程存在和已保存完成状态，计划不计入训练完成、营养摄入或健康成绩。删除菜单通过独立精确 ID 事务处理所选类别；报告与日历继续读取同一真实日期源。
+
+日报日期按钮17px（rem缩放）、左右44px对称，深色分类底色使用既有主题 Token。周/月报告及原有四张等尺寸营养卡不重写；本轮不新增完整周期报告。原有发布、视觉、数据与真机门槛保留。

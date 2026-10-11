@@ -1,11 +1,13 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { SleepSession, WaterLog, CardioSession, DietEvent, DietTemplate, Exercise, Food, FoodLog, Habit, HabitCheckIn, NutritionTarget, NutritionStrategyTemplate, NutritionStrategyVariant, NutritionStrategyPhase, PelvicFloorSession, Task, TaskTag, WeightLog, Workout, WorkoutTemplate } from './types'
+import type { NutritionCycle, NutritionCycleDay, SleepSession, WaterLog, CardioSession, DietEvent, DietTemplate, Exercise, Food, FoodLog, Habit, HabitCheckIn, NutritionTarget, NutritionStrategyTemplate, NutritionStrategyVariant, NutritionStrategyPhase, PelvicFloorSession, Task, TaskTag, WeightLog, Workout, WorkoutTemplate } from './types'
 
 export const PRODUCTION_DATABASE_NAME = 'fitlog-lite-db'
 
 export const STARTER_EXERCISE_NAMES = ['杠铃卧推', '深蹲', '硬拉', '引体向上', '哑铃弯举', '杠铃划船', '哑铃侧平举'] as const
 
 export class FitLogDatabase extends Dexie {
+  nutritionCycles!: EntityTable<NutritionCycle, 'id'>
+  nutritionCycleDays!: EntityTable<NutritionCycleDay, 'id'>
   sleepSessions!: EntityTable<SleepSession, 'id'>
   waterLogs!: EntityTable<WaterLog, 'id'>
   dietEvents!: EntityTable<DietEvent, 'id'>
@@ -101,6 +103,9 @@ export class FitLogDatabase extends Dexie {
     })
     this.version(11).stores({ sleepSessions: 'id, &activeKey, recordDate, startTime', waterLogs: 'id, date, timestamp' }).upgrade(() => {
       // Add empty recovery stores only. Preserve every V10 store, index and historical snapshot.
+    })
+    this.version(12).stores({ nutritionCycles: 'id, startDate, endDate, archivedAt, updatedAt', nutritionCycleDays: 'id, cycleId, date, &[cycleId+date]' }).upgrade(() => {
+      // Add two empty planning stores only. Never backfill targets, food or historical facts.
     })
     this.on('populate', () => {
       const now = new Date().toISOString()

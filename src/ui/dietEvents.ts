@@ -1,3 +1,5 @@
+import { db } from '../db/database'
+import { icon } from './icons'
 import type { DietEvent, MealType } from '../db/types'
 import { saveDietEvent, deleteDietEvent, dietEventTitle, dietEventEstimate } from '../services/dietEventService'
 import { AiProfiles } from '../services/aiProfiles'
@@ -18,7 +20,19 @@ export interface DietEventUi {
 export function dietEventsHtml(events: DietEvent[], esc: DietEventUi['esc'], dayDetail = false): string {
   return `<section class="diet-events ${dayDetail ? 'diet-events-detail' : ''}" aria-label="特殊饮食"><div class="diet-events-heading"><h${dayDetail ? '3' : '2'}>特殊饮食</h${dayDetail ? '3' : '2'}>${!dayDetail && !events.some(event => event.scope === 'day') ? '<button type="button" class="text-btn compact-action" data-diet-event-new>标记放纵餐</button>' : ''}</div>${events.map(event => `<button type="button" class="diet-event-row" data-diet-event-edit="${esc(event.id)}" aria-label="编辑 ${esc(dietEventTitle(event))}"><span><strong>${esc(dietEventTitle(event))}</strong><small>${esc(dietEventEstimate(event))}</small>${event.estimateSource === 'photo' ? `<small>照片粗略范围 ${formatEnergyInputValue(event.estimatedCaloriesLow!)}–${formatEnergyInputValue(event.estimatedCaloriesHigh!)} kcal</small>` : ''}${event.note ? `<span class="diet-event-note">${esc(event.note)}</span>` : ''}</span><span class="diet-event-edit">编辑</span></button>`).join('')}${events.some(event => event.scope === 'day') ? '<p class="ai-note">当天已标记放纵日；已有单餐备注保留，可分别编辑。</p>' : ''}</section>`
 }
+/** Quiet date-specific entry after every meal; estimates remain contextual. */
+export function dietEventEntryHtml(events: DietEvent[], esc: DietEventUi['esc']): string {
+  return `<button type="button" class="special-diet-entry" data-diet-events-open aria-label="特殊饮食，${esc(events.length ? `已标记 ${events.length} 条` : '添加标记')}"><span class="special-diet-entry-label">${icon('bookmark',19)}<span>特殊饮食</span></span><span class="special-diet-entry-status">${events.length ? `已标记 ${events.length} 条` : '添加标记'}${icon('chevron',16)}</span></button>`
+}
+export async function showDietEventsList(ui: DietEventUi, date: string, owner?: HTMLElement): Promise<void> {
+  const events = await db.dietEvents.where('date').equals(date).sortBy('createdAt')
+  if (owner && !owner.isConnected) return
+  if (!events.length) { showDietEvent(ui, date); return }
+  const dialog = ui.openModal('特殊饮食', `<p class="ai-note">${ui.esc(date)} · 已标记 ${events.length} 条 · 仅作备注，不计入营养总计</p>${dietEventsHtml(events, ui.esc, true)}${events.some(e=>e.scope==='day') ? '' : '<button type="button" class="secondary full-btn" data-diet-event-new>添加标记</button>'}`)
+  bindDietEvents(dialog, date, events, ui)
+}
 export function bindDietEvents(host: HTMLElement, date: string, events: DietEvent[], ui: DietEventUi): void {
+  host.querySelector('[data-diet-events-open]')?.addEventListener('click', () => void showDietEventsList(ui, date, host))
   host.querySelector('[data-diet-event-new]')?.addEventListener('click', () => showDietEvent(ui, date))
   host.querySelectorAll<HTMLButtonElement>('[data-diet-event-edit]').forEach(button => button.addEventListener('click', () => showDietEvent(ui, date, events.find(event => event.id === button.dataset.dietEventEdit))))
 }

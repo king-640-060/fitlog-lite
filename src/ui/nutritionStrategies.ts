@@ -1,3 +1,4 @@
+import { showNutritionCycles } from './nutritionCycles'
 import { observeManagerCatalog } from './observeManagerCatalog'
 import { managerToolbarHtml, managerListHtml, managerRowHtml, managerEmptyHtml, managerSectionHtml } from './managerPrimitives'
 import type { ManagedSurfaceContext } from './managementWorkspace'
@@ -12,7 +13,7 @@ import { setSheetVariant } from './sheetController'
 import { bindNumericPresentation } from './numericPresentation'
 import { mountDatePicker, datePickerLabel } from './datePicker'
 
-interface StrategyUi {
+export interface StrategyUi {
   surface?: ManagedSurfaceContext
 
   openModal(title: string, body: string, wide?: boolean): HTMLDialogElement
@@ -87,8 +88,9 @@ export async function showNutritionStrategyManager(ui: StrategyUi, back?: ()=>vo
     if(!isOpen(dialog)||!managerRoot.isConnected)return
     if (!ui.surface) setSheetVariant(dialog,templates.length>2?'large':'content')
     const available=templates.filter(t=>t.id!==current?.id&&!t.archivedAt),archived=templates.filter(t=>t.archivedAt)
-    dialog.querySelector('#strategy-manager')!.innerHTML=`${back?'<button type="button" class="sheet-link" id="strategy-manager-back">返回当日目标</button>':''}${managerToolbarHtml(`${templates.length} 个模板`,'strategy-create','营养模板',!templates.length)}<p class="manager-section-note">一个模板包含多个日目标方案，每天选择一个。切换模板不改写已保存目标。</p>${templates.length?`${currentHtml}${available.length?managerSectionHtml(current?'其他模板':'可用模板',managerListHtml(available.map(row).join(''))):''}${archived.length?`<details class="strategy-archive manager-section"><summary>已归档 · ${archived.length}</summary>${managerListHtml(archived.map(row).join(''))}</details>`:''}`:managerEmptyHtml('营养模板','把训练日、休息日等目标放在同一模板中，每天选一个。','strategy-empty-create')}${errorHtml()}`
+    dialog.querySelector('#strategy-manager')!.innerHTML=`${back?'<button type="button" class="sheet-link" id="strategy-manager-back">返回当日目标</button>':''}${managerToolbarHtml(`${templates.length} 个模板`,'strategy-create','营养模板',!templates.length)}<p class="manager-section-note">一个模板包含多个日目标方案，每天选择一个。切换模板不改写已保存目标。</p>${templates.length?`${currentHtml}${available.length?managerSectionHtml(current?'其他模板':'可用模板',managerListHtml(available.map(row).join(''))):''}${archived.length?`<details class="strategy-archive manager-section"><summary>已归档 · ${archived.length}</summary>${managerListHtml(archived.map(row).join(''))}</details>`:''}`:managerEmptyHtml('营养模板','把训练日、休息日等目标放在同一模板中，每天选一个。','strategy-empty-create')}<button type="button" class="secondary full-btn" id="strategy-cycles">营养周期排程</button>${errorHtml()}`
 
+    dialog.querySelector('#strategy-cycles')!.addEventListener('click',()=>void showNutritionCycles(ui,()=>void showNutritionStrategyManager(ui,back)))
     observeManagerCatalog(ui.surface,managerRoot,['nutritionStrategyTemplates','nutritionStrategyVariants'],()=>showNutritionStrategyManager(ui,back))
     ui.surface?.restoreScroll()
     dialog.querySelector('#strategy-empty-create')?.addEventListener('click',()=>showNutritionStrategyEditor(ui,undefined,back))

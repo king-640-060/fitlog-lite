@@ -1,3 +1,6 @@
+import { applyScheduledDietTemplate, scheduledNutritionDay, dietTemplateSourceFingerprint } from './services/nutritionCycleService'
+import { showScheduledTargetPreview } from './ui/nutritionCycles'
+import './styles/nutritionCycles.css'
 import { openNutritionCompletionSheet, type CompletionMode } from './ui/nutritionCompletionSheet'
 import { openMealEntry } from './ui/mealEntry'
 import { calorieBudgetHtml } from './ui/calorieBudget'
@@ -15,14 +18,14 @@ import { liveQuery } from 'dexie'
 import { readDailyRecords } from './services/dailyRecordsSummary'
 import { showActionToast } from './ui/actionToast'
 import { observeManagerCatalog } from './ui/observeManagerCatalog'
-import { mountRecovery, recoverySlotHtml, type RecoveryUi } from './ui/recovery'
+import { mountRecovery, recoverySlotHtml, showSleepBackfill, showWaterEditor, type RecoveryUi } from './ui/recovery'
 import { readDailyNutritionSummary, observeDailyNutritionSummary } from './services/dailyNutritionSummary'
 import { macroNutritionSummaryForDay } from './ui/macroNutritionSummary'
 import { managerToolbarHtml, managerSearchHtml, managerListHtml, managerRowHtml, managerEmptyHtml, managerNoResultsHtml, managerUtilitiesHtml, managerSectionHtml } from './ui/managerPrimitives'
 import { createManagementWorkspace, type ManagedSurfaceContext } from './ui/managementWorkspace'
 import { retireLegacyVideoSearchStorage } from './services/retiredVideoStorage'
 import { animateMotion, setupMotionInteractions, stabilizeSheetSubview } from './ui/motion'
-import { dietEventsHtml, bindDietEvents, showDietEvent, type DietEventUi } from './ui/dietEvents'
+import { dietEventEntryHtml, bindDietEvents, showDietEvent, type DietEventUi } from './ui/dietEvents'
 import { bindNumericPresentation } from './ui/numericPresentation'
 import { setupInputModality } from './ui/inputModality'
 import { openSheet, presentDialog, setupSheetViewport } from './ui/sheetController'
@@ -55,7 +58,7 @@ import { db } from './db/database'
 import { getNutritionCompletionSummary, type NutritionCompletionSummary } from './utils/nutritionCompletion'
 import type { CardioActivityType, CardioSession, DietTemplate, Exercise, Food, FoodLog, Habit, HabitCheckIn, MealType, NutritionGoal, NutritionTarget, Task, TaskTag, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
 import { exportBackup, restoreBackup, validateBackup, type ValidatedBackup } from './services/backupService'
-import { clearDayRecords } from './services/dayRecordsService'
+import { calendarOperationsHtml, bindDayRecordManagement } from './ui/dayRecordManagement'
 import { deleteCardioSession, getCardioSessionsByDate, saveCardioSession, updateCardioSession } from './services/cardioService'
 import { deleteFoodLog, deleteFoodLogsForMeal, saveFood, updateFoodLogDetails, validateFoodInput } from './services/foodService'
 import { buildImportPreview, parseFoodCsv, parseFoodJson, type ImportPreview } from './services/importService'
@@ -940,20 +943,27 @@ async function showCalendarDaySheet(date: string,request=++daySheetRequest): Pro
   const owner=document.querySelector('#calendar-host')
   let records=await readDailyRecords(date)
   if(request!==daySheetRequest||!owner?.isConnected)return
-  const dialog=openModal(formatHeaderDate(date),`<h3 class="daily-records-heading">当日记录</h3><div data-daily-records-host>${dailyRecordsHtml(records,esc,true)}</div><section class="calendar-quick-record" aria-label="快捷记录"><h3>快捷记录</h3><div class="calendar-day-actions"><button id="calendar-day-food">${icon('utensils',18)} 饮食</button><button id="calendar-day-workout">${icon('dumbbell',18)} 训练</button><button id="calendar-day-weight">${icon('scale',18)} 体重</button></div></section><div class="calendar-day-danger"><button id="calendar-clear-day" class="danger-button">清空饮食、训练与体重记录</button></div>`,true)
+  const dialog=openModal(formatHeaderDate(date),`<h3 class="daily-records-heading">当日记录</h3><div data-daily-records-host>${dailyRecordsHtml(records,esc,true)}</div>${calendarOperationsHtml()}`,true)
   dialog.classList.add('calendar-detail-sheet')
   const host=dialog.querySelector<HTMLElement>('[data-daily-records-host]')!
   host.addEventListener('click',event=>{const button=(event.target as Element).closest<HTMLElement>('[data-diet-event-edit]');if(button)showDietEvent(dietEventUi(),date,records.source.dietEvents.find(e=>e.id===button.dataset.dietEventEdit))})
-  const sub=liveQuery(()=>readDailyRecords(date)).subscribe({next:value=>{if(!dialog.open||!host.isConnected)return;records=value;updateDailyRecordsHtml(host,dailyRecordsHtml(records,esc,true))},error:fail})
+  const updateManagement=bindDayRecordManagement(dialog,date,()=>records,(title,body,action)=>confirmAction(title,body,action,true),toast)
+  const sub=liveQuery(()=>readDailyRecords(date)).subscribe({next:value=>{if(!dialog.open||!host.isConnected)return;records=value;updateDailyRecordsHtml(host,dailyRecordsHtml(records,esc,true));updateManagement()},error:fail})
   dialog.addEventListener('close',()=>sub.unsubscribe(),{once:true})
   dialog.querySelector('#calendar-day-food')?.addEventListener('click',()=>{dialog.close();activeTab='food';foodDate=date;void render().catch(fail)})
   dialog.querySelector('#calendar-day-workout')?.addEventListener('click',()=>{dialog.close();activeTab='workout';workoutDate=date;currentWorkout=undefined;workoutEditorOpen=false;showWorkoutHistory=false;void render().catch(fail)})
   dialog.querySelector('#calendar-day-weight')?.addEventListener('click',()=>{dialog.close();activeTab='progress';progressView='trend';void render().then(()=>showWeightForm(date,records.summary.weightKg)).catch(fail)})
-  dialog.querySelector('#calendar-clear-day')?.addEventListener('click',async()=>{
-    const day=new Intl.DateTimeFormat('zh-CN',{month:'long',day:'numeric'}).format(new Date(date+'T12:00:00'))
-    if(!await confirmAction(`清空 ${day} 的饮食、训练和体重记录？`,'将删除当天饮食记录、特殊饮食备注、营养目标、力量训练、有氧训练、凯格尔训练和体重记录。睡眠、饮水、习惯打卡与计划任务保留。删除后无法恢复。','清空这些记录'))return
-    try{await clearDayRecords(date);toast('饮食、训练与体重记录已清空')}catch(error){fail(error)}
+  dialog.querySelector('[data-calendar-quick=cardio]')?.addEventListener('click',()=>{dialog.close();showCardioForm(undefined,undefined,date)})
+  dialog.querySelector('[data-calendar-quick=pelvic]')?.addEventListener('click',()=>{dialog.close();workoutDate=date;void showPelvicFloorSetup().catch(fail)})
+  dialog.querySelector('[data-calendar-quick=dietEvent]')?.addEventListener('click',()=>showDietEvent(dietEventUi(),date))
+  dialog.querySelector('[data-calendar-quick=plan]')?.addEventListener('click',()=>{dialog.close();void showTaskEditor(undefined,date).catch(fail)})
+  dialog.querySelector('[data-calendar-quick=habit]')?.addEventListener('click',async()=>{
+    const habits=await getActiveHabits();if(!dialog.open)return
+    const restore=historySubview(dialog,'习惯打卡',`<p class="report-note">${esc(date)}</p><div class="picker-list">${habits.map(h=>`<button type="button" class="picker-item" data-calendar-habit="${esc(h.id)}">${esc(h.name)}</button>`).join('')||'<p class="report-note">暂无已启用习惯；可在管理与设置中创建。</p>'}</div>`)
+    dialog.querySelectorAll<HTMLButtonElement>('[data-calendar-habit]').forEach(button=>button.addEventListener('click',async()=>{if(button.disabled)return;button.disabled=true;try{await toggleHabitCheckIn(button.dataset.calendarHabit!,date);restore()}catch(e){button.disabled=false;fail(e)}}))
   })
+  dialog.querySelector('[data-calendar-quick=sleep]')?.addEventListener('click',()=>{dialog.close();showSleepBackfill(recoveryUi(),date)})
+  dialog.querySelector('[data-calendar-quick=water]')?.addEventListener('click',()=>{dialog.close();showWaterEditor(undefined,recoveryUi(),undefined,date)})
 }
 
 interface PreviousRingValue { actual: number; goal?: number }
@@ -1182,9 +1192,10 @@ async function renderFoodPage(): Promise<void> {
   const requestedDate = foodDate
   const requestVersion = ++foodContentVersion
   const view = document.querySelector<HTMLElement>('#view')!
-  const [nutrition, dietEvents] = await Promise.all([
+  const [nutrition, dietEvents, scheduled] = await Promise.all([
     readDailyNutritionSummary(requestedDate),
     db.dietEvents.where('date').equals(requestedDate).sortBy('createdAt'),
+    scheduledNutritionDay(requestedDate),
   ])
   if (activeTab !== 'food' || !view.isConnected || !isCurrentFoodRender(requestVersion, foodContentVersion, requestedDate, foodDate)) return
   const { logs, target, totals } = nutrition
@@ -1199,11 +1210,12 @@ async function renderFoodPage(): Promise<void> {
   const completionStrip = foodCompletionStripHtml(requestedDate, getNutritionCompletionSummary(target ?? {}, logs))
   const expandedMeals = new Set(Array.from(view.querySelectorAll<HTMLButtonElement>('.food-content-body[data-food-date="' + requestedDate + '"] [data-toggle-meal][aria-expanded="true"]'), button => button.dataset.toggleMeal))
   const slotHtml = `<div class="food-content-body" data-food-date="${requestedDate}">
-    <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">饮食总览</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 16)}</button></div><div class="food-calorie-row">${calorieGaugeHtml(totals.calories, calorieTarget, 'food', previous.get('calories'))}</div><div class="macros" data-macro-summary-host>${macroNutritionSummaryForDay(nutrition)}</div>${target?.strategySelection ? `<p class="strategy-food-source">${esc(target.strategySelection.templateName)} · ${esc(target.strategySelection.variantName)}</p>` : ''}</section>
+    <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">饮食总览</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 16)}</button></div><div class="food-calorie-row">${calorieGaugeHtml(totals.calories, calorieTarget, 'food', previous.get('calories'))}</div><div class="macros" data-macro-summary-host>${macroNutritionSummaryForDay(nutrition)}</div>${target?.strategySelection ? `<p class="strategy-food-source">${esc(target.strategySelection.templateName)} · ${esc(target.strategySelection.variantName)}</p>` : target?.cycleSelection?`<p class="strategy-food-source">${esc(target.cycleSelection.cycleName)} · ${esc(target.cycleSelection.variantName)}</p>`:''}</section>
     ${completionStrip}
-    ${dietEventsHtml(dietEvents, esc)}
+
+    ${scheduled?`<section class="food-cycle-plan"><strong>${esc(scheduled.cycle.name)} · 当日安排</strong><span>${esc(scheduled.day.nutrition?.variantName??'未指定营养目标')} · ${esc(scheduled.day.dietTemplate?.name??'无饮食模板')}</span><p>仅为安排，未计入实际摄入。</p><div>${scheduled.day.nutrition?'<button type="button" class="text-btn" data-food-cycle-target>预览 / 应用目标</button>':''}${scheduled.day.dietTemplate?'<button type="button" class="text-btn" data-food-cycle-diet>预览饮食模板</button>':''}</div></section>`:''}
     <section class="food-meals-head"><div><h2>${isToday ? '今日' : '当日'}饮食</h2><span>${logs.length ? `${logs.length} 项记录` : '按餐次记录，更清楚'}</span></div>${logs.length ? '<button class="food-save-template" id="save-day-diet-template" type="button" aria-label="将当天饮食保存为模板">保存为模板</button>' : ''}</section>
-    <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday, expandedMeals.has(group.meal ?? 'unclassified'))).join('')}</div></div>`
+    <div class="food-meals">${groups.map((group) => foodMealSectionHtml(group, isToday, expandedMeals.has(group.meal ?? 'unclassified'))).join('')}</div>${dietEventEntryHtml(dietEvents, esc)}</div>`
   let rail = view.querySelector<HTMLElement>('.food-date-rail')
   let content = view.querySelector<HTMLElement>('.food-content')
   const firstAppearance = !rail
@@ -1224,10 +1236,15 @@ async function renderFoodPage(): Promise<void> {
     body.querySelectorAll<SVGCircleElement>('[data-final-offset]').forEach((ring) => { ring.style.strokeDashoffset = ring.dataset.finalOffset ?? '' })
     body.querySelectorAll<HTMLElement>('[data-count-to]').forEach((number) => { number.textContent = formatNumber(Number(number.dataset.countTo)) })
   }
+  body.querySelector('[data-food-cycle-target]')?.addEventListener('click',()=>void showScheduledTargetPreview(nutritionStrategyUi(),requestedDate).catch(fail))
+  body.querySelector('[data-food-cycle-diet]')?.addEventListener('click',()=>void showScheduledDietPreview(requestedDate).catch(fail))
   bindFoodContent(body, target, logs)
   bindDietEvents(body, requestedDate, dietEvents, dietEventUi())
   bindFoodHeader()
-  nutritionDispose = observeDailyNutritionSummary(requestedDate, nutrition, () => { if (activeTab === 'food' && foodDate === requestedDate && view.isConnected) void renderFoodPage().catch(fail) }, fail)
+  const scheduledSignature=JSON.stringify(scheduled)
+  const scheduleSub=liveQuery(()=>scheduledNutritionDay(requestedDate)).subscribe({next:next=>{if(activeTab==='food'&&foodDate===requestedDate&&view.isConnected&&JSON.stringify(next)!==scheduledSignature)void renderFoodPage().catch(fail)},error:fail})
+  const stopNutrition = observeDailyNutritionSummary(requestedDate, nutrition, () => { if (activeTab === 'food' && foodDate === requestedDate && view.isConnected) void renderFoodPage().catch(fail) }, fail)
+  nutritionDispose=()=>{stopNutrition();scheduleSub.unsubscribe()}
 }
 
 function bindFoodHeader(): void {
@@ -2103,7 +2120,7 @@ async function showWorkoutTemplateExercisePicker(draft: WorkoutTemplate, surface
   const dialog = mountManagementModal(surface, '添加模板动作', `<label class="search-field">${icon('search', 20)}<input id="template-exercise-search" type="search" placeholder="搜索动作"></label><div id="template-exercise-results" class="picker-list"></div>`, true)
   const draw = (query = '') => {
     const matches = exercises.filter((item) => item.name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
-    dialog.querySelector('#template-exercise-results')!.innerHTML = matches.map((exercise) => `<button class="picker-item" data-pick-template-exercise="${exercise.id}"><strong>${esc(exercise.name)}</strong></button>`).join('') || '<p class="muted">没有匹配动作</p>'
+    dialog.querySelector('#template-exercise-results')!.innerHTML = matches.map((exercise) => `<button class="picker-item" data-pick-template-exercise="${exercise.id}"><strong>${esc(exercise.name)}</strong></button>`).join('') || `<div class="template-exercise-empty" role="status"><span class="template-exercise-empty-icon" aria-hidden="true">${icon('search',20)}</span><p>${exercises.length ? '没有匹配动作' : '动作库还没有动作'}</p>${query.trim() ? '<small>试试其他关键词</small>' : ''}</div>`
     dialog.querySelectorAll<HTMLButtonElement>('[data-pick-template-exercise]').forEach((button) => button.addEventListener('click', () => {
       const exercise = exercises.find((item) => item.id === button.dataset.pickTemplateExercise)!
       draft.exercises.push({ id: crypto.randomUUID(), exerciseId: exercise.id, exerciseName: exercise.name, sets: [{ id: crypto.randomUUID(), reps: 10 }] })
@@ -2119,6 +2136,19 @@ function saveWorkoutAsTemplate(workout: Workout): void {
   dialog.querySelector<HTMLFormElement>('#save-workout-as-template')?.addEventListener('submit', async (event) => {
     event.preventDefault()
     try { await db.workoutTemplates.add(workoutTemplateFromWorkout(workout, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'name'))); dialog.close(); toast('已保存为训练模板') } catch (error) { fail(error) }
+  })
+}
+
+async function showScheduledDietPreview(date:string):Promise<void>{
+  const plan=await scheduledNutritionDay(date);if(!plan?.day.dietTemplate)return
+  const template=await db.dietTemplates.get(plan.day.dietTemplate.id),savedTarget=await db.nutritionTargets.where('date').equals(date).first(),future=date>getLocalDateString()
+  const resolved=template?await resolveDietTemplateFoods(template):[]
+  const dialog=openModal('排程饮食模板预览',`<p>${esc(date)} · ${esc(plan.day.dietTemplate.name)}</p>${template?`<p>${template.items.length} 项食物 · ${formatEnergyInputValue(resolved.reduce((sum,value)=>sum+calculateNutrition(value.food,value.item.grams).calories,0))} kcal</p><div class="cycle-food-preview">${resolved.map(value=>`<p>${esc(value.food.name)} · ${formatNumber(value.item.grams)} g${value.missing?' · 使用模板快照':''}</p>`).join('')}</div>`:'<p role="alert">模板已删除，保留排程名称供追溯，无法实际应用。</p>'}<p class="report-note">${future?'未来日期只能预览。':'确认已实际摄入后才记账；记录使用真实模板服务及当前营养目标冲突处理。'}</p><p role="alert" data-cycle-error hidden></p><button type="button" class="primary full-btn" data-cycle-diet-confirm ${future||!template?'disabled':''}>已实际摄入，确认记账</button>`)
+  let busy=false
+  dialog.querySelector<HTMLButtonElement>('[data-cycle-diet-confirm]')!.addEventListener('click',async e=>{
+    if(busy||!template||future)return;busy=true;const button=e.currentTarget as HTMLButtonElement;button.disabled=true
+    try{let options={};if(template.nutritionGoal&&savedTarget){const choice=await chooseNutritionTargetConflict();if(!choice){button.disabled=false;return}options=choice==='replace'?{replaceNutritionTarget:true}:{preserveNutritionTarget:true}}await applyScheduledDietTemplate(date,plan,template,JSON.stringify(savedTarget??null),options,db,dietTemplateSourceFingerprint(resolved));dialog.close();toast(`已添加 ${template.items.length} 项实际饮食记录`);await renderFoodPage()}
+    catch(e){const error=dialog.querySelector<HTMLElement>('[data-cycle-error]')!;error.hidden=false;error.textContent=e instanceof Error?e.message:'记账失败，请重试';button.disabled=false}finally{busy=false}
   })
 }
 
@@ -2140,22 +2170,23 @@ async function dietTemplateCardHtml(template: DietTemplate): Promise<string> {
   return `<article class="template-card"><div><h3>${esc(template.name)}</h3><p>${names || '暂无食物'}</p><small>${template.items.length} 项 · ${formatEnergyInputValue(calories)} kcal${goal}</small></div><button class="primary compact-button" data-apply-diet-template="${template.id}">添加</button></article>`
 }
 
-async function applySelectedDietTemplate(template: DietTemplate, dialog?: HTMLDialogElement): Promise<void> {
+async function applySelectedDietTemplate(template: DietTemplate, dialog?: HTMLDialogElement, entryDate=foodDate): Promise<boolean> {
   try {
     const resolved = await resolveDietTemplateFoods(template)
     try {
-      await applyDietTemplate(template, foodDate)
+      await applyDietTemplate(template, entryDate)
     } catch (error) {
       if (!(error instanceof NutritionTargetConflictError)) throw error
       const choice = await chooseNutritionTargetConflict()
-      if (!choice) return
-      await applyDietTemplate(template, foodDate, db, choice === 'replace' ? { replaceNutritionTarget: true } : { preserveNutritionTarget: true })
+      if (!choice) return false
+      await applyDietTemplate(template, entryDate, db, choice === 'replace' ? { replaceNutritionTarget: true } : { preserveNutritionTarget: true })
     }
     dialog?.close()
     const missing = resolved.filter((item) => item.missing).length
     toast(missing ? `已添加 ${template.items.length} 项，${missing} 项使用模板快照` : `已添加 ${template.items.length} 项`)
     await renderFoodPage()
-  } catch (error) { fail(error) }
+    return true
+  } catch (error) { fail(error); return false }
 }
 
 async function showDietTemplateManager(query = '', surface?: ManagedSurfaceContext, refreshGuard?:()=>boolean): Promise<void> {
@@ -2270,7 +2301,7 @@ async function showSettings(surface?: ManagedSurfaceContext): Promise<void> {
 }
 
 function showRestorePreview(backup: ValidatedBackup, surface?: ManagedSurfaceContext): void {
-  const counts = [{ label: '睡眠', count: backup.data.sleepSessions.length }, { label: '饮水', count: backup.data.waterLogs.length }, { label: '特殊饮食', count: backup.data.dietEvents.length }, { label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '力量训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }, { label: '训练模板', count: backup.data.workoutTemplates.length }, { label: '饮食模板', count: backup.data.dietTemplates.length }, { label: '营养目标', count: backup.data.nutritionTargets.length }, { label: '凯格尔训练', count: backup.data.pelvicFloorSessions.length }, { label: '有氧训练', count: backup.data.cardioSessions.length }, { label: '习惯', count: backup.data.habits.length }, { label: '习惯打卡', count: backup.data.habitCheckIns.length }, { label: '任务', count: backup.data.tasks.length }, { label: '标签', count: backup.data.taskTags.length }, { label: '营养模板', count: backup.data.nutritionStrategyTemplates.length }, { label: '营养日方案', count: backup.data.nutritionStrategyVariants.length }, { label: '营养阶段', count: backup.data.nutritionStrategyPhases.length }]
+  const counts = [{ label:'营养周期',count:backup.data.nutritionCycles.length }, {label:'周期日期排程',count:backup.data.nutritionCycleDays.length}, { label: '睡眠', count: backup.data.sleepSessions.length }, { label: '饮水', count: backup.data.waterLogs.length }, { label: '特殊饮食', count: backup.data.dietEvents.length }, { label: '食物', count: backup.data.foods.length }, { label: '饮食记录', count: backup.data.foodLogs.length }, { label: '动作', count: backup.data.exercises.length }, { label: '力量训练', count: backup.data.workouts.length }, { label: '体重', count: backup.data.weights.length }, { label: '训练模板', count: backup.data.workoutTemplates.length }, { label: '饮食模板', count: backup.data.dietTemplates.length }, { label: '营养目标', count: backup.data.nutritionTargets.length }, { label: '凯格尔训练', count: backup.data.pelvicFloorSessions.length }, { label: '有氧训练', count: backup.data.cardioSessions.length }, { label: '习惯', count: backup.data.habits.length }, { label: '习惯打卡', count: backup.data.habitCheckIns.length }, { label: '任务', count: backup.data.tasks.length }, { label: '标签', count: backup.data.taskTags.length }, { label: '营养模板', count: backup.data.nutritionStrategyTemplates.length }, { label: '营养日方案', count: backup.data.nutritionStrategyVariants.length }, { label: '营养阶段', count: backup.data.nutritionStrategyPhases.length }]
   if (surface && !surface.alive) return
   const dialog = mountManagementModal(surface, '确认恢复备份', `<div class="restore-counts">${counts.map((item) => `<p><span>${item.label}</span><strong>${item.count}</strong></p>`).join('')}</div><div class="warning">恢复将清除当前所有数据，并替换为该备份。</div><button class="danger-button full-btn" id="confirm-restore">继续恢复</button>`)
   dialog.querySelector('#confirm-restore')?.addEventListener('click', async () => { if (!await confirmAction('覆盖当前全部数据？', '恢复会清除当前数据并替换为备份内容，此操作无法撤销。', '恢复备份')) return; try { await restoreBackup(backup); surface ? surface.close() : dialog.close(); currentWorkout = undefined; workoutEditorOpen = false; toast('恢复完成'); await render() } catch (error) { fail(error) } })

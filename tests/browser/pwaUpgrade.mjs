@@ -37,7 +37,7 @@ const read=async page=>page.evaluate(async()=>{
 const canonical=value=>JSON.stringify({...value,records:Object.fromEntries(Object.entries(value.records).sort(([a],[b])=>a.localeCompare(b)).map(([k,rows])=>[k,rows.sort((a,b)=>a.id.localeCompare(b.id))]))})
 const hash=value=>createHash('sha256').update(canonical(value)).digest('hex')
 const verifyMigration=(before,after)=>{
- assert.equal(after.version,110);assert.equal(Object.keys(after.records).length,20)
+ assert.equal(after.version,120);assert.equal(Object.keys(after.records).length,22)
  for(const name of ['nutritionStrategyTemplates','nutritionStrategyVariants','nutritionStrategyPhases','dietEvents','sleepSessions','waterLogs'])assert.deepEqual(after.records[name],[],'additive migration must not synthesize goals/strategies')
  const preserved={version:before.version,records:Object.fromEntries(Object.keys(before.records).map(k=>[k,after.records[k]])),ai:after.ai}
  assert.equal(hash(preserved),hash(before),'all original records and AI credentials preserved across V7 to V11')

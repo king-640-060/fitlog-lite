@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FitLog Lite｜添加模板动作·搜索空状态原型 v0.1</title>
+<style>
+:root{color-scheme:dark;--outside:#07100c;--sheet:#29352d;--ink:#f2f3ef;--secondary:#abb6ad;--subtle:#829188;--line:#3d4c43;--input:#29352d;--muted:#aab8ae;--border:#536157;--accent:#afc5a1;--focus:#bbd0ae}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue",Arial,sans-serif}body{background:#131a16;color:#e9ede8;-webkit-font-smoothing:antialiased}button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:2px solid var(--focus);outline-offset:3px}button:focus:not(:focus-visible){outline:none}
+.workspace{min-height:100dvh;display:flex;justify-content:center;align-items:flex-start;gap:28px;padding:16px 20px 32px}.device{position:relative;isolation:isolate;flex:0 0 416px;width:416px;min-height:890px;height:min(930px,calc(100dvh - 32px));max-height:960px;border:1px solid #364139;border-radius:40px;overflow:hidden;background:var(--outside);box-shadow:0 22px 70px #0006;color:var(--ink)}.status{height:75px;position:relative;display:flex;justify-content:space-between;align-items:flex-start;padding:17px 31px 0 37px;color:#f7f9f6;font-size:15px;font-weight:700;letter-spacing:-.3px}.dynamic-island{position:absolute;left:50%;top:11px;transform:translateX(-50%);height:40px;width:158px;background:#030805;border-radius:30px;border:1px solid #12461c}.signal{display:flex;align-items:center;gap:7px;font-size:14px}.bars{font-size:13px;letter-spacing:-3px}.battery{display:inline-block;background:#bfc5be;color:#151a15;font-size:12px;border-radius:4px;padding:0 4px;line-height:17px}
+.sheet{position:absolute;inset:74px 0 0;border-radius:29px 29px 0 0;background:var(--sheet);display:flex;flex-direction:column;min-height:0;padding-bottom:env(safe-area-inset-bottom,0px)}.handle{margin:10px auto 0;width:39px;height:5px;background:#415146;border-radius:100px;flex:none}.sheet-header{margin:0 18px;padding:20px 0 9px;min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:14px}.sheet-header h1{font-size:22px;font-weight:760;line-height:1.2;margin:0;letter-spacing:-.02em}.close{display:grid;place-items:center;width:44px;height:44px;border:0;background:transparent;color:var(--secondary);border-radius:12px;font-size:29px;font-weight:200;line-height:1}.sheet-body{min-height:0;flex:1;overflow-y:auto;overscroll-behavior:contain;padding:16px 19px 24px}.search-field{position:relative;display:block;height:48px;margin:0}.search-field input{display:block;width:100%;height:48px;border:1px solid transparent;background:var(--input);border-radius:11px;color:var(--ink);font-size:16px;padding:0 38px 0 45px;outline:none}.search-field input::placeholder{color:var(--secondary);opacity:1}.search-field input:focus{border-color:var(--border);background:color-mix(in srgb,var(--sheet) 89%,white)}.search-icon{position:absolute;top:50%;left:15px;transform:translateY(-50%);width:23px;height:23px;fill:none;stroke:var(--secondary);stroke-linecap:round;stroke-linejoin:round;stroke-width:2;pointer-events:none}.clear{position:absolute;right:5px;top:4px;height:40px;width:40px;background:transparent;color:var(--secondary);border:0;border-radius:8px;font-size:21px;display:none}.search-field.has-value .clear{display:block}.picker-list{min-height:0;display:grid;align-content:start;gap:0}.picker-item{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;min-height:62px;padding:12px 2px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent;color:var(--ink);text-align:left;font-size:16px}.picker-item span{color:var(--secondary);font-size:13px}.picker-item:active{opacity:.68}.picker-item strong{font-weight:630}
+/* Scoped preview of the approved proposal; other picker states retain current list rhythm. */
+.empty-state{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0;padding:65px 12px 16px;gap:0}.empty-icon{height:43px;width:43px;margin-bottom:15px;display:grid;place-items:center;border:1px solid var(--line);border-radius:15px;color:var(--subtle);background:color-mix(in srgb,var(--sheet) 93%,white)}.empty-icon svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.empty-title{margin:0;color:var(--secondary);font-size:15px;font-weight:540;line-height:1.55}.empty-support{margin:9px 0 0;color:var(--subtle);font-size:12px;line-height:1.65}.old .empty-state{display:block;text-align:left;padding:6px 0 0}.old .empty-icon,.old .empty-support{display:none}.old .empty-title{font-size:16px;font-weight:400}.list-note{font-size:12px;color:var(--subtle);margin:14px 0 4px}.outcome{position:absolute;bottom:18px;left:22px;color:var(--secondary);font-size:13px;opacity:.65}.closed-notice{position:absolute;inset:75px 0 0;display:none;place-content:center;text-align:center;gap:10px;background:var(--outside);padding:20px}.closed-notice p{color:var(--secondary)}.closed-notice button{height:44px;border:1px solid var(--line);border-radius:12px;background:var(--sheet);color:var(--ink);padding:0 18px}.is-closed .closed-notice{display:grid}.is-closed .sheet{display:none}
+.panel{width:278px;align-self:flex-start;border:1px solid #35433a;border-radius:20px;padding:19px;background:#1b251f;color:#e7ede7;margin-top:32px}.panel h2{font-size:16px;margin:0 0 8px}.panel p{font-size:12px;color:#a9b8ab;line-height:1.7;margin:0 0 17px}.panel label{display:block;font-size:12px;color:#abb8ad;margin-bottom:7px}.panel .toggle{display:flex;gap:7px;margin-bottom:18px}.panel .toggle button{flex:1;border:1px solid #4b5e50;border-radius:10px;padding:9px 8px;color:#b9cabc;background:transparent;font-size:12px;min-height:40px}.panel .toggle button[aria-pressed=true]{background:#38503b;border-color:#6e8b65;color:#fff}.panel .notes{border-top:1px solid #35443a;padding-top:15px;font-size:12px;line-height:1.75;color:#b0c0b1;margin-top:17px}.panel .notes strong{color:#edf3e8}.mobile-demo-toggle{display:none}
+.device.light{--outside:#f0f0e9;--sheet:#fcfbf6;--ink:#303a32;--secondary:#727f72;--subtle:#8e998e;--line:#e3e6dc;--input:#f4f5ee;--muted:#6d776b;--border:#a9b99f;--accent:#526f43;--focus:#637e54}.device.light .status{color:#202a23}.device.light .signal{color:#202a23}.device.light .dynamic-island{background:#040806}.device.light .handle{background:#d9ddd4}.device.light .empty-icon{background:#f7f8f2}.device.light .battery{background:#444;color:#fff}.device.light .close{color:#606c60}
+@media(max-width:760px){body{background:#121b14}.workspace{display:block;padding:0}.device{width:100%;height:100dvh;min-height:600px;max-height:none;border:0;border-radius:0;box-shadow:none}.panel{position:fixed;z-index:10;left:10px;right:10px;bottom:9px;width:auto;margin:0;padding:13px 15px 15px;border:1px solid #526257;box-shadow:0 14px 44px #0008;transform:translateY(calc(100% + 24px));transition:transform .22s ease;max-height:70dvh;overflow:auto}.panel.open{transform:translateY(0)}.mobile-demo-toggle{position:fixed;display:block;z-index:11;right:12px;bottom:18px;min-height:44px;padding:0 13px;border:1px solid #667c67;border-radius:14px;background:#1c3021f0;color:#edf4e7;font-size:12px;box-shadow:0 5px 24px #0005}.panel.open~.mobile-demo-toggle{bottom:min(72dvh,380px)}}
+@media(prefers-reduced-motion:reduce){.panel{transition:none}}
+</style>
+</head>
+<body>
+<div class="workspace">
+<div class="device" id="device" aria-label="FitLog Lite 原型手机预览">
+ <div class="status" aria-hidden="true"><span>19:22</span><span class="dynamic-island"></span><span class="signal"><span class="bars">▂▄▆█</span> 5G <span class="battery">28</span></span></div>
+ <section class="sheet" aria-label="添加模板动作">
+  <div class="handle" aria-hidden="true"></div>
+  <header class="sheet-header"><h1>添加模板动作</h1><button class="close" id="close" aria-label="关闭">×</button></header>
+  <main class="sheet-body">
+   <label class="search-field" id="search-field"><svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="7.6"></circle><path d="m16.5 16.5 5 5"></path></svg><input id="search" type="search" placeholder="搜索动作" autocomplete="off" aria-label="搜索动作"><button class="clear" id="clear" type="button" aria-label="清空搜索">×</button></label>
+   <div class="picker-list" id="results" aria-live="polite"></div>
+  </main>
+ </section>
+ <div class="closed-notice"><h2>已关闭添加模板动作</h2><p>仅用于演示关闭与返回操作。</p><button id="reopen">重新打开</button></div>
+</div>
+<aside class="panel" id="panel" aria-label="原型交互控制">
+ <h2>原型交互控制 · v0.1</h2><p>这些切换控件仅用于检查原型，不属于生产界面。可直接在模拟界面输入搜索词。</p>
+ <label>视觉对照</label><div class="toggle" id="layout-switch"><button data-layout="new" aria-pressed="true">优化后</button><button data-layout="old" aria-pressed="false">当前布局</button></div>
+ <label>动作数据</label><div class="toggle" id="data-switch"><button data-data="empty" aria-pressed="true">空动作库</button><button data-data="sample" aria-pressed="false">示例动作</button></div>
+ <label>外观</label><div class="toggle" id="theme-switch"><button data-theme="dark" aria-pressed="true">深色</button><button data-theme="light" aria-pressed="false">浅色</button></div>
+ <div class="notes"><strong>可检查的状态</strong><div>① 空动作库（截图同类情况）</div><div>② 输入不存在的搜索词</div><div>③ 有匹配结果并点击动作</div><div>④ 前后布局对照、深浅主题</div><br>这里仅演示视觉与交互，不访问业务数据，也不创建实际训练模板。</div>
+</aside>
+<button class="mobile-demo-toggle" id="mobile-tools" aria-expanded="false" aria-controls="panel">原型设置</button>
+</div>
+<script>
+(() => {
+ const device=document.getElementById('device'),results=document.getElementById('results'),input=document.getElementById('search'),field=document.getElementById('search-field'),panel=document.getElementById('panel'),tools=document.getElementById('mobile-tools');
+ const data=[{name:'杠铃卧推',group:'胸部'},{name:'哑铃上斜卧推',group:'胸部'},{name:'深蹲',group:'腿部'},{name:'坐姿划船',group:'背部'},{name:'罗马尼亚硬拉',group:'腿部'}];
+ let currentData='empty',layout='new';
+ const searchIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="7.6"></circle><path d="m16.5 16.5 5 5"></path></svg>';
+ const safe=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+ function draw(){const q=input.value.trim().toLocaleLowerCase();field.classList.toggle('has-value',!!input.value);const a=(currentData==='empty'?[]:data).filter(e=>e.name.toLocaleLowerCase().includes(q));
+ if(a.length){results.innerHTML=a.map(e=>`<button class="picker-item" type="button" data-item="${safe(e.name)}"><strong>${safe(e.name)}</strong><span>${safe(e.group)}</span></button>`).join('');results.querySelectorAll('.picker-item').forEach(b=>b.addEventListener('click',()=>{alert('模拟选择：'+b.dataset.item+'\n\n正式应用会回到训练模板编辑器，此原型不会保存任何数据。')}));}
+ else results.innerHTML=`<div class="empty-state" role="status"><span class="empty-icon">${searchIcon}</span><p class="empty-title">没有匹配动作</p>${q?'<p class="empty-support">可以尝试其他关键词</p>':''}</div>`;}
+ document.querySelectorAll('[data-layout]').forEach(b=>b.addEventListener('click',()=>{layout=b.dataset.layout;device.classList.toggle('old',layout==='old');document.querySelectorAll('[data-layout]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));draw()}));
+ document.querySelectorAll('[data-data]').forEach(b=>b.addEventListener('click',()=>{currentData=b.dataset.data;document.querySelectorAll('[data-data]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));draw()}));
+ document.querySelectorAll('[data-theme]').forEach(b=>b.addEventListener('click',()=>{device.classList.toggle('light',b.dataset.theme==='light');document.querySelectorAll('[data-theme]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)))}));
+ input.addEventListener('input',draw);document.getElementById('clear').addEventListener('click',()=>{input.value='';draw();input.focus()});
+ document.getElementById('close').addEventListener('click',()=>{device.classList.add('is-closed');input.blur()});document.getElementById('reopen').addEventListener('click',()=>device.classList.remove('is-closed'));
+ tools.addEventListener('click',()=>{const open=panel.classList.toggle('open');tools.setAttribute('aria-expanded',String(open));tools.textContent=open?'关闭设置':'原型设置';});draw();
+})();
+</script>
+</body>
+</html>

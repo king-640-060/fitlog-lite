@@ -1,6 +1,6 @@
 import { resolveSleepBusinessDate, sleepQueryWindow } from '../utils/sleepBusinessDate'
 import { db, type FitLogDatabase } from '../db/database'
-import type { FoodLog, NutritionTarget, Workout, CardioSession, PelvicFloorSession, WeightLog, DietEvent, Habit, HabitCheckIn, SleepSession, WaterLog } from '../db/types'
+import type { FoodLog, NutritionTarget, Workout, CardioSession, PelvicFloorSession, WeightLog, DietEvent, Habit, HabitCheckIn, SleepSession, WaterLog, Task } from '../db/types'
 import { pelvicFloorSessionDurationSeconds } from './pelvicFloorService'
 import { shiftLocalDate } from '../utils/date'
 import { latestValidDayWeight, recoveryDayFacts } from '../utils/recovery'
@@ -8,16 +8,16 @@ import { latestValidDayWeight, recoveryDayFacts } from '../utils/recovery'
 export interface DailyRecordsSource {
   foodLogs: FoodLog[]; nutritionTargets: NutritionTarget[]; workouts: Workout[]; cardioSessions: CardioSession[]
   pelvicFloorSessions: PelvicFloorSession[]; weights: WeightLog[]; dietEvents: DietEvent[]
-  habits: Habit[]; habitCheckIns: HabitCheckIn[]; sleepSessions: SleepSession[]; waterLogs: WaterLog[]
+  habits: Habit[]; habitCheckIns: HabitCheckIn[]; sleepSessions: SleepSession[]; waterLogs: WaterLog[]; tasks?: Task[]
 }
 export interface DailyRecordsSummary {
   date: string; dietEvents?: DietEvent[]; foodLogCount: number; calories?: number; protein?: number; carbs?: number; fat?: number
   nutritionTarget?: NutritionTarget; hasWorkout: boolean; workoutCount: number; setCount: number
   cardioCount: number; cardioMinutes: number; pelvicFloorSessionCount: number; pelvicFloorContractions: number; pelvicFloorSeconds: number
-  weightKg?: number; habitCount?: number; sleepCount?: number; sleepMinutes?: number; waterCount?: number; waterMl?: number
+  weightKg?: number; habitCount?: number; sleepCount?: number; sleepMinutes?: number; waterCount?: number; waterMl?: number; planCount?: number
 }
 export interface DailyRecords { date: string; source: DailyRecordsSource; summary: DailyRecordsSummary }
-export const dailyRecordTables = ['foodLogs','nutritionTargets','workouts','cardioSessions','pelvicFloorSessions','weights','dietEvents','habits','habitCheckIns','sleepSessions','waterLogs'] as const
+export const dailyRecordTables = ['foodLogs','nutritionTargets','workouts','cardioSessions','pelvicFloorSessions','weights','dietEvents','habits','habitCheckIns','sleepSessions','waterLogs','tasks'] as const
 /** Bounded business-date reads; no library join or historical snapshot recalculation. */
 export async function readDailyRecordsSource(start: string, end: string, database: FitLogDatabase = db, allHabitDefinitions = false): Promise<DailyRecordsSource> {
   return database.transaction('r', dailyRecordTables.map(t=>database.table(t)), async()=>{
@@ -37,12 +37,12 @@ export function buildDailyRecords(source: DailyRecordsSource, date: string): Dai
   const day={} as DailyRecordsSource
   for(const table of dailyRecordTables) {
     if(table==='habits')continue
-    ;(day as unknown as Record<string,unknown>)[table]=(source[table] as Array<{date?:string;recordDate?:string;endTime?:string}>).filter(r=>table==='sleepSessions'?!!r.endTime&&resolveSleepBusinessDate(r as SleepSession)===date:r.date===date)
+    ;(day as unknown as Record<string,unknown>)[table]=((source[table] ?? []) as Array<{date?:string;recordDate?:string;endTime?:string}>).filter(r=>table==='sleepSessions'?!!r.endTime&&resolveSleepBusinessDate(r as SleepSession)===date:r.date===date)
   }
   day.habits=source.habits.filter(h=>day.habitCheckIns.some(c=>c.habitId===h.id))
   const food=day.foodLogs, recovery=recoveryDayFacts(day.sleepSessions,day.waterLogs,date)
   const macro=(key:'totalProtein'|'totalCarbs'|'totalFat')=>food.length&&food.every(l=>l[key]!==undefined)?food.reduce((n,l)=>n+l[key]!,0):undefined
-  const summary:DailyRecordsSummary={date,dietEvents:day.dietEvents,foodLogCount:food.length,calories:food.length?food.reduce((n,l)=>n+l.totalCalories,0):undefined,protein:macro('totalProtein'),carbs:macro('totalCarbs'),fat:macro('totalFat'),nutritionTarget:day.nutritionTargets[0],hasWorkout:!!day.workouts.length,workoutCount:day.workouts.length,setCount:day.workouts.reduce((n,w)=>n+w.exercises.reduce((s,e)=>s+e.sets.length,0),0),cardioCount:day.cardioSessions.length,cardioMinutes:day.cardioSessions.reduce((n,c)=>n+c.durationMinutes,0),pelvicFloorSessionCount:day.pelvicFloorSessions.length,pelvicFloorContractions:day.pelvicFloorSessions.reduce((n,s)=>n+s.completedRepetitions,0),pelvicFloorSeconds:day.pelvicFloorSessions.reduce((n,s)=>n+pelvicFloorSessionDurationSeconds(s),0),weightKg:latestValidDayWeight(day.weights,date),habitCount:day.habitCheckIns.length,sleepCount:recovery.sessions.length,sleepMinutes:recovery.minutes,waterCount:recovery.drinks.length,waterMl:recovery.waterMl}
+  const summary:DailyRecordsSummary={date,dietEvents:day.dietEvents,foodLogCount:food.length,calories:food.length?food.reduce((n,l)=>n+l.totalCalories,0):undefined,protein:macro('totalProtein'),carbs:macro('totalCarbs'),fat:macro('totalFat'),nutritionTarget:day.nutritionTargets[0],hasWorkout:!!day.workouts.length,workoutCount:day.workouts.length,setCount:day.workouts.reduce((n,w)=>n+w.exercises.reduce((s,e)=>s+e.sets.length,0),0),cardioCount:day.cardioSessions.length,cardioMinutes:day.cardioSessions.reduce((n,c)=>n+c.durationMinutes,0),pelvicFloorSessionCount:day.pelvicFloorSessions.length,pelvicFloorContractions:day.pelvicFloorSessions.reduce((n,s)=>n+s.completedRepetitions,0),pelvicFloorSeconds:day.pelvicFloorSessions.reduce((n,s)=>n+pelvicFloorSessionDurationSeconds(s),0),weightKg:latestValidDayWeight(day.weights,date),habitCount:day.habitCheckIns.length,sleepCount:recovery.sessions.length,sleepMinutes:recovery.minutes,waterCount:recovery.drinks.length,waterMl:recovery.waterMl,planCount:day.tasks?.length??0}
   return {date,source:day,summary}
 }
 export async function readDailyRecords(date:string,database:FitLogDatabase=db):Promise<DailyRecords>{return buildDailyRecords(await readDailyRecordsSource(date,date,database),date)}

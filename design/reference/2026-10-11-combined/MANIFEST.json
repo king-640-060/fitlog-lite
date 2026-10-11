@@ -1,0 +1,135 @@
+{
+  "package": "FitLog Lite combined Codex handoff",
+  "version": "2026-10-11.v1",
+  "repository": "king-640-060/fitlog-lite",
+  "entrypoint": "CODEX_TASK.md",
+  "prototype_policy": "Four supplied interactive HTML references; unchanged originals; read and hash-verify before implementation.",
+  "scope": "Special Diet UI, Template Exercise Picker empty-state, 10-category calendar/day detail with controlled deletion, flexible nutrition cycle schedule, local report date and dark theme icon fixes.",
+  "out_of_scope": [
+    "new period/cycle report UI (not yet approved as a prototype)",
+    "unrelated workout defects",
+    "all unrelated refactors"
+  ],
+  "files": [
+    {
+      "path": "ACCEPTANCE_MATRIX.md",
+      "size_bytes": 4176,
+      "sha256": "4ead2dc7c6c5fec0b257c7d70842fef7cdfb51aa182cae8344665ff3f17dd297"
+    },
+    {
+      "path": "CODEX_TASK.md",
+      "size_bytes": 18290,
+      "sha256": "bce3f45c151bae4b00be4de80c6b84c38581684869d7888c5c8303f9bb24d6f9"
+    },
+    {
+      "path": "README.md",
+      "size_bytes": 2549,
+      "sha256": "cd0c2b9a84e6408810415890838b209c9ecec99f3b4c60ae089fb1a71ebfe076"
+    },
+    {
+      "path": "previews/FitLog_Calendar_10_Categories_Prototype_v0.1_calendar_dark.png",
+      "size_bytes": 47967,
+      "sha256": "871c38f70a79442b191cbdf0650ea5edffb6b43706b0aa965517539bb454f1a8"
+    },
+    {
+      "path": "previews/FitLog_Calendar_10_Categories_Prototype_v0.1_calendar_light.png",
+      "size_bytes": 48924,
+      "sha256": "829038e31758749a92069dfba2b392f25a32afda5643ee837b2c322873f064db"
+    },
+    {
+      "path": "previews/FitLog_Calendar_10_Categories_Prototype_v0.1_sheet_dark.png",
+      "size_bytes": 53048,
+      "sha256": "ba2451f036941a254de87ca3c463ee08a7c69eefa1eeffca6546a612ae13fa2e"
+    },
+    {
+      "path": "previews/FitLog_Nutrition_Cycle_Prototype_v0.1_320_dark.png",
+      "size_bytes": 185339,
+      "sha256": "1615b5fb5543750f0b98315d5744c403902fa1f13e6f5a9eb00be83b6a3b8672"
+    },
+    {
+      "path": "previews/FitLog_Nutrition_Cycle_Prototype_v0.1_390_dark.png",
+      "size_bytes": 188637,
+      "sha256": "f947d7dfa04283c6893c3dd8c515fa312cc0efdd50666ab6f740bd0ece2644af"
+    },
+    {
+      "path": "previews/FitLog_Nutrition_Cycle_Prototype_v0.1_390_light.png",
+      "size_bytes": 194896,
+      "sha256": "829876a7d1392bb30df5fa8c108364c7ea4adca174233570836237cf99f707b9"
+    },
+    {
+      "path": "previews/FitLog_Nutrition_Cycle_Prototype_v0.1_430_dark.png",
+      "size_bytes": 188813,
+      "sha256": "ea39ef22857dc548845c98fab653dda90194bda0854cbf27557833dcf7c5d8a4"
+    },
+    {
+      "path": "previews/FitLog_Nutrition_Cycle_Prototype_v0.1_assign_preview.png",
+      "size_bytes": 71001,
+      "sha256": "69e094ed3343364b13c1f861088dd795d65bbc8dfc8a654c3e05b637f66a3a6c"
+    },
+    {
+      "path": "previews/FitLog_Nutrition_Cycle_Prototype_v0.1_week_preview.png",
+      "size_bytes": 70976,
+      "sha256": "a22e7b43d8e61a290a71370df63566d658e435ad7d25c8fc04bfdc6c3709f891"
+    },
+    {
+      "path": "previews/FitLog_Template_Exercise_EmptyState_Prototype_v0.1_preview.png",
+      "size_bytes": 21686,
+      "sha256": "9418d40e18401c7fce914ea56dff1edd8f57aaa964e18638b4e0390699e8a2e7"
+    },
+    {
+      "path": "prototypes/FitLog_Calendar_10_Categories_Interactive_Prototype_v0.1.html",
+      "size_bytes": 20106,
+      "sha256": "1ad3131b6dca4f863005c90b47491fc5d67b5773e8cc21bead23f59911134387"
+    },
+    {
+      "path": "prototypes/FitLog_Nutrition_Cycle_Schedule_Interactive_Prototype_v0.1.html",
+      "size_bytes": 25169,
+      "sha256": "0d42580f17d9d5a5d6e66c1947a30ca0ebc26424e682d7242fab5f45b5e6d5ed"
+    },
+    {
+      "path": "prototypes/FitLog_Special_Diet_Interactive_Prototype_v0.1.html",
+      "size_bytes": 28728,
+      "sha256": "bb166e5f7c1aedfc5940015a1b7626cf13b0280f25d5dda164ebed9e19b46c26"
+    },
+    {
+      "path": "prototypes/FitLog_Template_Exercise_EmptyState_Prototype_v0.1.html",
+      "size_bytes": 13067,
+      "sha256": "31f9d9b0780db4b7ee75c91b9802305932560f0bd5f50de0706c83a82428aa9b"
+    },
+    {
+      "path": "references/calendar_original.jpg",
+      "size_bytes": 100015,
+      "sha256": "7ff7ca34323b45c738601ff3ce7374eda161705badbd0cbeab5bab8880777450"
+    },
+    {
+      "path": "references/day_sheet_original.png",
+      "size_bytes": 207915,
+      "sha256": "8509fa15e0168a2729399e15059d7152c6595dfc49e81dd374f5fe254063a9c1"
+    },
+    {
+      "path": "references/day_sheet_records_original.png",
+      "size_bytes": 192628,
+      "sha256": "69557e7d282af3d4eb7cc2b8e2a11886a67650d693cfe9c879520c71e26b2da6"
+    },
+    {
+      "path": "references/report_categories_original.png",
+      "size_bytes": 277241,
+      "sha256": "457539b715fc68ab6ac80847b275b1690b5e90cc9fd8b9b62d4d065f684ac79f"
+    },
+    {
+      "path": "references/report_original.png",
+      "size_bytes": 323579,
+      "sha256": "b6f5d9b309245a94bf6f81fc8f98aa049a2289333938de8d3965fa9292eb2848"
+    },
+    {
+      "path": "references/special_diet_original.png",
+      "size_bytes": 428072,
+      "sha256": "bfd4f45032a77ca9eef0de15480cdc46a67d2e54000d8f9b759680040fa5f0bc"
+    },
+    {
+      "path": "references/template_picker_original.png",
+      "size_bytes": 105095,
+      "sha256": "666730a8fc194af8cc484d79f8a194a4a85a21b110ab05b4ea3cfc3161aaef4a"
+    }
+  ]
+}

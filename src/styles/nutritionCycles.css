@@ -1,0 +1,52 @@
+/* Approved cycle prototype anatomy, production rem sizes and >=44px controls. */
+.nutrition-cycle { display:grid; gap:16px; min-width:0; }
+.nutrition-cycle :is(h3,p) { margin:0; }
+.nutrition-cycle h3 { font-size:1rem; font-weight:650; }
+.cycle-subtitle, .cycle-stat, .cycle-boundary { color:var(--text-secondary); font-size:.8125rem; line-height:1.6; overflow-wrap:anywhere; }
+.cycle-card { display:grid; gap:12px; padding:15px; border:1px solid var(--border); border-radius:19px; background:var(--surface); min-width:0; }
+.cycle-card > label, .cycle-date-fields label { display:grid; gap:6px; min-width:0; font-size:.75rem; color:var(--text-secondary); }
+.cycle-card input:not([type=checkbox]), .cycle-card select { min-width:0; width:100%; min-height:44px; font-size:1rem; }
+.cycle-date-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.cycle-date-fields button { min-width:0; padding:8px; font-size:.8125rem; overflow-wrap:anywhere; }
+.cycle-boundary { padding:10px; border:1px dashed var(--border); border-radius:12px; font-size:.75rem; }
+.cycle-stat { font-size:.75rem; }
+.cycle-section-title { margin-bottom:10px!important; }
+[data-cycle-weeks] { display:grid; gap:10px; margin-top:12px; }
+.cycle-week { margin:0; border:1px solid var(--border); border-radius:16px; background:var(--surface); padding:10px; min-width:0; }
+.cycle-week summary { min-height:44px; display:grid; gap:4px; padding:0 0 8px; cursor:pointer; list-style:none; }
+.cycle-week summary strong { font-size:.8125rem; overflow-wrap:anywhere; }
+.cycle-week summary span { color:var(--text-secondary); font-size:.75rem; }
+.cycle-week-scroll { overflow-x:auto; overscroll-behavior-x:contain; }
+.cycle-week-grid { display:grid; grid-template-columns:repeat(7,minmax(44px,1fr)); gap:4px; min-width:max(332px,20.75rem); }
+.cycle-date { display:flex; min-width:44px; min-height:83px; flex-direction:column; align-items:center; gap:4px; padding:6px 3px; background:var(--surface-soft); border:1px solid var(--border); border-radius:11px; font-size:.75rem; color:var(--text-primary); }
+.cycle-date strong { font-size:.9375rem; }
+.cycle-date small, .cycle-date span { font-size:.6875rem; font-weight:500; overflow-wrap:anywhere; }
+.cycle-date small { color:var(--text-secondary); }
+.cycle-date[aria-pressed=true], .nutrition-cycle .cycle-variant[aria-pressed=true] { border-color:var(--accent-mid); background:var(--accent-soft); }
+.cycle-week-actions, .cycle-masks { display:flex; gap:4px 10px; flex-wrap:wrap; }
+.cycle-week-actions button { font-size:.75rem; padding-inline:6px; }
+.cycle-variants { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+.nutrition-cycle .cycle-variant { display:grid; grid-template-columns:minmax(0,1fr); align-items:start; align-content:start; justify-content:stretch; gap:6px; min-height:79px; padding:12px; border-color:var(--border); text-align:left; }
+.cycle-variant strong { font-size:.875rem; overflow-wrap:anywhere; }
+.cycle-variant small { color:var(--text-secondary); font-size:.75rem; line-height:1.6; font-weight:400; overflow-wrap:anywhere; }
+.cycle-masks label { display:flex; align-items:center; min-height:44px; gap:6px; font-size:.8125rem; }
+.cycle-masks input { width:20px; height:20px; flex:none; }
+.cycle-assign-actions { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; }
+.cycle-assign-actions button { font-size:.8125rem; white-space:normal; }
+.cycle-preview-heading { display:flex; align-items:center; gap:8px; justify-content:space-between; }
+.cycle-preview-heading button { font-size:.75rem; }
+[data-cycle-preview-list] { display:grid; gap:7px; }
+.cycle-preview-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px; min-height:53px; border:1px solid var(--border); border-radius:12px; background:var(--surface); }
+.cycle-preview-row > div { display:grid; min-width:0; gap:5px; overflow-wrap:anywhere; }
+.cycle-preview-row strong, .cycle-preview-row span, .cycle-preview-row small { font-size:.75rem; }
+.cycle-preview-row span, .cycle-preview-row small { color:var(--text-secondary); line-height:1.5; }
+.cycle-preview-row button { flex:none; font-size:.75rem; }
+[data-cycle-error] { color:var(--danger); overflow-wrap:anywhere; }
+.food-cycle-plan { display:grid; gap:6px; padding:12px; border:1px solid var(--border); border-radius:14px; background:var(--surface); }
+.food-cycle-plan strong { font-size:.875rem; }
+.food-cycle-plan > span, .food-cycle-plan p { color:var(--text-secondary); font-size:.75rem; margin:0; }
+.food-cycle-plan > div { display:flex; flex-wrap:wrap; gap:4px 12px; }
+.food-cycle-plan button { font-size:.8125rem; }
+@media(max-width:23em) { .cycle-date-fields, .cycle-assign-actions { grid-template-columns:minmax(0,1fr); } }
+
+#strategy-cycles { white-space:nowrap; }

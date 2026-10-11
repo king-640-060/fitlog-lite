@@ -237,6 +237,7 @@ export interface NutritionTarget extends NutritionGoal {
   date: string
   sourceTemplateId?: string // Existing DietTemplate origin; distinct from nutrition strategies.
   strategySelection?: NutritionStrategySelection
+  cycleSelection?: NutritionCycleSelection
   createdAt: string
   updatedAt: string
 }
@@ -341,7 +342,7 @@ export interface BackupDataV9 extends BackupBase {
   data: BackupDataV8['data']
 }
 
-export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6 | BackupDataV7 | BackupDataV8 | BackupDataV9 | BackupDataV10 | BackupDataV11
+export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6 | BackupDataV7 | BackupDataV8 | BackupDataV9 | BackupDataV10 | BackupDataV11 | BackupDataV12
 
 /** Context only: estimates never contribute to canonical FoodLog nutrition. */
 export interface DietEvent {
@@ -379,4 +380,25 @@ export interface WaterLog {
 export interface BackupDataV11 extends BackupBase {
   schemaVersion: 11
   data: BackupDataV10['data'] & { sleepSessions: SleepSession[]; waterLogs: WaterLog[] }
+}
+
+
+/** Planned choices are not consumed food or saved daily targets. */
+export interface NutritionCycle {
+  id: string; name: string; startDate: string; endDate: string
+  templateId: string; templateName: string; revision: number
+  archivedAt?: string; createdAt: string; updatedAt: string
+}
+export interface NutritionCycleSelection {
+  cycleId: string; cycleName: string; templateId: string; templateName: string; variantId: string; variantName: string
+}
+export interface NutritionCycleDay {
+  id: string; cycleId: string; date: string
+  nutrition?: NutritionGoal & { variantId: string; variantName: string; templateId: string; templateName: string }
+  dietTemplate?: { id: string; name: string }
+  createdAt: string; updatedAt: string
+}
+export interface BackupDataV12 extends BackupBase {
+  schemaVersion: 12
+  data: BackupDataV11['data'] & { nutritionCycles: NutritionCycle[]; nutritionCycleDays: NutritionCycleDay[] }
 }

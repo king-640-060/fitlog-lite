@@ -88,7 +88,8 @@ export function buildCalendarDayDetailRows(
     row('dietEvent','特殊饮食',summary?.dietEvents?.length?`${summary.dietEvents.length} 条`:'未记录',[],!summary?.dietEvents?.length),
     row('habit','习惯',summary?.habitCount?`${summary.habitCount} 次打卡`:'未记录',[],!summary?.habitCount),
     row('sleep','睡眠',summary?.sleepCount?formatSleepDuration(summary.sleepMinutes??0):'未记录',summary?.sleepCount?[`${summary.sleepCount} 段`]:[],!summary?.sleepCount),
-    row('water','饮水',summary?.waterCount?`${summary.waterMl} ml`:'未记录',summary?.waterCount?[`${summary.waterCount} 次记录`]:[],!summary?.waterCount)]
+    row('water','饮水',summary?.waterCount?`${summary.waterMl} ml`:'未记录',summary?.waterCount?[`${summary.waterCount} 次记录`]:[],!summary?.waterCount),
+    row('plan','计划',summary?.planCount?`${summary.planCount} 项日程`:'未安排',[],!summary?.planCount)]
 }
 
 /** Day Sheet and Day Report share complete saved-record disclosures and the same grammar. */
@@ -116,9 +117,10 @@ export function dailyRecordsHtml(records:DailyRecords,esc:(value:unknown)=>strin
     dietEvent:`<div class="diet-events-detail">${s.dietEvents.map(e=>`<article class="daily-record-item"><strong>${esc(dietEventTitle(e))}</strong><p>${esc(e.scope==='day'?'整天':mealNames[e.scope])}</p><p>${esc(dietEventEstimate(e))}</p>${e.note?`<p class="diet-event-note">${esc(e.note)}</p>`:''}${editable?`<button type="button" class="text-btn" data-diet-event-edit="${esc(e.id)}">编辑</button>`:''}</article>`).join('')}</div>`,
     habit:s.habitCheckIns.map(c=>detail(s.habits.find(h=>h.id===c.habitId)?.name??'已移除的习惯',[`${c.date} · 已打卡`,instant(c.completedAt)])).join(''),
     sleep:sleepTimelineHtml(s.sleepSessions,records.date,esc)+s.sleepSessions.map(p=>detail(formatSleepDuration(p.durationMinutes!),[`${instant(p.startTime)} → ${instant(p.endTime!)}`,`所属夜晚 ${sleepNightLabel(resolveSleepBusinessDate(p))}`])).join(''),
+    plan:(s.tasks??[]).map(t=>detail(t.title,[`${t.date} · ${t.completedAt?'已完成':'待完成'}`, ...(t.startTime?[`${t.startTime}${t.endTime?' → '+t.endTime:''}`]:[]),...(t.note?[t.note]:[])])).join(''),
     water:s.waterLogs.map(w=>detail(`${w.amountMl} ml`,[instant(w.timestamp),`记录日期 ${w.date}`])).join(''),
   }
-  return `<div class="calendar-day-sheet daily-records" data-record-date="${esc(records.date)}">${rows.map(r=>`<details class="daily-record-group" data-record-category="${r.key}"><summary class="day-detail-row" aria-label="${esc(r.accessibleLabel)}"><span class="day-detail-label"><span class="day-detail-icon calendar-category-${r.key}" aria-hidden="true">${icon(calendarCategoryIcons[r.key],16)}</span><span>${esc(r.label)}</span></span><span class="day-detail-content"><strong class="${r.empty?'is-empty':''}">${esc(r.primary)}</strong>${r.secondary.map(v=>`<span>${esc(v)}</span>`).join('')}</span><span class="daily-record-chevron" aria-hidden="true">${icon('chevron',16)}</span></summary><div class="daily-record-content">${r.key==='food'?contents.food:r.empty?'<p class="report-note">当天未记录</p>':contents[r.key]}</div></details>`).join('')}</div>`
+  return `<div class="calendar-day-sheet daily-records" data-record-date="${esc(records.date)}">${rows.map(r=>`<details class="daily-record-group" data-record-category="${r.key}"><summary class="day-detail-row" aria-label="${esc(r.accessibleLabel)}"><span class="day-detail-label"><span class="day-detail-icon calendar-category-${r.key}" aria-hidden="true">${icon(calendarCategoryIcons[r.key],16)}</span><span>${esc(r.label)}</span></span><span class="day-detail-content"><strong class="${r.empty?'is-empty':''}">${esc(r.primary)}</strong>${r.secondary.map(v=>`<span>${esc(v)}</span>`).join('')}</span><span class="daily-record-chevron" aria-hidden="true">${icon('chevron',16)}</span></summary><div class="daily-record-content">${r.key==='food'?contents.food:r.empty?`<p class="report-note">${r.key==='plan'?'当天未安排':'当天未记录'}</p>`:contents[r.key]}</div></details>`).join('')}</div>`
 }
 
 /** Patch changed groups only; keep the Sheet, other nodes, expanded categories, scroll and focus. */

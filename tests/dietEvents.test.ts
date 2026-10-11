@@ -30,7 +30,7 @@ describe('independent contextual DietEvent', () => {
     const after = (await exportBackup(d)).data; for (const key of Object.keys(v9)) expect(after[key as keyof typeof after]).toEqual(before[key as keyof typeof before])
     const summary = (await loadMonthSummaries(2026, 8, d)).get(date)!
     expect(summary.calories).toBe(100); expect(summary.foodLogCount).toBe(1); expect(summary.dietEvents).toHaveLength(1)
-    expect(getCalendarVisibleMarkers(summary)).toEqual({ visible: ['food','strength','cardio','pelvic','weight','dietEvent','habit'], hiddenCount: 0 })
+    expect(getCalendarVisibleMarkers(summary)).toEqual({ visible: ['food','strength','cardio','pelvic','weight','dietEvent','habit','plan'], hiddenCount: 0 })
     expect(getCalendarDayAccessibleLabel(date, summary)).toContain('放纵餐'); expect(getCalendarDayAccessibleLabel('2026-09-29', (await loadMonthSummaries(2026,8,d)).get('2026-09-29'))).toContain('放纵日')
   })
   it('event-only day has records but has no food intake/food marker; day title distinct', async () => {
@@ -53,13 +53,13 @@ describe('independent contextual DietEvent', () => {
 describe('explicit V9 → V10 preservation and Backup V10',()=>{
   it('all 17 frozen rows/indexes preserved, one empty new store; reopening never reseeds or infers',async()=>{
     const d=make(),old=legacyV9Database(d.name);await old.open();await old.transaction('rw',old.tables,async()=>{for(const [store,rows] of Object.entries(v9))await old.table(store).bulkAdd(rows)});const indexes=old.tables.map(t=>({name:t.name,indexes:t.schema.indexes.map(i=>i.src)}));old.close();await d.open()
-    expect(d.verno).toBe(11);expect(d.tables).toHaveLength(20);expect(await d.dietEvents.count()).toBe(0)
-    expect(d.tables.filter(t=>!['dietEvents','sleepSessions','waterLogs'].includes(t.name)).map(t=>({name:t.name,indexes:t.schema.indexes.map(i=>i.src)}))).toEqual(indexes)
+    expect(d.verno).toBe(12);expect(d.tables).toHaveLength(22);expect(await d.dietEvents.count()).toBe(0)
+    expect(d.tables.filter(t=>!['dietEvents','sleepSessions','waterLogs','nutritionCycles','nutritionCycleDays'].includes(t.name)).map(t=>({name:t.name,indexes:t.schema.indexes.map(i=>i.src)}))).toEqual(indexes)
     for(const [store,rows] of Object.entries(v9))for(const row of rows)expect(await d.table(store).get(row.id)).toEqual(row)
     expect(await d.exercises.count()).toBe(v9.exercises.length);const before=await exportBackup(d);d.close();await d.open();expect((await exportBackup(d)).data).toEqual(before.data);expect(Object.keys(LEGACY_V9_SCHEMA)).toHaveLength(17)
   })
   it('new frozen V10 manual/photo/day notes survive reopen, Backup and encrypted envelope V1/hash',async()=>{
-    expect(Object.keys(LEGACY_V10_SCHEMA)).toHaveLength(18);const d=make(),old=legacyV10Database(d.name);await old.open();await old.transaction('rw',old.tables,async()=>{for(const [store,rows] of Object.entries(v10))await old.table(store).bulkAdd(rows)});old.close();await d.open();const backup=await exportBackup(d);expect(backup.schemaVersion).toBe(11)
+    expect(Object.keys(LEGACY_V10_SCHEMA)).toHaveLength(18);const d=make(),old=legacyV10Database(d.name);await old.open();await old.transaction('rw',old.tables,async()=>{for(const [store,rows] of Object.entries(v10))await old.table(store).bulkAdd(rows)});old.close();await d.open();const backup=await exportBackup(d);expect(backup.schemaVersion).toBe(12)
     const encrypted=await encryptSyncText(JSON.stringify(backup),'synthetic-password-123456');expect(encrypted.formatVersion).toBe(1)
     const other=make();await restoreBackup(JSON.parse(await decryptSyncText(encrypted,'synthetic-password-123456')),other);expect((await exportBackup(other)).data).toEqual(backup.data)
     const hash=await syncDataHash(backup.data);await deleteDietEvent('diet-manual-v10',other);expect(await syncDataHash((await exportBackup(other)).data)).not.toBe(hash)

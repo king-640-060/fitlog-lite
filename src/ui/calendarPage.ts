@@ -29,25 +29,26 @@ export async function loadMonthSummaries(year: number, month: number, database: 
 }
 
 export function hasDayRecords(summary?: CalendarDaySummary): boolean {
-  return Boolean(summary && ((summary.dietEvents?.length ?? 0) > 0 || summary.foodLogCount > 0 || summary.workoutCount > 0 || summary.cardioCount > 0 || summary.pelvicFloorSessionCount > 0 || summary.weightKg !== undefined || (summary.habitCount??0)>0 || (summary.sleepCount??0)>0 || (summary.waterCount??0)>0))
+  return Boolean(summary && ((summary.dietEvents?.length ?? 0) > 0 || summary.foodLogCount > 0 || summary.workoutCount > 0 || summary.cardioCount > 0 || summary.pelvicFloorSessionCount > 0 || summary.weightKg !== undefined || (summary.habitCount??0)>0 || (summary.sleepCount??0)>0 || (summary.waterCount??0)>0 || (summary.planCount??0)>0))
 }
 
-export const calendarCategories = ['food', 'strength', 'cardio', 'pelvic', 'weight', 'dietEvent', 'habit', 'sleep', 'water'] as const
+export const calendarCategories = ['food', 'strength', 'cardio', 'pelvic', 'weight', 'dietEvent', 'habit', 'sleep', 'water', 'plan'] as const
 export type CalendarCategory = typeof calendarCategories[number]
 export const calendarCategoryLabels: Record<CalendarCategory, string> = {
-  food: '饮食', strength: '力量训练', cardio: '有氧训练', pelvic: '凯格尔训练', weight: '体重', dietEvent: '特殊饮食', habit:'习惯', sleep:'睡眠', water:'饮水',
+  food: '饮食', strength: '力量训练', cardio: '有氧训练', pelvic: '凯格尔训练', weight: '体重', dietEvent: '特殊饮食', habit:'习惯', sleep:'睡眠', water:'饮水', plan:'计划',
 }
 export const calendarLegendLabels: Record<CalendarCategory, string> = {
-  food: '饮食', strength: '力量', cardio: '有氧', pelvic: '凯格尔', weight: '体重', dietEvent: '特殊饮食', habit:'习惯', sleep:'睡眠', water:'饮水',
+  food: '饮食', strength: '力量', cardio: '有氧', pelvic: '凯格尔', weight: '体重', dietEvent: '特殊饮食', habit:'习惯', sleep:'睡眠', water:'饮水', plan:'计划',
 }
 export const calendarCategoryIcons: Record<CalendarCategory, IconName> = {
-  food: 'fork', strength: 'dumbbell', cardio: 'stairs', pelvic: 'leaf', weight: 'scale', dietEvent: 'flame', habit:'check', sleep:'moon', water:'water',
+  food: 'fork', strength: 'dumbbell', cardio: 'stairs', pelvic: 'leaf', weight: 'scale', dietEvent: 'flame', habit:'check', sleep:'moon', water:'water', plan:'calendar',
 }
 
 export function getCalendarRecordCategories(summary?: CalendarDaySummary): CalendarCategory[] {
   if (!summary) return []
   return calendarCategories.filter((category) => {
     switch (category) {
+      case 'plan': return (summary.planCount??0)>0
       case 'habit': return (summary.habitCount??0)>0
       case 'sleep': return (summary.sleepCount??0)>0
       case 'water': return (summary.waterCount??0)>0
@@ -90,6 +91,7 @@ export function getCalendarDayAccessibleLabel(date: string, summary?: CalendarDa
     summary.hasWorkout ? `${summary.workoutCount} 次力量训练，${summary.setCount} 组` : undefined,
     summary.cardioCount ? `${summary.cardioCount} 次有氧训练，共 ${formatCompactNumber(summary.cardioMinutes)} 分钟` : undefined,
     summary.pelvicFloorSessionCount ? `${summary.pelvicFloorSessionCount} 次凯格尔训练，${summary.pelvicFloorContractions} 次收缩` : undefined,
+    summary.planCount ? `${summary.planCount} 项计划（不代表完成）` : undefined,
     summary.habitCount ? `${summary.habitCount} 次习惯打卡` : undefined,
     summary.sleepCount ? `睡眠 ${formatCompactNumber((summary.sleepMinutes??0)/60)} 小时，${summary.sleepCount} 段` : undefined,
     summary.waterCount ? `饮水 ${summary.waterMl} ml，${summary.waterCount} 次` : undefined,
