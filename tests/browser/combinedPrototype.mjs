@@ -29,7 +29,7 @@ try{for(const[width,scale,theme]of cases){
   if(i>=2&&theme==='light')await page.locator('#theme').click()
   // Fixed-pixel demo fonts get equivalent temporary magnification for comparison.
   // Files remain byte-identical; normal-font cases retain original CSS.
-  
+
  }
  await load(0);await page.locator('#specialEntry').scrollIntoViewIfNeeded();assert.match(await page.locator('#specialStatus').innerText(),/添加标记/);await capture('special-entry-empty','#specialEntry');await page.locator('#specialEntry').click();await capture('special-form','.sheet');await page.locator('#closeSheet').click();await page.locator('#seedMode').click();await page.locator('#specialEntry').click();await capture('special-list','.sheet');await page.locator('#closeSheet').click();await capture('special-entry','#specialEntry')
  await load(1);await capture('picker-empty','#results');await page.evaluate(()=>document.querySelector('[data-data=sample]').click());await page.locator('#search').fill('绝对不存在');await capture('picker-no-hit','#results');await page.locator('#search').fill('');assert.ok(await page.locator('[data-item]').count()>0)

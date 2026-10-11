@@ -7,7 +7,7 @@
 - START_COMMIT：`4bfa6c2d75b57b88587ebd2baa3350d0e533f0bf`。开发前及提交前重新 fetch，实际 main / origin main 和工作区核对完成，初始干净。
 - APPLICATION_COMMIT：`a77bcf5ee09de9bdd4efd4572bcdee2bf613edb1`，[提交](https://github.com/king-640-060/fitlog-lite/commit/a77bcf5ee09de9bdd4efd4572bcdee2bf613edb1)。应用代码、测试、设计原件与合同已推送。
 - Application Actions / Pages：[38147200098](https://github.com/king-640-060/fitlog-lite/actions/runs/38147200098)，success；typecheck / test / build / deploy 各步骤通过。
-- END_COMMIT：承载本报告的 LATEST-only 提交，避免自引用。完整 SHA、最终 Actions、精确资源 / 同 profile / 离线回执在外部 `artifacts/combined-2026-10-11/DELIVERY.md` 和最终回复；END 推送后再次验证。
+- END_COMMIT：承载最终报告说明及新增原型测试一行尾部空白校正的提交，避免自引用；不含产品代码修改。完整 SHA、最终 Actions、精确资源 / 同 profile / 离线回执在外部 `artifacts/combined-2026-10-11/DELIVERY.md` 和最终回复；END 推送后再次验证。
 - 正式环境：<https://king-640-060.github.io/fitlog-lite/>。
 
 ## 真实设计基准
@@ -50,7 +50,7 @@
 
 33套既有 gate：aiAssistant、aiDualModelRouting、aiStreaming、aiVoice、catalogRecovery、coachReportExperience、dailyRecordsExperience、dietEvents、foodRecovery、foodServing、foodVision、githubSyncSafety、habitDeletion、habitEditorLayout、interactionStabilization、macroNutritionSummary、managementVisualConsistency、managementWorkspace、mobileLayout、motionPolish、nutritionGauge、nutritionTemplates、sharedDatePicker、trainingJournal、trainingRecoveryExperience、trainingRecoveryLifecycle、uiQualityAudit、uiSemanticConsistency、unifiedExperience、v421Consistency、v4FoodPlanToday、voiceMode、remainingPrototype。
 
-所有失败尝试日志保留：初始HMR界面更替/参考服务未启动、过时的9类与V11断言、Food旧入口/折叠菜单定位、原生checkbox glyph与44px label区分、最后一次周期按钮CSS specificity修正均已修复并完整重跑相应范围。首次PWA命令给了旧checkout根目录，修正为其实际dist后执行通过。线上首轮联合测试第三组管理入口click超时；没有改产品代码或降低断言，原命令完整4组重跑通过。没有删测试、skip或用清空真实数据库获得PASS。
+所有失败尝试日志保留：初始HMR界面更替/参考服务未启动、过时的9类与V11断言、Food旧入口/折叠菜单定位、原生checkbox glyph与44px label区分、最后一次周期按钮CSS specificity修正均已修复并完整重跑相应范围。首次PWA命令给了旧checkout根目录，修正为其实际dist后执行通过。线上首轮联合测试第三组管理入口click超时；没有改产品代码或降低断言，原命令完整4组重跑通过。最终对整个START→HEAD提交范围做diff检查发现新增原型测试一行尾部空白，已定向移除并复核整个范围。没有删测试、skip或用清空真实数据库获得PASS。
 
 ## 实际原型 / UI视觉对照
 
