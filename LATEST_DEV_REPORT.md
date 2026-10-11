@@ -1,92 +1,83 @@
 # FitLog Lite Development Report
 
-本轮：V4.2.1「剩余目标」原型定向还原，2026-10-10。仅修改 Today/Food 两个组件及其必要相邻容器。
+本轮：2026-10-11 四份已批准原型联合实施（A 特殊饮食、B 模板动作空态、C 十类日历与精确删除、D 营养周期排程），包含日报日期与深色分类图标两项局部修复。依据用户附件 CODEX_TASK 和原验收矩阵执行，未开发未批准的完整周期报告。
 
 ## 代码身份与发布
 
-- START_COMMIT：`bc0cbe1225898661414b10ed19b730a5f6f0109a`。开发前及提交前实际 fetch、main/remote 身份核对完成。
-- APPLICATION_COMMIT：`0f4c9d10f7202c651993b1dd1ef8c6a527739ddb`。
-- Application Actions / Pages：[38031469258](https://github.com/king-640-060/fitlog-lite/actions/runs/38031469258)，success；CI typecheck/test/build/deploy 均通过。
-- END_COMMIT：承载本报告的 LATEST-only 提交，避免提交自引用。完整 SHA、最终 Actions 和生产资源/data/offline 回执记录在外部 `artifacts/v421-remaining-reference-2026-10-10/DELIVERY.md` 及最终回复。END 发布后继续核查。
+- START_COMMIT：`4bfa6c2d75b57b88587ebd2baa3350d0e533f0bf`。开发前及提交前重新 fetch，实际 main / origin main 和工作区核对完成，初始干净。
+- APPLICATION_COMMIT：`a77bcf5ee09de9bdd4efd4572bcdee2bf613edb1`，[提交](https://github.com/king-640-060/fitlog-lite/commit/a77bcf5ee09de9bdd4efd4572bcdee2bf613edb1)。应用代码、测试、设计原件与合同已推送。
+- Application Actions / Pages：[38147200098](https://github.com/king-640-060/fitlog-lite/actions/runs/38147200098)，success；typecheck / test / build / deploy 各步骤通过。
+- END_COMMIT：承载本报告的 LATEST-only 提交，避免自引用。完整 SHA、最终 Actions、精确资源 / 同 profile / 离线回执在外部 `artifacts/combined-2026-10-11/DELIVERY.md` 和最终回复；END 推送后再次验证。
 - 正式环境：<https://king-640-060.github.io/fitlog-lite/>。
 
-## 找回并固定真实设计基准
+## 真实设计基准
 
-已在既有交付目录 `artifacts/v4-2-2026-10-10/prototype/FitLog_V4_2_Prototype.html` 找到原型，实际校验、运行、切换 Today/Food/主题，并检查实际 DOM、最终 CSS cascade 及355px规则。没有重新要求用户上传，也没有用文字推测代替。
+原 ZIP SHA256：`1e32f5c203d168122e271dde09ecccb2e82b39a17d4bc28e3f8b84f0ebb09351`。完整解压、读取任务与矩阵，实际运行四份 HTML、操作68个原型状态，读取 DOM/computed CSS。25份交付原件全部 SHA 校验通过，原字节永久保存在 [新设计参考目录](design/reference/2026-10-11-combined/DESIGN_REFERENCE.md)。原 V4.2 SHA `aa8d37f0509035970eb3a26be056eec619066ba308cf5bc8f5911d2458d24687` 未改变。
 
-- HTML SHA256：`aa8d37f0509035970eb3a26be056eec619066ba308cf5bc8f5911d2458d24687`，与用户提供值完全一致。
-- ZIP SHA256：`7e9b64b701fc38d89d4ee08849bcdd3e238e86f6ffcdc9eb2ec9a10c52174dde`。
-- 原始 HTML 原字节保存于 [design/reference/v4.2/FitLog_V4_2_Prototype.html](design/reference/v4.2/FitLog_V4_2_Prototype.html)，没有修改内容。
-- [参考说明](design/reference/v4.2/README.md)记录来源、SHA、运行方法和验收边界。AGENTS/UI规范/视觉规范/修复合同明确：后续涉及此设计必须先运行并对照原型，禁止用纯文字网格替代或重复索要相同附件。
-- 新增单元和浏览器 SHA256 guard，原型只作为视觉参考；没有将其演示数据、模拟计算或优化器引入生产。
+|原型|SHA256|
+|---|---|
+|A 特殊饮食|bb166e5f7c1aedfc5940015a1b7626cf13b0280f25d5dda164ebed9e19b46c26|
+|B 模板动作空态|31f9d9b0780db4b7ee75c91b9802305932560f0bd5f50de0706c83a82428aa9b|
+|C 十类日历|1ad3131b6dca4f863005c90b47491fc5d67b5773e8cc21bead23f59911134387|
+|D 营养周期|0d42580f17d9d5a5d6e66c1947a30ca0ebc26424e682d7242fab5f45b5e6d5ed|
 
-## 实际修改
+没有将演示日期、食物、营养值或模拟算法移植到生产服务。
 
-- `src/ui/remainingNutritionGoals.ts`：同一个纯渲染组件，保留现有 completionGapText/getNutritionCompletionSummary 的四项独立事实。Today恢复四个边框 mini-card、5px营养色点、标题右侧去补齐；Food恢复标题、四个数据格和底部两个等宽边框按钮。紧凑文字仅缩短前缀；完整语义保留在 canonical属性和可访问名称中。无目标/已达标仍可通过原有服务查看解释，不会生成虚假方案或写历史。
-- `src/main.ts`：两页复用上述组件；Food剩余卡片移到营养总览之后，成为独立 sibling。原日期捕获、点击处理、补齐算法、预览/确认记录与实时刷新保持。
-- `src/styles/nutritionBudget.css`：局部恢复原型背景、边框、圆角、padding、6px格间距、7px双按钮间距与字号/字重层级。局部 gutter恢复剩余卡片宽度，同时保留其他Food卡片的横向 bounds；Today小屏 host恢复原型留白。没有重做其他页面或已完成模块。
-- 测试：新增 `tests/browser/remainingPrototype.mjs` / `tests/designReference.test.ts`；更新 `tests/v4Nutrition.test.ts` 的组件与完整状态断言；`tests/browser/v421Consistency.mjs` 从过时透明/同HTML断言改为原型结构及同canonical事实断言，其他回归断言保留；`tests/browser/v4FoodPlanToday.mjs` 仅增加独立 artifact目录配置；同步 `tests/browser/README.md`。
-- 文档：更新 `AGENTS.md`、`docs/UI_INTERACTION_SPEC.md`、`docs/INTERACTION_VISUAL_SYSTEM.md`、`docs/UI_QA_MATRIX.md`、`docs/V4_2_1_VISUAL_REPAIR_CONTRACT.md`；新增原始 HTML 和参考 README；本文件记录最终验证。
+## 实际实施
 
-## 原型与正式版实际视觉对照
+- **A**：Food 全部餐次及未分类记录之后唯一低强调特殊饮食入口，按所选日期显示真实 N；空状态进现有表单，多条进完整列表，继续沿用增删改、照片/手工估算和日期隔离。日期捕获与异步所属界面保护保持；粗估算不进入 FoodLog / 实际营养统计。
+- **B**：仅模板动作 picker 的结果区域，居中65px留白、43px搜索图标、15px标题与12px辅助说明；分别区分空库和无匹配。真实结果列表、模板草稿及 Sheet 返回保留。
+- **C**：原九类顺序不变，第十类 Task.date 计划在第四行中间，固定3×4槽位；42个实际日期格和七列44px目标保持。日期详情两列五行完整 native disclosures，默认折叠快捷记录与管理删除；十条快捷流程带选定日期。新 API 预览十类精确 ID、真实数量，再确认日期/类别/数量/不可撤销，并在事务内检查陈旧来源、原子回滚。营养目标单独列示真实值，默认不删除；习惯/标签定义、库/模板、跨日数据、活动中睡眠受保护。原 clearDayRecords 七类语义不扩张。日报日期17px居中、箭头对称44px；受影响分类暗色底使用现有主题Token。
+- **D**：管理与设置 → 营养模板 → 营养周期。自定义名称、本地包含首尾日期（≤366天）、真实模板任意多变体与独立饮食模板；单日/跨周多选、工作日/周末、更新掩码、按星期复制与覆盖确认、逐日完整预览、保存/编辑/归档。revision、多连接、真实来源与重叠周期校验，历史快照不随模板修改重算。
+- **D真实落地**：Food 所选日期有排程时，分别「预览目标」→保留/显式应用，和「预览饮食模板」→用户实际摄入确认；未来饮食只预览。保存排程不写 FoodLog / 已保存目标 / 营养阶段。最终事务复核周期、每日安排、模板、解析食物及现有目标，防重复提交与陈旧预览。不存在自动食物记账。
 
-同一 Chromium/WebKit、相同视口/系统字体/主题、等价合成实际记录与目标；保留每页原始截图及 DOM/computed-style JSON。原始字体100%对照未改变原型样式；字号放大用临时浏览器等比放大原型固定像素文字，HTML文件始终未变。
-
-实际打开检查了390浅色/深色、320放大字体及发布后截图。`visual-comparison.html`提供33组线上原图对照；`comparison-390-100-light.png`、`comparison-390-100-dark.png`、`comparison-320-200-dark.png`是原图对照页截图，不是修图。完整逐项记录见外部 `VISUAL_REVIEW.md`。
-
-|390px/100%|原型|正式版|结论|
-|---|---|---|---|
-|Today容器|324×172px|324×176px|宽度一致；44px触摸高度使总高+4px|
-|Today四格|146×47px|146×47px|四格边框/营养色点/右侧入口恢复|
-|Food独立容器|360×207.265625px|360×208.265625px|宽度一致；按钮触摸高度使总高+1px|
-|Food四格|164×49.6875px|164×49.6875px|两列四格一致|
-|格间距/容器圆角|6px/16px|6px/16px|一致|
-|双按钮间距/圆角|7px/10px|7px/10px|等宽同排，尺寸规则一致|
-|浅色容器/小格/边框|#f8f8f2/#fffefa/#e9e8df|同一现有Token|一致|
-|主标题/数值字号|13px/12px|13px/12px|层级及对应字重一致|
-
-明确保留差异，不能宣称完全逐像素一致：
-
-- 控件最小44px，原型Today40/Food43px；不降低触摸可访问性。
-- 正式版既有整数kcal格式保留；示例原型306.1kcal显示为正式306kcal，实际存储/算法未改变。
-- 浅色辅助文字保留现有更高对比度 #697369；原型 #737c73。深色克制渐变复用现有surface Token，端点约一个蓝色通道差异，没有新增调色体系。
-- 放大字体保留完整数值/单位换行，不使用原型的省略号裁切。两列四项、全部按钮和状态仍可读、无重叠/溢出。
-- 320/375/390/430手机宽度下两个组件宽度与原型一致。844横屏保留现有外层布局：原型Today378/Food414px，正式550/586px；内部组件规则和可用性通过，未改全局页面布局。
-- 真实缺失、未设、达标、超额四项状态保留；不能照搬演示版筛掉无目标项的行为。
+主要实现：`src/main.ts`、`src/ui/{dietEvents,calendarPage,dayDetail,dayRecordManagement,nutritionCycles,nutritionStrategies,recovery,icons,githubSync}.ts`、`src/services/{nutritionCycleService,dayRecordsService,dailyRecordsSummary,backupService}.ts`、`src/db/{database,types}.ts`、`src/styles/{main,nutritionCycles}.css`。全部96个 APPLICATION文件的精确清单在交付 `application-files.txt`；其中原始交付包26文件、8张候选截图及说明均明确分开，测试版本断言只随新增结构递增，未删除原回归。
 
 ## Automated Verification
 
-|Gate|结果|
+|命令/门槛|实际结果|
 |---|---|
 |npm run typecheck|PASS|
-|npm test|PASS：846 tests /68 files；原844保留，新增2|
-|npm run build|PASS：clean APPLICATION Pages构建；只有既有chunk-size advisory|
+|npm test|PASS：879 tests /70 files；原846保留，新增33|
+|npm run build|PASS：clean APPLICATION Pages base；仅既有chunk-size advisory|
 |git diff --check|PASS|
-|remainingPrototype|Chromium33 + WebKit33，全部PASS；原型SHA、实际DOM/几何/色点/按钮/边框/字体/完整状态/无裁切及真实入口/预览不写入|
-|v421Consistency|完整65组合PASS；保留其他六项修复的所有断言；WebKit5 PASS|
-|v4FoodPlanToday|完整65组合PASS：连续添加、重复提交、历史日期、严格候选、未知/无可行方案、preview不写入、未来只读、即时跨页事实、任务同步、报告几何；WebKit5 PASS|
-|macroNutritionSummary|完整40组合PASS：三宏量/gkg/未知/同日体重/跨页实时一致/大数值/大量食物/历史日期/对比度|
-|foodRecovery|完整35组合PASS：餐次、旧记录、恢复/饮水/睡眠操作与布局|
-|uiQualityAudit|完整4宽度及既有字号/横屏/弹层/键盘/备份恢复/同步入口/AI mock交互gate PASS|
-|PWA升级|真实冻结V7→V11、实际START V11→APPLICATION V11，PASS；保护草稿/图片/待确认提案/其他client/取消/单次reload与离线冷启动|
+|shasum -a 256 -c SHA256SUMS.txt|PASS：25份原件|
+|Markdown相对路径 / 变更范围|PASS：所有本轮相关文档引用存在，冻结旧fixtures与原V4.2参考不改|
+|33套既有浏览器回归|PASS：全部默认范围实际执行；逐套日志与exit0汇总见 regression-final-summary.json|
+|combinedHandoff（新增）|PASS：Chromium33显示组合＋WebKit4；额外三真实变体含缺失营养的WebKit4通过|
+|combinedPrototype（新增）|PASS：四原型×4显示环境，共68原型状态截图与DOM/CSS，SHA guard通过|
+|PWA真实构建升级|PASS：冻结V7→V12、实际START V11→V12；图片/草稿/待确认提案/其他client/取消/单次reload/写入排空/离线启动|
 
-原有测试保留，没有删除、skip或降低断言来获得通过。本轮执行受影响的上述6个UI套件及PWA/生产资源/数据保护；未宣称重新执行全仓其他未受影响套件。WebKit浮点字体13.200001与13.2px仅以0.001px表示精度比较；布局/状态断言保持。第一次并发生产浏览器出现ERR_NETWORK_IO_SUSPENDED/加载超时；并发质量gate出现Vision mock超时。失败日志保留为attempt1；减少并发后完整默认范围重新执行通过，未修改生产逻辑或验收条件。
+33套既有 gate：aiAssistant、aiDualModelRouting、aiStreaming、aiVoice、catalogRecovery、coachReportExperience、dailyRecordsExperience、dietEvents、foodRecovery、foodServing、foodVision、githubSyncSafety、habitDeletion、habitEditorLayout、interactionStabilization、macroNutritionSummary、managementVisualConsistency、managementWorkspace、mobileLayout、motionPolish、nutritionGauge、nutritionTemplates、sharedDatePicker、trainingJournal、trainingRecoveryExperience、trainingRecoveryLifecycle、uiQualityAudit、uiSemanticConsistency、unifiedExperience、v421Consistency、v4FoodPlanToday、voiceMode、remainingPrototype。
+
+所有失败尝试日志保留：初始HMR界面更替/参考服务未启动、过时的9类与V11断言、Food旧入口/折叠菜单定位、原生checkbox glyph与44px label区分、最后一次周期按钮CSS specificity修正均已修复并完整重跑相应范围。首次PWA命令给了旧checkout根目录，修正为其实际dist后执行通过。线上首轮联合测试第三组管理入口click超时；没有改产品代码或降低断言，原命令完整4组重跑通过。没有删测试、skip或用清空真实数据库获得PASS。
+
+## 实际原型 / UI视觉对照
+
+同 Chromium、视口、文字缩放、主题；字体栈/computed数值记录于DOM JSON。原100%参考CSS未改；放大字体仅在临时原型浏览器等比放大固定字号。已实际查看四模块原图，以及部署后的A/B/C/D、320px200%暗色日期详情和周期分配截图。
+
+详细几何、必要差异与原矩阵23个ID逐项结果见 [联合验收说明](docs/COMBINED_HANDOFF_2026_10_11.md)，仓库可见 [四组原图对照](docs/evidence/combined-2026-10-11/README.md)。外部 `visual-comparison.html` 有40组候选/批准原图；`production-visual-comparison.html` 有20组线上同视口对照。最终候选原图在 delivery/local、delivery/webkit；线上在 production-retry/prod。
+
+不能宣称逐像素无差异：A宽358而参考360px（既有16px页面边距），同58px高/16px餐次距离；B宽354而参考352px、行高使高度约差2.8px；C真实42格而参考35格，native Sheet高度820而示例707px，真实Food计数/kcal/目标提示保留；D在既有管理Sheet中，真实首尾/部分周/任意变体/冲突、来源、更新掩码、显式应用安全信息多于演示，44px/16px要求与内部七日滚动保留。必要业务与可访问性差异已说明，不用测试绿色替代视觉核对，不自称用户已验收。
 
 ## Production Verification
 
-- APPLICATION线上 remainingPrototype33、v421Consistency5、v4FoodPlanToday5 全PASS；截图来自真实生产URL的独立合成上下文。
-- Production HTML/build-info/SW/precache与本地clean APPLICATION精确一致；JS/CSS字节与SHA256全部匹配。
-- 同一个上一轮既有专用合成生产profile，不清空、不重建、不重播：20stores/25rows及8项配置在START与APPLICATION哈希完全一致。
-- Store SHA256：`6448eeaacd97e099ef91416e1db77db3f683113b11662765ad48c8e9dc995799`。
-- Config SHA256：`609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34`。
-- APPLICATION App/SW均指向0f4c9d1，真实离线冷启动PASS；END之后再次验证身份、资源、同profile数据及离线。
+- APPLICATION线上 combinedHandoff4组：390/100%浅色、320/200%暗色、430/140%暗色、844横屏；v421Consistency5组（含原剩余目标、报告、Food布局与操作）均PASS。
+- 正式 index / build-info / SW / precache 与本地clean APPLICATION一致；JS / CSS 字节长度和 SHA256完全匹配。五页入口、AI设置及GitHub Sync入口检查通过，pageerror为空。
+- 使用同一个此前已存在的专用合成profile，不清空、不新建、不重新播种；START V11→APPLICATION V12，原20stores /25rows 与8项配置哈希一致，新增两表为空；真实离线冷启动PASS，App/SW均a77bcf5。
+- Store SHA256：`6448eeaacd97e099ef91416e1db77db3f683113b11662765ad48c8e9dc995799`；Config SHA256：`609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34`。
+- END为报告提交，之后再次验证最终CI/Pages、精确资产和同profile数据/配置/离线/身份，实际结果放入外部DELIVERY。
 
-## 数据版本与 Manual Device Verification
+## 数据与文档合同
 
-Dexie11 / IndexedDB110 /20stores；Backup11 / Restore1–11；GitHub Sync/encrypted envelope1。数据库、备份协议、恢复、同步、AI/Voice配置与算法均未改变，无迁移、清空或历史快照重算。没有读取或清空用户真实浏览器。
+Dexie12 / IndexedDB120 /22stores；Backup12 / Restore1–12；GitHub Sync / encrypted envelope1，设备配置不变。唯一正向迁移新增空 nutritionCycles / nutritionCycleDays；原20表索引、快照及冻结老fixtures原字节保留。新V12冻结fixture覆盖完整22表，备份严格验证后同一替换事务；旧格式、失败回滚、加密roundtrip、跨年/DST/闰年、366天、多连接/陈旧来源、计划与目标独立、实际摄入预览保护均有回归。
 
-实体iPhone Safari、原有主屏幕PWA、真实键盘/SafeArea和个人设备历史连续性：**Pending**。四张此前真机图片是修复前证据，不能当作本轮发布后的设备验收。当前自动化范围没有未解决的功能/视觉结构问题；上文差异明确记录，不用测试绿色替代实际视觉核对。
+维护 AGENTS、UI_INTERACTION_SPEC、INTERACTION_VISUAL_SYSTEM、UI_QA_MATRIX、DAILY_RECORDS_UX_CONTRACT、PROFESSIONAL_FITNESS_REPORT_CONTRACT；新增 NUTRITION_CYCLE_SCHEDULE / COMBINED_HANDOFF合同、原件参考、候选截图和browser README。本报告记录本轮状态，不改CHAT_CODEX_WORKFLOW或历史交接内容。
+
+## Manual Device Verification / Remaining
+
+实体iPhone Safari、原主屏幕PWA、实际键盘/Safe Area、用户个人设备历史连续性：**Pending**。所有浏览器数据都是独立合成QA，不读取或清空用户真实浏览器。当前执行范围没有未解决自动化失败；构建chunk advisory保持。完整周期报告不在批准范围，待ChatGPT原型确认，不自动开发。
 
 ## ChatGPT Baseline
 
-Application0f4c9d10f7202c651993b1dd1ef8c6a527739ddb；最终main为承载本报告的LATEST-only END。V4.2.1剩余目标已恢复：Today四个边框小卡/色点/标题右侧去补齐，Food独立四格卡/底部两个等宽边框补齐按钮；共享真实事实与原服务。不可改原型SHA aa8d37f0509035970eb3a26be056eec619066ba308cf5bc8f5911d2458d24687，参考在design/reference/v4.2，任何相关后续先运行并对照。其他V4.2.1修复保持。846/68、相关6套件、Chromium/WebKit原型对照、真实PWA升级及生产数据/资源验证通过；物理Safari/原PWA仍Pending。外部证据根：artifacts/v421-remaining-reference-2026-10-10。
+START4bfa6c2；Applicationa77bcf5，END为本报告提交。A餐次末尾唯一特殊饮食入口，B定向picker空态，C十类/固定3×4/两列详情/折叠菜单/十类精确删除及独立目标，D真实持久化周期和独立营养/饮食排程、明确应用不自动写摄入。Dexie12/IDB120/Backup12/22表，Restore1–12、Sync1；历史原20表与配置保护。879/70、33既有浏览器gate、新33Chromium/4WebKit/额外4多变体、68原型状态、真实PWA升级及线上资源/交互/既有profile离线均通过。四不可改原型在design/reference/2026-10-11-combined；旧V4.2保留。必要视觉差异已记，真机Pending，完整周期报告未实施。外部证据根artifacts/combined-2026-10-11。
