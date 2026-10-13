@@ -5,7 +5,7 @@ import { formatNumber } from './nutrition'
 
 export interface TodayActivityState { status: string; meta: string; action: string }
 export function getTodayWeightState(weights: WeightLog[], today: string): TodayActivityState {
-  const eligible = weights.filter((item) => item.date <= today).sort((a, b) => b.date.localeCompare(a.date))
+  const eligible = weights.filter((item) => item.date <= today && Number.isFinite(item.weightKg) && item.weightKg > 0).sort((a, b) => b.date.localeCompare(a.date) || b.updatedAt.localeCompare(a.updatedAt) || b.id.localeCompare(a.id))
   const current = eligible.find((item) => item.date === today)
   const previous = eligible.find((item) => item.date < today)
   if (!current) return { status: '今日尚未记录', meta: previous ? `最近 ${formatNumber(previous.weightKg)} kg · ${formatShortDate(previous.date)}` : '暂无历史记录', action: '记录体重' }

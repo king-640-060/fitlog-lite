@@ -29,9 +29,10 @@ export async function createCompletedSleep(startTime:string,endTime:string,datab
   validateSleepSession(record)
   return database.transaction('rw',database.sleepSessions,async()=>{const old=await database.sleepSessions.get(id);if(old){if(old.startTime!==startTime||old.endTime!==endTime||old.sleepNightDate!==record.sleepNightDate)throw new Error('此记录已保存，请重新打开补录');return old}await database.sleepSessions.add(record);return record})
 }
-export async function editSleep(id:string,startTime:string,endTime:string|undefined,database:FitLogDatabase=db,now=new Date(),attribution?:{source:'auto'|'manual';date?:string}):Promise<SleepSession> {
+export async function editSleep(id:string,startTime:string,endTime:string|undefined,database:FitLogDatabase=db,now=new Date(),attribution?:{source:'auto'|'manual';date?:string},expected?:string):Promise<SleepSession> {
   return database.transaction('rw',database.sleepSessions,async()=>{
     const record=await database.sleepSessions.get(id);if(!record)throw new Error('睡眠记录已不存在')
+    if(expected!==undefined&&JSON.stringify(record)!==expected)throw new Error('记录已变化，请重新确认')
     if(Boolean(record.endTime)!==Boolean(endTime))throw new Error('请通过“我醒了”结束进行中的睡眠')
     if(Date.parse(startTime)>now.getTime()||(endTime&&Date.parse(endTime)>now.getTime()))throw new Error('睡眠时间不能晚于当前时间')
     const unchanged=Date.parse(startTime)===Date.parse(record.startTime)
@@ -46,12 +47,12 @@ export async function editSleep(id:string,startTime:string,endTime:string|undefi
     validateSleepSession(saved);await database.sleepSessions.put(saved);return saved
   })
 }
-export async function deleteSleep(id:string,database:FitLogDatabase=db):Promise<void>{await database.sleepSessions.delete(id)}
+export async function deleteSleep(id:string,database:FitLogDatabase=db,expected?:string):Promise<void>{await database.transaction('rw',database.sleepSessions,async()=>{const old=await database.sleepSessions.get(id);if(expected!==undefined&&JSON.stringify(old)!==expected)throw new Error('记录已变化，请重新确认');await database.sleepSessions.delete(id)})}
 export async function addWater(amountMl:number,database:FitLogDatabase=db,now=new Date()):Promise<WaterLog>{
   const stamp=now.toISOString(),record={id:crypto.randomUUID(),date:getLocalDateString(now),timestamp:stamp,amountMl,createdAt:stamp,updatedAt:stamp}
   validateWaterLog(record);await database.waterLogs.add(record);return record
 }
-export async function editWater(id:string,amountMl:number,database:FitLogDatabase=db):Promise<void>{
-  await database.transaction('rw',database.waterLogs,async()=>{const old=await database.waterLogs.get(id);if(!old)throw new Error('饮水记录已不存在');const record={...old,amountMl,updatedAt:new Date().toISOString()};validateWaterLog(record);await database.waterLogs.put(record)})
+export async function editWater(id:string,amountMl:number,database:FitLogDatabase=db,expected?:string):Promise<void>{
+  await database.transaction('rw',database.waterLogs,async()=>{const old=await database.waterLogs.get(id);if(!old)throw new Error('饮水记录已不存在');if(expected!==undefined&&JSON.stringify(old)!==expected)throw new Error('记录已变化，请重新确认');const record={...old,amountMl,updatedAt:new Date().toISOString()};validateWaterLog(record);await database.waterLogs.put(record)})
 }
-export async function deleteWater(id:string,database:FitLogDatabase=db):Promise<void>{await database.waterLogs.delete(id)}
+export async function deleteWater(id:string,database:FitLogDatabase=db,expected?:string):Promise<void>{await database.transaction('rw',database.waterLogs,async()=>{const old=await database.waterLogs.get(id);if(expected!==undefined&&JSON.stringify(old)!==expected)throw new Error('记录已变化，请重新确认');await database.waterLogs.delete(id)})}

@@ -23,6 +23,7 @@ export type DayDeletionCategory = keyof typeof dayDeletionSources
 export interface DayDeletionPreview {
   date: string; categories: DayDeletionCategory[]; includeNutritionTarget: boolean
   counts: Partial<Record<DayDeletionCategory | 'nutritionTarget', number>>
+  subtaskCount: number
   signature: string
 }
 import { readDailyRecords, dailyRecordTables } from './dailyRecordsSummary'
@@ -35,7 +36,7 @@ export async function previewDayDeletion(date: string, categories: DayDeletionCa
   const records = (await readDailyRecords(date, database)).source
   const facts: Array<[string, unknown[]]> = selected.map(c=>[c, (records[dayDeletionSources[c]] ?? []).slice().sort((a,b)=>a.id.localeCompare(b.id))])
   if (includeNutritionTarget) facts.push(['nutritionTarget', records.nutritionTargets])
-  return { date, categories:selected, includeNutritionTarget, counts:Object.fromEntries(facts.map(([key,rows])=>[key,(rows as unknown[]).length])), signature:JSON.stringify(facts) }
+  return { date, categories:selected, includeNutritionTarget, counts:Object.fromEntries(facts.map(([key,rows])=>[key,(rows as unknown[]).length])), subtaskCount:selected.includes('plan')?(records.tasks??[]).reduce((n,task)=>n+(task.subtasks?.length??0),0):0, signature:JSON.stringify(facts) }
 }
 export async function deleteDayRecords(preview: DayDeletionPreview, database: FitLogDatabase = db): Promise<void> {
   await database.transaction('rw', dailyRecordTables.map(t=>database.table(t)), async()=>{

@@ -1,0 +1,9 @@
+.record-history-filters { display:flex; flex-wrap:wrap; align-items:end; gap:8px; min-width:0; }
+.record-history-filters label { display:grid; gap:4px; color:var(--text-secondary); font-size:var(--type-meta); }
+.record-history-filters select { min-height:44px; font-size:1rem; }
+.record-history-filters button { min-height:44px; max-width:100%; white-space:normal; }
+.history-date-group { border:1px solid var(--border); border-radius:14px; overflow:hidden; margin:10px 0; }
+.history-date-group > summary { display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 8px; min-height:44px; padding:10px 12px; background:var(--surface-soft); cursor:pointer; }
+.history-date-group > summary span { color:var(--text-secondary); font-size:var(--type-meta); }
+.history-date-group > div { padding:0 12px; }
+[data-history-more] { min-height:44px; margin-top:8px; white-space:normal; }

@@ -1,3 +1,4 @@
+import { pagedHistoryControls, mountPagedHistory } from './pagedHistory'
 import { trendModuleHtml, trendStates, selectRecordedTrend, observeTrendRefresh, type TrendState } from './trendModule'
 import { showActionToast } from './actionToast'
 import { recoveryLineChartHtml, mountRecoveryCharts } from './recoveryLineChart'
@@ -10,7 +11,7 @@ import { formatSleepDuration, localClock, recoverySummary, recoveryDayFacts } fr
 import { getLocalDateString, shiftLocalDate } from '../utils/date'
 import { readWaterReference, saveWaterReference, observeWaterReference } from '../services/waterReferenceConfig'
 import { icon } from './icons'
-import { openHistorySheet, historyRowHtml, historyEmptyHtml, updateHistoryList, historySubview as recoverySubview, historyDatePicker } from './recordHistory'
+import { openHistorySheet, historyRowHtml, historyEmptyHtml, historySubview as recoverySubview, historyDatePicker } from './recordHistory'
 import { sleepTimelineHtml } from './sleepTimeline'
 import { resolveSleepBusinessDate, sleepAttributionDates, sleepNightLabel, getSleepBusinessDate } from '../utils/sleepBusinessDate'
 
@@ -114,20 +115,24 @@ function showWaterReference(ui:RecoveryUi):void {
   dialog.querySelector('[data-water-reference-cancel]')!.addEventListener('click',()=>dialog.close())
 }
 function showSleepHistory(ui:RecoveryUi):void {
-  const dialog=openHistorySheet(ui,'睡眠记录','<p class="recovery-note" data-sleep-legacy-note hidden>旧记录按当前本地时区推断所属夜晚；原始历史时区未保存。真实起止时间保持不变。</p><div data-sleep-history-list></div>'),list=dialog.querySelector<HTMLElement>('[data-sleep-history-list]')!,legacyNote=dialog.querySelector<HTMLElement>('[data-sleep-legacy-note]')!
+  const dialog=openHistorySheet(ui,'睡眠记录',`<div data-active-sleep-history></div><p class="recovery-note" data-sleep-legacy-note hidden>旧记录按当前本地时区推断所属夜晚；原始历史时区未保存。真实起止时间保持不变。</p>${pagedHistoryControls('sleep')}`),list=dialog.querySelector<HTMLElement>('[data-sleep-history-list]')!,legacyNote=dialog.querySelector<HTMLElement>('[data-sleep-legacy-note]')!
+  const activeHost=dialog.querySelector<HTMLElement>('[data-active-sleep-history]')!
+  const activeSub=liveQuery(()=>db.sleepSessions.where('activeKey').equals('active').first()).subscribe({next:active=>{
+    if(!dialog.open)return
+    activeHost.innerHTML=active?`<article class="record-history-row" data-history-id="${ui.esc(active.id)}"><div class="record-history-main"><strong>睡眠记录中</strong><span class="record-history-meta">${ui.esc(new Date(active.startTime).toLocaleString('zh-CN'))} 开始 · 不计入已完成历史</span></div><button type="button" class="text-btn" data-edit-sleep="${ui.esc(active.id)}">修正开始时间</button></article>`:''
+    activeHost.querySelector('button')?.addEventListener('click',()=>active&&showSleepEditor(active,ui,dialog))
+  },error:ui.fail})
+  dialog.addEventListener('close',()=>activeSub.unsubscribe(),{once:true})
   let current:SleepSession[]=[],timelineDate:string|undefined
   const timeline=()=>timelineDate?(sleepTimelineHtml(current,timelineDate,ui.esc)||historyEmptyHtml('这晚已没有睡眠记录。')):''
-  const sub=liveQuery(()=>db.sleepSessions.orderBy('startTime').reverse().toArray()).subscribe({next:rows=>{
-    if(!dialog.open)return;current=rows;legacyNote.hidden=!rows.some(s=>!s.sleepNightDate)
-    updateHistoryList(list,rows.map(s=>historyRowHtml(s.id,s.endTime?sleepNightLabel(resolveSleepBusinessDate(s)):'睡眠记录中',`${s.endTime?formatSleepDuration(s.durationMinutes!)+' · ':''}${new Date(s.startTime).toLocaleDateString('zh-CN')} ${localClock(s.startTime)} → ${s.endTime?new Date(s.endTime).toLocaleDateString('zh-CN')+' '+localClock(s.endTime):'尚未结束'}`,`data-edit-sleep="${ui.esc(s.id)}"`,ui.esc,(s.endTime?`<button type="button" class="text-btn" data-view-sleep="${ui.esc(s.id)}">查看</button>`:'' ) )).join('')||historyEmptyHtml('还没有睡眠记录。'))
-    const timelineHost=dialog.querySelector<HTMLElement>('[data-history-timeline]');if(timelineHost)timelineHost.innerHTML=timeline()
-  },error:ui.fail})
+  const stop=mountPagedHistory(dialog,'sleep',ui.esc,row=>{const s=row as SleepSession;return historyRowHtml(s.id,sleepNightLabel(resolveSleepBusinessDate(s)),`${formatSleepDuration(s.durationMinutes!)} · ${new Date(s.startTime).toLocaleDateString('zh-CN')} ${localClock(s.startTime)} → ${new Date(s.endTime!).toLocaleDateString('zh-CN')} ${localClock(s.endTime!)}`,`data-edit-sleep="${ui.esc(s.id)}"`,ui.esc,`<button type="button" class="text-btn" data-view-sleep="${ui.esc(s.id)}">查看</button>`)},rows=>{current=rows as SleepSession[];legacyNote.hidden=!current.some(s=>!s.sleepNightDate);const timelineHost=dialog.querySelector<HTMLElement>('[data-history-timeline]');if(timelineHost)timelineHost.innerHTML=timeline()},ui.fail)
+
   list.addEventListener('click',async event=>{const b=(event.target as Element).closest<HTMLElement>('button');if(!b)return;const id=b.dataset.historyEdit??b.dataset.historyDelete??b.dataset.viewSleep,record=current.find(s=>s.id===id);if(!record)return
     if(b.hasAttribute('data-history-edit'))showSleepEditor(record,ui,dialog)
     if(b.hasAttribute('data-view-sleep')){const date=resolveSleepBusinessDate(record);timelineDate=date;recoverySubview(dialog,sleepNightLabel(date),`<div data-history-timeline>${timeline()}</div>`,()=>{timelineDate=undefined})}
-    if(b.hasAttribute('data-history-delete')&&await ui.confirm('删除睡眠记录？','仅删除这一条记录，真实时间和其它记录保留。'))try{await deleteSleep(record.id)}catch(e){ui.fail(e)}
+    if(b.hasAttribute('data-history-delete')&&await ui.confirm('删除睡眠记录？',`将删除 ${sleepNightLabel(resolveSleepBusinessDate(record))}的这一段睡眠：${new Date(record.startTime).toLocaleString('zh-CN')} → ${new Date(record.endTime!).toLocaleString('zh-CN')}，${formatSleepDuration(record.durationMinutes!)}。其它记录保留，无法撤销。`))try{await deleteSleep(record.id,db,JSON.stringify(record))}catch(e){ui.fail(e)}
   })
-  dialog.addEventListener('close',()=>sub.unsubscribe(),{once:true})
+  dialog.addEventListener('close',stop,{once:true})
 }
 function showSleepEditor(record:SleepSession,ui:RecoveryUi,parent?:HTMLDialogElement):void {
   let startDate=getLocalDateString(new Date(record.startTime)),endDate=record.endTime?getLocalDateString(new Date(record.endTime)):undefined
@@ -137,25 +142,23 @@ function showSleepEditor(record:SleepSession,ui:RecoveryUi,parent?:HTMLDialogEle
   dialog.querySelector('[name=start]')!.addEventListener('input',syncNightChoices)
   dialog.querySelector('[data-sleep-start-date]')!.addEventListener('click',()=>recoveryDatePicker(dialog,ui,'睡眠开始日期',startDate,d=>{startDate=d;dialog.querySelector('[data-sleep-start-date]')!.textContent=d;syncNightChoices()}))
   dialog.querySelector('[data-sleep-end-date]')?.addEventListener('click',()=>recoveryDatePicker(dialog,ui,'睡眠结束日期',endDate!,d=>{endDate=d;dialog.querySelector('[data-sleep-end-date]')!.textContent=d}))
-  bindSave(dialog,'[data-sleep-form]',ui,async form=>{const f=new FormData(form),start=startDate===getLocalDateString(new Date(record.startTime))&&f.get('start')===localClock(record.startTime)?record.startTime:new Date(`${startDate}T${f.get('start')}:00`).toISOString(),end=endDate?(record.endTime&&endDate===getLocalDateString(new Date(record.endTime))&&f.get('end')===localClock(record.endTime)?record.endTime:new Date(`${endDate}T${f.get('end')}:00`).toISOString()):undefined;const choice=String(f.get('night'));await editSleep(record.id,start,end,db,new Date(),choice==='auto'?{source:'auto'}:{source:'manual',date:choice})},done)
+  bindSave(dialog,'[data-sleep-form]',ui,async form=>{const f=new FormData(form),start=startDate===getLocalDateString(new Date(record.startTime))&&f.get('start')===localClock(record.startTime)?record.startTime:new Date(`${startDate}T${f.get('start')}:00`).toISOString(),end=endDate?(record.endTime&&endDate===getLocalDateString(new Date(record.endTime))&&f.get('end')===localClock(record.endTime)?record.endTime:new Date(`${endDate}T${f.get('end')}:00`).toISOString()):undefined;const choice=String(f.get('night'));await editSleep(record.id,start,end,db,new Date(),choice==='auto'?{source:'auto'}:{source:'manual',date:choice},JSON.stringify(record))},done)
 }
 export function showWaterEditor(record:WaterLog|undefined,ui:RecoveryUi,parent?:HTMLDialogElement,entryDate?:string):void {
   const {dialog,done}=formSurface(parent,ui,record?'修改饮水':'记录饮水',`<form class="form" data-water-form>${entryDate?`<p class="recovery-note">${entryDate} · 记录实际饮水</p>`:''}<label>饮水量（ml）<input name="amount" type="number" inputmode="numeric" min="1" max="100000" step="1" required value="${record?.amountMl??''}" placeholder="例如：350"></label><p role="alert" data-recovery-error hidden></p><button class="primary full-btn" type="submit">保存饮水记录</button></form>`)
-  bindSave(dialog,'[data-water-form]',ui,async form=>{const amount=Number(new FormData(form).get('amount'));if(record)await editWater(record.id,amount);else {const saved=await addWater(amount,db,entryDate?new Date(`${entryDate}T12:00:00`):new Date());selectRecordedTrend('water',saved.date);waterUndo(saved)}},done)
+  bindSave(dialog,'[data-water-form]',ui,async form=>{const amount=Number(new FormData(form).get('amount'));if(record)await editWater(record.id,amount,db,JSON.stringify(record));else {const saved=await addWater(amount,db,entryDate?new Date(`${entryDate}T12:00:00`):new Date());selectRecordedTrend('water',saved.date);waterUndo(saved)}},done)
 }
 function bindSave(dialog:HTMLDialogElement,selector:string,_ui:RecoveryUi,save:(form:HTMLFormElement)=>Promise<void>,done:()=>void):void {
   const form=dialog.querySelector<HTMLFormElement>(selector)!;let busy=false
   form.addEventListener('submit',async e=>{e.preventDefault();if(busy)return;busy=true;const b=form.querySelector<HTMLButtonElement>('[type=submit]')!;b.disabled=true;b.setAttribute('aria-busy','true');try{await save(form);done()}catch(error){const message=form.querySelector<HTMLElement>('[data-recovery-error]')!;message.hidden=false;message.textContent=error instanceof Error?error.message:'保存失败，请重试'}finally{busy=false;b.disabled=false;b.removeAttribute('aria-busy')}})
 }
 function showWaterHistory(ui:RecoveryUi):void {
-  let date=getLocalDateString(),current:WaterLog[]=[],sub:{unsubscribe():void}|undefined
-  const dialog=openHistorySheet(ui,'饮水记录','<div class="record-history-heading"><button type="button" class="text-btn" data-water-date></button><span data-water-history-total></span></div><div data-water-history-list></div>')
-  const list=dialog.querySelector<HTMLElement>('[data-water-history-list]')!,dateButton=dialog.querySelector<HTMLElement>('[data-water-date]')!,totalLabel=dialog.querySelector<HTMLElement>('[data-water-history-total]')!
-  const draw=()=>{if(!dialog.open)return;dateButton.textContent=new Date(date+'T12:00:00').toLocaleDateString('zh-CN');totalLabel.textContent=current.length?`当日共 ${current.reduce((n,w)=>n+w.amountMl,0)} ml`:'当天未记录饮水';updateHistoryList(list,current.map(w=>historyRowHtml(w.id,`${w.amountMl} ml`,localClock(w.timestamp),`data-edit-water="${ui.esc(w.id)}"`,ui.esc)).join('')||historyEmptyHtml('当天还没有饮水记录。'))}
-  const subscribe=()=>{sub?.unsubscribe();const selected=date;sub=liveQuery(()=>db.waterLogs.where('date').equals(selected).reverse().sortBy('timestamp')).subscribe({next:rows=>{if(selected!==date)return;current=rows;draw()},error:ui.fail})}
-  list.addEventListener('click',async event=>{const b=(event.target as Element).closest<HTMLElement>('button');if(!b)return;const record=current.find(w=>w.id===(b.dataset.historyEdit??b.dataset.historyDelete));if(!record)return;if(b.hasAttribute('data-history-edit'))showWaterEditor(record,ui,dialog);if(b.hasAttribute('data-history-delete')&&await ui.confirm('删除饮水记录？','仅删除这一条饮水记录。'))try{await deleteWater(record.id)}catch(e){ui.fail(e)}})
-  dateButton.addEventListener('click',()=>recoveryDatePicker(dialog,ui,'选择饮水日期',date,d=>{date=d;subscribe()}));subscribe();dialog.addEventListener('close',()=>sub?.unsubscribe(),{once:true})
+  let current:WaterLog[]=[]
+  const dialog=openHistorySheet(ui,'饮水记录',pagedHistoryControls('water')),list=dialog.querySelector<HTMLElement>('[data-water-history-list]')!
+  mountPagedHistory(dialog,'water',ui.esc,row=>{const w=row as WaterLog;return historyRowHtml(w.id,`${w.amountMl} ml`,`${w.date} · ${localClock(w.timestamp)}`,`data-edit-water="${ui.esc(w.id)}"`,ui.esc)},rows=>{current=rows as WaterLog[]},ui.fail)
+  list.addEventListener('click',async event=>{const b=(event.target as Element).closest<HTMLElement>('button');if(!b)return;const record=current.find(w=>w.id===(b.dataset.historyEdit??b.dataset.historyDelete));if(!record)return;if(b.hasAttribute('data-history-edit'))showWaterEditor(record,ui,dialog);if(b.hasAttribute('data-history-delete')&&await ui.confirm('删除饮水记录？',`仅删除 ${record.date} ${localClock(record.timestamp)} 的 ${record.amountMl} ml 记录。`))try{await deleteWater(record.id,db,JSON.stringify(record))}catch(e){ui.fail(e)}})
 }
+
 function waterUndo(record:WaterLog):void {
   showActionToast(`已记录 ${record.amountMl} ml`,{className:'water-undo',duration:6000,action:{label:'撤销',run:async()=>{try{await deleteWater(record.id)}catch{throw new Error('撤销未完成，请重试')}}}})
 }

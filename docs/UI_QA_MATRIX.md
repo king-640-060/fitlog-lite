@@ -239,3 +239,8 @@ Use [approved acceptance matrix](../design/reference/2026-10-11-combined/ACCEPTA
 Add combinedHandoff.mjs: four widths320/375/390/430 × fonts100/120/140/200 × light/dark plus landscape, exact prototypeSHA, selected-date quiet DietEvent count/full notes, scoped picker draft return,42-date ten stable slots/plan semantic position, ten full disclosures/default-folded menus, optional target protection/confirmation, real cycle multi/cross-week assignment/masks/cancel-copy/save/reopen/no fact writes/explicit target application. Actual prototype originals and computed styles must be compared with production; accessibility differences are explicit. WebKit targeted contexts supplement Chromium; physical Safari/PWA stay Pending.
 
 Retain all33 preceding browser suites, product unit tests and PWA prompt/legacy upgrade gates. Expand immutable V11→V12 migration to22stores and Backup12/Restore1–12; verify old20 hashes, config hashes, offline App/SW/resource identity in the same existing synthetic production profile before/after application and report-only END. No clearing/reseeding that preservation profile. Per-category/optional-target delete, stale preview, rollback, cross-night/other-date/definition protection, cycle revisions/source/missing-template/conflicts/DST/copy/backup/encryption/restore rollback have real service tests. No simulated algorithm or lowered assertions.
+
+
+## Approved joint v0.5 (2026-10-12)
+
+Follow [Approved joint v0.5 contract](APPROVED_JOINT_V05.md). It supersedes prior smart-completion entries, whole-row Habit toggles, flat recovery history and version12 descriptions for this release. Preserve all preceding unrelated data/UI contracts.

@@ -1,0 +1,90 @@
+[
+  {
+    "engine": "chromium",
+    "width": 390,
+    "fontScale": 100,
+    "theme": "light",
+    "scene": "calendar",
+    "approved": "chromium-390-100-light-calendar-approved.png",
+    "actual": "chromium-390-100-light-calendar-local.png",
+    "approvedSha256": "320d78677f35bb3d2be1a6524645d603b5583cb0dc02c3fc9bf05390c86f1b87",
+    "actualSha256": "26baf59275d77288f81669316c7947ab83ab1de30cba6fb646032fea54f4767f"
+  },
+  {
+    "engine": "chromium",
+    "width": 390,
+    "fontScale": 100,
+    "theme": "light",
+    "scene": "subtasks-expanded",
+    "approved": "chromium-390-100-light-subtasks-expanded-approved.png",
+    "actual": "chromium-390-100-light-subtasks-expanded-local.png",
+    "approvedSha256": "38fd1ad599057d4a94fe54c9d6fb450203c0a8fac43d649e5ee632abc96bff22",
+    "actualSha256": "768066acc3202ad684eba49b48f2504f4f84f3a63dfe77f7b25a198bf6d8b233"
+  },
+  {
+    "engine": "chromium",
+    "width": 390,
+    "fontScale": 100,
+    "theme": "light",
+    "scene": "habit-delete",
+    "approved": "chromium-390-100-light-habit-delete-approved.png",
+    "actual": "chromium-390-100-light-habit-delete-local.png",
+    "approvedSha256": "ed89cc79e891cb04e7e39ef52185fe06ede11aa04274d597dfd4ab77c81b1b74",
+    "actualSha256": "cc43605e88f9e193edb1c54508851d76625c6e21c8f08c8b986c6a0cf63ac2e0"
+  },
+  {
+    "engine": "chromium",
+    "width": 390,
+    "fontScale": 100,
+    "theme": "light",
+    "scene": "cycle-report",
+    "approved": "chromium-390-100-light-cycle-report-approved.png",
+    "actual": "chromium-390-100-light-cycle-report-local.png",
+    "approvedSha256": "6f7c792d722bb11c32a9bf71ed79a924e8714e2023459ebc528c39c682a5f907",
+    "actualSha256": "524dd58c5a1c9ec57f20184439479f8ede3475a35011fc748a6aa4dbfca8389e"
+  },
+  {
+    "engine": "chromium",
+    "width": 320,
+    "fontScale": 200,
+    "theme": "dark",
+    "scene": "calendar",
+    "approved": "chromium-320-200-dark-calendar-approved.png",
+    "actual": "chromium-320-200-dark-calendar-local.png",
+    "approvedSha256": "7bab47d832c28a820eb21ed72b7f84c997be65402f2a45d0e81e76e3fc805395",
+    "actualSha256": "83c972c505ea3c588a0e9a7f6a4e719364b534ea5c302192bd4281ad18238a1a"
+  },
+  {
+    "engine": "chromium",
+    "width": 320,
+    "fontScale": 200,
+    "theme": "dark",
+    "scene": "subtasks-expanded",
+    "approved": "chromium-320-200-dark-subtasks-expanded-approved.png",
+    "actual": "chromium-320-200-dark-subtasks-expanded-local.png",
+    "approvedSha256": "5d137a1edef8fac0840b875f30bd0f7e713c17b4152e5cc058e63de54a9267bf",
+    "actualSha256": "52a942e1decb97f93f16b24700c0540fc6ad2891c04bf67616212f749cff9445"
+  },
+  {
+    "engine": "chromium",
+    "width": 320,
+    "fontScale": 200,
+    "theme": "dark",
+    "scene": "history-water",
+    "approved": "chromium-320-200-dark-history-water-approved.png",
+    "actual": "chromium-320-200-dark-history-water-local.png",
+    "approvedSha256": "aba7c8d50ee48971eaeb923c3a822cf33a27518288e6c4dec348056624aae41c",
+    "actualSha256": "b09abbf1cceb28812298dddb736610a53203165a3a03c80fb32335b82aad251c"
+  },
+  {
+    "engine": "chromium",
+    "width": 320,
+    "fontScale": 200,
+    "theme": "dark",
+    "scene": "cycle-report",
+    "approved": "chromium-320-200-dark-cycle-report-approved.png",
+    "actual": "chromium-320-200-dark-cycle-report-local.png",
+    "approvedSha256": "2755f1addc7be5dc64896bc9a421374fd06ec7f7aab796619ac9c94f304114d3",
+    "actualSha256": "3d66cc8dcf4f61a0fc540fd2ff66c47a816a9831ac39203cf34ad3e840de7b58"
+  }
+]

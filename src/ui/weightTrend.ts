@@ -12,7 +12,7 @@ export function mountWeightTrend(root:HTMLElement,ui:RecoveryUi,options:{state:T
   if(disposed||!root.isConnected)return
   const scroll=root.querySelector<HTMLElement>('.weight-chart-scroll');if(scroll&&state.initialized)state.scroll=scroll.scrollLeft
   const focus=document.activeElement instanceof HTMLElement&&root.contains(document.activeElement)?document.activeElement:undefined,key=focus?.id,range=focus?.dataset.range
-  chartDispose?.();const today=getLocalDateString(),actual=weights.filter(w=>Number.isFinite(w.weightKg)&&w.weightKg>0&&w.date>=shiftLocalDate(today,1-state.range)&&w.date<=today),todayWeight=weights.filter(w=>w.date===today).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt))[0]
+  chartDispose?.();const today=getLocalDateString(),actual=weights.filter(w=>Number.isFinite(w.weightKg)&&w.weightKg>0&&w.date>=shiftLocalDate(today,1-state.range)&&w.date<=today).sort((a,b)=>a.date.localeCompare(b.date)||a.updatedAt.localeCompare(b.updatedAt)||a.id.localeCompare(b.id)),todayWeight=actual.filter(w=>w.date===today).sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt)||b.id.localeCompare(a.id))[0]
   const selected=actual.find(w=>w.id===state.selected)??actual.at(-1);state.selected=selected?.id
   root.innerHTML=trendModuleHtml('weight',weightChartHtml(actual,state.selected,'weight-chart',{start:shiftLocalDate(today,1-state.range),end:today}),state,`<button type="button" class="primary" id="record-weight">${todayWeight?'修改今日体重':'记录体重'}</button>`)
   root.querySelector('#weight-history-open')!.addEventListener('click',()=>showWeightHistory(ui))

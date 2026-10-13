@@ -1,5 +1,9 @@
+import { loadNutritionCycleReport } from './services/nutritionCycleReportService'
+import { nutritionCycleReportHtml } from './ui/nutritionCycleReport'
+import { setupAppearance } from './services/appearanceConfig'
+import { showAppearance } from './ui/appearance'
 import { applyScheduledDietTemplate, scheduledNutritionDay, dietTemplateSourceFingerprint } from './services/nutritionCycleService'
-import { showScheduledTargetPreview } from './ui/nutritionCycles'
+import { showScheduledTargetPreview, showNutritionCycles } from './ui/nutritionCycles'
 import './styles/nutritionCycles.css'
 import { openNutritionCompletionSheet, type CompletionMode } from './ui/nutritionCompletionSheet'
 import { openMealEntry } from './ui/mealEntry'
@@ -43,6 +47,9 @@ import './styles/recovery.css'
 import './styles/macroNutritionSummary.css'
 import './styles/nutritionBudget.css'
 import './styles/modules.css'
+import './styles/appearance.css'
+import './styles/cycleReport.css'
+import './styles/history.css'
 import { showNutritionStrategyPicker, showNutritionStrategyManager } from './ui/nutritionStrategies'
 import { bindEnergyEditor } from './ui/energyEditor'
 import { showFoodVisionImport } from './ui/foodVisionImport'
@@ -56,7 +63,7 @@ import { AiOrchestrator } from './ai/orchestrator'
 import { Chart, registerables } from 'chart.js'
 import { db } from './db/database'
 import { getNutritionCompletionSummary, type NutritionCompletionSummary } from './utils/nutritionCompletion'
-import type { CardioActivityType, CardioSession, DietTemplate, Exercise, Food, FoodLog, Habit, HabitCheckIn, MealType, NutritionGoal, NutritionTarget, Task, TaskTag, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
+import type { CardioActivityType, CardioSession, DietTemplate, Exercise, Food, FoodLog, Habit, HabitCheckIn, MealType, NutritionGoal, NutritionTarget, Task, TaskSubtask, TaskTag, Workout, WorkoutExercise, WorkoutSet, WorkoutTemplate, WorkoutTemplateExercise } from './db/types'
 import { exportBackup, restoreBackup, validateBackup, type ValidatedBackup } from './services/backupService'
 import { calendarOperationsHtml, bindDayRecordManagement } from './ui/dayRecordManagement'
 import { deleteCardioSession, getCardioSessionsByDate, saveCardioSession, updateCardioSession } from './services/cardioService'
@@ -64,7 +71,7 @@ import { deleteFoodLog, deleteFoodLogsForMeal, saveFood, updateFoodLogDetails, v
 import { buildImportPreview, parseFoodCsv, parseFoodJson, type ImportPreview } from './services/importService'
 import { upsertWeight } from './services/weightService'
 import { createHabit, deleteHabitWithHistory, deleteUnusedHabit, getActiveHabits, getHabitCheckInsByDate, reorderHabits, setHabitActive, toggleHabitCheckIn, updateHabit } from './services/habitService'
-import { createTask, deleteTask, getInboxTasks, getTasksByDate, getUpcomingTasks, sortTasksForPlan, toggleTaskCompletion, updateTask } from './services/taskService'
+import { createTask, deleteTask, getInboxTasks, getTasksByDate, getUpcomingTasks, sortTasksForPlan, toggleTaskCompletion, toggleSubtaskCompletion, taskFingerprint, updateTask } from './services/taskService'
 import { createTaskTag, deleteTaskTag, getTaskTags, getTaskTagUsageCount, updateTaskTag } from './services/taskTagService'
 import { deleteNutritionTarget, normalizeNutritionGoal, saveNutritionTarget } from './services/nutritionTargetService'
 import { deletePelvicFloorSession, pelvicFloorSessionDurationSeconds, savePelvicFloorSession, sessionFromPelvicFloorTimer } from './services/pelvicFloorService'
@@ -92,7 +99,9 @@ import { calculateNutrition, formatNumber } from './utils/nutrition'
 import { cardioActivityDefinitions, formatCardioMetrics, getCardioActivityLabel, getCardioActivityType } from './utils/cardio'
 import { getReportRange, shiftReportPeriod, type ReportMode, type ReportResult } from './utils/reporting'
 import { getTodayPelvicState, getTodayWeightState } from './utils/todayActivity'
+import { latestValidDayWeight } from './utils/recovery'
 
+setupAppearance()
 Chart.register(...registerables)
 const pwaRuntime = new PwaRuntime()
 
@@ -124,7 +133,8 @@ let workoutEditorOpen = false
 let showWorkoutHistory = false
 
 const coachState:CoachState={focus:'all',metric:'load'}
-let reportMode: ReportMode = 'week'
+let selectedCycleReport: string | undefined
+let reportMode: ReportMode | 'cycle' = 'week'
 let reportAnchorDate = getLocalDateString()
 let trainingCompletion: TrainingCompletion | undefined
 let pelvicTimerState: PelvicFloorTimerState | undefined
@@ -239,10 +249,10 @@ function showBusinessDatePicker(title: string, date: string, commit: (date: stri
   dialog.addEventListener('close', () => picker.destroy(), { once: true })
 }
 
-function confirmAction(title: string, message: string, confirmLabel = '确认删除', danger = true, cancelLabel = '取消', layout?: 'meal-clear'): Promise<boolean> {
+function confirmAction(title: string, message: string, confirmLabel = '确认删除', danger = true, cancelLabel = '取消', layout?: 'meal-clear' | 'habit-delete'): Promise<boolean> {
   return new Promise((resolve) => {
     const dialog = document.createElement('dialog')
-    dialog.className = `confirm-dialog${layout === 'meal-clear' ? ' meal-clear-confirm' : ''}`
+    dialog.className = `confirm-dialog${layout === 'meal-clear' ? ' meal-clear-confirm' : layout === 'habit-delete' ? ' habit-delete-confirm' : ''}`
     dialog.innerHTML = `<div class="confirm-mark ${danger ? 'danger-mark' : ''}">${icon(danger ? 'trash' : 'check', 24)}</div><h2>${esc(title)}</h2><p>${esc(message)}</p><div class="dialog-actions"><button data-cancel>${esc(cancelLabel)}</button><button class="${danger ? 'danger-solid' : 'primary'}" data-confirm>${esc(confirmLabel)}</button></div>`
     let result = false
     dialog.querySelector('[data-cancel]')?.addEventListener('click', () => dialog.close())
@@ -331,10 +341,11 @@ function todayHabitCardHtml(habits: Habit[], checkIns: HabitCheckIn[], date: str
   const checked = new Set(checkIns.map((item) => item.habitId))
   const count = habits.filter((habit) => checked.has(habit.id)).length
   const weekday = ((new Date(`${date}T12:00:00`).getDay() + 6) % 7) + 1
-  return `<section class="today-card today-activity-card today-habits-card" id="today-habits"><div class="card-heading today-activity-head"><div><span class="card-icon habit-icon">${icon('check', 20)}</span><h2>习惯</h2></div><button class="text-btn" id="today-habits-manage">管理 ${icon('chevron', 16)}</button></div>${habits.length ? `<div class="today-habit-list">${habits.map((habit) => `<button class="today-habit-row" type="button" data-habit-toggle="${esc(habit.id)}" aria-pressed="${checked.has(habit.id)}"><span class="habit-check-indicator" aria-hidden="true">${icon('check', 16)}</span><span class="habit-row-name">${esc(habit.name)}</span>${habit.weekdays?.includes(weekday) ? '<small class="habit-planned-badge">计划</small>' : ''}</button>`).join('')}</div><p class="today-habit-summary" id="today-habit-summary">${habitTodaySummary(count)}</p>` : '<div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">还没有习惯</strong><span class="today-activity-meta">完成时轻触打卡即可</span></div><button class="secondary today-activity-action" id="today-habit-create">新建习惯</button></div>'}</section>`
+  return `<section class="today-card today-activity-card today-habits-card" id="today-habits"><div class="card-heading today-activity-head"><div><span class="card-icon habit-icon">${icon('check', 20)}</span><h2>习惯</h2></div><button class="text-btn" id="today-habits-manage">管理 ${icon('chevron', 16)}</button></div>${habits.length ? `<div class="today-habit-list">${habits.map((habit) => `<div class="today-habit-row"><button class="today-habit-check" type="button" data-habit-toggle="${esc(habit.id)}" aria-pressed="${checked.has(habit.id)}" aria-label="${checked.has(habit.id)?'取消打卡':'完成打卡'} ${esc(habit.name)}"><span class="habit-check-indicator" aria-hidden="true">${icon('check',16)}</span></button><button class="today-habit-detail" type="button" data-habit-detail="${esc(habit.id)}" aria-label="查看习惯 ${esc(habit.name)}"><span class="habit-row-name">${esc(habit.name)}</span>${habit.weekdays?.includes(weekday) ? '<small class="habit-planned-badge">计划</small>' : ''}${icon('chevron',16)}</button></div>`).join('')}</div><p class="today-habit-summary" id="today-habit-summary">${habitTodaySummary(count)}</p>` : '<div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">还没有习惯</strong><span class="today-activity-meta">完成时轻触打卡即可</span></div><button class="secondary today-activity-action" id="today-habit-create">新建习惯</button></div>'}</section>`
 }
 
 function bindTodayHabitCard(root: ParentNode, date: string): void {
+  root.querySelectorAll<HTMLElement>('[data-habit-detail]').forEach(button=>button.addEventListener('click',()=>void showHabitManager(false,undefined,button.dataset.habitDetail)))
   root.querySelector('#today-habits-manage')?.addEventListener('click', () => void showHabitManager())
   root.querySelector('#today-habit-create')?.addEventListener('click', () => void showHabitManager(true))
   root.querySelectorAll<HTMLButtonElement>('[data-habit-toggle]').forEach((button) => button.addEventListener('click', () => {
@@ -344,6 +355,7 @@ function bindTodayHabitCard(root: ParentNode, date: string): void {
       const checked = await toggleHabitCheckIn(id, date)
       if (!button.isConnected) return
       button.setAttribute('aria-pressed', String(checked))
+      button.setAttribute('aria-label',`${checked?'取消打卡':'完成打卡'} ${button.closest('.today-habit-row')?.querySelector('.habit-row-name')?.textContent??''}`)
       button.classList.toggle('is-checked', checked)
       const card = button.closest('#today-habits')!
       const count = card.querySelectorAll('[data-habit-toggle][aria-pressed="true"]').length
@@ -368,7 +380,7 @@ async function refreshTodayHabitCard(): Promise<void> {
   bindTodayHabitCard(card, date)
 }
 
-async function showHabitManager(openCreate = false, surface?: ManagedSurfaceContext): Promise<void> {
+async function showHabitManager(openCreate = false, surface?: ManagedSurfaceContext, editId?: string): Promise<void> {
   // Manager and editor share the existing large frame, never freeze an empty manager's short height.
   if (surface && !surface.alive) return
   const dialog = mountManagementModal(surface, '习惯', '<div id="habit-manager-body"></div>', true)
@@ -435,14 +447,15 @@ async function showHabitManager(openCreate = false, surface?: ManagedSurfaceCont
       button.disabled = true
       try {
         const count = await db.habitCheckIns.where('habitId').equals(habit.id).count()
-        if (!await confirmAction(count ? '删除习惯及全部记录？' : '删除习惯？', count ? `将永久删除这个习惯和 ${count} 条打卡记录。此操作无法恢复。` : '删除后无法恢复。', count ? `删除习惯及 ${count} 条记录` : '删除习惯')) return
+        if (!await confirmAction(count ? '删除习惯及全部记录？' : '删除习惯？', `将永久删除「${habit.name}」及其 ${count} 条打卡记录。此操作无法恢复。`, '永久删除', true, '取消', 'habit-delete')) return
         if (count) await deleteHabitWithHistory(habit.id, db, count); else await deleteUnusedHabit(habit.id)
         reorderMode = false; await manager(); await refreshTodayHabitCard()
       } catch (error) { fail(error) }
       finally { if (button.isConnected) button.disabled = false }
     })
   }
-  if (openCreate) await editor()
+  if (editId) { const habit=await db.habits.get(editId); if(habit)await editor(habit); else await manager() }
+  else if (openCreate) await editor()
   else await manager()
 }
 
@@ -511,7 +524,7 @@ async function renderTodayPage(): Promise<void> {
   view.querySelector('#today-workout')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = openWorkout; workoutEditorOpen = Boolean(openWorkout); showWorkoutHistory = false; void render().then(() => { if (!openWorkout) window.scrollTo({ top: 0, behavior: 'instant' }) }).catch(fail) })
   view.querySelector('#today-cardio')?.addEventListener('click', () => showCardioForm(undefined, undefined, today))
   view.querySelector('#today-weight-details')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; void render().catch(fail) })
-  view.querySelector('#today-record-weight')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; void render().then(() => showWeightForm(today, weights.find((item) => item.date === today)?.weightKg)).catch(fail) })
+  view.querySelector('#today-record-weight')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; void render().then(() => showWeightForm(today, latestValidDayWeight(weights,today))).catch(fail) })
   view.querySelector('#today-pelvic')?.addEventListener('click', () => { workoutDate = today; void showPelvicFloorSetup().catch(fail) })
   view.querySelector('#today-pelvic-history')?.addEventListener('click', () => void showPelvicFloorHistory())
   nutritionDispose?.()
@@ -521,7 +534,7 @@ async function renderTodayPage(): Promise<void> {
     view.querySelector('[data-macro-summary-host]')!.innerHTML = macroNutritionSummaryForDay(next)
     view.querySelector('[data-today-remaining]')!.innerHTML = foodCompletionStripHtml(today, getNutritionCompletionSummary(next.target ?? {}, next.logs), false)
   }, fail)
-  view.addEventListener('click', event => { if ((event.target as Element).closest('[data-today-completion]')) { activeTab = 'food'; foodDate = today; void render().then(() => showNutritionCompletion(today)).catch(fail) } })
+  view.addEventListener('click', event => { if ((event.target as Element).closest('[data-today-completion]')) { activeTab = 'food'; foodDate = today; void render().then(() => showNutritionCompletion(today, 'designated')).catch(fail) } })
   bindTodayPlanCard(view)
   bindTodayHabitCard(view, today)
   recoveryDispose?.(); recoveryDispose = mountRecovery(view.querySelector('[data-recovery-root]')!, recoveryUi())
@@ -576,12 +589,13 @@ function reportPeriodLabel(report: ReportResult): string {
 
 async function renderReportsPage():Promise<void> {
   const view=document.querySelector<HTMLElement>('#view')!,viewVersion=view.dataset.renderVersion,today=getLocalDateString(),mode=reportMode,anchor=reportAnchorDate
+  if(mode==='cycle'){await renderCycleReportsPage(view,viewVersion,today);return}
   let data=await loadCoachReport(mode,anchor,today),report=data.report
   if(activeTab!=='progress'||progressView!=='reports'||!view.isConnected||view.dataset.renderVersion!==viewVersion)return
   const isCurrent=report.range.start===getReportRange(mode,today).start,period=mode==='day'?'天':mode==='week'?'周':'月'
-  const retainedTabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page"><div class="report-mode" role="group" aria-label="报告周期">${(['day','week','month'] as const).map(m=>`<button data-report-mode="${m}" class="${mode===m?'active':''}" aria-pressed="${mode===m}">${m==='day'?'日报':m==='week'?'周报':'月报'}</button>`).join('')}</div><div class="report-period"><button id="report-previous" aria-label="上一${period}">‹</button>${mode==='day'?`<button class="text-btn fitlog-date-trigger" id="report-date-picker">${reportPeriodLabel(report)}</button>`:`<strong>${reportPeriodLabel(report)}</strong>`}<button id="report-next" aria-label="下一${period}" ${isCurrent?'disabled':''}>›</button></div>${isCurrent?'':`<button class="report-return" id="report-return">${mode==='day'?'回到今天':'回到本'+period}</button>`}<div class="report-content">${coachReportHtml(data,coachState,mode,esc)}</div></div>`)
+  const retainedTabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page"><div class="report-mode" role="group" aria-label="报告周期">${(['day','week','month','cycle'] as const).map(m=>`<button data-report-mode="${m}" class="${mode===m?'active':''}" aria-pressed="${mode===m}">${m==='day'?'日报':m==='week'?'周报':m==='month'?'月报':'周期报'}</button>`).join('')}</div><div class="report-period"><button id="report-previous" aria-label="上一${period}">‹</button>${mode==='day'?`<button class="text-btn fitlog-date-trigger" id="report-date-picker">${reportPeriodLabel(report)}</button>`:`<strong>${reportPeriodLabel(report)}</strong>`}<button id="report-next" aria-label="下一${period}" ${isCurrent?'disabled':''}>›</button></div>${isCurrent?'':`<button class="report-return" id="report-return">${mode==='day'?'回到今天':'回到本'+period}</button>`}<div class="report-content">${coachReportHtml(data,coachState,mode,esc)}</div></div>`)
   if(!retainedTabs)bindProgressTabs(view)
-  view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach(b=>b.addEventListener('click',()=>{reportMode=b.dataset.reportMode as ReportMode;void render().catch(fail)}))
+  view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach(b=>b.addEventListener('click',()=>{reportMode=b.dataset.reportMode as ReportMode|'cycle';void render().catch(fail)}))
   view.querySelector('#report-previous')?.addEventListener('click',()=>{reportAnchorDate=shiftReportPeriod(mode,anchor,-1);void render().catch(fail)})
   view.querySelector('#report-next')?.addEventListener('click',()=>{if(isCurrent)return;reportAnchorDate=shiftReportPeriod(mode,anchor,1);void render().catch(fail)})
   view.querySelector('#report-return')?.addEventListener('click',()=>{reportAnchorDate=today;void render().catch(fail)})
@@ -611,12 +625,28 @@ async function renderReportsPage():Promise<void> {
 
 }
 
+async function renderCycleReportsPage(view:HTMLElement,version:string|undefined,today:string):Promise<void> {
+  let data=await loadNutritionCycleReport(selectedCycleReport,today)
+  if(!view.isConnected||view.dataset.renderVersion!==version||progressView!=='reports'||reportMode!=='cycle')return
+  selectedCycleReport=data.selected?.id
+  const tabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page"><div class="report-mode" role="group" aria-label="报告周期">${(['day','week','month','cycle'] as const).map(m=>`<button data-report-mode="${m}" class="${m==='cycle'?'active':''}" aria-pressed="${m==='cycle'}">${m==='day'?'日报':m==='week'?'周报':m==='month'?'月报':'周期报'}</button>`).join('')}</div><div class="report-content">${nutritionCycleReportHtml(data,esc)}</div></div>`)
+  if(!tabs)bindProgressTabs(view)
+  view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach(b=>b.addEventListener('click',()=>{reportMode=b.dataset.reportMode as ReportMode|'cycle';void render().catch(fail)}))
+  const host=view.querySelector<HTMLElement>('.report-content')!,events=new AbortController()
+  host.addEventListener('change',event=>{const select=event.target as HTMLSelectElement;if(select.hasAttribute('data-cycle-report-select')){selectedCycleReport=select.value;void render().catch(fail)}},{signal:events.signal})
+  host.addEventListener('click',event=>{if((event.target as Element).closest('[data-cycle-report-manage]'))void showNutritionCycles(nutritionStrategyUi()).catch(fail)},{signal:events.signal})
+  let previous=JSON.stringify(data)
+  const sub=liveQuery(()=>loadNutritionCycleReport(selectedCycleReport,today)).subscribe({next:value=>{if(!host.isConnected||view.dataset.renderVersion!==version)return;const next=JSON.stringify(value);if(next===previous)return;previous=next;data=value;selectedCycleReport=value.selected?.id;host.innerHTML=nutritionCycleReportHtml(data,esc)},error:fail})
+  recordsDispose=()=>{events.abort();sub.unsubscribe()}
+}
+
+const expandedSubtasks = new Set<string>()
 const taskToggleQueue = new Map<string, Promise<void>>()
 
 function taskRowHtml(task: Task, tags: Map<string, TaskTag>): string {
   const visibleTags = task.tagIds.map((id) => tags.get(id)).filter((tag): tag is TaskTag => Boolean(tag))
   const time = task.startTime ? `${task.startTime}${task.endTime ? `–${task.endTime}` : ''}` : ''
-  return `<div class="plan-task-row${task.completedAt ? ' is-complete' : ''}"><button type="button" class="plan-task-check" data-task-complete="${esc(task.id)}" aria-pressed="${Boolean(task.completedAt)}" aria-label="${task.completedAt ? '撤销完成' : '完成'} ${esc(task.title)}"><span aria-hidden="true">${icon('check', 16)}</span></button><button type="button" class="plan-task-main" data-task-edit="${esc(task.id)}" aria-label="编辑 ${esc(task.title)}"><span class="plan-task-copy"><strong>${esc(task.title)}</strong>${visibleTags.length || task.note ? `<small>${visibleTags.slice(0, 2).map((tag) => `<span class="plan-tag-chip">#${esc(tag.name)}</span>`).join('')}${visibleTags.length > 2 ? `<span class="plan-tag-overflow">+${visibleTags.length - 2}</span>` : ''}${task.note ? '<span class="plan-note-meta">有备注</span>' : ''}</small>` : ''}</span>${time ? `<time>${esc(time)}</time>` : ''}${icon('chevron', 16)}</button></div>`
+  return `<article class="plan-task-item"><div class="plan-task-row${task.completedAt ? ' is-complete' : ''}"><button type="button" class="plan-task-check" data-task-complete="${esc(task.id)}" aria-pressed="${Boolean(task.completedAt)}" aria-label="${task.completedAt ? '撤销完成' : '完成'} ${esc(task.title)}"><span aria-hidden="true">${icon('check', 16)}</span></button><button type="button" class="plan-task-main" data-task-edit="${esc(task.id)}" aria-label="编辑 ${esc(task.title)}"><span class="plan-task-copy"><strong>${esc(task.title)}</strong>${visibleTags.length || task.note ? `<small>${visibleTags.slice(0, 2).map((tag) => `<span class="plan-tag-chip">#${esc(tag.name)}</span>`).join('')}${visibleTags.length > 2 ? `<span class="plan-tag-overflow">+${visibleTags.length - 2}</span>` : ''}${task.note ? '<span class="plan-note-meta">有备注</span>' : ''}</small>` : ''}</span>${time ? `<time>${esc(time)}</time>` : ''}${icon('chevron', 16)}</button></div>${task.subtasks?.length?`<details class="plan-subtasks" data-task-subtasks="${esc(task.id)}" ${expandedSubtasks.has(task.id)?'open':''}><summary>子任务 ${task.subtasks.filter(s=>s.completedAt).length}/${task.subtasks.length}</summary><div class="subtask-grid">${task.subtasks.map(sub=>`<button type="button" class="subtask-item ${[...sub.text].reduce((n,c)=>n+(/[\u2e80-\u9fff]/u.test(c)?1:.52),0)>7?'subtask-long':''}" data-subtask-toggle="${esc(sub.id)}" data-subtask-parent="${esc(task.id)}" aria-pressed="${Boolean(sub.completedAt)}" aria-label="${sub.completedAt?'取消完成':'完成'}子任务 ${esc(sub.text)}"><span class="subtask-dot" aria-hidden="true">${sub.completedAt?icon('check',12):''}</span><span class="subtask-name">${esc(sub.text)}</span></button>`).join('')}</div></details>`:''}</article>`
 }
 
 function taskGroupHtml(tasks: Task[], tags: Map<string, TaskTag>): string {
@@ -624,6 +654,13 @@ function taskGroupHtml(tasks: Task[], tags: Map<string, TaskTag>): string {
 }
 
 function bindTaskRows(root: ParentNode, afterChange: (task: Task) => Promise<void>): void {
+  root.querySelectorAll<HTMLDetailsElement>('[data-task-subtasks]').forEach(details=>details.addEventListener('toggle',()=>{if(details.open)expandedSubtasks.add(details.dataset.taskSubtasks!);else expandedSubtasks.delete(details.dataset.taskSubtasks!)}))
+  root.querySelectorAll<HTMLButtonElement>('[data-subtask-toggle]').forEach(button=>button.addEventListener('click',()=>{
+    const id=button.dataset.subtaskParent!,previous=taskToggleQueue.get(id)??Promise.resolve()
+    const next=previous.catch(()=>{}).then(async()=>{const task=await toggleSubtaskCompletion(id,button.dataset.subtaskToggle!);await afterChange(task)}).catch(fail)
+    taskToggleQueue.set(id,next);void next.finally(()=>{if(taskToggleQueue.get(id)===next)taskToggleQueue.delete(id)})
+  }))
+
   root.querySelectorAll<HTMLButtonElement>('[data-task-complete]').forEach((button) => button.addEventListener('click', () => {
     const id = button.dataset.taskComplete!
     const previous = taskToggleQueue.get(id) ?? Promise.resolve()
@@ -741,9 +778,18 @@ async function showTaskTagManager(): Promise<void> {
 async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> {
   const allTags = await getTaskTags()
   const selectedTagIds = [...(task?.tagIds ?? [])]
-  const dialog = openModal(task ? '编辑任务' : '新建任务', `<form id="task-form" class="task-editor"><label class="task-title-field">任务<input name="title" maxlength="120" value="${esc(task?.title ?? '')}" placeholder="要做什么？" required autocomplete="off" aria-expanded="false" aria-controls="task-tag-suggestions"></label><div id="task-tag-suggestions" class="task-tag-suggestions" role="listbox" hidden></div><div id="task-selected-tags" class="task-selected-tags"></div><section class="task-editor-section"><h3>日期</h3><div class="task-date-choices"><button type="button" data-task-date="today">今天</button><button type="button" data-task-date="tomorrow">明天</button><button type="button" data-task-date="none">无日期</button></div><input type="hidden" name="date" value="${esc(task?.date ?? defaultDate ?? '')}"><button type="button" id="task-date-picker-open" class="task-date-field fitlog-date-trigger">${icon('calendar', 18)}<span>选择日期</span></button></section><section class="task-editor-section" id="task-time-section"><h3>时间（可选）</h3><div class="task-time-fields"><label>开始时间<input type="time" name="startTime" value="${esc(task?.startTime ?? '')}"></label><label>结束时间<input type="time" name="endTime" value="${esc(task?.endTime ?? '')}"></label></div><p class="task-inline-error" id="task-time-error" role="alert" hidden>结束时间必须晚于开始时间</p></section><label class="task-note-field">备注（可选）<textarea name="note" maxlength="2000" rows="3" placeholder="补充一点细节">${esc(task?.note ?? '')}</textarea></label><div class="task-editor-actions"><button type="submit" class="primary full-btn">保存任务</button></div>${task ? '<button type="button" class="plan-quiet-danger" id="task-delete">删除任务</button>' : ''}</form>`)
+  const subtasks: TaskSubtask[] = structuredClone(task?.subtasks ?? [])
+  const expected = task ? taskFingerprint(task) : undefined
+  const dialog = openModal(task ? '编辑任务' : '新建任务', `<form id="task-form" class="task-editor"><label class="task-title-field">任务<input name="title" maxlength="120" value="${esc(task?.title ?? '')}" placeholder="要做什么？" required autocomplete="off" aria-expanded="false" aria-controls="task-tag-suggestions"></label><div id="task-tag-suggestions" class="task-tag-suggestions" role="listbox" hidden></div><div id="task-selected-tags" class="task-selected-tags"></div><section class="task-editor-section"><h3>日期</h3><div class="task-date-choices"><button type="button" data-task-date="today">今天</button><button type="button" data-task-date="tomorrow">明天</button><button type="button" data-task-date="none">无日期</button></div><input type="hidden" name="date" value="${esc(task?.date ?? defaultDate ?? '')}"><button type="button" id="task-date-picker-open" class="task-date-field fitlog-date-trigger">${icon('calendar', 18)}<span>选择日期</span></button></section><section class="task-editor-section" id="task-time-section"><h3>时间（可选）</h3><div class="task-time-fields"><label>开始时间<input type="time" name="startTime" value="${esc(task?.startTime ?? '')}"></label><label>结束时间<input type="time" name="endTime" value="${esc(task?.endTime ?? '')}"></label></div><p class="task-inline-error" id="task-time-error" role="alert" hidden>结束时间必须晚于开始时间</p></section><label class="task-note-field">备注（可选）<textarea name="note" maxlength="2000" rows="3" placeholder="补充一点细节">${esc(task?.note ?? '')}</textarea></label><section class="task-editor-section"><h3>子任务（可选）</h3><div data-subtask-editor></div><button type="button" class="secondary full-btn" data-subtask-add>添加子任务</button><p class="report-note">子任务独立勾选；全部完成后，主任务仍需手动勾选。</p></section><div class="task-editor-actions"><button type="submit" class="primary full-btn">保存任务</button></div>${task ? '<button type="button" class="plan-quiet-danger" id="task-delete">删除任务</button>' : ''}</form>`)
   dialog.classList.add('task-editor-sheet')
   const form = dialog.querySelector<HTMLFormElement>('#task-form')!
+  const subHost=form.querySelector<HTMLElement>('[data-subtask-editor]')!
+  const drawSubtasks=()=>{
+    subHost.innerHTML=subtasks.map((sub,i)=>`<div class="subtask-editor-row"><label>子任务 ${i+1}<textarea maxlength="500" rows="2" data-subtask-text="${esc(sub.id)}">${esc(sub.text)}</textarea></label><div class="subtask-editor-actions"><button type="button" data-subtask-up="${i}" aria-label="上移子任务 ${i+1}" ${i===0?'disabled':''}>↑</button><button type="button" data-subtask-down="${i}" aria-label="下移子任务 ${i+1}" ${i===subtasks.length-1?'disabled':''}>↓</button><button type="button" class="text-btn danger" data-subtask-remove="${i}" aria-label="移除子任务 ${i+1}">移除</button></div></div>`).join('')
+    subHost.querySelectorAll<HTMLTextAreaElement>('[data-subtask-text]').forEach(field=>field.addEventListener('input',()=>{subtasks.find(sub=>sub.id===field.dataset.subtaskText)!.text=field.value}))
+    subHost.querySelectorAll<HTMLButtonElement>('[data-subtask-up],[data-subtask-down],[data-subtask-remove]').forEach(button=>button.addEventListener('click',()=>{const i=Number(button.dataset.subtaskUp??button.dataset.subtaskDown??button.dataset.subtaskRemove);if(button.hasAttribute('data-subtask-remove'))subtasks.splice(i,1);else{const j=i+(button.hasAttribute('data-subtask-up')?-1:1);[subtasks[i],subtasks[j]]=[subtasks[j]!,subtasks[i]!]}drawSubtasks()}))
+  }
+  drawSubtasks();form.querySelector('[data-subtask-add]')!.addEventListener('click',()=>{if(subtasks.length>=100){toast('子任务最多 100 项');return}subtasks.push({id:crypto.randomUUID(),text:''});drawSubtasks()})
   const title = form.querySelector<HTMLInputElement>('[name="title"]')!
   const suggestions = form.querySelector<HTMLElement>('#task-tag-suggestions')!
   const chips = form.querySelector<HTMLElement>('#task-selected-tags')!
@@ -832,17 +878,23 @@ async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> 
   startInput.addEventListener('change', updateDateControls)
   endInput.addEventListener('change', updateDateControls)
   updateDateControls()
+  let savingTask=false
   form.addEventListener('submit', async (event) => {
     event.preventDefault()
-    if (pendingTagCreation) await pendingTagCreation
-    if (!form.reportValidity()) return
-    const values = new FormData(form)
-    const input = { title: valueOf(values, 'title'), note: valueOf(values, 'note'), date: valueOf(values, 'date') || undefined, startTime: valueOf(values, 'startTime') || undefined, endTime: valueOf(values, 'endTime') || undefined, tagIds: [...selectedTagIds] }
-    try { if (task) await updateTask(task.id, input); else await createTask(input); dialog.close(); if (activeTab === 'plan') await renderPlanPage(); else await refreshTodayPlanCard() } catch (error) { fail(error) }
+    if(savingTask)return
+    savingTask=true;const submit=form.querySelector<HTMLButtonElement>('[type=submit]')!;submit.disabled=true;submit.setAttribute('aria-busy','true')
+    try {
+      if (pendingTagCreation) await pendingTagCreation
+      if (!form.reportValidity()) return
+      const values=new FormData(form)
+      const input={title:valueOf(values,'title'),note:valueOf(values,'note'),date:valueOf(values,'date')||undefined,startTime:valueOf(values,'startTime')||undefined,endTime:valueOf(values,'endTime')||undefined,tagIds:[...selectedTagIds],...(task?.subtasks!==undefined||subtasks.length?{subtasks}: {})}
+      if(task)await updateTask(task.id,input,db,expected);else await createTask(input)
+      dialog.close();if(activeTab==='plan')await renderPlanPage();else await refreshTodayPlanCard()
+    }catch(error){fail(error)}finally{savingTask=false;submit.disabled=false;submit.removeAttribute('aria-busy')}
   })
   form.querySelector('#task-delete')?.addEventListener('click', async () => {
-    if (!task || !await confirmAction('删除这个任务？', '删除后无法恢复。', '删除任务')) return
-    try { await deleteTask(task.id); dialog.close(); if (activeTab === 'plan') await renderPlanPage(); else await refreshTodayPlanCard() } catch (error) { fail(error) }
+    if (!task || !await confirmAction('删除这个任务？', `将删除「${task.title}」及其 ${task.subtasks?.length??0} 个子任务，无法恢复。`, '删除任务')) return
+    try { await deleteTask(task.id, db, expected); dialog.close(); if (activeTab === 'plan') await renderPlanPage(); else await refreshTodayPlanCard() } catch (error) { fail(error) }
   })
 }
 
@@ -851,7 +903,7 @@ function showManagementHub(): void {
   const dialog = managementModal(surface)('管理与设置', '<div id="management-hub"></div>', true)
   const view = dialog.querySelector<HTMLElement>('#management-hub')!
   const row = (id: string, iconName: IconName, title: string, detail: string) => `<button id="${id}"><span class="setting-icon">${icon(iconName, 18)}</span><span><strong>${title}</strong><small>${detail}</small></span>${icon('chevron', 18)}</button>`
-  view.innerHTML = `<section class="settings-section"><h3>内容与模板</h3><div class="settings-group">${row('more-food-library', 'utensils', '食物库', '管理食物与营养数据')}${row('more-exercise-library', 'dumbbell', '动作库', '管理力量训练动作')}${row('more-workout-templates', 'activity', '训练模板', '管理常用训练组合')}${row('more-diet-templates', 'archive', '饮食模板', '管理常用饮食组合')}${row('more-nutrition-strategies', 'leaf', '营养模板', '管理营养目标方案')}</div></section><section class="settings-section"><h3>个人管理</h3><div class="settings-group">${row('more-habits', 'leaf', '习惯', '管理打卡习惯与计划')}</div></section><section class="settings-section"><h3>数据与备份</h3><div class="settings-group">${row('more-import', 'upload', '导入数据', '从文件导入食物数据')}${row('more-backup', 'download', '备份与恢复', '导出或恢复本地数据')}${row('more-github-sync', 'archive', 'GitHub 同步', esc(githubSyncDetail()))}</div><p class="settings-section-note" role="note">数据保存在当前设备。更换设备或清除浏览器数据前，请先备份。</p></section><section class="settings-section"><h3>应用</h3><div class="settings-group">${row('more-ai-settings', 'sparkles', 'AI 设置', esc(aiSettingsDetail()))}${row('more-diagnostics', 'info', '版本诊断', '查看版本、更新与 Service Worker 状态')}${row('more-about', 'info', '关于 FitLog Lite', '应用信息与版本说明')}</div></section>`
+  view.innerHTML = `<section class="settings-section"><h3>内容与模板</h3><div class="settings-group">${row('more-food-library', 'utensils', '食物库', '管理食物与营养数据')}${row('more-exercise-library', 'dumbbell', '动作库', '管理力量训练动作')}${row('more-workout-templates', 'activity', '训练模板', '管理常用训练组合')}${row('more-diet-templates', 'archive', '饮食模板', '管理常用饮食组合')}${row('more-nutrition-strategies', 'leaf', '营养模板', '管理营养目标方案')}</div></section><section class="settings-section"><h3>个人管理</h3><div class="settings-group">${row('more-habits', 'leaf', '习惯', '管理打卡习惯与计划')}</div></section><section class="settings-section"><h3>数据与备份</h3><div class="settings-group">${row('more-import', 'upload', '导入数据', '从文件导入食物数据')}${row('more-backup', 'download', '备份与恢复', '导出或恢复本地数据')}${row('more-github-sync', 'archive', 'GitHub 同步', esc(githubSyncDetail()))}</div><p class="settings-section-note" role="note">数据保存在当前设备。更换设备或清除浏览器数据前，请先备份。</p></section><section class="settings-section"><h3>应用</h3><div class="settings-group">${row('more-appearance', 'leaf', '外观', '跟随系统 / 始终浅色 / 始终深色')}${row('more-ai-settings', 'sparkles', 'AI 设置', esc(aiSettingsDetail()))}${row('more-diagnostics', 'info', '版本诊断', '查看版本、更新与 Service Worker 状态')}${row('more-about', 'info', '关于 FitLog Lite', '应用信息与版本说明')}</div></section>`
   surface.onResume(() => {
     view.querySelector('#more-github-sync small')!.textContent = githubSyncDetail()
     view.querySelector('#more-ai-settings small')!.textContent = aiSettingsDetail()
@@ -865,6 +917,7 @@ function showManagementHub(): void {
   view.querySelector('#more-backup')?.addEventListener('click', () => surface.navigate('备份与恢复', surface => showSettings(surface).catch(fail)))
   view.querySelector('#more-nutrition-strategies')?.addEventListener('click', () => surface.navigate('营养模板', surface => { return showNutritionStrategyManager(nutritionStrategyUi(surface)).catch(fail) }))
   view.querySelector('#more-github-sync')?.addEventListener('click', () => surface.navigate('GitHub 同步', surface => { return flushWorkoutAutosave().then(() => { if (!surface.alive) return; showGitHubSync({ surface, openModal: managementModal(surface), esc, toast, restored: async () => { workoutAutosave.cancel(); currentWorkout = undefined; workoutEditorOpen = false; await render() } }) }).catch(fail) }))
+  view.querySelector('#more-appearance')?.addEventListener('click',()=>surface.navigate('外观',showAppearance))
   view.querySelector('#more-ai-settings')?.addEventListener('click', () => surface.navigate('AI 设置', surface => showAiSettings({ surface, openModal: managementModal(surface), esc, changed: () => aiAssistant.settingsChanged() }, aiAssistant.profiles)))
   view.querySelector('#more-diagnostics')?.addEventListener('click', () => surface.navigate('版本诊断', surface => showPwaDiagnostics(pwaRuntime, {
     surface, openModal: managementModal(surface), esc,
@@ -887,7 +940,7 @@ async function renderCalendarOverview(withProgressTabs = false): Promise<void> {
   const viewVersion = view.dataset.renderVersion
   let summaries = await loadMonthSummaries(calendarYear, calendarMonth)
   if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
-  const retainedTabs = setTabbedViewHtml(view, `${withProgressTabs ? progressTabsHtml() : ''}<section class="calendar-overview-head"><button class="icon-btn quiet calendar-prev" id="calendar-prev" aria-label="上个月">${icon('chevron', 20)}</button><div><strong>${calendarYear}年 ${calendarMonth + 1}月</strong><button class="text-btn" id="calendar-today">回到今天</button></div><button class="icon-btn quiet" id="calendar-next" aria-label="下个月">${icon('chevron', 20)}</button></section><div id="calendar-host"></div><section class="calendar-legend" aria-label="日历标记说明">${calendarCategories.map((category) => `<span class="calendar-legend-item"><i class="calendar-legend-icon calendar-category-${category}" aria-hidden="true">${icon(calendarCategoryIcons[category], 14)}</i><span>${calendarLegendLabels[category]}</span></span>`).join('')}</section>`)
+  const retainedTabs = setTabbedViewHtml(view, `${withProgressTabs ? progressTabsHtml() : ''}<section class="calendar-overview-head"><button class="icon-btn quiet calendar-prev" id="calendar-prev" aria-label="上个月">${icon('chevron', 20)}</button><strong class="calendar-month"><span>${calendarYear}年</span> <span>${calendarMonth+1}月</span></strong><button class="text-btn" id="calendar-today" aria-label="回到今天">今天</button><button class="icon-btn quiet" id="calendar-next" aria-label="下个月">${icon('chevron', 20)}</button></section><div id="calendar-host"></div><section class="calendar-legend" aria-label="日历标记说明">${calendarCategories.map((category) => `<span class="calendar-legend-item"><i class="calendar-legend-icon calendar-category-${category}" aria-hidden="true">${icon(calendarCategoryIcons[category], 14)}</i><span>${calendarLegendLabels[category]}</span></span>`).join('')}</section>`)
   if (withProgressTabs && !retainedTabs) bindProgressTabs(view)
   const host = view.querySelector<HTMLElement>('#calendar-host')!
   const year=calendarYear,month=calendarMonth
@@ -1258,7 +1311,7 @@ function bindFoodHeader(): void {
 }
 
 function bindFoodContent(slot: HTMLElement, target: NutritionTarget | undefined, logs: FoodLog[]): void {
-  slot.querySelector<HTMLButtonElement>('#food-completion-open')?.addEventListener('click', async event => { const button=event.currentTarget as HTMLButtonElement;if(button.disabled)return;button.disabled=true;button.setAttribute('aria-busy','true');try{await showNutritionCompletion(slot.dataset.foodDate!)}catch(error){fail(error)}finally{button.disabled=false;button.removeAttribute('aria-busy')} })
+
   slot.querySelector('#save-day-diet-template')?.addEventListener('click', () => void saveDayAsDietTemplate(logs))
   slot.querySelector('[data-edit-nutrition-target]')?.addEventListener('click', () => showNutritionTargetForm(foodDate, target))
   slot.querySelector('#food-completion-custom')?.addEventListener('click', () => void showNutritionCompletion(slot.dataset.foodDate!, 'designated').catch(fail))
@@ -1292,7 +1345,7 @@ function foodCompletionStripHtml(date: string, summary: NutritionCompletionSumma
   return remainingNutritionSummaryHtml(date, summary, showAction ? 'food' : 'today')
 }
 
-async function showNutritionCompletion(date: string, mode: CompletionMode = 'smart'): Promise<void> {
+async function showNutritionCompletion(date: string, mode: CompletionMode = 'designated'): Promise<void> {
   await openNutritionCompletionSheet(date, { openModal, esc, saved: count => { toast(`已添加 ${count} 项饮食记录`); if (activeTab === 'food') void renderFoodPage().catch(fail) } }, mode)
 }
 

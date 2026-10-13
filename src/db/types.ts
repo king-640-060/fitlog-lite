@@ -106,6 +106,11 @@ export interface TaskTag {
   updatedAt: string
 }
 
+export interface TaskSubtask {
+  id: string
+  text: string
+  completedAt?: string
+}
 export interface Task {
   id: string
   title: string
@@ -114,6 +119,8 @@ export interface Task {
   startTime?: string
   endTime?: string
   tagIds: string[]
+  /** Array order is the explicit one-level checklist order; absence preserves legacy rows. */
+  subtasks?: TaskSubtask[]
   completedAt?: string
   createdAt: string
   updatedAt: string
@@ -342,7 +349,7 @@ export interface BackupDataV9 extends BackupBase {
   data: BackupDataV8['data']
 }
 
-export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6 | BackupDataV7 | BackupDataV8 | BackupDataV9 | BackupDataV10 | BackupDataV11 | BackupDataV12
+export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6 | BackupDataV7 | BackupDataV8 | BackupDataV9 | BackupDataV10 | BackupDataV11 | BackupDataV12 | BackupDataV13
 
 /** Context only: estimates never contribute to canonical FoodLog nutrition. */
 export interface DietEvent {
@@ -401,4 +408,9 @@ export interface NutritionCycleDay {
 export interface BackupDataV12 extends BackupBase {
   schemaVersion: 12
   data: BackupDataV11['data'] & { nutritionCycles: NutritionCycle[]; nutritionCycleDays: NutritionCycleDay[] }
+}
+
+export interface BackupDataV13 extends BackupBase {
+  schemaVersion: 13
+  data: BackupDataV12['data']
 }

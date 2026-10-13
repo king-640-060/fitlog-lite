@@ -33,5 +33,5 @@ it('approved remaining anatomy shares four canonical facts and distinct Today/Fo
   const today=remainingNutritionSummaryHtml(date,summary,'today'),food=remainingNutritionSummaryHtml(date,summary,'food')
   for(const html of [today,food]){expect(html.match(/data-gap-text=/g)).toHaveLength(4);for(const state of ['已达目标','已超 10 g','未设置目标','数据不完整'])expect(html).toContain(`data-gap-text="${state}"`)}
   expect(today.match(/class="goal-mini-dot /g)).toHaveLength(4);expect(today.match(/<button/g)).toHaveLength(1);expect(today.indexOf('data-today-completion')).toBeLessThan(today.indexOf('goal-mini-grid'));expect(today).toContain('remaining-compact');expect(today).toContain('超 10 g')
-  expect(food).toContain('gap-grid');expect(food).toContain('remaining-actions');expect(food.match(/class="text-btn remaining-action"/g)).toHaveLength(2);expect(food).not.toContain('goal-mini-dot')
+  expect(food).toContain('gap-grid');expect(food).toContain('remaining-actions');expect(food.match(/class="text-btn remaining-action"/g)).toHaveLength(1);expect(food).not.toContain('智能补齐');expect(today).not.toContain('去补齐');expect(food).toContain('指定食物');expect(food).not.toContain('goal-mini-dot')
 })

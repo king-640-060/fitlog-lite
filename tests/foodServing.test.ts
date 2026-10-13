@@ -45,9 +45,9 @@ describe('optional serving input and factual grams snapshots',()=>{
 describe('one V8 → V9 migration and Backup V9 preservation',()=>{
  it('opens actual production V8, preserves all 17 stores, then retains new Food fields on reopen and Backup round-trip',async()=>{
   const d=make(),previous=legacyV8Database(d.name);await previous.open();await previous.transaction('rw',previous.tables,async()=>{for(const [store,rows] of Object.entries(v8))await previous.table(store).bulkAdd(rows)});previous.close()
-  await d.open();expect(d.verno).toBe(12);expect(d.tables).toHaveLength(22);for(const [store,rows] of Object.entries(v8))for(const row of rows)expect(await d.table(store).get(row.id)).toEqual(row)
+  await d.open();expect(d.verno).toBe(13);expect(d.tables).toHaveLength(22);for(const [store,rows] of Object.entries(v8))for(const row of rows)expect(await d.table(store).get(row.id)).toEqual(row)
   expect((await d.foods.get('food-old'))?.servingGrams).toBeUndefined();expect(d.foods.schema.indexes.map(i=>i.name)).not.toContain('servingGrams');expect(d.foodLogs.schema.indexes.map(i=>i.name)).not.toContain('[date+meal]')
-  await saveFood({...input,servingGrams:150.123456},'new-food',d);const backup=await exportBackup(d);expect(backup.schemaVersion).toBe(12);d.close();await d.open();expect((await exportBackup(d)).data).toEqual(backup.data)
+  await saveFood({...input,servingGrams:150.123456},'new-food',d);const backup=await exportBackup(d);expect(backup.schemaVersion).toBe(13);d.close();await d.open();expect((await exportBackup(d)).data).toEqual(backup.data)
   const target=make();await restoreBackup(JSON.parse(JSON.stringify(backup)),target);expect((await exportBackup(target)).data).toEqual(backup.data)
   await restoreBackup({app:'FitLog Lite',schemaVersion:8,exportedAt:backup.exportedAt,data:v8},target);expect((await target.foods.get('food-old'))?.servingGrams).toBeUndefined();expect((await exportBackup(target)).data.nutritionTargets).toEqual(v8.nutritionTargets)
  })

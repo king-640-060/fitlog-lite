@@ -244,3 +244,8 @@ Use the immutable [combined reference directory](../design/reference/2026-10-11-
 Calendar keeps seven44px columns and nine old positions, with plan in fourth-row middle; blank positions stay empty. Calendar Day Detail uses two columns/five rows,13px bordered quiet summaries,8px gap,67px minimum height and complete native disclosures. Open details span both columns to retain full long facts. Two default-folded menus hold quick recording and precise management; no permanent ten-action wall. Report date uses17px centered text. Category backgrounds come from light/dark semantic tokens, never fixed pale fills.
 
 Cycle sections retain approved information→week selection→independent assignment→preview anatomy,19px cards/16px weeks, real variant cards and shared primary/secondary controls. Production uses existing Sheet, shared date picker, scalable rem text,44px touch and16px inputs. Seven-day grid scrolls internally when seven accessible targets cannot fit. Document these accessibility and business-state differences against actual prototype screenshots; do not substitute simulated data or claim pixel equality.
+
+
+## Approved joint v0.5 (2026-10-12)
+
+Follow [Approved joint v0.5 contract](APPROVED_JOINT_V05.md). It supersedes prior smart-completion entries, whole-row Habit toggles, flat recovery history and version12 descriptions for this release. Preserve all preceding unrelated data/UI contracts.

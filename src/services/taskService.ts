@@ -1,7 +1,21 @@
 import { db, type FitLogDatabase } from '../db/database'
-import type { Task } from '../db/types'
+import type { Task, TaskSubtask } from '../db/types'
 
-export type TaskInput = Pick<Task, 'title' | 'tagIds'> & Partial<Pick<Task, 'note' | 'date' | 'startTime' | 'endTime'>>
+export type TaskInput = Pick<Task, 'title' | 'tagIds'> & Partial<Pick<Task, 'note' | 'date' | 'startTime' | 'endTime' | 'subtasks'>>
+
+export function validateSubtasks(value: unknown): TaskSubtask[] {
+  if (!Array.isArray(value) || value.length > 100) throw Error('子任务最多 100 项')
+  const ids = new Set<string>()
+  return value.map(item => {
+    if (!item || typeof item !== 'object' || typeof item.id !== 'string' || !item.id.trim() || item.id.length > 120 || ids.has(item.id)) throw Error('子任务 ID 不合法或重复')
+    ids.add(item.id)
+    if (typeof item.text !== 'string' || !item.text.trim() || item.text.trim().length > 500) throw Error('子任务内容需为 1–500 字符')
+    if (item.completedAt !== undefined && (typeof item.completedAt !== 'string' || !Number.isFinite(Date.parse(item.completedAt)))) throw Error('子任务完成时间不合法')
+    if (Object.keys(item).some(key => !['id', 'text', 'completedAt'].includes(key))) throw Error('不支持嵌套子任务或未知字段')
+    return { id: item.id, text: item.text.trim(), ...(item.completedAt ? { completedAt: item.completedAt } : {}) }
+  })
+}
+export const taskFingerprint = (task: Task): string => JSON.stringify(task)
 
 export function validateTaskDate(value: string): void {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
@@ -26,7 +40,7 @@ export function validateTaskInput(input: TaskInput): TaskInput {
   if (input.startTime && input.endTime && input.endTime <= input.startTime) throw new Error('结束时间必须晚于开始时间')
   if (!Array.isArray(input.tagIds) || input.tagIds.some((id) => typeof id !== 'string' || !id.trim())) throw new Error('任务标签格式不正确')
   if (new Set(input.tagIds).size !== input.tagIds.length) throw new Error('任务标签不能重复')
-  return { title, tagIds: [...input.tagIds], ...(note ? { note } : {}), ...(input.date ? { date: input.date } : {}), ...(input.startTime ? { startTime: input.startTime } : {}), ...(input.endTime ? { endTime: input.endTime } : {}) }
+  return { title, tagIds: [...input.tagIds], ...(input.subtasks !== undefined ? { subtasks: validateSubtasks(input.subtasks) } : {}), ...(note ? { note } : {}), ...(input.date ? { date: input.date } : {}), ...(input.startTime ? { startTime: input.startTime } : {}), ...(input.endTime ? { endTime: input.endTime } : {}) }
 }
 
 async function ensureTaskTagsExist(tagIds: string[], database: FitLogDatabase): Promise<void> {
@@ -46,20 +60,41 @@ export async function createTask(input: TaskInput, database: FitLogDatabase = db
   })
 }
 
-export async function updateTask(id: string, input: TaskInput, database: FitLogDatabase = db): Promise<Task> {
+export async function updateTask(id: string, input: TaskInput, database: FitLogDatabase = db, expected?: string): Promise<Task> {
   const values = validateTaskInput(input)
   return database.transaction('rw', database.tasks, database.taskTags, async () => {
     const current = await database.tasks.get(id)
     if (!current) throw new Error('找不到任务')
+    if (expected !== undefined && taskFingerprint(current) !== expected) throw Error('任务已变化，请重新打开编辑器')
     await ensureTaskTagsExist(values.tagIds, database)
-    const updated: Task = { id, ...values, createdAt: current.createdAt, updatedAt: new Date().toISOString(), ...(current.completedAt ? { completedAt: current.completedAt } : {}) }
+    const updated: Task = { id, ...values, ...(values.subtasks === undefined && current.subtasks !== undefined ? { subtasks: structuredClone(current.subtasks) } : {}), createdAt: current.createdAt, updatedAt: new Date().toISOString(), ...(current.completedAt ? { completedAt: current.completedAt } : {}) }
     await database.tasks.put(updated)
     return updated
   })
 }
 
-export async function deleteTask(id: string, database: FitLogDatabase = db): Promise<void> {
-  await database.tasks.delete(id)
+export async function deleteTask(id: string, database: FitLogDatabase = db, expected?: string): Promise<void> {
+  await database.transaction('rw', database.tasks, async () => {
+    const task = await database.tasks.get(id)
+    if (!task) throw Error('找不到任务')
+    if (expected !== undefined && taskFingerprint(task) !== expected) throw Error('任务已变化，请重新确认删除范围')
+    await database.tasks.delete(id)
+  })
+}
+
+export async function toggleSubtaskCompletion(id: string, subtaskId: string, database: FitLogDatabase = db): Promise<Task> {
+  return database.transaction('rw', database.tasks, async () => {
+    const task = await database.tasks.get(id)
+    if (!task) throw Error('找不到任务')
+    const subtasks = structuredClone(task.subtasks ?? []), subtask = subtasks.find(item => item.id === subtaskId)
+    if (!subtask) throw Error('子任务已不存在')
+    const now = new Date().toISOString()
+    if (subtask.completedAt) delete subtask.completedAt
+    else subtask.completedAt = now
+    const updated = { ...task, subtasks, updatedAt: now }
+    await database.tasks.put(updated)
+    return updated
+  })
 }
 
 export async function toggleTaskCompletion(id: string, database: FitLogDatabase = db): Promise<Task> {

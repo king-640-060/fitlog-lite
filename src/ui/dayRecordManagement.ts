@@ -25,7 +25,7 @@ export function bindDayRecordManagement(dialog: HTMLDialogElement, date: string,
         preview=await previewDayDeletion(date,[...selected],includeTarget)
         if(!dialog.open||!host.isConnected)return
         if(!Object.values(preview.counts).some(n=>n!>0))throw new Error('请选择当天已有的记录')
-        const summary=Object.entries(preview.counts).map(([key,n])=>`${key==='nutritionTarget'?'营养目标':calendarCategoryLabels[key as typeof calendarCategories[number]]} ${n} 条`).join('；')
+        const summary=Object.entries(preview.counts).map(([key,n])=>`${key==='nutritionTarget'?'营养目标':calendarCategoryLabels[key as typeof calendarCategories[number]]} ${n} 条${key==='plan'&&preview!.subtaskCount?`（同时删除 ${preview!.subtaskCount} 个子任务）`:''}`).join('；')
         host.querySelector('[data-day-delete-preview]')!.innerHTML=`<p>${summary}${includeTarget?`。已保存目标：${targetInfo}`:''}</p><button type="button" class="danger-button full-btn" data-day-delete-confirm>删除所选记录</button>`
         host.querySelector('[data-day-delete-confirm]')!.addEventListener('click',async()=>{
           if(busy||!preview)return;busy=true;const reviewed=preview

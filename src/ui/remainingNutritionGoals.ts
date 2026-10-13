@@ -1,3 +1,4 @@
+import { icon } from './icons'
 import { completionKeys, type NutritionCompletionSummary } from '../utils/nutritionCompletion'
 import { completionGapText, completionLabels } from './nutritionCompletion'
 
@@ -18,8 +19,8 @@ export function remainingNutritionGoalsHtml(summary: NutritionCompletionSummary,
 export function remainingNutritionSummaryHtml(date: string, summary: NutritionCompletionSummary, surface: RemainingSurface): string {
   const compact = surface === 'today'
   const heading = compact
-    ? `<div class="goal-compact-top"><div class="goal-compact-heading"><h3 class="remaining-title">剩余目标</h3><small>按当日实际记录计算</small></div><button type="button" class="text-btn remaining-compact-action" data-today-completion="${date}" aria-label="前往饮食页面补齐营养">去补齐 <span aria-hidden="true">›</span></button></div>`
-    : '<div class="remaining-heading"><h3 class="remaining-title">剩余目标</h3><span class="remaining-caption">按实际记录计算 · 点击选择补齐方式</span></div>'
-  const actions = compact ? '' : '<div class="remaining-actions completion-entry-actions"><button type="button" class="text-btn remaining-action" id="food-completion-open"><span aria-hidden="true">✧</span>智能补齐<span aria-hidden="true">›</span></button><button type="button" class="text-btn remaining-action" id="food-completion-custom"><span aria-hidden="true">≡</span>指定食物<span aria-hidden="true">›</span></button></div>'
+    ? `<div class="goal-compact-top"><div class="goal-compact-heading"><h3 class="remaining-title">剩余目标</h3><small>按当日实际记录计算</small></div><button type="button" class="text-btn remaining-compact-action" data-today-completion="${date}" aria-label="前往饮食页面指定食物">指定食物 <span aria-hidden="true">›</span></button></div>`
+    : '<div class="remaining-heading"><h3 class="remaining-title">剩余目标</h3><span class="remaining-caption">按实际记录计算</span></div>'
+  const actions = compact ? '' : `<div class="remaining-actions completion-entry-actions"><button type="button" class="text-btn remaining-action" id="food-completion-custom">${icon('fork',16)}指定食物<span aria-hidden="true">›</span></button></div>`
   return `<section class="food-completion-strip remaining ${compact ? 'today-remaining remaining-compact' : 'food-remaining'}" aria-label="剩余营养目标">${heading}${remainingNutritionGoalsHtml(summary, surface)}${actions}</section>`
 }

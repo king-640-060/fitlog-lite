@@ -372,3 +372,8 @@ The immutable [approved package](../design/reference/2026-10-11-combined/DESIGN_
 Calendar keeps old nine categories in order, appends plan at fourth-row middle in a3×4 matrix. Task.date presence lights plan independently of completedAt. Seven columns/42dates and real health statistics stay intact. Calendar Day Sheet uses ten two-column native disclosures with complete expanded facts and two default-folded operations. Quick actions reuse actual existing flows and selected date/night resolver. Management previews exact per-category IDs/counts and date, then irreversible second confirmation; optional saved target is separate and unchecked, with current values disclosed. Atomic delete/stale preview protects other dates, active sleep, habit definitions, tags and catalog/template/phase data. Legacy clearDayRecords is unchanged. Day report date is centered17px with symmetric44px arrows. Category surfaces use actual theme tokens.
 
 [Nutrition Cycle Schedule](NUTRITION_CYCLE_SCHEDULE.md) owns real persisted date plans, masks, partial weeks, copy/override confirmation, revision conflicts and explicit target/intake application. Saving plans never writes facts. Dexie12/Backup12 is additive and Restore1–12 remains valid; Sync/envelope1 unchanged. No cycle report is introduced.
+
+
+## Approved joint v0.5 (2026-10-12)
+
+Follow [Approved joint v0.5 contract](APPROVED_JOINT_V05.md). It supersedes prior smart-completion entries, whole-row Habit toggles, flat recovery history and version12 descriptions for this release. Preserve all preceding unrelated data/UI contracts.

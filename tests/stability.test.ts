@@ -166,10 +166,10 @@ describe('Backup 深度验证与恢复', () => {
     expect(() => validateBackup(backup)).toThrow('id 重复')
   })
 
-  it('拒绝重复 weight date', () => {
+  it('V13 保留同日不同 ID 的旧体重', () => {
     const backup = validBackup()
     backup.data.weights.push({ ...backup.data.weights[0]!, id: 'weight-2' })
-    expect(() => validateBackup(backup)).toThrow('date 重复')
+    expect(validateBackup(backup).data.weights).toEqual(backup.data.weights)
   })
 
   it('拒绝不存在的日历日期', () => {

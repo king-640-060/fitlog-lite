@@ -51,7 +51,7 @@
 .food-completion-strip .remaining-action { border:1px solid var(--border); border-radius:10px; min-height:44px; min-width:0; background:var(--surface); color:var(--accent-strong); font-size:.75rem; font-weight:700; padding:0 7px; display:flex; align-items:center; justify-content:center; gap:5px; white-space:normal; overflow-wrap:anywhere; }
 .remaining-action span:last-child { font-size:1.0625rem; font-weight:450; }
 @media(max-width:355px) { .food-content-body { width:calc(100% + 10px); margin-inline:-5px; padding-inline:5px; } .food-remaining { margin-inline:-5px; } .nutrition-today-card [data-today-remaining] { width:calc(100% + 14px); margin-inline:-7px; } .today-remaining { padding:9px; } .goal-mini-item { padding:6px 7px; } .goal-mini-item strong { font-size:.6875rem; } }
-@media(prefers-color-scheme:dark) { .food-completion-strip { background:linear-gradient(135deg,var(--surface),color-mix(in srgb,var(--surface-soft) 75%,var(--surface))); } }
+:root[data-effective-theme=dark] .food-completion-strip { background:linear-gradient(135deg,var(--surface),color-mix(in srgb,var(--surface-soft) 75%,var(--surface))); }
 .today-dashboard .pelvic-today-card .pelvic-icon { background:var(--carbs-soft); color:var(--carbs); }
 @media(max-width:25rem) { .budget-head { gap:8px; } }
 

@@ -95,3 +95,10 @@ PWA gate additionally runs pwaUpgrade with FITLOG_PWA_OLD_DIST pointing to the i
 ### Combined four-prototype handoff
 
 `combinedHandoff.mjs` adds the34th suite while retaining all33 prior suites. Set FITLOG_PLAYWRIGHT_MODULE/FITLOG_CHROME/FITLOG_QA_URL; default33 mobile/font/theme/landscape contexts, FITLOG_COMBINED_ENGINE=webkit gives4 representative contexts, FITLOG_COMBINED_SMOKE is diagnostic only. Synthetic records are isolated; never use personal profiles. Hashes and real UI flows, no-fact plan writes, target confirmation and precise deletion are checked; actual prototype comparisons and physical evidence remain separate. `pwaUpgrade.mjs` preserves its oldV7 and precedingV11 baselines while requiring newV12/22-store application state.
+
+
+## Approved joint v0.5 (2026-10-12)
+
+`approvedJointV05.mjs` adds cross-browser tests: four mobile widths×100/200% fonts×two system colors plus landscape. Three appearance choices, actual checkbox-only Habit touch, shortened dangerous confirmation, symmetric Calendar geometry, independent child completion, grouped25/50 history, strict designated-food previews and readonly archived/future cycle reports are exercised. `FITLOG_JOINT_ENGINE=webkit` runs the same full17 cases; smoke is development-only. Native control text may ellipsize while full selected cycle name/dates are exposed separately. Enlarged-font report modes use two rows to keep short labels intact.
+
+`approvedJointPreservation.mjs baseline|application|end` reuses the previously existing dedicated synthetic production profile, without reseeding/clearing, checks every22-store row hash and8 pre-existing config hashes, actual App/SW identity and cold offline reopen. Baseline120→current130 is an explicit compatible migration. `pwaUpgrade.mjs` continues frozenV7 plus actual precedingV12 Pages assets→V13. All34 previous browser suites remain required. Old remainingPrototype preserves V4.2 geometry/data guards while explicitly testing the newly approved single designated entry and absence of smart mode; its old immutable reference bytes are unchanged.

@@ -107,6 +107,13 @@ export class FitLogDatabase extends Dexie {
     this.version(12).stores({ nutritionCycles: 'id, startDate, endDate, archivedAt, updatedAt', nutritionCycleDays: 'id, cycleId, date, &[cycleId+date]' }).upgrade(() => {
       // Add two empty planning stores only. Never backfill targets, food or historical facts.
     })
+    this.version(13).stores({
+      weights: 'id, date, createdAt',
+      sleepSessions: 'id, &activeKey, recordDate, startTime, sleepNightDate',
+    }).upgrade(() => {
+      // Preserve every row. Optional embedded Task.subtasks stays absent on old tasks.
+      // Permit legacy same-date weights; index captured sleep nights without recomputation.
+    })
     this.on('populate', () => {
       const now = new Date().toISOString()
       return this.exercises.bulkAdd(STARTER_EXERCISE_NAMES.map((name) => ({

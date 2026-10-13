@@ -35,3 +35,8 @@
 单测：tests/nutritionCycles.test.ts。浏览器：tests/browser/combinedHandoff.mjs，并保留既有营养模板、Food、Calendar、报告、Backup、Sync、PWA 回归。视觉以实际运行批准 HTML、匹配视口/字体/主题的截图和 DOM/CSS 对照为证据；可访问性与真实数据差异必须说明。
 
 周期报告没有批准原型，本轮不新增周期报告、不替换日报/周报/月报。浏览器模拟、WebKit、正式部署检查与实体 iPhone Safari / 原安装 PWA 独立；没有设备证据标 Pending。
+
+
+## Approved joint v0.5 (2026-10-12)
+
+Follow [Approved joint v0.5 contract](APPROVED_JOINT_V05.md). It supersedes prior smart-completion entries, whole-row Habit toggles, flat recovery history and version12 descriptions for this release. Preserve all preceding unrelated data/UI contracts.

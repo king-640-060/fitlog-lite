@@ -69,14 +69,14 @@ export function monthWeekBuckets(range: ReportRange): ReportBucket[] {
 function average(values: number[]): number | undefined { return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : undefined }
 function round(value: number): number { return Math.round(value * 10) / 10 }
 
-export function aggregateReport(source: ReportSource, mode: ReportMode, anchor: string, today = getLocalDateString()): ReportResult {
-  const range = getReportRange(mode, anchor)
+export function aggregateReport(source: ReportSource, mode: ReportMode, anchor: string, today = getLocalDateString(), rangeOverride?: ReportRange): ReportResult {
+  const range = rangeOverride ?? getReportRange(mode, anchor)
   const days = reportPeriodDays(range, today)
   const eligible = new Set(days.filter((day) => !day.future).map((day) => day.date))
   const within = <T extends { date: string }>(records: T[]): T[] => records.filter((record) => eligible.has(record.date))
   const foodLogs = within(source.foodLogs), targets = within(source.nutritionTargets), workouts = within(source.workouts)
   const cardio = within(source.cardioSessions), pelvic = within(source.pelvicFloorSessions)
-  const weights = within(source.weights).sort((a, b) => a.date.localeCompare(b.date))
+  const weights = within(source.weights).sort((a, b) => a.date.localeCompare(b.date) || a.updatedAt.localeCompare(b.updatedAt) || a.id.localeCompare(b.id))
   const checkIns = within(source.habitCheckIns)
   const foodByDay = new Map<string, FoodLog[]>(), targetByDay = new Map(targets.map((target) => [target.date, target]))
   foodLogs.forEach((log) => foodByDay.set(log.date, [...(foodByDay.get(log.date) ?? []), log]))

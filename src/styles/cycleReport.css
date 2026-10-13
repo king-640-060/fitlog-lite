@@ -1,0 +1,20 @@
+.report-mode { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.report-mode button { padding-inline:4px; white-space:nowrap; }
+.report-page { container-type:inline-size; }
+@container (max-width:17rem) { .report-mode { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.cycle-report-card { display:grid; gap:14px; min-width:0; padding:16px; margin-bottom:14px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--surface); }
+.cycle-report-card h2 { font-size:var(--type-module); }
+.cycle-report-picker { display:grid; grid-template-columns:minmax(0,1fr); min-width:0; gap:8px; font-size:var(--type-meta); color:var(--text-secondary); }
+.cycle-report-picker select { width:100%; max-width:100%; min-width:0; font-size:1rem; overflow:hidden; text-overflow:ellipsis; -webkit-appearance:none; appearance:none; padding-inline-end:32px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23747e71' stroke-width='1.8'%3E%3Cpath d='m5 7 5 5 5-5'/%3E%3C/svg%3E"); background-size:18px; background-position:right 10px center; background-repeat:no-repeat; }
+.cycle-report-metrics { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.cycle-report-metric { display:grid; gap:8px; padding:12px; border-radius:var(--control-radius); background:var(--surface-soft); min-width:0; }
+.cycle-report-metric span { font-size:var(--type-meta); color:var(--text-secondary); }
+.cycle-report-metric strong { font-size:1.25rem; overflow-wrap:anywhere; }
+.cycle-report-coverage { display:grid; gap:14px; padding-top:14px; border-top:1px solid var(--divider); }
+.cycle-report-coverage > div { display:grid; gap:6px; min-width:0; }
+.cycle-report-coverage span,.cycle-report-coverage small { font-size:var(--type-meta); color:var(--text-secondary); }
+.cycle-report-coverage .progress-track { height:7px; border-radius:8px; background:var(--border); }
+.cycle-report-coverage i { display:block; height:100%; border-radius:8px; background:var(--accent-mid); }
+.cycle-report-facts { display:grid; gap:12px; margin:0; }
+.cycle-report-facts dt { color:var(--text-secondary); font-size:var(--type-meta); }
+.cycle-report-facts dd { margin:4px 0 0; overflow-wrap:anywhere; }

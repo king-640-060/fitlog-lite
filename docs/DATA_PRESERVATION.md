@@ -23,3 +23,8 @@ Browser storage is not guaranteed permanent: clearing website data, deleting a b
 ## Encrypted remote recovery
 
 GitHub is an additional user-controlled encrypted recovery copy; IndexedDB remains the active working database. Sync transport configuration is separate from business Backup and never adds business stores. Manual sync must encrypt the complete versioned Backup on-device before upload, preserve local data on failed requests, detect divergent changes, use remote SHA concurrency protection, and require explicit choices for replacement. Download must decrypt and validate before local mutation; Restore uses the existing transaction path after a preview and explicit confirmation. Never persist the data password or derived key. Sync cannot bypass this contract.
+
+
+## Approved joint v0.5 (2026-10-12)
+
+Follow [Approved joint v0.5 contract](APPROVED_JOINT_V05.md). It supersedes prior smart-completion entries, whole-row Habit toggles, flat recovery history and version12 descriptions for this release. Preserve all preceding unrelated data/UI contracts.
