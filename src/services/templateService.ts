@@ -237,3 +237,15 @@ export function sortTemplates<T extends { name: string, updatedAt: string, lastU
     return b.updatedAt.localeCompare(a.updatedAt) || a.name.localeCompare(b.name, 'zh-CN')
   })
 }
+
+/** Move only among visible meal peers in day mode; legacy combinations retain flat ordering. */
+export function moveDietTemplateItem(items:DietTemplateItem[],id:string,direction:number,mode?:DietTemplate['mode']):DietTemplateItem[]{
+  if(direction!==-1&&direction!==1)throw new Error('移动方向不合法')
+  const index=items.findIndex(item=>item.id===id),next=[...items]
+  if(index<0)return next
+  const peers=items.map((item,index)=>({item,index})).filter(p=>mode!=='day'||p.item.meal===items[index]!.meal)
+  const peer=peers.findIndex(p=>p.index===index),destination=peers[peer+direction]?.index
+  if(destination===undefined)return next
+  ;[next[index],next[destination]]=[next[destination]!,next[index]!]
+  return next
+}
