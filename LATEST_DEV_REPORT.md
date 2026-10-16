@@ -1,14 +1,15 @@
 # FitLog Lite Development Report — 2026-10-16
 
-## 最新验证状态
+## 最新验收状态
 
-F1–F5已实施、自动化验证并正式发布：精确重量输入与独立g、组合/整日模板逐项餐次、等权500/1000ml与低强调自定义、十类73px标准双列及独立展开事实、无引用营养模板事务永久删除与历史引用保护。既有A–D、B1–B9和35个旧browser suites全部保留。实体设备与ChatGPT/用户独立验收仍Pending。
+F1–F5已实施、自动化验证并正式发布：精确重量输入与独立g、组合/整日模板逐项餐次、等权500/1000ml与低强调自定义、十类73px标准双列及独立展开事实、无引用营养模板事务永久删除与历史引用保护。既有A–D、B1–B9和35个旧browser suites全部保留。用户于2026-10-16在ChatGPT中确认六组实体iPhone原安装PWA验收全部通过、历史数据正常、所检查功能无阻断性问题；本轮正式结案，**36/36 PASS，0项本轮验收Pending**。详见[最终验收归档与后续UX待办](docs/FOOD_WATER_DAY_V04_ACCEPTANCE.md)。
 
 - main；START_COMMIT `e082689dce56f7fcdfd055c4709b93fafafd7819`，起点干净，pull --ff-only且与远程一致。
 - Application Commit `79c570be9cc7ef6b05d74a7ed070fabd7cc950d4`，94个任务文件。
 - Application Actions / Pages：[38847590284](https://github.com/king-640-060/fitlog-lite/actions/runs/38847590284)，Type check/Test/Build/Deploy实际success。
 - 正式地址 https://king-640-060.github.io/fitlog-lite/ 。线上两引擎各20组F1–F5完整流程，以及两引擎真实Backup UI验证均PASS；都是隔离合成数据，不能冒充个人数据/实体Safari。
-- END_COMMIT是包含本报告的提交，且只修改本文件。最终END CI、资源、App/SW、同档案与离线复核记录在本轮正式十项回执及证据包；不拿Application run替代END run，不预先宣称尚未发生的END CI成功。
+- 开发END_COMMIT `2fbae4be92f4e663cd854f4679a004a7d1b03740`；[开发END Actions / Pages](https://github.com/king-640-060/fitlog-lite/actions/runs/38849071210)实际success。原开发十项回执包含该END的资源、App/SW、同档案及离线验证；本次只读复核该CI结论，不把历史产品测试算成本次重跑。
+- 本次是2026-10-16纯文档验收归档，归档START为上述开发END；归档END为包含本次三份文档的提交，实际推送、CI和Pages结果见归档交付回执。未修改产品代码、测试、数据库、业务记录、设计基准或兼容合同。
 - 普通HTTPS push首次HTTP2 framing error；单次 `git -c http.version=HTTP/1.1 push origin main`正常非强制推送成功，未改全局配置、未强推、未覆盖别人提交。
 
 ## 数据与业务合同
@@ -23,7 +24,7 @@ DietTemplate可选mode combo/day，items可选合法MealType；缺字段的旧�
 
 Calendar十类概览铺满原内容区，两列标准73px；320/375/390/430卡宽138/165.5/173/193px。0/1/11/100正常记录几何稳定，长数字/200%可增长。原生summary位置不因展开改变，完整实际/目标/全部快照在网格后，概览无冗余已保存目标。保留完整访问、liveQuery、十类精确删除和快捷录入。
 
-## 本轮自动化与原型证据
+## 开发阶段自动化与原型证据（历史结果）
 
 - typecheck PASS；npm test PASS：969 tests /72files（旧927保留+42）；Pages base干净构建PASS，local:false，只有既有chunk-size advisory；diff --check PASS。
 - 所有35个既有browser suites，含approvedJointV05双引擎，共36条完整命令最终PASS；uiQualityAudit完整矩阵；本轮新foodWaterDayV04两引擎各20组（四宽+844横屏×100/200%×深浅）PASS；foodWaterBackupV04两引擎PASS。新旧共37个独立suite/40条命令，未smoke/skip。
@@ -40,14 +41,18 @@ Calendar十类概览铺满原内容区，两列标准73px；320/375/390/430卡�
 
 productionAssets实际PASS：{"build": "79c570be9cc7ef6b05d74a7ed070fabd7cc950d4", "assets": [{"file": "index-LHivBYUA.js", "bytes": 942506, "sha256": "53ae306af4ee39a316afce9ef820f7dae572b0a6190c534ec3ad80219c3b5dfa"}, {"file": "index-B5XslnSD.css", "bytes": 171028, "sha256": "2fa87b90b3695490ad1a9d56f4af08294571c9aa40cb69b568bc582d5a48ecda"}], "swPrecacheMatches": true, "swExactBytes": true, "mainViews": 5, "aiSettings": true, "githubSyncEntry": true, "errors": []}
 
-此前已有专用合成profile不清空、不重建、不重新播种，全22表25rows hash `049bc97a200c585af636db0378c6c72b1c81696208f15b5d30276755c6ba7c1a`；全部fitlog设备配置8项hash `609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34`，均与START相同。App/SW均Application SHA，离线冷启PASS。END推送后再重复最终资源/同档案/offline验证并在外部十项回执给出真实END证据。
+此前已有专用合成profile不清空、不重建、不重新播种，全22表25rows hash `049bc97a200c585af636db0378c6c72b1c81696208f15b5d30276755c6ba7c1a`；全部fitlog设备配置8项hash `609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34`，均与START相同。上述为Application阶段结果；随后开发END `2fbae4be92f4e663cd854f4679a004a7d1b03740`的资源、App/SW、同一合成档案与离线冷启动也已通过，记录在原十项回执。原记录保留，本次归档不访问业务数据库或浏览器档案，也不新增离线/数据连续性实测声明。
 
-## 文档与Pending
+## 正式结案、证据归属与范围
 
-新增FOOD_WATER_DAY_V04及QA、批准原包、Backup14冻结样本、两引擎UI/Backup与旧profile脚本；更新相关UI/交互/数据/周期/恢复合同和AGENTS必要入口。CHAT_CODEX_WORKFLOW长期规则不改。
+原开发轮新增FOOD_WATER_DAY_V04及QA、批准原包、Backup14冻结样本、两引擎UI/Backup与旧profile脚本；更新相关UI/交互/数据/周期/恢复合同和AGENTS必要入口。CHAT_CODEX_WORKFLOW长期规则不改。
 
-实体iPhone Safari、原主屏幕PWA、真实键盘/Safe Area/VoiceOver、个人设备旧数据连续性：Pending；浏览器/CI/Pages不等于实体或用户验收。真实AI/Voice Provider/麦克风仍此前独立Pending，本轮不用真实密钥测试。最后回执、完整矩阵、原始日志/原图/文件清单和可校验ZIP在本聊天outputs/food-water-v04；交回ChatGPT独立验收后由用户最终确认。完成F1–F5后不继续未批准功能。
+用户确认是六组实体iPhone原安装PWA与历史数据的验收来源，不能表述为Codex亲自执行。Codex历史自动化/CI/Pages与用户真机验收分别记录。ChatGPT独立代码与CI核查属于独立证据类别；本次指令未附该报告全文或链接，不补造其核查步骤或通过结论。用户已明确授权正式结案，本轮验收为36 PASS /0 Pending。
+
+VoiceOver、独立Safari运行模式、真实AI/Voice Provider、麦克风等未单独提供验证结果的扩展范围不标PASS，也不算本轮36项的未结事项。原开发回执、矩阵、失败记录、截图及可校验ZIP保留原样；原34 PASS /2真机Pending是开发交付时历史状态，当前结果以[最终验收矩阵](docs/FOOD_WATER_DAY_V04_ACCEPTANCE.md)为准。
+
+后续新需求仅登记、尚未修复，不计入F1–F5验收：UX-01首页今日饮水卡片过高、留白及按钮视觉过重；UX-02进度页面记录饮水弹层按钮尺寸与布局需统一优化；UX-03营养模板被历史引用保护时需可追溯的引用来源、日期及管理入口，禁止删除历史绕过保护。后续由ChatGPT制作原型、用户确认后再交付开发；本次不实施或设计。
 
 ## ChatGPT Baseline
 
-START e082689；Application79c570be；END为本报告提交。F1–F5完成且Application CI/Pages/实际线上回归/资产/同档案/offline通过，最终END证据需读外部回执。DB13/130/22不变，Backup14/Restore1–14/Sync1；旧组合未分类语义、四餐次/精确克数/fallback/目标和原A–D/B1–B9保留。969/72；旧35 suites完整+新UI/Backup双引擎；营养硬删六表引用与来源保护，归档保留历史。原型SHA856de7...归档不改字节。真机、个人设备连续性与ChatGPT/用户独立验收Pending。
+开发START e082689；Application79c570be；开发END 2fbae4be（完整SHA见上）。本次仅验收归档。F1–F5完成且Application CI/Pages/实际线上回归/资产/同档案/offline通过，原开发END证据保留于十项回执。DB13/130/22不变，Backup14/Restore1–14/Sync1；旧组合未分类语义、四餐次/精确克数/fallback/目标和原A–D/B1–B9保留。969/72；旧35 suites完整+新UI/Backup双引擎；营养硬删六表引用与来源保护，归档保留历史。原型SHA856de7...归档不改字节。用户于2026-10-16确认六组实体iPhone原安装PWA通过且历史数据正常，F1–F5正式结案36/36 PASS、0本轮Pending；不是Codex亲自真机测试，也不扩张为VoiceOver/真实Provider等已通过。UX-01/02/03是未实施的新需求，仅登记，等待后续原型与确认。

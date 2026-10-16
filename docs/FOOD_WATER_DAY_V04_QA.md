@@ -1,5 +1,7 @@
 # Food / Water / Day Detail v0.4 · 候选QA记录
 
+> 当前结案状态（2026-10-16）：**36/36 PASS，0项本轮验收Pending**。来源为用户在ChatGPT确认的六组实体iPhone原安装PWA验收、历史数据正常和已归档开发证据，详见[最终验收归档](FOOD_WATER_DAY_V04_ACCEPTANCE.md)。以下候选测试和Pending文字保留开发交付时的历史状态，不表示本次重新测试，也不覆盖最终结论。
+
 本页记录真实执行的开发候选门槛。Git/PWA/CI/Pages与同档案上线后哈希不从候选通过推断，见 LATEST_DEV_REPORT.md 与最终十项回执。批准包16项SHA256全部通过；原HTML SHA256 `856de7f201b630572c8eedadfd4b4e299700d153894f9ee2fd99b4663e5c81a3`。包提供的是展开目录，已原样复制归档，未虚构输入ZIP哈希。文件内title仍v0.2，原字节不改。
 
 ## 执行与覆盖
@@ -84,3 +86,13 @@
 - v421Consistency：PASS，['node', 'tests/browser/v421Consistency.mjs']。
 - v4FoodPlanToday：PASS，['node', 'tests/browser/v4FoodPlanToday.mjs']。
 - voiceMode：PASS，['node', 'tests/browser/voiceMode.mjs']。
+
+## 2026-10-16 用户真机验收与最终结案
+
+用户通过本次归档指令确认：2026-10-16在ChatGPT中，F1–F5的六组实体iPhone原安装PWA验收均通过，历史数据正常，所检查功能未发现阻断性问题。依据用户最终确认，原34 PASS /2真机Pending更新为**36 PASS /0项本轮验收Pending**；原批准矩阵及开发证据不改写，完整36项当前结果见[验收归档](FOOD_WATER_DAY_V04_ACCEPTANCE.md)。
+
+证据归属：用户执行/确认的真机结果；Codex开发轮的969项/72文件、浏览器回归与CI属于历史自动化；ChatGPT独立代码与CI核查单列，本指令未附独立核查报告，不补写其步骤或结论。Codex本次只核对文档、Git和CI/Pages，不访问产品数据库、不运行真机或业务流程。六组的具体脚本、设备型号和iOS版本未在本指令展开，不虚构这些细节。
+
+本轮结案不表示VoiceOver、真实Provider、麦克风或其他未单独确认的扩展范围通过；它们不计入本轮36项，也不构成本轮待结案事项。
+
+后续UX-01（今日饮水卡片高度/留白/按钮视觉）、UX-02（进度饮水弹层按钮尺寸/布局）、UX-03（营养模板引用来源/日期/管理入口追溯）均是尚未修复的新需求，仅归档、不实施或设计，不重新打开F1–F5。UX-03不得删除历史以绕过引用保护。后续由ChatGPT制作原型并经用户确认后再开发。
