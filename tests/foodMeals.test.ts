@@ -112,7 +112,7 @@ describe('餐次迁移与 Backup V3 兼容', () => {
     const source = newDatabase()
     await source.foodLogs.add(log('dinner'))
     const exported = await exportBackup(source)
-    expect(exported.schemaVersion).toBe(13)
+    expect(exported.schemaVersion).toBe(14)
     expect(exported.data.foodLogs[0]?.meal).toBe('dinner')
     const target = newDatabase()
     await restoreBackup(JSON.parse(JSON.stringify(exported)), target)

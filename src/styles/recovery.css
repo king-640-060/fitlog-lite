@@ -116,3 +116,8 @@
 [data-weight-module] { grid-template-columns:minmax(0,1fr); }
 .sleep-timeline-intervals { display:grid; gap:8px; margin:0; padding:0; list-style:none; color:var(--text-secondary); font-size:.8rem; line-height:1.6; font-variant-numeric:tabular-nums; }
 .sleep-timeline-intervals li { overflow-wrap:anywhere; }
+
+.water-actions, .water-record-options { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,7rem),1fr)); gap:10px; }
+.water-actions [data-water-add], .water-record-options [data-water-quick] { width:100%; min-height:58px; font-size:1.0625rem; font-weight:600; }
+.water-actions [data-water-custom], .water-record-options [data-water-custom], .water-record-options > p { grid-column:1 / -1; }
+.water-actions [data-water-custom], .water-record-options [data-water-custom] { min-height:46px; justify-content:center; }

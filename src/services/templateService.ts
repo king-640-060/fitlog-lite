@@ -1,5 +1,8 @@
+import { isMealType } from '../utils/foodMeals'
+import { getLocalDateString } from '../utils/date'
+import { strategyBusinessDate } from './nutritionStrategyService'
 import type {
-  DietTemplate, DietTemplateFallback, DietTemplateItem, Food, FoodLog, NutritionGoal, Workout, WorkoutTemplate,
+  MealType, DietTemplate, DietTemplateFallback, DietTemplateItem, Food, FoodLog, NutritionGoal, Workout, WorkoutTemplate,
   WorkoutTemplateExercise, WorkoutTemplateSet,
 } from '../db/types'
 import { db, type FitLogDatabase } from '../db/database'
@@ -107,9 +110,11 @@ function normalizeFallback(value: Partial<DietTemplateFallback>): DietTemplateFa
 
 function cloneDietItem(item: Partial<DietTemplateItem>): DietTemplateItem {
   if (!item.fallback) throw new Error('饮食模板项目缺少营养快照')
+  if (item.meal !== undefined && !isMealType(item.meal)) throw new Error('模板餐次不合法')
   return {
     id: item.id ?? crypto.randomUUID(), foodId: optionalText(item.foodId),
     foodName: requiredText(item.foodName, '食物名称'), brand: optionalText(item.brand),
+    ...(item.meal === undefined ? {} : { meal: item.meal }),
     grams: finiteNumber(item.grams, '克数', Number.EPSILON), fallback: normalizeFallback(item.fallback),
   }
 }
@@ -117,9 +122,13 @@ function cloneDietItem(item: Partial<DietTemplateItem>): DietTemplateItem {
 export function normalizeDietTemplate(template: Partial<DietTemplate>): DietTemplate {
   const now = new Date().toISOString()
   if (!Array.isArray(template.items)) throw new Error('饮食模板缺少食物列表')
+  if (template.mode !== undefined && !['combo','day'].includes(template.mode)) throw new Error('模板类型不合法')
+  const items=template.items.map(cloneDietItem)
+  if(new Set(items.map(i=>i.id)).size!==items.length)throw new Error('模板食物标识重复')
   return {
     id: template.id ?? crypto.randomUUID(), name: requiredText(template.name, '模板名称'),
-    description: optionalText(template.description), items: template.items.map(cloneDietItem),
+    description: optionalText(template.description), items,
+    ...(template.mode === undefined ? {} : { mode: template.mode }),
     nutritionGoal: normalizeNutritionGoal(template.nutritionGoal),
     createdAt: template.createdAt ?? now, updatedAt: now, lastUsedAt: template.lastUsedAt,
   }
@@ -141,10 +150,10 @@ export function dietTemplateItemFromFood(food: Food, grams: number): DietTemplat
 
 export function dietTemplateFromLogs(logs: FoodLog[], name: string, nutritionGoal?: NutritionGoal): DietTemplate {
   return normalizeDietTemplate({
-    name,
+    name, mode: 'day',
     nutritionGoal,
     items: logs.map((log) => ({
-      id: crypto.randomUUID(), foodId: log.foodId, foodName: log.foodName, brand: log.brand, grams: log.grams,
+      id: crypto.randomUUID(), foodId: log.foodId, foodName: log.foodName, brand: log.brand, grams: log.grams, ...(log.meal ? {meal:log.meal}:{}),
       fallback: { referenceGrams: log.referenceGrams, calories: log.caloriesPerReference, protein: log.proteinPerReference, carbs: log.carbsPerReference, fat: log.fatPerReference },
     })),
   })
@@ -160,8 +169,10 @@ export function duplicateDietTemplate(template: DietTemplate): DietTemplate {
 }
 
 function fallbackFood(item: DietTemplateItem): Food {
+  if(!item.fallback)throw new Error('食物已删除且模板缺少营养快照')
+  const fallback=normalizeFallback(item.fallback)
   return {
-    id: item.foodId ?? crypto.randomUUID(), name: item.foodName, brand: item.brand, ...item.fallback,
+    id: item.foodId ?? crypto.randomUUID(), name: item.foodName, brand: item.brand, ...fallback,
     createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
   }
 }
@@ -186,28 +197,36 @@ export async function applyDietTemplate(
   template: DietTemplate,
   date: string,
   database: FitLogDatabase = db,
-  options: { replaceNutritionTarget?: boolean, preserveNutritionTarget?: boolean } = {},
+  options: { replaceNutritionTarget?: boolean, preserveNutritionTarget?: boolean, meal?: MealType, expectedTemplate?: string, expectedTarget?: string, expectedFoods?: string } = {},
 ): Promise<FoodLog[]> {
-  const resolved = await resolveDietTemplateFoods(template, database)
-  const logs = resolved.map(({ item, food, missing }) => {
-    const log = createFoodLogSnapshot(food, item.grams, date)
-    if (missing) log.foodId = undefined
-    return log
-  })
-  const now = new Date().toISOString()
-  await database.transaction('rw', [database.foodLogs, database.dietTemplates, database.nutritionTargets], async () => {
-    const existingTarget = template.nutritionGoal
-      ? await database.nutritionTargets.where('date').equals(date).first()
-      : undefined
-    if (existingTarget && !options.replaceNutritionTarget && !options.preserveNutritionTarget) throw new NutritionTargetConflictError()
+  strategyBusinessDate(date)
+  if(date>getLocalDateString())throw new Error('未来日期只能预览，不能确认实际摄入')
+  if(options.meal!==undefined&&!isMealType(options.meal))throw new Error('餐次不合法')
+  // Resolve and recheck in the same write transaction; no source can change after preview.
+  return database.transaction('rw', [database.foods, database.foodLogs, database.dietTemplates, database.nutritionTargets], async () => {
+    if(options.expectedTemplate!==undefined&&JSON.stringify(await database.dietTemplates.get(template.id))!==options.expectedTemplate)throw new Error('饮食模板已变化，请重新预览')
+    if(template.mode!==undefined&&!['combo','day'].includes(template.mode))throw new Error('模板类型不合法')
+    if(new Set(template.items.map(i=>i.id)).size!==template.items.length)throw new Error('模板食物标识重复')
+    for(const item of template.items){finiteNumber(item.grams,'克数',Number.EPSILON);if(item.meal!==undefined&&!isMealType(item.meal))throw new Error('模板餐次不合法')}
+    const resolved=await resolveDietTemplateFoods(template,database)
+    if(options.expectedFoods!==undefined&&dietFoodsFingerprint(resolved)!==options.expectedFoods)throw new Error('食物资料已变化，请重新预览')
+    const actualTarget=await database.nutritionTargets.where('date').equals(date).first()
+    if(options.expectedTarget!==undefined&&JSON.stringify(actualTarget??null)!==options.expectedTarget)throw new Error('当天目标已变化，请重新预览')
+    const existingTarget=template.nutritionGoal?actualTarget:undefined
+    if(existingTarget&&!options.replaceNutritionTarget&&!options.preserveNutritionTarget)throw new NutritionTargetConflictError()
+    const logs=resolved.map(({item,food,missing})=>{
+      const log=createFoodLogSnapshot(food,item.grams,date,template.mode==='day'?item.meal:(options.meal??item.meal))
+      if(missing)log.foodId=undefined
+      return log
+    })
     await database.foodLogs.bulkAdd(logs)
-    await database.dietTemplates.update(template.id, { lastUsedAt: now })
-    if (template.nutritionGoal && !(existingTarget && options.preserveNutritionTarget)) {
-      const target = createNutritionTarget(date, template.nutritionGoal, existingTarget, template.id)
-      await database.nutritionTargets.put(target)
-    }
+    await database.dietTemplates.update(template.id,{lastUsedAt:new Date().toISOString()})
+    if(template.nutritionGoal&&!(existingTarget&&options.preserveNutritionTarget))await database.nutritionTargets.put(createNutritionTarget(date,template.nutritionGoal,existingTarget,template.id))
+    return logs
   })
-  return logs
+}
+export function dietFoodsFingerprint(resolved:Awaited<ReturnType<typeof resolveDietTemplateFoods>>):string {
+  return JSON.stringify(resolved.map(({item,food,missing})=>({item,missing,food:missing?item.fallback:food})))
 }
 
 export function sortTemplates<T extends { name: string, updatedAt: string, lastUsedAt?: string }>(templates: T[]): T[] {

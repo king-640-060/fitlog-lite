@@ -185,6 +185,7 @@ export interface DietTemplateItem {
   brand?: string
   grams: number
   fallback: DietTemplateFallback
+  meal?: MealType
 }
 
 export interface NutritionGoal {
@@ -195,6 +196,7 @@ export interface NutritionGoal {
 }
 
 export interface DietTemplate {
+  mode?: 'combo' | 'day' // Missing remains the legacy unclassified combination.
   id: string
   name: string
   description?: string
@@ -349,7 +351,7 @@ export interface BackupDataV9 extends BackupBase {
   data: BackupDataV8['data']
 }
 
-export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6 | BackupDataV7 | BackupDataV8 | BackupDataV9 | BackupDataV10 | BackupDataV11 | BackupDataV12 | BackupDataV13
+export type BackupData = BackupDataV1 | BackupDataV2 | BackupDataV3 | BackupDataV4 | BackupDataV5 | BackupDataV6 | BackupDataV7 | BackupDataV8 | BackupDataV9 | BackupDataV10 | BackupDataV11 | BackupDataV12 | BackupDataV13 | BackupDataV14
 
 /** Context only: estimates never contribute to canonical FoodLog nutrition. */
 export interface DietEvent {
@@ -413,4 +415,10 @@ export interface BackupDataV12 extends BackupBase {
 export interface BackupDataV13 extends BackupBase {
   schemaVersion: 13
   data: BackupDataV12['data']
+}
+
+/** Meal-aware DietTemplate semantics; old clients must reject rather than silently drop them. */
+export interface BackupDataV14 extends BackupBase {
+  schemaVersion: 14
+  data: BackupDataV13['data']
 }

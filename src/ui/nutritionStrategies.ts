@@ -5,7 +5,7 @@ import type { ManagedSurfaceContext } from './managementWorkspace'
 import { animateMotion, stabilizeSheetSubview } from './motion'
 import type { NutritionGoal, NutritionTarget, NutritionStrategyPhase, NutritionStrategyVariant } from '../db/types'
 import { db } from '../db/database'
-import { activateNutritionStrategy, applyNutritionStrategyVariant, archiveNutritionStrategy, duplicateNutritionStrategy, getNutritionPhaseSummary, getNutritionStrategy, getNutritionStrategyForDate, saveNutritionStrategy, type NutritionStrategyDefinition, type StrategyDraft } from '../services/nutritionStrategyService'
+import { activateNutritionStrategy, applyNutritionStrategyVariant, archiveNutritionStrategy, previewNutritionStrategyDeletion, deleteUnusedNutritionStrategy, duplicateNutritionStrategy, getNutritionPhaseSummary, getNutritionStrategy, getNutritionStrategyForDate, saveNutritionStrategy, type NutritionStrategyDefinition, type StrategyDraft } from '../services/nutritionStrategyService'
 import { getLocalDateString, shiftLocalDate } from '../utils/date'
 import { formatNumber } from '../utils/nutrition'
 import { formatEnergyInputValue } from '../utils/energy'
@@ -23,7 +23,7 @@ export interface StrategyUi {
   manual(date: string, target?: NutritionTarget): void
   changed(): Promise<void>
   toast(message: string): void
-  confirm(title: string, message: string, action?: string): Promise<boolean>
+  confirm(title: string, message: string, action?: string, danger?: boolean): Promise<boolean>
 }
 const isOpen = (dialog: HTMLDialogElement) => dialog.isConnected && dialog.open
 function errorHtml(): string { return '<p class="strategy-error" role="alert" hidden></p>' }
@@ -82,16 +82,24 @@ export async function showNutritionStrategyManager(ui: StrategyUi, back?: ()=>vo
   try{
     const [templates,phases]=await Promise.all([db.nutritionStrategyTemplates.orderBy('updatedAt').reverse().toArray(),db.nutritionStrategyPhases.orderBy('startDate').reverse().toArray()])
     const active=phases.find(p=>!p.endDate),current=templates.find(t=>t.id===active?.templateId)
-    const counts=new Map((await db.nutritionStrategyVariants.toArray()).reduce<Array<[string,number]>>((a,v)=>{const pair=a.find(p=>p[0]===v.templateId);if(pair)pair[1]++;else a.push([v.templateId,1]);return a},[]))
-    const row=(t:typeof templates[number])=>managerRowHtml(ui.esc(t.name), `${counts.get(t.id)??0} 个日方案${t.id===current?.id&&active?` · 当前使用 · ${ui.esc(active.startDate)} 起`:t.archivedAt?' · 已归档':phases.some(p=>p.templateId===t.id)?' · 曾使用':' · 尚未启用'}`, `data-strategy-detail="${ui.esc(t.id)}"`)
+    const previews=await Promise.all(templates.map(t=>previewNutritionStrategyDeletion(t.id)))
+    const row=(t:typeof templates[number])=>{
+      const p=previews.find(p=>p.id===t.id)!,activeTemplate=t.id===current?.id&&active
+      const status=activeTemplate?`当前使用 · ${ui.esc(active.startDate)} 起`:t.archivedAt?'已归档':p.canDelete?'无历史引用':'有历史或周期引用'
+      const main=managerRowHtml(ui.esc(t.name),`${p.variants} 个日方案 · ${status}`,`data-strategy-detail="${ui.esc(t.id)}"`)
+      const actions=`<div class="strategy-manager-row-actions"><button type="button" class="secondary ${p.canDelete?'danger':''}" data-delete-strategy="${ui.esc(t.id)}" ${p.canDelete?'':'disabled'}>${p.canDelete?'删除模板':activeTemplate?'当前使用':'保留历史'}</button><button type="button" class="secondary" data-strategy-reference="${ui.esc(t.id)}">${p.canDelete||activeTemplate?'查看详情':'查看引用'}</button></div>`
+      return main.replace(/<\/div>$/,actions+'</div>')
+    }
     const currentHtml=current&&active?managerSectionHtml('当前使用',managerListHtml(row(current))):''
     if(!isOpen(dialog)||!managerRoot.isConnected)return
     if (!ui.surface) setSheetVariant(dialog,templates.length>2?'large':'content')
     const available=templates.filter(t=>t.id!==current?.id&&!t.archivedAt),archived=templates.filter(t=>t.archivedAt)
     dialog.querySelector('#strategy-manager')!.innerHTML=`${back?'<button type="button" class="sheet-link" id="strategy-manager-back">返回当日目标</button>':''}${managerToolbarHtml(`${templates.length} 个模板`,'strategy-create','营养模板',!templates.length)}<p class="manager-section-note">一个模板包含多个日目标方案，每天选择一个。切换模板不改写已保存目标。</p>${templates.length?`${currentHtml}${available.length?managerSectionHtml(current?'其他模板':'可用模板',managerListHtml(available.map(row).join(''))):''}${archived.length?`<details class="strategy-archive manager-section"><summary>已归档 · ${archived.length}</summary>${managerListHtml(archived.map(row).join(''))}</details>`:''}`:managerEmptyHtml('营养模板','把训练日、休息日等目标放在同一模板中，每天选一个。','strategy-empty-create')}<button type="button" class="secondary full-btn" id="strategy-cycles">营养周期排程</button>${errorHtml()}`
 
+    dialog.querySelectorAll<HTMLButtonElement>('[data-delete-strategy]').forEach(b=>b.addEventListener('click',()=>void confirmStrategyDeletion(ui,previews.find(p=>p.id===b.dataset.deleteStrategy)!,dialog,back,b)))
+    dialog.querySelectorAll<HTMLButtonElement>('[data-strategy-reference]').forEach(b=>b.addEventListener('click',()=>{void showNutritionStrategyDetail(ui,b.dataset.strategyReference!,back).catch(e=>reportError(dialog,e))}))
     dialog.querySelector('#strategy-cycles')!.addEventListener('click',()=>void showNutritionCycles(ui,()=>void showNutritionStrategyManager(ui,back)))
-    observeManagerCatalog(ui.surface,managerRoot,['nutritionStrategyTemplates','nutritionStrategyVariants'],()=>showNutritionStrategyManager(ui,back))
+    observeManagerCatalog(ui.surface,managerRoot,['nutritionStrategyTemplates','nutritionStrategyVariants','nutritionStrategyPhases','nutritionTargets','nutritionCycles','nutritionCycleDays'],()=>showNutritionStrategyManager(ui,back))
     ui.surface?.restoreScroll()
     dialog.querySelector('#strategy-empty-create')?.addEventListener('click',()=>showNutritionStrategyEditor(ui,undefined,back))
     dialog.querySelector('#strategy-create')!.addEventListener('click',()=>showNutritionStrategyEditor(ui,undefined,back))
@@ -106,13 +114,15 @@ export async function showNutritionStrategyDetail(ui: StrategyUi, id: string, ba
   if(!value)return
   const phases=(await db.nutritionStrategyPhases.where('templateId').equals(id).toArray()).sort((a,b)=>b.startDate.localeCompare(a.startDate)),active=phases.some(p=>!p.endDate)
   const summaries=await Promise.all(phases.map(p=>phaseHtml(ui,p,value.template.name)))
+  const deletion=await previewNutritionStrategyDeletion(id)
   if(ui.surface&&!ui.surface.alive)return
-  const dialog=ui.openModal('营养模板详情',`<div class="nutrition-strategy"><button type="button" class="sheet-link" id="strategy-detail-back">返回模板管理</button><h3 class="strategy-title">${ui.esc(value.template.name)}</h3><p class="strategy-note">${active?'当前使用':value.template.archivedAt?'已归档，历史目标和阶段仍保留':'尚未启用或已结束使用'} · ${value.variants.length} 个日方案</p>${summaries.join('')}<section><h3>日方案</h3><div class="strategy-list">${value.variants.map(v=>`<article class="strategy-variant-card">${variantContent(ui,v)}</article>`).join('')}</div></section>${errorHtml()}${!value.template.archivedAt&&!active?'<button type="button" class="primary full-btn" id="strategy-activate-open">启用此模板</button>':''}<button type="button" class="${active?'primary':'secondary'} full-btn" id="strategy-detail-copy">复制为新模板</button>${value.template.archivedAt?'':'<button type="button" class="secondary full-btn" id="strategy-edit">编辑模板</button>'}${!active&&!value.template.archivedAt?'<button type="button" class="danger-button full-btn" id="strategy-archive">归档模板</button>':''}<p class="strategy-note">编辑只影响以后再次选择的方案；已保存的每日目标和来源名称保持不变。调整策略时可复制成新版本。</p></div>`,true)
+  const dialog=ui.openModal('营养模板详情',`<div class="nutrition-strategy"><button type="button" class="sheet-link" id="strategy-detail-back">返回模板管理</button><h3 class="strategy-title">${ui.esc(value.template.name)}</h3><p class="strategy-note">${active?'当前使用':value.template.archivedAt?'已归档，历史目标和阶段仍保留':'尚未启用或已结束使用'} · ${value.variants.length} 个日方案</p>${summaries.join('')}<section><h3>日方案</h3><div class="strategy-list">${value.variants.map(v=>`<article class="strategy-variant-card">${variantContent(ui,v)}</article>`).join('')}</div></section>${errorHtml()}${!value.template.archivedAt&&!active?'<button type="button" class="primary full-btn" id="strategy-activate-open">启用此模板</button>':''}<button type="button" class="${active?'primary':'secondary'} full-btn" id="strategy-detail-copy">复制为新模板</button>${value.template.archivedAt?'':'<button type="button" class="secondary full-btn" id="strategy-edit">编辑模板</button>'}${!active&&!value.template.archivedAt?'<button type="button" class="secondary full-btn" id="strategy-archive">归档模板</button>':''}<div class="manager-danger-zone"><p class="strategy-note">阶段 ${deletion.references.phases} · 每日目标 ${deletion.references.targets} · 周期 ${deletion.references.cycles} · 排程日 ${deletion.references.days}</p><button type="button" class="text-btn danger" id="strategy-delete" ${deletion.canDelete?'':'disabled'}>${deletion.canDelete?'永久删除营养模板':'有历史引用，不能永久删除'}</button></div><p class="strategy-note">编辑只影响以后再次选择的方案；已保存的每日目标和来源名称保持不变。调整策略时可复制成新版本。</p></div>`,true)
+  dialog.querySelector<HTMLButtonElement>('#strategy-delete')?.addEventListener('click',e=>void confirmStrategyDeletion(ui,deletion,dialog,back,e.currentTarget as HTMLButtonElement))
   dialog.querySelector('#strategy-detail-back')!.addEventListener('click',()=>void showNutritionStrategyManager(ui,back))
   dialog.querySelector('#strategy-detail-copy')!.addEventListener('click',()=>showNutritionStrategyEditor(ui,duplicateNutritionStrategy(value),back,true))
   dialog.querySelector('#strategy-edit')?.addEventListener('click',()=>showNutritionStrategyEditor(ui,{id:value.template.id,name:value.template.name,variants:structuredClone(value.variants)},back))
   dialog.querySelector('#strategy-activate-open')?.addEventListener('click',()=>void showNutritionStrategyActivation(ui,value,back))
-  dialog.querySelector('#strategy-archive')?.addEventListener('click',async()=>{if(!await ui.confirm('归档营养模板？','不再提供启用；历史阶段、每日目标和来源快照完整保留。','归档模板'))return;try{await archiveNutritionStrategy(id);ui.toast('模板已归档');await showNutritionStrategyManager(ui,back)}catch(e){reportError(dialog,e)}})
+  dialog.querySelector('#strategy-archive')?.addEventListener('click',async()=>{if(!await ui.confirm('归档营养模板？','不再提供启用；历史阶段、每日目标和来源快照完整保留。','归档模板',false))return;try{await archiveNutritionStrategy(id);ui.toast('模板已归档');await showNutritionStrategyManager(ui,back)}catch(e){reportError(dialog,e)}})
 }
 
 export function showNutritionStrategyEditor(ui: StrategyUi, source?: StrategyDraft, back?:()=>void, copy=false): void {
@@ -173,4 +183,11 @@ async function showNutritionStrategyActivation(ui: StrategyUi, value: NutritionS
   dialog.querySelector('#strategy-activation-back')!.addEventListener('click',()=>{if(!busy)void showNutritionStrategyDetail(ui,value.template.id,back)})
   dialog.querySelector('#strategy-activate-confirm')!.addEventListener('click',async()=>{if(busy)return;busy=true;const button=dialog.querySelector<HTMLButtonElement>('#strategy-activate-confirm')!;button.disabled=true;try{await activateNutritionStrategy(value.template.id,date,db,{activePhaseId:active?.id??null,templateUpdatedAt:value.template.updatedAt});ui.toast('已启用营养模板');await showNutritionStrategyDetail(ui,value.template.id,back)}catch(e){busy=false;button.disabled=false;reportError(dialog,e)}})
   draw()
+}
+
+async function confirmStrategyDeletion(ui:StrategyUi,preview:Awaited<ReturnType<typeof previewNutritionStrategyDeletion>>,dialog:HTMLDialogElement,back:(()=>void)|undefined,button:HTMLButtonElement):Promise<void>{
+  if(button.disabled)return;button.disabled=true
+  try{if(!await ui.confirm('永久删除营养模板？',`「${preview.name}」 · ${preview.variants} 个日方案；阶段 ${preview.references.phases}、每日目标 ${preview.references.targets}、周期 ${preview.references.cycles}、排程日 ${preview.references.days}。只删除这个无引用模板及日方案，无法撤销。`,'永久删除'))return
+    await deleteUnusedNutritionStrategy(preview.id,preview.fingerprint);ui.toast('未引用的营养模板已永久删除');await showNutritionStrategyManager(ui,back)
+  }catch(e){reportError(dialog,e)}finally{button.disabled=false}
 }

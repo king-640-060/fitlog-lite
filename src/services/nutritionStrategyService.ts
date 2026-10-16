@@ -124,3 +124,34 @@ export async function getNutritionPhaseSummary(phase: NutritionStrategyPhase, da
   const weights = end < phase.startDate ? [] : await getWeightsInRange(phase.startDate, end, database)
   return { days: nutritionPhaseDays(phase, today), end, count: weights.length, first: weights[0], last: weights.at(-1), change: weights.length > 1 ? weights.at(-1)!.weightKg - weights[0]!.weightKg : undefined }
 }
+
+/** Complete persisted reference allowlist. AI proposals are memory-only, never references. */
+export interface NutritionStrategyDeletionPreview {
+  id:string; name:string; variants:number; references:{phases:number; targets:number; cycles:number; days:number}; canDelete:boolean; fingerprint:string
+}
+function strategyDeletionStores(database:FitLogDatabase){return [database.nutritionStrategyTemplates,database.nutritionStrategyVariants,database.nutritionStrategyPhases,database.nutritionTargets,database.nutritionCycles,database.nutritionCycleDays]}
+async function readStrategyDeletion(id:string,database:FitLogDatabase):Promise<NutritionStrategyDeletionPreview>{
+  const definition=await getNutritionStrategy(id,database)
+  if(!definition)throw new Error('模板不存在')
+  const variantIds=new Set(definition.variants.map(v=>v.id))
+  const phases=(await database.nutritionStrategyPhases.toArray()).filter(p=>p.templateId===id),phaseIds=new Set(phases.map(p=>p.id))
+  const targets=(await database.nutritionTargets.toArray()).filter(t=>t.strategySelection&&(t.strategySelection.templateId===id||variantIds.has(t.strategySelection.variantId)||phaseIds.has(t.strategySelection.phaseId))||t.cycleSelection&&(t.cycleSelection.templateId===id||variantIds.has(t.cycleSelection.variantId)))
+  const cycles=(await database.nutritionCycles.toArray()).filter(c=>c.templateId===id),cycleIds=new Set(cycles.map(c=>c.id))
+  const days=(await database.nutritionCycleDays.toArray()).filter(d=>cycleIds.has(d.cycleId)||d.nutrition&&(d.nutrition.templateId===id||variantIds.has(d.nutrition.variantId)))
+  const references={phases:phases.length,targets:targets.length,cycles:cycles.length,days:days.length}
+  const sort=<T extends {id:string}>(rows:T[])=>rows.sort((a,b)=>a.id.localeCompare(b.id))
+  const fingerprint=JSON.stringify({definition,phases:sort(phases),targets:sort(targets),cycles:sort(cycles),days:sort(days)})
+  return{id,name:definition.template.name,variants:definition.variants.length,references,canDelete:Object.values(references).every(n=>n===0),fingerprint}
+}
+export async function previewNutritionStrategyDeletion(id:string,database:FitLogDatabase=db):Promise<NutritionStrategyDeletionPreview>{
+  return database.transaction('r',strategyDeletionStores(database),()=>readStrategyDeletion(id,database))
+}
+export async function deleteUnusedNutritionStrategy(id:string,expectedFingerprint:string,database:FitLogDatabase=db):Promise<void>{
+  await database.transaction('rw',strategyDeletionStores(database),async()=>{
+    const current=await readStrategyDeletion(id,database)
+    if(!current.canDelete)throw new Error('模板有阶段、目标或周期引用，不能永久删除；请保留历史并归档')
+    if(current.fingerprint!==expectedFingerprint)throw new Error('模板或引用已变化，请重新查看删除预览')
+    await database.nutritionStrategyVariants.where('templateId').equals(id).delete()
+    await database.nutritionStrategyTemplates.delete(id)
+  })
+}

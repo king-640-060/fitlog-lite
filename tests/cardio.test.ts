@@ -154,7 +154,7 @@ describe('Backup V5 / Restore V1–V5', () => {
   it('V5 导出旧楼梯机时显式标记类型，不修改数据库原记录', async () => {
     const source = newDatabase(); await source.cardioSessions.add({ ...record(), note: '晚间' })
     const backup = await exportBackup(source)
-    expect(backup.schemaVersion).toBe(13)
+    expect(backup.schemaVersion).toBe(14)
     expect(backup.data.cardioSessions).toMatchObject([{ activityType: 'stair_climber', durationMinutes: 25, speed: 6.5, note: '晚间' }])
     expect((await source.cardioSessions.get('cardio-1'))?.activityType).toBeUndefined()
     const target = newDatabase(); await restoreBackup(JSON.parse(JSON.stringify(backup)), target)

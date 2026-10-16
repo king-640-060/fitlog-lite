@@ -1,0 +1,33 @@
+# Food / Water / Day Detail v0.4 implementation contract
+
+Approved package: [unaltered originals](../design/reference/2026-10-15-food-water-v0.4/README.md). HTML SHA256 `856de7f201b630572c8eedadfd4b4e299700d153894f9ee2fd99b4663e5c81a3`. This scoped F1–F5 handoff supersedes earlier 250ml shortcuts and saved-goal indication in folded Food summaries. A–D and B1–B9 remain.
+
+## Templates and food facts
+
+DietTemplate optional mode is combo/day; absence retains legacy combination semantics. Each ordered DietTemplateItem has optional validated MealType. Never infer missing meals, even when a user changes mode to day: show the existing unclassified group. Meal groups can add, edit grams, move/order, remove and reopen; switching display modes preserves every item and meal. Nutrition goals stay optional and initially folded. Save/copy creates no intake. From actual daily logs preserves all original meals, missing meals and fallback snapshots. Copies deep-clone nested values and create fresh template/item IDs. AI partial source edits preserve mode and existing meal.
+
+Actual application has date, current source preview, explicit actual-intake confirmation and, for combo, an optional chosen target meal; unchanged selection preserves each original meal or unclassified. Day mode always preserves each stored meal. Future dates are preview-only. The final Food/Template/Target transaction rechecks the exact template, source-food and target preview fingerprints, target keep/replace choice, date and values, then appends fresh FoodLog snapshots and optional target plus lastUsedAt atomically. Cycle application adds the existing cycle/day/revision guard and source checks. Saving a schedule never writes intake or targets. Source deletion retains validated fallback and unknown macros; editing templates never rewrites earlier snapshots.
+
+## Data version and compatibility
+
+Dexie13 / IndexedDB130 /22stores are unchanged. Optional fields require no index/store migration and never rewrite existing rows. Export is **Backup14**, Restore1–14, encrypted Sync/envelope1. The version boundary prevents older applications (whose template normalizer drops mode/meal) from accepting a new meal-aware backup silently. All earlier frozen V7–V13 files stay immutable. New `approvedFoodWaterBackupV14.json` freezes the 22-store meal-aware backup; it is not a Dexie14 schema. Restore validates modes, per-item unique IDs, grams and meal enums before any writes and retains one22-store replacement transaction with rollback. AI/Voice/WaterReference/Appearance device preferences remain outside business Backup/Sync.
+
+## Weight input, water and compact facts
+
+Default new food is still100g; no stored value is inferred or mass rewritten. The reproduced UI cause was an82px field, generic13px padding overriding the local25px rule, and an absolutely positioned g sharing numeric/spinner space. g now owns a flowing independent column. Container width relative to scaled text switches the entire item layout when needed; >=16px editable text, native decimal input, required finite positive grams and canonical precision remain.
+
+Today and Trend use equal neutral500/1000ml buttons and quiet 自定义饮水量. Standard widths show peers side-by-side; enlarged fonts reflow both using the same responsive rule. Busy guards reject rapid duplicate actions; only a successful independent exact-ml row changes totals or creates Undo. Shared custom editor displays date and actual volume, validates1–100000 integer ml, retains inline failure, exact-ID Undo/history/edit/delete and normal offline behavior. Reference is never intake.
+
+Calendar Detail retains full existing content width, two equal columns and ten native disclosures. Standard summary73px including borders, label/icon then one metric line; Food uses kcal and concise count, no redundant saved-goal text. Complete actual/target grids, every snapshot and all actions stay in the expanded disclosure and accessible name. Long values and200% text grow naturally; no clipping/fixed width/font shrinking. Native details/summary remain; display:contents plus explicit summary grid coordinates keep all ten card positions and widths unchanged on open. Full-width fact content follows all ten summaries, as in the approved prototype. No layout observer or new animation owner; summaries remain keyboard accessible. Day Report keeps complete facts with shared compact Food copy.
+
+## Safe permanent deletion
+
+Nutrition preview and delete share a six-store transaction scope: templates, variants, phases, targets, cycles, cycleDays. References cover phase.templateId; target.strategySelection templateId/variantId/phaseId; target.cycleSelection templateId/variantId; cycle.templateId; cycleDay.cycleId/nutrition.templateId/variantId. Both active and historical/archived references block hard deletion. Full definition/variant/reference fingerprint is rechecked under the write lock, then owned variants and template delete together; concurrent changes and failures leave everything unchanged. The UI names actual template, owned variants and real counts, distinguishes quiet archive from dangerous permanent deletion, supports cancel and leaves archive/history visibility intact. No AI destructive tool.
+
+Diet management exposes 管理删除模板. Nutrition manager rows directly show 删除模板 for unreferenced definitions, or 当前使用 / 保留历史 with 查看详情 / 查看引用, matching the approved visible action hierarchy. Both reuse the shared workspace and danger confirmations. Diet deletion only removes the definition; FoodLog snapshots, saved targets and schedule names remain unchanged. Existing editor deletion remains available.
+
+## Verification and necessary prototype differences
+
+Run all previous35 unique browser suites (approvedJointV05 on both engines), new foodWaterDayV04 on Chromium and WebKit, full unit/typecheck/Pages build, actual old-version SW upgrade, exact production asset/SW identities and same-existing-synthetic-profile data/config hashes plus offline cold boot. Keep raw failures and fixes; do not skip assertions to obtain PASS.
+
+Production retains native Sheet, real saved values, semantic theme tokens, >=16px inputs (prototype14px),44px controls (prototype some25–41px), explicit move/meal controls and all saved facts. The prototype's fixed73px/ellipsis does not override accessibility: production grows at large fonts. Physical iPhone Safari, original installed PWA, real keyboard/Safe Area and VoiceOver remain separately Pending without device evidence. Runtime font/viewport mocks are labelled browser evidence.

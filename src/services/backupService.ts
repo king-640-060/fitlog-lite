@@ -1,7 +1,7 @@
 import { validateCycleCollection } from './nutritionCycleService'
 import { validateSleepSession, validateWaterLog } from '../utils/recovery'
 import { validateDietEvent } from './dietEventService'
-import type { BackupData, BackupDataV13 } from '../db/types'
+import type { BackupData, BackupDataV14 } from '../db/types'
 import { db, type FitLogDatabase } from '../db/database'
 import { isMealType } from '../utils/foodMeals'
 import { getCardioActivityType } from '../utils/cardio'
@@ -198,6 +198,7 @@ function validateDietTemplate(record: UnknownRecord, index: number): void {
   nonEmptyString(record.name, `${location} name`)
   optionalString(record.description, `${location} description`)
   if (!Array.isArray(record.items)) throw new Error(`${location} items：必须是 array`)
+  if(record.mode!==undefined&&record.mode!=='combo'&&record.mode!=='day')throw new Error(`${location}：模板类型不合法`)
   const itemIds = new Set<string>()
   record.items.forEach((itemValue, itemIndex) => {
     const itemLocation = `${location}，第 ${itemIndex + 1} 个食物`
@@ -208,6 +209,7 @@ function validateDietTemplate(record: UnknownRecord, index: number): void {
     if (item.foodId !== undefined) nonEmptyString(item.foodId, `${itemLocation} foodId`)
     nonEmptyString(item.foodName, `${itemLocation} foodName`)
     optionalString(item.brand, `${itemLocation} brand`)
+    if(item.meal!==undefined&&!isMealType(item.meal))throw new Error(`${itemLocation}：餐次不合法`)
     finite(item.grams, `${itemLocation} grams`, Number.EPSILON)
     const fallback = objectValue(item.fallback, `${itemLocation} fallback`)
     finite(fallback.referenceGrams, `${itemLocation} fallback.referenceGrams`, Number.EPSILON)
@@ -343,17 +345,17 @@ function validateHabitCheckIn(record: UnknownRecord, index: number): string {
 
 export interface ValidatedBackup {
   app: 'FitLog Lite'
-  schemaVersion: 13
+  schemaVersion: 14
   exportedAt: string
-  data: BackupDataV13['data']
+  data: BackupDataV14['data']
 }
 
 export function validateBackup(value: unknown): ValidatedBackup {
   if (!value || typeof value !== 'object') throw new Error('备份文件格式不正确')
   const backup = value as Partial<BackupData>
-  if (backup.app !== 'FitLog Lite' || (backup.schemaVersion !== 1 && backup.schemaVersion !== 2 && backup.schemaVersion !== 3 && backup.schemaVersion !== 4 && backup.schemaVersion !== 5 && backup.schemaVersion !== 6 && backup.schemaVersion !== 7 && backup.schemaVersion !== 8 && backup.schemaVersion !== 9 && backup.schemaVersion !== 10 && backup.schemaVersion !== 11 && backup.schemaVersion !== 12 && backup.schemaVersion !== 13)) throw new Error('不是兼容的 FitLog Lite 备份')
+  if (backup.app !== 'FitLog Lite' || (backup.schemaVersion !== 1 && backup.schemaVersion !== 2 && backup.schemaVersion !== 3 && backup.schemaVersion !== 4 && backup.schemaVersion !== 5 && backup.schemaVersion !== 6 && backup.schemaVersion !== 7 && backup.schemaVersion !== 8 && backup.schemaVersion !== 9 && backup.schemaVersion !== 10 && backup.schemaVersion !== 11 && backup.schemaVersion !== 12 && backup.schemaVersion !== 13 && backup.schemaVersion !== 14)) throw new Error('不是兼容的 FitLog Lite 备份')
   if (!backup.data || typeof backup.data !== 'object' || Array.isArray(backup.data)) throw new Error('备份 data 必须是 object')
-  const data = backup.data as Partial<BackupDataV13['data']>
+  const data = backup.data as Partial<BackupDataV14['data']>
   timestamp(backup.exportedAt, '备份 exportedAt')
   const keys = ['foods', 'foodLogs', 'exercises', 'workouts', 'weights'] as const
   for (const key of keys) if (!Array.isArray(backup.data[key])) throw new Error(`备份缺少 ${key} 数据`)
@@ -496,7 +498,7 @@ export function validateBackup(value: unknown): ValidatedBackup {
     if (variant && variant.templateId !== selection.templateId) throw new Error('每日目标的日方案来源无效')
   }
   return {
-    app: 'FitLog Lite', schemaVersion: 13, exportedAt: backup.exportedAt!,
+    app: 'FitLog Lite', schemaVersion: 14, exportedAt: backup.exportedAt!,
     data: {
       foods: backup.data.foods, foodLogs: backup.data.foodLogs, exercises: backup.data.exercises,
       workouts: backup.data.workouts, weights: backup.data.weights,
@@ -506,9 +508,9 @@ export function validateBackup(value: unknown): ValidatedBackup {
   } as ValidatedBackup
 }
 
-export async function exportBackup(database: FitLogDatabase = db): Promise<BackupDataV13> {
+export async function exportBackup(database: FitLogDatabase = db): Promise<BackupDataV14> {
   return database.transaction('r', database.tables, async () => ({
-    app: 'FitLog Lite' as const, schemaVersion: 13 as const, exportedAt: new Date().toISOString(),
+    app: 'FitLog Lite' as const, schemaVersion: 14 as const, exportedAt: new Date().toISOString(),
     data: {
       nutritionCycles: await database.nutritionCycles.toArray(), nutritionCycleDays: await database.nutritionCycleDays.toArray(),
       sleepSessions: await database.sleepSessions.toArray(), waterLogs: await database.waterLogs.toArray(),

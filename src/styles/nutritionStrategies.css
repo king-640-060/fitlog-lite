@@ -41,3 +41,7 @@
 
 #strategy-activation-root { display: grid; gap: var(--field-gap); min-width: 0; }
 .nutrition-strategy [hidden] { display: none !important; }
+
+.strategy-manager-row-actions { display:flex; flex-wrap:wrap; gap:8px; padding:0 14px 12px; }
+.strategy-manager-row-actions button { width:auto; min-height:44px; font-size:.8125rem; }
+.strategy-manager-row-actions .danger { color:var(--danger); }

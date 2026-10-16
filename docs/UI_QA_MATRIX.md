@@ -244,3 +244,8 @@ Retain all33 preceding browser suites, product unit tests and PWA prompt/legacy 
 ## Approved joint v0.5 (2026-10-12)
 
 Follow [Approved joint v0.5 contract](APPROVED_JOINT_V05.md). It supersedes prior smart-completion entries, whole-row Habit toggles, flat recovery history and version12 descriptions for this release. Preserve all preceding unrelated data/UI contracts.
+
+
+## Food / Water / Day Detail v0.4 release gate
+
+See [F1–F5 implementation contract](FOOD_WATER_DAY_V04.md). New `foodWaterDayV04.mjs` runs Chromium and WebKit on320/375/390/430px plus844×390,100/200% fonts and both themes. It checks exact decimal input/reopen, day/combo create/edit/copy and actual apply, future/goal conflict, equal water actions/invalid/offline/failure/Undo,0/1/11/100 records and long numbers, fixed ten-summary geometry on expansion, live cross-tab refresh and unused/used deletion. `foodWaterBackupV04.mjs` uses the real prior e082 build to reject14 unchanged and the candidate to restore13/14/export14/reopen/reject invalid meals. `foodWaterPreservationV04.mjs` reuses the existing synthetic production profile without reseeding and hashes all business stores plus every fitlog device config. Retain all35 prior suites, approvedJointV05 both engines, uiQualityAudit and pwaUpgrade from real V7 and START V13 assets. Detailed actual counts, raw logs and physical-device Pending are recorded in FOOD_WATER_DAY_V04_QA.md and the final receipt; no result is inferred from this gate definition.

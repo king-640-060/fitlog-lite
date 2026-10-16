@@ -7,7 +7,7 @@ export function bindNumericPresentation(root: ParentNode): void {
     const originals = new Map<HTMLInputElement, { source: string; display: string }>()
     form.querySelectorAll<HTMLInputElement>('input[type=number]').forEach(input => {
       // EnergyEditor owns both its display and canonical state.
-      if (['calories', 'energyValue'].includes(input.name) || !input.value) return
+      if (input.hasAttribute('data-diet-grams') || ['calories', 'energyValue'].includes(input.name) || !input.value) return
       const original = input.value, number = Number(original)
       if (!Number.isFinite(number)) return
       const formatted = input.name === 'goalCalories' ? formatEnergyInputValue(number) : formatNumber(number)

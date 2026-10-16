@@ -106,7 +106,7 @@ describe('Dexie V7 and Backup V7', () => {
     const task = await createTask({ title: '订票', date: '2026-09-30', tagIds: [tag.id] }, source)
     await toggleTaskCompletion(task.id, source)
     const backup = await exportBackup(source)
-    expect(backup.schemaVersion).toBe(13)
+    expect(backup.schemaVersion).toBe(14)
     const target = database(); await restoreBackup(backup, target)
     expect(await target.taskTags.get(tag.id)).toMatchObject({ name: '旅行' })
     expect(await target.tasks.get(task.id)).toMatchObject({ date: '2026-09-30', tagIds: [tag.id] })

@@ -117,7 +117,7 @@ export const catalogTools:AiTool[]=[
     const items=mergeList(old?.items??[],args.items,args.removeIds,args.order,(p,prev)=>{
       if(!p.foodRef){if(!prev)fail('新食物项目需要真实 foodRef');return {...prev,grams:p.grams??prev.grams}}
       const food=refs.get(p.foodRef);if(!food)fail('Food ID 不存在，请查询或明确同时新建')
-      return {...dietTemplateItemFromFood(food,p.grams??prev?.grams??NaN),id:prev?.id??crypto.randomUUID()}
+      return {...dietTemplateItemFromFood(food,p.grams??prev?.grams??NaN),...(prev?.meal?{meal:prev.meal}:{}),id:prev?.id??crypto.randomUUID()}
     })
     if(!items.length)fail('饮食模板至少需要一种食物')
     const after=normalizeDietTemplate({...old,name:args.name??old?.name,description:args.description??(old as {description?:string}|undefined)?.description,items});uniqueName(rows.dietTemplates as {id:string;name:string}[],after.name,old?.id)

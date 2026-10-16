@@ -61,7 +61,7 @@ try{
    let replies=[]
    await page.route('https://mock-pwa.invalid/**',async route=>{await route.fulfill({json:{choices:[{message:replies.shift()??{content:'Synthetic reply'}}]}})})
    await open(page);await seed(page);await page.reload({waitUntil:'networkidle'});await page.waitForSelector('#open-management')
-   const before=await read(page);assert.equal(before.version,mode==='legacy'?70:120);assert.equal(Object.keys(before.records).length,mode==='legacy'?14:22);assert.equal(Object.values(before.records).flat().length,15)
+   const before=await read(page);assert.equal(before.version,mode==='legacy'?70:Number(process.env.FITLOG_PWA_PROMPT_DB_VERSION||120));assert.equal(Object.keys(before.records).length,mode==='legacy'?14:22);assert.equal(Object.values(before.records).flat().length,15)
    // Keep an actual unsaved selected image in memory during the deployment.
    await page.locator('[data-tab=food]').click();await page.locator('#food-library').click();await page.locator('#food-vision-import').click()
    const png=Buffer.from(await page.evaluate(()=>{const c=document.createElement('canvas');c.width=32;c.height=32;return c.toDataURL('image/png').split(',')[1]}),'base64')

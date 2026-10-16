@@ -377,3 +377,8 @@ Calendar keeps old nine categories in order, appends plan at fourth-row middle i
 ## Approved joint v0.5 (2026-10-12)
 
 Follow [Approved joint v0.5 contract](APPROVED_JOINT_V05.md). It supersedes prior smart-completion entries, whole-row Habit toggles, flat recovery history and version12 descriptions for this release. Preserve all preceding unrelated data/UI contracts.
+
+
+## Approved Food / Water / Day Detail v0.4 (2026-10-15)
+
+[Food / Water / Day Detail v0.4](FOOD_WATER_DAY_V04.md) supersedes earlier250ml shortcut and folded Food saved-goal-copy rules. Meal-aware templates remain plans until explicit actual confirmation, with full date/meal/source and target transaction guards. Calendar ten summaries retain width and73px standard height with accessible growth; complete target/actual facts and exact deletion remain. Nutrition permanent deletion checks every persisted reference and source version in one transaction; referenced history can only archive. Dexie13/130/22stores unchanged; Backup14/Restore1–14/encryptedSync1, immutable older snapshots plus new frozenBackup14. Device-only configuration remains excluded; exact production/SW/same-profile/offline evidence and separate physical Pending remain mandatory.

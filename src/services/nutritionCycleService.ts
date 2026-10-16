@@ -1,5 +1,5 @@
 import { db, type FitLogDatabase } from '../db/database'
-import type { NutritionCycle, NutritionCycleDay, NutritionGoal, DietTemplate, FoodLog } from '../db/types'
+import type { NutritionCycle, NutritionCycleDay, NutritionGoal, DietTemplate, FoodLog, MealType } from '../db/types'
 import { getLocalDateString, shiftLocalDate } from '../utils/date'
 import { strategyBusinessDate } from './nutritionStrategyService'
 import { applyDietTemplate, resolveDietTemplateFoods } from './templateService'
@@ -106,7 +106,7 @@ export function dietTemplateSourceFingerprint(resolved: Awaited<ReturnType<typeo
 /** Explicit actual-intake confirmation, rechecked atomically after any target-conflict choice. */
 export async function applyScheduledDietTemplate(
   date:string, expectedPlan:{cycle:NutritionCycle;day:NutritionCycleDay}, template:DietTemplate,
-  expectedTarget:string, options:{replaceNutritionTarget?:boolean;preserveNutritionTarget?:boolean}={},
+  expectedTarget:string, options:{replaceNutritionTarget?:boolean;preserveNutritionTarget?:boolean;meal?:MealType}={},
   database:FitLogDatabase=db, expectedFoods?:string,
 ):Promise<FoodLog[]> {
   strategyBusinessDate(date)

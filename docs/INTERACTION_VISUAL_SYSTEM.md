@@ -249,3 +249,8 @@ Cycle sections retain approved information→week selection→independent assign
 ## Approved joint v0.5 (2026-10-12)
 
 Follow [Approved joint v0.5 contract](APPROVED_JOINT_V05.md). It supersedes prior smart-completion entries, whole-row Habit toggles, flat recovery history and version12 descriptions for this release. Preserve all preceding unrelated data/UI contracts.
+
+
+## Food / Water / Day Detail v0.4 (2026-10-15)
+
+[Approved F1–F5 contract](FOOD_WATER_DAY_V04.md) owns meal-aware templates, flowing exact gram inputs, equal500/1000ml and quiet custom actions, and safe template deletion. In Calendar Detail, ten73px standard native summary cells keep their original two-column width and positions even while open; complete native disclosure facts follow the entire grid. This supersedes the earlier open-summary full-width layout. Scaled text and long numbers grow without clipping; existing theme tokens, Sheet/motion/focus/44px targets remain. Backup14 protects new meal semantics; DB13/22stores and Sync1 remain unchanged.

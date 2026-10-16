@@ -74,7 +74,7 @@ describe('V5 → V6 与备份', () => {
   it('V6 往返保留停用习惯和历史打卡；V5 恢复清空习惯', async () => {
     const source = database(); const habit = await createHabit({ name: '拉伸', targetPerWeek: 3 }, source)
     await toggleHabitCheckIn(habit.id, '2026-09-27', source); await setHabitActive(habit.id, false, source)
-    const backup = await exportBackup(source); expect(backup.schemaVersion).toBe(13)
+    const backup = await exportBackup(source); expect(backup.schemaVersion).toBe(14)
     const target = database(); await restoreBackup(backup, target)
     expect(await target.habits.get(habit.id)).toMatchObject({ active: false, targetPerWeek: 3 })
     expect(await target.habitCheckIns.count()).toBe(1)

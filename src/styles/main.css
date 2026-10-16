@@ -992,3 +992,48 @@ body.keyboard-open .action-toast { top:calc(var(--sheet-offset-top,0px) + 8px); 
 .day-delete-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
 .day-delete-grid label, .day-delete-target { display:flex; min-height:49px; align-items:center; gap:8px; font-size:.8125rem; overflow-wrap:anywhere; }
 .day-delete-grid input, .day-delete-target input { font-size:1rem; width:20px; height:20px; flex:none; }
+
+/* Approved Food/Water/Day Detail v0.4: flowing units and scalable two-line summaries. */
+.diet-template-item > label { display:flex !important; align-items:center; gap:6px; min-width:0; position:static; }
+.diet-template-item > label input { width:100%; min-width:0; min-height:44px; padding:8px; text-align:right; }
+.diet-template-item > label span { position:static !important; flex:none; font-size:1rem; }
+.diet-template-item > div:first-child strong { white-space:normal; overflow:visible; overflow-wrap:anywhere; }
+.calendar-detail-sheet .daily-records { align-items:start; }
+.calendar-detail-sheet .day-detail-row { grid-template-columns:24px minmax(0,1fr) 16px; min-height:71px; padding:9px; row-gap:3px; }
+.calendar-detail-sheet .day-detail-icon { grid-row:1; }
+.calendar-detail-sheet .day-detail-content { grid-column:1 / -1; grid-row:2; }
+.calendar-detail-sheet .day-detail-content > span { display:none; }
+.calendar-detail-sheet .day-detail-content strong { font-weight:500; overflow-wrap:anywhere; }
+.calendar-detail-sheet .daily-record-chevron { grid-row:1; }
+
+.template-editor-items { container-type:inline-size; }
+.diet-template-item { grid-template-columns:minmax(0,1fr) minmax(6rem,8rem); }
+@container (max-width:16rem) { .diet-template-item { grid-template-columns:minmax(0,1fr); } }
+.diet-template-modes { display:flex; gap:4px; padding:4px; background:var(--surface-soft); border-radius:13px; }
+.diet-template-modes button { flex:1; min-width:0; }
+.diet-template-modes [aria-pressed=true] { background:var(--accent-soft); color:var(--accent-strong); }
+.diet-template-meal { border:1px solid var(--border); border-radius:16px; padding:10px; min-width:0; }
+.diet-template-meal > summary { min-height:44px; display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.diet-template-meal > summary small { color:var(--text-secondary); }
+.diet-template-meal .diet-template-item { margin-top:8px; padding:8px; }
+.diet-template-meal .reorder-actions { flex-wrap:wrap; }
+.diet-template-meal select { min-width:0; max-width:100%; }
+
+.calendar-detail-sheet .day-detail-row { grid-template-columns:24px minmax(0,1fr); column-gap:6px; }
+.calendar-detail-sheet .daily-record-chevron { display:none; }
+
+.diet-template-meal > summary { color:var(--text-primary); }
+.diet-template-meal .diet-template-item { border:0; border-bottom:1px solid var(--border); border-radius:0; background:transparent; padding:10px 0; }
+.diet-template-goal { border:1px solid var(--border); border-radius:15px; padding:0 12px; }
+.diet-template-goal > summary { display:flex; align-items:center; justify-content:space-between; gap:8px; min-height:47px; color:var(--text-primary); font-size:.8125rem; font-weight:600; list-style:none; }
+.diet-template-goal > summary::-webkit-details-marker { display:none; }
+.diet-template-goal > summary .icon { transform:rotate(90deg); }
+.diet-template-goal[open] > summary .icon { transform:rotate(-90deg); }
+.diet-template-goal .nutrition-goal-fields { border:0; padding:0 0 12px; margin:0; }
+
+/* Native disclosures keep the ten summary cells fixed; expanded facts follow the grid. */
+.calendar-detail-sheet .daily-record-group { display:contents; }
+.calendar-detail-sheet .daily-record-group::details-content { display:contents; }
+.calendar-detail-sheet .daily-record-group > summary { grid-row:var(--record-row); grid-column:var(--record-column); min-height:73px; border:1px solid var(--border); border-radius:13px; background:var(--surface-soft); }
+.calendar-detail-sheet .daily-record-group > .daily-record-content { grid-column:1 / -1; min-width:0; padding:0 12px 12px; border:1px solid var(--border); border-radius:13px; background:var(--surface-soft); }
+.calendar-detail-sheet .daily-record-group:not([open]) > .daily-record-content { display:none; }

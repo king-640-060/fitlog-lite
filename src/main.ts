@@ -82,7 +82,7 @@ import {
 } from './services/pelvicFloorTimer'
 import { createWorkout, findOpenWorkout, finishWorkout, normalizeWorkoutForSave, saveExercise, saveWorkout, WorkoutAutosaveController } from './services/workoutService'
 import {
-  NutritionTargetConflictError, applyDietTemplate, dietTemplateFromLogs, dietTemplateItemFromFood, duplicateDietTemplate, duplicateWorkoutTemplate,
+  dietFoodsFingerprint, applyDietTemplate, dietTemplateFromLogs, dietTemplateItemFromFood, duplicateDietTemplate, duplicateWorkoutTemplate,
   resolveDietTemplateFoods, saveDietTemplate, saveWorkoutTemplate,
   sortTemplates, startWorkoutFromTemplate, workoutTemplateFromWorkout,
 } from './services/templateService'
@@ -2066,7 +2066,7 @@ async function showWorkoutTemplateManager(query = '', surface?: ManagedSurfaceCo
   const exerciseIds = [...new Set(templates.flatMap((template) => template.exercises.map((item) => item.exerciseId).filter((id): id is string => Boolean(id))))]
   const existingIds = new Set((await db.exercises.bulkGet(exerciseIds)).filter((item): item is Exercise => Boolean(item)).map((item) => item.id))
   if (surface && (!surface.alive || (refreshGuard && !refreshGuard()))) return
-  const dialog = mountManagementModal(surface, '训练模板', `<div class="manager-surface">${managerToolbarHtml(managerSearchHtml('workout-template-search', '搜索训练模板', '搜索模板', esc(query)), 'new-workout-template', '训练模板', !templates.length)}<div class="template-manager-list manager-results"></div></div>`, templates.length > 0)
+  const dialog = mountManagementModal(surface, '训练模板', `<div class="manager-surface">${managerToolbarHtml(managerSearchHtml('workout-template-search', '搜索训练模板', '搜索模板', esc(query)), 'new-workout-template', '训练模板', !templates.length)}<button type="button" class="text-btn" id="diet-delete-manager">管理删除模板</button><div data-diet-delete-list hidden></div><div class="template-manager-list manager-results"></div></div>`, templates.length > 0)
   const draw = (value: string) => {
     const normalized = value.trim().toLocaleLowerCase()
     const filtered = templates.filter((item) => item.name.toLocaleLowerCase().includes(normalized))
@@ -2196,11 +2196,11 @@ async function showScheduledDietPreview(date:string):Promise<void>{
   const plan=await scheduledNutritionDay(date);if(!plan?.day.dietTemplate)return
   const template=await db.dietTemplates.get(plan.day.dietTemplate.id),savedTarget=await db.nutritionTargets.where('date').equals(date).first(),future=date>getLocalDateString()
   const resolved=template?await resolveDietTemplateFoods(template):[]
-  const dialog=openModal('排程饮食模板预览',`<p>${esc(date)} · ${esc(plan.day.dietTemplate.name)}</p>${template?`<p>${template.items.length} 项食物 · ${formatEnergyInputValue(resolved.reduce((sum,value)=>sum+calculateNutrition(value.food,value.item.grams).calories,0))} kcal</p><div class="cycle-food-preview">${resolved.map(value=>`<p>${esc(value.food.name)} · ${formatNumber(value.item.grams)} g${value.missing?' · 使用模板快照':''}</p>`).join('')}</div>`:'<p role="alert">模板已删除，保留排程名称供追溯，无法实际应用。</p>'}<p class="report-note">${future?'未来日期只能预览。':'确认已实际摄入后才记账；记录使用真实模板服务及当前营养目标冲突处理。'}</p><p role="alert" data-cycle-error hidden></p><button type="button" class="primary full-btn" data-cycle-diet-confirm ${future||!template?'disabled':''}>已实际摄入，确认记账</button>`)
+  const dialog=openModal('排程饮食模板预览',`<p>${esc(date)} · ${esc(plan.day.dietTemplate.name)}</p>${template?`<p>${template.items.length} 项食物 · ${formatEnergyInputValue(resolved.reduce((sum,value)=>sum+calculateNutrition(value.food,value.item.grams).calories,0))} kcal</p><div class="cycle-food-preview">${resolved.map(value=>`<p>${esc(value.item.meal?mealNames[value.item.meal]:'未分类')} · ${esc(value.food.name)} · ${value.item.grams} g${value.missing?' · 使用模板快照':''}</p>`).join('')}</div>${template.mode!=='day'?`<label>目标餐次<select data-cycle-diet-meal><option value="">保持原餐次／未分类</option>${mealTypes.map(m=>`<option value="${m}">${mealNames[m]}</option>`).join('')}</select></label>`:''}`:'<p role="alert">模板已删除，保留排程名称供追溯，无法实际应用。</p>'}<p class="report-note">${future?'未来日期只能预览。':'确认已实际摄入后才记账；记录使用真实模板服务及当前营养目标冲突处理。'}</p><p role="alert" data-cycle-error hidden></p><button type="button" class="primary full-btn" data-cycle-diet-confirm ${future||!template?'disabled':''}>已实际摄入，确认记账</button>`)
   let busy=false
   dialog.querySelector<HTMLButtonElement>('[data-cycle-diet-confirm]')!.addEventListener('click',async e=>{
     if(busy||!template||future)return;busy=true;const button=e.currentTarget as HTMLButtonElement;button.disabled=true
-    try{let options={};if(template.nutritionGoal&&savedTarget){const choice=await chooseNutritionTargetConflict();if(!choice){button.disabled=false;return}options=choice==='replace'?{replaceNutritionTarget:true}:{preserveNutritionTarget:true}}await applyScheduledDietTemplate(date,plan,template,JSON.stringify(savedTarget??null),options,db,dietTemplateSourceFingerprint(resolved));dialog.close();toast(`已添加 ${template.items.length} 项实际饮食记录`);await renderFoodPage()}
+    try{const meal=dialog.querySelector<HTMLSelectElement>('[data-cycle-diet-meal]')?.value;let options:{meal?:MealType;replaceNutritionTarget?:boolean;preserveNutritionTarget?:boolean}=isMealType(meal)?{meal}:{};if(template.nutritionGoal&&savedTarget){const choice=await chooseNutritionTargetConflict();if(!choice){button.disabled=false;return}options={...options,...(choice==='replace'?{replaceNutritionTarget:true}:{preserveNutritionTarget:true})}}await applyScheduledDietTemplate(date,plan,template,JSON.stringify(savedTarget??null),options,db,dietTemplateSourceFingerprint(resolved));dialog.close();toast(`已添加 ${template.items.length} 项实际饮食记录`);await renderFoodPage()}
     catch(e){const error=dialog.querySelector<HTMLElement>('[data-cycle-error]')!;error.hidden=false;error.textContent=e instanceof Error?e.message:'记账失败，请重试';button.disabled=false}finally{busy=false}
   })
 }
@@ -2223,23 +2223,26 @@ async function dietTemplateCardHtml(template: DietTemplate): Promise<string> {
   return `<article class="template-card"><div><h3>${esc(template.name)}</h3><p>${names || '暂无食物'}</p><small>${template.items.length} 项 · ${formatEnergyInputValue(calories)} kcal${goal}</small></div><button class="primary compact-button" data-apply-diet-template="${template.id}">添加</button></article>`
 }
 
-async function applySelectedDietTemplate(template: DietTemplate, dialog?: HTMLDialogElement, entryDate=foodDate): Promise<boolean> {
-  try {
-    const resolved = await resolveDietTemplateFoods(template)
-    try {
-      await applyDietTemplate(template, entryDate)
-    } catch (error) {
-      if (!(error instanceof NutritionTargetConflictError)) throw error
-      const choice = await chooseNutritionTargetConflict()
-      if (!choice) return false
-      await applyDietTemplate(template, entryDate, db, choice === 'replace' ? { replaceNutritionTarget: true } : { preserveNutritionTarget: true })
-    }
-    dialog?.close()
-    const missing = resolved.filter((item) => item.missing).length
-    toast(missing ? `已添加 ${template.items.length} 项，${missing} 项使用模板快照` : `已添加 ${template.items.length} 项`)
-    await renderFoodPage()
-    return true
-  } catch (error) { fail(error); return false }
+async function applySelectedDietTemplate(template: DietTemplate, _parent?: HTMLDialogElement, entryDate=foodDate): Promise<boolean> {
+  const resolved=await resolveDietTemplateFoods(template),expectedTemplate=JSON.stringify(template),expectedFoods=dietFoodsFingerprint(resolved)
+  let date=entryDate,busy=false,target=await db.nutritionTargets.where('date').equals(date).first()
+  const dialog=openModal('饮食模板预览',`<div data-diet-apply-root><h3>${esc(template.name)}</h3><button type="button" class="secondary full-btn" data-diet-apply-date>${esc(date)}</button>${template.mode==='day'?'<p class="report-note">整日模板 · 保留各项餐次；未分类保持未分类。</p>':`<label>目标餐次<select data-diet-apply-meal><option value="">保持原餐次／未分类</option>${mealTypes.map(m=>`<option value="${m}">${mealNames[m]}</option>`).join('')}</select></label>`}<div class="cycle-food-preview">${resolved.map(({item,food,missing})=>`<p>${esc(item.meal?mealNames[item.meal]:'未分类')} · ${esc(food.name)} · ${item.grams} g${missing?' · 使用模板快照':''}</p>`).join('')}</div><p class="report-note" data-diet-apply-note></p><p role="alert" data-diet-apply-error hidden></p><button type="button" class="primary full-btn" data-diet-apply-confirm>已实际摄入，确认记账</button></div><div data-diet-apply-picker hidden></div>`,true)
+  const root=dialog.querySelector<HTMLElement>('[data-diet-apply-root]')!,pickerHost=dialog.querySelector<HTMLElement>('[data-diet-apply-picker]')!,button=dialog.querySelector<HTMLButtonElement>('[data-diet-apply-confirm]')!
+  const draw=()=>{dialog.querySelector('[data-diet-apply-date]')!.textContent=date;button.disabled=date>getLocalDateString();dialog.querySelector('[data-diet-apply-note]')!.textContent=date>getLocalDateString()?'未来日期只能预览，不会记录摄入。':`${date} · ${template.items.length} 项；确认实际已吃下后写入，营养目标冲突需另行选择。`};draw()
+  let picker:DatePickerController|undefined
+  const closePicker=()=>{picker?.destroy();picker=undefined;pickerHost.hidden=true;pickerHost.innerHTML='';root.hidden=false;dialog.querySelector('h2')!.textContent='饮食模板预览'}
+  dialog.querySelector('[data-diet-apply-date]')!.addEventListener('click',()=>{if(busy)return;root.hidden=true;pickerHost.hidden=false;dialog.querySelector('h2')!.textContent='选择实际摄入日期';picker=mountDatePicker(pickerHost,{value:date,onCancel:closePicker,onConfirm:next=>{date=next!;void db.nutritionTargets.where('date').equals(date).first().then(value=>{target=value;closePicker();draw()})}})})
+  dialog.addEventListener('cancel',e=>{if(picker){e.preventDefault();closePicker()}});dialog.addEventListener('close',()=>picker?.destroy(),{once:true})
+  return new Promise(resolve=>{
+    let saved=false;dialog.addEventListener('close',()=>resolve(saved),{once:true})
+    button.addEventListener('click',async()=>{if(busy||date>getLocalDateString())return;busy=true;button.disabled=true
+      try{let conflict={};if(template.nutritionGoal&&target){const choice=await chooseNutritionTargetConflict();if(!choice)return;conflict=choice==='replace'?{replaceNutritionTarget:true}:{preserveNutritionTarget:true}}
+        const meal=dialog.querySelector<HTMLSelectElement>('[data-diet-apply-meal]')?.value
+        await applyDietTemplate(template,date,db,{...conflict,...(isMealType(meal)?{meal}:{}),expectedTemplate,expectedFoods,expectedTarget:JSON.stringify(target??null)})
+        saved=true;dialog.close();toast(`已添加 ${template.items.length} 项实际饮食记录`);await render()
+      }catch(error){const node=dialog.querySelector<HTMLElement>('[data-diet-apply-error]')!;node.hidden=false;node.textContent=error instanceof Error?error.message:'保存失败，请重试'}finally{busy=false;draw()}
+    })
+  })
 }
 
 async function showDietTemplateManager(query = '', surface?: ManagedSurfaceContext, refreshGuard?:()=>boolean): Promise<void> {
@@ -2250,15 +2253,16 @@ async function showDietTemplateManager(query = '', surface?: ManagedSurfaceConte
     const kcal = resolved.reduce((sum, value) => sum + calculateNutrition(value.food, value.item.grams).calories, 0)
     const missing = resolved.filter((item) => item.missing).length
     const goal = template.nutritionGoal?.calories === undefined ? '' : ` · 目标 ${formatEnergyInputValue(template.nutritionGoal.calories)} kcal`
-    summaries.set(template.id, `${template.items.length} 项 · ${formatEnergyInputValue(kcal)} kcal${goal}${missing ? ` · ${missing} 项使用快照` : ''}`)
+    summaries.set(template.id, `${template.mode==='day'?'整日':'组合 / 单餐'} · ${template.items.length} 项 · ${formatEnergyInputValue(kcal)} kcal${goal}${missing ? ` · ${missing} 项使用快照` : ''}`)
   }))
   if (surface && (!surface.alive || (refreshGuard && !refreshGuard()))) return
-  const dialog = mountManagementModal(surface, '饮食模板', `<div class="manager-surface">${managerToolbarHtml(managerSearchHtml('diet-template-search', '搜索饮食模板', '搜索模板', esc(query)), 'new-diet-template', '饮食模板', !templates.length)}<div class="template-manager-list manager-results"></div></div>`, templates.length > 0)
+  const dialog = mountManagementModal(surface, '饮食模板', `<div class="manager-surface">${managerToolbarHtml(managerSearchHtml('diet-template-search', '搜索饮食模板', '搜索模板', esc(query)), 'new-diet-template', '饮食模板', !templates.length)}<button type="button" class="text-btn" id="diet-delete-manager">管理删除模板</button><div data-diet-delete-list hidden></div><div class="template-manager-list manager-results"></div></div>`, templates.length > 0)
   const draw = (value: string) => {
     const normalized = value.trim().toLocaleLowerCase(); const filtered = templates.filter((item) => item.name.toLocaleLowerCase().includes(normalized))
     dialog.querySelector('.template-manager-list')!.innerHTML = filtered.length ? managerListHtml(filtered.map(template => managerRowHtml(esc(template.name), esc(summaries.get(template.id)), `data-edit-diet-template="${esc(template.id)}"`)).join('')) : normalized ? managerNoResultsHtml('饮食模板') : managerEmptyHtml('饮食模板', '新建常用饮食组合，方便以后使用。', 'empty-new-diet-template')
-    bindDietTemplateManagerActions(dialog, templates, surface)
+    bindDietTemplateManagerActions(dialog, templates, surface, dialog.querySelector('.template-manager-list')!)
   }
+  dialog.querySelector('#diet-delete-manager')!.addEventListener('click',()=>{const host=dialog.querySelector<HTMLElement>('[data-diet-delete-list]')!;host.hidden=!host.hidden;if(!host.hidden){host.innerHTML=templates.map(t=>`<div class="manager-danger-zone"><strong>${esc(t.name)}</strong><button type="button" class="text-btn danger" data-delete-diet-template="${t.id}">删除饮食模板</button></div>`).join('')||'<p class="report-note">暂无模板</p>';bindDietTemplateManagerActions(dialog,templates,surface,host)}})
   draw(dialog.querySelector<HTMLInputElement>('#diet-template-search')!.value); dialog.querySelector<HTMLInputElement>('#diet-template-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
   dialog.querySelector<HTMLButtonElement>('#new-diet-template')!.hidden = !templates.length
   dialog.querySelector('.template-manager-list')!.addEventListener('click', event => { if ((event.target as Element).closest('#empty-new-diet-template')) void showDietTemplateEditor(undefined, surface) })
@@ -2267,17 +2271,19 @@ async function showDietTemplateManager(query = '', surface?: ManagedSurfaceConte
   surface?.restoreScroll()
 }
 
-function bindDietTemplateManagerActions(dialog: HTMLDialogElement, templates: DietTemplate[], surface?: ManagedSurfaceContext): void {
-  dialog.querySelectorAll<HTMLButtonElement>('[data-edit-diet-template]').forEach((button) => button.addEventListener('click', () => { const template = templates.find((item) => item.id === button.dataset.editDietTemplate); if (template) { leaveStandalone(dialog, surface); void showDietTemplateEditor(template, surface) } }))
-  dialog.querySelectorAll<HTMLButtonElement>('[data-apply-diet-template]').forEach((button) => button.addEventListener('click', () => { const template = templates.find((item) => item.id === button.dataset.applyDietTemplate); if (template) void applySelectedDietTemplate(template, dialog) }))
-  dialog.querySelectorAll<HTMLButtonElement>('[data-duplicate-diet-template]').forEach((button) => button.addEventListener('click', async () => { const template = templates.find((item) => item.id === button.dataset.duplicateDietTemplate); if (!template) return; try { await db.dietTemplates.add(duplicateDietTemplate(template)); leaveStandalone(dialog, surface); toast('模板已复制'); await showDietTemplateManager('', surface) } catch (error) { fail(error) } }))
-  dialog.querySelectorAll<HTMLButtonElement>('[data-delete-diet-template]').forEach((button) => button.addEventListener('click', async () => { if (!await confirmAction('删除饮食模板？', '只删除模板，历史饮食记录不会受影响。')) return; try { await db.dietTemplates.delete(button.dataset.deleteDietTemplate!); leaveStandalone(dialog, surface); toast('模板已删除，历史记录未受影响'); await showDietTemplateManager('', surface) } catch (error) { fail(error) } }))
+function bindDietTemplateManagerActions(dialog: HTMLDialogElement, templates: DietTemplate[], surface?: ManagedSurfaceContext, actionRoot:ParentNode=dialog): void {
+  actionRoot.querySelectorAll<HTMLButtonElement>('[data-edit-diet-template]').forEach((button) => button.addEventListener('click', () => { const template = templates.find((item) => item.id === button.dataset.editDietTemplate); if (template) { leaveStandalone(dialog, surface); void showDietTemplateEditor(template, surface) } }))
+  actionRoot.querySelectorAll<HTMLButtonElement>('[data-apply-diet-template]').forEach((button) => button.addEventListener('click', () => { const template = templates.find((item) => item.id === button.dataset.applyDietTemplate); if (template) void applySelectedDietTemplate(template, dialog) }))
+  actionRoot.querySelectorAll<HTMLButtonElement>('[data-duplicate-diet-template]').forEach((button) => button.addEventListener('click', async () => { const template = templates.find((item) => item.id === button.dataset.duplicateDietTemplate); if (!template) return; try { await db.dietTemplates.add(duplicateDietTemplate(template)); leaveStandalone(dialog, surface); toast('模板已复制'); await showDietTemplateManager('', surface) } catch (error) { fail(error) } }))
+  actionRoot.querySelectorAll<HTMLButtonElement>('[data-delete-diet-template]').forEach((button) => button.addEventListener('click', async () => { if(button.dataset.busy)return;button.dataset.busy='true';const template=templates.find(t=>t.id===button.dataset.deleteDietTemplate);if (!await confirmAction('删除饮食模板？', `「${template?.name??''}」：只删除模板，历史饮食记录与排程名称快照不会受影响。`)){delete button.dataset.busy;return} try { await db.dietTemplates.delete(button.dataset.deleteDietTemplate!); leaveStandalone(dialog, surface); toast('模板已删除，历史记录未受影响'); await showDietTemplateManager('', surface) } catch (error) { fail(error) }finally{delete button.dataset.busy} }))
 }
 
 async function showDietTemplateEditor(source?: DietTemplate, surface?: ManagedSurfaceContext): Promise<void> {
   const editing = source ? Boolean(await db.dietTemplates.get(source.id)) : false
-  const draft: DietTemplate = source ? structuredClone(source) : { id: crypto.randomUUID(), name: '', items: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+  const draft: DietTemplate = source ? structuredClone(source) : { id: crypto.randomUUID(), name: '', mode:'day', items: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
   const resolved = await resolveDietTemplateFoods(draft)
+  const foodByItem=new Map(resolved.map(v=>[v.item.id,v.food]))
+  const caloriesFor=(items:DietTemplate['items'])=>items.reduce((sum,item)=>sum+calculateNutrition(foodByItem.get(item.id)??{...item.fallback},item.grams).calories,0)
   const missingIds = new Set(resolved.filter((item) => item.missing).map((item) => item.item.id))
   if (surface && !surface.alive) return
   const dialog = mountManagementModal(surface, editing ? '编辑饮食模板' : '新建饮食模板', '<div id="diet-template-editor"></div>', true)
@@ -2285,18 +2291,25 @@ async function showDietTemplateEditor(source?: DietTemplate, surface?: ManagedSu
     const form = dialog.querySelector<HTMLFormElement>('#diet-template-form'); if (!form) return
     const data = new FormData(form); draft.name = valueOf(data, 'name'); draft.description = valueOf(data, 'description').trim() || undefined; draft.nutritionGoal = nutritionGoalFromForm(data)
   }
+  const opened=new Set<string>(['breakfast','lunch','combo','unclassified'])
+  const itemHtml=(item:DietTemplate['items'][number],index:number)=>`<article class="diet-template-item" data-diet-template-item="${item.id}"><div><strong>${esc(item.foodName)}</strong>${item.brand?`<small>${esc(item.brand)}</small>`:''}${missingIds.has(item.id)?'<small class="warning-text">食物已删除，将使用营养快照</small>':''}</div><label><input aria-label="${esc(item.foodName)}重量（克）" data-diet-grams type="number" inputmode="decimal" min="0" step="any" required value="${item.grams}"><span aria-hidden="true">g</span></label><div class="reorder-actions">${draft.mode==='day'?`<select data-diet-item-meal="${item.id}" aria-label="${esc(item.foodName)}餐次"><option value="" ${!item.meal?'selected':''}>未分类</option>${mealTypes.map(m=>`<option value="${m}" ${item.meal===m?'selected':''}>${mealNames[m]}</option>`).join('')}</select>`:''}<button type="button" data-diet-move="${item.id}" aria-label="上移食物" data-direction="-1" ${index===0?'disabled':''}>↑</button><button type="button" data-diet-move="${item.id}" aria-label="下移食物" data-direction="1" ${index===draft.items.length-1?'disabled':''}>↓</button><button type="button" class="icon-btn quiet danger" data-remove-diet-item="${item.id}" aria-label="移除食物">${icon('trash',18)}</button></div></article>`
   const draw = () => {
-    dialog.querySelector('#diet-template-editor')!.innerHTML = `<form id="diet-template-form" class="form template-editor manager-editor"><label>模板名称 *<input name="name" value="${esc(draft.name)}" placeholder="训练日早餐" required></label><label>说明<textarea name="description" rows="2" placeholder="可选">${esc(draft.description)}</textarea></label>${nutritionGoalFields(draft.nutritionGoal)}<div class="template-editor-items">${draft.items.map((item, index) => `<article class="diet-template-item" data-diet-template-item="${item.id}"><div><strong>${esc(item.foodName)}</strong>${item.brand ? `<small>${esc(item.brand)}</small>` : ''}${missingIds.has(item.id) ? '<small class="warning-text">食物已删除，将使用营养快照</small>' : ''}</div><label><input data-diet-grams type="number" inputmode="decimal" min="0.1" step="0.1" value="${item.grams}"><span>g</span></label><div class="reorder-actions"><button type="button" data-diet-move="${item.id}" aria-label="上移食物" data-direction="-1" ${index === 0 ? 'disabled' : ''}>↑</button><button type="button" data-diet-move="${item.id}" aria-label="下移食物" data-direction="1" ${index === draft.items.length - 1 ? 'disabled' : ''}>↓</button><button type="button" class="icon-btn quiet danger" data-remove-diet-item="${item.id}" aria-label="移除食物">${icon('trash', 18)}</button></div></article>`).join('') || '<p class="muted padded">还没有食物</p>'}</div><button type="button" class="secondary" id="add-diet-template-food">${icon('plus', 18)} 添加食物</button><button class="primary" type="submit">保存饮食模板</button></form>`
+    const groups=draft.mode==='day'?[...mealTypes,...(draft.items.some(i=>!i.meal)?['unclassified']:[])]:['combo']
+    dialog.querySelector('#diet-template-editor')!.innerHTML=`<form id="diet-template-form" class="form template-editor manager-editor"><div class="diet-template-modes" role="group" aria-label="模板类型"><button type="button" class="secondary" data-diet-mode="combo" aria-pressed="${draft.mode!=='day'}">单餐 / 组合</button><button type="button" class="secondary" data-diet-mode="day" aria-pressed="${draft.mode==='day'}">整日模板</button></div><label>模板名称 *<input name="name" value="${esc(draft.name)}" placeholder="休息日饮食" required></label><label>说明<textarea name="description" rows="2" placeholder="可选">${esc(draft.description)}</textarea></label><p class="report-note">模板是计划，不代表已摄入。按实际需求编辑重量与餐次。</p><div class="template-editor-items">${groups.map((group,groupIndex)=>{const items=draft.items.filter(i=>group==='combo'||(group==='unclassified'?!i.meal:i.meal===group));return `<details class="diet-template-meal" data-diet-meal="${group}" ${opened.has(group)?'open':''}><summary><strong>${group==='combo'?'组合':group==='unclassified'?'未分类':mealNames[group as MealType]}</strong><small data-diet-meal-total="${group}">${items.length} 项 · ${formatEnergyInputValue(caloriesFor(items))} kcal</small></summary>${items.map(i=>itemHtml(i,draft.items.indexOf(i))).join('')}${!items.length?'<p class="report-note">还没有食物</p>':''}<button type="button" class="text-btn" ${groupIndex===0?'id="add-diet-template-food"':''} data-add-diet-meal="${group}">${icon('plus',18)} 添加食物</button></details>`}).join('')}</div><p class="report-note" data-diet-total>共 ${draft.items.length} 项食物 · ${formatEnergyInputValue(caloriesFor(draft.items))} kcal</p><details class="diet-template-goal"><summary>营养目标（可选）${icon('chevron',16)}</summary>${nutritionGoalFields(draft.nutritionGoal).replace('<legend>','<legend class="sr-only">')}</details><button class="primary" type="submit">保存饮食模板</button></form>`
     bind()
   }
   const bind = () => {
     bindNumericPresentation(dialog)
     const form = dialog.querySelector<HTMLFormElement>('#diet-template-form')!
-    form.querySelectorAll<HTMLInputElement>('[data-diet-grams]').forEach((input) => input.addEventListener('input', () => { const item = draft.items.find((value) => value.id === input.closest<HTMLElement>('[data-diet-template-item]')?.dataset.dietTemplateItem); if (item) item.grams = Number(input.value) }))
+    form.querySelectorAll<HTMLInputElement>('[data-diet-grams]').forEach((input) => input.addEventListener('input', () => { const item = draft.items.find((value) => value.id === input.closest<HTMLElement>('[data-diet-template-item]')?.dataset.dietTemplateItem); if (item) item.grams = Number(input.value);if(Number.isFinite(item?.grams)&&item!.grams>0){form.querySelector('[data-diet-total]')!.textContent=`共 ${draft.items.length} 项食物 · ${formatEnergyInputValue(caloriesFor(draft.items))} kcal`;const group=input.closest('[data-diet-meal]')!,key=group.getAttribute('data-diet-meal'),items=draft.items.filter(i=>key==='combo'||(key==='unclassified'?!i.meal:i.meal===key));group.querySelector('[data-diet-meal-total]')!.textContent=`${items.length} 项 · ${formatEnergyInputValue(caloriesFor(items))} kcal`} }))
     form.querySelectorAll<HTMLButtonElement>('[data-remove-diet-item]').forEach((button) => button.addEventListener('click', () => { syncText(); draft.items = draft.items.filter((item) => item.id !== button.dataset.removeDietItem); draw() }))
     form.querySelectorAll<HTMLButtonElement>('[data-diet-move]').forEach((button) => button.addEventListener('click', () => { syncText(); const index = draft.items.findIndex((item) => item.id === button.dataset.dietMove); const next = index + Number(button.dataset.direction); if (index < 0 || next < 0 || next >= draft.items.length) return; const [moved] = draft.items.splice(index, 1); draft.items.splice(next, 0, moved!); draw() }))
-    form.querySelector('#add-diet-template-food')?.addEventListener('click', () => { syncText(); leaveStandalone(dialog, surface); void showDietTemplateFoodPicker(draft, surface) })
-    form.addEventListener('submit', async (event) => { event.preventDefault(); syncText(); try { await saveDietTemplate(draft); leaveStandalone(dialog, surface); toast('饮食模板已保存'); await showDietTemplateManager('', surface) } catch (error) { fail(error) } })
+    form.querySelectorAll<HTMLButtonElement>('[data-diet-mode]').forEach(b=>b.addEventListener('click',()=>{syncText();draft.mode=b.dataset.dietMode as 'combo'|'day';draw()}))
+    form.querySelectorAll<HTMLDetailsElement>('[data-diet-meal]').forEach(d=>d.addEventListener('toggle',()=>{if(d.open)opened.add(d.dataset.dietMeal!);else opened.delete(d.dataset.dietMeal!)}))
+    form.querySelectorAll<HTMLSelectElement>('[data-diet-item-meal]').forEach(select=>select.addEventListener('change',()=>{syncText();const item=draft.items.find(i=>i.id===select.dataset.dietItemMeal)!;if(isMealType(select.value)){item.meal=select.value;opened.add(select.value)}else delete item.meal;draw()}))
+    form.querySelectorAll<HTMLButtonElement>('[data-add-diet-meal]').forEach(b=>b.addEventListener('click',()=>{syncText();leaveStandalone(dialog,surface);void showDietTemplateFoodPicker(draft,surface,isMealType(b.dataset.addDietMeal)?b.dataset.addDietMeal:undefined)}))
+    let saving=false
+    form.addEventListener('submit', async (event) => { event.preventDefault();if(saving)return;saving=true; syncText(); try { await saveDietTemplate(draft); leaveStandalone(dialog, surface); toast('饮食模板已保存'); await showDietTemplateManager('', surface) } catch (error) { fail(error) }finally{saving=false} })
   }
   draw()
   if (editing && source) {
@@ -2306,14 +2319,14 @@ async function showDietTemplateEditor(source?: DietTemplate, surface?: ManagedSu
   }
 }
 
-async function showDietTemplateFoodPicker(draft: DietTemplate, surface?: ManagedSurfaceContext): Promise<void> {
+async function showDietTemplateFoodPicker(draft: DietTemplate, surface?: ManagedSurfaceContext, meal?:MealType): Promise<void> {
   const foods = await db.foods.orderBy('name').toArray()
   if (surface && !surface.alive) return
   const dialog = mountManagementModal(surface, '添加模板食物', `<label class="search-field">${icon('search', 20)}<input id="diet-template-food-search" type="search" placeholder="搜索食物或品牌"></label><div id="diet-template-food-results" class="picker-list"></div>`, true)
   const draw = (query = '') => {
     const normalized = query.trim().toLocaleLowerCase(); const matches = foods.filter((food) => `${food.name} ${food.brand ?? ''}`.toLocaleLowerCase().includes(normalized))
     dialog.querySelector('#diet-template-food-results')!.innerHTML = matches.map((food) => `<button class="picker-item" data-pick-diet-food="${food.id}"><span><strong>${esc(food.name)}</strong>${food.brand ? `<small>${esc(food.brand)}</small>` : ''}</span><em>${formatEnergyInputValue(food.calories)} kcal / ${formatNumber(food.referenceGrams)}g</em></button>`).join('') || '<p class="muted">食物库中没有匹配项</p>'
-    dialog.querySelectorAll<HTMLButtonElement>('[data-pick-diet-food]').forEach((button) => button.addEventListener('click', () => { const food = foods.find((item) => item.id === button.dataset.pickDietFood)!; draft.items.push(dietTemplateItemFromFood(food, 100)); leaveStandalone(dialog, surface); void showDietTemplateEditor(draft, surface) }))
+    dialog.querySelectorAll<HTMLButtonElement>('[data-pick-diet-food]').forEach((button) => button.addEventListener('click', () => { const food = foods.find((item) => item.id === button.dataset.pickDietFood)!; draft.items.push({...dietTemplateItemFromFood(food, 100),...(meal?{meal}:{})}); leaveStandalone(dialog, surface); void showDietTemplateEditor(draft, surface) }))
   }
   draw(); dialog.querySelector<HTMLInputElement>('#diet-template-food-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
 }
