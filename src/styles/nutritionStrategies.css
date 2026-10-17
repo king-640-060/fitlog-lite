@@ -45,3 +45,22 @@
 .strategy-manager-row-actions { display:flex; flex-wrap:wrap; gap:8px; padding:0 14px 12px; }
 .strategy-manager-row-actions button { width:auto; min-height:44px; font-size:.8125rem; }
 .strategy-manager-row-actions .danger { color:var(--danger); }
+
+/* Approved six-category impact preview, within the existing Sheet/workspace. */
+.strategy-delete-entry { display:grid; gap:10px; min-width:0; }
+.strategy-delete-entry .danger { color:var(--danger); }
+.strategy-impact summary { min-height:44px; display:flex; align-items:center; font-size:.8125rem; color:var(--accent-strong); }
+.strategy-impact ul { list-style:none; margin:0; padding:0; display:grid; gap:8px; }
+.strategy-impact li { display:grid; gap:3px; padding:10px; border:1px solid var(--border); border-radius:12px; font-size:.8125rem; overflow-wrap:anywhere; }
+.strategy-impact li span,.strategy-impact li small { color:var(--text-secondary); }
+.strategy-cascade-counts { margin:0; border:1px solid var(--border); border-radius:13px; overflow:hidden; }
+.strategy-cascade-counts > div { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:44px; padding:10px 13px; background:var(--surface-soft); }
+.strategy-cascade-counts > div + div { border-top:1px solid var(--divider); }
+.strategy-cascade-counts dt { font-size:.8125rem; overflow-wrap:anywhere; }
+.strategy-cascade-counts dd { margin:0; font-size:.8125rem; font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.strategy-cascade-warning { margin:0; padding:11px; border-radius:12px; background:var(--danger-soft); font-size:.8125rem; line-height:1.7; }
+.strategy-cascade-warning strong { color:var(--danger); }
+.strategy-cascade-ack { display:flex; align-items:center; gap:9px; min-height:44px; font-size:.8125rem; line-height:1.7; color:var(--text-secondary); }
+.strategy-cascade-ack input { flex:0 0 auto; }
+.strategy-cascade-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+.strategy-cascade-actions button { min-width:0; min-height:44px; white-space:normal; }

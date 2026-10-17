@@ -1,0 +1,82 @@
+[
+  {
+    "file": "chromium-prototype-today-collapsed.png",
+    "source": "prototype-evidence/chromium-390-light-100-today-collapsed.png",
+    "sha256": "3c976605f15bc3660d70712ca46c527493d4a0521c75ed444a0abdcf1a774379"
+  },
+  {
+    "file": "chromium-candidate-today-collapsed.png",
+    "source": "chromium-final/chromium-390-light-100-today-collapsed.png",
+    "sha256": "8d13d81e27452ff350f8cef76a417d92a7b32ddf6507144c83deb5cb5e854ddc"
+  },
+  {
+    "file": "chromium-prototype-today-expanded.png",
+    "source": "prototype-evidence/chromium-390-light-100-today-expanded.png",
+    "sha256": "00bc5b15faf96fabdcfaf560739d5e6b4ada631d7ff96d31e2fbf19f5ecf843d"
+  },
+  {
+    "file": "chromium-candidate-today-expanded.png",
+    "source": "chromium-final/chromium-390-light-100-today-expanded.png",
+    "sha256": "191a23e11eb413409b00055b8bc87cadb4cc861095f57bc5af13460d02e1091e"
+  },
+  {
+    "file": "chromium-prototype-water-sheet.png",
+    "source": "prototype-evidence/chromium-390-light-100-water-sheet.png",
+    "sha256": "f1042f289749fcd96383625dcd428286c2d713ca25d88ac970ff6af06224f935"
+  },
+  {
+    "file": "chromium-candidate-water-sheet.png",
+    "source": "chromium-final/chromium-390-light-100-water-sheet.png",
+    "sha256": "34684d5a9bbbe32f25485686a70cae047418acf6a3e07ec2c7098d638f02e2e8"
+  },
+  {
+    "file": "chromium-prototype-cascade-preview.png",
+    "source": "prototype-evidence/chromium-390-light-100-delete-current.png",
+    "sha256": "b67e9e55b1e76033730a4ebd411a2150bfe8bbcac8f1fed45bcb27559db3dd92"
+  },
+  {
+    "file": "chromium-candidate-cascade-preview.png",
+    "source": "chromium-final/chromium-390-light-100-cascade-preview.png",
+    "sha256": "d399af6da8e2239bd940a9d43c250404cfbddc2a6c4fff449134c86bdbc62998"
+  },
+  {
+    "file": "webkit-prototype-today-collapsed.png",
+    "source": "prototype-evidence/webkit-390-light-100-today-collapsed.png",
+    "sha256": "67b6bc94f444fdcfd5729230a7dfbad8490f45b2985ccd8f238f412d378af0e4"
+  },
+  {
+    "file": "webkit-candidate-today-collapsed.png",
+    "source": "webkit-final/webkit-390-light-100-today-collapsed.png",
+    "sha256": "0ab5f640a7651673dd8a51ff07edef01afc7d97bb722ba4884c5f31b0bf79962"
+  },
+  {
+    "file": "webkit-prototype-today-expanded.png",
+    "source": "prototype-evidence/webkit-390-light-100-today-expanded.png",
+    "sha256": "1e769dd94fda5e45864434f62693ff02cab72f587ba217c31d197aefe8d367e2"
+  },
+  {
+    "file": "webkit-candidate-today-expanded.png",
+    "source": "webkit-final/webkit-390-light-100-today-expanded.png",
+    "sha256": "707471b41ddc9857eb94156589c072ed1f98d161699917f129db57999669a3f2"
+  },
+  {
+    "file": "webkit-prototype-water-sheet.png",
+    "source": "prototype-evidence/webkit-390-light-100-water-sheet.png",
+    "sha256": "bf4e026fe5ce5a600c1025063c999991c0b3fd599b644cf0e96ed7191a261fbe"
+  },
+  {
+    "file": "webkit-candidate-water-sheet.png",
+    "source": "webkit-final/webkit-390-light-100-water-sheet.png",
+    "sha256": "bba01efb6e6c16d1a05181530e992e8eb965fd6eaa57be6405570449e2eafbfe"
+  },
+  {
+    "file": "webkit-prototype-cascade-preview.png",
+    "source": "prototype-evidence/webkit-390-light-100-delete-current.png",
+    "sha256": "583fbca999b647bef7aec9703ac6b28b484e2fbb17983de8c2565c72a51ebcb1"
+  },
+  {
+    "file": "webkit-candidate-cascade-preview.png",
+    "source": "webkit-final/webkit-390-light-100-cascade-preview.png",
+    "sha256": "26fb7359e7090abf248f018b2cff2c6481961b7eff7aa4ad41dab917438964d0"
+  }
+]

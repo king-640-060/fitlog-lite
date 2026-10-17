@@ -43,3 +43,8 @@ Weight／Sleep／Water共享日期分组、默认30天、7／30／90范围、日
 Chromium／WebKit属于浏览器证据；实体iPhone Safari／原主屏幕PWA／实际状态栏、键盘及Safe Area无证据仍Pending。不得声明用户验收通过。
 
 具体执行矩阵、原图、CSS/DOM必要差异和失败修复记录见 [v0.5 QA说明](APPROVED_JOINT_V05_QA.md)；实际发布与正式验收结果见 LATEST_DEV_REPORT 和十项交付回执。
+
+
+## Approved UX-01–03 v0.4 (2026-10-17)
+
+[Water / six-category cascade contract](UX_WATER_CASCADE_V04.md) supersedes the earlier always-visible Today water controls and archive-only handling for referenced nutrition templates in this explicitly acknowledged path. Default Today disclosure and compact equal500/1000 Sheet preserve all water services. Only the six specified nutrition tables may lose approved owned rows, with full preview, risk checkbox, second danger confirmation, stale-source/ownership checks and complete rollback; mixed provenance and invalid cross-cycle allocations reject without writes. Original unused-only delete API remains guarded; all health facts, unrelated targets/templates and device config survive. Removed cycles leave the existing cycle-report picker; ordinary reports continue reading actual facts, deleted goals are not reconstructed, and no new nutrition-template analysis report is introduced. DB13/130/22, Backup14/Restore1–14/Sync1 unchanged. New-UX unit/browser/production/physical evidence is separate from the completed F1–F5 acceptance.

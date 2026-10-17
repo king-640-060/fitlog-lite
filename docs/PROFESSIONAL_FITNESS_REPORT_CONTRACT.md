@@ -41,3 +41,7 @@ Retain all prior units/browser suites and frozen fixtures. Add analysis qualific
 ## Approved joint v0.5 (2026-10-12)
 
 Follow [Approved joint v0.5 contract](APPROVED_JOINT_V05.md). It supersedes prior smart-completion entries, whole-row Habit toggles, flat recovery history and version12 descriptions for this release. Preserve all preceding unrelated data/UI contracts.
+
+## Approved UX-01–03 v0.4 (2026-10-17)
+
+The explicitly confirmed [six-category nutrition cascade](UX_WATER_CASCADE_V04.md) permanently removes only its selected template, owned variants/phases, related saved targets, owned cycles and their day allocations. Removed cycles disappear from the existing cycle-report picker; ordinary reports continue reading surviving actual FoodLogs, workouts, weights, sleep, water, habits and tasks without reconstructing deleted goals or historical source links. This approval adds no nutrition-template analysis report. Current DB13/IDB130/22 stores, Backup14/Restore1–14/Sync1 contracts remain unchanged.

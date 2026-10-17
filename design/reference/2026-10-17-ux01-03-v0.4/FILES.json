@@ -1,0 +1,37 @@
+{
+  "package": "FitLog UX-01–03 approved v0.4",
+  "files": {
+    "ACCEPTANCE_MATRIX.md": {
+      "sha256": "f2ed8fb478661fa09b418ce54e104edcd08783303ed94634f02361f326be9013",
+      "bytes": 3338
+    },
+    "CASCADE_DELETE_CONTRACT.md": {
+      "sha256": "04a7f752acc64bada8dcc1187e4b6a80f6be19e0c7e3aab03c7d981b480653aa",
+      "bytes": 5214
+    },
+    "CODEX_TASK.md": {
+      "sha256": "a8ff0bcc926e4063ae0306ba374ee1d104ee70b9ec36e7168027613a22381a2c",
+      "bytes": 6444
+    },
+    "DATA_RELEASE_SAFETY.md": {
+      "sha256": "668620423c9cdf71152487dc2643f3ec803464caf4370a6ea50e67c84de2dc68",
+      "bytes": 2378
+    },
+    "DESIGN_LOCK.md": {
+      "sha256": "3535807f16bc086c2cfc9e0630ceadec7c6a2a6d03d17100c19e69d8b4ee4ead",
+      "bytes": 2840
+    },
+    "README.md": {
+      "sha256": "2037bce674caa2df10fc06b608fc7763f060a3c716fe6511a5fa2e020bb09c2e",
+      "bytes": 1710
+    },
+    "preview/delete_with_history_light.png": {
+      "sha256": "ceb25f331a384786a061468c71b073d95cdfe48ccd8dda1cbc649fdfb46187e2",
+      "bytes": 77362
+    },
+    "prototype/FitLog_UX01_UX02_UX03_Interactive_Prototype_v0.4.html": {
+      "sha256": "96804e985c5287fa9d0ea857924335a30813a49758b74f1abf73af550dbf8ceb",
+      "bytes": 45949
+    }
+  }
+}

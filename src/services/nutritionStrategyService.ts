@@ -155,3 +155,13 @@ export async function deleteUnusedNutritionStrategy(id:string,expectedFingerprin
     await database.nutritionStrategyTemplates.delete(id)
   })
 }
+
+/** End only this active phase; saved goals and health facts remain independent. */
+export async function endNutritionStrategyPhase(id:string,expectedFingerprint:string,database:FitLogDatabase=db):Promise<void>{
+  await database.transaction('rw',database.nutritionStrategyPhases,async()=>{
+    const phase=await database.nutritionStrategyPhases.get(id),date=getLocalDateString()
+    if(!phase||phase.endDate||JSON.stringify(phase)!==expectedFingerprint)throw new Error('营养阶段已变化，请重新查看后确认结束')
+    if(date<phase.startDate)throw new Error('当前日期早于阶段开始日期，未更改阶段')
+    await database.nutritionStrategyPhases.update(id,{endDate:date})
+  })
+}
