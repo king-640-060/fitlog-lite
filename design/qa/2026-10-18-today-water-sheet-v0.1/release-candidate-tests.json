@@ -1,0 +1,238 @@
+[
+  {
+    "path": "tests/browser/aiAssistant.mjs",
+    "sha256": "8c4c27a122676afc13937b3d3b479a2b17f4705492bf74f516473c2f3ae79c9d"
+  },
+  {
+    "path": "tests/browser/aiDualModelRouting.mjs",
+    "sha256": "96868367e2a28670df6df129f198acb5907e906c6cabb4baee9a34085ba8e5cd"
+  },
+  {
+    "path": "tests/browser/aiStreaming.mjs",
+    "sha256": "17aaae1d1d241860117f6c809abfdc9fc1fdc2f048a34f6336893a62a5c0c861"
+  },
+  {
+    "path": "tests/browser/aiVoice.mjs",
+    "sha256": "cf44b53a89f54a20f9177b2c58d9da9dbcdf075308be2f014b2a86091122b9e2"
+  },
+  {
+    "path": "tests/browser/aiVoicePreservation.mjs",
+    "sha256": "d16a7fa603c55c637dfce0ac0509f82891868b4ac1ae16753200a80da5635728"
+  },
+  {
+    "path": "tests/browser/approvedJointPreservation.mjs",
+    "sha256": "f16f82c8755122049b704b3a6ba55275c3b411e3cbbb3e48e2fd0c44617ab715"
+  },
+  {
+    "path": "tests/browser/approvedJointV05.mjs",
+    "sha256": "e96508a1bbb2338076af02df91942f77e9c3830ef7144f125ad9c5573b0f6e7b"
+  },
+  {
+    "path": "tests/browser/catalogRecovery.mjs",
+    "sha256": "cde29ad02c992c8b3ae4c9c523f03714bfd3b1d5d787feb597fdea8d2734ccec"
+  },
+  {
+    "path": "tests/browser/coachReportExperience.mjs",
+    "sha256": "44f8b60a7bb14ad411e9130065e3cef17c0d992ad10beb55f34e0681462be10a"
+  },
+  {
+    "path": "tests/browser/coachReportPreservation.mjs",
+    "sha256": "af1c2d38d8f999b403eee791d3688b03c988b4b795972da18e384abd459e262d"
+  },
+  {
+    "path": "tests/browser/combinedHandoff.mjs",
+    "sha256": "4198b8d1b5f8b0c3916c391367fb23d9a3e5898c75b091d6da468c4b96d5a29b"
+  },
+  {
+    "path": "tests/browser/combinedPrototype.mjs",
+    "sha256": "c0495cbaca22fb6f8f2701a71ad13b3ac99b593171fdc5daada79504ebccbb98"
+  },
+  {
+    "path": "tests/browser/dailyRecordsExperience.mjs",
+    "sha256": "a56f9f72bbb51bc70a8ef1c4ea695c88a6b9500fdc38dae899f7d09d3df19b3c"
+  },
+  {
+    "path": "tests/browser/dietEvents.mjs",
+    "sha256": "b44a696bfa4385f18f4895cce9b6a6f155caf86e45dcf1d96ee76381d14159b1"
+  },
+  {
+    "path": "tests/browser/foodRecovery.mjs",
+    "sha256": "3eb7c9b40916385a05669930e4506eeb18195f29f9b503ebad441282d975986e"
+  },
+  {
+    "path": "tests/browser/foodServing.mjs",
+    "sha256": "51dae89acd856de3eb6f4e4b8ba3bb71f57dadffc2752a1729d7e6986b05327e"
+  },
+  {
+    "path": "tests/browser/foodVision.mjs",
+    "sha256": "1046c05107f268688918ba815b709bddfd6336a0ba85fa592332e688ab9e959b"
+  },
+  {
+    "path": "tests/browser/foodVisionPreservation.mjs",
+    "sha256": "bf42ddf6691d8df34b169857c3c3a5e7c5e732c4201b379d72b149196e847c77"
+  },
+  {
+    "path": "tests/browser/foodWaterBackupV04.mjs",
+    "sha256": "0d4b288faf454eef058e449178b6277c733cddbc4aa93254a4a5a091e540cefc"
+  },
+  {
+    "path": "tests/browser/foodWaterDayV04.mjs",
+    "sha256": "f1533737c859b949c6c09a84367e84dea54cb5bbdac399948af4e76ec1c4691f"
+  },
+  {
+    "path": "tests/browser/foodWaterPreservationV04.mjs",
+    "sha256": "771d12515cd78b72203d2d993bd25e06be9cabceb0ef9ad5ac8b45572320c1fb"
+  },
+  {
+    "path": "tests/browser/githubSyncSafety.mjs",
+    "sha256": "75c71f0e2b05ab9e43718de9da552d8cbe138bb03d9802677aa56cb3cdd086f6"
+  },
+  {
+    "path": "tests/browser/habitDeletion.mjs",
+    "sha256": "0a9dfb233f71756555163eb48d544766ff90b381151140981e442cccb48c1288"
+  },
+  {
+    "path": "tests/browser/habitEditorLayout.mjs",
+    "sha256": "4b9faa0bb22720c76a4b5728092d89c0c0dd754add2400357ea54e11f9be9cb5"
+  },
+  {
+    "path": "tests/browser/interactionStabilization.mjs",
+    "sha256": "d9983a38c2d74e3488358d413dd778e1555b953ccce91b1686ece7989b5d9318"
+  },
+  {
+    "path": "tests/browser/jointReportRanges.mjs",
+    "sha256": "f882868c1817484076aca7e20437f4e3b59a5928dfaae92f5b45674fabb1fb7b"
+  },
+  {
+    "path": "tests/browser/jointUxPreservation.mjs",
+    "sha256": "754eaa0e531a47dc3bbeda2e18da1ddffd1f23dabfc8c75916df66ba1fe459ab"
+  },
+  {
+    "path": "tests/browser/jointUxReportsRange.mjs",
+    "sha256": "c3fc2a5ceb475882ce7c2c2f369008ca0eb88ab34d07eb797e39ac5d7a90ab5e"
+  },
+  {
+    "path": "tests/browser/macroNutritionSummary.mjs",
+    "sha256": "160dc58be0c33fdcae8d56e1addfa39ef3d495b4906bff1dd1eebd451309b679"
+  },
+  {
+    "path": "tests/browser/managementVisualConsistency.mjs",
+    "sha256": "bb0c2bfb1cea9f05ecb47092ed238f0db22e2f452f367f95a9d2201cb96ab10b"
+  },
+  {
+    "path": "tests/browser/managementWorkspace.mjs",
+    "sha256": "2afccbb8ba0e3c960d8a5ae48c770b76754720edca1fdaa06108b0fc462f5d83"
+  },
+  {
+    "path": "tests/browser/mobileLayout.mjs",
+    "sha256": "13c0fdcf26ea401cf8007ed0cce6ba45249335ff022033bee1f5677aa7a94046"
+  },
+  {
+    "path": "tests/browser/motionPolish.mjs",
+    "sha256": "e873b8df19c3fcfe498c78b232b02a29acd66b2ccbb88c3987bdd20f99bbf1db"
+  },
+  {
+    "path": "tests/browser/nutritionGauge.mjs",
+    "sha256": "ec4e1ae0cebee315f27693d1e2b1f0a5993cd5b626e53b903260cfcab62dbc3b"
+  },
+  {
+    "path": "tests/browser/nutritionTemplates.mjs",
+    "sha256": "a2916df15fcb86d5cbc4ffb6a86c618d9b60aec7b883184cd252912bc6d5461e"
+  },
+  {
+    "path": "tests/browser/productionAssets.mjs",
+    "sha256": "6b16c8e9232e14a0f40bdf13aeb3520bb05dd4ba366100e96650942d0217c121"
+  },
+  {
+    "path": "tests/browser/pwaUpgrade.mjs",
+    "sha256": "15683032f2d6a64694e1e3bc7cc8c861e40727b12c642fee39e5004f66c6fa56"
+  },
+  {
+    "path": "tests/browser/rangeCascadeFixture.mjs",
+    "sha256": "5e5370d9e817b3fc5fcdd68977ff9f3042b0533d5144b0885a0191bdb001670f"
+  },
+  {
+    "path": "tests/browser/recoveryPreservation.mjs",
+    "sha256": "bdba2be987c19b11efdf043939567984cd7f3fed430f28f31247ecf6c9947921"
+  },
+  {
+    "path": "tests/browser/remainingPrototype.mjs",
+    "sha256": "d49e3bdaa55945bb8b4885db9bc5af651c82036ec43c75a077e89c4d3e054ae7"
+  },
+  {
+    "path": "tests/browser/reportDisclosure.mjs",
+    "sha256": "c3e5e52702d1fdf1c3a04cb5efbbcdec719b767b967963d79473d8635b98368b"
+  },
+  {
+    "path": "tests/browser/sharedDatePicker.mjs",
+    "sha256": "52e48626126785bcb8b333f156b0e45f2d3f9233060634525d88e0acd8e92643"
+  },
+  {
+    "path": "tests/browser/todayWaterButton.mjs",
+    "sha256": "77a55ab9ce41635e30f8af42414879e883ad610c3aef219d1f1295a43ff43d04"
+  },
+  {
+    "path": "tests/browser/trainingJournal.mjs",
+    "sha256": "52ae47fea1eec40a1a656f0608b67558e9761fc3db7a1d9d41c72990408849af"
+  },
+  {
+    "path": "tests/browser/trainingRecoveryExperience.mjs",
+    "sha256": "6747889c40e629370d4d78cda7f60483bdd338cfe852fac7ae8094f5811454fd"
+  },
+  {
+    "path": "tests/browser/trainingRecoveryLifecycle.mjs",
+    "sha256": "e9c1c709ffaa2aa4be6ccee73baef4861ca77336d7327d99acaca4b21d55c8b5"
+  },
+  {
+    "path": "tests/browser/trainingRecoveryPreservation.mjs",
+    "sha256": "f3195e9d5099b2e9ca7c615f78e4d3bd4d5957f29ef8914222467773bb87b1c0"
+  },
+  {
+    "path": "tests/browser/uiQualityAudit.mjs",
+    "sha256": "e3049691069f20f98555a9c02b2c0a9350872e3c10b0c37bde06839fc6311e53"
+  },
+  {
+    "path": "tests/browser/uiSemanticConsistency.mjs",
+    "sha256": "cde8ed8718c2be3561103db0579542269bfa691d9e954083698c02aa9991bed9"
+  },
+  {
+    "path": "tests/browser/unifiedExperience.mjs",
+    "sha256": "5a28b95c58a6f222d86e67668ccb32755f9ed8c4de669b8a48d3d70a850f00fc"
+  },
+  {
+    "path": "tests/browser/unifiedExperiencePreservation.mjs",
+    "sha256": "536238f2396a5868b15acf1baffc2cb19c3fee93062742e2d933df33caccba94"
+  },
+  {
+    "path": "tests/browser/uxWaterCascade.mjs",
+    "sha256": "4a0b1beab109d0cc84b1514d2c22b1c91e968135fb0169856c91bdad633f262b"
+  },
+  {
+    "path": "tests/browser/uxWaterCascadeBackup.mjs",
+    "sha256": "7bda9f9822900eb06b65b1d85e646dc794dd5902e36143ed9170d0b3e8230ef6"
+  },
+  {
+    "path": "tests/browser/uxWaterCascadePreservation.mjs",
+    "sha256": "76f42c8520dae59c290784080d2ad5e8a53e2a57c10cc7ccf2e29c394e6c47c3"
+  },
+  {
+    "path": "tests/browser/v421Consistency.mjs",
+    "sha256": "5f8d281c0f2d182730f24f098ab5ffd3a25fb3cf609a91c843a19c99c4584091"
+  },
+  {
+    "path": "tests/browser/v4FoodPlanToday.mjs",
+    "sha256": "0e51de54499962d7c6447e3cad2b31f7e1ef6795001842c54944402503c5201f"
+  },
+  {
+    "path": "tests/browser/v4Preservation.mjs",
+    "sha256": "b44549f8df11638448686584cac43e03ffe6074c2e3dc53eb2b3865a565f2310"
+  },
+  {
+    "path": "tests/browser/videoRetirementPreservation.mjs",
+    "sha256": "01b72487e08bc27def395c54e8c5899b25b73259aac98f79d0880c12d9fad098"
+  },
+  {
+    "path": "tests/browser/voiceMode.mjs",
+    "sha256": "cc4e957ac9614019fd4cd0dc1e7b48709ab7374d51ae9bf3e438f08f713d2cdd"
+  }
+]

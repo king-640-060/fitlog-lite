@@ -1,0 +1,24 @@
+{"engine":"webkit","width":320,"scale":100,"system":"light","status":"PASS"}
+{"engine":"webkit","width":320,"scale":100,"system":"dark","status":"PASS"}
+{"engine":"webkit","width":320,"scale":200,"system":"light","status":"PASS"}
+{"engine":"webkit","width":320,"scale":200,"system":"dark","status":"PASS"}
+{"engine":"webkit","width":375,"scale":100,"system":"light","status":"PASS"}
+{"engine":"webkit","width":375,"scale":100,"system":"dark","status":"PASS"}
+{"engine":"webkit","width":375,"scale":200,"system":"light","status":"PASS"}
+{"engine":"webkit","width":375,"scale":200,"system":"dark","status":"PASS"}
+{"engine":"webkit","width":390,"scale":100,"system":"light","status":"PASS"}
+{"engine":"webkit","width":390,"scale":100,"system":"dark","status":"PASS"}
+{"engine":"webkit","width":390,"scale":200,"system":"light","status":"PASS"}
+{"engine":"webkit","width":390,"scale":200,"system":"dark","status":"PASS"}
+FAIL_STATE {"engine":"webkit","width":430,"scale":100,"system":"light","mode":"system","theme":"light","mediaDark":false}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.waitForFunction: Timeout 12000ms exceeded.
+    at <repository>/tests/browser/approvedJointV05.mjs:33:414 {
+  log: [],
+  name: 'TimeoutError'
+}
+
+Node.js v24.16.0

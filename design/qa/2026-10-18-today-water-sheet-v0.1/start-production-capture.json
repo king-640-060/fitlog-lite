@@ -1,0 +1,81 @@
+{
+  "build": "120cb0624d0efa06b7ff7ce638e7d02104d4d62c",
+  "source": "https://king-640-060.github.io/fitlog-lite/",
+  "files": [
+    {
+      "file": "apple-touch-icon.png",
+      "sha256": "71d298fc04dc1953f0437af24737d02632ef0613f13828923b1d67c33e4755ae",
+      "bytes": 5836
+    },
+    {
+      "file": "assets/index-GiYnyqEF.js",
+      "sha256": "601625c4147b6edb693d62f3a9d33e311551e240600fb28b2f7930da95b62b83",
+      "bytes": 971288
+    },
+    {
+      "file": "assets/index-QJ2Wizgv.css",
+      "sha256": "96352e9e8fd19fe143afffc2810b0d604727c0a24b8cc639f965222ad024828b",
+      "bytes": 178030
+    },
+    {
+      "file": "build-info.json",
+      "sha256": "ecb5e9593d61df563689736dde3c461327a4baca0fcbe4ccdad9e3604d0b72a3",
+      "bytes": 155
+    },
+    {
+      "file": "favicon.svg",
+      "sha256": "222da72a02c3074ea9267b0b8fcd27588c2e32811074da6ab32432458db1a70d",
+      "bytes": 261
+    },
+    {
+      "file": "icons.svg",
+      "sha256": "b45fa506195cfcdef406ba9f0c77b36ddc1a7c224040926ec70abc2fdea7b93a",
+      "bytes": 5031
+    },
+    {
+      "file": "index.html",
+      "sha256": "716a5f78ea91aebf413717565faa8903fce051e560b2cedee5a0b6d49173fb34",
+      "bytes": 1485
+    },
+    {
+      "file": "manifest.webmanifest",
+      "sha256": "a9277ca9a1e7403806e97ba16883cc19de419f6afc83b24add3eac89f9b9939e",
+      "bytes": 388
+    },
+    {
+      "file": "pwa-192.png",
+      "sha256": "67ee1a997a0cfd3ee47707e2f52033da322f73756f2f915911652a5edd609a29",
+      "bytes": 3820
+    },
+    {
+      "file": "pwa-192.svg",
+      "sha256": "9bdb77da74ae9e65de9e055f546413df28373ebee634f49e39f5058047204d9f",
+      "bytes": 277
+    },
+    {
+      "file": "pwa-512.png",
+      "sha256": "c469ae22d8f1a1d1c800f120e6074f8965eb69dfaadf30f5f81f0e3ffa579bc7",
+      "bytes": 13570
+    },
+    {
+      "file": "pwa-512.svg",
+      "sha256": "479df2bed0bb05a34fbfd5e4ce33ff610eb42636c86a4d48b571e8009a88c8eb",
+      "bytes": 293
+    },
+    {
+      "file": "sw-build-120cb0624d0efa06b7ff7ce638e7d02104d4d62c.js",
+      "sha256": "1aa351bfeac3289f7ed9c8f07f93accd88510025d9e22b3b63c18712b918981d",
+      "bytes": 427
+    },
+    {
+      "file": "sw.js",
+      "sha256": "999d9cc8c89ff2f00f935c513333ee71f0d29bb9d3d096e72a696f1090e98905",
+      "bytes": 2072
+    },
+    {
+      "file": "workbox-9c191d2f.js",
+      "sha256": "04b086f1b2f4215ee4b659a7bc9c76162894abdb43fa876247bc7c0bd6fd1c37",
+      "bytes": 15112
+    }
+  ]
+}

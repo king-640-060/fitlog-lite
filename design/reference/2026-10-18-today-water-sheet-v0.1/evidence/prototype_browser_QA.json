@@ -1,0 +1,118 @@
+{
+  "htmlSha256": "b611db36022fa5232c4d17d13f7039547bc31d0967ed6ce50e05790ae2616c39",
+  "tested": "Chromium desktop browser, mobile viewport emulation, not physical iPhone",
+  "results": [
+    {
+      "width": 320,
+      "theme": "light",
+      "status": "PASS",
+      "fourPeerWidthsPx": [
+        78,
+        78,
+        78,
+        78
+      ],
+      "sheetTopPx": 390.27,
+      "sheetBottomPx": 720,
+      "htmlOverflowPx": 0
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "status": "PASS",
+      "fourPeerWidthsPx": [
+        78,
+        78,
+        78,
+        78
+      ],
+      "sheetTopPx": 390.27,
+      "sheetBottomPx": 720,
+      "htmlOverflowPx": 0
+    },
+    {
+      "width": 375,
+      "theme": "light",
+      "status": "PASS",
+      "fourPeerWidthsPx": [
+        78,
+        78,
+        78,
+        78
+      ],
+      "sheetTopPx": 514.27,
+      "sheetBottomPx": 844,
+      "htmlOverflowPx": 0
+    },
+    {
+      "width": 375,
+      "theme": "dark",
+      "status": "PASS",
+      "fourPeerWidthsPx": [
+        78,
+        78,
+        78,
+        78
+      ],
+      "sheetTopPx": 514.27,
+      "sheetBottomPx": 844,
+      "htmlOverflowPx": 0
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "status": "PASS",
+      "fourPeerWidthsPx": [
+        78,
+        78,
+        78,
+        78
+      ],
+      "sheetTopPx": 514.27,
+      "sheetBottomPx": 844,
+      "htmlOverflowPx": 0
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "status": "PASS",
+      "fourPeerWidthsPx": [
+        78,
+        78,
+        78,
+        78
+      ],
+      "sheetTopPx": 514.27,
+      "sheetBottomPx": 844,
+      "htmlOverflowPx": 0
+    },
+    {
+      "width": 430,
+      "theme": "light",
+      "status": "PASS",
+      "fourPeerWidthsPx": [
+        78,
+        78,
+        78,
+        78
+      ],
+      "sheetTopPx": 514.27,
+      "sheetBottomPx": 844,
+      "htmlOverflowPx": 0
+    },
+    {
+      "width": 430,
+      "theme": "dark",
+      "status": "PASS",
+      "fourPeerWidthsPx": [
+        78,
+        78,
+        78,
+        78
+      ],
+      "sheetTopPx": 514.27,
+      "sheetBottomPx": 844,
+      "htmlOverflowPx": 0
+    }
+  ]
+}

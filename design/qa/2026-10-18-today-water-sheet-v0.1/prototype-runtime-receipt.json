@@ -1,0 +1,66 @@
+[
+  {
+    "theme": "light",
+    "status": "PASS",
+    "demoOnly": true,
+    "flows": [
+      "open",
+      "close",
+      "500",
+      "Undo",
+      "custom333",
+      "history",
+      "reference2800"
+    ],
+    "widths": [
+      {
+        "text": "记录训练",
+        "width": 78
+      },
+      {
+        "text": "记录体重",
+        "width": 78
+      },
+      {
+        "text": "开始睡眠",
+        "width": 78
+      },
+      {
+        "text": "记录饮水",
+        "width": 78
+      }
+    ]
+  },
+  {
+    "theme": "dark",
+    "status": "PASS",
+    "demoOnly": true,
+    "flows": [
+      "open",
+      "close",
+      "500",
+      "Undo",
+      "custom333",
+      "history",
+      "reference2800"
+    ],
+    "widths": [
+      {
+        "text": "记录训练",
+        "width": 78
+      },
+      {
+        "text": "记录体重",
+        "width": 78
+      },
+      {
+        "text": "开始睡眠",
+        "width": 78
+      },
+      {
+        "text": "记录饮水",
+        "width": 78
+      }
+    ]
+  }
+]

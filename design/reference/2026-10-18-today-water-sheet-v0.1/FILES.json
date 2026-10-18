@@ -1,0 +1,74 @@
+{
+  "package": "FitLog_Lite_Today_Water_Bottom_Sheet_Approved_v0.1_Codex_2026-10-18",
+  "approvedHtml": "prototype/FitLog_Today_Water_Bottom_Sheet_Interactive_Prototype_v0.1.html",
+  "approvedHtmlSha256": "b611db36022fa5232c4d17d13f7039547bc31d0967ed6ce50e05790ae2616c39",
+  "baselineRemoteMainWhenPackaged": "120cb0624d0efa06b7ff7ce638e7d02104d4d62c",
+  "memberCountBeforeChecksums": 13,
+  "members": [
+    {
+      "path": "00_README_请先阅读.md",
+      "bytes": 2995,
+      "sha256": "fbe79cd84bcee0e3ee69ee8996ecf57d303ec069022d13768012aaee305d814b"
+    },
+    {
+      "path": "01_CODEX_EXECUTION_INSTRUCTION.md",
+      "bytes": 9493,
+      "sha256": "7bdd80d37a45c1b3744014135ae8d4324fb0db2e96a4700a90b37dfe9acafb18"
+    },
+    {
+      "path": "02_APPROVED_DESIGN_LOCK.md",
+      "bytes": 3683,
+      "sha256": "cc4d66d4c0a0faefeaf04c76b5542f42981a9a4ec2f60b18a6ceacac6fe41853"
+    },
+    {
+      "path": "03_INTEGRATION_AND_DATA_CONTRACT.md",
+      "bytes": 3915,
+      "sha256": "8dd87217df84ee32d642011e48e870ae06db46948c4929d3f97473016dd2f090"
+    },
+    {
+      "path": "04_ACCEPTANCE_MATRIX.md",
+      "bytes": 4272,
+      "sha256": "c9d8d0e75fac5d26fe8167bcfd269ace7c51d313643af74134d015418ddaafe8"
+    },
+    {
+      "path": "05_QA_RELEASE_SAFETY.md",
+      "bytes": 3029,
+      "sha256": "02289077f48673d5d5dc1365878fba3e32e68de0c36180be88d510544d30c532"
+    },
+    {
+      "path": "06_EVIDENCE_AND_SCOPE.md",
+      "bytes": 2295,
+      "sha256": "ec8a09fc36bc9bcdae5a76aa5e06845c2cb2ff86650cfe82bd3876c7d45fb8f6"
+    },
+    {
+      "path": "07_FORWARD_TO_CODEX.md",
+      "bytes": 1918,
+      "sha256": "3050b3542200d923017664f480cd3e5c140c6c1b4ec0bad3edf8c150e3123ee9"
+    },
+    {
+      "path": "evidence/prototype_browser_QA.json",
+      "bytes": 2165,
+      "sha256": "8124fd09bfcb179bff753f3e7513fff19c46cfa8b446c929ccf2a9f8dfba107a"
+    },
+    {
+      "path": "preview/FitLog_Today_Water_Sheet_Prototype_v01_open.png",
+      "bytes": 63594,
+      "sha256": "72c32bade7d0b465f03eaa44de8d035b8a344b72b98112abf25fd7474a3742c5"
+    },
+    {
+      "path": "preview/FitLog_Today_Water_Sheet_Prototype_v01_open_dark.png",
+      "bytes": 60160,
+      "sha256": "75cc07e0df2cba5ad50b11ddb49b57fda6dc114e3a3a60de05ae5ce26d615d71"
+    },
+    {
+      "path": "preview/FitLog_Today_Water_Sheet_Prototype_v01_today.png",
+      "bytes": 71051,
+      "sha256": "b30012ea643b211b11d497a445a8c6278fc9ddd287b72b6f4da70cf448cdd4ad"
+    },
+    {
+      "path": "prototype/FitLog_Today_Water_Bottom_Sheet_Interactive_Prototype_v0.1.html",
+      "bytes": 23483,
+      "sha256": "b611db36022fa5232c4d17d13f7039547bc31d0967ed6ce50e05790ae2616c39"
+    }
+  ]
+}

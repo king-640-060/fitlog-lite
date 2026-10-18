@@ -1,0 +1,14 @@
+HABIT_BEFORE {"pressed":"true","rows":[{"id":"check-old","habitId":"habit-old","date":"2026-10-12","completedAt":"2026-09-28T08:00:00.000Z","createdAt":"2026-09-28T08:00:00.000Z","updatedAt":"2026-09-28T08:00:00.000Z"}]}
+HABIT_AFTER {"pressed":"false","rows":[]}
+FAIL_STATE {"engine":"webkit","width":390,"scale":100,"system":"light","mode":"system","theme":"light","mediaDark":false}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.waitForFunction: Timeout 12000ms exceeded.
+    at <external-evidence>/habit-gate-proof.mjs:33:710 {
+  log: [],
+  name: 'TimeoutError'
+}
+
+Node.js v24.16.0

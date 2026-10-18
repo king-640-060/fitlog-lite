@@ -263,3 +263,11 @@ See [F1–F5 implementation contract](FOOD_WATER_DAY_V04.md). New `foodWaterDayV
 - Joint v0.3 自定义报告：`tests/browser/jointReportRanges.mjs` 用原生共享日期选择器实选五天区间、未来区间，拒绝反向和超过366天的范围；Chromium/WebKit实际核对分母、尚未开始及查询阶段全22表只读。随后另一个真实客户端删除筛选模板，原报告无需刷新即重置筛选并显示保留周期/阶段，22表精确核对允许删除后的完整对象集合。结果与原始截图另见本轮QA和正式回执。
 
 - 今日饮水按钮小修复：`tests/browser/todayWaterButton.mjs` 在隔离合成上下文比较饮水/体重/睡眠/训练的实际computed styles，覆盖深浅主题、320/390/430及横屏、100/200%字体；检查收起/展开配色与箭头、右侧定位、文本可读与44px、真实触摸500ml→Undo→收起、布局锚点/必要显露与自然滚动夹紧、22表完整恢复。390标准字号另核对按压/禁用/键盘焦点。`FITLOG_WATER_BUTTON_PHASE=before`仅用于保留旧版明确不一致证据，默认after必须严格一致；浏览器与实体iPhone验收分开记录。
+
+## 2026-10-18 Today Water Sheet v0.1
+
+[新批准合同](TODAY_WATER_SHEET_V01.md)及[原矩阵](../design/reference/2026-10-18-today-water-sheet-v0.1/04_ACCEPTANCE_MATRIX.md)替代旧 `todayWaterButton.mjs` 的箭头/卡内展开断言。保留并加强四按钮 computed style、正常/按压/禁用/键盘状态、390标准字号宽差≤1px、右侧位置、≥44px、精确ID新增/Undo、全22表还原、无新增滚动的语义。新脚本双引擎320/375/390/430和横屏、100/140/200%深浅、短视口，实测单Sheet/初始标题焦点/原高度/返回焦点/关闭和重入，快捷/自定义/非法/配额失败/重试/双击/双提交/跨午夜Undo，参考值不写日志、Progress和离线。键盘和34px安全区为浏览器模拟；WebKit移动模式不支持mouse.wheel时只查固定背景及内部滚动，不伪称真实触摸滚动。原生背景滚动、iPhone/PWA/VoiceOver/真实键盘Safe Area仍需实体证据。
+
+旧套件中的卡内操作精确替换成每次打开共享Sheet，并保留累计、历史、回滚、跨标签和其余领域断言；自定义成功后原本返回快捷页的期待改为批准的整个录入关闭。参考值由独立弹层变同Sheet子视图后，几何审计等待有限的真实过渡完成再测量，不降低边界断言。实际运行范围/原始失败/复测与结论见[TODAY_WATER_SHEET_V01_QA.md](TODAY_WATER_SHEET_V01_QA.md)。
+
+新Sheet关闭后的Toast还须避开实际Today水入口/睡眠/体重及底栏，保留custom键盘下不挡输入的检查。430/120由真实回归发现遮挡后，仅新饮水Sheet反馈显式设置8px控件缓冲；共享默认32px不变。必须记录初始失败和新候选完整复测，不用旧候选PASS代替最终源码。

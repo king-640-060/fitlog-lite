@@ -1,0 +1,57 @@
+engine,theme,property,STARTwater,water,weight,sleep,training
+chromium,light,backgroundColor,"rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)"
+chromium,light,color,"rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)"
+chromium,light,borderRadius,12px,12px,12px,12px,12px
+chromium,light,paddingTop,0px,0px,0px,0px,0px
+chromium,light,paddingRight,11px,11px,11px,11px,11px
+chromium,light,paddingBottom,0px,0px,0px,0px,0px
+chromium,light,paddingLeft,11px,11px,11px,11px,11px
+chromium,light,minHeight,44px,44px,44px,44px,44px
+chromium,light,fontSize,14px,14px,14px,14px,14px
+chromium,light,fontWeight,700,700,700,700,700
+chromium,light,borderTopWidth,0px,0px,0px,0px,0px
+chromium,light,opacity,1,1,1,1,1
+chromium,light,width,100,92,92,92,92
+chromium,light,Undo scroll delta (different UI paths),0,0,not applicable,not applicable,not applicable
+chromium,dark,backgroundColor,"rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)"
+chromium,dark,color,"rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)"
+chromium,dark,borderRadius,12px,12px,12px,12px,12px
+chromium,dark,paddingTop,0px,0px,0px,0px,0px
+chromium,dark,paddingRight,11px,11px,11px,11px,11px
+chromium,dark,paddingBottom,0px,0px,0px,0px,0px
+chromium,dark,paddingLeft,11px,11px,11px,11px,11px
+chromium,dark,minHeight,44px,44px,44px,44px,44px
+chromium,dark,fontSize,14px,14px,14px,14px,14px
+chromium,dark,fontWeight,700,700,700,700,700
+chromium,dark,borderTopWidth,0px,0px,0px,0px,0px
+chromium,dark,opacity,1,1,1,1,1
+chromium,dark,width,100,92,92,92,92
+chromium,dark,Undo scroll delta (different UI paths),0,0,not applicable,not applicable,not applicable
+webkit,light,backgroundColor,"rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)"
+webkit,light,color,"rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)"
+webkit,light,borderRadius,12px,12px,12px,12px,12px
+webkit,light,paddingTop,0px,0px,0px,0px,0px
+webkit,light,paddingRight,11px,11px,11px,11px,11px
+webkit,light,paddingBottom,0px,0px,0px,0px,0px
+webkit,light,paddingLeft,11px,11px,11px,11px,11px
+webkit,light,minHeight,44px,44px,44px,44px,44px
+webkit,light,fontSize,14px,14px,14px,14px,14px
+webkit,light,fontWeight,700,700,700,700,700
+webkit,light,borderTopWidth,0px,0px,0px,0px,0px
+webkit,light,opacity,1,1,1,1,1
+webkit,light,width,99.578125,92,92,92,92
+webkit,light,Undo scroll delta (different UI paths),-128,0,not applicable,not applicable,not applicable
+webkit,dark,backgroundColor,"rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)"
+webkit,dark,color,"rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)"
+webkit,dark,borderRadius,12px,12px,12px,12px,12px
+webkit,dark,paddingTop,0px,0px,0px,0px,0px
+webkit,dark,paddingRight,11px,11px,11px,11px,11px
+webkit,dark,paddingBottom,0px,0px,0px,0px,0px
+webkit,dark,paddingLeft,11px,11px,11px,11px,11px
+webkit,dark,minHeight,44px,44px,44px,44px,44px
+webkit,dark,fontSize,14px,14px,14px,14px,14px
+webkit,dark,fontWeight,700,700,700,700,700
+webkit,dark,borderTopWidth,0px,0px,0px,0px,0px
+webkit,dark,opacity,1,1,1,1,1
+webkit,dark,width,99.578125,92,92,92,92
+webkit,dark,Undo scroll delta (different UI paths),-128,0,not applicable,not applicable,not applicable

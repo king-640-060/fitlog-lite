@@ -1,6 +1,6 @@
 import { icon } from './icons'
 import { animateMotion } from './motion'
-export interface ActionToastOptions { tone?:'normal'|'error'; action?:{label:string;run:()=>Promise<void>}; duration?:number; className?:string }
+export interface ActionToastOptions { tone?:'normal'|'error'; action?:{label:string;run:()=>Promise<void>}; duration?:number; className?:string; controlGap?:number }
 let current:{element:HTMLElement;dispose:()=>void}|undefined
 /** Shared one-at-a-time feedback. A manual popover joins the top layer without stealing focus. */
 export function showActionToast(message:string,options:ActionToastOptions={}):void {
@@ -20,9 +20,9 @@ export function showActionToast(message:string,options:ActionToastOptions={}):vo
     const top=(keyboard?parseFloat(style.getPropertyValue('--sheet-offset-top'))||0:parseFloat(style.getPropertyValue('--safe-area-top'))||0)+8
     const nav=document.querySelector<HTMLElement>('.bottom-nav')?.getBoundingClientRect()
     const bottom=keyboard?top-8+(parseFloat(style.getPropertyValue('--sheet-viewport-height'))||innerHeight)-8:Math.min(innerHeight-8,nav?.height?nav.top-8:innerHeight-8)
-    const bounds=element.getBoundingClientRect(),blocked:Array<[number,number]>=[]
+    const bounds=element.getBoundingClientRect(),blocked:Array<[number,number]>=[],controlGap=options.controlGap??32
     const controls=(dialog??document).querySelectorAll<HTMLElement>(dialog?'button,input,textarea':'.water-card,button,input,textarea')
-    for(const control of controls){if(control.closest('.action-toast'))continue;const r=control.getBoundingClientRect();if(r.width&&r.height&&r.right>bounds.left&&r.left<bounds.right&&r.bottom>top&&r.top<bottom)blocked.push([Math.max(top,r.top-32),Math.min(bottom,r.bottom+32)])}
+    for(const control of controls){if(control.closest('.action-toast'))continue;const r=control.getBoundingClientRect();if(r.width&&r.height&&r.right>bounds.left&&r.left<bounds.right&&r.bottom>top&&r.top<bottom)blocked.push([Math.max(top,r.top-controlGap),Math.min(bottom,r.bottom+controlGap)])}
     blocked.sort((a,b)=>a[0]-b[0]);let cursor=top;const gaps:Array<[number,number]>=[]
     for(const [a,b]of blocked){if(a>cursor)gaps.push([cursor,a]);cursor=Math.max(cursor,b)}if(cursor<bottom)gaps.push([cursor,bottom])
     const gap=gaps.filter(([a,b])=>b-a>=bounds.height).at(-1)

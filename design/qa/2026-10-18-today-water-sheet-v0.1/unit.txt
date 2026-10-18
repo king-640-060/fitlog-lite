@@ -1,0 +1,15 @@
+
+> fitlog-lite@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.1 <repository>
+
+
+ Test Files  75 passed (75)
+      Tests  1081 passed (1081)
+   Start at  17:05:10
+   Duration  9.00s (tests 73%, import 16%, transform 11%, worker 1%)
+
+    Isolate  75 workers spawned · ~295ms startup each (spawn + environment, per file)
+             at least ~2.17s faster with isolate: false — reuses workers across files instead of one per file

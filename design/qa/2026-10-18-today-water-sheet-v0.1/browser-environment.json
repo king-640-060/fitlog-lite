@@ -1,0 +1,15 @@
+{
+  "node": "v24.16.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "engines": [
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34"
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5"
+    }
+  ]
+}

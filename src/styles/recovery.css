@@ -117,12 +117,12 @@
 .sleep-timeline-intervals { display:grid; gap:8px; margin:0; padding:0; list-style:none; color:var(--text-secondary); font-size:.8rem; line-height:1.6; font-variant-numeric:tabular-nums; }
 .sleep-timeline-intervals li { overflow-wrap:anywhere; }
 
-.water-actions, .water-record-options { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,7rem),1fr)); gap:10px; }
-.water-actions [data-water-add], .water-record-options [data-water-quick] { width:100%; min-height:44px; padding:8px; font-size:.9375rem; font-weight:600; }
-.water-actions [data-water-custom], .water-record-options [data-water-custom], .water-record-options > p { grid-column:1 / -1; }
-.water-actions [data-water-custom], .water-record-options [data-water-custom] { min-height:44px; justify-content:center; }
+.water-record-options { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,7rem),1fr)); gap:10px; }
+.water-record-options [data-water-quick] { width:100%; min-height:44px; padding:8px; font-size:.9375rem; font-weight:600; }
+.water-record-options [data-water-custom], .water-record-options > p { grid-column:1 / -1; }
+.water-record-options [data-water-custom] { min-height:44px; justify-content:center; }
 
-/* Approved UX-01/02: default disclosure and content-sized peer water actions. */
+/* Approved Today Sheet v0.1: compact card and shared content-sized water recorder. */
 .water-card .card-heading { margin-bottom:8px; }
 .water-card { container-type:inline-size; }
 .water-brief { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:8px; }
@@ -130,16 +130,8 @@
 .water-brief-stats > * { min-width:0; }
 .water-brief-total { font-size:.9375rem; font-weight:500; line-height:1.4; overflow-wrap:anywhere; }
 .water-brief-total .recovery-number { font-size:1.125rem; font-weight:700; }
-.water-expand-toggle { display:inline-flex; align-items:center; gap:6px; }
-.water-expand-toggle .icon { width:1rem; height:1rem; transform:rotate(90deg); }
-.water-expand-toggle[aria-expanded=true] .icon { transform:rotate(270deg); }
-.water-collapsible { margin-top:8px; padding-top:10px; border-top:1px solid var(--divider); }
-.water-collapsible[hidden] { display:none; }
-.water-expand-secondary { display:flex; flex-wrap:wrap; justify-content:space-between; gap:0 8px; margin-top:3px; }
-.water-expand-secondary button { min-height:44px; font-size:.8125rem; padding-inline:0; }
 .water-record-options > p { margin:0; }
 .water-record-options .water-record-footnote { font-size:.75rem; text-align:center; }
-/* Even enlarged narrow layouts retain the approved right-side action. */
 
 /* Only the two quick controls participate in this adaptive row; full-span copy cannot create a third track. */
 .water-record-options > .water-record-quick-actions { display:grid; grid-column:1 / -1; grid-template-columns:repeat(auto-fit,minmax(min(100%,7rem),1fr)); gap:10px; }
@@ -147,3 +139,6 @@
 .water-number-slot { display:grid; min-width:0; white-space:normal; }
 .water-number-slot > span { grid-area:1 / 1; overflow-wrap:anywhere; }
 .water-number-sizer { visibility:hidden; pointer-events:none; }
+
+.water-record-links { display:flex; grid-column:1 / -1; flex-wrap:wrap; justify-content:space-between; gap:0 8px; }
+.water-record-links button { min-height:44px; padding-inline:0; }
