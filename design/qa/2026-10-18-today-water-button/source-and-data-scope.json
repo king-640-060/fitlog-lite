@@ -1,0 +1,1406 @@
+{
+  "START": "57a58bfe32114af32a8b9fe19afe6b3fbb9e7f93",
+  "onlyProductChanges": [
+    "src/ui/recovery.ts class attribute",
+    "src/styles/recovery.css redundant geometry rule removed"
+  ],
+  "allEventHandlersAndBusinessLogicUnchanged": true,
+  "allExistingFixturesAndApprovedReferencesUnchanged": true,
+  "files": [
+    {
+      "file": "design/reference/2026-10-11-combined/ACCEPTANCE_MATRIX.md",
+      "unchanged": true,
+      "sha256": "4ead2dc7c6c5fec0b257c7d70842fef7cdfb51aa182cae8344665ff3f17dd297"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/CODEX_TASK.md",
+      "unchanged": true,
+      "sha256": "bce3f45c151bae4b00be4de80c6b84c38581684869d7888c5c8303f9bb24d6f9"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/DESIGN_REFERENCE.md",
+      "unchanged": true,
+      "sha256": "2f567def7f1166287b54a099ff672dbbb3d613a4ceb43472d6dec0a3b4c4ce98"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/MANIFEST.json",
+      "unchanged": true,
+      "sha256": "733983c27d8cf90a6f4ea4de734a2d43e378a9ee2d0239295215bb721bc310a3"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/README.md",
+      "unchanged": true,
+      "sha256": "cd0c2b9a84e6408810415890838b209c9ecec99f3b4c60ae089fb1a71ebfe076"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/SHA256SUMS.txt",
+      "unchanged": true,
+      "sha256": "e522ccf55c7cd78fca242e5b7c8ad7cf5958ca340482a602420deb79700560c8"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/previews/FitLog_Calendar_10_Categories_Prototype_v0.1_calendar_dark.png",
+      "unchanged": true,
+      "sha256": "871c38f70a79442b191cbdf0650ea5edffb6b43706b0aa965517539bb454f1a8"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/previews/FitLog_Calendar_10_Categories_Prototype_v0.1_calendar_light.png",
+      "unchanged": true,
+      "sha256": "829038e31758749a92069dfba2b392f25a32afda5643ee837b2c322873f064db"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/previews/FitLog_Calendar_10_Categories_Prototype_v0.1_sheet_dark.png",
+      "unchanged": true,
+      "sha256": "ba2451f036941a254de87ca3c463ee08a7c69eefa1eeffca6546a612ae13fa2e"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/previews/FitLog_Nutrition_Cycle_Prototype_v0.1_320_dark.png",
+      "unchanged": true,
+      "sha256": "1615b5fb5543750f0b98315d5744c403902fa1f13e6f5a9eb00be83b6a3b8672"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/previews/FitLog_Nutrition_Cycle_Prototype_v0.1_390_dark.png",
+      "unchanged": true,
+      "sha256": "f947d7dfa04283c6893c3dd8c515fa312cc0efdd50666ab6f740bd0ece2644af"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/previews/FitLog_Nutrition_Cycle_Prototype_v0.1_390_light.png",
+      "unchanged": true,
+      "sha256": "829876a7d1392bb30df5fa8c108364c7ea4adca174233570836237cf99f707b9"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/previews/FitLog_Nutrition_Cycle_Prototype_v0.1_430_dark.png",
+      "unchanged": true,
+      "sha256": "ea39ef22857dc548845c98fab653dda90194bda0854cbf27557833dcf7c5d8a4"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/previews/FitLog_Nutrition_Cycle_Prototype_v0.1_assign_preview.png",
+      "unchanged": true,
+      "sha256": "69e094ed3343364b13c1f861088dd795d65bbc8dfc8a654c3e05b637f66a3a6c"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/previews/FitLog_Nutrition_Cycle_Prototype_v0.1_week_preview.png",
+      "unchanged": true,
+      "sha256": "a22e7b43d8e61a290a71370df63566d658e435ad7d25c8fc04bfdc6c3709f891"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/previews/FitLog_Template_Exercise_EmptyState_Prototype_v0.1_preview.png",
+      "unchanged": true,
+      "sha256": "9418d40e18401c7fce914ea56dff1edd8f57aaa964e18638b4e0390699e8a2e7"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/prototypes/FitLog_Calendar_10_Categories_Interactive_Prototype_v0.1.html",
+      "unchanged": true,
+      "sha256": "1ad3131b6dca4f863005c90b47491fc5d67b5773e8cc21bead23f59911134387"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/prototypes/FitLog_Nutrition_Cycle_Schedule_Interactive_Prototype_v0.1.html",
+      "unchanged": true,
+      "sha256": "0d42580f17d9d5a5d6e66c1947a30ca0ebc26424e682d7242fab5f45b5e6d5ed"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/prototypes/FitLog_Special_Diet_Interactive_Prototype_v0.1.html",
+      "unchanged": true,
+      "sha256": "bb166e5f7c1aedfc5940015a1b7626cf13b0280f25d5dda164ebed9e19b46c26"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/prototypes/FitLog_Template_Exercise_EmptyState_Prototype_v0.1.html",
+      "unchanged": true,
+      "sha256": "31f9d9b0780db4b7ee75c91b9802305932560f0bd5f50de0706c83a82428aa9b"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/references/calendar_original.jpg",
+      "unchanged": true,
+      "sha256": "7ff7ca34323b45c738601ff3ce7374eda161705badbd0cbeab5bab8880777450"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/references/day_sheet_original.png",
+      "unchanged": true,
+      "sha256": "8509fa15e0168a2729399e15059d7152c6595dfc49e81dd374f5fe254063a9c1"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/references/day_sheet_records_original.png",
+      "unchanged": true,
+      "sha256": "69557e7d282af3d4eb7cc2b8e2a11886a67650d693cfe9c879520c71e26b2da6"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/references/report_categories_original.png",
+      "unchanged": true,
+      "sha256": "457539b715fc68ab6ac80847b275b1690b5e90cc9fd8b9b62d4d065f684ac79f"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/references/report_original.png",
+      "unchanged": true,
+      "sha256": "b6f5d9b309245a94bf6f81fc8f98aa049a2289333938de8d3965fa9292eb2848"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/references/special_diet_original.png",
+      "unchanged": true,
+      "sha256": "bfd4f45032a77ca9eef0de15480cdc46a67d2e54000d8f9b759680040fa5f0bc"
+    },
+    {
+      "file": "design/reference/2026-10-11-combined/references/template_picker_original.png",
+      "unchanged": true,
+      "sha256": "666730a8fc194af8cc484d79f8a194a4a85a21b110ab05b4ea3cfc3161aaef4a"
+    },
+    {
+      "file": "design/reference/2026-10-12-approved-v0.5/ACCEPTANCE_MATRIX.md",
+      "unchanged": true,
+      "sha256": "3f45a0d3da3f3c00435105d48314a5ccb34aff7af28987639caf1fb640e70eab"
+    },
+    {
+      "file": "design/reference/2026-10-12-approved-v0.5/CODEX_TASK.md",
+      "unchanged": true,
+      "sha256": "55c32dee7501d1a42858e66914c5ee11d8358d24fbb7daed6de7194ee390d282"
+    },
+    {
+      "file": "design/reference/2026-10-12-approved-v0.5/DESIGN_LOCK.md",
+      "unchanged": true,
+      "sha256": "a696587215ceb036f329dd4aad9bf6c06a9850106876c6f114fce5d79477ff1e"
+    },
+    {
+      "file": "design/reference/2026-10-12-approved-v0.5/README.md",
+      "unchanged": true,
+      "sha256": "981322ffb2fc8b452c004ae9f56d5c4d95b0539c1da2432860053c03aa07dc4c"
+    },
+    {
+      "file": "design/reference/2026-10-12-approved-v0.5/SHA256SUMS.txt",
+      "unchanged": true,
+      "sha256": "80d4b539096ef5b04fc2d130378b4f812477848c1931cae2bcc18c2f2b5f1c5f"
+    },
+    {
+      "file": "design/reference/2026-10-12-approved-v0.5/issue_references/calendar-original-issue.png",
+      "unchanged": true,
+      "sha256": "ebed6b73327ca976e6fcb79260b6a75252a2cbcbed3a1bb41db8646f02ebfe87"
+    },
+    {
+      "file": "design/reference/2026-10-12-approved-v0.5/issue_references/habit-delete-original-issue.png",
+      "unchanged": true,
+      "sha256": "758c5120b9d879791e5a602eae7b2d4fbc0147b8212c4f798533dcbce694f135"
+    },
+    {
+      "file": "design/reference/2026-10-12-approved-v0.5/previews/calendar-dark-approved.png",
+      "unchanged": true,
+      "sha256": "740c0536f233de8ca59ad7c9c5e0eaec387c8db4a940ab6192af8d38441d73c3"
+    },
+    {
+      "file": "design/reference/2026-10-12-approved-v0.5/previews/calendar-light-approved.png",
+      "unchanged": true,
+      "sha256": "9473c5d9aad57e6f5cd394659fc18884142b675a0b8acb673228c411fe3bceb3"
+    },
+    {
+      "file": "design/reference/2026-10-12-approved-v0.5/previews/cycle-report-reference.png",
+      "unchanged": true,
+      "sha256": "e4a5b8139557259ffce9741893345f97ce1ca115d7f3194edadee3866cf559b3"
+    },
+    {
+      "file": "design/reference/2026-10-12-approved-v0.5/previews/habit-delete-reference.png",
+      "unchanged": true,
+      "sha256": "3fabd9fb5ee577ba433670ffdb25f184a4ae2495b309352d054369cab5213875"
+    },
+    {
+      "file": "design/reference/2026-10-12-approved-v0.5/previews/subtask-adaptive-reference.png",
+      "unchanged": true,
+      "sha256": "4c3634f739da6dd236c8bd3d8ef82d48ae0019e59a038ff00d880f592a8e1bf1"
+    },
+    {
+      "file": "design/reference/2026-10-12-approved-v0.5/previews/subtask-collapsed-reference.png",
+      "unchanged": true,
+      "sha256": "fe365ed6f4370c4ce1bc2354f0249873e2d08c46ba6a48a99b508b0d26666c76"
+    },
+    {
+      "file": "design/reference/2026-10-12-approved-v0.5/previews/trend-reference.png",
+      "unchanged": true,
+      "sha256": "799919bf13259d6127857b3055c79e5f056bb376d1a169953af2f01d1ca55d59"
+    },
+    {
+      "file": "design/reference/2026-10-12-approved-v0.5/prototype/FitLog_Joint_Interactive_Prototype_v0.5.html",
+      "unchanged": true,
+      "sha256": "c7024903b4e6a3e628119403c1d31284c0f6e3c9bdd422bf766234df759494f2"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/ACCEPTANCE_MATRIX.md",
+      "unchanged": true,
+      "sha256": "837e73590efb299842fb5765e884734a53fc9aecfe61d1ddcf003e9aa4ba750b"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/CODEX_TASK.md",
+      "unchanged": true,
+      "sha256": "ceaebc20036cc65df7019a82ac6015d1796cd7a802bd250954948048c442b7c4"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/DESIGN_LOCK.md",
+      "unchanged": true,
+      "sha256": "98f55114e677155f043fc61c92ceeb80c7c3c4e5bc80536756c3f864d4f12b1f"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/FILES.json",
+      "unchanged": true,
+      "sha256": "8f2dfb3bd9dc2acb6442a04399ab14f3ef036234557fef588a0febe25e9f1021"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/README.md",
+      "unchanged": true,
+      "sha256": "9a0b529a96a694a53fbae83011e413ed675bfe3f4c0aef4900e4c6091ad4d673"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/SAFETY_RELEASE.md",
+      "unchanged": true,
+      "sha256": "8e93188e1720b96bf2a97fcc9a5695a8e90e1c49d234a41675cb6346d09e9002"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/SHA256SUMS.txt",
+      "unchanged": true,
+      "sha256": "52c8db35e617ccf0d0061258ba271c5a3b64f564a4951b99468b6ea0e6742a51"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/prototype/FitLog_FoodTemplate_Water_DayDetail_v0.4.html",
+      "unchanged": true,
+      "sha256": "856de7f201b630572c8eedadfd4b4e299700d153894f9ee2fd99b4663e5c81a3"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/screenshots/approved/day-detail-fullwidth-320.png",
+      "unchanged": true,
+      "sha256": "aafd9aef505c4f5ab04cc55e8e4b0e1241ee0a4a952283b05371042cb79ecab2"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/screenshots/approved/day-detail-fullwidth-390.png",
+      "unchanged": true,
+      "sha256": "0c92779ec1bae3c0634c84b761dd2727befa8a34c9ca5501c5ad40bd07ce859e"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/screenshots/approved/day-detail-fullwidth-430.png",
+      "unchanged": true,
+      "sha256": "bee1f648afa117a073d1afc81a1cbaa74ddff270d55ba7019fb1a9f1398b77d6"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/screenshots/approved/diet-390.png",
+      "unchanged": true,
+      "sha256": "b753b43ecf6a804206c5ccdec8b6fbdbaaa036d06afb2834e7b7417c6975e686"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/screenshots/approved/diet-nutrition-target-expanded-390.png",
+      "unchanged": true,
+      "sha256": "2b9a04a077dfd5e88a19e8f5799ef38466a1457d3a559c9bd317674d014fce99"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/screenshots/approved/nutrition-template-390.png",
+      "unchanged": true,
+      "sha256": "705f75b30068f124135a9de70bfcf8eda6476d78eadc346d68c8b2d47a3ca488"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/screenshots/approved/water-390.png",
+      "unchanged": true,
+      "sha256": "dc034861cf58d989935bdfd7ab6afb232652ae3617a28767181282d0db6373b3"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/screenshots/issues/original-day-detail.jpg",
+      "unchanged": true,
+      "sha256": "abb975e8c1c9a7c5bf6f2aba8160933a967d1391fe14f754c86ecae88d77267d"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/screenshots/issues/original-diet-template.jpg",
+      "unchanged": true,
+      "sha256": "3e5f30505aeea56b9b411cf848a3fa591d5e5b98cd2eeac3fb7b9ab386ad2ddf"
+    },
+    {
+      "file": "design/reference/2026-10-15-food-water-v0.4/screenshots/issues/original-water-record.png",
+      "unchanged": true,
+      "sha256": "bea4fa9cf3d6e318bd0689b0c93b7e9f19c8b2833bdbacffaf962bfb698456c6"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/00_README_请先阅读.md",
+      "unchanged": true,
+      "sha256": "b3909e18caa2bac474f682843b6ac125af75709bedec9c366efe89b4729a48a1"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/01_CODEX_EXECUTION_INSTRUCTION.md",
+      "unchanged": true,
+      "sha256": "a1c3b6e4bf8ffa16d1346a68efd358919209b3221bab220d76709fd96889c05e"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/02_UI_TRENDS_DESIGN_LOCK.md",
+      "unchanged": true,
+      "sha256": "2ba5f6c39e160f152e37311f05ec90ea59fb6ff3c04fbb176baae846470df4de"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/03_RANGE_CASCADE_DELETION_CONTRACT.md",
+      "unchanged": true,
+      "sha256": "31795fa62f457865fc40e204c41efa943170f84e48882ce21e048678d0c707c6"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/04_SPORTS_SCIENCE_REPORT_CONTRACT.md",
+      "unchanged": true,
+      "sha256": "58dfbae86cd4909042485ec684a1efa94ab25aadc36b42f97d1dd5d70f1b653c"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/05_ACCEPTANCE_MATRIX.md",
+      "unchanged": true,
+      "sha256": "9cd2a8d590c1eebc7e9a451d7494ca531c2d751a5fc325ab56c166463ab7f597"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/06_DATA_RELEASE_SECURITY.md",
+      "unchanged": true,
+      "sha256": "c203cb71308e5ed2c34b7bffa2acd4205ff9123952e61d821c6be8f6629eda4b"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/07_EVIDENCE_BASIS.md",
+      "unchanged": true,
+      "sha256": "eb95bfa984f3288c5cfd033912cea47919857e034e57287ea50e7973eeb7a9a9"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/MANIFEST.json",
+      "unchanged": true,
+      "sha256": "b0b064da787ad710a726e4dc1f440383b620db643b8c00a2e107e8b8d9ccf3c8"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/SHA256SUMS.txt",
+      "unchanged": true,
+      "sha256": "f29267be5dc7f74d92b43d452b1aedfcc302cc0ada8946dec302eaed207311b8"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/prototype/FitLog_Joint_Water_Trends_Reports_RangeDelete_Prototype_v0.3.html",
+      "unchanged": true,
+      "sha256": "436f5eeaec511559026ffa7364be64b7d1fd94a63ee1cda04351efeed91e3991"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/reference_qa/measured_heights_v0.3.json",
+      "unchanged": true,
+      "sha256": "7dd391cb17d72ea1712e66b3f97833f2ce81933d9abcd8d234191a90885e93c5"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/reference_visuals/cycle_report_390.png",
+      "unchanged": true,
+      "sha256": "26482bb67d1674453d5969478ed2fb90c9c8499495edf2836c7db9fd7533f1d4"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/reference_visuals/daily_report_390.png",
+      "unchanged": true,
+      "sha256": "d5d4cce6a09830a26ee429f2b228d83c364f54db471604334613872f9ae48834"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/reference_visuals/delete_preview_390.png",
+      "unchanged": true,
+      "sha256": "90ab2bb448495f4da33dfcb05892289737c730dd4f1491ed64531233c9b36426"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/reference_visuals/height_7_30_90_390.png",
+      "unchanged": true,
+      "sha256": "21f45835f617df90ee03cd5b4002508c876b8e1a21edad7ecee3cfeb9bcb4897"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/reference_visuals/independent_three_charts_390.png",
+      "unchanged": true,
+      "sha256": "f49cc69f2d7e23fe98215d89f7069b5467c880715dd30ea0e04e7ea5977f90b4"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/reference_visuals/sleep_empty_390.png",
+      "unchanged": true,
+      "sha256": "9a7941dbbbb494a6a903b50f84d13ded6329303fb56c7fe3642f6f909e8db0cb"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/reference_visuals/today_expanded_390.png",
+      "unchanged": true,
+      "sha256": "8fb7fe29573b208b62f09a4ea71c71e230e162384824b18bd6f364fca5c251eb"
+    },
+    {
+      "file": "design/reference/2026-10-17-joint-v0.3/reference_visuals/today_right_390.png",
+      "unchanged": true,
+      "sha256": "d88fe98823f6f7a61468100b4d88b2c439431ad1c4ad2523be9d9beb21c317a9"
+    },
+    {
+      "file": "design/reference/2026-10-17-ux01-03-v0.4/ACCEPTANCE_MATRIX.md",
+      "unchanged": true,
+      "sha256": "f2ed8fb478661fa09b418ce54e104edcd08783303ed94634f02361f326be9013"
+    },
+    {
+      "file": "design/reference/2026-10-17-ux01-03-v0.4/CASCADE_DELETE_CONTRACT.md",
+      "unchanged": true,
+      "sha256": "04a7f752acc64bada8dcc1187e4b6a80f6be19e0c7e3aab03c7d981b480653aa"
+    },
+    {
+      "file": "design/reference/2026-10-17-ux01-03-v0.4/CODEX_TASK.md",
+      "unchanged": true,
+      "sha256": "a8ff0bcc926e4063ae0306ba374ee1d104ee70b9ec36e7168027613a22381a2c"
+    },
+    {
+      "file": "design/reference/2026-10-17-ux01-03-v0.4/DATA_RELEASE_SAFETY.md",
+      "unchanged": true,
+      "sha256": "668620423c9cdf71152487dc2643f3ec803464caf4370a6ea50e67c84de2dc68"
+    },
+    {
+      "file": "design/reference/2026-10-17-ux01-03-v0.4/DESIGN_LOCK.md",
+      "unchanged": true,
+      "sha256": "3535807f16bc086c2cfc9e0630ceadec7c6a2a6d03d17100c19e69d8b4ee4ead"
+    },
+    {
+      "file": "design/reference/2026-10-17-ux01-03-v0.4/FILES.json",
+      "unchanged": true,
+      "sha256": "ee598f99dcdfb60ecc0f05d0d832069b26dbe0046436bc708d4137fa2fdfc3c8"
+    },
+    {
+      "file": "design/reference/2026-10-17-ux01-03-v0.4/README.md",
+      "unchanged": true,
+      "sha256": "2037bce674caa2df10fc06b608fc7763f060a3c716fe6511a5fa2e020bb09c2e"
+    },
+    {
+      "file": "design/reference/2026-10-17-ux01-03-v0.4/SHA256SUMS.txt",
+      "unchanged": true,
+      "sha256": "a6759733a13e7b2a81cbc95750e0515f6777ccf714f6dd8f5d6ced9320a02dc0"
+    },
+    {
+      "file": "design/reference/2026-10-17-ux01-03-v0.4/preview/delete_with_history_light.png",
+      "unchanged": true,
+      "sha256": "ceb25f331a384786a061468c71b073d95cdfe48ccd8dda1cbc649fdfb46187e2"
+    },
+    {
+      "file": "design/reference/2026-10-17-ux01-03-v0.4/prototype/FitLog_UX01_UX02_UX03_Interactive_Prototype_v0.4.html",
+      "unchanged": true,
+      "sha256": "96804e985c5287fa9d0ea857924335a30813a49758b74f1abf73af550dbf8ceb"
+    },
+    {
+      "file": "design/reference/v4.2/FitLog_V4_2_Prototype.html",
+      "unchanged": true,
+      "sha256": "aa8d37f0509035970eb3a26be056eec619066ba308cf5bc8f5911d2458d24687"
+    },
+    {
+      "file": "design/reference/v4.2/README.md",
+      "unchanged": true,
+      "sha256": "530e73f801c81ccfbf698b00793891fee1c2511cbd06e5c3dea3e4e09c0da907"
+    },
+    {
+      "file": "src/ai/foodVisionPrompt.ts",
+      "unchanged": true,
+      "sha256": "a52200d66a0a946ddd1b9b1c87f025a95bdacdc1403fced7bdc9549462a7f8d7"
+    },
+    {
+      "file": "src/ai/modelRouting.ts",
+      "unchanged": true,
+      "sha256": "55295a89c77de91a2d4bb668e9f1019ac3a3a7b6d59534c26fd21b9055efc48d"
+    },
+    {
+      "file": "src/ai/nutritionPlans.ts",
+      "unchanged": true,
+      "sha256": "4a9501ebf0e5c78bcc0eb628e98618bd7207d7b6eefa78e6e0ba101d19a883de"
+    },
+    {
+      "file": "src/ai/orchestrator.ts",
+      "unchanged": true,
+      "sha256": "8b923c8e6cb2dbab6026348eb58272fa3abfe6e8a6ab7235db299d72992e2e38"
+    },
+    {
+      "file": "src/ai/proposals.ts",
+      "unchanged": true,
+      "sha256": "e338649bbe95fb3527368911b3f9a843070cd6845f6c329ca46d60acb5df6dba"
+    },
+    {
+      "file": "src/ai/security.ts",
+      "unchanged": true,
+      "sha256": "74057f2675aac3744654de28e6ded59eaa8206b745b6138f13107b5fb7ede28e"
+    },
+    {
+      "file": "src/ai/sse.ts",
+      "unchanged": true,
+      "sha256": "530f8e492bca87b3e021cd2fd8e0bba5242afc2863ea44941ccf29f3acee3b92"
+    },
+    {
+      "file": "src/ai/systemPrompt.ts",
+      "unchanged": true,
+      "sha256": "79259916199608de8514bad54cba99f2165b806853bbfd65e29eb5d7f3d46744"
+    },
+    {
+      "file": "src/ai/toolRegistry.ts",
+      "unchanged": true,
+      "sha256": "24a0b69256dca48e31798e83a652c7e6957c3a69194bc178edcde2ce7b0d61de"
+    },
+    {
+      "file": "src/ai/tools/catalogTools.ts",
+      "unchanged": true,
+      "sha256": "a8cc48f93d485ecdd64073ecfef772ee5c9c99d82b9c3cecbd77fc41b27516be"
+    },
+    {
+      "file": "src/ai/tools/proposalTools.ts",
+      "unchanged": true,
+      "sha256": "2a34f8361d1f5f446c8ef403990c842b4433e488eb2caf311c36be045da01b85"
+    },
+    {
+      "file": "src/ai/tools/readTools.ts",
+      "unchanged": true,
+      "sha256": "1f823194d081cb1c8edc530c5e8488387fbb9a089d1193d255ad35f82b206361"
+    },
+    {
+      "file": "src/ai/tools/types.ts",
+      "unchanged": true,
+      "sha256": "121f88d59c819437d4354e509b66e752c1ac2f4d532974e9b81d84c30d6f2322"
+    },
+    {
+      "file": "src/ai/types.ts",
+      "unchanged": true,
+      "sha256": "900c9b3c42f56bfd4778b29e9189c19d53e25b9ee3b64f948d95d1091b54fc25"
+    },
+    {
+      "file": "src/ai/visionImages.ts",
+      "unchanged": true,
+      "sha256": "c5386c0698e31bdd60259b5996f1479956fb768ebbfb0c12ca343c1e4ac1a7b9"
+    },
+    {
+      "file": "src/ai/visionPrivacy.ts",
+      "unchanged": true,
+      "sha256": "323dc87fca8377e96c9baec7d1854d320ef7e219c79922453a7a18bf348e7c22"
+    },
+    {
+      "file": "src/ai/workoutAnalysis.ts",
+      "unchanged": true,
+      "sha256": "5e91e8bd8782a9a8f2eeb76072a4fd9e8d661ec7f64bffc9b1a4d24754bbeed0"
+    },
+    {
+      "file": "src/assets/hero.png",
+      "unchanged": true,
+      "sha256": "881ffbcaafc212e49addad08846a5b82761355fa20624253af3477ba33262c5c"
+    },
+    {
+      "file": "src/assets/typescript.svg",
+      "unchanged": true,
+      "sha256": "e45b2f008f0a40c1011b0fd460081f8bb00df063a41240449159da164724d96c"
+    },
+    {
+      "file": "src/assets/vite.svg",
+      "unchanged": true,
+      "sha256": "5be21acd42eb7b896e517f4e0f0f11eb5c5d9e54fbbcebe9453f033008fcca6f"
+    },
+    {
+      "file": "src/build.d.ts",
+      "unchanged": true,
+      "sha256": "99b7d47576a729f20d569d1369b0c80deb55a558de90b85347aef8e953f76164"
+    },
+    {
+      "file": "src/db/database.ts",
+      "unchanged": true,
+      "sha256": "cd72bbc24447bfa6626cc91e332f69e0c5a6d9a3b8a4ff95cbb6f2ca8ea0b79f"
+    },
+    {
+      "file": "src/db/types.ts",
+      "unchanged": true,
+      "sha256": "e99bf0b79c9d8268ca96cf356c2f5a74904da871dcdcec3d518a1fd274ca50aa"
+    },
+    {
+      "file": "src/main.ts",
+      "unchanged": true,
+      "sha256": "4ce603a39c6fb131e29a20037ea2e1b70fc90235ce1f24ad41cf0e001c2a0f25"
+    },
+    {
+      "file": "src/pwa/diagnostics.ts",
+      "unchanged": true,
+      "sha256": "1dbab9f49f96ce8233646e9c7f678eef47952b6c84e9fa5659b9f6c6e91d0185"
+    },
+    {
+      "file": "src/pwa/runtime.ts",
+      "unchanged": true,
+      "sha256": "6bcd3fe7f20ab821eb5382fd22335227fa4722acfdc304f0ebdc7ca489253740"
+    },
+    {
+      "file": "src/services/aiProfiles.ts",
+      "unchanged": true,
+      "sha256": "ec369b493352d3d7c2a046c3894effc6eb88854f8e437e090a9119289bc00091"
+    },
+    {
+      "file": "src/services/aiProvider.ts",
+      "unchanged": true,
+      "sha256": "6d26ac1a3fad43c90e83522a17b1482077e42d876701247c08d43c372f05e94e"
+    },
+    {
+      "file": "src/services/aiVisionFoodService.ts",
+      "unchanged": true,
+      "sha256": "37d3d9aaf7c3a130ebb6e14c1c001b6d5537ec0884221a6eac1b9daaa9888e9d"
+    },
+    {
+      "file": "src/services/appearanceConfig.ts",
+      "unchanged": true,
+      "sha256": "3acc9a1c0a26ddfa0cdcb0de2858a9819639801e4d4e2cac77f31255d93e653b"
+    },
+    {
+      "file": "src/services/backupService.ts",
+      "unchanged": true,
+      "sha256": "86c45dbf4c0003ae705f69172c304b8c1c75b618e0dd124990dd5ce25f64e246"
+    },
+    {
+      "file": "src/services/cardioService.ts",
+      "unchanged": true,
+      "sha256": "7597132426aaf067f1c3655cd52d624afaac3ab7bcdc533da932b3e2821a4b8e"
+    },
+    {
+      "file": "src/services/coachReportService.ts",
+      "unchanged": true,
+      "sha256": "889a0b34a00d47be7d0acc83d4713280cdbc80a71c22d841409b9032f848963a"
+    },
+    {
+      "file": "src/services/dailyNutritionSummary.ts",
+      "unchanged": true,
+      "sha256": "21a36a7c4c257d3c8ea4da2b631401eac2fc0742e6f047ce78c10626297bc428"
+    },
+    {
+      "file": "src/services/dailyRecordsSummary.ts",
+      "unchanged": true,
+      "sha256": "1d32d3c926c297ce12a908bb4024e32dc02f7127413fc85c9f971f2235d1678e"
+    },
+    {
+      "file": "src/services/dayRecordsService.ts",
+      "unchanged": true,
+      "sha256": "453bf6e3e570063fef285f9ec0e67644c961243bea3f3a28dfa7d97a8f32443a"
+    },
+    {
+      "file": "src/services/dietEventService.ts",
+      "unchanged": true,
+      "sha256": "af4bd949835a623141d1d0bdbb763b0b12bd37f1394af06296e072564389cbb3"
+    },
+    {
+      "file": "src/services/foodService.ts",
+      "unchanged": true,
+      "sha256": "793db5bb9b83bb516d6231e8971afa3f4ce80623299a25da0f1d2ac8a2413a19"
+    },
+    {
+      "file": "src/services/foodVisionImportService.ts",
+      "unchanged": true,
+      "sha256": "14267ce47521303eea7331b41265f9165d73eae52376a7bfa7d8f64e8de74007"
+    },
+    {
+      "file": "src/services/githubManualSync.ts",
+      "unchanged": true,
+      "sha256": "f6ed85efa3b03b414070ea761260bb35196d076abb8bb492d6f583bd1175b992"
+    },
+    {
+      "file": "src/services/githubSyncService.ts",
+      "unchanged": true,
+      "sha256": "0e1a5b0e084658e5b0f70d478a8d3075fefec32a6531e03e77c5c4aa72eb2574"
+    },
+    {
+      "file": "src/services/habitService.ts",
+      "unchanged": true,
+      "sha256": "35568b21daa8734a597bd2dd53806e778c96cfa71441ea1f883ec5745aad1163"
+    },
+    {
+      "file": "src/services/importService.ts",
+      "unchanged": true,
+      "sha256": "7c6b26e5a67fd064dd821eb7e78a5547c549756acab4882ec3893c716d938405"
+    },
+    {
+      "file": "src/services/mealPhotoEstimateService.ts",
+      "unchanged": true,
+      "sha256": "21ea977365b3463c7a5c44d65aba1a4826e30d68f434d123e36e8bc306e9efda"
+    },
+    {
+      "file": "src/services/nutritionCompletionService.ts",
+      "unchanged": true,
+      "sha256": "a15faf0b1b93564ecc20a074d86d0211c40169ec04a2b83fcb75ee06168daf36"
+    },
+    {
+      "file": "src/services/nutritionCycleReportService.ts",
+      "unchanged": true,
+      "sha256": "0843eeeaf103988491a035f426afee1815c01b91579dfcfd2da70fe96d77f881"
+    },
+    {
+      "file": "src/services/nutritionCycleService.ts",
+      "unchanged": true,
+      "sha256": "214e48ba9531ac5528185d442462013a7abfd537e7e00d536432c7a836ccb3bb"
+    },
+    {
+      "file": "src/services/nutritionRangeCascadeService.ts",
+      "unchanged": true,
+      "sha256": "936625bdafa9736e8c38a87beb7627b4316da980339c6c3ff481ca6823975c97"
+    },
+    {
+      "file": "src/services/nutritionStrategyCascadeService.ts",
+      "unchanged": true,
+      "sha256": "38be5cfd552263ce426ff2a21389bdea584b7ac859a0fad011b639495ca66207"
+    },
+    {
+      "file": "src/services/nutritionStrategyService.ts",
+      "unchanged": true,
+      "sha256": "b1244382d68f60cdaaa8e152aada13d8e2381e7d456ee89572096b6f7002aef3"
+    },
+    {
+      "file": "src/services/nutritionTargetService.ts",
+      "unchanged": true,
+      "sha256": "99284e64e2fc17548ec4d7651cf87eb165d569f31561319662a683764ac7b203"
+    },
+    {
+      "file": "src/services/pelvicFloorPlan.ts",
+      "unchanged": true,
+      "sha256": "e5ea7f67efe2cdf397010b7f883e52f7d51c3ffed8d146a60942de545c27fd60"
+    },
+    {
+      "file": "src/services/pelvicFloorService.ts",
+      "unchanged": true,
+      "sha256": "7ad23b948fc683e847323fd3cbbddfe0029eaaa53c777f6e1c8ca5c439dbb436"
+    },
+    {
+      "file": "src/services/pelvicFloorTimer.ts",
+      "unchanged": true,
+      "sha256": "6388d28753bdab41fb15b9630a4a5b674077cc9075ed721bea693c3c673268a2"
+    },
+    {
+      "file": "src/services/pendingHealthOperations.ts",
+      "unchanged": true,
+      "sha256": "0c0e6dee9a092e927969d9bb1c921d6ca3766dddd04fe3d33323255b54f2c09f"
+    },
+    {
+      "file": "src/services/recordHistoryService.ts",
+      "unchanged": true,
+      "sha256": "2c16a56f1b30aa5fafccfb8009bbc762563041d4bbfc4e1343a05a1ea381b9b8"
+    },
+    {
+      "file": "src/services/recoveryService.ts",
+      "unchanged": true,
+      "sha256": "69f3dd3369c6f01d102496bbc8b4be0b0efe637aca1ccf177bee86811cf9abc1"
+    },
+    {
+      "file": "src/services/reportService.ts",
+      "unchanged": true,
+      "sha256": "17183d6bb632ef479af2a9b25a6987bcd795947be884a18fcc8d4e66342f8821"
+    },
+    {
+      "file": "src/services/retiredVideoStorage.ts",
+      "unchanged": true,
+      "sha256": "0497b32f1d2741cb5a09cabca7ac702be5b166ab60e972206d876acb8665e995"
+    },
+    {
+      "file": "src/services/speechRecognitionService.ts",
+      "unchanged": true,
+      "sha256": "76819aa2a10158a039f60ce07aa0b906cbbb192c9f5ecaaf9e94336faf0ea39d"
+    },
+    {
+      "file": "src/services/syncCryptoService.ts",
+      "unchanged": true,
+      "sha256": "05936f773091a1a56bc111119004c264dabbb0aa337f8e9d0d959d3c477ef7ed"
+    },
+    {
+      "file": "src/services/taskService.ts",
+      "unchanged": true,
+      "sha256": "899061da1cd3e36673009e1422a2329d452e0d6378967e02a4cc521eace22540"
+    },
+    {
+      "file": "src/services/taskTagService.ts",
+      "unchanged": true,
+      "sha256": "db9e9e3d803dca835258b330af78d18b36dadb56cbf3cce5397c749342d5ce0f"
+    },
+    {
+      "file": "src/services/templateService.ts",
+      "unchanged": true,
+      "sha256": "21bd23887030e697af78791a328c48213313098e90524b60cbeed71cd9b933ad"
+    },
+    {
+      "file": "src/services/voiceAudio.ts",
+      "unchanged": true,
+      "sha256": "16e8522226fe17325cd09a386ae4f0e8a6e4f0d77ebd0c9dae0cb1fd4a91f9ce"
+    },
+    {
+      "file": "src/services/voiceCaptureController.ts",
+      "unchanged": true,
+      "sha256": "fe3dc323e6e684b3cbe3af869aaa3ce93b03f53e512825c261cbf4accd3d2ed4"
+    },
+    {
+      "file": "src/services/voiceReply.ts",
+      "unchanged": true,
+      "sha256": "d39b4da3aaaa38294c90ae56adf6ef079fb141f963920dbe1144a37bc9078bc3"
+    },
+    {
+      "file": "src/services/voiceTranscriptionService.ts",
+      "unchanged": true,
+      "sha256": "1d65fc490719f1633dc159d133b53e9aa7f9ae34a68d1c4c6b54b8d23eb22489"
+    },
+    {
+      "file": "src/services/waterReferenceConfig.ts",
+      "unchanged": true,
+      "sha256": "176a760eecdc29b68467306fb7946c36261fcdab4225db26c5b2754456bd9d7a"
+    },
+    {
+      "file": "src/services/weightService.ts",
+      "unchanged": true,
+      "sha256": "caf1312707ce8b89d74331f3d7ac6ad7b0930bd206214149c95a6f1064c10dae"
+    },
+    {
+      "file": "src/services/workoutService.ts",
+      "unchanged": true,
+      "sha256": "d2210b21bab3477e2485b26f5d664318046b6b9b0d734b42694ca57d3faefd37"
+    },
+    {
+      "file": "src/styles/ai.css",
+      "unchanged": true,
+      "sha256": "d9eb8b3ef0e37395fa0a2f836fa3ed9e6b1feda15be5cbf57609042d92e70be9"
+    },
+    {
+      "file": "src/styles/appearance.css",
+      "unchanged": true,
+      "sha256": "0b6e9a0bc714e096eaf0900762ed1b5026993ed290fe91114e37b021c9b81ddd"
+    },
+    {
+      "file": "src/styles/coachReport.css",
+      "unchanged": true,
+      "sha256": "c6e17a8f4b3894714c343d93dd92c9e2084e9997d74ede6c90ead29d725b3e08"
+    },
+    {
+      "file": "src/styles/cycleReport.css",
+      "unchanged": true,
+      "sha256": "27df728b6d06be0cf526ecfcb0884a58537399153bc0d2ca444894dab7fb64a8"
+    },
+    {
+      "file": "src/styles/foodVision.css",
+      "unchanged": true,
+      "sha256": "067bf439ca9f6c46f300026b83b891974c40761f95069c887c7ff706ad7011ec"
+    },
+    {
+      "file": "src/styles/history.css",
+      "unchanged": true,
+      "sha256": "3066a9397b14414a4947aa8444eed84fed2e9205c4454682901f5b369337461a"
+    },
+    {
+      "file": "src/styles/interaction.css",
+      "unchanged": true,
+      "sha256": "e36043d12c406b844e8f120e80f9940815767e0167ae03be2787fd3eba9329cf"
+    },
+    {
+      "file": "src/styles/macroNutritionSummary.css",
+      "unchanged": true,
+      "sha256": "10a2179a93b81d36af1cbc94cbca0d194334f8afa4e28867b9e51de6f780a531"
+    },
+    {
+      "file": "src/styles/main.css",
+      "unchanged": true,
+      "sha256": "7a777ae59e01d1083633345940279d3b983c625f5f567e659419b31765ab30cf"
+    },
+    {
+      "file": "src/styles/modules.css",
+      "unchanged": true,
+      "sha256": "4219f65ed0d22c707e09d358328ee751181c51cf2b51f9199fb154ab2d80837e"
+    },
+    {
+      "file": "src/styles/nutritionBudget.css",
+      "unchanged": true,
+      "sha256": "0493a2f9270de95ff6dbab10e660a3a32cebc8396f60f5ea05abb9ee8cb6aa15"
+    },
+    {
+      "file": "src/styles/nutritionCycles.css",
+      "unchanged": true,
+      "sha256": "3eaf5302d0e66773ec63fd7b679a38d8dad5f01925fba23471630cceeb455a11"
+    },
+    {
+      "file": "src/styles/nutritionStrategies.css",
+      "unchanged": true,
+      "sha256": "1287c0076ef35faf1452c57dc08d8c25c9be82ca7c87bf07efc1edb639fca9b0"
+    },
+    {
+      "file": "src/styles/plan.css",
+      "unchanged": true,
+      "sha256": "078b8699b992a932663c45bde4d9134019ce24c7f7be298619c959de595d1dbf"
+    },
+    {
+      "file": "src/styles/primitives.css",
+      "unchanged": true,
+      "sha256": "20b0fc0d4af7aa2634168cc15543047d7f504a06e2de93a3872fd2511efc2d64"
+    },
+    {
+      "file": "src/styles/pwa.css",
+      "unchanged": true,
+      "sha256": "02de55f1348da58ed44cf833f1d435d07af906f7940af0bb67dcbf09e5584354"
+    },
+    {
+      "file": "src/styles/recovery.css",
+      "unchanged": false,
+      "sha256": "02eaf353e28e556fd8f003d5f6cb18a2a14f9cda07ffed5d965f708afc2e6dee"
+    },
+    {
+      "file": "src/styles/sheets.css",
+      "unchanged": true,
+      "sha256": "a3a64e847aa380a8f0c1a55787e6c9b50ae724879e6bff21153515c35ec36d1c"
+    },
+    {
+      "file": "src/styles/trainingCompletion.css",
+      "unchanged": true,
+      "sha256": "0d7f9996cbe95b7ce852b6d90deb6bd5daf41b197901005b1873a818da172b65"
+    },
+    {
+      "file": "src/ui/actionToast.ts",
+      "unchanged": true,
+      "sha256": "28acd3f5d734beb0ff18928aa71857d929f8977c873b0a30ee8799d0c518b7fa"
+    },
+    {
+      "file": "src/ui/aiAssistant.ts",
+      "unchanged": true,
+      "sha256": "7900aac6ee31c7300e0b7c1e9c73b21b75a8fb79db46df19a543d794cce0f3bf"
+    },
+    {
+      "file": "src/ui/aiSettings.ts",
+      "unchanged": true,
+      "sha256": "d9a077551e83f37c4409a7f90540f23fa47c0fb22141bf4c953b24ef7c80f5f3"
+    },
+    {
+      "file": "src/ui/aiUiHelpers.ts",
+      "unchanged": true,
+      "sha256": "45e1b8a092408cd11b71c4b59bec5fec24ff4870f296acd557294c026c1aee0d"
+    },
+    {
+      "file": "src/ui/appearance.ts",
+      "unchanged": true,
+      "sha256": "23ee615aaeed38de265e4bef4eb56af761262ff78d695ccfd0d64ce38dc03b28"
+    },
+    {
+      "file": "src/ui/calendarPage.ts",
+      "unchanged": true,
+      "sha256": "cbc80730c92758717f0591a55d2878bedb55967dc6303fb155769ebe8e471679"
+    },
+    {
+      "file": "src/ui/calorieBudget.ts",
+      "unchanged": true,
+      "sha256": "63d77101745a7f6c45d841b27ae253f608cd7a6fd4eaae423c5e042a94f91dab"
+    },
+    {
+      "file": "src/ui/calorieGaugeGeometry.ts",
+      "unchanged": true,
+      "sha256": "2af12383d15866545e5d34696b9ff958b685c85e0964065c0c06c6bc2dd6e4c6"
+    },
+    {
+      "file": "src/ui/coachReport.ts",
+      "unchanged": true,
+      "sha256": "5829822798feeacf79b30e4a95bf246c6f1187da73ca9a10bf5e9382621480b0"
+    },
+    {
+      "file": "src/ui/datePicker.ts",
+      "unchanged": true,
+      "sha256": "e821181bf62ecbfee133495d0d5023cec79cd5d76304b8b0006e9edd70b2a933"
+    },
+    {
+      "file": "src/ui/dayDetail.ts",
+      "unchanged": true,
+      "sha256": "1a424f2c56835b20cdc6a985a7705e2e683dde950d2373b75d34cb05761ecae6"
+    },
+    {
+      "file": "src/ui/dayRecordManagement.ts",
+      "unchanged": true,
+      "sha256": "aa5dc605b49bb1f020b81aae85565938ed357198049da6da9bddce90748330a4"
+    },
+    {
+      "file": "src/ui/dietEvents.ts",
+      "unchanged": true,
+      "sha256": "ea60dc01a0cc86a594625038c89a5c80c4494ce23fc36432112cf287761aa0ed"
+    },
+    {
+      "file": "src/ui/energyEditor.ts",
+      "unchanged": true,
+      "sha256": "680c791545580406d2c5592a0810c6ad209f17a58c7caa348021f9ab14dc6f90"
+    },
+    {
+      "file": "src/ui/foodPager.ts",
+      "unchanged": true,
+      "sha256": "d38d161793482ddd250d85ef78025f8121153b9fc446f6c522c0e38021584a96"
+    },
+    {
+      "file": "src/ui/foodQuantity.ts",
+      "unchanged": true,
+      "sha256": "dd9661c4725c96d5bd0d7102f58e42a228f69de958250ffaf8c54fa54c292558"
+    },
+    {
+      "file": "src/ui/foodVisionImport.ts",
+      "unchanged": true,
+      "sha256": "9327b98d551004d793261952cae97cabf5aee4681677631a84a3d5cbcee67d71"
+    },
+    {
+      "file": "src/ui/githubSync.ts",
+      "unchanged": true,
+      "sha256": "14061aa4095a124b8922b66cb3ab63ba00c480a1b5c45ffc41d437b8faec5a67"
+    },
+    {
+      "file": "src/ui/githubSyncSetup.ts",
+      "unchanged": true,
+      "sha256": "4550ecaa9449611f98c101228dbb02f4ef92ea7e656d2303eb436dd42e526e12"
+    },
+    {
+      "file": "src/ui/habitPresentation.ts",
+      "unchanged": true,
+      "sha256": "8f9b56300845b2b1f9a486feab2043e059da117883c0690800eb39fd412cd2ad"
+    },
+    {
+      "file": "src/ui/icons.ts",
+      "unchanged": true,
+      "sha256": "819a9cce56904ecf6a860895b76ff740f35d7c2d3e19c0dc5881f69deeed5a78"
+    },
+    {
+      "file": "src/ui/inputModality.ts",
+      "unchanged": true,
+      "sha256": "956198d6fd59d838c05bad0afb7be8859df7b8d2956cfc9cb994319c5af66020"
+    },
+    {
+      "file": "src/ui/macroNutritionSummary.ts",
+      "unchanged": true,
+      "sha256": "e6101dd4b134eb7d7ec01fa58ab2c86e08df5a9852ea434c3de7f13e52c1bd05"
+    },
+    {
+      "file": "src/ui/managementWorkspace.ts",
+      "unchanged": true,
+      "sha256": "be06039bc366a24eef96961d8a38752993a3ab16687f22f34eea956336f99087"
+    },
+    {
+      "file": "src/ui/managerPrimitives.ts",
+      "unchanged": true,
+      "sha256": "f85712057a2282205f6e8eea4c51650d2e3b95fff9cf4cc7849eae98377d8221"
+    },
+    {
+      "file": "src/ui/mealEntry.ts",
+      "unchanged": true,
+      "sha256": "019b1e5042cad9c8ce7d4e34591cbbd999d643cd8a4679ac4cca788466aa6cb6"
+    },
+    {
+      "file": "src/ui/motion.ts",
+      "unchanged": true,
+      "sha256": "0ecc09d3981f0f4e355afe2a3db36ceab3aab7c0892539b9bbbae773070e9d24"
+    },
+    {
+      "file": "src/ui/numericPresentation.ts",
+      "unchanged": true,
+      "sha256": "a8cbdcddbdb127266c571b9f2d8380336790a89e6b7aacb9b6670dd4524cf8bd"
+    },
+    {
+      "file": "src/ui/nutritionCompletion.ts",
+      "unchanged": true,
+      "sha256": "b0c86a0c177a9d3eb950ae2c1debbbbc3620108db78e34a6c9dcbfd5b4a5bc5a"
+    },
+    {
+      "file": "src/ui/nutritionCompletionSheet.ts",
+      "unchanged": true,
+      "sha256": "b6cd44cd0c9fc08c80582e3b2af7849a22bbde012f8de06bb59b25d21dfcd9aa"
+    },
+    {
+      "file": "src/ui/nutritionCycleReport.ts",
+      "unchanged": true,
+      "sha256": "c0742d28490f00969b3e628c71b585d27ea28b7fef5e81f51ab1c603d1918ccc"
+    },
+    {
+      "file": "src/ui/nutritionCycles.ts",
+      "unchanged": true,
+      "sha256": "c33e28134bd9a24fa1927bea7a4a47629ad9a0a818de0063360134aef3aefa91"
+    },
+    {
+      "file": "src/ui/nutritionStrategies.ts",
+      "unchanged": true,
+      "sha256": "1070d1df730a550f0c7db7d57f496cb0ebd9ac69b367771b950244a5f58b6430"
+    },
+    {
+      "file": "src/ui/nutritionStrategyCascade.ts",
+      "unchanged": true,
+      "sha256": "a9978289da96c9c3eb5f1854d549cdc9ba41ad092adfc9fd6b66719548d57d34"
+    },
+    {
+      "file": "src/ui/observeManagerCatalog.ts",
+      "unchanged": true,
+      "sha256": "5964938afe97d0704683fb337057358d942a92e234f828d4661c11cc977edfd8"
+    },
+    {
+      "file": "src/ui/pagedHistory.ts",
+      "unchanged": true,
+      "sha256": "91ec95a183d0679aa7e1d94b50cd6fe039c5ac2c38cea21f0a80c6eab690f332"
+    },
+    {
+      "file": "src/ui/progressRing.ts",
+      "unchanged": true,
+      "sha256": "3390d1de7dc54dc4516dfe97764f48d0fa2a7199a4a7016da71bc21e8184b013"
+    },
+    {
+      "file": "src/ui/pwaDiagnostics.ts",
+      "unchanged": true,
+      "sha256": "e499cacc2b4e341d1368edf325bced592e8131e5d5d2aa611d9e365463c83984"
+    },
+    {
+      "file": "src/ui/quickLaunch.ts",
+      "unchanged": true,
+      "sha256": "ba8eea0ac1c1c93cfdc96af7c8261bb523924a1dd4cd16d0bf65d637607f96bd"
+    },
+    {
+      "file": "src/ui/recordHistory.ts",
+      "unchanged": true,
+      "sha256": "fc194e9edb3112873de8a21bcb0ea88314d289b4b76e9153881bb5c127cbd75e"
+    },
+    {
+      "file": "src/ui/recovery.ts",
+      "unchanged": false,
+      "sha256": "96e407904cb249d47d7e1f3b37509908e9e77b967ffbd3bd555225264f53973f"
+    },
+    {
+      "file": "src/ui/recoveryLineChart.ts",
+      "unchanged": true,
+      "sha256": "33dd3396dc73e10615a56e65e60d6561ae2224d55cf8f8c6db141ef8148d9345"
+    },
+    {
+      "file": "src/ui/recoveryReport.ts",
+      "unchanged": true,
+      "sha256": "c063f371f10ece23ccff19a6d890c6a18c86a626b160c9657e336be8969c7d9c"
+    },
+    {
+      "file": "src/ui/remainingNutritionGoals.ts",
+      "unchanged": true,
+      "sha256": "ce82afb033d68e8b3b2ad0995e22eb40687184a7fc06e29980f2fa3461204c32"
+    },
+    {
+      "file": "src/ui/reportChapters.ts",
+      "unchanged": true,
+      "sha256": "bbb1da48d6103b99982239753bc93c5a4e47a507fb5bb7ab36260be1706aa374"
+    },
+    {
+      "file": "src/ui/reportObservations.ts",
+      "unchanged": true,
+      "sha256": "a7b7be572669b80ec36f41c62756e10c69fb20bc69052416510ef8b8d930fb83"
+    },
+    {
+      "file": "src/ui/revealOwnedContent.ts",
+      "unchanged": true,
+      "sha256": "3461690b5fc3bedb35f45900b08bebcf70a443b9196ccdb2fd09a3ac8402846b"
+    },
+    {
+      "file": "src/ui/sheetController.ts",
+      "unchanged": true,
+      "sha256": "1af9b22e05a47f50f5b897716e4062427f6c2c3ff108244553dc2867627f9209"
+    },
+    {
+      "file": "src/ui/sheetViewport.ts",
+      "unchanged": true,
+      "sha256": "5ff3806d6096a794001672328c72a264114979c4e58dd32f152a71ef94c0fe41"
+    },
+    {
+      "file": "src/ui/sleepTimeline.ts",
+      "unchanged": true,
+      "sha256": "4142ec7d2d894b5570f35088491f5382eb231f1bf9746b65abc507b3baf2fbae"
+    },
+    {
+      "file": "src/ui/trainingCompletion.ts",
+      "unchanged": true,
+      "sha256": "5444b2f280087ae5da04eddc24ac3635b62b4e575b13f1cc77dd3714498d135c"
+    },
+    {
+      "file": "src/ui/trendGeometry.ts",
+      "unchanged": true,
+      "sha256": "3bd77e3137b4c731b6a4db846627cdd0b4bcb76b49e2e27b231c5db62aeeddce"
+    },
+    {
+      "file": "src/ui/trendInteraction.ts",
+      "unchanged": true,
+      "sha256": "9e7fe01091edd2285a46b2507ff2b831ea0f0ef271e7c0d34dc2839057ed85dd"
+    },
+    {
+      "file": "src/ui/trendModule.ts",
+      "unchanged": true,
+      "sha256": "34c2c09a16a5904c460520fb7e2c150348c705e9fb02cbc9e070cffd2d24c45a"
+    },
+    {
+      "file": "src/ui/voiceSettings.ts",
+      "unchanged": true,
+      "sha256": "072da6241d1be9fdde0b4d2350b2b440f2b6621a83891957fcacafc7dc6fbf5d"
+    },
+    {
+      "file": "src/ui/weightChart.ts",
+      "unchanged": true,
+      "sha256": "b92d8944af8ee3fb395cd300164d42d6de675af7b59e923c7c7ea534b74d8872"
+    },
+    {
+      "file": "src/ui/weightHistory.ts",
+      "unchanged": true,
+      "sha256": "2fceefc15fef53a13eb3a83152a8812b811258b927b68836c8f37095e514c6a2"
+    },
+    {
+      "file": "src/ui/weightTrend.ts",
+      "unchanged": true,
+      "sha256": "09ba7be78792059d72afa13b23e45f2b257df71eeac3011cb7bfc71a0ce7f2f4"
+    },
+    {
+      "file": "src/utils/calendarGrid.ts",
+      "unchanged": true,
+      "sha256": "5de7fac5f4c7f34bd5489df5a13b4392f31969a4b1ed45fa14fbdc183cd391a4"
+    },
+    {
+      "file": "src/utils/cardio.ts",
+      "unchanged": true,
+      "sha256": "3f525ba9d95f8f247ea3b2be5ad7b808d9f947f726d3a1f7a553d883cb9c6417"
+    },
+    {
+      "file": "src/utils/coachReportAnalysis.ts",
+      "unchanged": true,
+      "sha256": "682cc3f992b185a3e530f644e4bb97daf94afb101dcbd8249743bba2f247d7d6"
+    },
+    {
+      "file": "src/utils/date.ts",
+      "unchanged": true,
+      "sha256": "d9df07fabc2e041c2a850a02afa02509140c3635fb0ebb61bcde7ebffd2e32ee"
+    },
+    {
+      "file": "src/utils/designatedNutrition.ts",
+      "unchanged": true,
+      "sha256": "518d72d4a8debff30a5bd6a0b3ba3551b811316cd8f41dd4adfa17f26c5f449f"
+    },
+    {
+      "file": "src/utils/energy.ts",
+      "unchanged": true,
+      "sha256": "5f1e61a41fbaa4e271e54283a62d1b5b6c2511f44518ab4e14eadf29c80f8b97"
+    },
+    {
+      "file": "src/utils/exercisePerformanceAnalysis.ts",
+      "unchanged": true,
+      "sha256": "0788f24bb6e7232c6f29f3a3014a0b34fdb0a4e5d316d1b719a7dd25b063a321"
+    },
+    {
+      "file": "src/utils/foodMeals.ts",
+      "unchanged": true,
+      "sha256": "7ce1949fdb3334ff0246e5237647a1fac16f9cddbad7a968202a44f473fb65c5"
+    },
+    {
+      "file": "src/utils/foodQuantity.ts",
+      "unchanged": true,
+      "sha256": "7621376e7572c608eacd44445091e80426c894fb5c691436c41392d4d5e1d71f"
+    },
+    {
+      "file": "src/utils/githubSyncDecision.ts",
+      "unchanged": true,
+      "sha256": "2037c41438b59f13842b18d3a70594162808273458b046ea0ae858435bbc102f"
+    },
+    {
+      "file": "src/utils/nutrition.ts",
+      "unchanged": true,
+      "sha256": "fa0b7278dff64f0e931c8b1184179cdd670b718dae75c752db50a75f198e6abe"
+    },
+    {
+      "file": "src/utils/nutritionCompletion.ts",
+      "unchanged": true,
+      "sha256": "08f0ea9e29a1f9b16a004916f580ed44bda09cc767990d90a8e661193b81b325"
+    },
+    {
+      "file": "src/utils/nutritionCycleReport.ts",
+      "unchanged": true,
+      "sha256": "02ed12a4c51316cb30b03656b85e88ce032d1ca4c34afa991b55d4616a0b339d"
+    },
+    {
+      "file": "src/utils/recovery.ts",
+      "unchanged": true,
+      "sha256": "859440b1b576c597f98756f5981664fa2642c82b2a287de899b1a73cc1816260"
+    },
+    {
+      "file": "src/utils/reportObservations.ts",
+      "unchanged": true,
+      "sha256": "1219bf62aab8a4a09ee1a444a0864314ecb84d098a4692195a344e731457cfe8"
+    },
+    {
+      "file": "src/utils/reporting.ts",
+      "unchanged": true,
+      "sha256": "9beb1afa44025c733c9e668c12204993a205347a2990497061d2cabe2d605399"
+    },
+    {
+      "file": "src/utils/sleepBusinessDate.ts",
+      "unchanged": true,
+      "sha256": "1d5b9c5351efb5b77ebbeaf7fc204eff9584382663ec20ff4acdfad38fba36c8"
+    },
+    {
+      "file": "src/utils/syncDataHash.ts",
+      "unchanged": true,
+      "sha256": "2fe49582f9bbdb9b7757e34a56645d9808afd67efe5dd35ab0e37f5e3b95a850"
+    },
+    {
+      "file": "src/utils/taskTags.ts",
+      "unchanged": true,
+      "sha256": "d64580310a234ae507ac223e4903d794c81372f0dbbc34289e7ee6595a8af265"
+    },
+    {
+      "file": "src/utils/todayActivity.ts",
+      "unchanged": true,
+      "sha256": "8707dde3caaf9c1c4f2ccbbdb6e1765c1b210e89eb0283e1572b312b05e4351d"
+    },
+    {
+      "file": "src/utils/trainingVolumeAnalysis.ts",
+      "unchanged": true,
+      "sha256": "62b82b2a16ebc2bca32a1a69f92287af7d4b6e1189a97a2006bea1e2c55a8a76"
+    },
+    {
+      "file": "src/utils/validation.ts",
+      "unchanged": true,
+      "sha256": "3acb6711a7cd834033c16f1cecc8745a4abe32a3443d651ee7ed432866f8f7bb"
+    },
+    {
+      "file": "tests/fixtures/approvedFoodWaterBackupV14.json",
+      "unchanged": true,
+      "sha256": "40c18e364daa0d06a956bd8cd09c163c705e18e42d3c5b4240a477719947a1f7"
+    },
+    {
+      "file": "tests/fixtures/jointRangeCascadeBackupV14.json",
+      "unchanged": true,
+      "sha256": "184dbfb13b1f9474a36c94e2da0ad8cff7e3f76e126bf14bd7a7262620852710"
+    },
+    {
+      "file": "tests/fixtures/legacyV10Data.json",
+      "unchanged": true,
+      "sha256": "bc9c8c8f2b053e12eef31620e322b0e811ab9b638ad0886a28805e61d17b2c1d"
+    },
+    {
+      "file": "tests/fixtures/legacyV10Database.ts",
+      "unchanged": true,
+      "sha256": "61880d7618bb9ad5ee38b66e0c9ec710a19f08f33cda6c705bebe32980a7f6a6"
+    },
+    {
+      "file": "tests/fixtures/legacyV11Data.json",
+      "unchanged": true,
+      "sha256": "267a208890c3ca5556e8db1ea6e139409f0033e3060008c63d4d97b4b8daebf8"
+    },
+    {
+      "file": "tests/fixtures/legacyV11Database.ts",
+      "unchanged": true,
+      "sha256": "d7403f97317ec7ba1120bc95350d8615a6ff70cfac343fa926967e396fcdd8ff"
+    },
+    {
+      "file": "tests/fixtures/legacyV12Data.json",
+      "unchanged": true,
+      "sha256": "b8663c210d0e324bc0e531ec2d7ef1c1f0383c83a05afbcca5e3a612f378c706"
+    },
+    {
+      "file": "tests/fixtures/legacyV12Database.ts",
+      "unchanged": true,
+      "sha256": "cce661c685f820e71c363c581febeffac1ef9a231f8a35150f27ab9e7c072b5b"
+    },
+    {
+      "file": "tests/fixtures/legacyV13Data.json",
+      "unchanged": true,
+      "sha256": "cfce46db7e120b1361c256d3fef17c62f67aeb4759033e0dc5fa2916cff374ba"
+    },
+    {
+      "file": "tests/fixtures/legacyV13Database.ts",
+      "unchanged": true,
+      "sha256": "738e3d3d87f2ef8081bcebc30087c31ee529cd401a056f7af3ba6585edd1de6a"
+    },
+    {
+      "file": "tests/fixtures/legacyV7Data.json",
+      "unchanged": true,
+      "sha256": "b22bb2209b6c774f625c910936ed00f7b4934896409398a52ea312ebd181acea"
+    },
+    {
+      "file": "tests/fixtures/legacyV7Database.ts",
+      "unchanged": true,
+      "sha256": "25dbc7c9437efc51505fd0fe05d92867f2dc18bda6d13084bad955c79989dd3b"
+    },
+    {
+      "file": "tests/fixtures/legacyV8Data.json",
+      "unchanged": true,
+      "sha256": "7d3a54765c7502875cdf8098cd3254d3b8952a8d75d1c7c62930f8689653289e"
+    },
+    {
+      "file": "tests/fixtures/legacyV8Database.ts",
+      "unchanged": true,
+      "sha256": "cd4693e145341f5253bca3da16d38136ed414e669935f3d58f5cd6dcadf635e2"
+    },
+    {
+      "file": "tests/fixtures/legacyV9Data.json",
+      "unchanged": true,
+      "sha256": "a14016bf5d8de6cd75ad50ae850e98fdced5aa1feb72ca172cb849fcf6de1224"
+    },
+    {
+      "file": "tests/fixtures/legacyV9Database.ts",
+      "unchanged": true,
+      "sha256": "dc0cfc2ce5417a236a42e39a4954f5e52d80e903300ef5eccf5fdb7d87f5b4fc"
+    },
+    {
+      "file": "tests/fixtures/uxNutritionCascadeBackupV14.json",
+      "unchanged": true,
+      "sha256": "535526c485d18efe22d53feb447a1ee7fd6bfc72e6b6c8125adfd098cf41a97d"
+    }
+  ]
+}

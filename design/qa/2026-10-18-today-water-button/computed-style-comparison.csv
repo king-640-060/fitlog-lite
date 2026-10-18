@@ -1,0 +1,157 @@
+engine,theme,state,property,beforeWater,afterWater,weight,sleep,training
+chromium,light,normal/expanded,backgroundColor,"rgba(0, 0, 0, 0)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)"
+chromium,light,normal/expanded,color,"rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)"
+chromium,light,normal/expanded,borderRadius,12px,12px,12px,12px,12px
+chromium,light,normal/expanded,paddingTop,0px,0px,0px,0px,0px
+chromium,light,normal/expanded,paddingRight,0px,11px,11px,11px,11px
+chromium,light,normal/expanded,paddingBottom,0px,0px,0px,0px,0px
+chromium,light,normal/expanded,paddingLeft,4px,11px,11px,11px,11px
+chromium,light,normal/expanded,minHeight,44px,44px,44px,44px,44px
+chromium,light,normal/expanded,fontSize,13px,14px,14px,14px,14px
+chromium,light,normal/expanded,fontWeight,650,700,700,700,700
+chromium,light,normal/expanded,borderTopWidth,0px,0px,0px,0px,0px
+chromium,light,normal/expanded,opacity,1,1,1,1,1
+chromium,light,pressed,backgroundColor,"rgba(0, 0, 0, 0)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)"
+chromium,light,pressed,color,"rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)"
+chromium,light,pressed,borderRadius,12px,12px,12px,12px,12px
+chromium,light,pressed,paddingTop,0px,0px,0px,0px,0px
+chromium,light,pressed,paddingRight,0px,11px,11px,11px,11px
+chromium,light,pressed,paddingBottom,0px,0px,0px,0px,0px
+chromium,light,pressed,paddingLeft,4px,11px,11px,11px,11px
+chromium,light,pressed,minHeight,44px,44px,44px,44px,44px
+chromium,light,pressed,fontSize,13px,14px,14px,14px,14px
+chromium,light,pressed,fontWeight,650,700,700,700,700
+chromium,light,pressed,borderTopWidth,0px,0px,0px,0px,0px
+chromium,light,pressed,opacity,0.7,1,1,1,1
+chromium,light,disabled,backgroundColor,"rgba(0, 0, 0, 0)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)"
+chromium,light,disabled,color,"rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)"
+chromium,light,disabled,borderRadius,12px,12px,12px,12px,12px
+chromium,light,disabled,paddingTop,0px,0px,0px,0px,0px
+chromium,light,disabled,paddingRight,0px,11px,11px,11px,11px
+chromium,light,disabled,paddingBottom,0px,0px,0px,0px,0px
+chromium,light,disabled,paddingLeft,4px,11px,11px,11px,11px
+chromium,light,disabled,minHeight,44px,44px,44px,44px,44px
+chromium,light,disabled,fontSize,13px,14px,14px,14px,14px
+chromium,light,disabled,fontWeight,650,700,700,700,700
+chromium,light,disabled,borderTopWidth,0px,0px,0px,0px,0px
+chromium,light,disabled,opacity,0.48,0.48,0.48,0.48,0.48
+chromium,light,keyboard,outlineStyle,solid,solid,solid,solid,solid
+chromium,light,keyboard,outlineWidth,2px,2px,2px,2px,2px
+chromium,light,keyboard,outlineColor,"rgb(110, 139, 67)","rgb(110, 139, 67)","rgb(110, 139, 67)","rgb(110, 139, 67)","rgb(110, 139, 67)"
+chromium,dark,normal/expanded,backgroundColor,"rgba(0, 0, 0, 0)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)"
+chromium,dark,normal/expanded,color,"rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)"
+chromium,dark,normal/expanded,borderRadius,12px,12px,12px,12px,12px
+chromium,dark,normal/expanded,paddingTop,0px,0px,0px,0px,0px
+chromium,dark,normal/expanded,paddingRight,0px,11px,11px,11px,11px
+chromium,dark,normal/expanded,paddingBottom,0px,0px,0px,0px,0px
+chromium,dark,normal/expanded,paddingLeft,4px,11px,11px,11px,11px
+chromium,dark,normal/expanded,minHeight,44px,44px,44px,44px,44px
+chromium,dark,normal/expanded,fontSize,13px,14px,14px,14px,14px
+chromium,dark,normal/expanded,fontWeight,650,700,700,700,700
+chromium,dark,normal/expanded,borderTopWidth,0px,0px,0px,0px,0px
+chromium,dark,normal/expanded,opacity,1,1,1,1,1
+chromium,dark,pressed,backgroundColor,"rgba(0, 0, 0, 0)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)"
+chromium,dark,pressed,color,"rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)"
+chromium,dark,pressed,borderRadius,12px,12px,12px,12px,12px
+chromium,dark,pressed,paddingTop,0px,0px,0px,0px,0px
+chromium,dark,pressed,paddingRight,0px,11px,11px,11px,11px
+chromium,dark,pressed,paddingBottom,0px,0px,0px,0px,0px
+chromium,dark,pressed,paddingLeft,4px,11px,11px,11px,11px
+chromium,dark,pressed,minHeight,44px,44px,44px,44px,44px
+chromium,dark,pressed,fontSize,13px,14px,14px,14px,14px
+chromium,dark,pressed,fontWeight,650,700,700,700,700
+chromium,dark,pressed,borderTopWidth,0px,0px,0px,0px,0px
+chromium,dark,pressed,opacity,0.7,1,1,1,1
+chromium,dark,disabled,backgroundColor,"rgba(0, 0, 0, 0)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)"
+chromium,dark,disabled,color,"rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)"
+chromium,dark,disabled,borderRadius,12px,12px,12px,12px,12px
+chromium,dark,disabled,paddingTop,0px,0px,0px,0px,0px
+chromium,dark,disabled,paddingRight,0px,11px,11px,11px,11px
+chromium,dark,disabled,paddingBottom,0px,0px,0px,0px,0px
+chromium,dark,disabled,paddingLeft,4px,11px,11px,11px,11px
+chromium,dark,disabled,minHeight,44px,44px,44px,44px,44px
+chromium,dark,disabled,fontSize,13px,14px,14px,14px,14px
+chromium,dark,disabled,fontWeight,650,700,700,700,700
+chromium,dark,disabled,borderTopWidth,0px,0px,0px,0px,0px
+chromium,dark,disabled,opacity,0.48,0.48,0.48,0.48,0.48
+chromium,dark,keyboard,outlineStyle,solid,solid,solid,solid,solid
+chromium,dark,keyboard,outlineWidth,2px,2px,2px,2px,2px
+chromium,dark,keyboard,outlineColor,"rgb(159, 185, 122)","rgb(159, 185, 122)","rgb(159, 185, 122)","rgb(159, 185, 122)","rgb(159, 185, 122)"
+webkit,light,normal/expanded,backgroundColor,"rgba(0, 0, 0, 0)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)"
+webkit,light,normal/expanded,color,"rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)"
+webkit,light,normal/expanded,borderRadius,12px,12px,12px,12px,12px
+webkit,light,normal/expanded,paddingTop,0px,0px,0px,0px,0px
+webkit,light,normal/expanded,paddingRight,0px,11px,11px,11px,11px
+webkit,light,normal/expanded,paddingBottom,0px,0px,0px,0px,0px
+webkit,light,normal/expanded,paddingLeft,4px,11px,11px,11px,11px
+webkit,light,normal/expanded,minHeight,44px,44px,44px,44px,44px
+webkit,light,normal/expanded,fontSize,13px,14px,14px,14px,14px
+webkit,light,normal/expanded,fontWeight,650,700,700,700,700
+webkit,light,normal/expanded,borderTopWidth,0px,0px,0px,0px,0px
+webkit,light,normal/expanded,opacity,1,1,1,1,1
+webkit,light,pressed,backgroundColor,"rgba(0, 0, 0, 0)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)"
+webkit,light,pressed,color,"rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)"
+webkit,light,pressed,borderRadius,12px,12px,12px,12px,12px
+webkit,light,pressed,paddingTop,0px,0px,0px,0px,0px
+webkit,light,pressed,paddingRight,0px,11px,11px,11px,11px
+webkit,light,pressed,paddingBottom,0px,0px,0px,0px,0px
+webkit,light,pressed,paddingLeft,4px,11px,11px,11px,11px
+webkit,light,pressed,minHeight,44px,44px,44px,44px,44px
+webkit,light,pressed,fontSize,13px,14px,14px,14px,14px
+webkit,light,pressed,fontWeight,650,700,700,700,700
+webkit,light,pressed,borderTopWidth,0px,0px,0px,0px,0px
+webkit,light,pressed,opacity,0.7,1,1,1,1
+webkit,light,disabled,backgroundColor,"rgba(0, 0, 0, 0)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)","rgb(233, 240, 220)"
+webkit,light,disabled,color,"rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)","rgb(82, 114, 59)"
+webkit,light,disabled,borderRadius,12px,12px,12px,12px,12px
+webkit,light,disabled,paddingTop,0px,0px,0px,0px,0px
+webkit,light,disabled,paddingRight,0px,11px,11px,11px,11px
+webkit,light,disabled,paddingBottom,0px,0px,0px,0px,0px
+webkit,light,disabled,paddingLeft,4px,11px,11px,11px,11px
+webkit,light,disabled,minHeight,44px,44px,44px,44px,44px
+webkit,light,disabled,fontSize,13px,14px,14px,14px,14px
+webkit,light,disabled,fontWeight,650,700,700,700,700
+webkit,light,disabled,borderTopWidth,0px,0px,0px,0px,0px
+webkit,light,disabled,opacity,0.48,0.48,0.48,0.48,0.48
+webkit,light,keyboard,outlineStyle,solid,solid,solid,solid,solid
+webkit,light,keyboard,outlineWidth,2px,2px,2px,2px,2px
+webkit,light,keyboard,outlineColor,"rgb(110, 139, 67)","rgb(110, 139, 67)","rgb(110, 139, 67)","rgb(110, 139, 67)","rgb(110, 139, 67)"
+webkit,dark,normal/expanded,backgroundColor,"rgba(0, 0, 0, 0)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)"
+webkit,dark,normal/expanded,color,"rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)"
+webkit,dark,normal/expanded,borderRadius,12px,12px,12px,12px,12px
+webkit,dark,normal/expanded,paddingTop,0px,0px,0px,0px,0px
+webkit,dark,normal/expanded,paddingRight,0px,11px,11px,11px,11px
+webkit,dark,normal/expanded,paddingBottom,0px,0px,0px,0px,0px
+webkit,dark,normal/expanded,paddingLeft,4px,11px,11px,11px,11px
+webkit,dark,normal/expanded,minHeight,44px,44px,44px,44px,44px
+webkit,dark,normal/expanded,fontSize,13px,14px,14px,14px,14px
+webkit,dark,normal/expanded,fontWeight,650,700,700,700,700
+webkit,dark,normal/expanded,borderTopWidth,0px,0px,0px,0px,0px
+webkit,dark,normal/expanded,opacity,1,1,1,1,1
+webkit,dark,pressed,backgroundColor,"rgba(0, 0, 0, 0)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)"
+webkit,dark,pressed,color,"rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)"
+webkit,dark,pressed,borderRadius,12px,12px,12px,12px,12px
+webkit,dark,pressed,paddingTop,0px,0px,0px,0px,0px
+webkit,dark,pressed,paddingRight,0px,11px,11px,11px,11px
+webkit,dark,pressed,paddingBottom,0px,0px,0px,0px,0px
+webkit,dark,pressed,paddingLeft,4px,11px,11px,11px,11px
+webkit,dark,pressed,minHeight,44px,44px,44px,44px,44px
+webkit,dark,pressed,fontSize,13px,14px,14px,14px,14px
+webkit,dark,pressed,fontWeight,650,700,700,700,700
+webkit,dark,pressed,borderTopWidth,0px,0px,0px,0px,0px
+webkit,dark,pressed,opacity,0.7,1,1,1,1
+webkit,dark,disabled,backgroundColor,"rgba(0, 0, 0, 0)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)","rgb(48, 65, 42)"
+webkit,dark,disabled,color,"rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)","rgb(184, 214, 141)"
+webkit,dark,disabled,borderRadius,12px,12px,12px,12px,12px
+webkit,dark,disabled,paddingTop,0px,0px,0px,0px,0px
+webkit,dark,disabled,paddingRight,0px,11px,11px,11px,11px
+webkit,dark,disabled,paddingBottom,0px,0px,0px,0px,0px
+webkit,dark,disabled,paddingLeft,4px,11px,11px,11px,11px
+webkit,dark,disabled,minHeight,44px,44px,44px,44px,44px
+webkit,dark,disabled,fontSize,13px,14px,14px,14px,14px
+webkit,dark,disabled,fontWeight,650,700,700,700,700
+webkit,dark,disabled,borderTopWidth,0px,0px,0px,0px,0px
+webkit,dark,disabled,opacity,0.48,0.48,0.48,0.48,0.48
+webkit,dark,keyboard,outlineStyle,solid,solid,solid,solid,solid
+webkit,dark,keyboard,outlineWidth,2px,2px,2px,2px,2px
+webkit,dark,keyboard,outlineColor,"rgb(159, 185, 122)","rgb(159, 185, 122)","rgb(159, 185, 122)","rgb(159, 185, 122)","rgb(159, 185, 122)"

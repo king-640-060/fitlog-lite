@@ -1,0 +1,17 @@
+{"engine":"chromium","width":390,"font":100,"theme":"light","status":"PASS"}
+{"engine":"chromium","width":390,"font":100,"theme":"dark","status":"PASS"}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Undo does not scroll {"recorded":{"toggle":{"x":281.390625,"y":571.71875,"width":77.609375,"height":44,"right":359,"bottom":615.71875},"brief":{"x":31,"y":560.359375,"width":328,"height":66.734375,"right":359,"bottom":627.09375},"stats":{"x":31,"y":560.359375,"width":242.390625,"height":66.734375,"right":273.390625,"bottom":627.09375},"icon":{"x":343,"y":585.71875,"width":16,"height":16,"right":359,"bottom":601.71875},"text":{"x":285.39764404296875,"y":586.0634765625,"width":51.5953369140625,"height":15.310546875,"top":586.0634765625,"right":336.99298095703125,"bottom":601.3740234375,"left":285.39764404296875},"arrow":-1,"expanded":"true","hidden":false,"actions":{"x":31,"y":643.09375,"width":328,"height":102,"right":359,"bottom":745.09375},"navTop":753,"scroll":1025,"maxScroll":1050,"anchor":1585.359375,"rootOverflow":false,"clipped":[]},"undone":{"toggle":{"x":281.390625,"y":699.71875,"width":77.609375,"height":44,"right":359,"bottom":743.71875},"brief":{"x":31,"y":688.359375,"width":328,"height":66.734375,"right":359,"bottom":755.09375},"stats":{"x":31,"y":688.359375,"width":242.390625,"height":66.734375,"right":273.390625,"bottom":755.09375},"icon":{"x":343,"y":713.71875,"width":16,"height":16,"right":359,"bottom":729.71875},"text":{"x":285.39764404296875,"y":714.0634765625,"width":51.5953369140625,"height":15.310546875,"top":714.0634765625,"right":336.99298095703125,"bottom":729.3740234375,"left":285.39764404296875},"arrow":-1,"expanded":"true","hidden":false,"actions":{"x":31,"y":771.09375,"width":328,"height":102,"right":359,"bottom":873.09375},"navTop":753,"scroll":897,"maxScroll":1050,"anchor":1585.359375,"rootOverflow":false,"clipped":[]},"calls":[{"owner":"window","args":[{"top":108.09375,"behavior":"instant"}]},{"owner":"window","args":[{"top":128.09375,"behavior":"instant"}]}]}
+    at file:///Users/zhaozhantian/Documents/Codex/2026-09-24/files-pasted-by-the-user-king/work/fitlog-lite/tests/browser/todayWaterButton.mjs:51:590 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.16.0

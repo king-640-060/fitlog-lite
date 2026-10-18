@@ -1,0 +1,51 @@
+{
+  "url": "http://127.0.0.1:5341/fitlog-lite/",
+  "results": [
+    {
+      "name": "uxWaterCascade-chromium",
+      "file": "uxWaterCascade",
+      "engine": "chromium",
+      "start": "2026-10-18T05:18:13.390Z",
+      "end": "2026-10-18T05:20:51.699Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "uiQualityAudit",
+      "file": "uiQualityAudit",
+      "start": "2026-10-18T05:18:13.391Z",
+      "end": "2026-10-18T05:22:59.571Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "uxWaterCascade-webkit",
+      "file": "uxWaterCascade",
+      "engine": "webkit",
+      "start": "2026-10-18T05:20:51.700Z",
+      "end": "2026-10-18T05:23:25.492Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "joint-critical-chromium",
+      "file": "jointUxReportsRange",
+      "engine": "chromium",
+      "one": true,
+      "start": "2026-10-18T05:22:59.572Z",
+      "end": "2026-10-18T05:23:35.628Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "joint-critical-webkit",
+      "file": "jointUxReportsRange",
+      "engine": "webkit",
+      "one": true,
+      "start": "2026-10-18T05:23:25.493Z",
+      "end": "2026-10-18T05:23:59.302Z",
+      "exitCode": 0,
+      "status": "PASS"
+    }
+  ]
+}

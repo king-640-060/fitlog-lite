@@ -392,3 +392,7 @@ Follow [Approved joint v0.5 contract](APPROVED_JOINT_V05.md). It supersedes prio
 ## 2026-10-17 联合 v0.3 新批准范围
 
 [联合 UX / 报告 / 区间删除合同](JOINT_UX_REPORTS_RANGE_V03.md)在新范围内生效：Today SVG disclosure与必要时定位、三张独立全日轴趋势及逐部位7/30/90不变高、两类共享实际事实报告与明确非周期阶段、独立原子日期并集删除入口。此前四focus、空图移除、抽样日期、侧Y占宽及管理危险路径只删六类等说明仅作为旧轮历史；旧六类/unused-only/清日API本身仍保留原边界。计划及共享定义永远不随营养范围删除，DB/Backup/Restore/Sync版本不变；本轮真机验收独立Pending。
+
+## 2026-10-18 今日饮水按钮视觉小修复
+
+今日「记录饮水」复用 `secondary today-activity-action`，与体重、训练、空闲睡眠按钮共享配色、背景、圆角、内边距与交互状态；不同时使用 `text-btn`，避免透明背景及其独立按压规则。`water-expand-toggle` 只保留箭头排列、展开旋转，视觉尺寸由统一今日按钮规则提供。保留右侧独立列、44px触控高度、默认收起及原显露/记录/撤销逻辑，不改变Progress饮水Sheet、趋势、报告、删除和数据合同。此为用户直接批准的局部视觉修复，无新原型。
