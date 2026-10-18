@@ -59,20 +59,23 @@ export async function createWorkout(date: string): Promise<Workout> {
   return workout
 }
 
-export async function saveWorkout(workout: Workout, database: FitLogDatabase = db): Promise<Workout> {
-  const normalized = normalizeWorkoutForSave(workout)
-  normalized.updatedAt = new Date().toISOString()
-  await database.workouts.put(normalized)
-  return normalized
+async function persistWorkout(normalized:Workout,database:FitLogDatabase,requireExisting=false):Promise<Workout>{
+  const write=async()=>{if(requireExisting&&!await database.workouts.get(normalized.id))throw new Error('这条训练记录已删除；草稿未重新创建，请返回查看现有记录');await database.workouts.put(normalized);return normalized}
+  return requireExisting?database.transaction('rw',database.workouts,write):write()
 }
 
-export async function finishWorkout(workout: Workout, database: FitLogDatabase = db): Promise<Workout> {
+export async function saveWorkout(workout: Workout, database: FitLogDatabase = db, options:{requireExisting?:boolean}={}): Promise<Workout> {
+  const normalized = normalizeWorkoutForSave(workout)
+  normalized.updatedAt = new Date().toISOString()
+  return persistWorkout(normalized,database,options.requireExisting)
+}
+
+export async function finishWorkout(workout: Workout, database: FitLogDatabase = db, options:{requireExisting?:boolean}={}): Promise<Workout> {
   const normalized = normalizeWorkoutForSave(workout)
   if (!normalized.exercises.length) throw new Error('请至少添加一个动作')
   normalized.finishedAt = new Date().toISOString()
   normalized.updatedAt = normalized.finishedAt
-  await database.workouts.put(normalized)
-  return normalized
+  return persistWorkout(normalized,database,options.requireExisting)
 }
 
 export async function findOpenWorkout(date: string): Promise<Workout | undefined> {

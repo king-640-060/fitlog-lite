@@ -1,3 +1,4 @@
+import { rangeCascadeQaFixture } from './rangeCascadeFixture.mjs'
 // Actual Backup UI after a confirmed synthetic cascade, on both new and prior Backup14 clients.
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -5,11 +6,11 @@ import assert from 'node:assert/strict'
 import {createHash} from 'node:crypto'
 const pw=await import(process.env.FITLOG_PLAYWRIGHT_MODULE),engine=process.env.FITLOG_UX_ENGINE||'chromium'
 const b=await pw[engine].launch({headless:true,...(engine==='chromium'?{executablePath:process.env.FITLOG_CHROME}:{})}),root=path.resolve(process.env.FITLOG_UX_ARTIFACT_ROOT||'/tmp/ux-backup-'+engine)
-await fs.mkdir(root,{recursive:true});const input=JSON.parse(await fs.readFile('tests/fixtures/uxNutritionCascadeBackupV14.json')),results=[]
+await fs.mkdir(root,{recursive:true});const input=rangeCascadeQaFixture(JSON.parse(await fs.readFile('tests/fixtures/uxNutritionCascadeBackupV14.json'))),results=[]
 const hash=v=>createHash('sha256').update(JSON.stringify(v)).digest('hex'),sort=data=>Object.fromEntries(Object.entries(data).sort(([a],[b])=>a.localeCompare(b)).map(([n,rows])=>[n,[...rows].sort((a,b)=>a.id.localeCompare(b.id))]))
 let exported
 try{for(const stage of ['delete-and-export','prior-client-restore','new-client-restore']){
- const c=await b.newContext({viewport:{width:390,height:844},serviceWorkers:'block',timezoneId:'Asia/Shanghai'}),p=await c.newPage()
+ const c=await b.newContext({viewport:{width:390,height:844},serviceWorkers:'block',timezoneId:'Asia/Shanghai'}),p=await c.newPage();await p.clock.setFixedTime(new Date('2026-10-17T04:00:00Z'))
  try{
   const url=stage==='prior-client-restore'?(process.env.FITLOG_UX_BASELINE_URL||'http://127.0.0.1:5320/fitlog-lite/'):(process.env.FITLOG_QA_URL||'http://127.0.0.1:5297/fitlog-lite/')
   await p.goto(url,{waitUntil:'networkidle'});await p.locator('#open-management').waitFor()

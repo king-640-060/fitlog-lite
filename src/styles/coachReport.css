@@ -86,3 +86,18 @@
 .recovery-report .recovery-statistics > div:first-child,.recovery-report .recovery-statistics > div:nth-child(5) { background:var(--surface-soft); padding:10px 12px; border-radius:var(--control-radius); grid-row:1; }
 .recovery-report .recovery-statistics > div:first-child dd,.recovery-report .recovery-statistics > div:nth-child(5) dd { font-size:1.125rem; font-weight:700; }
 @media(max-width:18rem){ .recovery-report .recovery-statistics { grid-template-columns:minmax(0,1fr); } .recovery-report .recovery-statistics > div:nth-child(5) { grid-row:2; } }
+
+/* Approved v0.3: concise report chapters; complete professional evidence stays in native disclosure. */
+.report-chapter > summary { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:44px; list-style:none; cursor:pointer; }
+.report-chapter > summary::-webkit-details-marker { display:none; }
+.report-chapter > summary h2 { margin:0; font-size:var(--type-module); line-height:1.4; }
+.report-chapter[open] > summary > .icon { transform:rotate(90deg); }
+.report-chapter-body { padding-top:8px; }
+.report-chapter-body > .report-section { margin:0; padding:12px 0; border:0; border-radius:0; box-shadow:none; background:transparent; }
+.report-page .coach-report > .report-chapter { display:block; padding:6px 16px; }
+.report-chapter > summary { color:var(--text-primary); }
+
+.coach-observations { margin:10px 0 0; padding-left:1.25em; font-size:var(--type-meta); line-height:1.6; }
+.coach-observations > li + li { margin-top:12px; }
+.coach-observations p { margin:4px 0; }
+.coach-observation-evidence > summary { display:flex; align-items:center; min-height:44px; color:var(--text-secondary); cursor:pointer; }

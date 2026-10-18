@@ -40,3 +40,8 @@ Dexie13/IDB130/22表、Backup14/Restore1–14、Sync/envelope1不变，无schema
 发布保留原969项及全部旧浏览器gates（包含F1–F5双引擎UI/Backup），增加六表并发/回滚/保留事实单测和双引擎实际UI、Backup/旧当前客户端恢复验证。原型与产品同视口/字体/主题截图，320/375/390/430、100/140/200%、844横屏及共享键盘模拟。实际CI/Pages/资源/SW/同一合成profile/offline记录于本轮QA和交付回执。
 
 本轮新UX的实体iPhone Safari、原安装PWA、真实键盘/SafeArea、VoiceOver、个人数据连续性以及ChatGPT/用户验收须单独记录；没有实际证据为Pending。原F1–F5六组用户真机验收仍正式结案，不挪作新UX真机证明。
+
+
+## 2026-10-17 联合 v0.3 新批准范围
+
+[联合 UX / 报告 / 区间删除合同](JOINT_UX_REPORTS_RANGE_V03.md)在新范围内生效：Today SVG disclosure与必要时定位、三张独立全日轴趋势及逐部位7/30/90不变高、两类共享实际事实报告与明确非周期阶段、独立原子日期并集删除入口。此前四focus、空图移除、抽样日期、侧Y占宽及管理危险路径只删六类等说明仅作为旧轮历史；旧六类/unused-only/清日API本身仍保留原边界。计划及共享定义永远不随营养范围删除，DB/Backup/Restore/Sync版本不变；本轮真机验收独立Pending。

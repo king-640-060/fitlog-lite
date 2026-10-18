@@ -1,0 +1,418 @@
+{
+  "prototype": "/mnt/data/FitLog_Joint_Water_Trends_Reports_RangeDelete_Prototype_v0.3.html",
+  "sha256": "436f5eeaec511559026ffa7364be64b7d1fd94a63ee1cda04351efeed91e3991",
+  "status": "PASS",
+  "testedViewports": [
+    320,
+    375,
+    390,
+    430
+  ],
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "kinds": [
+    "weight",
+    "sleep",
+    "water"
+  ],
+  "ranges": [
+    7,
+    30,
+    90,
+    7
+  ],
+  "scenarios": 24,
+  "allSectionsInvariant": true,
+  "sleepEmptyStateInvariant": true,
+  "allDatesPresent": true,
+  "verticalScale90DayAnchor": true,
+  "chromiumPageErrors": [],
+  "measurements": [
+    {
+      "width": 320,
+      "theme": "light",
+      "kind": "weight",
+      "heightsPx": {
+        "card": 362.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 320,
+      "theme": "light",
+      "kind": "sleep",
+      "heightsPx": {
+        "card": 362.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 320,
+      "theme": "light",
+      "kind": "water",
+      "heightsPx": {
+        "card": 362.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "kind": "weight",
+      "heightsPx": {
+        "card": 362.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "kind": "sleep",
+      "heightsPx": {
+        "card": 362.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 320,
+      "theme": "dark",
+      "kind": "water",
+      "heightsPx": {
+        "card": 362.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 375,
+      "theme": "light",
+      "kind": "weight",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 375,
+      "theme": "light",
+      "kind": "sleep",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 375,
+      "theme": "light",
+      "kind": "water",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 375,
+      "theme": "dark",
+      "kind": "weight",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 375,
+      "theme": "dark",
+      "kind": "sleep",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 375,
+      "theme": "dark",
+      "kind": "water",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "kind": "weight",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "kind": "sleep",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "kind": "water",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "kind": "weight",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "kind": "sleep",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "kind": "water",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 430,
+      "theme": "light",
+      "kind": "weight",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 430,
+      "theme": "light",
+      "kind": "sleep",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 430,
+      "theme": "light",
+      "kind": "water",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 430,
+      "theme": "dark",
+      "kind": "weight",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 430,
+      "theme": "dark",
+      "kind": "sleep",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    },
+    {
+      "width": 430,
+      "theme": "dark",
+      "kind": "water",
+      "heightsPx": {
+        "card": 364.094,
+        "head": 23,
+        "plot": 184,
+        "svg": 150,
+        "axis": 31,
+        "range": 50,
+        "meta": 21,
+        "legend": 34.094
+      },
+      "allRangesEqual": true
+    }
+  ]
+}

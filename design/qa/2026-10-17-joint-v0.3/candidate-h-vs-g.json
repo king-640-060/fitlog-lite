@@ -1,0 +1,10 @@
+{
+  "productChangedFiles": [
+    "src/styles/coachReport.css"
+  ],
+  "change": "Only narrowly scoped report-chapter CSS block/padding6px16px/text-primary; TS/JS and all trend/data/runtime source unchanged. Global style precedence verified in native computed styles.",
+  "emittedJsEquivalentAfterAssetReferenceSubstitution": true,
+  "nativeClosedChapterHeight": 58,
+  "nativeSummaryTouchHeight": 44,
+  "finalCandidate": "H"
+}

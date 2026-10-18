@@ -1,0 +1,641 @@
+{
+  "candidate": "G complete trend/data matrix; H report CSS, I stale report filter and K CJK label wrap. Scoped complete regressions, both-engine filter/delete and final source manifest recorded; START identity/local=true. Clean published builds independently verified later",
+  "commands": [
+    {
+      "name": "aiAssistant",
+      "command": [
+        "node",
+        "tests/browser/aiAssistant.mjs"
+      ],
+      "start": "2026-10-17T13:49:51.522Z",
+      "end": "2026-10-17T13:50:33.835Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g/aiAssistant",
+      "environment": "http://127.0.0.1:5307/fitlog-lite/",
+      "resultManifest": "regression-g-results-4243.json"
+    },
+    {
+      "name": "aiDualModelRouting",
+      "command": [
+        "node",
+        "tests/browser/aiDualModelRouting.mjs"
+      ],
+      "start": "2026-10-17T13:49:51.522Z",
+      "end": "2026-10-17T13:50:47.834Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g/aiDualModelRouting",
+      "environment": "http://127.0.0.1:5307/fitlog-lite/",
+      "resultManifest": "regression-g-results-4243.json"
+    },
+    {
+      "name": "aiStreaming",
+      "command": [
+        "node",
+        "tests/browser/aiStreaming.mjs"
+      ],
+      "start": "2026-10-17T13:50:33.836Z",
+      "end": "2026-10-17T13:50:59.642Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g/aiStreaming",
+      "environment": "http://127.0.0.1:5307/fitlog-lite/",
+      "resultManifest": "regression-g-results-4243.json"
+    },
+    {
+      "name": "aiVoice",
+      "command": [
+        "node",
+        "tests/browser/aiVoice.mjs"
+      ],
+      "start": "2026-10-17T13:50:47.835Z",
+      "end": "2026-10-17T13:51:11.911Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g/aiVoice",
+      "environment": "http://127.0.0.1:5307/fitlog-lite/",
+      "resultManifest": "regression-g-results-4243.json"
+    },
+    {
+      "name": "catalogRecovery",
+      "command": [
+        "node",
+        "tests/browser/catalogRecovery.mjs"
+      ],
+      "start": "2026-10-17T13:50:59.643Z",
+      "end": "2026-10-17T13:52:14.790Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g/catalogRecovery",
+      "environment": "http://127.0.0.1:5307/fitlog-lite/",
+      "resultManifest": "regression-g-results-4243.json"
+    },
+    {
+      "name": "coachReportExperience",
+      "command": [
+        "node",
+        "tests/browser/coachReportExperience.mjs"
+      ],
+      "start": "2026-10-18T01:39:30.694Z",
+      "end": "2026-10-18T01:48:03.347Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-h-report/coachReportExperience",
+      "environment": "http://127.0.0.1:5310/fitlog-lite/",
+      "resultManifest": "regression-h-report-results-42030.json"
+    },
+    {
+      "name": "dailyRecordsExperience",
+      "command": [
+        "node",
+        "tests/browser/dailyRecordsExperience.mjs"
+      ],
+      "start": "2026-10-18T01:48:03.351Z",
+      "end": "2026-10-18T01:58:13.753Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-h-report/dailyRecordsExperience",
+      "environment": "http://127.0.0.1:5310/fitlog-lite/",
+      "resultManifest": "regression-h-report-results-42030.json"
+    },
+    {
+      "name": "dietEvents",
+      "command": [
+        "node",
+        "tests/browser/dietEvents.mjs"
+      ],
+      "start": "2026-10-18T01:21:18.608Z",
+      "end": "2026-10-18T01:24:24.563Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/dietEvents",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "foodRecovery",
+      "command": [
+        "node",
+        "tests/browser/foodRecovery.mjs"
+      ],
+      "start": "2026-10-18T01:24:24.564Z",
+      "end": "2026-10-18T01:27:52.160Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/foodRecovery",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "foodServing",
+      "command": [
+        "node",
+        "tests/browser/foodServing.mjs"
+      ],
+      "start": "2026-10-18T01:27:52.160Z",
+      "end": "2026-10-18T01:32:21.080Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/foodServing",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "foodVision",
+      "command": [
+        "node",
+        "tests/browser/foodVision.mjs"
+      ],
+      "start": "2026-10-17T13:59:55.016Z",
+      "end": "2026-10-17T14:01:14.260Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g/foodVision",
+      "environment": "http://127.0.0.1:5307/fitlog-lite/",
+      "resultManifest": "regression-g-results-4243.json"
+    },
+    {
+      "name": "githubSyncSafety",
+      "command": [
+        "node",
+        "tests/browser/githubSyncSafety.mjs"
+      ],
+      "start": "2026-10-18T01:30:18.538Z",
+      "end": "2026-10-18T01:30:59.114Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/githubSyncSafety",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "habitDeletion",
+      "command": [
+        "node",
+        "tests/browser/habitDeletion.mjs"
+      ],
+      "start": "2026-10-18T01:30:59.115Z",
+      "end": "2026-10-18T01:31:34.323Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/habitDeletion",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "habitEditorLayout",
+      "command": [
+        "node",
+        "tests/browser/habitEditorLayout.mjs"
+      ],
+      "start": "2026-10-18T01:31:34.323Z",
+      "end": "2026-10-18T01:32:38.467Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/habitEditorLayout",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "interactionStabilization",
+      "command": [
+        "node",
+        "tests/browser/interactionStabilization.mjs"
+      ],
+      "start": "2026-10-18T01:32:21.081Z",
+      "end": "2026-10-18T01:35:16.043Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/interactionStabilization",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "macroNutritionSummary",
+      "command": [
+        "node",
+        "tests/browser/macroNutritionSummary.mjs"
+      ],
+      "start": "2026-10-18T01:32:38.468Z",
+      "end": "2026-10-18T01:36:33.076Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/macroNutritionSummary",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "managementVisualConsistency",
+      "command": [
+        "node",
+        "tests/browser/managementVisualConsistency.mjs"
+      ],
+      "start": "2026-10-18T01:35:16.044Z",
+      "end": "2026-10-18T01:38:59.553Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/managementVisualConsistency",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "managementWorkspace",
+      "command": [
+        "node",
+        "tests/browser/managementWorkspace.mjs"
+      ],
+      "start": "2026-10-18T01:36:33.077Z",
+      "end": "2026-10-18T01:39:26.173Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/managementWorkspace",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "mobileLayout",
+      "command": [
+        "node",
+        "tests/browser/mobileLayout.mjs"
+      ],
+      "start": "2026-10-17T14:21:51.166Z",
+      "end": "2026-10-17T14:26:15.934Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g/mobileLayout",
+      "environment": "http://127.0.0.1:5307/fitlog-lite/",
+      "resultManifest": "regression-g-results-4243.json"
+    },
+    {
+      "name": "motionPolish",
+      "command": [
+        "node",
+        "tests/browser/motionPolish.mjs"
+      ],
+      "start": "2026-10-18T01:38:59.555Z",
+      "end": "2026-10-18T01:43:32.136Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/motionPolish",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "nutritionGauge",
+      "command": [
+        "node",
+        "tests/browser/nutritionGauge.mjs"
+      ],
+      "start": "2026-10-18T01:39:26.174Z",
+      "end": "2026-10-18T01:40:17.083Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/nutritionGauge",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "nutritionTemplates",
+      "command": [
+        "node",
+        "tests/browser/nutritionTemplates.mjs"
+      ],
+      "start": "2026-10-18T01:40:17.085Z",
+      "end": "2026-10-18T01:43:02.594Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/nutritionTemplates",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "sharedDatePicker",
+      "command": [
+        "node",
+        "tests/browser/sharedDatePicker.mjs"
+      ],
+      "start": "2026-10-18T01:43:02.596Z",
+      "end": "2026-10-18T01:43:26.067Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/sharedDatePicker",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "trainingJournal",
+      "command": [
+        "node",
+        "tests/browser/trainingJournal.mjs"
+      ],
+      "start": "2026-10-17T14:32:13.916Z",
+      "end": "2026-10-17T14:32:15.920Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g/trainingJournal",
+      "environment": "http://127.0.0.1:5307/fitlog-lite/",
+      "resultManifest": "regression-g-results-4243.json"
+    },
+    {
+      "name": "trainingRecoveryExperience",
+      "command": [
+        "node",
+        "tests/browser/trainingRecoveryExperience.mjs"
+      ],
+      "start": "2026-10-18T01:43:26.068Z",
+      "end": "2026-10-18T01:57:17.342Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/trainingRecoveryExperience",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "trainingRecoveryLifecycle",
+      "command": [
+        "node",
+        "tests/browser/trainingRecoveryLifecycle.mjs"
+      ],
+      "start": "2026-10-18T01:43:32.138Z",
+      "end": "2026-10-18T01:43:50.934Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/trainingRecoveryLifecycle",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "uiQualityAudit",
+      "command": [
+        "node",
+        "tests/browser/uiQualityAudit.mjs"
+      ],
+      "start": "2026-10-18T01:43:50.936Z",
+      "end": "2026-10-18T01:49:06.159Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/uiQualityAudit",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "uiSemanticConsistency",
+      "command": [
+        "node",
+        "tests/browser/uiSemanticConsistency.mjs"
+      ],
+      "start": "2026-10-18T01:49:06.160Z",
+      "end": "2026-10-18T01:50:39.274Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/uiSemanticConsistency",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "unifiedExperience",
+      "command": [
+        "node",
+        "tests/browser/unifiedExperience.mjs"
+      ],
+      "start": "2026-10-18T02:01:06.602Z",
+      "end": "2026-10-18T02:12:50.785Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-i-cycle/unifiedExperience",
+      "environment": "http://127.0.0.1:5311/fitlog-lite/",
+      "resultManifest": "regression-i-cycle-results-52042.json"
+    },
+    {
+      "name": "v421Consistency",
+      "command": [
+        "node",
+        "tests/browser/v421Consistency.mjs"
+      ],
+      "start": "2026-10-18T01:55:08.479Z",
+      "end": "2026-10-18T02:00:10.806Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/v421Consistency",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "v4FoodPlanToday",
+      "command": [
+        "node",
+        "tests/browser/v4FoodPlanToday.mjs"
+      ],
+      "start": "2026-10-18T01:57:17.344Z",
+      "end": "2026-10-18T02:03:48.539Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/v4FoodPlanToday",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "voiceMode",
+      "command": [
+        "node",
+        "tests/browser/voiceMode.mjs"
+      ],
+      "start": "2026-10-18T02:00:10.807Z",
+      "end": "2026-10-18T02:00:46.878Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/voiceMode",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "remainingPrototype",
+      "command": [
+        "node",
+        "tests/browser/remainingPrototype.mjs"
+      ],
+      "start": "2026-10-18T02:00:46.878Z",
+      "end": "2026-10-18T02:02:05.050Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/remainingPrototype",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "combinedHandoff",
+      "command": [
+        "node",
+        "tests/browser/combinedHandoff.mjs"
+      ],
+      "start": "2026-10-18T04:17:24.449Z",
+      "end": "2026-10-18T04:21:17.483Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-k-final/combinedHandoff",
+      "environment": "http://127.0.0.1:5313/fitlog-lite/",
+      "resultManifest": "regression-k-final-results-4864.json"
+    },
+    {
+      "name": "approvedJointV05",
+      "command": [
+        "node",
+        "tests/browser/approvedJointV05.mjs"
+      ],
+      "start": "2026-10-18T02:01:06.603Z",
+      "end": "2026-10-18T02:03:48.449Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-i-cycle/approvedJointV05",
+      "environment": "http://127.0.0.1:5311/fitlog-lite/",
+      "resultManifest": "regression-i-cycle-results-52042.json"
+    },
+    {
+      "name": "approvedJointV05-webkit",
+      "command": [
+        "node",
+        "tests/browser/approvedJointV05.mjs"
+      ],
+      "start": "2026-10-18T02:14:04.231Z",
+      "end": "2026-10-18T02:16:31.313Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-j-final/approvedJointV05-webkit",
+      "environment": "http://127.0.0.1:5312/fitlog-lite/",
+      "resultManifest": "regression-j-final-results-57257.json"
+    },
+    {
+      "name": "foodWaterDayV04",
+      "command": [
+        "node",
+        "tests/browser/foodWaterDayV04.mjs"
+      ],
+      "start": "2026-10-18T02:05:29.935Z",
+      "end": "2026-10-18T02:14:23.948Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/foodWaterDayV04",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "foodWaterDayV04-webkit",
+      "command": [
+        "node",
+        "tests/browser/foodWaterDayV04.mjs"
+      ],
+      "start": "2026-10-18T02:06:12.640Z",
+      "end": "2026-10-18T02:14:54.063Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/foodWaterDayV04-webkit",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "foodWaterBackupV04",
+      "command": [
+        "node",
+        "tests/browser/foodWaterBackupV04.mjs"
+      ],
+      "start": "2026-10-17T20:09:35.391Z",
+      "end": "2026-10-17T20:09:39.769Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-retry/foodWaterBackupV04",
+      "environment": "http://127.0.0.1:5307/fitlog-lite/",
+      "resultManifest": "regression-g-retry-results-14695.json"
+    },
+    {
+      "name": "foodWaterBackupV04-webkit",
+      "command": [
+        "node",
+        "tests/browser/foodWaterBackupV04.mjs"
+      ],
+      "start": "2026-10-17T20:09:39.769Z",
+      "end": "2026-10-17T20:09:43.900Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-retry/foodWaterBackupV04-webkit",
+      "environment": "http://127.0.0.1:5307/fitlog-lite/",
+      "resultManifest": "regression-g-retry-results-14695.json"
+    },
+    {
+      "name": "uxWaterCascade",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascade.mjs"
+      ],
+      "start": "2026-10-18T02:14:23.949Z",
+      "end": "2026-10-18T02:17:01.969Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-final/uxWaterCascade",
+      "environment": "http://127.0.0.1:5308/fitlog-lite/",
+      "resultManifest": "regression-g-final-results-33634.json"
+    },
+    {
+      "name": "uxWaterCascade-webkit",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascade.mjs"
+      ],
+      "start": "2026-10-17T20:10:51.047Z",
+      "end": "2026-10-17T20:24:41.287Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-retry/uxWaterCascade-webkit",
+      "environment": "http://127.0.0.1:5307/fitlog-lite/",
+      "resultManifest": "regression-g-retry-results-14695.json"
+    },
+    {
+      "name": "uxWaterCascadeBackup",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascadeBackup.mjs"
+      ],
+      "start": "2026-10-17T20:24:41.288Z",
+      "end": "2026-10-17T20:24:47.839Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-retry/uxWaterCascadeBackup",
+      "environment": "http://127.0.0.1:5307/fitlog-lite/",
+      "resultManifest": "regression-g-retry-results-14695.json"
+    },
+    {
+      "name": "uxWaterCascadeBackup-webkit",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascadeBackup.mjs"
+      ],
+      "start": "2026-10-17T20:24:47.839Z",
+      "end": "2026-10-17T20:24:54.099Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-g-retry/uxWaterCascadeBackup-webkit",
+      "environment": "http://127.0.0.1:5307/fitlog-lite/",
+      "resultManifest": "regression-g-retry-results-14695.json"
+    }
+  ],
+  "fullCommandCount": 44,
+  "engineContexts": {
+    "chromium": 30,
+    "webkit": 30
+  },
+  "heightGroups": 1080,
+  "heightStepMeasurements": 4320,
+  "maxDeltas": {
+    "card": 0,
+    "header": 0,
+    "selection": 0,
+    "scroll": 0,
+    "plot": 0,
+    "axis": 0,
+    "ranges": 0,
+    "coverage": 0,
+    "footer": 0
+  },
+  "physicalIPhone": "Pending",
+  "personalData": "Pending"
+}

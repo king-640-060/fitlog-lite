@@ -1,0 +1,323 @@
+{
+  "diagnostic": true,
+  "receipts": [
+    {
+      "engine": "webkit",
+      "width": 390,
+      "theme": "light",
+      "font": 100,
+      "build": "9423586813e2c65a2f2d7126b82acb70bbe02100",
+      "waterOwnerEvidence": {
+        "ownerScroll": 1117,
+        "windowScroll": 0,
+        "referenceNoScroll": true,
+        "crossTabLiveQueryNoScroll": true
+      },
+      "states": [
+        "normal",
+        "no-sleep",
+        "single",
+        "extreme",
+        "cross-month",
+        "offline"
+      ],
+      "danger": {
+        "closeDuringLockWait": {
+          "beforeHash": "13da7de058af0d7ceb5c6bd704c07391d5894a146d5f32aedf2052baf7bed85b",
+          "afterHash": "13da7de058af0d7ceb5c6bd704c07391d5894a146d5f32aedf2052baf7bed85b",
+          "all22Exact": true
+        },
+        "closeDuringRwRollback": {
+          "beforeHash": "13da7de058af0d7ceb5c6bd704c07391d5894a146d5f32aedf2052baf7bed85b",
+          "afterHash": "13da7de058af0d7ceb5c6bd704c07391d5894a146d5f32aedf2052baf7bed85b",
+          "all22Exact": true
+        },
+        "activePelvicCrossTab": true,
+        "activeSleep": true,
+        "foreignArchivedOverlap": true,
+        "healthStale": true,
+        "healthFaultAll22Rollback": true,
+        "lateWorkoutAutosaveRejected": true
+      },
+      "counts": {
+        "nutritionStrategyTemplates": 1,
+        "nutritionStrategyVariants": 3,
+        "nutritionStrategyPhases": 2,
+        "nutritionTargets": 6,
+        "nutritionCycles": 2,
+        "nutritionCycleDays": 4,
+        "foodLogs": 1,
+        "weights": 65,
+        "waterLogs": 67,
+        "sleepSessions": 58,
+        "workouts": 1,
+        "cardioSessions": 1,
+        "pelvicFloorSessions": 2,
+        "dietEvents": 3,
+        "habitCheckIns": 1
+      },
+      "perTableBefore": {
+        "cardioSessions": {
+          "count": 1,
+          "idsHash": "1a325c6a80033d711284661ab319930fcafa0ba61a2544aab8a3e1fa914a44dc",
+          "contentHash": "2fc25604afab155f7bfd77221872ef2a4dd3ae8d67722ee1da13d5dc48f929a3"
+        },
+        "dietEvents": {
+          "count": 3,
+          "idsHash": "70ca5b0fe1a675782d79a6e9354a5e370817479cae0b44d89b6a0170ecaaa501",
+          "contentHash": "ea61ceaeffc043ec5ef2ce0d6417375acec1c966b54f9fd5f7a8bf26250368a5"
+        },
+        "dietTemplates": {
+          "count": 1,
+          "idsHash": "cfbc7285d585bcea4369d7e03699383d8be36517fb388653fafa24d24e1f025e",
+          "contentHash": "bdb6ce022afe828c2ff5cb56919f39d9755997435e486f8363b9c3b8698a7f29"
+        },
+        "exercises": {
+          "count": 1,
+          "idsHash": "2ed5c4bbbf2e16b5711695652dbf02bf0b6b41228ea99e155b2dda890b6778ec",
+          "contentHash": "cee831e44b62f08b063ee970c062c49b45b75cd23b76bd235eb39fea10753a6d"
+        },
+        "foodLogs": {
+          "count": 1,
+          "idsHash": "0bfecd3a295f04dacf6392f32faafc34192d6010c1ca93da3b690ba665886d0a",
+          "contentHash": "39530e6ff68fbd0e3f9ed30f708f53237db9aeb605a892cb3217d1bfbbfa2a30"
+        },
+        "foods": {
+          "count": 1,
+          "idsHash": "f543d2051d765ae536cde22fd7b030ff9dbe9313ee0508f2cb5a1207860bc7e2",
+          "contentHash": "6db3a77b4583b9923050b02776b8efa34ba49aceabd8115c9699edeea1d7c70b"
+        },
+        "habitCheckIns": {
+          "count": 1,
+          "idsHash": "ad862a58fa66657f7d24798dae7e0a8ea3c764091b164d83bead2cc9eb09a5e2",
+          "contentHash": "ba0415c3b78a548897e1afaa74ad54ec76dd6476d4a07e2f5732d6c83f15f844"
+        },
+        "habits": {
+          "count": 1,
+          "idsHash": "3ec66cbf26f36e7bae6f334a07eb4240c5d8a6dbe053beb8bf23dfb77f6cce9a",
+          "contentHash": "7967405a2e6d179119b2640aae646d59589aaba288c86ef91573a0d6619f313f"
+        },
+        "nutritionCycleDays": {
+          "count": 6,
+          "idsHash": "13d246214623214582f7cadc46e6f80b406edff9a12da1fdd8f459c261aacf22",
+          "contentHash": "d17933f87d5859c2139fb2624181847ade2aaa996c0c7925e62d63f4fc42b471"
+        },
+        "nutritionCycles": {
+          "count": 3,
+          "idsHash": "b93a318aa7efed89088661ee26ac00d0dbbbd696a769a1a41b5787bd4080d88f",
+          "contentHash": "3afb7fcf5f0e3e72182f8a4e8dc29d54c45c38329fcb7d44d5d12751f993f3a6"
+        },
+        "nutritionStrategyPhases": {
+          "count": 3,
+          "idsHash": "23b6fb23e12967c973a4e5f9f31507a0ed2b3f82d1a72df515e68ffc3d46ffaf",
+          "contentHash": "80955536549f0eba359a7620f8a8ab7f0a2d4d9e8b44d08148495cd25423306c"
+        },
+        "nutritionStrategyTemplates": {
+          "count": 3,
+          "idsHash": "f4fa72450b544d2ff0a98fc20ebe642c4d006181eda807a37ef52dc89a74613e",
+          "contentHash": "2eeca3bcf2c375e68e347242e01b2d35f8d7ae3be58b98640b87b2bdb4995036"
+        },
+        "nutritionStrategyVariants": {
+          "count": 6,
+          "idsHash": "cd05d07d12d218958b2e78ef22cabf2619bb1bec0ba63fa32f39857002defb6a",
+          "contentHash": "c5f2c9df993083866340fd633422a6e501159ce3240e52fe6b36f4ae1035158e"
+        },
+        "nutritionTargets": {
+          "count": 7,
+          "idsHash": "5797024316a3712fa64bf6f0cae649064332cd92ce41a4a309bc604bc3f5f97d",
+          "contentHash": "586bf2f1e50bd8a89b881a4b48a2e442dd165038c6c6af4af261fcd1fe5e3518"
+        },
+        "pelvicFloorSessions": {
+          "count": 2,
+          "idsHash": "1c1c0ae80a6212e53964316e1ccb9934030692c05728adb8677cd06040aa2c74",
+          "contentHash": "472a4a1239c48ef3669dc42daf1ee8e52c1de5ab3af23811915079ff95bb8dde"
+        },
+        "sleepSessions": {
+          "count": 67,
+          "idsHash": "5b9e97ff69f04434b40bb54023026432c912226dee4e7b7e8c652af7c845ea31",
+          "contentHash": "4198ab282f234c41654d2ad34b0bbc8e5db1db40f71563adb63469fd8e599a31"
+        },
+        "taskTags": {
+          "count": 1,
+          "idsHash": "4df8b9cb8c1d3f7d295d3b9ac7e93cec782d5ed61b77556ddaf9a71c1b827e06",
+          "contentHash": "e7edd0ddc2a888e7b054d8b642677d34ba788501b0b13acd3cccbecb37e9ad83"
+        },
+        "tasks": {
+          "count": 2,
+          "idsHash": "3e610eeae8a14f7890fc3c9fd2a64726b62029f3ffe215ce761a4811bc530665",
+          "contentHash": "1b76fe92a1cbedee4aa7376ef7991ea85d3707a1039c20b1d8b419d8763c4e16"
+        },
+        "waterLogs": {
+          "count": 76,
+          "idsHash": "0510e8d0354abd61977a6c5d6c8c0ed5fb2bc428087e6b933e46a1c7b7278350",
+          "contentHash": "1b546e3aecb14a74016178e283e8e97172b54bc51f847d04474e17333e1ee83d"
+        },
+        "weights": {
+          "count": 74,
+          "idsHash": "3a2c479f1494d6aba5da0dc561da07d0aa56ce943ec980c30291828cc163b581",
+          "contentHash": "6a14bb775fa3843e3517b0ce9c478c96792d128a93ff52ad95188b660b911e2d"
+        },
+        "workoutTemplates": {
+          "count": 1,
+          "idsHash": "b5f0ed14c0a0fc349b2bbe6fa49eec2b59fab97dcfd70e5b6a62074ef3157d5b",
+          "contentHash": "1b65fab238fd835bcb99ebfed1c156ca5438d9cd9cdff79cc2c5a78811ead7bf"
+        },
+        "workouts": {
+          "count": 1,
+          "idsHash": "99a9fd2cfffc1077c42bfa7fecee995ad7977d768e71835d38d94a39d18e4fc9",
+          "contentHash": "61cdd1e7bec4f880a59c130e174f31045703990ad3a1c34d726f4708195930fa"
+        }
+      },
+      "perTableAfter": {
+        "cardioSessions": {
+          "count": 0,
+          "idsHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "contentHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "dietEvents": {
+          "count": 0,
+          "idsHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "contentHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "dietTemplates": {
+          "count": 1,
+          "idsHash": "cfbc7285d585bcea4369d7e03699383d8be36517fb388653fafa24d24e1f025e",
+          "contentHash": "bdb6ce022afe828c2ff5cb56919f39d9755997435e486f8363b9c3b8698a7f29"
+        },
+        "exercises": {
+          "count": 1,
+          "idsHash": "2ed5c4bbbf2e16b5711695652dbf02bf0b6b41228ea99e155b2dda890b6778ec",
+          "contentHash": "cee831e44b62f08b063ee970c062c49b45b75cd23b76bd235eb39fea10753a6d"
+        },
+        "foodLogs": {
+          "count": 0,
+          "idsHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "contentHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "foods": {
+          "count": 1,
+          "idsHash": "f543d2051d765ae536cde22fd7b030ff9dbe9313ee0508f2cb5a1207860bc7e2",
+          "contentHash": "6db3a77b4583b9923050b02776b8efa34ba49aceabd8115c9699edeea1d7c70b"
+        },
+        "habitCheckIns": {
+          "count": 0,
+          "idsHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "contentHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "habits": {
+          "count": 1,
+          "idsHash": "3ec66cbf26f36e7bae6f334a07eb4240c5d8a6dbe053beb8bf23dfb77f6cce9a",
+          "contentHash": "7967405a2e6d179119b2640aae646d59589aaba288c86ef91573a0d6619f313f"
+        },
+        "nutritionCycleDays": {
+          "count": 2,
+          "idsHash": "5eb3d576f4acba3fdceebcaf1323336f79f22325780ab63cc77f9a5671b16b63",
+          "contentHash": "1441e69411777669f1ba59a8fc515c569d47419f90e85565dcbe85a3502c3ac9"
+        },
+        "nutritionCycles": {
+          "count": 1,
+          "idsHash": "299dae8eb33851f5937a3bbb5d979c6651e2fe2b11a7059cf408cc31d89d1431",
+          "contentHash": "d0d892a318c91f71070ccf3fc654a4e69b196abd88409d8797e8b6a31e3c4062"
+        },
+        "nutritionStrategyPhases": {
+          "count": 1,
+          "idsHash": "041843b586eb876521a65729fc1a392e2f233012f6aef7c73cb1c78b41411e47",
+          "contentHash": "c0fd965b93fe36fe7dc0ba7231e275faa7226ddf516feecd4de2e875ebc21c48"
+        },
+        "nutritionStrategyTemplates": {
+          "count": 2,
+          "idsHash": "4922a8e7f98806939d6bf93a2024550e9d466f60bdb829c6de5b67cd0b749676",
+          "contentHash": "d8dd6400050f32e6bf376354bd53cdbd43d71738e6115d3c06c0316a5bd23af6"
+        },
+        "nutritionStrategyVariants": {
+          "count": 3,
+          "idsHash": "98acb89055ab9d954590a9152e4971ac6f8aa02556d7280f7e272767945bf0a3",
+          "contentHash": "7c65a9ea0a54a37bddd9270cbcc23227b762b32817a9bd4a43f5a21cf7206fa0"
+        },
+        "nutritionTargets": {
+          "count": 1,
+          "idsHash": "400487cef09aaa51d76ef71e7d067e32f2d7aa3fbb71c07e806b17d1f5bea57f",
+          "contentHash": "8350769487dcb47185be56faf40aa5892aa32cab6d83b418eed9b43c8ee05cd4"
+        },
+        "pelvicFloorSessions": {
+          "count": 0,
+          "idsHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "contentHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        },
+        "sleepSessions": {
+          "count": 9,
+          "idsHash": "862bdd45bc124fe6241383ba3b68beb8810f7aa12e81f09eeb6f917258b7b711",
+          "contentHash": "cd97161919a304467619da1de6c3430a1e112d3138acebf9aff8bab61e5b2652"
+        },
+        "taskTags": {
+          "count": 1,
+          "idsHash": "4df8b9cb8c1d3f7d295d3b9ac7e93cec782d5ed61b77556ddaf9a71c1b827e06",
+          "contentHash": "e7edd0ddc2a888e7b054d8b642677d34ba788501b0b13acd3cccbecb37e9ad83"
+        },
+        "tasks": {
+          "count": 2,
+          "idsHash": "3e610eeae8a14f7890fc3c9fd2a64726b62029f3ffe215ce761a4811bc530665",
+          "contentHash": "1b76fe92a1cbedee4aa7376ef7991ea85d3707a1039c20b1d8b419d8763c4e16"
+        },
+        "waterLogs": {
+          "count": 9,
+          "idsHash": "0cca6195d0d881ba09e1e96349a0c0e46e7c2f87645c72bc511c882ad003ade4",
+          "contentHash": "c860916a5ed98c43851297659d1472515467f227b59be8d924ca2c2a10068903"
+        },
+        "weights": {
+          "count": 9,
+          "idsHash": "a72b93b905d38596eda0c4851b257fadba8b5c09f93eaae8c0bb3d715482bbd2",
+          "contentHash": "ba53c0ef273a632d403e9490f11548a8b5ac7775863bcba3b4aa9ded090589e2"
+        },
+        "workoutTemplates": {
+          "count": 1,
+          "idsHash": "b5f0ed14c0a0fc349b2bbe6fa49eec2b59fab97dcfd70e5b6a62074ef3157d5b",
+          "contentHash": "1b65fab238fd835bcb99ebfed1c156ca5438d9cd9cdff79cc2c5a78811ead7bf"
+        },
+        "workouts": {
+          "count": 0,
+          "idsHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+          "contentHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+        }
+      },
+      "deviceConfigHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "all22ExactSurvivors": true,
+      "reopen": true,
+      "scenes": [
+        "webkit-390-light-100-normal-weight.png",
+        "webkit-390-light-100-normal-sleep.png",
+        "webkit-390-light-100-normal-water.png",
+        "webkit-390-light-100-no-sleep-weight.png",
+        "webkit-390-light-100-no-sleep-sleep.png",
+        "webkit-390-light-100-no-sleep-water.png",
+        "webkit-390-light-100-single-weight.png",
+        "webkit-390-light-100-single-sleep.png",
+        "webkit-390-light-100-single-water.png",
+        "webkit-390-light-100-extreme-weight.png",
+        "webkit-390-light-100-extreme-sleep.png",
+        "webkit-390-light-100-extreme-water.png",
+        "webkit-390-light-100-cross-month-weight.png",
+        "webkit-390-light-100-cross-month-sleep.png",
+        "webkit-390-light-100-cross-month-water.png",
+        "webkit-390-light-100-offline-weight.png",
+        "webkit-390-light-100-offline-sleep.png",
+        "webkit-390-light-100-offline-water.png",
+        "webkit-390-light-100-water-expanded.png",
+        "webkit-390-light-100-water-owned-scroll.png",
+        "webkit-390-light-100-daily-report.png",
+        "webkit-390-light-100-daily-professional-details.png",
+        "webkit-390-light-100-phase-report.png",
+        "webkit-390-light-100-active-cross-tab-rejected.png",
+        "webkit-390-light-100-foreign-archived-overlap.png",
+        "webkit-390-light-100-health-stale-rejected.png",
+        "webkit-390-light-100-health-fault-whole-rollback.png",
+        "webkit-390-light-100-range-delete-preview.png",
+        "webkit-late-workout-autosave-rejected.png",
+        "webkit-390-light-100-retained-cycle-report.png",
+        "webkit-390-light-100-preserved-plan.png"
+      ],
+      "status": "PASS",
+      "physicalIPhone": "Pending"
+    }
+  ]
+}

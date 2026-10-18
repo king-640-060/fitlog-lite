@@ -1,0 +1,87 @@
+{
+  "inventory": [
+    "aiAssistant",
+    "aiDualModelRouting",
+    "aiStreaming",
+    "aiVoice",
+    "catalogRecovery",
+    "coachReportExperience",
+    "dailyRecordsExperience",
+    "dietEvents",
+    "foodRecovery",
+    "foodServing",
+    "foodVision",
+    "githubSyncSafety",
+    "habitDeletion",
+    "habitEditorLayout",
+    "interactionStabilization",
+    "macroNutritionSummary",
+    "managementVisualConsistency",
+    "managementWorkspace",
+    "mobileLayout",
+    "motionPolish",
+    "nutritionGauge",
+    "nutritionTemplates",
+    "sharedDatePicker",
+    "trainingJournal",
+    "trainingRecoveryExperience",
+    "trainingRecoveryLifecycle",
+    "uiQualityAudit",
+    "uiSemanticConsistency",
+    "unifiedExperience",
+    "v421Consistency",
+    "v4FoodPlanToday",
+    "voiceMode",
+    "remainingPrototype",
+    "combinedHandoff",
+    "approvedJointV05",
+    "approvedJointV05-webkit",
+    "foodWaterDayV04",
+    "foodWaterDayV04-webkit",
+    "foodWaterBackupV04",
+    "foodWaterBackupV04-webkit",
+    "uxWaterCascade",
+    "uxWaterCascade-webkit",
+    "uxWaterCascadeBackup",
+    "uxWaterCascadeBackup-webkit"
+  ],
+  "environment": "http://127.0.0.1:5311/fitlog-lite/",
+  "results": [
+    {
+      "name": "approvedJointV05",
+      "command": [
+        "node",
+        "tests/browser/approvedJointV05.mjs"
+      ],
+      "start": "2026-10-18T02:01:06.603Z",
+      "end": "2026-10-18T02:03:48.449Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-i-cycle/approvedJointV05"
+    },
+    {
+      "name": "approvedJointV05-webkit",
+      "command": [
+        "node",
+        "tests/browser/approvedJointV05.mjs"
+      ],
+      "start": "2026-10-18T02:03:48.450Z",
+      "end": "2026-10-18T02:04:43.955Z",
+      "exitCode": 1,
+      "status": "FAIL",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-i-cycle/approvedJointV05-webkit"
+    },
+    {
+      "name": "unifiedExperience",
+      "command": [
+        "node",
+        "tests/browser/unifiedExperience.mjs"
+      ],
+      "start": "2026-10-18T02:01:06.602Z",
+      "end": "2026-10-18T02:12:50.785Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/joint-v03/regression-i-cycle/unifiedExperience"
+    }
+  ]
+}

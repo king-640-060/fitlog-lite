@@ -1,0 +1,57 @@
+{
+  "baseline": "9423586813e2c65a2f2d7126b82acb70bbe02100",
+  "files": [
+    {
+      "file": "src/db/database.ts",
+      "sha256": "cd72bbc24447bfa6626cc91e332f69e0c5a6d9a3b8a4ff95cbb6f2ca8ea0b79f",
+      "unchanged": true
+    },
+    {
+      "file": "src/db/types.ts",
+      "sha256": "e99bf0b79c9d8268ca96cf356c2f5a74904da871dcdcec3d518a1fd274ca50aa",
+      "unchanged": true
+    },
+    {
+      "file": "src/services/aiProfiles.ts",
+      "sha256": "ec369b493352d3d7c2a046c3894effc6eb88854f8e437e090a9119289bc00091",
+      "unchanged": true
+    },
+    {
+      "file": "src/services/appearanceConfig.ts",
+      "sha256": "3acc9a1c0a26ddfa0cdcb0de2858a9819639801e4d4e2cac77f31255d93e653b",
+      "unchanged": true
+    },
+    {
+      "file": "src/services/backupService.ts",
+      "sha256": "86c45dbf4c0003ae705f69172c304b8c1c75b618e0dd124990dd5ce25f64e246",
+      "unchanged": true
+    },
+    {
+      "file": "src/services/githubManualSync.ts",
+      "sha256": "f6ed85efa3b03b414070ea761260bb35196d076abb8bb492d6f583bd1175b992",
+      "unchanged": true
+    },
+    {
+      "file": "src/services/githubSyncService.ts",
+      "sha256": "0e1a5b0e084658e5b0f70d478a8d3075fefec32a6531e03e77c5c4aa72eb2574",
+      "unchanged": true
+    },
+    {
+      "file": "src/services/syncCryptoService.ts",
+      "sha256": "05936f773091a1a56bc111119004c264dabbb0aa337f8e9d0d959d3c477ef7ed",
+      "unchanged": true
+    },
+    {
+      "file": "src/services/waterReferenceConfig.ts",
+      "sha256": "176a760eecdc29b68467306fb7946c36261fcdab4225db26c5b2754456bd9d7a",
+      "unchanged": true
+    }
+  ],
+  "dbVersion": 13,
+  "indexedDbVersion": 130,
+  "stores": 22,
+  "backupVersion": 14,
+  "restoreVersions": "1\u201314",
+  "syncVersion": 1,
+  "encryptedEnvelopeVersion": 1
+}

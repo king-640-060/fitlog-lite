@@ -254,3 +254,10 @@ See [F1–F5 implementation contract](FOOD_WATER_DAY_V04.md). New `foodWaterDayV
 ## Approved UX-01–03 v0.4 (2026-10-17)
 
 [Water / six-category cascade contract](UX_WATER_CASCADE_V04.md) supersedes the earlier always-visible Today water controls and archive-only handling for referenced nutrition templates in this explicitly acknowledged path. Default Today disclosure and compact equal500/1000 Sheet preserve all water services. Only the six specified nutrition tables may lose approved owned rows, with full preview, risk checkbox, second danger confirmation, stale-source/ownership checks and complete rollback; mixed provenance and invalid cross-cycle allocations reject without writes. Original unused-only delete API remains guarded; all health facts, unrelated targets/templates and device config survive. Removed cycles leave the existing cycle-report picker; ordinary reports continue reading actual facts, deleted goals are not reconstructed, and no new nutrition-template analysis report is introduced. DB13/130/22, Backup14/Restore1–14/Sync1 unchanged. New-UX unit/browser/production/physical evidence is separate from the completed F1–F5 acceptance.
+
+
+## 联合 UX / 报告 / 日期并集删除 v0.3
+
+按[本轮执行QA](JOINT_UX_REPORTS_RANGE_V03_QA.md)及不可删行的[批准矩阵](../design/reference/2026-10-17-joint-v0.3/05_ACCEPTANCE_MATRIX.md)逐项核验。保留原44浏览器命令及1009单测；新增双引擎 `jointUxReportsRange.mjs`：320/375/390/430/844、深浅、100/140/200%、normal/no-sleep/single/extreme/cross-month/offline，每图7→30→90→7的card/header/readout/scroll/CanvasSVG/axis/range/coverage/footer逐项实测<=0.5px，逐日标签、Y参考、独立状态、真实范围危险确认/并发/健康表故障回滚及全22表精确内容hash。原 `uxWaterCascade` 的危险UI断言按本轮新范围升级，原六表API单测不扩大；原冻结输入不修改。`jointUxPreservation.mjs`复用原合成profile，基线/App/END均不得reset/reseed，逐表/config/SW/离线另证。物理iPhone/原安装PWA/VoiceOver/真实键盘及SafeArea/个人数据和独立验收无实际证据时Pending。
+
+- Joint v0.3 自定义报告：`tests/browser/jointReportRanges.mjs` 用原生共享日期选择器实选五天区间、未来区间，拒绝反向和超过366天的范围；Chromium/WebKit实际核对分母、尚未开始及查询阶段全22表只读。随后另一个真实客户端删除筛选模板，原报告无需刷新即重置筛选并显示保留周期/阶段，22表精确核对允许删除后的完整对象集合。结果与原始截图另见本轮QA和正式回执。

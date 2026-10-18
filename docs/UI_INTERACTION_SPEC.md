@@ -387,3 +387,8 @@ Follow [Approved joint v0.5 contract](APPROVED_JOINT_V05.md). It supersedes prio
 ## Approved UX-01–03 v0.4 (2026-10-17)
 
 [Water / six-category cascade contract](UX_WATER_CASCADE_V04.md) supersedes the earlier always-visible Today water controls and archive-only handling for referenced nutrition templates in this explicitly acknowledged path. Default Today disclosure and compact equal500/1000 Sheet preserve all water services. Only the six specified nutrition tables may lose approved owned rows, with full preview, risk checkbox, second danger confirmation, stale-source/ownership checks and complete rollback; mixed provenance and invalid cross-cycle allocations reject without writes. Original unused-only delete API remains guarded; all health facts, unrelated targets/templates and device config survive. Removed cycles leave the existing cycle-report picker; ordinary reports continue reading actual facts, deleted goals are not reconstructed, and no new nutrition-template analysis report is introduced. DB13/130/22, Backup14/Restore1–14/Sync1 unchanged. New-UX unit/browser/production/physical evidence is separate from the completed F1–F5 acceptance.
+
+
+## 2026-10-17 联合 v0.3 新批准范围
+
+[联合 UX / 报告 / 区间删除合同](JOINT_UX_REPORTS_RANGE_V03.md)在新范围内生效：Today SVG disclosure与必要时定位、三张独立全日轴趋势及逐部位7/30/90不变高、两类共享实际事实报告与明确非周期阶段、独立原子日期并集删除入口。此前四focus、空图移除、抽样日期、侧Y占宽及管理危险路径只删六类等说明仅作为旧轮历史；旧六类/unused-only/清日API本身仍保留原边界。计划及共享定义永远不随营养范围删除，DB/Backup/Restore/Sync版本不变；本轮真机验收独立Pending。

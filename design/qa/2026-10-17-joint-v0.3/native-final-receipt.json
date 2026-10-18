@@ -1,0 +1,106 @@
+{
+  "url": "http://127.0.0.1:5310/fitlog-lite/",
+  "build": "9423586813e2c65a2f2d7126b82acb70bbe02100",
+  "synthetic": true,
+  "dateFixedOnlyInIsolatedTest": "2026-10-17",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "chapterGeometry": [
+    {
+      "key": "nutrition",
+      "open": false,
+      "height": 58,
+      "display": "block",
+      "padding": "6px 16px",
+      "summaryHeight": 44
+    },
+    {
+      "key": "training",
+      "open": false,
+      "height": 58,
+      "display": "block",
+      "padding": "6px 16px",
+      "summaryHeight": 44
+    },
+    {
+      "key": "recovery",
+      "open": false,
+      "height": 58,
+      "display": "block",
+      "padding": "6px 16px",
+      "summaryHeight": 44
+    },
+    {
+      "key": "habits",
+      "open": false,
+      "height": 58,
+      "display": "block",
+      "padding": "6px 16px",
+      "summaryHeight": 44
+    }
+  ],
+  "scenes": [
+    {
+      "name": "today-water-closed",
+      "selector": ".water-card",
+      "kind": "native element screenshot"
+    },
+    {
+      "name": "today-water-expanded",
+      "selector": ".water-card",
+      "kind": "native element screenshot"
+    },
+    {
+      "name": "weight-seven-days",
+      "selector": "[data-trend-module=weight]",
+      "kind": "native element screenshot"
+    },
+    {
+      "name": "sleep-seven-days",
+      "selector": "[data-trend-module=sleep]",
+      "kind": "native element screenshot"
+    },
+    {
+      "name": "water-seven-days",
+      "selector": "[data-trend-module=water]",
+      "kind": "native element screenshot"
+    },
+    {
+      "name": "daily-report-top",
+      "kind": "actual viewport"
+    },
+    {
+      "name": "daily-report-folded-chapters",
+      "kind": "actual viewport"
+    },
+    {
+      "name": "real-cycle-report",
+      "kind": "actual viewport"
+    },
+    {
+      "name": "real-phase-report",
+      "kind": "actual viewport"
+    },
+    {
+      "name": "delete-sources-top",
+      "kind": "actual viewport"
+    },
+    {
+      "name": "delete-real-counts",
+      "kind": "actual viewport"
+    },
+    {
+      "name": "delete-risk-controls",
+      "kind": "actual viewport"
+    },
+    {
+      "name": "dark-today-water",
+      "selector": ".water-card",
+      "kind": "native element screenshot"
+    }
+  ],
+  "errors": [],
+  "physicalIPhone": "Pending"
+}

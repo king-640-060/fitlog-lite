@@ -1,0 +1,2557 @@
+{
+  "app": "FitLog Lite",
+  "schemaVersion": 14,
+  "exportedAt": "2026-10-15T00:00:00.000Z",
+  "data": {
+    "foods": [
+      {
+        "id": "food-old",
+        "name": "PRIVATE_TEST_FOOD_123",
+        "brand": "legacy",
+        "referenceGrams": 100,
+        "calories": 333,
+        "protein": 25,
+        "carbs": 12,
+        "createdAt": "2026-09-28T08:00:00.000Z",
+        "updatedAt": "2026-09-28T08:00:00.000Z",
+        "servingGrams": 150.123
+      }
+    ],
+    "foodLogs": [
+      {
+        "id": "log-old",
+        "date": "2026-09-28",
+        "foodId": "food-old",
+        "foodName": "Historical food snapshot",
+        "grams": 50,
+        "referenceGrams": 100,
+        "caloriesPerReference": 200,
+        "proteinPerReference": 20,
+        "totalCalories": 100,
+        "totalProtein": 10,
+        "meal": "dinner",
+        "createdAt": "2026-09-28T08:00:00.000Z",
+        "updatedAt": "2026-09-28T08:00:00.000Z"
+      }
+    ],
+    "exercises": [
+      {
+        "id": "exercise-old",
+        "name": "Edited current library exercise",
+        "notes": "user",
+        "createdAt": "2026-09-28T08:00:00.000Z",
+        "updatedAt": "2026-09-28T08:00:00.000Z"
+      }
+    ],
+    "workouts": [
+      {
+        "id": "workout-old",
+        "date": "2026-09-28",
+        "startedAt": "2026-09-28T08:00:00.000Z",
+        "finishedAt": "2026-09-28T09:00:00.000Z",
+        "exercises": [
+          {
+            "id": "we-old",
+            "exerciseId": "exercise-old",
+            "exerciseName": "Historical exercise snapshot",
+            "sets": [
+              {
+                "id": "set-old",
+                "weightKg": 60,
+                "reps": 8,
+                "rpe": 7,
+                "note": "historic"
+              },
+              {
+                "id": "set-body",
+                "reps": 5
+              }
+            ]
+          }
+        ],
+        "note": "historical",
+        "createdAt": "2026-09-28T08:00:00.000Z",
+        "updatedAt": "2026-09-28T08:00:00.000Z"
+      }
+    ],
+    "weights": [
+      {
+        "id": "weight-old",
+        "date": "2026-09-28",
+        "weightKg": 72.4,
+        "createdAt": "2026-09-28T08:00:00.000Z",
+        "updatedAt": "2026-09-28T08:00:00.000Z"
+      },
+      {
+        "id": "legacy-same-day-weight",
+        "date": "2026-09-28",
+        "weightKg": 78.123456,
+        "createdAt": "2026-09-28T08:00:00.000Z",
+        "updatedAt": "2026-09-28T09:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-1",
+        "date": "2026-07-21",
+        "weightKg": 73.99,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-2",
+        "date": "2026-07-22",
+        "weightKg": 73.98,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-3",
+        "date": "2026-07-23",
+        "weightKg": 73.96,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-4",
+        "date": "2026-07-24",
+        "weightKg": 73.95,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-6",
+        "date": "2026-07-26",
+        "weightKg": 73.93,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-7",
+        "date": "2026-07-27",
+        "weightKg": 73.92,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-8",
+        "date": "2026-07-28",
+        "weightKg": 73.9,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-9",
+        "date": "2026-07-29",
+        "weightKg": 73.89,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-11",
+        "date": "2026-07-31",
+        "weightKg": 73.87,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-12",
+        "date": "2026-08-01",
+        "weightKg": 73.86,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-13",
+        "date": "2026-08-02",
+        "weightKg": 73.84,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-14",
+        "date": "2026-08-03",
+        "weightKg": 73.83,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-16",
+        "date": "2026-08-05",
+        "weightKg": 73.81,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-17",
+        "date": "2026-08-06",
+        "weightKg": 73.8,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-18",
+        "date": "2026-08-07",
+        "weightKg": 73.78,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-19",
+        "date": "2026-08-08",
+        "weightKg": 73.77,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-21",
+        "date": "2026-08-10",
+        "weightKg": 73.75,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-22",
+        "date": "2026-08-11",
+        "weightKg": 73.74,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-23",
+        "date": "2026-08-12",
+        "weightKg": 73.72,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-24",
+        "date": "2026-08-13",
+        "weightKg": 73.71,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-26",
+        "date": "2026-08-15",
+        "weightKg": 73.69,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-27",
+        "date": "2026-08-16",
+        "weightKg": 73.68,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-28",
+        "date": "2026-08-17",
+        "weightKg": 73.66,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-29",
+        "date": "2026-08-18",
+        "weightKg": 73.65,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-31",
+        "date": "2026-08-20",
+        "weightKg": 73.63,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-32",
+        "date": "2026-08-21",
+        "weightKg": 73.62,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-33",
+        "date": "2026-08-22",
+        "weightKg": 73.6,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-34",
+        "date": "2026-08-23",
+        "weightKg": 73.59,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-36",
+        "date": "2026-08-25",
+        "weightKg": 73.57,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-37",
+        "date": "2026-08-26",
+        "weightKg": 73.56,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-38",
+        "date": "2026-08-27",
+        "weightKg": 73.54,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-39",
+        "date": "2026-08-28",
+        "weightKg": 73.53,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-41",
+        "date": "2026-08-30",
+        "weightKg": 73.51,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-42",
+        "date": "2026-08-31",
+        "weightKg": 73.5,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-43",
+        "date": "2026-09-01",
+        "weightKg": 73.48,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-44",
+        "date": "2026-09-02",
+        "weightKg": 73.47,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-46",
+        "date": "2026-09-04",
+        "weightKg": 73.45,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-47",
+        "date": "2026-09-05",
+        "weightKg": 73.44,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-48",
+        "date": "2026-09-06",
+        "weightKg": 73.42,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-49",
+        "date": "2026-09-07",
+        "weightKg": 73.41,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-51",
+        "date": "2026-09-09",
+        "weightKg": 73.39,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-52",
+        "date": "2026-09-10",
+        "weightKg": 73.38,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-53",
+        "date": "2026-09-11",
+        "weightKg": 73.36,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-54",
+        "date": "2026-09-12",
+        "weightKg": 73.35,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-56",
+        "date": "2026-09-14",
+        "weightKg": 73.33,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-57",
+        "date": "2026-09-15",
+        "weightKg": 73.32,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-58",
+        "date": "2026-09-16",
+        "weightKg": 73.3,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-59",
+        "date": "2026-09-17",
+        "weightKg": 73.29,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-61",
+        "date": "2026-09-19",
+        "weightKg": 73.27,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-62",
+        "date": "2026-09-20",
+        "weightKg": 73.26,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-63",
+        "date": "2026-09-21",
+        "weightKg": 73.24,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-64",
+        "date": "2026-09-22",
+        "weightKg": 73.23,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-66",
+        "date": "2026-09-24",
+        "weightKg": 73.21,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-67",
+        "date": "2026-09-25",
+        "weightKg": 73.2,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-68",
+        "date": "2026-09-26",
+        "weightKg": 73.18,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-69",
+        "date": "2026-09-27",
+        "weightKg": 73.17,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-71",
+        "date": "2026-09-29",
+        "weightKg": 73.15,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-72",
+        "date": "2026-09-30",
+        "weightKg": 73.14,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-73",
+        "date": "2026-10-01",
+        "weightKg": 73.12,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-74",
+        "date": "2026-10-02",
+        "weightKg": 73.11,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-76",
+        "date": "2026-10-04",
+        "weightKg": 73.09,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-77",
+        "date": "2026-10-05",
+        "weightKg": 73.08,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-78",
+        "date": "2026-10-06",
+        "weightKg": 73.06,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-79",
+        "date": "2026-10-07",
+        "weightKg": 73.05,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-81",
+        "date": "2026-10-09",
+        "weightKg": 73.03,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-82",
+        "date": "2026-10-10",
+        "weightKg": 73.02,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-83",
+        "date": "2026-10-11",
+        "weightKg": 73.0,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-84",
+        "date": "2026-10-12",
+        "weightKg": 72.99,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-86",
+        "date": "2026-10-14",
+        "weightKg": 72.97,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-87",
+        "date": "2026-10-15",
+        "weightKg": 72.96,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-88",
+        "date": "2026-10-16",
+        "weightKg": 72.94,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-weight-89",
+        "date": "2026-10-17",
+        "weightKg": 72.93,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      }
+    ],
+    "workoutTemplates": [
+      {
+        "id": "wt-old",
+        "name": "Legacy template",
+        "exercises": [
+          {
+            "id": "we-old",
+            "exerciseId": "exercise-old",
+            "exerciseName": "Historical exercise snapshot",
+            "sets": [
+              {
+                "id": "set-old",
+                "weightKg": 60,
+                "reps": 8,
+                "rpe": 7,
+                "note": "historic"
+              },
+              {
+                "id": "set-body",
+                "reps": 5
+              }
+            ]
+          }
+        ],
+        "lastUsedAt": "2026-09-28T08:00:00.000Z",
+        "createdAt": "2026-09-28T08:00:00.000Z",
+        "updatedAt": "2026-09-28T08:00:00.000Z"
+      }
+    ],
+    "dietTemplates": [
+      {
+        "id": "approved-v04-day-template",
+        "name": "Frozen four meal template",
+        "items": [
+          {
+            "id": "approved-v04-item-0",
+            "foodId": "food-old",
+            "foodName": "Template food snapshot",
+            "grams": 100,
+            "fallback": {
+              "referenceGrams": 100,
+              "calories": 210,
+              "protein": 18
+            },
+            "meal": "breakfast"
+          },
+          {
+            "id": "approved-v04-item-1",
+            "foodId": "food-old",
+            "foodName": "Template food snapshot",
+            "grams": 125.5,
+            "fallback": {
+              "referenceGrams": 100,
+              "calories": 210,
+              "protein": 18
+            },
+            "meal": "lunch"
+          },
+          {
+            "id": "approved-v04-item-2",
+            "foodId": "food-old",
+            "foodName": "Template food snapshot",
+            "grams": 0.25,
+            "fallback": {
+              "referenceGrams": 100,
+              "calories": 210,
+              "protein": 18
+            },
+            "meal": "dinner"
+          },
+          {
+            "id": "approved-v04-item-3",
+            "foodId": "food-old",
+            "foodName": "Template food snapshot",
+            "grams": 999.99,
+            "fallback": {
+              "referenceGrams": 100,
+              "calories": 210,
+              "protein": 18
+            },
+            "meal": "snack"
+          }
+        ],
+        "nutritionGoal": {
+          "calories": 2200,
+          "protein": 180
+        },
+        "createdAt": "2026-09-28T08:00:00.000Z",
+        "updatedAt": "2026-09-28T08:00:00.000Z",
+        "mode": "day"
+      }
+    ],
+    "nutritionTargets": [
+      {
+        "id": "ux-a-target",
+        "date": "2026-06-15",
+        "calories": 2100,
+        "protein": 140,
+        "strategySelection": {
+          "templateId": "ux-a",
+          "templateName": "待删除策略",
+          "variantId": "ux-a-v1",
+          "variantName": "历史名称快照",
+          "phaseId": "ux-a-old-phase"
+        },
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-a-removed-variant-target",
+        "date": "2026-06-16",
+        "calories": 2100,
+        "protein": 140,
+        "strategySelection": {
+          "templateId": "ux-a",
+          "templateName": "待删除策略",
+          "variantId": "removed-historical-variant",
+          "variantName": "历史名称快照",
+          "phaseId": "ux-a-old-phase"
+        },
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-b-target",
+        "date": "2026-07-15",
+        "calories": 2100,
+        "protein": 140,
+        "strategySelection": {
+          "templateId": "ux-b",
+          "templateName": "独立保留策略",
+          "variantId": "ux-b-v1",
+          "variantName": "历史名称快照",
+          "phaseId": "ux-b-phase"
+        },
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-manual-target",
+        "date": "2026-09-28",
+        "calories": 2100,
+        "protein": 140,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-diet-target",
+        "date": "2026-10-10",
+        "calories": 2100,
+        "protein": 140,
+        "sourceTemplateId": "approved-v04-day-template",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-a-old-cycle-target",
+        "date": "2025-06-01",
+        "calories": 2100,
+        "protein": 140,
+        "cycleSelection": {
+          "cycleId": "ux-a-old-cycle",
+          "cycleName": "ux-a-old-cycle",
+          "templateId": "ux-a",
+          "templateName": "待删除策略",
+          "variantId": "ux-a-v1",
+          "variantName": "日方案1"
+        },
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-a-future-cycle-target",
+        "date": "2030-01-01",
+        "calories": 2100,
+        "protein": 140,
+        "cycleSelection": {
+          "cycleId": "ux-a-future-cycle",
+          "cycleName": "ux-a-future-cycle",
+          "templateId": "ux-a",
+          "templateName": "待删除策略",
+          "variantId": "ux-a-v1",
+          "variantName": "日方案1"
+        },
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      }
+    ],
+    "pelvicFloorSessions": [
+      {
+        "id": "pelvic-old",
+        "date": "2026-09-28",
+        "startedAt": "2026-09-28T08:00:00.000Z",
+        "finishedAt": "2026-09-28T08:01:00.000Z",
+        "phases": [
+          {
+            "type": "contract",
+            "durationSeconds": 3
+          },
+          {
+            "type": "relax",
+            "durationSeconds": 3
+          }
+        ],
+        "repetitions": 10,
+        "completedRepetitions": 10,
+        "createdAt": "2026-09-28T08:00:00.000Z",
+        "updatedAt": "2026-09-28T08:00:00.000Z"
+      }
+    ],
+    "cardioSessions": [
+      {
+        "id": "cardio-old",
+        "date": "2026-09-28",
+        "activityType": "treadmill",
+        "durationMinutes": 20,
+        "speed": 6,
+        "inclinePercent": 0,
+        "createdAt": "2026-09-28T08:00:00.000Z",
+        "updatedAt": "2026-09-28T08:00:00.000Z"
+      }
+    ],
+    "habits": [
+      {
+        "id": "habit-old",
+        "name": "Legacy habit",
+        "weekdays": [
+          1,
+          3,
+          5
+        ],
+        "targetPerWeek": 3,
+        "active": true,
+        "sortOrder": 0,
+        "createdAt": "2026-09-28T08:00:00.000Z",
+        "updatedAt": "2026-09-28T08:00:00.000Z"
+      }
+    ],
+    "habitCheckIns": [
+      {
+        "id": "check-old",
+        "habitId": "habit-old",
+        "date": "2026-09-28",
+        "completedAt": "2026-09-28T08:00:00.000Z",
+        "createdAt": "2026-09-28T08:00:00.000Z",
+        "updatedAt": "2026-09-28T08:00:00.000Z"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "task-old",
+        "title": "PRIVATE_TEST_TASK_456",
+        "date": "2026-09-28",
+        "startTime": "18:00",
+        "endTime": "19:00",
+        "tagIds": [
+          "tag-old"
+        ],
+        "createdAt": "2026-09-28T08:00:00.000Z",
+        "updatedAt": "2026-09-28T08:00:00.000Z",
+        "subtasks": [
+          {
+            "id": "sub-frozen-a",
+            "text": "清理客厅",
+            "completedAt": "2026-09-28T09:00:00.000Z"
+          },
+          {
+            "id": "sub-frozen-b",
+            "text": "保留完整长文本与顺序"
+          }
+        ]
+      },
+      {
+        "id": "task-inbox",
+        "title": "Inbox optional date",
+        "tagIds": [],
+        "createdAt": "2026-09-28T08:00:00.000Z",
+        "updatedAt": "2026-09-28T08:00:00.000Z"
+      }
+    ],
+    "taskTags": [
+      {
+        "id": "tag-old",
+        "name": "Legacy",
+        "normalizedName": "legacy",
+        "createdAt": "2026-09-28T08:00:00.000Z",
+        "updatedAt": "2026-09-28T08:00:00.000Z"
+      }
+    ],
+    "nutritionStrategyTemplates": [
+      {
+        "id": "ux-a",
+        "name": "待删除策略",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-b",
+        "name": "独立保留策略",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-c",
+        "name": "未使用模板",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      }
+    ],
+    "nutritionStrategyVariants": [
+      {
+        "id": "ux-a-v1",
+        "templateId": "ux-a",
+        "name": "日方案1",
+        "calories": 2100,
+        "protein": 140,
+        "sortOrder": 0,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-a-v2",
+        "templateId": "ux-a",
+        "name": "日方案2",
+        "calories": 2200,
+        "protein": 140,
+        "sortOrder": 1,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-b-v1",
+        "templateId": "ux-b",
+        "name": "日方案1",
+        "calories": 2100,
+        "protein": 140,
+        "sortOrder": 0,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-b-v2",
+        "templateId": "ux-b",
+        "name": "日方案2",
+        "calories": 2200,
+        "protein": 140,
+        "sortOrder": 1,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "removed-historical-variant",
+        "templateId": "ux-a",
+        "name": "历史日方案",
+        "calories": 2100,
+        "protein": 140,
+        "sortOrder": 2,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-c-v1",
+        "templateId": "ux-c",
+        "name": "未使用日方案",
+        "calories": 2100,
+        "protein": 140,
+        "sortOrder": 0,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      }
+    ],
+    "nutritionStrategyPhases": [
+      {
+        "id": "ux-a-old-phase",
+        "templateId": "ux-a",
+        "templateName": "待删除策略",
+        "startDate": "2026-06-01",
+        "endDate": "2026-06-30",
+        "createdAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-b-phase",
+        "templateId": "ux-b",
+        "templateName": "独立保留策略",
+        "startDate": "2026-07-01",
+        "endDate": "2026-07-31",
+        "createdAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-a-active",
+        "templateId": "ux-a",
+        "templateName": "待删除策略",
+        "startDate": "2026-08-01",
+        "createdAt": "2026-10-16T00:00:00.000Z"
+      }
+    ],
+    "dietEvents": [
+      {
+        "id": "diet-manual-v10",
+        "date": "2026-09-28",
+        "kind": "indulgence",
+        "scope": "lunch",
+        "note": "聚餐",
+        "estimatedCalories": 1600.123,
+        "estimateSource": "manual",
+        "createdAt": "2026-10-03T00:00:00.000Z",
+        "updatedAt": "2026-10-03T00:00:00.000Z"
+      },
+      {
+        "id": "diet-photo-v10",
+        "date": "2026-09-28",
+        "kind": "indulgence",
+        "scope": "dinner",
+        "estimatedCalories": 1800.125,
+        "estimatedCaloriesLow": 1200,
+        "estimatedCaloriesHigh": 2200,
+        "estimateSource": "photo",
+        "createdAt": "2026-10-03T00:00:00.000Z",
+        "updatedAt": "2026-10-03T00:00:00.000Z"
+      },
+      {
+        "id": "diet-day-v10",
+        "date": "2026-09-29",
+        "kind": "indulgence",
+        "scope": "day",
+        "note": "旅行",
+        "createdAt": "2026-10-03T00:00:00.000Z",
+        "updatedAt": "2026-10-03T00:00:00.000Z"
+      }
+    ],
+    "sleepSessions": [
+      {
+        "id": "sleep-completed",
+        "startTime": "2026-10-08T15:48:00Z",
+        "endTime": "2026-10-08T23:24:00Z",
+        "durationMinutes": 456,
+        "recordDate": "2026-10-09",
+        "createdAt": "2026-10-08T15:48:00Z",
+        "updatedAt": "2026-10-08T23:24:00Z"
+      },
+      {
+        "id": "joint-sleep-1",
+        "startTime": "2026-07-21T23:00:00+08:00",
+        "endTime": "2026-07-22T07:00:00+08:00",
+        "recordDate": "2026-07-22",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-07-21",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-07-21",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-2",
+        "startTime": "2026-07-22T23:00:00+08:00",
+        "endTime": "2026-07-23T07:00:00+08:00",
+        "recordDate": "2026-07-23",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-07-22",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-07-22",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-3",
+        "startTime": "2026-07-23T23:00:00+08:00",
+        "endTime": "2026-07-24T07:00:00+08:00",
+        "recordDate": "2026-07-24",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-07-23",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-07-23",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-5",
+        "startTime": "2026-07-25T23:00:00+08:00",
+        "endTime": "2026-07-26T07:00:00+08:00",
+        "recordDate": "2026-07-26",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-07-25",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-07-25",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-6",
+        "startTime": "2026-07-26T23:00:00+08:00",
+        "endTime": "2026-07-27T07:00:00+08:00",
+        "recordDate": "2026-07-27",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-07-26",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-07-26",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-7",
+        "startTime": "2026-07-27T23:00:00+08:00",
+        "endTime": "2026-07-28T07:00:00+08:00",
+        "recordDate": "2026-07-28",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-07-27",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-07-27",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-9",
+        "startTime": "2026-07-29T23:00:00+08:00",
+        "endTime": "2026-07-30T07:00:00+08:00",
+        "recordDate": "2026-07-30",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-07-29",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-07-29",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-10",
+        "startTime": "2026-07-30T23:00:00+08:00",
+        "endTime": "2026-07-31T07:00:00+08:00",
+        "recordDate": "2026-07-31",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-07-30",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-07-30",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-11",
+        "startTime": "2026-07-31T23:00:00+08:00",
+        "endTime": "2026-08-01T07:00:00+08:00",
+        "recordDate": "2026-08-01",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-07-31",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-07-31",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-13",
+        "startTime": "2026-08-02T23:00:00+08:00",
+        "endTime": "2026-08-03T07:00:00+08:00",
+        "recordDate": "2026-08-03",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-02",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-02",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-14",
+        "startTime": "2026-08-03T23:00:00+08:00",
+        "endTime": "2026-08-04T07:00:00+08:00",
+        "recordDate": "2026-08-04",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-03",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-03",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-15",
+        "startTime": "2026-08-04T23:00:00+08:00",
+        "endTime": "2026-08-05T07:00:00+08:00",
+        "recordDate": "2026-08-05",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-04",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-04",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-17",
+        "startTime": "2026-08-06T23:00:00+08:00",
+        "endTime": "2026-08-07T07:00:00+08:00",
+        "recordDate": "2026-08-07",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-06",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-06",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-18",
+        "startTime": "2026-08-07T23:00:00+08:00",
+        "endTime": "2026-08-08T07:00:00+08:00",
+        "recordDate": "2026-08-08",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-07",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-07",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-19",
+        "startTime": "2026-08-08T23:00:00+08:00",
+        "endTime": "2026-08-09T07:00:00+08:00",
+        "recordDate": "2026-08-09",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-08",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-08",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-21",
+        "startTime": "2026-08-10T23:00:00+08:00",
+        "endTime": "2026-08-11T07:00:00+08:00",
+        "recordDate": "2026-08-11",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-10",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-10",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-22",
+        "startTime": "2026-08-11T23:00:00+08:00",
+        "endTime": "2026-08-12T07:00:00+08:00",
+        "recordDate": "2026-08-12",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-11",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-11",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-23",
+        "startTime": "2026-08-12T23:00:00+08:00",
+        "endTime": "2026-08-13T07:00:00+08:00",
+        "recordDate": "2026-08-13",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-12",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-12",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-25",
+        "startTime": "2026-08-14T23:00:00+08:00",
+        "endTime": "2026-08-15T07:00:00+08:00",
+        "recordDate": "2026-08-15",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-14",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-14",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-26",
+        "startTime": "2026-08-15T23:00:00+08:00",
+        "endTime": "2026-08-16T07:00:00+08:00",
+        "recordDate": "2026-08-16",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-15",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-15",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-27",
+        "startTime": "2026-08-16T23:00:00+08:00",
+        "endTime": "2026-08-17T07:00:00+08:00",
+        "recordDate": "2026-08-17",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-16",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-16",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-29",
+        "startTime": "2026-08-18T23:00:00+08:00",
+        "endTime": "2026-08-19T07:00:00+08:00",
+        "recordDate": "2026-08-19",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-18",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-18",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-30",
+        "startTime": "2026-08-19T23:00:00+08:00",
+        "endTime": "2026-08-20T07:00:00+08:00",
+        "recordDate": "2026-08-20",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-19",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-19",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-31",
+        "startTime": "2026-08-20T23:00:00+08:00",
+        "endTime": "2026-08-21T07:00:00+08:00",
+        "recordDate": "2026-08-21",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-20",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-20",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-33",
+        "startTime": "2026-08-22T23:00:00+08:00",
+        "endTime": "2026-08-23T07:00:00+08:00",
+        "recordDate": "2026-08-23",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-22",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-22",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-34",
+        "startTime": "2026-08-23T23:00:00+08:00",
+        "endTime": "2026-08-24T07:00:00+08:00",
+        "recordDate": "2026-08-24",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-23",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-23",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-35",
+        "startTime": "2026-08-24T23:00:00+08:00",
+        "endTime": "2026-08-25T07:00:00+08:00",
+        "recordDate": "2026-08-25",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-24",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-24",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-37",
+        "startTime": "2026-08-26T23:00:00+08:00",
+        "endTime": "2026-08-27T07:00:00+08:00",
+        "recordDate": "2026-08-27",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-26",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-26",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-38",
+        "startTime": "2026-08-27T23:00:00+08:00",
+        "endTime": "2026-08-28T07:00:00+08:00",
+        "recordDate": "2026-08-28",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-27",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-27",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-39",
+        "startTime": "2026-08-28T23:00:00+08:00",
+        "endTime": "2026-08-29T07:00:00+08:00",
+        "recordDate": "2026-08-29",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-28",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-28",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-41",
+        "startTime": "2026-08-30T23:00:00+08:00",
+        "endTime": "2026-08-31T07:00:00+08:00",
+        "recordDate": "2026-08-31",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-30",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-30",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-42",
+        "startTime": "2026-08-31T23:00:00+08:00",
+        "endTime": "2026-09-01T07:00:00+08:00",
+        "recordDate": "2026-09-01",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-08-31",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-08-31",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-43",
+        "startTime": "2026-09-01T23:00:00+08:00",
+        "endTime": "2026-09-02T07:00:00+08:00",
+        "recordDate": "2026-09-02",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-01",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-01",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-45",
+        "startTime": "2026-09-03T23:00:00+08:00",
+        "endTime": "2026-09-04T07:00:00+08:00",
+        "recordDate": "2026-09-04",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-03",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-03",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-46",
+        "startTime": "2026-09-04T23:00:00+08:00",
+        "endTime": "2026-09-05T07:00:00+08:00",
+        "recordDate": "2026-09-05",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-04",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-04",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-47",
+        "startTime": "2026-09-05T23:00:00+08:00",
+        "endTime": "2026-09-06T07:00:00+08:00",
+        "recordDate": "2026-09-06",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-05",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-05",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-49",
+        "startTime": "2026-09-07T23:00:00+08:00",
+        "endTime": "2026-09-08T07:00:00+08:00",
+        "recordDate": "2026-09-08",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-07",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-07",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-50",
+        "startTime": "2026-09-08T23:00:00+08:00",
+        "endTime": "2026-09-09T07:00:00+08:00",
+        "recordDate": "2026-09-09",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-08",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-08",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-51",
+        "startTime": "2026-09-09T23:00:00+08:00",
+        "endTime": "2026-09-10T07:00:00+08:00",
+        "recordDate": "2026-09-10",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-09",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-09",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-53",
+        "startTime": "2026-09-11T23:00:00+08:00",
+        "endTime": "2026-09-12T07:00:00+08:00",
+        "recordDate": "2026-09-12",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-11",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-11",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-54",
+        "startTime": "2026-09-12T23:00:00+08:00",
+        "endTime": "2026-09-13T07:00:00+08:00",
+        "recordDate": "2026-09-13",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-12",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-12",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-55",
+        "startTime": "2026-09-13T23:00:00+08:00",
+        "endTime": "2026-09-14T07:00:00+08:00",
+        "recordDate": "2026-09-14",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-13",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-13",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-57",
+        "startTime": "2026-09-15T23:00:00+08:00",
+        "endTime": "2026-09-16T07:00:00+08:00",
+        "recordDate": "2026-09-16",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-15",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-15",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-58",
+        "startTime": "2026-09-16T23:00:00+08:00",
+        "endTime": "2026-09-17T07:00:00+08:00",
+        "recordDate": "2026-09-17",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-16",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-16",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-59",
+        "startTime": "2026-09-17T23:00:00+08:00",
+        "endTime": "2026-09-18T07:00:00+08:00",
+        "recordDate": "2026-09-18",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-17",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-17",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-61",
+        "startTime": "2026-09-19T23:00:00+08:00",
+        "endTime": "2026-09-20T07:00:00+08:00",
+        "recordDate": "2026-09-20",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-19",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-19",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-62",
+        "startTime": "2026-09-20T23:00:00+08:00",
+        "endTime": "2026-09-21T07:00:00+08:00",
+        "recordDate": "2026-09-21",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-20",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-20",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-63",
+        "startTime": "2026-09-21T23:00:00+08:00",
+        "endTime": "2026-09-22T07:00:00+08:00",
+        "recordDate": "2026-09-22",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-21",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-21",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-65",
+        "startTime": "2026-09-23T23:00:00+08:00",
+        "endTime": "2026-09-24T07:00:00+08:00",
+        "recordDate": "2026-09-24",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-23",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-23",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-66",
+        "startTime": "2026-09-24T23:00:00+08:00",
+        "endTime": "2026-09-25T07:00:00+08:00",
+        "recordDate": "2026-09-25",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-24",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-24",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-67",
+        "startTime": "2026-09-25T23:00:00+08:00",
+        "endTime": "2026-09-26T07:00:00+08:00",
+        "recordDate": "2026-09-26",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-25",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-25",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-69",
+        "startTime": "2026-09-27T23:00:00+08:00",
+        "endTime": "2026-09-28T07:00:00+08:00",
+        "recordDate": "2026-09-28",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-27",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-27",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-70",
+        "startTime": "2026-09-28T23:00:00+08:00",
+        "endTime": "2026-09-29T07:00:00+08:00",
+        "recordDate": "2026-09-29",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-28",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-28",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-71",
+        "startTime": "2026-09-29T23:00:00+08:00",
+        "endTime": "2026-09-30T07:00:00+08:00",
+        "recordDate": "2026-09-30",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-09-29",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-09-29",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-73",
+        "startTime": "2026-10-01T23:00:00+08:00",
+        "endTime": "2026-10-02T07:00:00+08:00",
+        "recordDate": "2026-10-02",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-10-01",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-10-01",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-74",
+        "startTime": "2026-10-02T23:00:00+08:00",
+        "endTime": "2026-10-03T07:00:00+08:00",
+        "recordDate": "2026-10-03",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-10-02",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-10-02",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-75",
+        "startTime": "2026-10-03T23:00:00+08:00",
+        "endTime": "2026-10-04T07:00:00+08:00",
+        "recordDate": "2026-10-04",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-10-03",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-10-03",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-77",
+        "startTime": "2026-10-05T23:00:00+08:00",
+        "endTime": "2026-10-06T07:00:00+08:00",
+        "recordDate": "2026-10-06",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-10-05",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-10-05",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-78",
+        "startTime": "2026-10-06T23:00:00+08:00",
+        "endTime": "2026-10-07T07:00:00+08:00",
+        "recordDate": "2026-10-07",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-10-06",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-10-06",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-79",
+        "startTime": "2026-10-07T23:00:00+08:00",
+        "endTime": "2026-10-08T07:00:00+08:00",
+        "recordDate": "2026-10-08",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-10-07",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-10-07",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-81",
+        "startTime": "2026-10-09T23:00:00+08:00",
+        "endTime": "2026-10-10T07:00:00+08:00",
+        "recordDate": "2026-10-10",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-10-09",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-10-09",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-82",
+        "startTime": "2026-10-10T23:00:00+08:00",
+        "endTime": "2026-10-11T07:00:00+08:00",
+        "recordDate": "2026-10-11",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-10-10",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-10-10",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-83",
+        "startTime": "2026-10-11T23:00:00+08:00",
+        "endTime": "2026-10-12T07:00:00+08:00",
+        "recordDate": "2026-10-12",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-10-11",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-10-11",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-85",
+        "startTime": "2026-10-13T23:00:00+08:00",
+        "endTime": "2026-10-14T07:00:00+08:00",
+        "recordDate": "2026-10-14",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-10-13",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-10-13",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-86",
+        "startTime": "2026-10-14T23:00:00+08:00",
+        "endTime": "2026-10-15T07:00:00+08:00",
+        "recordDate": "2026-10-15",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-10-14",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-10-14",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-sleep-87",
+        "startTime": "2026-10-15T23:00:00+08:00",
+        "endTime": "2026-10-16T07:00:00+08:00",
+        "recordDate": "2026-10-16",
+        "durationMinutes": 480,
+        "sleepNightDate": "2026-10-15",
+        "sleepNightDateSource": "auto",
+        "sleepStartLocalDate": "2026-10-15",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      }
+    ],
+    "waterLogs": [
+      {
+        "id": "water-frozen",
+        "date": "2026-10-09",
+        "timestamp": "2026-10-09T00:30:00Z",
+        "amountMl": 350,
+        "createdAt": "2026-10-09T00:30:00Z",
+        "updatedAt": "2026-10-09T00:30:00Z"
+      },
+      {
+        "id": "joint-water-1",
+        "date": "2026-07-21",
+        "amountMl": 1750,
+        "timestamp": "2026-07-21T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-2",
+        "date": "2026-07-22",
+        "amountMl": 2000,
+        "timestamp": "2026-07-22T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-3",
+        "date": "2026-07-23",
+        "amountMl": 2250,
+        "timestamp": "2026-07-23T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-4",
+        "date": "2026-07-24",
+        "amountMl": 1500,
+        "timestamp": "2026-07-24T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-6",
+        "date": "2026-07-26",
+        "amountMl": 2000,
+        "timestamp": "2026-07-26T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-7",
+        "date": "2026-07-27",
+        "amountMl": 2250,
+        "timestamp": "2026-07-27T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-8",
+        "date": "2026-07-28",
+        "amountMl": 1500,
+        "timestamp": "2026-07-28T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-9",
+        "date": "2026-07-29",
+        "amountMl": 1750,
+        "timestamp": "2026-07-29T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-11",
+        "date": "2026-07-31",
+        "amountMl": 2250,
+        "timestamp": "2026-07-31T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-12",
+        "date": "2026-08-01",
+        "amountMl": 1500,
+        "timestamp": "2026-08-01T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-13",
+        "date": "2026-08-02",
+        "amountMl": 1750,
+        "timestamp": "2026-08-02T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-14",
+        "date": "2026-08-03",
+        "amountMl": 2000,
+        "timestamp": "2026-08-03T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-16",
+        "date": "2026-08-05",
+        "amountMl": 1500,
+        "timestamp": "2026-08-05T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-17",
+        "date": "2026-08-06",
+        "amountMl": 1750,
+        "timestamp": "2026-08-06T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-18",
+        "date": "2026-08-07",
+        "amountMl": 2000,
+        "timestamp": "2026-08-07T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-19",
+        "date": "2026-08-08",
+        "amountMl": 2250,
+        "timestamp": "2026-08-08T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-21",
+        "date": "2026-08-10",
+        "amountMl": 1750,
+        "timestamp": "2026-08-10T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-22",
+        "date": "2026-08-11",
+        "amountMl": 2000,
+        "timestamp": "2026-08-11T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-23",
+        "date": "2026-08-12",
+        "amountMl": 2250,
+        "timestamp": "2026-08-12T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-24",
+        "date": "2026-08-13",
+        "amountMl": 1500,
+        "timestamp": "2026-08-13T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-26",
+        "date": "2026-08-15",
+        "amountMl": 2000,
+        "timestamp": "2026-08-15T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-27",
+        "date": "2026-08-16",
+        "amountMl": 2250,
+        "timestamp": "2026-08-16T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-28",
+        "date": "2026-08-17",
+        "amountMl": 1500,
+        "timestamp": "2026-08-17T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-29",
+        "date": "2026-08-18",
+        "amountMl": 1750,
+        "timestamp": "2026-08-18T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-31",
+        "date": "2026-08-20",
+        "amountMl": 2250,
+        "timestamp": "2026-08-20T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-32",
+        "date": "2026-08-21",
+        "amountMl": 1500,
+        "timestamp": "2026-08-21T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-33",
+        "date": "2026-08-22",
+        "amountMl": 1750,
+        "timestamp": "2026-08-22T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-34",
+        "date": "2026-08-23",
+        "amountMl": 2000,
+        "timestamp": "2026-08-23T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-36",
+        "date": "2026-08-25",
+        "amountMl": 1500,
+        "timestamp": "2026-08-25T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-37",
+        "date": "2026-08-26",
+        "amountMl": 1750,
+        "timestamp": "2026-08-26T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-38",
+        "date": "2026-08-27",
+        "amountMl": 2000,
+        "timestamp": "2026-08-27T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-39",
+        "date": "2026-08-28",
+        "amountMl": 2250,
+        "timestamp": "2026-08-28T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-41",
+        "date": "2026-08-30",
+        "amountMl": 1750,
+        "timestamp": "2026-08-30T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-42",
+        "date": "2026-08-31",
+        "amountMl": 2000,
+        "timestamp": "2026-08-31T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-43",
+        "date": "2026-09-01",
+        "amountMl": 2250,
+        "timestamp": "2026-09-01T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-44",
+        "date": "2026-09-02",
+        "amountMl": 1500,
+        "timestamp": "2026-09-02T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-46",
+        "date": "2026-09-04",
+        "amountMl": 2000,
+        "timestamp": "2026-09-04T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-47",
+        "date": "2026-09-05",
+        "amountMl": 2250,
+        "timestamp": "2026-09-05T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-48",
+        "date": "2026-09-06",
+        "amountMl": 1500,
+        "timestamp": "2026-09-06T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-49",
+        "date": "2026-09-07",
+        "amountMl": 1750,
+        "timestamp": "2026-09-07T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-51",
+        "date": "2026-09-09",
+        "amountMl": 2250,
+        "timestamp": "2026-09-09T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-52",
+        "date": "2026-09-10",
+        "amountMl": 1500,
+        "timestamp": "2026-09-10T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-53",
+        "date": "2026-09-11",
+        "amountMl": 1750,
+        "timestamp": "2026-09-11T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-54",
+        "date": "2026-09-12",
+        "amountMl": 2000,
+        "timestamp": "2026-09-12T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-56",
+        "date": "2026-09-14",
+        "amountMl": 1500,
+        "timestamp": "2026-09-14T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-57",
+        "date": "2026-09-15",
+        "amountMl": 1750,
+        "timestamp": "2026-09-15T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-58",
+        "date": "2026-09-16",
+        "amountMl": 2000,
+        "timestamp": "2026-09-16T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-59",
+        "date": "2026-09-17",
+        "amountMl": 2250,
+        "timestamp": "2026-09-17T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-61",
+        "date": "2026-09-19",
+        "amountMl": 1750,
+        "timestamp": "2026-09-19T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-62",
+        "date": "2026-09-20",
+        "amountMl": 2000,
+        "timestamp": "2026-09-20T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-63",
+        "date": "2026-09-21",
+        "amountMl": 2250,
+        "timestamp": "2026-09-21T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-64",
+        "date": "2026-09-22",
+        "amountMl": 1500,
+        "timestamp": "2026-09-22T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-66",
+        "date": "2026-09-24",
+        "amountMl": 2000,
+        "timestamp": "2026-09-24T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-67",
+        "date": "2026-09-25",
+        "amountMl": 2250,
+        "timestamp": "2026-09-25T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-68",
+        "date": "2026-09-26",
+        "amountMl": 1500,
+        "timestamp": "2026-09-26T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-69",
+        "date": "2026-09-27",
+        "amountMl": 1750,
+        "timestamp": "2026-09-27T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-71",
+        "date": "2026-09-29",
+        "amountMl": 2250,
+        "timestamp": "2026-09-29T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-72",
+        "date": "2026-09-30",
+        "amountMl": 1500,
+        "timestamp": "2026-09-30T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-73",
+        "date": "2026-10-01",
+        "amountMl": 1750,
+        "timestamp": "2026-10-01T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-74",
+        "date": "2026-10-02",
+        "amountMl": 2000,
+        "timestamp": "2026-10-02T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-76",
+        "date": "2026-10-04",
+        "amountMl": 1500,
+        "timestamp": "2026-10-04T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-77",
+        "date": "2026-10-05",
+        "amountMl": 1750,
+        "timestamp": "2026-10-05T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-78",
+        "date": "2026-10-06",
+        "amountMl": 2000,
+        "timestamp": "2026-10-06T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-79",
+        "date": "2026-10-07",
+        "amountMl": 2250,
+        "timestamp": "2026-10-07T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-81",
+        "date": "2026-10-09",
+        "amountMl": 1750,
+        "timestamp": "2026-10-09T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-82",
+        "date": "2026-10-10",
+        "amountMl": 2000,
+        "timestamp": "2026-10-10T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-83",
+        "date": "2026-10-11",
+        "amountMl": 2250,
+        "timestamp": "2026-10-11T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-84",
+        "date": "2026-10-12",
+        "amountMl": 1500,
+        "timestamp": "2026-10-12T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-86",
+        "date": "2026-10-14",
+        "amountMl": 2000,
+        "timestamp": "2026-10-14T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-87",
+        "date": "2026-10-15",
+        "amountMl": 2250,
+        "timestamp": "2026-10-15T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-88",
+        "date": "2026-10-16",
+        "amountMl": 1500,
+        "timestamp": "2026-10-16T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "joint-water-89",
+        "date": "2026-10-17",
+        "amountMl": 1750,
+        "timestamp": "2026-10-17T12:00:00+08:00",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      }
+    ],
+    "nutritionCycles": [
+      {
+        "id": "ux-a-old-cycle",
+        "templateId": "ux-a",
+        "templateName": "待删除策略",
+        "name": "ux-a-old-cycle",
+        "startDate": "2025-06-01",
+        "endDate": "2025-06-03",
+        "revision": 1,
+        "archivedAt": "2026-10-16T00:00:00.000Z",
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-a-future-cycle",
+        "templateId": "ux-a",
+        "templateName": "待删除策略",
+        "name": "ux-a-future-cycle",
+        "startDate": "2030-01-01",
+        "endDate": "2030-01-03",
+        "revision": 1,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-b-cycle",
+        "templateId": "ux-b",
+        "templateName": "独立保留策略",
+        "name": "ux-b-cycle",
+        "startDate": "2026-07-01",
+        "endDate": "2026-07-31",
+        "revision": 1,
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      }
+    ],
+    "nutritionCycleDays": [
+      {
+        "id": "ux-a-old-cycle-day-1",
+        "cycleId": "ux-a-old-cycle",
+        "date": "2025-06-01",
+        "nutrition": {
+          "templateId": "ux-a",
+          "templateName": "待删除策略",
+          "variantId": "ux-a-v1",
+          "variantName": "日方案1",
+          "calories": 2100,
+          "protein": 140
+        },
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-a-old-cycle-day-2",
+        "cycleId": "ux-a-old-cycle",
+        "date": "2025-06-02",
+        "nutrition": {
+          "templateId": "ux-a",
+          "templateName": "待删除策略",
+          "variantId": "ux-a-v1",
+          "variantName": "日方案1",
+          "calories": 2100,
+          "protein": 140
+        },
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z",
+        "dietTemplate": {
+          "id": "approved-v04-day-template",
+          "name": "Frozen four meal template"
+        }
+      },
+      {
+        "id": "ux-a-future-cycle-day-1",
+        "cycleId": "ux-a-future-cycle",
+        "date": "2030-01-01",
+        "nutrition": {
+          "templateId": "ux-a",
+          "templateName": "待删除策略",
+          "variantId": "ux-a-v1",
+          "variantName": "日方案1",
+          "calories": 2100,
+          "protein": 140
+        },
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-a-future-cycle-day-2",
+        "cycleId": "ux-a-future-cycle",
+        "date": "2030-01-02",
+        "nutrition": {
+          "templateId": "ux-a",
+          "templateName": "待删除策略",
+          "variantId": "ux-a-v1",
+          "variantName": "日方案1",
+          "calories": 2100,
+          "protein": 140
+        },
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z",
+        "dietTemplate": {
+          "id": "approved-v04-day-template",
+          "name": "Frozen four meal template"
+        }
+      },
+      {
+        "id": "ux-b-cycle-day-1",
+        "cycleId": "ux-b-cycle",
+        "date": "2026-07-01",
+        "nutrition": {
+          "templateId": "ux-b",
+          "templateName": "独立保留策略",
+          "variantId": "ux-b-v1",
+          "variantName": "日方案1",
+          "calories": 2100,
+          "protein": 140
+        },
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z"
+      },
+      {
+        "id": "ux-b-cycle-day-2",
+        "cycleId": "ux-b-cycle",
+        "date": "2026-07-02",
+        "nutrition": {
+          "templateId": "ux-b",
+          "templateName": "独立保留策略",
+          "variantId": "ux-b-v1",
+          "variantName": "日方案1",
+          "calories": 2100,
+          "protein": 140
+        },
+        "createdAt": "2026-10-16T00:00:00.000Z",
+        "updatedAt": "2026-10-16T00:00:00.000Z",
+        "dietTemplate": {
+          "id": "approved-v04-day-template",
+          "name": "Frozen four meal template"
+        }
+      }
+    ]
+  }
+}

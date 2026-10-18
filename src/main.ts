@@ -1,3 +1,5 @@
+import { replaceReportHtml } from './ui/reportChapters'
+import { acquirePelvicRangeLease } from './services/pendingHealthOperations'
 import { loadNutritionCycleReport } from './services/nutritionCycleReportService'
 import { nutritionCycleReportHtml } from './ui/nutritionCycleReport'
 import { setupAppearance } from './services/appearanceConfig'
@@ -16,7 +18,6 @@ import { createTrainingCompletion, type TrainingCompletion } from './ui/training
 import './styles/trainingCompletion.css'
 import { coachReportHtml, bindCoachPlots, exerciseHistoryHtml, type CoachState } from './ui/coachReport'
 import { loadCoachReport } from './services/coachReportService'
-import type { CoachFocus } from './utils/coachReportAnalysis'
 import './styles/coachReport.css'
 import { liveQuery } from 'dexie'
 import { readDailyRecords } from './services/dailyRecordsSummary'
@@ -134,9 +135,12 @@ let showWorkoutHistory = false
 
 const coachState:CoachState={focus:'all',metric:'load'}
 let selectedCycleReport: string | undefined
-let reportMode: ReportMode | 'cycle' = 'week'
+let reportMode: ReportMode | 'cycle' | 'custom' = 'week'
+let customReportRange={start:shiftLocalDate(getLocalDateString(),-29),end:getLocalDateString()}
+let reportTemplateFilter:string|undefined
 let reportAnchorDate = getLocalDateString()
 let trainingCompletion: TrainingCompletion | undefined
+let releasePelvicRangeLease:(()=>void)|undefined
 let pelvicTimerState: PelvicFloorTimerState | undefined
 let pelvicTimerDate = getLocalDateString()
 let pelvicTimerInterval: number | undefined
@@ -211,7 +215,7 @@ function fail(error: unknown): void {
 }
 
 const workoutAutosave = new WorkoutAutosaveController(
-  (workout) => saveWorkout(workout),
+  (workout) => saveWorkout(workout,db,{requireExisting:true}),
   400,
   (state, error) => {
     const element = document.querySelector('#autosave-state')
@@ -587,32 +591,42 @@ function reportPeriodLabel(report: ReportResult): string {
   return `${reportDateLabel(report.range.start)}–${reportDateLabel(report.range.end)}`
 }
 
+function reportKindsHtml(cycle=false):string {return `<div class="report-kinds segmented" role="group" aria-label="报告类型"><button type="button" data-report-kind="daily" class="${!cycle?'active':''}" aria-pressed="${!cycle}">日常综合报告</button><button type="button" data-report-mode="cycle" data-report-kind="cycle" class="${cycle?'active':''}" aria-pressed="${cycle}">营养周期报告</button></div>`}
+const reportDisabledBeforeFetch=new WeakMap<HTMLButtonElement|HTMLSelectElement,boolean>()
+async function readReportSurface<T>(view:HTMLElement,version:string|undefined,read:()=>Promise<T>):Promise<T>{
+ const page=view.querySelector<HTMLElement>('.report-page'),controls=[...view.querySelectorAll<HTMLButtonElement|HTMLSelectElement>('.report-page button,.report-page select')]
+ for(const control of controls){if(!reportDisabledBeforeFetch.has(control))reportDisabledBeforeFetch.set(control,control.disabled);control.disabled=true}
+ page?.setAttribute('aria-busy','true')
+ try{return await read()}finally{if(view.dataset.renderVersion===version){for(const control of controls)if(control.isConnected){control.disabled=reportDisabledBeforeFetch.get(control)??false;reportDisabledBeforeFetch.delete(control)}page?.removeAttribute('aria-busy')}}
+}
 async function renderReportsPage():Promise<void> {
   const view=document.querySelector<HTMLElement>('#view')!,viewVersion=view.dataset.renderVersion,today=getLocalDateString(),mode=reportMode,anchor=reportAnchorDate
   if(mode==='cycle'){await renderCycleReportsPage(view,viewVersion,today);return}
-  let data=await loadCoachReport(mode,anchor,today),report=data.report
+  const analysisMode=mode==='custom'?'month':mode,override=mode==='custom'?customReportRange:undefined
+  let data=await readReportSurface(view,viewVersion,()=>loadCoachReport(analysisMode,anchor,today,db,override)),report=data.report
   if(activeTab!=='progress'||progressView!=='reports'||!view.isConnected||view.dataset.renderVersion!==viewVersion)return
-  const isCurrent=report.range.start===getReportRange(mode,today).start,period=mode==='day'?'天':mode==='week'?'周':'月'
-  const retainedTabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page"><div class="report-mode" role="group" aria-label="报告周期">${(['day','week','month','cycle'] as const).map(m=>`<button data-report-mode="${m}" class="${mode===m?'active':''}" aria-pressed="${mode===m}">${m==='day'?'日报':m==='week'?'周报':m==='month'?'月报':'周期报'}</button>`).join('')}</div><div class="report-period"><button id="report-previous" aria-label="上一${period}">‹</button>${mode==='day'?`<button class="text-btn fitlog-date-trigger" id="report-date-picker">${reportPeriodLabel(report)}</button>`:`<strong>${reportPeriodLabel(report)}</strong>`}<button id="report-next" aria-label="下一${period}" ${isCurrent?'disabled':''}>›</button></div>${isCurrent?'':`<button class="report-return" id="report-return">${mode==='day'?'回到今天':'回到本'+period}</button>`}<div class="report-content">${coachReportHtml(data,coachState,mode,esc)}</div></div>`)
+  const isCurrent=mode==='custom'||report.range.start===getReportRange(analysisMode,today).start,period=mode==='day'?'天':mode==='week'?'周':'月'
+  const retainedTabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page">${reportKindsHtml()}<div class="report-mode" role="group" aria-label="报告周期">${(['day','week','month','custom'] as const).map(m=>`<button data-report-mode="${m}" class="${mode===m?'active':''}" aria-pressed="${mode===m}">${m==='day'?'日报':m==='week'?'周报':m==='month'?'月报':'自定义'}</button>`).join('')}</div><div class="report-period" ${mode==='custom'?'hidden':''}><button id="report-previous" aria-label="上一${period}">‹</button>${mode==='day'?`<button class="text-btn fitlog-date-trigger" id="report-date-picker">${reportPeriodLabel(report)}</button>`:`<strong>${reportPeriodLabel(report)}</strong>`}<button id="report-next" aria-label="下一${period}" ${isCurrent?'disabled':''}>›</button></div>${isCurrent?'':`<button class="report-return" id="report-return">${mode==='day'?'回到今天':'回到本'+period}</button>`}<div class="report-custom-range" ${mode==='custom'?'':'hidden'}><button class="secondary" type="button" data-report-start>开始 ${customReportRange.start}</button><button class="secondary" type="button" data-report-end>结束 ${customReportRange.end}</button><p class="report-note">最多366天；实际统计仅截至今天。</p></div><div class="report-content">${coachReportHtml(data,coachState,analysisMode,esc)}</div></div>`)
   if(!retainedTabs)bindProgressTabs(view)
-  view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach(b=>b.addEventListener('click',()=>{reportMode=b.dataset.reportMode as ReportMode|'cycle';void render().catch(fail)}))
-  view.querySelector('#report-previous')?.addEventListener('click',()=>{reportAnchorDate=shiftReportPeriod(mode,anchor,-1);void render().catch(fail)})
-  view.querySelector('#report-next')?.addEventListener('click',()=>{if(isCurrent)return;reportAnchorDate=shiftReportPeriod(mode,anchor,1);void render().catch(fail)})
+  view.querySelector('[data-report-kind=daily]')?.addEventListener('click',()=>{reportMode='week';void render().catch(fail)})
+  view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach(b=>b.addEventListener('click',()=>{reportMode=b.dataset.reportMode as ReportMode|'cycle'|'custom';void render().catch(fail)}))
+  view.querySelector('#report-previous')?.addEventListener('click',()=>{reportAnchorDate=shiftReportPeriod(analysisMode,anchor,-1);void render().catch(fail)})
+  view.querySelector('#report-next')?.addEventListener('click',()=>{if(isCurrent)return;reportAnchorDate=shiftReportPeriod(analysisMode,anchor,1);void render().catch(fail)})
   view.querySelector('#report-return')?.addEventListener('click',()=>{reportAnchorDate=today;void render().catch(fail)})
   view.querySelector('#report-date-picker')?.addEventListener('click',()=>showBusinessDatePicker('选择日报日期',anchor,date=>{reportAnchorDate=date;void render().catch(fail)}))
+  for(const edge of ['start','end'] as const)view.querySelector(`[data-report-${edge}]`)?.addEventListener('click',()=>showBusinessDatePicker(edge==='start'?'报告开始日期':'报告结束日期',customReportRange[edge],date=>{const next={...customReportRange,[edge]:date};if(next.start>next.end||(Date.parse(next.end+'T00:00:00Z')-Date.parse(next.start+'T00:00:00Z'))/86400000>365){toast('日期需先后正确且最多366天');return}customReportRange=next;void render().catch(fail)}))
   const host=view.querySelector<HTMLElement>('.report-content')!,events=new AbortController()
   let plotsDispose=bindCoachPlots(host,id=>{if(!id.startsWith('weight:'))coachState.point=id})
-  const draw=()=>{const y=scrollY;plotsDispose();host.innerHTML=coachReportHtml(data,coachState,mode,esc);plotsDispose=bindCoachPlots(host,id=>{if(!id.startsWith('weight:'))coachState.point=id});window.scrollTo({top:y,behavior:'instant'})}
+  const draw=()=>{const y=scrollY;plotsDispose();replaceReportHtml(host,coachReportHtml(data,coachState,analysisMode,esc));plotsDispose=bindCoachPlots(host,id=>{if(!id.startsWith('weight:'))coachState.point=id});window.scrollTo({top:y,behavior:'instant'})}
   host.addEventListener('click',e=>{
     const button=(e.target as Element).closest<HTMLElement>('button');if(!button)return
-    if(button.dataset.coachFocus){coachState.focus=button.dataset.coachFocus as CoachFocus;draw()}
     if(button.dataset.coachExercise){coachState.exercise=button.dataset.coachExercise;delete coachState.point;draw()}
     if(button.dataset.coachChart){coachState.metric=button.dataset.coachChart as CoachState['metric'];draw()}
     if(button.dataset.coachHistory){const group=data.analysis.groups.find(g=>g.key===button.dataset.coachHistory);if(group)openModal(group.name+' · 训练明细',exerciseHistoryHtml(group,esc))}
   },{signal:events.signal})
   const signature=(value:unknown)=>JSON.stringify(value,(_k,v)=>v instanceof Set?[...v]:v)
   let previous=signature(data)
-  const sub=liveQuery(()=>loadCoachReport(mode,anchor,today)).subscribe({next:value=>{
+  const sub=liveQuery(()=>loadCoachReport(analysisMode,anchor,today,db,override)).subscribe({next:value=>{
     if(!host.isConnected||view.dataset.renderVersion!==viewVersion)return
     const next=signature(value);if(next===previous)return;previous=next;data=value;report=data.report
     if(mode==='day'){
@@ -626,18 +640,21 @@ async function renderReportsPage():Promise<void> {
 }
 
 async function renderCycleReportsPage(view:HTMLElement,version:string|undefined,today:string):Promise<void> {
-  let data=await loadNutritionCycleReport(selectedCycleReport,today)
+  let data=await readReportSurface(view,version,()=>loadNutritionCycleReport(selectedCycleReport,today,db,reportTemplateFilter))
   if(!view.isConnected||view.dataset.renderVersion!==version||progressView!=='reports'||reportMode!=='cycle')return
   selectedCycleReport=data.selected?.id
-  const tabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page"><div class="report-mode" role="group" aria-label="报告周期">${(['day','week','month','cycle'] as const).map(m=>`<button data-report-mode="${m}" class="${m==='cycle'?'active':''}" aria-pressed="${m==='cycle'}">${m==='day'?'日报':m==='week'?'周报':m==='month'?'月报':'周期报'}</button>`).join('')}</div><div class="report-content">${nutritionCycleReportHtml(data,esc)}</div></div>`)
+  reportTemplateFilter=data.templateFilter
+  const tabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page">${reportKindsHtml(true)}<div class="report-content">${nutritionCycleReportHtml(data,esc,coachState)}</div></div>`)
   if(!tabs)bindProgressTabs(view)
-  view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach(b=>b.addEventListener('click',()=>{reportMode=b.dataset.reportMode as ReportMode|'cycle';void render().catch(fail)}))
+  view.querySelector('[data-report-kind=daily]')?.addEventListener('click',()=>{reportMode='week';void render().catch(fail)})
+  view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach(b=>b.addEventListener('click',()=>{reportMode=b.dataset.reportMode as ReportMode|'cycle'|'custom';void render().catch(fail)}))
   const host=view.querySelector<HTMLElement>('.report-content')!,events=new AbortController()
-  host.addEventListener('change',event=>{const select=event.target as HTMLSelectElement;if(select.hasAttribute('data-cycle-report-select')){selectedCycleReport=select.value;void render().catch(fail)}},{signal:events.signal})
-  host.addEventListener('click',event=>{if((event.target as Element).closest('[data-cycle-report-manage]'))void showNutritionCycles(nutritionStrategyUi()).catch(fail)},{signal:events.signal})
+  let cyclePlots=bindCoachPlots(host,id=>{coachState.point=id})
+  host.addEventListener('change',event=>{const select=event.target as HTMLSelectElement;if(select.hasAttribute('data-report-template')){reportTemplateFilter=select.value||undefined;selectedCycleReport=undefined;void render().catch(fail)}if(select.hasAttribute('data-cycle-report-select')){selectedCycleReport=select.value;void render().catch(fail)}},{signal:events.signal})
+  host.addEventListener('click',event=>{const button=(event.target as Element).closest<HTMLElement>('button');if(!button)return;if(button.hasAttribute('data-cycle-report-manage'))void showNutritionCycles(nutritionStrategyUi()).catch(fail);if(button.dataset.coachExercise){coachState.exercise=button.dataset.coachExercise;delete coachState.point;cyclePlots();replaceReportHtml(host,nutritionCycleReportHtml(data,esc,coachState));cyclePlots=bindCoachPlots(host,id=>{coachState.point=id})}if(button.dataset.coachChart){coachState.metric=button.dataset.coachChart as CoachState['metric'];cyclePlots();replaceReportHtml(host,nutritionCycleReportHtml(data,esc,coachState));cyclePlots=bindCoachPlots(host,id=>{coachState.point=id})}if(button.dataset.coachHistory){const group=data.coach?.analysis.groups.find(g=>g.key===button.dataset.coachHistory);if(group)openModal(group.name+' · 训练明细',exerciseHistoryHtml(group,esc))}},{signal:events.signal})
   let previous=JSON.stringify(data)
-  const sub=liveQuery(()=>loadNutritionCycleReport(selectedCycleReport,today)).subscribe({next:value=>{if(!host.isConnected||view.dataset.renderVersion!==version)return;const next=JSON.stringify(value);if(next===previous)return;previous=next;data=value;selectedCycleReport=value.selected?.id;host.innerHTML=nutritionCycleReportHtml(data,esc)},error:fail})
-  recordsDispose=()=>{events.abort();sub.unsubscribe()}
+  const sub=liveQuery(()=>loadNutritionCycleReport(selectedCycleReport,today,db,reportTemplateFilter)).subscribe({next:value=>{if(!host.isConnected||view.dataset.renderVersion!==version)return;const next=JSON.stringify(value);if(next===previous)return;previous=next;data=value;selectedCycleReport=value.selected?.id;reportTemplateFilter=value.templateFilter;cyclePlots();replaceReportHtml(host,nutritionCycleReportHtml(data,esc,coachState));cyclePlots=bindCoachPlots(host,id=>{coachState.point=id})},error:fail})
+  recordsDispose=()=>{events.abort();sub.unsubscribe();cyclePlots()}
 }
 
 const expandedSubtasks = new Set<string>()
@@ -1697,6 +1714,7 @@ async function showPelvicFloorSetup(): Promise<void> {
         if (!selectedRoutine) throw new Error('训练方案不可用')
         const ready = createPelvicFloorTimer(selectedRoutine)
         await initializePelvicAudio()
+        releasePelvicRangeLease?.();releasePelvicRangeLease=await acquirePelvicRangeLease(workoutDate)
         pelvicTimerState = startPelvicFloorTimer(ready, Date.now())
         pelvicTimerDate = workoutDate
         pelvicSessionSaving = false
@@ -1815,6 +1833,7 @@ function tickPelvicFloorTimer(): void {
 }
 
 function returnFromTrainingCompletion(): void {
+  releasePelvicRangeLease?.();releasePelvicRangeLease=undefined
   trainingCompletion=undefined;pelvicTimerState=undefined;pelvicTimerElements=undefined
   currentWorkout=undefined;workoutEditorOpen=false;showWorkoutHistory=false
   document.body.classList.remove('immersive');void render().catch(fail)
@@ -1939,7 +1958,7 @@ function bindWorkoutEditor(workout: Workout): void {
       if(!await confirmAction('完成本次训练？','完成后仍可查看和编辑本次记录。','完成训练',false))return
       const captured=structuredClone(workout)
       trainingCompletion=createTrainingCompletion({kind:'strength',title:'力量训练',result:captured,esc,
-        save:async result=>{await flushWorkoutAutosave(result);const saved=await finishWorkout(result);workoutAutosave.cancel();currentWorkout=undefined;workoutEditorOpen=false;return saved},
+        save:async result=>{await flushWorkoutAutosave(result);const saved=await finishWorkout(result,db,{requireExisting:true});workoutAutosave.cancel();currentWorkout=undefined;workoutEditorOpen=false;return saved},
         summary:result=>[['实际动作',`${result.exercises.length} 个动作`],['实际组数',`${result.exercises.reduce((n,e)=>n+e.sets.length,0)} 组`],['训练日期',result.date],...(result.note?[['训练日志',result.note] as [string,string]]:[])],
         returned:returnFromTrainingCompletion,
         view:result=>{const dialog=openModal('本次力量训练',`<div class="completion-record"><p>${formatHeaderDate(result.date)}</p>${result.exercises.map(e=>`<section><h3>${esc(e.exerciseName)}</h3>${e.sets.map((set,i)=>`<p>第${i+1}组 · ${workoutSetSummary(set)}${set.note?` · ${esc(set.note)}`:''}</p>`).join('')}</section>`).join('')}${result.note?`<p class="journal-copy">${esc(result.note)}</p>`:''}<button class="secondary full-btn" data-completion-record-back>返回完成页</button></div>`);dialog.querySelector('[data-completion-record-back]')!.addEventListener('click',()=>dialog.close())}})

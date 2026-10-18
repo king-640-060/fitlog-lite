@@ -126,22 +126,25 @@
 .water-card .card-heading { margin-bottom:8px; }
 .water-card { container-type:inline-size; }
 .water-brief { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:8px; }
-.water-brief-stats { display:grid; gap:3px; min-width:0; }
+.water-brief-stats { display:grid; gap:3px; min-width:0; overflow-wrap:anywhere; }
+.water-brief-stats > * { min-width:0; }
 .water-brief-total { font-size:.9375rem; font-weight:500; line-height:1.4; overflow-wrap:anywhere; }
 .water-brief-total .recovery-number { font-size:1.125rem; font-weight:700; }
 .water-expand-toggle { min-height:44px; padding-inline:4px 0; font-size:.8125rem; white-space:nowrap; }
-.water-expand-toggle span { display:inline-block; font-size:1.1rem; }
-.water-expand-toggle[aria-expanded=true] span { transform:rotate(180deg); }
+.water-expand-toggle { display:inline-flex; align-items:center; gap:6px; }
+.water-expand-toggle .icon { width:1rem; height:1rem; transform:rotate(90deg); }
+.water-expand-toggle[aria-expanded=true] .icon { transform:rotate(270deg); }
 .water-collapsible { margin-top:8px; padding-top:10px; border-top:1px solid var(--divider); }
 .water-collapsible[hidden] { display:none; }
 .water-expand-secondary { display:flex; flex-wrap:wrap; justify-content:space-between; gap:0 8px; margin-top:3px; }
 .water-expand-secondary button { min-height:44px; font-size:.8125rem; padding-inline:0; }
 .water-record-options > p { margin:0; }
 .water-record-options .water-record-footnote { font-size:.75rem; text-align:center; }
-@container (max-width:14rem) {
-  .water-brief { grid-template-columns:minmax(0,1fr); }
-  .water-expand-toggle { justify-self:start; }
-}
+/* Even enlarged narrow layouts retain the approved right-side action. */
 
 /* Only the two quick controls participate in this adaptive row; full-span copy cannot create a third track. */
 .water-record-options > .water-record-quick-actions { display:grid; grid-column:1 / -1; grid-template-columns:repeat(auto-fit,minmax(min(100%,7rem),1fr)); gap:10px; }
+
+.water-number-slot { display:grid; min-width:0; white-space:normal; }
+.water-number-slot > span { grid-area:1 / 1; overflow-wrap:anywhere; }
+.water-number-sizer { visibility:hidden; pointer-events:none; }

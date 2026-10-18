@@ -3,7 +3,7 @@ import type { NutritionStrategyTemplate, NutritionStrategyVariant, NutritionStra
 import { validateCycleCollection } from './nutritionCycleService'
 
 /** Explicitly confirmed destructive scope. No health-fact table participates in this transaction. */
-interface Snapshot {
+export interface Snapshot {
   templates: NutritionStrategyTemplate[]
   variants: NutritionStrategyVariant[]
   phases: NutritionStrategyPhase[]
@@ -38,14 +38,14 @@ async function snapshot(database: FitLogDatabase): Promise<Snapshot> {
   return { templates, variants, phases, targets, cycles, days }
 }
 /** Stable by ID, category and object keys; malformed numeric values never collide with JSON null. */
-function fingerprint(value: unknown): string {
+export function nutritionCascadeFingerprint(value: unknown): string {
   return JSON.stringify(value, (_key, item: unknown) => {
     if (typeof item === 'number' && !Number.isFinite(item)) throw new Error('营养关联数据含无效数值；未删除任何记录，请先核对数据')
     if (item && typeof item === 'object' && !Array.isArray(item)) return Object.fromEntries(Object.entries(item).sort(([a], [b]) => a.localeCompare(b)))
     return item
   })
 }
-function plan(id: string, data: Snapshot): { selected: Snapshot; preview: NutritionCascadePreview } {
+export function planNutritionStrategyCascade(id: string, data: Snapshot): { selected: Snapshot; preview: NutritionCascadePreview } {
   const template = data.templates.find(t => t.id === id)
   if (!template) throw new Error('模板已不存在；未删除任何记录，请返回模板管理')
   const variants = data.variants.filter(v => v.templateId === id), phases = data.phases.filter(p => p.templateId === id), cycles = data.cycles.filter(c => c.templateId === id)
@@ -83,14 +83,14 @@ function plan(id: string, data: Snapshot): { selected: Snapshot; preview: Nutrit
     ...cycles.map(c => ({ category: 'cycles' as const, id: c.id, label: c.name, date: `${c.startDate} — ${c.endDate}` })),
     ...days.map(d => ({ category: 'days' as const, id: d.id, label: cycleMap.get(d.cycleId)?.name ?? '所属周期缺失', date: d.date })),
   ]
-  return { selected, preview: { id, name: template.name, counts, total: Object.values(counts).reduce((sum, n) => sum + n, 0), fingerprint: fingerprint(data), conflicts: [...new Set(conflicts)], details } }
+  return { selected, preview: { id, name: template.name, counts, total: Object.values(counts).reduce((sum, n) => sum + n, 0), fingerprint: nutritionCascadeFingerprint(data), conflicts: [...new Set(conflicts)], details } }
 }
 export async function previewNutritionStrategyCascade(id: string, database: FitLogDatabase = db): Promise<NutritionCascadePreview> {
-  return database.transaction('r', stores(database), async () => plan(id, await snapshot(database)).preview)
+  return database.transaction('r', stores(database), async () => planNutritionStrategyCascade(id, await snapshot(database)).preview)
 }
 export async function deleteNutritionStrategyCascade(id: string, expectedFingerprint: string, database: FitLogDatabase = db): Promise<void> {
   await database.transaction('rw', stores(database), async () => {
-    const before = await snapshot(database), { selected, preview } = plan(id, before)
+    const before = await snapshot(database), { selected, preview } = planNutritionStrategyCascade(id, before)
     if (preview.fingerprint !== expectedFingerprint) throw new Error('模板或关联数据已变化；未删除任何记录，请重新预览并确认')
     if (preview.conflicts.length) throw new Error(`${preview.conflicts.join('；')}。未删除任何记录，请核对来源后重新预览`)
     await database.nutritionTargets.bulkDelete(selected.targets.map(t => t.id))
@@ -104,7 +104,7 @@ export async function deleteNutritionStrategyCascade(id: string, expectedFingerp
       const ids = new Set(selected[k].map(row => row.id))
       return [k, before[k].filter(row => !ids.has(row.id))]
     })) as unknown as Snapshot
-    if (fingerprint(after) !== fingerprint(expected)) throw new Error('删除后的关联数据校验失败；本次事务已回滚，未删除任何记录')
+    if (nutritionCascadeFingerprint(after) !== nutritionCascadeFingerprint(expected)) throw new Error('删除后的关联数据校验失败；本次事务已回滚，未删除任何记录')
     validateCycleCollection(after.cycles, after.days)
   })
 }

@@ -1,0 +1,80 @@
+{
+  "package": "FitLog_Lite_Joint_UX_Reports_RangeDelete_Approved_v0.3_Codex_2026-10-17",
+  "approved_prototype_sha256": "436f5eeaec511559026ffa7364be64b7d1fd94a63ee1cda04351efeed91e3991",
+  "repository": "king-640-060/fitlog-lite",
+  "reference_main_sha_at_package_creation": "9423586813e2c65a2f2d7126b82acb70bbe02100",
+  "items": {
+    "00_README_请先阅读.md": {
+      "bytes": 3423,
+      "sha256": "b3909e18caa2bac474f682843b6ac125af75709bedec9c366efe89b4729a48a1"
+    },
+    "01_CODEX_EXECUTION_INSTRUCTION.md": {
+      "bytes": 7161,
+      "sha256": "a1c3b6e4bf8ffa16d1346a68efd358919209b3221bab220d76709fd96889c05e"
+    },
+    "02_UI_TRENDS_DESIGN_LOCK.md": {
+      "bytes": 4429,
+      "sha256": "2ba5f6c39e160f152e37311f05ec90ea59fb6ff3c04fbb176baae846470df4de"
+    },
+    "03_RANGE_CASCADE_DELETION_CONTRACT.md": {
+      "bytes": 8663,
+      "sha256": "31795fa62f457865fc40e204c41efa943170f84e48882ce21e048678d0c707c6"
+    },
+    "04_SPORTS_SCIENCE_REPORT_CONTRACT.md": {
+      "bytes": 6214,
+      "sha256": "58dfbae86cd4909042485ec684a1efa94ab25aadc36b42f97d1dd5d70f1b653c"
+    },
+    "05_ACCEPTANCE_MATRIX.md": {
+      "bytes": 6030,
+      "sha256": "9cd2a8d590c1eebc7e9a451d7494ca531c2d751a5fc325ab56c166463ab7f597"
+    },
+    "06_DATA_RELEASE_SECURITY.md": {
+      "bytes": 3036,
+      "sha256": "c203cb71308e5ed2c34b7bffa2acd4205ff9123952e61d821c6be8f6629eda4b"
+    },
+    "07_EVIDENCE_BASIS.md": {
+      "bytes": 1695,
+      "sha256": "eb95bfa984f3288c5cfd033912cea47919857e034e57287ea50e7973eeb7a9a9"
+    },
+    "prototype/FitLog_Joint_Water_Trends_Reports_RangeDelete_Prototype_v0.3.html": {
+      "bytes": 54740,
+      "sha256": "436f5eeaec511559026ffa7364be64b7d1fd94a63ee1cda04351efeed91e3991"
+    },
+    "reference_qa/measured_heights_v0.3.json": {
+      "bytes": 8070,
+      "sha256": "7dd391cb17d72ea1712e66b3f97833f2ce81933d9abcd8d234191a90885e93c5"
+    },
+    "reference_visuals/cycle_report_390.png": {
+      "bytes": 132742,
+      "sha256": "26482bb67d1674453d5969478ed2fb90c9c8499495edf2836c7db9fd7533f1d4"
+    },
+    "reference_visuals/daily_report_390.png": {
+      "bytes": 98832,
+      "sha256": "d5d4cce6a09830a26ee429f2b228d83c364f54db471604334613872f9ae48834"
+    },
+    "reference_visuals/delete_preview_390.png": {
+      "bytes": 148028,
+      "sha256": "90ab2bb448495f4da33dfcb05892289737c730dd4f1491ed64531233c9b36426"
+    },
+    "reference_visuals/height_7_30_90_390.png": {
+      "bytes": 28557,
+      "sha256": "21f45835f617df90ee03cd5b4002508c876b8e1a21edad7ecee3cfeb9bcb4897"
+    },
+    "reference_visuals/independent_three_charts_390.png": {
+      "bytes": 99973,
+      "sha256": "f49cc69f2d7e23fe98215d89f7069b5467c880715dd30ea0e04e7ea5977f90b4"
+    },
+    "reference_visuals/sleep_empty_390.png": {
+      "bytes": 92791,
+      "sha256": "9a7941dbbbb494a6a903b50f84d13ded6329303fb56c7fe3642f6f909e8db0cb"
+    },
+    "reference_visuals/today_expanded_390.png": {
+      "bytes": 80734,
+      "sha256": "8fb7fe29573b208b62f09a4ea71c71e230e162384824b18bd6f364fca5c251eb"
+    },
+    "reference_visuals/today_right_390.png": {
+      "bytes": 75095,
+      "sha256": "d88fe98823f6f7a61468100b4d88b2c439431ad1c4ad2523be9d9beb21c317a9"
+    }
+  }
+}

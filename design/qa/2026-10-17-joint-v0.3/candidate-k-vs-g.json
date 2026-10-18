@@ -1,0 +1,11 @@
+{
+  "comparedWith": "candidate-g-source-sha256.json",
+  "changed": [
+    "src/main.ts",
+    "src/styles/coachReport.css",
+    "src/styles/main.css",
+    "src/services/nutritionCycleReportService.ts"
+  ],
+  "added": [],
+  "removed": []
+}

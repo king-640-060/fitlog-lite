@@ -127,7 +127,7 @@ describe('explicit six-category nutrition cascade, never date-based health delet
   })
   it('removed cycle reports are no longer selectable; ordinary actual-history reports remain intact',async()=>{
     const d=await seed(),before=await loadReport('day','2026-09-28','2026-10-17',d),p=await previewNutritionStrategyCascade('ux-a',d);await deleteNutritionStrategyCascade(p.id,p.fingerprint,d)
-    const report=await loadNutritionCycleReport('ux-a-old-cycle','2026-10-17',d);expect(report.cycles.map(c=>c.id)).toEqual(['ux-b-cycle']);expect(report.selected!.id).toBe('ux-b-cycle');expect(await loadReport('day','2026-09-28','2026-10-17',d)).toEqual(before)
+    const report=await loadNutritionCycleReport('ux-a-old-cycle','2026-10-17',d);expect(report.cycles.filter(c=>c.kind==='cycle').map(c=>c.id)).toEqual(['ux-b-cycle']);expect(report.cycles.filter(c=>c.kind==='phase').map(c=>c.id)).toEqual(['phase:ux-b-phase']);expect(report.selected!.id).toBe('ux-b-cycle');expect(await loadReport('day','2026-09-28','2026-10-17',d)).toEqual(before)
   })
   it('explicit end phase preserves definitions, targets, other phases and every health fact; stale phase refuses',async()=>{
     const d=await seed(),phase=(await d.nutritionStrategyPhases.get('ux-a-active'))!,before=await data(d);await endNutritionStrategyPhase(phase.id,JSON.stringify(phase),d);const after=await data(d)

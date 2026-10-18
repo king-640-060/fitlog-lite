@@ -7,7 +7,7 @@ import { analyzeExercisePerformance } from './exercisePerformanceAnalysis'
 import { trainingVolumeAnalysis } from './trainingVolumeAnalysis'
 export type CoachFocus='all'|'strength'|'hypertrophy'|'fat-loss'
 export type MacroKey='calories'|'protein'|'carbs'|'fat'
-export interface CoachNutrition {actual?:number;target?:number;pairedActual?:number;achievement?:number;completeDays:number;partialDays:number;matchedDays:number;gkg?:number}
+export interface CoachNutrition {actual?:number;target?:number;pairedActual?:number;achievement?:number;completeDays:number;partialDays:number;matchedDays:number;gkg?:number;gkgWeightKg?:number;gkgDate?:string}
 export type HabitCell='done'|'missing'|'off'|'future'|'before'|'unknown'
 export function habitPlanKnown(habit:Habit,start:string):boolean {
   return habit.active&&getLocalDateString(new Date(habit.createdAt))<=start&&getLocalDateString(new Date(habit.updatedAt))<=start
@@ -24,7 +24,7 @@ export function analyzeCoachReport(source:ReportSource,report:ReportResult) {
     const avg=(xs:number[])=>xs.length?xs.reduce((a,b)=>a+b,0)/xs.length:undefined
     const actual=avg(complete.map(d=>d.value)),target=avg(paired.map(d=>d.target)),pairedActual=avg(paired.map(d=>d.value)),day=report.range.start===report.range.end?complete.find(d=>d.date===report.range.start):undefined
     const weight=day?latestValidDayWeight(source.weights,day.date):undefined
-    nutrition[key]={actual,target,pairedActual,achievement:target!==undefined&&pairedActual!==undefined?pairedActual/target*100:undefined,completeDays:complete.length,partialDays:byDay.size-complete.length,matchedDays:paired.length,...(key!=='calories'&&day&&weight?{gkg:day.value/weight}:{})}
+    nutrition[key]={actual,target,pairedActual,achievement:target!==undefined&&pairedActual!==undefined?pairedActual/target*100:undefined,completeDays:complete.length,partialDays:byDay.size-complete.length,matchedDays:paired.length,...(key!=='calories'&&day&&weight?{gkg:day.value/weight,gkgWeightKg:weight,gkgDate:day.date}:{})}
   }
   const habits=report.habits.map(row=>{
     const created=getLocalDateString(new Date(row.habit.createdAt)),dates=new Set([...row.dates].filter(d=>d<=end))

@@ -64,3 +64,6 @@
 .strategy-cascade-ack input { flex:0 0 auto; }
 .strategy-cascade-actions { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
 .strategy-cascade-actions button { min-width:0; min-height:44px; white-space:normal; }
+
+.strategy-range-sources { margin:0; padding-inline-start:1.25em; font-size:.875rem; line-height:1.6; overflow-wrap:anywhere; }
+.strategy-range-sources li+li { margin-top:6px; }

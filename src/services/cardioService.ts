@@ -45,6 +45,7 @@ export async function saveCardioSession(input: CardioSessionInput, database: Fit
 
 export async function updateCardioSession(id: string, input: CardioSessionInput, database: FitLogDatabase = db): Promise<CardioSession> {
   const values = validateCardioInput(input)
+  return database.transaction('rw', database.cardioSessions, async () => {
   const existing = await database.cardioSessions.get(id)
   if (!existing) throw new Error('找不到这条有氧训练记录')
   const updated: CardioSession = { ...existing, ...values, updatedAt: new Date().toISOString() }
@@ -53,6 +54,7 @@ export async function updateCardioSession(id: string, input: CardioSessionInput,
   if (values.note === undefined) delete updated.note
   await database.cardioSessions.put(updated)
   return updated
+  })
 }
 
 export async function deleteCardioSession(id: string, database: FitLogDatabase = db): Promise<void> {

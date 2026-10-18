@@ -1,0 +1,103 @@
+{
+  "baseline": "9423586813e2c65a2f2d7126b82acb70bbe02100",
+  "allTrackedFixtures": [
+    {
+      "file": "tests/fixtures/approvedFoodWaterBackupV14.json",
+      "startSha256": "40c18e364daa0d06a956bd8cd09c163c705e18e42d3c5b4240a477719947a1f7",
+      "currentSha256": "40c18e364daa0d06a956bd8cd09c163c705e18e42d3c5b4240a477719947a1f7",
+      "unchanged": true
+    },
+    {
+      "file": "tests/fixtures/legacyV10Data.json",
+      "startSha256": "bc9c8c8f2b053e12eef31620e322b0e811ab9b638ad0886a28805e61d17b2c1d",
+      "currentSha256": "bc9c8c8f2b053e12eef31620e322b0e811ab9b638ad0886a28805e61d17b2c1d",
+      "unchanged": true
+    },
+    {
+      "file": "tests/fixtures/legacyV10Database.ts",
+      "startSha256": "61880d7618bb9ad5ee38b66e0c9ec710a19f08f33cda6c705bebe32980a7f6a6",
+      "currentSha256": "61880d7618bb9ad5ee38b66e0c9ec710a19f08f33cda6c705bebe32980a7f6a6",
+      "unchanged": true
+    },
+    {
+      "file": "tests/fixtures/legacyV11Data.json",
+      "startSha256": "267a208890c3ca5556e8db1ea6e139409f0033e3060008c63d4d97b4b8daebf8",
+      "currentSha256": "267a208890c3ca5556e8db1ea6e139409f0033e3060008c63d4d97b4b8daebf8",
+      "unchanged": true
+    },
+    {
+      "file": "tests/fixtures/legacyV11Database.ts",
+      "startSha256": "d7403f97317ec7ba1120bc95350d8615a6ff70cfac343fa926967e396fcdd8ff",
+      "currentSha256": "d7403f97317ec7ba1120bc95350d8615a6ff70cfac343fa926967e396fcdd8ff",
+      "unchanged": true
+    },
+    {
+      "file": "tests/fixtures/legacyV12Data.json",
+      "startSha256": "b8663c210d0e324bc0e531ec2d7ef1c1f0383c83a05afbcca5e3a612f378c706",
+      "currentSha256": "b8663c210d0e324bc0e531ec2d7ef1c1f0383c83a05afbcca5e3a612f378c706",
+      "unchanged": true
+    },
+    {
+      "file": "tests/fixtures/legacyV12Database.ts",
+      "startSha256": "cce661c685f820e71c363c581febeffac1ef9a231f8a35150f27ab9e7c072b5b",
+      "currentSha256": "cce661c685f820e71c363c581febeffac1ef9a231f8a35150f27ab9e7c072b5b",
+      "unchanged": true
+    },
+    {
+      "file": "tests/fixtures/legacyV13Data.json",
+      "startSha256": "cfce46db7e120b1361c256d3fef17c62f67aeb4759033e0dc5fa2916cff374ba",
+      "currentSha256": "cfce46db7e120b1361c256d3fef17c62f67aeb4759033e0dc5fa2916cff374ba",
+      "unchanged": true
+    },
+    {
+      "file": "tests/fixtures/legacyV13Database.ts",
+      "startSha256": "738e3d3d87f2ef8081bcebc30087c31ee529cd401a056f7af3ba6585edd1de6a",
+      "currentSha256": "738e3d3d87f2ef8081bcebc30087c31ee529cd401a056f7af3ba6585edd1de6a",
+      "unchanged": true
+    },
+    {
+      "file": "tests/fixtures/legacyV7Data.json",
+      "startSha256": "b22bb2209b6c774f625c910936ed00f7b4934896409398a52ea312ebd181acea",
+      "currentSha256": "b22bb2209b6c774f625c910936ed00f7b4934896409398a52ea312ebd181acea",
+      "unchanged": true
+    },
+    {
+      "file": "tests/fixtures/legacyV7Database.ts",
+      "startSha256": "25dbc7c9437efc51505fd0fe05d92867f2dc18bda6d13084bad955c79989dd3b",
+      "currentSha256": "25dbc7c9437efc51505fd0fe05d92867f2dc18bda6d13084bad955c79989dd3b",
+      "unchanged": true
+    },
+    {
+      "file": "tests/fixtures/legacyV8Data.json",
+      "startSha256": "7d3a54765c7502875cdf8098cd3254d3b8952a8d75d1c7c62930f8689653289e",
+      "currentSha256": "7d3a54765c7502875cdf8098cd3254d3b8952a8d75d1c7c62930f8689653289e",
+      "unchanged": true
+    },
+    {
+      "file": "tests/fixtures/legacyV8Database.ts",
+      "startSha256": "cd4693e145341f5253bca3da16d38136ed414e669935f3d58f5cd6dcadf635e2",
+      "currentSha256": "cd4693e145341f5253bca3da16d38136ed414e669935f3d58f5cd6dcadf635e2",
+      "unchanged": true
+    },
+    {
+      "file": "tests/fixtures/legacyV9Data.json",
+      "startSha256": "a14016bf5d8de6cd75ad50ae850e98fdced5aa1feb72ca172cb849fcf6de1224",
+      "currentSha256": "a14016bf5d8de6cd75ad50ae850e98fdced5aa1feb72ca172cb849fcf6de1224",
+      "unchanged": true
+    },
+    {
+      "file": "tests/fixtures/legacyV9Database.ts",
+      "startSha256": "dc0cfc2ce5417a236a42e39a4954f5e52d80e903300ef5eccf5fdb7d87f5b4fc",
+      "currentSha256": "dc0cfc2ce5417a236a42e39a4954f5e52d80e903300ef5eccf5fdb7d87f5b4fc",
+      "unchanged": true
+    },
+    {
+      "file": "tests/fixtures/uxNutritionCascadeBackupV14.json",
+      "startSha256": "535526c485d18efe22d53feb447a1ee7fd6bfc72e6b6c8125adfd098cf41a97d",
+      "currentSha256": "535526c485d18efe22d53feb447a1ee7fd6bfc72e6b6c8125adfd098cf41a97d",
+      "unchanged": true
+    }
+  ],
+  "frozenHistoricalFiles": 15,
+  "allUnchanged": true
+}
