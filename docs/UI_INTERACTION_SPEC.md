@@ -400,3 +400,8 @@ Follow [Approved joint v0.5 contract](APPROVED_JOINT_V05.md). It supersedes prio
 ## 2026-10-18 今日饮水底部 Sheet v0.1
 
 [已批准的新合同](TODAY_WATER_SHEET_V01.md)替代上文 Today 水卡的展开箭头、默认收起状态和必要显露逻辑；上一轮改色结论保持为已结案历史。Today 普通右侧四字次级按钮无箭头，与四字同级按钮等宽同色；直接复用 Progress 的真实紧凑饮水 Sheet。快捷和自定义成功均关闭整个录入，失败保留输入，重入回到快捷视图；参考值与自定义在同一 dialog 子视图内，历史仍使用既有真实 History Sheet。22表及全部水服务、精确ID Undo、数据/趋势/报告/区间删除合同不变。复用原生焦点/键盘/背景锁，禁止私有滚动补偿或新增保存体系。
+
+
+## Nutrition Goal / Template v0.2 (2026-10-20)
+
+[Nutrition Goal / Template contract](NUTRITION_GOAL_TEMPLATE_V02.md) supersedes the older active-template-only goal entry: always list available templates/Create/secondary Manual first. Only the actual selected date’s effective phase earns the single usage label. Unavailable templates explain why; dated activation, variant preview and explicit daily replacement are separate steps. New-template Save returns to the picker without activation/target writes. Template editors retain the same large workspace/frame, owned Save footer, internal body scroll and draft confirmation; remove only this editor’s stale inline height on entry/subview/return. Long titles wrap within this flow. Keep existing shared viewport/controller/motion and all unrelated modules unchanged. Actual services retain canonical/unknown values and history-safe phase restrictions, with transaction-level stale checks.

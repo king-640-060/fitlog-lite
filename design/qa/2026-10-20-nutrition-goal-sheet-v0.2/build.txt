@@ -1,0 +1,29 @@
+
+> fitlog-lite@0.0.0 build
+> tsc --noEmit && vite build
+
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 172 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/build-info.json                                         0.15 kB │ gzip:   0.14 kB
+dist/manifest.webmanifest                                    0.38 kB
+dist/sw-build-fa312427115db55311d9b2d380f0b87d7ac930d9.js    0.42 kB
+dist/index.html                                              1.48 kB │ gzip:   0.78 kB
+dist/assets/index-L_SF97wU.css                             178.92 kB │ gzip:  31.55 kB
+dist/assets/index-D5ehbGw8.js                              978.28 kB │ gzip: 310.40 kB
+
+[plugin builtin:vite-reporter]
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 166ms
+
+PWA v1.3.0
+mode      generateSW
+precache  17 entries (1160.74 KiB)
+files generated
+  dist/sw.js
+  dist/workbox-9c191d2f.js

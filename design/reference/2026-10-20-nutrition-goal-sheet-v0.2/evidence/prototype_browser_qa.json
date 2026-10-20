@@ -1,0 +1,95 @@
+{
+  "prototype": "v0.2",
+  "tests": [
+    {
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "status": "PASS",
+      "cases": [
+        "initial picker",
+        "existing template activation",
+        "variant preview",
+        "apply goal",
+        "new template",
+        "add variant",
+        "mock keyboard save and return",
+        "switch deactivates old template",
+        "single active label",
+        "manual target"
+      ]
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "theme": "dark",
+      "status": "PASS",
+      "cases": [
+        "initial picker",
+        "existing template activation",
+        "variant preview",
+        "apply goal",
+        "new template",
+        "add variant",
+        "mock keyboard save and return",
+        "switch deactivates old template",
+        "single active label",
+        "manual target"
+      ]
+    },
+    {
+      "width": 320,
+      "height": 700,
+      "theme": "light",
+      "status": "PASS",
+      "cases": [
+        "initial picker",
+        "existing template activation",
+        "variant preview",
+        "apply goal",
+        "new template",
+        "add variant",
+        "mock keyboard save and return",
+        "switch deactivates old template",
+        "single active label",
+        "manual target"
+      ]
+    },
+    {
+      "width": 430,
+      "height": 844,
+      "theme": "light",
+      "status": "PASS",
+      "cases": [
+        "initial picker",
+        "existing template activation",
+        "variant preview",
+        "apply goal",
+        "new template",
+        "add variant",
+        "mock keyboard save and return",
+        "switch deactivates old template",
+        "single active label",
+        "manual target"
+      ]
+    },
+    {
+      "width": 375,
+      "height": 667,
+      "theme": "light",
+      "status": "PASS",
+      "cases": [
+        "initial picker",
+        "existing template activation",
+        "variant preview",
+        "apply goal",
+        "new template",
+        "add variant",
+        "mock keyboard save and return",
+        "switch deactivates old template",
+        "single active label",
+        "manual target"
+      ]
+    }
+  ]
+}

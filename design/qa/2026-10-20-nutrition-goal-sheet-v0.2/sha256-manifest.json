@@ -1,0 +1,22 @@
+{
+  "README.md": "1a6df8f7cad6528a72b2fc5c1e82cd132e44397f186c376cc6db0ed3f27c80be",
+  "baseline-receipt.json": "5121c743e733ea9e4047d857c7da4dd1506e96036bac90cf7449fa0316504319",
+  "browser-environment.json": "79b4d17385202d11743f881191987f2cc95ab5e9b777a753e41a4ed33362550e",
+  "browser-hashes.json": "78e929dae8f6a517bfdb4645f059dbeae713c6875d27c20c62691a54ac05406c",
+  "build.txt": "0fbdf46ab246f2473ae5ba01a21dd760888ac3866499ec59b82dc99b9b3ebfe5",
+  "geometry-receipt.json": "4dbd0f8ed587699b0e7d20ea5d7038f9efdc0168bc52e8204d1ff1a592b05563",
+  "geometry.csv": "73b8913b7b0d2d572a7b3cf79609609994675dc87e27e14e52bfcc4146dec2e3",
+  "keyboard-drafts-e.json": "86c84289832db497d5a99e8103ecf127e71c797278179be86858a56c15ef044a",
+  "package-verification.json": "c5cf44d47bbf816951dc9a9f962adc9c895c0c64c0fe5f0ec481257610ca8871",
+  "preservation-baseline.json": "e2cbcc6ea6dc597d302864dddcb1dc42a86ddefd6a97702bcc68eb0a27c0f8b0",
+  "prototype-computed-comparison.json": "c60a3b53ac19eb018cfcc9a9e0a50899b71cba55968120f163aae8f652fb09f2",
+  "prototype-runtime.json": "69043100c46419a33bc0e6f5c86898f6f3e622015a35b24e2bc3c5150b03ac8a",
+  "pwa-v7.txt": "cb9bf49d938ab9574e6ae3289085a777c8cd4ecbd4968a687eeb4232ee1f5e57",
+  "regression-results.json": "6f604a6028939b14f5e1de461d1f634dfe0bf9809b9e7ef24e100f61d608a0a2",
+  "safe-area-rotation-e.json": "b27eda3988b2380d18fb5ad4df32f941988436ff0bbb44b907d00dc591d00982",
+  "source-data-scope.json": "fce66348c8c16bc4bee68c37f479b68bbf829f46b1c930d402120650b520beea",
+  "source-hashes.json": "67473362a82c51788c5afbc7945d4f1f124cbd312a5fe3ee46933ee3ed135047",
+  "typecheck.txt": "3e07b80c5eabe43e8addc1f3eac8a985e94ff976a972bb0263bf6df51c9d2018",
+  "unit.txt": "983f7bf4c62501b4850620774b9aece385665f3e94c0d371e18811156204d353",
+  "water-regression-e.json": "135f25896fd779fd692cb0331f79490c8a02e727adecae3a42e794bc35487798"
+}

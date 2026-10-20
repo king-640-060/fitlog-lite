@@ -271,3 +271,8 @@ See [F1–F5 implementation contract](FOOD_WATER_DAY_V04.md). New `foodWaterDayV
 旧套件中的卡内操作精确替换成每次打开共享Sheet，并保留累计、历史、回滚、跨标签和其余领域断言；自定义成功后原本返回快捷页的期待改为批准的整个录入关闭。参考值由独立弹层变同Sheet子视图后，几何审计等待有限的真实过渡完成再测量，不降低边界断言。实际运行范围/原始失败/复测与结论见[TODAY_WATER_SHEET_V01_QA.md](TODAY_WATER_SHEET_V01_QA.md)。
 
 新Sheet关闭后的Toast还须避开实际Today水入口/睡眠/体重及底栏，保留custom键盘下不挡输入的检查。430/120由真实回归发现遮挡后，仅新饮水Sheet反馈显式设置8px控件缓冲；共享默认32px不变。必须记录初始失败和新候选完整复测，不用旧候选PASS代替最终源码。
+
+
+## Nutrition Goal / Template v0.2 (2026-10-20)
+
+Use [approved matrix](../design/reference/2026-10-20-nutrition-goal-sheet-v0.2/05_ACCEPTANCE_MATRIX.md) and [round QA](NUTRITION_GOAL_TEMPLATE_V02_QA.md). New `nutritionGoalTemplate.mjs` covers Chromium/WebKit,320/375/390/430,100/200%,light/dark,short/landscape and actual same-dialog geometry across picker/editor/variant/keyboard/return/activation/preview. Record complete viewport/header/body/footer/focus/scroll values; stable full height returns after the simulated keyboard closes. Exercise real V13 Restore, new drafts/template/phase/target as separate writes, manual/cycle sources, exact22-store allowlists, failures/retry/double submit, stale cross-tab previews and safe same-day conflict. Keep all44 existing browser commands, adapt only nutritionTemplates’ approved navigation/footer expectations, plus retained water and joint report/range-delete gates. Keyboards/Safe Area mocks and browser engines do not establish physical Safari/PWA/VoiceOver continuity. Original required physical Pending list remains.

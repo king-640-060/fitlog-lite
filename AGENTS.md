@@ -429,3 +429,8 @@ Reports expose only daily comprehensive and nutrition cycle kinds, with day/week
 ## Approved Today Water Sheet v0.1 (2026-10-18)
 
 [Today Water Sheet contract](docs/TODAY_WATER_SHEET_V01.md) supersedes only the older Today disclosure/arrow/reveal UI. Use a plain right-side peer secondary action with no icon, shared real Progress recorder, same-dialog custom/reference subviews, whole-entry close after successful quick/custom save, exact-ID Undo and existing History. Preserve services/data formats, all trends/reports/range-deletion/plan contracts. No shared Toast/scroll refactor; old WebKit Undo observation and physical-device Pending remain separately reported.
+
+
+## Approved Nutrition Goal / Template Sheet v0.2 (2026-10-20)
+
+Follow [v0.2 contract](docs/NUTRITION_GOAL_TEMPLATE_V02.md). Food goal entry always starts with real available templates plus Create and secondary Manual, irrespective of active phases/old targets. Non-effective templates require explicit dated activation, then real variant selection and a separate saved/proposed target confirmation. Preserve current history-safe start-date restrictions, single effective phase per date and snapshot provenance; never silently replace same-day phases/other-day goals/cycle schedules. Use the existing persistent large Sheet and shared viewport; editor-only release of pixel freezing and owned Save footer must survive keyboard/Back/close without changing global Sheet/Toast behavior. Retain DB13/130/22, Backup14/Restore1–14/Sync1 and every report/range-delete/water/plan invariant. Physical iPhone/original PWA evidence remains separate.

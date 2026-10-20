@@ -38,6 +38,7 @@
 
 .nutrition-strategy-footer { display: grid; gap: 8px; }
 .nutrition-strategy-footer .full-btn { white-space: nowrap; }
+.nutrition-strategy-footer[data-scroll-footer] { margin-top:var(--field-gap); padding-inline:0; }
 
 #strategy-activation-root { display: grid; gap: var(--field-gap); min-width: 0; }
 .nutrition-strategy [hidden] { display: none !important; }
@@ -67,3 +68,16 @@
 
 .strategy-range-sources { margin:0; padding-inline-start:1.25em; font-size:.875rem; line-height:1.6; overflow-wrap:anywhere; }
 .strategy-range-sources li+li { margin-top:6px; }
+
+/* Approved goal picker uses existing colors and controls in the persistent large Sheet. */
+.goal-template-row { display:flex; width:100%; min-width:0; align-items:center; gap:10px; padding:14px; border:1px solid var(--border); border-radius:16px; background:var(--surface); color:var(--text-primary); text-align:left; white-space:normal; }
+.goal-template-row > span:first-child { flex:1; min-width:0; display:grid; gap:5px; }
+.goal-template-row strong,.goal-template-row small { overflow-wrap:anywhere; }
+.goal-template-row small { color:var(--text-secondary); font-size:.8rem; line-height:1.5; font-weight:400; }
+.goal-active { color:var(--accent-strong); background:var(--accent-soft); border-radius:8px; padding:4px 7px; font-size:.75rem; white-space:nowrap; }
+.goal-date { padding:8px 11px; background:var(--surface-soft); border-radius:12px; }
+.goal-value-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:0; min-width:0; }
+.goal-value-grid > div { display:grid; gap:4px; min-width:0; }
+.goal-value-grid dt { color:var(--text-secondary); font-size:.8rem; }
+.goal-value-grid dd { margin:0; color:var(--text-primary); font-size:.9rem; font-weight:650; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.sheet:has([data-goal-picker], [data-goal-variants], [data-goal-preview], #strategy-template-form, #strategy-activation-root) .modal-head h2 { white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere; }

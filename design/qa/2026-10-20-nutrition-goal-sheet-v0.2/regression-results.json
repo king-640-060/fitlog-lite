@@ -1,0 +1,1134 @@
+{
+  "inventory": [
+    "aiAssistant",
+    "aiDualModelRouting",
+    "aiStreaming",
+    "aiVoice",
+    "catalogRecovery",
+    "coachReportExperience",
+    "dailyRecordsExperience",
+    "dietEvents",
+    "foodRecovery",
+    "foodServing",
+    "foodVision",
+    "githubSyncSafety",
+    "habitDeletion",
+    "habitEditorLayout",
+    "interactionStabilization",
+    "macroNutritionSummary",
+    "managementVisualConsistency",
+    "managementWorkspace",
+    "mobileLayout",
+    "motionPolish",
+    "nutritionGauge",
+    "nutritionTemplates",
+    "sharedDatePicker",
+    "trainingJournal",
+    "trainingRecoveryExperience",
+    "trainingRecoveryLifecycle",
+    "uiQualityAudit",
+    "uiSemanticConsistency",
+    "unifiedExperience",
+    "v421Consistency",
+    "v4FoodPlanToday",
+    "voiceMode",
+    "remainingPrototype",
+    "combinedHandoff",
+    "approvedJointV05",
+    "approvedJointV05-webkit",
+    "foodWaterDayV04",
+    "foodWaterDayV04-webkit",
+    "foodWaterBackupV04",
+    "foodWaterBackupV04-webkit",
+    "uxWaterCascade",
+    "uxWaterCascade-webkit",
+    "uxWaterCascadeBackup",
+    "uxWaterCascadeBackup-webkit"
+  ],
+  "results": [
+    {
+      "name": "aiAssistant",
+      "command": [
+        "node",
+        "tests/browser/aiAssistant.mjs"
+      ],
+      "start": "2026-10-20T12:05:03.014Z",
+      "end": "2026-10-20T12:05:46.379Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/aiAssistant"
+    },
+    {
+      "name": "aiDualModelRouting",
+      "command": [
+        "node",
+        "tests/browser/aiDualModelRouting.mjs"
+      ],
+      "start": "2026-10-20T12:05:03.017Z",
+      "end": "2026-10-20T12:06:00.415Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/aiDualModelRouting"
+    },
+    {
+      "name": "aiStreaming",
+      "command": [
+        "node",
+        "tests/browser/aiStreaming.mjs"
+      ],
+      "start": "2026-10-20T12:05:46.380Z",
+      "end": "2026-10-20T12:06:12.162Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/aiStreaming"
+    },
+    {
+      "name": "aiVoice",
+      "command": [
+        "node",
+        "tests/browser/aiVoice.mjs"
+      ],
+      "start": "2026-10-20T12:06:00.415Z",
+      "end": "2026-10-20T12:06:24.181Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/aiVoice"
+    },
+    {
+      "name": "catalogRecovery",
+      "command": [
+        "node",
+        "tests/browser/catalogRecovery.mjs"
+      ],
+      "start": "2026-10-20T12:06:12.162Z",
+      "end": "2026-10-20T12:07:26.652Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/catalogRecovery"
+    },
+    {
+      "name": "coachReportExperience",
+      "command": [
+        "node",
+        "tests/browser/coachReportExperience.mjs"
+      ],
+      "start": "2026-10-20T12:06:24.181Z",
+      "end": "2026-10-20T12:13:58.996Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/coachReportExperience"
+    },
+    {
+      "name": "dailyRecordsExperience",
+      "command": [
+        "node",
+        "tests/browser/dailyRecordsExperience.mjs"
+      ],
+      "start": "2026-10-20T12:07:26.653Z",
+      "end": "2026-10-20T12:17:50.002Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/dailyRecordsExperience"
+    },
+    {
+      "name": "dietEvents",
+      "command": [
+        "node",
+        "tests/browser/dietEvents.mjs"
+      ],
+      "start": "2026-10-20T12:13:59.000Z",
+      "end": "2026-10-20T12:17:07.193Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/dietEvents"
+    },
+    {
+      "name": "foodRecovery",
+      "command": [
+        "node",
+        "tests/browser/foodRecovery.mjs"
+      ],
+      "start": "2026-10-20T12:17:07.194Z",
+      "end": "2026-10-20T12:20:20.856Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/foodRecovery"
+    },
+    {
+      "name": "foodServing",
+      "command": [
+        "node",
+        "tests/browser/foodServing.mjs"
+      ],
+      "start": "2026-10-20T12:17:50.002Z",
+      "end": "2026-10-20T12:22:16.522Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/foodServing"
+    },
+    {
+      "name": "foodVision",
+      "command": [
+        "node",
+        "tests/browser/foodVision.mjs"
+      ],
+      "start": "2026-10-20T12:20:20.856Z",
+      "end": "2026-10-20T12:21:15.643Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/foodVision"
+    },
+    {
+      "name": "githubSyncSafety",
+      "command": [
+        "node",
+        "tests/browser/githubSyncSafety.mjs"
+      ],
+      "start": "2026-10-20T12:21:15.643Z",
+      "end": "2026-10-20T12:21:55.412Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/githubSyncSafety"
+    },
+    {
+      "name": "habitDeletion",
+      "command": [
+        "node",
+        "tests/browser/habitDeletion.mjs"
+      ],
+      "start": "2026-10-20T12:21:55.412Z",
+      "end": "2026-10-20T12:22:30.358Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/habitDeletion"
+    },
+    {
+      "name": "habitEditorLayout",
+      "command": [
+        "node",
+        "tests/browser/habitEditorLayout.mjs"
+      ],
+      "start": "2026-10-20T12:22:16.522Z",
+      "end": "2026-10-20T12:23:12.042Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/habitEditorLayout"
+    },
+    {
+      "name": "interactionStabilization",
+      "command": [
+        "node",
+        "tests/browser/interactionStabilization.mjs"
+      ],
+      "start": "2026-10-20T12:22:30.358Z",
+      "end": "2026-10-20T12:25:14.076Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/interactionStabilization"
+    },
+    {
+      "name": "macroNutritionSummary",
+      "command": [
+        "node",
+        "tests/browser/macroNutritionSummary.mjs"
+      ],
+      "start": "2026-10-20T12:23:12.042Z",
+      "end": "2026-10-20T12:26:54.956Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/macroNutritionSummary"
+    },
+    {
+      "name": "managementVisualConsistency",
+      "command": [
+        "node",
+        "tests/browser/managementVisualConsistency.mjs"
+      ],
+      "start": "2026-10-20T12:25:14.076Z",
+      "end": "2026-10-20T12:28:00.570Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/managementVisualConsistency"
+    },
+    {
+      "name": "managementWorkspace",
+      "command": [
+        "node",
+        "tests/browser/managementWorkspace.mjs"
+      ],
+      "start": "2026-10-20T12:26:54.956Z",
+      "end": "2026-10-20T12:28:44.954Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/managementWorkspace"
+    },
+    {
+      "name": "mobileLayout",
+      "command": [
+        "node",
+        "tests/browser/mobileLayout.mjs"
+      ],
+      "start": "2026-10-20T12:28:00.570Z",
+      "end": "2026-10-20T12:28:49.697Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/mobileLayout"
+    },
+    {
+      "name": "motionPolish",
+      "command": [
+        "node",
+        "tests/browser/motionPolish.mjs"
+      ],
+      "start": "2026-10-20T12:28:44.954Z",
+      "end": "2026-10-20T12:32:58.171Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/motionPolish"
+    },
+    {
+      "name": "nutritionGauge",
+      "command": [
+        "node",
+        "tests/browser/nutritionGauge.mjs"
+      ],
+      "start": "2026-10-20T12:28:49.697Z",
+      "end": "2026-10-20T12:29:31.970Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/nutritionGauge"
+    },
+    {
+      "name": "nutritionTemplates",
+      "command": [
+        "node",
+        "tests/browser/nutritionTemplates.mjs"
+      ],
+      "start": "2026-10-20T12:29:31.970Z",
+      "end": "2026-10-20T12:32:29.953Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/nutritionTemplates"
+    },
+    {
+      "name": "sharedDatePicker",
+      "command": [
+        "node",
+        "tests/browser/sharedDatePicker.mjs"
+      ],
+      "start": "2026-10-20T12:32:29.953Z",
+      "end": "2026-10-20T12:32:50.697Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/sharedDatePicker"
+    },
+    {
+      "name": "trainingJournal",
+      "command": [
+        "node",
+        "tests/browser/trainingJournal.mjs"
+      ],
+      "start": "2026-10-20T12:32:50.698Z",
+      "end": "2026-10-20T12:32:52.381Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/trainingJournal"
+    },
+    {
+      "name": "trainingRecoveryExperience",
+      "command": [
+        "node",
+        "tests/browser/trainingRecoveryExperience.mjs"
+      ],
+      "start": "2026-10-20T12:32:52.382Z",
+      "end": "2026-10-20T12:45:14.971Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/trainingRecoveryExperience"
+    },
+    {
+      "name": "trainingRecoveryLifecycle",
+      "command": [
+        "node",
+        "tests/browser/trainingRecoveryLifecycle.mjs"
+      ],
+      "start": "2026-10-20T12:32:58.172Z",
+      "end": "2026-10-20T12:33:13.724Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/trainingRecoveryLifecycle"
+    },
+    {
+      "name": "uiQualityAudit",
+      "command": [
+        "node",
+        "tests/browser/uiQualityAudit.mjs"
+      ],
+      "start": "2026-10-20T12:33:13.725Z",
+      "end": "2026-10-20T12:37:58.396Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/uiQualityAudit"
+    },
+    {
+      "name": "uiSemanticConsistency",
+      "command": [
+        "node",
+        "tests/browser/uiSemanticConsistency.mjs"
+      ],
+      "start": "2026-10-20T12:37:58.398Z",
+      "end": "2026-10-20T12:39:28.805Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/uiSemanticConsistency"
+    },
+    {
+      "name": "unifiedExperience",
+      "command": [
+        "node",
+        "tests/browser/unifiedExperience.mjs"
+      ],
+      "start": "2026-10-20T12:39:28.806Z",
+      "end": "2026-10-20T12:51:27.200Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/unifiedExperience"
+    },
+    {
+      "name": "v421Consistency",
+      "command": [
+        "node",
+        "tests/browser/v421Consistency.mjs"
+      ],
+      "start": "2026-10-20T12:45:14.972Z",
+      "end": "2026-10-20T12:49:38.079Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/v421Consistency"
+    },
+    {
+      "name": "v4FoodPlanToday",
+      "command": [
+        "node",
+        "tests/browser/v4FoodPlanToday.mjs"
+      ],
+      "start": "2026-10-20T12:49:38.080Z",
+      "end": "2026-10-20T12:56:03.085Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/v4FoodPlanToday"
+    },
+    {
+      "name": "voiceMode",
+      "command": [
+        "node",
+        "tests/browser/voiceMode.mjs"
+      ],
+      "start": "2026-10-20T12:51:27.200Z",
+      "end": "2026-10-20T12:52:03.334Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/voiceMode"
+    },
+    {
+      "name": "remainingPrototype",
+      "command": [
+        "node",
+        "tests/browser/remainingPrototype.mjs"
+      ],
+      "start": "2026-10-20T12:52:03.335Z",
+      "end": "2026-10-20T12:53:22.518Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/remainingPrototype"
+    },
+    {
+      "name": "combinedHandoff",
+      "command": [
+        "node",
+        "tests/browser/combinedHandoff.mjs"
+      ],
+      "start": "2026-10-20T12:53:22.518Z",
+      "end": "2026-10-20T12:57:11.411Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/combinedHandoff"
+    },
+    {
+      "name": "approvedJointV05",
+      "command": [
+        "node",
+        "tests/browser/approvedJointV05.mjs"
+      ],
+      "start": "2026-10-20T12:56:03.086Z",
+      "end": "2026-10-20T12:58:48.866Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/approvedJointV05"
+    },
+    {
+      "name": "approvedJointV05-webkit",
+      "command": [
+        "node",
+        "tests/browser/approvedJointV05.mjs"
+      ],
+      "start": "2026-10-20T12:57:11.411Z",
+      "end": "2026-10-20T12:59:40.341Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/approvedJointV05-webkit"
+    },
+    {
+      "name": "foodWaterDayV04",
+      "command": [
+        "node",
+        "tests/browser/foodWaterDayV04.mjs"
+      ],
+      "start": "2026-10-20T12:58:48.866Z",
+      "end": "2026-10-20T13:07:49.889Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/foodWaterDayV04"
+    },
+    {
+      "name": "foodWaterDayV04-webkit",
+      "command": [
+        "node",
+        "tests/browser/foodWaterDayV04.mjs"
+      ],
+      "start": "2026-10-20T12:59:40.342Z",
+      "end": "2026-10-20T13:08:30.135Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/foodWaterDayV04-webkit"
+    },
+    {
+      "name": "foodWaterBackupV04",
+      "command": [
+        "node",
+        "tests/browser/foodWaterBackupV04.mjs"
+      ],
+      "start": "2026-10-20T13:07:49.890Z",
+      "end": "2026-10-20T13:07:53.893Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/foodWaterBackupV04"
+    },
+    {
+      "name": "foodWaterBackupV04-webkit",
+      "command": [
+        "node",
+        "tests/browser/foodWaterBackupV04.mjs"
+      ],
+      "start": "2026-10-20T13:07:53.893Z",
+      "end": "2026-10-20T13:07:58.336Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/foodWaterBackupV04-webkit"
+    },
+    {
+      "name": "uxWaterCascade",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascade.mjs"
+      ],
+      "start": "2026-10-20T13:07:58.336Z",
+      "end": "2026-10-20T13:10:38.884Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/uxWaterCascade"
+    },
+    {
+      "name": "uxWaterCascade-webkit",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascade.mjs"
+      ],
+      "start": "2026-10-20T13:08:30.136Z",
+      "end": "2026-10-20T13:11:05.885Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/uxWaterCascade-webkit"
+    },
+    {
+      "name": "uxWaterCascadeBackup",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascadeBackup.mjs"
+      ],
+      "start": "2026-10-20T13:12:55.620Z",
+      "end": "2026-10-20T13:13:01.532Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/uxWaterCascadeBackup"
+    },
+    {
+      "name": "uxWaterCascadeBackup-webkit",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascadeBackup.mjs"
+      ],
+      "start": "2026-10-20T13:12:55.624Z",
+      "end": "2026-10-20T13:13:02.042Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/uxWaterCascadeBackup-webkit"
+    }
+  ],
+  "allAttempts": [
+    {
+      "name": "aiAssistant",
+      "command": [
+        "node",
+        "tests/browser/aiAssistant.mjs"
+      ],
+      "start": "2026-10-20T12:05:03.014Z",
+      "end": "2026-10-20T12:05:46.379Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/aiAssistant"
+    },
+    {
+      "name": "aiDualModelRouting",
+      "command": [
+        "node",
+        "tests/browser/aiDualModelRouting.mjs"
+      ],
+      "start": "2026-10-20T12:05:03.017Z",
+      "end": "2026-10-20T12:06:00.415Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/aiDualModelRouting"
+    },
+    {
+      "name": "aiStreaming",
+      "command": [
+        "node",
+        "tests/browser/aiStreaming.mjs"
+      ],
+      "start": "2026-10-20T12:05:46.380Z",
+      "end": "2026-10-20T12:06:12.162Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/aiStreaming"
+    },
+    {
+      "name": "aiVoice",
+      "command": [
+        "node",
+        "tests/browser/aiVoice.mjs"
+      ],
+      "start": "2026-10-20T12:06:00.415Z",
+      "end": "2026-10-20T12:06:24.181Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/aiVoice"
+    },
+    {
+      "name": "catalogRecovery",
+      "command": [
+        "node",
+        "tests/browser/catalogRecovery.mjs"
+      ],
+      "start": "2026-10-20T12:06:12.162Z",
+      "end": "2026-10-20T12:07:26.652Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/catalogRecovery"
+    },
+    {
+      "name": "coachReportExperience",
+      "command": [
+        "node",
+        "tests/browser/coachReportExperience.mjs"
+      ],
+      "start": "2026-10-20T12:06:24.181Z",
+      "end": "2026-10-20T12:13:58.996Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/coachReportExperience"
+    },
+    {
+      "name": "dietEvents",
+      "command": [
+        "node",
+        "tests/browser/dietEvents.mjs"
+      ],
+      "start": "2026-10-20T12:13:59.000Z",
+      "end": "2026-10-20T12:17:07.193Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/dietEvents"
+    },
+    {
+      "name": "dailyRecordsExperience",
+      "command": [
+        "node",
+        "tests/browser/dailyRecordsExperience.mjs"
+      ],
+      "start": "2026-10-20T12:07:26.653Z",
+      "end": "2026-10-20T12:17:50.002Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/dailyRecordsExperience"
+    },
+    {
+      "name": "foodRecovery",
+      "command": [
+        "node",
+        "tests/browser/foodRecovery.mjs"
+      ],
+      "start": "2026-10-20T12:17:07.194Z",
+      "end": "2026-10-20T12:20:20.856Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/foodRecovery"
+    },
+    {
+      "name": "foodVision",
+      "command": [
+        "node",
+        "tests/browser/foodVision.mjs"
+      ],
+      "start": "2026-10-20T12:20:20.856Z",
+      "end": "2026-10-20T12:21:15.643Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/foodVision"
+    },
+    {
+      "name": "githubSyncSafety",
+      "command": [
+        "node",
+        "tests/browser/githubSyncSafety.mjs"
+      ],
+      "start": "2026-10-20T12:21:15.643Z",
+      "end": "2026-10-20T12:21:55.412Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/githubSyncSafety"
+    },
+    {
+      "name": "foodServing",
+      "command": [
+        "node",
+        "tests/browser/foodServing.mjs"
+      ],
+      "start": "2026-10-20T12:17:50.002Z",
+      "end": "2026-10-20T12:22:16.522Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/foodServing"
+    },
+    {
+      "name": "habitDeletion",
+      "command": [
+        "node",
+        "tests/browser/habitDeletion.mjs"
+      ],
+      "start": "2026-10-20T12:21:55.412Z",
+      "end": "2026-10-20T12:22:30.358Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/habitDeletion"
+    },
+    {
+      "name": "habitEditorLayout",
+      "command": [
+        "node",
+        "tests/browser/habitEditorLayout.mjs"
+      ],
+      "start": "2026-10-20T12:22:16.522Z",
+      "end": "2026-10-20T12:23:12.042Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/habitEditorLayout"
+    },
+    {
+      "name": "interactionStabilization",
+      "command": [
+        "node",
+        "tests/browser/interactionStabilization.mjs"
+      ],
+      "start": "2026-10-20T12:22:30.358Z",
+      "end": "2026-10-20T12:25:14.076Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/interactionStabilization"
+    },
+    {
+      "name": "macroNutritionSummary",
+      "command": [
+        "node",
+        "tests/browser/macroNutritionSummary.mjs"
+      ],
+      "start": "2026-10-20T12:23:12.042Z",
+      "end": "2026-10-20T12:26:54.956Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/macroNutritionSummary"
+    },
+    {
+      "name": "managementVisualConsistency",
+      "command": [
+        "node",
+        "tests/browser/managementVisualConsistency.mjs"
+      ],
+      "start": "2026-10-20T12:25:14.076Z",
+      "end": "2026-10-20T12:28:00.570Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/managementVisualConsistency"
+    },
+    {
+      "name": "managementWorkspace",
+      "command": [
+        "node",
+        "tests/browser/managementWorkspace.mjs"
+      ],
+      "start": "2026-10-20T12:26:54.956Z",
+      "end": "2026-10-20T12:28:44.954Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/managementWorkspace"
+    },
+    {
+      "name": "mobileLayout",
+      "command": [
+        "node",
+        "tests/browser/mobileLayout.mjs"
+      ],
+      "start": "2026-10-20T12:28:00.570Z",
+      "end": "2026-10-20T12:28:49.697Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/mobileLayout"
+    },
+    {
+      "name": "nutritionGauge",
+      "command": [
+        "node",
+        "tests/browser/nutritionGauge.mjs"
+      ],
+      "start": "2026-10-20T12:28:49.697Z",
+      "end": "2026-10-20T12:29:31.970Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/nutritionGauge"
+    },
+    {
+      "name": "nutritionTemplates",
+      "command": [
+        "node",
+        "tests/browser/nutritionTemplates.mjs"
+      ],
+      "start": "2026-10-20T12:29:31.970Z",
+      "end": "2026-10-20T12:32:29.953Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/nutritionTemplates"
+    },
+    {
+      "name": "sharedDatePicker",
+      "command": [
+        "node",
+        "tests/browser/sharedDatePicker.mjs"
+      ],
+      "start": "2026-10-20T12:32:29.953Z",
+      "end": "2026-10-20T12:32:50.697Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/sharedDatePicker"
+    },
+    {
+      "name": "trainingJournal",
+      "command": [
+        "node",
+        "tests/browser/trainingJournal.mjs"
+      ],
+      "start": "2026-10-20T12:32:50.698Z",
+      "end": "2026-10-20T12:32:52.381Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/trainingJournal"
+    },
+    {
+      "name": "motionPolish",
+      "command": [
+        "node",
+        "tests/browser/motionPolish.mjs"
+      ],
+      "start": "2026-10-20T12:28:44.954Z",
+      "end": "2026-10-20T12:32:58.171Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/motionPolish"
+    },
+    {
+      "name": "trainingRecoveryLifecycle",
+      "command": [
+        "node",
+        "tests/browser/trainingRecoveryLifecycle.mjs"
+      ],
+      "start": "2026-10-20T12:32:58.172Z",
+      "end": "2026-10-20T12:33:13.724Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/trainingRecoveryLifecycle"
+    },
+    {
+      "name": "uiQualityAudit",
+      "command": [
+        "node",
+        "tests/browser/uiQualityAudit.mjs"
+      ],
+      "start": "2026-10-20T12:33:13.725Z",
+      "end": "2026-10-20T12:37:58.396Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/uiQualityAudit"
+    },
+    {
+      "name": "uiSemanticConsistency",
+      "command": [
+        "node",
+        "tests/browser/uiSemanticConsistency.mjs"
+      ],
+      "start": "2026-10-20T12:37:58.398Z",
+      "end": "2026-10-20T12:39:28.805Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/uiSemanticConsistency"
+    },
+    {
+      "name": "trainingRecoveryExperience",
+      "command": [
+        "node",
+        "tests/browser/trainingRecoveryExperience.mjs"
+      ],
+      "start": "2026-10-20T12:32:52.382Z",
+      "end": "2026-10-20T12:45:14.971Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/trainingRecoveryExperience"
+    },
+    {
+      "name": "v421Consistency",
+      "command": [
+        "node",
+        "tests/browser/v421Consistency.mjs"
+      ],
+      "start": "2026-10-20T12:45:14.972Z",
+      "end": "2026-10-20T12:49:38.079Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/v421Consistency"
+    },
+    {
+      "name": "unifiedExperience",
+      "command": [
+        "node",
+        "tests/browser/unifiedExperience.mjs"
+      ],
+      "start": "2026-10-20T12:39:28.806Z",
+      "end": "2026-10-20T12:51:27.200Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/unifiedExperience"
+    },
+    {
+      "name": "voiceMode",
+      "command": [
+        "node",
+        "tests/browser/voiceMode.mjs"
+      ],
+      "start": "2026-10-20T12:51:27.200Z",
+      "end": "2026-10-20T12:52:03.334Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/voiceMode"
+    },
+    {
+      "name": "remainingPrototype",
+      "command": [
+        "node",
+        "tests/browser/remainingPrototype.mjs"
+      ],
+      "start": "2026-10-20T12:52:03.335Z",
+      "end": "2026-10-20T12:53:22.518Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/remainingPrototype"
+    },
+    {
+      "name": "v4FoodPlanToday",
+      "command": [
+        "node",
+        "tests/browser/v4FoodPlanToday.mjs"
+      ],
+      "start": "2026-10-20T12:49:38.080Z",
+      "end": "2026-10-20T12:56:03.085Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/v4FoodPlanToday"
+    },
+    {
+      "name": "combinedHandoff",
+      "command": [
+        "node",
+        "tests/browser/combinedHandoff.mjs"
+      ],
+      "start": "2026-10-20T12:53:22.518Z",
+      "end": "2026-10-20T12:57:11.411Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/combinedHandoff"
+    },
+    {
+      "name": "approvedJointV05",
+      "command": [
+        "node",
+        "tests/browser/approvedJointV05.mjs"
+      ],
+      "start": "2026-10-20T12:56:03.086Z",
+      "end": "2026-10-20T12:58:48.866Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/approvedJointV05"
+    },
+    {
+      "name": "approvedJointV05-webkit",
+      "command": [
+        "node",
+        "tests/browser/approvedJointV05.mjs"
+      ],
+      "start": "2026-10-20T12:57:11.411Z",
+      "end": "2026-10-20T12:59:40.341Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/approvedJointV05-webkit"
+    },
+    {
+      "name": "foodWaterDayV04",
+      "command": [
+        "node",
+        "tests/browser/foodWaterDayV04.mjs"
+      ],
+      "start": "2026-10-20T12:58:48.866Z",
+      "end": "2026-10-20T13:07:49.889Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/foodWaterDayV04"
+    },
+    {
+      "name": "foodWaterBackupV04",
+      "command": [
+        "node",
+        "tests/browser/foodWaterBackupV04.mjs"
+      ],
+      "start": "2026-10-20T13:07:49.890Z",
+      "end": "2026-10-20T13:07:53.893Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/foodWaterBackupV04"
+    },
+    {
+      "name": "foodWaterBackupV04-webkit",
+      "command": [
+        "node",
+        "tests/browser/foodWaterBackupV04.mjs"
+      ],
+      "start": "2026-10-20T13:07:53.893Z",
+      "end": "2026-10-20T13:07:58.336Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/foodWaterBackupV04-webkit"
+    },
+    {
+      "name": "foodWaterDayV04-webkit",
+      "command": [
+        "node",
+        "tests/browser/foodWaterDayV04.mjs"
+      ],
+      "start": "2026-10-20T12:59:40.342Z",
+      "end": "2026-10-20T13:08:30.135Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/foodWaterDayV04-webkit"
+    },
+    {
+      "name": "uxWaterCascade",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascade.mjs"
+      ],
+      "start": "2026-10-20T13:07:58.336Z",
+      "end": "2026-10-20T13:10:38.884Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/uxWaterCascade"
+    },
+    {
+      "name": "uxWaterCascade-webkit",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascade.mjs"
+      ],
+      "start": "2026-10-20T13:08:30.136Z",
+      "end": "2026-10-20T13:11:05.885Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/uxWaterCascade-webkit"
+    },
+    {
+      "name": "uxWaterCascadeBackup",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascadeBackup.mjs"
+      ],
+      "start": "2026-10-20T13:10:38.885Z",
+      "end": "2026-10-20T13:11:11.634Z",
+      "exitCode": 1,
+      "status": "FAIL",
+      "artifacts": "<round-work>/regression-e/uxWaterCascadeBackup"
+    },
+    {
+      "name": "uxWaterCascadeBackup-webkit",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascadeBackup.mjs"
+      ],
+      "start": "2026-10-20T13:11:05.886Z",
+      "end": "2026-10-20T13:11:38.917Z",
+      "exitCode": 1,
+      "status": "FAIL",
+      "artifacts": "<round-work>/regression-e/uxWaterCascadeBackup-webkit"
+    },
+    {
+      "name": "uxWaterCascadeBackup",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascadeBackup.mjs"
+      ],
+      "start": "2026-10-20T13:12:55.620Z",
+      "end": "2026-10-20T13:13:01.532Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/uxWaterCascadeBackup"
+    },
+    {
+      "name": "uxWaterCascadeBackup-webkit",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascadeBackup.mjs"
+      ],
+      "start": "2026-10-20T13:12:55.624Z",
+      "end": "2026-10-20T13:13:02.042Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-e/uxWaterCascadeBackup-webkit"
+    }
+  ],
+  "source": "final frozen candidate E; complete independent 44-command run; earlier interrupted batches kept separately",
+  "status": "PASS"
+}

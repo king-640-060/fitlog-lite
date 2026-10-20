@@ -1,0 +1,348 @@
+[
+  {
+    "engine": "chromium",
+    "entryFallbackReproduced": true,
+    "initial": {
+      "innerHeight": 844,
+      "visualHeight": 2121,
+      "offset": 0,
+      "inlineHeight": "",
+      "variant": "large",
+      "dialog": {
+        "x": 0,
+        "y": 40,
+        "width": 390,
+        "height": 820,
+        "top": 40,
+        "right": 390,
+        "bottom": 860,
+        "left": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 55,
+        "width": 390,
+        "height": 60,
+        "top": 55,
+        "right": 390,
+        "bottom": 115,
+        "left": 0
+      },
+      "body": {
+        "x": 0,
+        "y": 115,
+        "width": 390,
+        "height": 745,
+        "top": 115,
+        "right": 390,
+        "bottom": 860,
+        "left": 0
+      },
+      "scrollTop": 0,
+      "scrollHeight": 745,
+      "clientHeight": 745,
+      "cssHeight": "844px",
+      "bottomOffset": "0px"
+    },
+    "keyboard": {
+      "innerHeight": 844,
+      "visualHeight": 420,
+      "offset": 0,
+      "inlineHeight": "",
+      "variant": "large",
+      "dialog": {
+        "x": 0,
+        "y": 12.841832160949707,
+        "width": 390,
+        "height": 408,
+        "top": 12.841832160949707,
+        "right": 390,
+        "bottom": 420.8418321609497,
+        "left": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 27.84183120727539,
+        "width": 390,
+        "height": 60.000003814697266,
+        "top": 27.84183120727539,
+        "right": 390,
+        "bottom": 87.84183502197266,
+        "left": 0
+      },
+      "body": {
+        "x": 0,
+        "y": 87.84183502197266,
+        "width": 390,
+        "height": 333,
+        "top": 87.84183502197266,
+        "right": 390,
+        "bottom": 420.84183502197266,
+        "left": 0
+      },
+      "scrollTop": 0,
+      "scrollHeight": 386,
+      "clientHeight": 333,
+      "cssHeight": "420px",
+      "bottomOffset": "424px"
+    },
+    "subview": {
+      "innerHeight": 844,
+      "visualHeight": 420,
+      "offset": 0,
+      "inlineHeight": "408px",
+      "variant": "large",
+      "dialog": {
+        "x": 0,
+        "y": 12,
+        "width": 390,
+        "height": 408,
+        "top": 12,
+        "right": 390,
+        "bottom": 420,
+        "left": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 27,
+        "width": 390,
+        "height": 60,
+        "top": 27,
+        "right": 390,
+        "bottom": 87,
+        "left": 0
+      },
+      "body": {
+        "x": 0,
+        "y": 87,
+        "width": 390,
+        "height": 333,
+        "top": 87,
+        "right": 390,
+        "bottom": 420,
+        "left": 0
+      },
+      "scrollTop": 0,
+      "scrollHeight": 598,
+      "clientHeight": 333,
+      "cssHeight": "420px",
+      "bottomOffset": "424px"
+    },
+    "returned": {
+      "innerHeight": 844,
+      "visualHeight": 844,
+      "offset": 0,
+      "inlineHeight": "408px",
+      "variant": "large",
+      "dialog": {
+        "x": 0,
+        "y": 436,
+        "width": 390,
+        "height": 408,
+        "top": 436,
+        "right": 390,
+        "bottom": 844,
+        "left": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 451,
+        "width": 390,
+        "height": 60,
+        "top": 451,
+        "right": 390,
+        "bottom": 511,
+        "left": 0
+      },
+      "body": {
+        "x": 0,
+        "y": 511,
+        "width": 390,
+        "height": 333,
+        "top": 511,
+        "right": 390,
+        "bottom": 844,
+        "left": 0
+      },
+      "scrollTop": 203,
+      "scrollHeight": 536,
+      "clientHeight": 333,
+      "cssHeight": "844px",
+      "bottomOffset": "0px"
+    },
+    "heightLoss": 412
+  },
+  {
+    "engine": "webkit",
+    "entryFallbackReproduced": true,
+    "initial": {
+      "innerHeight": 844,
+      "visualHeight": 2120,
+      "offset": 0,
+      "inlineHeight": "",
+      "variant": "large",
+      "dialog": {
+        "x": 0,
+        "y": 31.266582489013672,
+        "width": 390,
+        "height": 820,
+        "top": 31.266582489013672,
+        "right": 390,
+        "bottom": 851.2665824890137,
+        "left": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 46.26658248901367,
+        "width": 390,
+        "height": 60.000003814697266,
+        "top": 46.26658248901367,
+        "right": 390,
+        "bottom": 106.26658630371094,
+        "left": 0
+      },
+      "body": {
+        "x": 0,
+        "y": 106.2665786743164,
+        "width": 390,
+        "height": 745,
+        "top": 106.2665786743164,
+        "right": 390,
+        "bottom": 851.2665786743164,
+        "left": 0
+      },
+      "scrollTop": 0,
+      "scrollHeight": 745,
+      "clientHeight": 745,
+      "cssHeight": "844px",
+      "bottomOffset": "0px"
+    },
+    "keyboard": {
+      "innerHeight": 844,
+      "visualHeight": 420,
+      "offset": 0,
+      "inlineHeight": "",
+      "variant": "large",
+      "dialog": {
+        "x": 0,
+        "y": 12.289777755737305,
+        "width": 390,
+        "height": 408,
+        "top": 12.289777755737305,
+        "right": 390,
+        "bottom": 420.2897777557373,
+        "left": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 27.289777755737305,
+        "width": 390,
+        "height": 60,
+        "top": 27.289777755737305,
+        "right": 390,
+        "bottom": 87.2897777557373,
+        "left": 0
+      },
+      "body": {
+        "x": 0,
+        "y": 87.28977966308594,
+        "width": 390,
+        "height": 333,
+        "top": 87.28977966308594,
+        "right": 390,
+        "bottom": 420.28977966308594,
+        "left": 0
+      },
+      "scrollTop": 0,
+      "scrollHeight": 379,
+      "clientHeight": 333,
+      "cssHeight": "420px",
+      "bottomOffset": "424px"
+    },
+    "subview": {
+      "innerHeight": 844,
+      "visualHeight": 420,
+      "offset": 0,
+      "inlineHeight": "408px",
+      "variant": "large",
+      "dialog": {
+        "x": 0,
+        "y": 12,
+        "width": 390,
+        "height": 408,
+        "top": 12,
+        "right": 390,
+        "bottom": 420,
+        "left": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 27,
+        "width": 390,
+        "height": 60,
+        "top": 27,
+        "right": 390,
+        "bottom": 87,
+        "left": 0
+      },
+      "body": {
+        "x": 0,
+        "y": 87,
+        "width": 390,
+        "height": 333,
+        "top": 87,
+        "right": 390,
+        "bottom": 420,
+        "left": 0
+      },
+      "scrollTop": 0,
+      "scrollHeight": 580,
+      "clientHeight": 333,
+      "cssHeight": "420px",
+      "bottomOffset": "424px"
+    },
+    "returned": {
+      "innerHeight": 844,
+      "visualHeight": 844,
+      "offset": 0,
+      "inlineHeight": "408px",
+      "variant": "large",
+      "dialog": {
+        "x": 0,
+        "y": 436,
+        "width": 390,
+        "height": 408,
+        "top": 436,
+        "right": 390,
+        "bottom": 844,
+        "left": 0
+      },
+      "header": {
+        "x": 0,
+        "y": 451,
+        "width": 390,
+        "height": 60,
+        "top": 451,
+        "right": 390,
+        "bottom": 511,
+        "left": 0
+      },
+      "body": {
+        "x": 0,
+        "y": 511,
+        "width": 390,
+        "height": 333,
+        "top": 511,
+        "right": 390,
+        "bottom": 844,
+        "left": 0
+      },
+      "scrollTop": 46,
+      "scrollHeight": 529,
+      "clientHeight": 333,
+      "cssHeight": "844px",
+      "bottomOffset": "0px"
+    },
+    "heightLoss": 412
+  }
+]

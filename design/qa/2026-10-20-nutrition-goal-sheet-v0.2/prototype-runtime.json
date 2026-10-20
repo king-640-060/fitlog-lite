@@ -1,0 +1,12 @@
+[
+  {
+    "theme": "light",
+    "status": "PASS",
+    "demoOnly": true
+  },
+  {
+    "theme": "dark",
+    "status": "PASS",
+    "demoOnly": true
+  }
+]

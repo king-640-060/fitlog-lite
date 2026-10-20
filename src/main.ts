@@ -1388,19 +1388,28 @@ function showNutritionTargetForm(date: string, target?: NutritionTarget): void {
 }
 function showManualNutritionTargetForm(date: string, target?: NutritionTarget): void {
   const dialog = openModal(target ? '编辑当日目标' : '设置当日目标', `<form id="nutrition-target-form" class="form"><p class="muted">${formatHeaderDate(date)}</p>${nutritionGoalFields(target)}<button class="primary" type="submit">保存目标</button>${target ? '<button class="danger-button" type="button" id="delete-nutrition-target">删除目标</button>' : ''}<button class="sheet-link compact-action" type="button" id="manual-nutrition-templates">管理营养模板</button></form>`)
+  let busy=false
   dialog.querySelector('#manual-nutrition-templates')?.addEventListener('click', () => { void showNutritionStrategyManager(nutritionStrategyUi(), () => showNutritionTargetForm(date, target)).catch(fail) })
   dialog.querySelector<HTMLFormElement>('#nutrition-target-form')?.addEventListener('submit', async (event) => {
     event.preventDefault()
+    if(busy)return
+    busy=true
     try {
       const goal = nutritionGoalFromForm(new FormData(event.currentTarget as HTMLFormElement))
       if (!goal) throw new Error('请至少填写一项营养目标')
-      await saveNutritionTarget(date, goal)
+      await db.transaction('rw',db.nutritionTargets,async()=>{
+        const current=await db.nutritionTargets.where('date').equals(date).first()
+        if(JSON.stringify(current)!==JSON.stringify(target))throw new Error('当天目标已变化，请关闭后重新查看')
+        await saveNutritionTarget(date,goal)
+      })
       dialog.close(); toast('营养目标已保存'); await renderFoodPage()
-    } catch (error) { fail(error) }
+    } catch (error) { busy=false;fail(error) }
   })
   dialog.querySelector('#delete-nutrition-target')?.addEventListener('click', async () => {
-    if (!await confirmAction('删除当日营养目标？', '饮食记录不会被删除。')) return
-    try { await deleteNutritionTarget(date); dialog.close(); toast('营养目标已删除'); await renderFoodPage() } catch (error) { fail(error) }
+    if(busy)return
+    busy=true
+    if (!await confirmAction('删除当日营养目标？', '饮食记录不会被删除。')) {busy=false;return}
+    try { await db.transaction('rw',db.nutritionTargets,async()=>{const current=await db.nutritionTargets.where('date').equals(date).first();if(JSON.stringify(current)!==JSON.stringify(target))throw new Error('当天目标已变化，请关闭后重新查看');await deleteNutritionTarget(date)}); dialog.close(); toast('营养目标已删除'); await renderFoodPage() } catch (error) { busy=false;fail(error) }
   })
 }
 

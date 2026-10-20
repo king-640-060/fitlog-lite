@@ -1,0 +1,85 @@
+{
+  "zip": "<user>/Downloads/FitLog_Lite_Nutrition_Goal_Template_Sheet_Approved_v0.2_Codex_2026-10-20.zip",
+  "zipSHA256": "2bdc73613bd9144444cdca2bbe6a24c5df75daff298d41ee20647b54518ebb5e",
+  "checksums": [
+    {
+      "path": "00_README_请先阅读.md",
+      "sha256": "c20382c590542bd735f83adcf1fde3379ee54cd476508ccf55fa256ad79681fb"
+    },
+    {
+      "path": "01_CODEX_EXECUTION_INSTRUCTION.md",
+      "sha256": "8977fc9ad140f1e650adfa26888a264e1a6e08e178f3f139cbc5ce6646fec5a7"
+    },
+    {
+      "path": "02_APPROVED_DESIGN_LOCK.md",
+      "sha256": "250dbdc5adfd56f34c11cf8e60f18f259b5beb7c608a5b981e71f7483d19578c"
+    },
+    {
+      "path": "03_NUTRITION_TEMPLATE_GOAL_CONTRACT.md",
+      "sha256": "b917050f0144e89c4d935d3d4b39c01699491199c3fb42d1998d9530913e32c0"
+    },
+    {
+      "path": "04_SHEET_KEYBOARD_VIEWPORT_CONTRACT.md",
+      "sha256": "928e50812acdeb8211702c8b16a6e3757916cbdc12044b1d8c40cb8601045074"
+    },
+    {
+      "path": "05_ACCEPTANCE_MATRIX.md",
+      "sha256": "bc02e67e49cbf53e8b25afd1965a58ba7f5e4d08067cd608aa4b6b1e722f0277"
+    },
+    {
+      "path": "06_DATA_QA_RELEASE_SAFETY.md",
+      "sha256": "7cba0a29e535de6f9ecef641b8dc58107952614671da04360cfb94f30c761ad4"
+    },
+    {
+      "path": "07_FORWARD_TO_CODEX.md",
+      "sha256": "771f85ae2a10f0c18b41250539228295c1fa24abe2b2758f052eafd0a4f25331"
+    },
+    {
+      "path": "08_CURRENT_CODE_SOURCE_MAP.md",
+      "sha256": "b518410635eab90763083e2f3d5effe586da40ab14d662e3cb6fe29e72e35de6"
+    },
+    {
+      "path": "FILES.json",
+      "sha256": "3141ff68204fc24ce64518f807625609cf6f842d537dffba2c8639024de7d191"
+    },
+    {
+      "path": "evidence/prototype_browser_qa.json",
+      "sha256": "4dd90ad04cfe861a93c92ec89a07755239fff2cb8438a903c9ab37a599d0007f"
+    },
+    {
+      "path": "preview/01_goal_picker.png",
+      "sha256": "a2927950f773691992ca50f6886bd214fce21a85c4fced5430c4e33d9b8cd3f5"
+    },
+    {
+      "path": "preview/02_new_template_editor.png",
+      "sha256": "89eb9d17e6fc40b2d8bb500a72e2e8b78bb8e06de511246bf2289478680d041f"
+    },
+    {
+      "path": "preview/03_variant_editor.png",
+      "sha256": "03c1d97304f9884e09d6ed75fe1f8e678c7335360395f1907165b32363351c71"
+    },
+    {
+      "path": "preview/04_keyboard_mock.png",
+      "sha256": "76c0c6b6f3aae806959ce262afc8cb422214525b9256c6ae93eb59ba49e6553d"
+    },
+    {
+      "path": "preview/05_return_full_height.png",
+      "sha256": "d81bdbb7c0342adde35e5fa5aaa165b4558af7595f532b5cba5cb5cbdfef7205"
+    },
+    {
+      "path": "preview/06_switch_template_warning.png",
+      "sha256": "6f685e538f98ee2c56e53bd2a58aeac1285c358c521df303b8c4acf7015f76b1"
+    },
+    {
+      "path": "preview/07_picker_single_active.png",
+      "sha256": "3ac40762b8c3868b47bef27da1928b6fc7bfa345ca7445fce90064935dc98eb6"
+    },
+    {
+      "path": "prototype/FitLog_Nutrition_Goal_Template_Sheet_Interactive_Prototype_v0.2.html",
+      "sha256": "e7fc5caf20eeac58151ee656cf22905bee6df1524e9c0964f946d0baa3c012d4"
+    }
+  ],
+  "manifestFiles": 18,
+  "zipMembers": 20,
+  "status": "PASS"
+}

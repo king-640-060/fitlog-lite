@@ -29,7 +29,9 @@ export async function getNutritionStrategy(templateId: string, database: FitLogD
 export async function getNutritionStrategyForDate(date: string, database: FitLogDatabase = db): Promise<NutritionStrategyContext | undefined> {
   strategyBusinessDate(date)
   const phases = await database.nutritionStrategyPhases.toArray()
-  const phase = phases.find(p => p.startDate <= date && (!p.endDate || p.endDate >= date))
+  const matches = phases.filter(p => p.startDate <= date && (!p.endDate || p.endDate >= date))
+  if (matches.length > 1) throw new Error('这个日期有重叠的模板阶段，请检查阶段后重新选择')
+  const phase = matches[0]
   if (!phase) return undefined
   const definition = await getNutritionStrategy(phase.templateId, database)
   return definition ? { ...definition, phase } : undefined
@@ -73,7 +75,10 @@ export async function archiveNutritionStrategy(id: string, database: FitLogDatab
     await database.nutritionStrategyTemplates.update(id, { archivedAt: template.archivedAt ?? now, updatedAt: now })
   })
 }
-export async function activateNutritionStrategy(id: string, startDate: string, database: FitLogDatabase = db, expected?: { activePhaseId: string | null; templateUpdatedAt: string }): Promise<NutritionStrategyPhase> {
+export function nutritionPhaseFingerprint(phases: NutritionStrategyPhase[]): string {
+  return JSON.stringify([...phases].sort((a,b)=>a.id.localeCompare(b.id)))
+}
+export async function activateNutritionStrategy(id: string, startDate: string, database: FitLogDatabase = db, expected?: { activePhaseId: string | null; templateUpdatedAt: string; phaseFingerprint?: string; definitionFingerprint?: string }): Promise<NutritionStrategyPhase> {
   strategyBusinessDate(startDate)
   if (startDate > getLocalDateString()) throw new Error('开始日期不能晚于今天；营养模板不自动排程')
   return database.transaction('rw', [database.nutritionStrategyTemplates, database.nutritionStrategyVariants, database.nutritionStrategyPhases], async () => {
@@ -85,6 +90,7 @@ export async function activateNutritionStrategy(id: string, startDate: string, d
     if (active.length > 1) throw new Error('阶段数据不一致，请检查备份')
     const current = active[0]
     if (expected && ((current?.id ?? null) !== expected.activePhaseId || template.updatedAt !== expected.templateUpdatedAt)) throw new Error('模板或阶段已变化，请重新查看后启用')
+    if (expected?.phaseFingerprint !== undefined && nutritionPhaseFingerprint(phases) !== expected.phaseFingerprint || expected?.definitionFingerprint !== undefined && JSON.stringify(await getNutritionStrategy(id,database)) !== expected.definitionFingerprint) throw new Error('模板或阶段已变化，请重新查看后启用')
     if (current?.templateId === id) throw new Error('这个模板已在使用中')
     const latest = phases.at(-1)
     if (latest && startDate <= (latest.endDate ?? latest.startDate)) throw new Error(`开始日期须晚于 ${latest.endDate ?? latest.startDate}，以保留已有阶段`)

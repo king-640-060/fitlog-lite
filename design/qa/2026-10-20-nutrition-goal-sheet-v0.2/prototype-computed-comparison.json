@@ -1,0 +1,44 @@
+[
+  {
+    "theme": "light",
+    "width": 390,
+    "height": 844,
+    "state": "one unactivated template with three variants; no saved target",
+    "prototype": {
+      "height": 720,
+      "background": "rgb(255, 254, 250)",
+      "heading": "18px",
+      "rowWidth": 354,
+      "createHeight": 46
+    },
+    "formal": {
+      "height": 820,
+      "background": "rgb(255, 254, 250)",
+      "heading": "19.52px",
+      "rowWidth": 354,
+      "createHeight": 44
+    },
+    "interpretation": "Design lock explicitly retains formal tokens, system typography, native controls and real dates. Same interaction hierarchy; original device frame, demo dates, decorative glyph and exact 720px demo geometry are not copied. Existing management/manual entry retained."
+  },
+  {
+    "theme": "dark",
+    "width": 390,
+    "height": 844,
+    "state": "one unactivated template with three variants; no saved target",
+    "prototype": {
+      "height": 720,
+      "background": "rgb(35, 43, 35)",
+      "heading": "18px",
+      "rowWidth": 354,
+      "createHeight": 45.999969482421875
+    },
+    "formal": {
+      "height": 820,
+      "background": "rgb(41, 51, 44)",
+      "heading": "19.52px",
+      "rowWidth": 354,
+      "createHeight": 44
+    },
+    "interpretation": "Design lock explicitly retains formal tokens, system typography, native controls and real dates. Same interaction hierarchy; original device frame, demo dates, decorative glyph and exact 720px demo geometry are not copied. Existing management/manual entry retained."
+  }
+]
