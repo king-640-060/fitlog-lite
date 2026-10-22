@@ -24,8 +24,8 @@ export interface RecoveryUi {
   fail(error:unknown):void
 }
 export function recoverySlotHtml():string { return '<section class="recovery-section" aria-label="恢复"><div data-recovery-root></div></section>' }
-export function mountRecovery(root:HTMLElement,ui:RecoveryUi,trends=false):()=>void {
-  if(trends)return mountRecoveryTrends(root,ui)
+export function mountRecovery(root:HTMLElement,ui:RecoveryUi,trends=false,states=trendStates):()=>void {
+  if(trends)return mountRecoveryTrends(root,ui,states)
   let latestCompleted:SleepSession|undefined
   let lastSnapshot=''
   const snapshot=()=>JSON.stringify([getLocalDateString(),readWaterReference(),sleep,water,latestCompleted])
@@ -68,11 +68,11 @@ export function mountRecovery(root:HTMLElement,ui:RecoveryUi,trends=false):()=>v
   const visible=()=>{if(document.visibilityState==='visible')subscribe()};document.addEventListener('visibilitychange',visible)
   return()=>{disposed=true;stopReference();subscription?.unsubscribe();clearInterval(tick);document.removeEventListener('visibilitychange',visible)}
 }
-function mountRecoveryTrends(root:HTMLElement,ui:RecoveryUi):()=>void {
+function mountRecoveryTrends(root:HTMLElement,ui:RecoveryUi,states=trendStates):()=>void {
   let disposed=false
   root.innerHTML='<div data-recovery-module="sleep"></div><div data-recovery-module="water"></div>'
   const disposers=(['sleep','water'] as const).map(kind=>{
-    const host=root.querySelector<HTMLElement>(`[data-recovery-module="${kind}"]`)!,state=trendStates[kind]
+    const host=root.querySelector<HTMLElement>(`[data-recovery-module="${kind}"]`)!,state=states[kind]
     let subscription:{unsubscribe():void}|undefined,chartDispose:(()=>void)|undefined,active:SleepSession|undefined,pending=false,last='',today=getLocalDateString()
     const subscribe=()=>{subscription?.unsubscribe();today=getLocalDateString();const range=state.range;subscription=liveQuery(()=>readRecoveryRecords(shiftLocalDate(today,-89),today)).subscribe({next:value=>{
       if(disposed||state.range!==range)return

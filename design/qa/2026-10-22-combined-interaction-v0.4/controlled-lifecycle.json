@@ -1,0 +1,48 @@
+{
+  "receipts": [
+    {
+      "engine": "chromium",
+      "type": "actual-coordinator-controlled-promise-harness",
+      "slowPreparation": true,
+      "lastClickDuringCommit": true,
+      "repeatNoCommit": true,
+      "resizePagehideModalAbort": true,
+      "destroyPendingRead": true,
+      "commits": [
+        "plan",
+        "workout",
+        "plan",
+        "food",
+        "today",
+        "workout",
+        "today"
+      ],
+      "reads": 12,
+      "disposals": 12,
+      "errors": [],
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "type": "actual-coordinator-controlled-promise-harness",
+      "slowPreparation": true,
+      "lastClickDuringCommit": true,
+      "repeatNoCommit": true,
+      "resizePagehideModalAbort": true,
+      "destroyPendingRead": true,
+      "commits": [
+        "plan",
+        "workout",
+        "plan",
+        "food",
+        "today",
+        "workout",
+        "today"
+      ],
+      "reads": 12,
+      "disposals": 12,
+      "errors": [],
+      "status": "PASS"
+    }
+  ]
+}

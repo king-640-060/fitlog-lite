@@ -1,0 +1,458 @@
+[
+  {
+    "engine": "chromium",
+    "theme": "light",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "approved": [
+      {
+        "kind": "strength",
+        "top": 24,
+        "localTop": 24,
+        "height": 820,
+        "width": 390,
+        "background": "rgb(255, 254, 250)",
+        "radius": "24px 24px 0px 0px",
+        "animation": "none",
+        "duration": "0s"
+      },
+      {
+        "kind": "cardio",
+        "top": 24,
+        "localTop": 24,
+        "height": 820,
+        "width": 390,
+        "background": "rgb(255, 254, 250)",
+        "radius": "24px 24px 0px 0px",
+        "animation": "none",
+        "duration": "0s"
+      },
+      {
+        "kind": "pelvic",
+        "top": 24,
+        "localTop": 24,
+        "height": 820,
+        "width": 390,
+        "background": "rgb(255, 254, 250)",
+        "radius": "24px 24px 0px 0px",
+        "animation": "none",
+        "duration": "0s"
+      }
+    ],
+    "START": [
+      {
+        "id": "start-workout",
+        "top": 24,
+        "height": 820,
+        "variant": "large",
+        "animation": "sheet-in",
+        "duration": "0.2s"
+      },
+      {
+        "id": "add-cardio",
+        "top": 298,
+        "height": 546,
+        "variant": "form",
+        "animation": "sheet-in",
+        "duration": "0.2s"
+      },
+      {
+        "id": "start-pelvic-floor",
+        "top": 12,
+        "height": 832,
+        "variant": "content",
+        "animation": "sheet-in",
+        "duration": "0.2s"
+      }
+    ],
+    "final": [
+      {
+        "kind": "strength",
+        "top": 24,
+        "height": 820,
+        "width": 390,
+        "variant": "large",
+        "animation": "training-sheet-in",
+        "duration": "0.275s",
+        "bodyScroll": false,
+        "inputSizes": [],
+        "close": 44
+      },
+      {
+        "kind": "cardio",
+        "top": 24,
+        "height": 820,
+        "width": 390,
+        "variant": "large",
+        "animation": "training-sheet-in",
+        "duration": "0.275s",
+        "bodyScroll": false,
+        "inputSizes": [
+          16,
+          16,
+          16,
+          16
+        ],
+        "close": 44
+      },
+      {
+        "kind": "pelvic",
+        "top": 24,
+        "height": 820,
+        "width": 390,
+        "variant": "large",
+        "animation": "training-sheet-in",
+        "duration": "0.275s",
+        "bodyScroll": true,
+        "inputSizes": [],
+        "close": 44
+      }
+    ],
+    "status": "PASS",
+    "visualReview": "Final source screenshots inspected: same Large frame/finite short motion, original tokens/real fields retained;320px200% Strength actions wrap whole buttons."
+  },
+  {
+    "engine": "chromium",
+    "theme": "dark",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "approved": [
+      {
+        "kind": "strength",
+        "top": 24,
+        "localTop": 24,
+        "height": 820,
+        "width": 390,
+        "background": "rgb(39, 47, 40)",
+        "radius": "24px 24px 0px 0px",
+        "animation": "none",
+        "duration": "0s"
+      },
+      {
+        "kind": "cardio",
+        "top": 24,
+        "localTop": 24,
+        "height": 820,
+        "width": 390,
+        "background": "rgb(39, 47, 40)",
+        "radius": "24px 24px 0px 0px",
+        "animation": "none",
+        "duration": "0s"
+      },
+      {
+        "kind": "pelvic",
+        "top": 24,
+        "localTop": 24,
+        "height": 820,
+        "width": 390,
+        "background": "rgb(39, 47, 40)",
+        "radius": "24px 24px 0px 0px",
+        "animation": "none",
+        "duration": "0s"
+      }
+    ],
+    "START": [
+      {
+        "id": "start-workout",
+        "top": 24,
+        "height": 820,
+        "variant": "large",
+        "animation": "sheet-in",
+        "duration": "0.2s"
+      },
+      {
+        "id": "add-cardio",
+        "top": 298,
+        "height": 546,
+        "variant": "form",
+        "animation": "sheet-in",
+        "duration": "0.2s"
+      },
+      {
+        "id": "start-pelvic-floor",
+        "top": 12,
+        "height": 832,
+        "variant": "content",
+        "animation": "sheet-in",
+        "duration": "0.2s"
+      }
+    ],
+    "final": [
+      {
+        "kind": "strength",
+        "top": 24,
+        "height": 820,
+        "width": 390,
+        "variant": "large",
+        "animation": "training-sheet-in",
+        "duration": "0.275s",
+        "bodyScroll": false,
+        "inputSizes": [],
+        "close": 44
+      },
+      {
+        "kind": "cardio",
+        "top": 24,
+        "height": 820,
+        "width": 390,
+        "variant": "large",
+        "animation": "training-sheet-in",
+        "duration": "0.275s",
+        "bodyScroll": false,
+        "inputSizes": [
+          16,
+          16,
+          16,
+          16
+        ],
+        "close": 44
+      },
+      {
+        "kind": "pelvic",
+        "top": 24,
+        "height": 820,
+        "width": 390,
+        "variant": "large",
+        "animation": "training-sheet-in",
+        "duration": "0.275s",
+        "bodyScroll": true,
+        "inputSizes": [],
+        "close": 44
+      }
+    ],
+    "status": "PASS",
+    "visualReview": "Final source screenshots inspected: same Large frame/finite short motion, original tokens/real fields retained;320px200% Strength actions wrap whole buttons."
+  },
+  {
+    "engine": "webkit",
+    "theme": "light",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "approved": [
+      {
+        "kind": "strength",
+        "top": 23.984375,
+        "localTop": 23.984375,
+        "height": 820,
+        "width": 390,
+        "background": "rgb(255, 254, 250)",
+        "radius": "24px 24px 0px 0px",
+        "animation": "none",
+        "duration": "0s"
+      },
+      {
+        "kind": "cardio",
+        "top": 23.984375,
+        "localTop": 23.984375,
+        "height": 820,
+        "width": 390,
+        "background": "rgb(255, 254, 250)",
+        "radius": "24px 24px 0px 0px",
+        "animation": "none",
+        "duration": "0s"
+      },
+      {
+        "kind": "pelvic",
+        "top": 23.984375,
+        "localTop": 23.984375,
+        "height": 820,
+        "width": 390,
+        "background": "rgb(255, 254, 250)",
+        "radius": "24px 24px 0px 0px",
+        "animation": "none",
+        "duration": "0s"
+      }
+    ],
+    "START": [
+      {
+        "id": "start-workout",
+        "top": 24,
+        "height": 820,
+        "variant": "large",
+        "animation": "sheet-in",
+        "duration": "0.2s"
+      },
+      {
+        "id": "add-cardio",
+        "top": 309.046875,
+        "height": 534.953125,
+        "variant": "form",
+        "animation": "sheet-in",
+        "duration": "0.2s"
+      },
+      {
+        "id": "start-pelvic-floor",
+        "top": 12,
+        "height": 832,
+        "variant": "content",
+        "animation": "sheet-in",
+        "duration": "0.2s"
+      }
+    ],
+    "final": [
+      {
+        "kind": "strength",
+        "top": 24,
+        "height": 820,
+        "width": 390,
+        "variant": "large",
+        "animation": "training-sheet-in",
+        "duration": "0.275s",
+        "bodyScroll": false,
+        "inputSizes": [],
+        "close": 44
+      },
+      {
+        "kind": "cardio",
+        "top": 24,
+        "height": 820,
+        "width": 390,
+        "variant": "large",
+        "animation": "training-sheet-in",
+        "duration": "0.275s",
+        "bodyScroll": false,
+        "inputSizes": [
+          16,
+          16,
+          16,
+          16
+        ],
+        "close": 44
+      },
+      {
+        "kind": "pelvic",
+        "top": 24,
+        "height": 820,
+        "width": 390,
+        "variant": "large",
+        "animation": "training-sheet-in",
+        "duration": "0.275s",
+        "bodyScroll": true,
+        "inputSizes": [],
+        "close": 44
+      }
+    ],
+    "status": "PASS",
+    "visualReview": "Final source screenshots inspected: same Large frame/finite short motion, original tokens/real fields retained;320px200% Strength actions wrap whole buttons."
+  },
+  {
+    "engine": "webkit",
+    "theme": "dark",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "approved": [
+      {
+        "kind": "strength",
+        "top": 23.984375,
+        "localTop": 23.984375,
+        "height": 820,
+        "width": 390,
+        "background": "rgb(39, 47, 40)",
+        "radius": "24px 24px 0px 0px",
+        "animation": "none",
+        "duration": "0s"
+      },
+      {
+        "kind": "cardio",
+        "top": 23.984375,
+        "localTop": 23.984375,
+        "height": 820,
+        "width": 390,
+        "background": "rgb(39, 47, 40)",
+        "radius": "24px 24px 0px 0px",
+        "animation": "none",
+        "duration": "0s"
+      },
+      {
+        "kind": "pelvic",
+        "top": 23.984375,
+        "localTop": 23.984375,
+        "height": 820,
+        "width": 390,
+        "background": "rgb(39, 47, 40)",
+        "radius": "24px 24px 0px 0px",
+        "animation": "none",
+        "duration": "0s"
+      }
+    ],
+    "START": [
+      {
+        "id": "start-workout",
+        "top": 24,
+        "height": 820,
+        "variant": "large",
+        "animation": "sheet-in",
+        "duration": "0.2s"
+      },
+      {
+        "id": "add-cardio",
+        "top": 309.046875,
+        "height": 534.953125,
+        "variant": "form",
+        "animation": "sheet-in",
+        "duration": "0.2s"
+      },
+      {
+        "id": "start-pelvic-floor",
+        "top": 12,
+        "height": 832,
+        "variant": "content",
+        "animation": "sheet-in",
+        "duration": "0.2s"
+      }
+    ],
+    "final": [
+      {
+        "kind": "strength",
+        "top": 24,
+        "height": 820,
+        "width": 390,
+        "variant": "large",
+        "animation": "training-sheet-in",
+        "duration": "0.275s",
+        "bodyScroll": false,
+        "inputSizes": [],
+        "close": 44
+      },
+      {
+        "kind": "cardio",
+        "top": 24,
+        "height": 820,
+        "width": 390,
+        "variant": "large",
+        "animation": "training-sheet-in",
+        "duration": "0.275s",
+        "bodyScroll": false,
+        "inputSizes": [
+          16,
+          16,
+          16,
+          16
+        ],
+        "close": 44
+      },
+      {
+        "kind": "pelvic",
+        "top": 24,
+        "height": 820,
+        "width": 390,
+        "variant": "large",
+        "animation": "training-sheet-in",
+        "duration": "0.275s",
+        "bodyScroll": true,
+        "inputSizes": [],
+        "close": 44
+      }
+    ],
+    "status": "PASS",
+    "visualReview": "Final source screenshots inspected: same Large frame/finite short motion, original tokens/real fields retained;320px200% Strength actions wrap whole buttons."
+  }
+]

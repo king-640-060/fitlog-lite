@@ -1,0 +1,64 @@
+{
+  "receipts": [
+    {
+      "engine": "chromium",
+      "mode": "blank",
+      "workoutId": "b88d0b36-1279-406e-8bff-3ed2f534c07d",
+      "exactClose": 1,
+      "exitVisualMounts": 0,
+      "autosaveSameID": true,
+      "originalOtherTables": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "chromium",
+      "mode": "template",
+      "workoutId": "f1bf2824-b2cb-403a-86ff-e6ed2ad2e7ca",
+      "exactClose": 1,
+      "exitVisualMounts": 0,
+      "autosaveSameID": true,
+      "originalOtherTables": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "chromium",
+      "mode": "continue",
+      "workoutId": "workout-old",
+      "exactClose": 1,
+      "exitVisualMounts": 0,
+      "autosaveSameID": true,
+      "originalOtherTables": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "mode": "blank",
+      "workoutId": "9f3d1520-1bb3-4ab6-921b-75e3a04da1ba",
+      "exactClose": 1,
+      "exitVisualMounts": 0,
+      "autosaveSameID": true,
+      "originalOtherTables": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "mode": "template",
+      "workoutId": "d1b557b5-aebf-4f10-b920-829e3c88a4b6",
+      "exactClose": 1,
+      "exitVisualMounts": 0,
+      "autosaveSameID": true,
+      "originalOtherTables": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "mode": "continue",
+      "workoutId": "workout-old",
+      "exactClose": 1,
+      "exitVisualMounts": 0,
+      "autosaveSameID": true,
+      "originalOtherTables": true,
+      "status": "PASS"
+    }
+  ]
+}

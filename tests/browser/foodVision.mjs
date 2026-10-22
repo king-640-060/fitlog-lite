@@ -1,3 +1,4 @@
+import { waitForMainNavigation } from './navigationSettlement.mjs'
 // Fresh synthetic browser contexts and mock providers only. No real image/key/data.
 import assert from 'node:assert/strict'
 const { chromium } = await import(process.env.FITLOG_PLAYWRIGHT_MODULE)
@@ -22,7 +23,7 @@ for (const [width,height] of sizes) {
     await route.fulfill({json:{choices:[{message:{content}}]}}).catch(()=>{})
   })
   await page.goto(base,{waitUntil:'networkidle'});await page.waitForSelector('#open-management')
-  const nav=async tab=>page.locator(`[data-tab=${tab}]`).click()
+  const nav=async tab=>{await page.locator(`[data-tab=${tab}]`).click();await waitForMainNavigation(page,tab)}
   const close=async()=>page.locator('dialog [data-close]').click()
   const records=async store=>page.evaluate(async store=>{const d=await new Promise(resolve=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>resolve(q.result)});const rows=await new Promise(resolve=>{const q=d.transaction(store).objectStore(store).getAll();q.onsuccess=()=>resolve(q.result)});d.close();return rows},store)
   const layout=async name=>{await page.waitForTimeout(280);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.equal(await page.locator('.modal-body').evaluate(e=>e.scrollWidth<=e.clientWidth),true);assert.equal(await page.locator('input[type=date]').count(),0);await page.screenshot({path:`/tmp/food-vision-${prod?'prod':'local'}-${width}-${name}.png`})}

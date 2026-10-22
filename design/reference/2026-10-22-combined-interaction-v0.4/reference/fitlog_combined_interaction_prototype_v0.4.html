@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>FitLog Lite · 主导航、饮食日期与训练大 Sheet 联合交互原型 v0.4</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-width:300px}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}[hidden]{display:none!important}
+:root{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Helvetica Neue",sans-serif;font-synthesis:none;font-size:16px;color:#29352a;background:#e9eee8}
+.workspace{display:grid;grid-template-columns:minmax(255px,320px) auto;gap:32px;align-items:center;justify-content:center;min-height:100dvh;padding:28px 22px}
+.controls{align-self:stretch;max-width:320px;padding:24px 4px;display:flex;flex-direction:column;gap:16px}.controls h1{font-size:1.35rem;line-height:1.28;letter-spacing:-.025em;margin:0}.controls h1 small{display:block;font-weight:500;font-size:.79rem;color:#607264;margin-top:8px;line-height:1.6}.controls .eyebrow{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:#5f765c;font-weight:800}.settings{border:1px solid #d2dcd0;border-radius:17px;background:#ffffffa8;padding:15px;display:grid;gap:13px}.settings label{display:grid;gap:6px;font-size:.8rem;font-weight:650;color:#4b5c4c}.settings select{width:100%;background:#fff;border:1px solid #cdd8cd;border-radius:9px;padding:9px 10px;min-height:42px;color:#263128}.settings .toggle{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:34px}.settings .toggle input{width:20px;height:20px;accent-color:#52723b}.hint{font-size:.79rem;color:#536756;line-height:1.7;margin:0}.tests{padding:0 3px;font-size:.77rem;line-height:1.75;color:#526452}.tests strong{font-size:.84rem;color:#253e2a}.tests ul{padding-left:18px;margin:8px 0}.tests li{margin-bottom:6px}.prototype-note{padding:10px 12px;border-left:3px solid #819a69;background:#edf2e9;font-size:.72rem;line-height:1.6;color:#475944;border-radius:4px}.log{font-size:.76rem;color:#446043;min-height:2.8em;line-height:1.5}
+.stage{display:flex;align-items:center;justify-content:center;min-width:0}.device{--base:#f5f2eb;--surface:#fffefa;--surface-soft:#f8f8f2;--ink:#282e28;--secondary:#697369;--muted:#889186;--accent:#52723b;--active-ink:#52723b;--pill:#e9f0dc;--border:#e9e8df;--shadow:0 2px 10px rgba(38,70,51,.035);--font-factor:1;--safe:18px;--nav-row: max(48px,calc(1.3em + 26px));--nav-total:calc(var(--nav-row) + 9px + var(--safe));position:relative;isolation:isolate;overflow:hidden;width:var(--device-width,390px);height:min(848px,calc(100dvh - 44px));min-height:590px;background:var(--base);color:var(--ink);font-size:calc(16px * var(--font-factor));border:1px solid rgba(38,65,40,.15);border-radius:34px;box-shadow:0 20px 60px rgba(37,54,36,.13);contain:layout style;touch-action:pan-y}
+.device[data-theme="dark"]{color-scheme:dark;--base:#1b211d;--surface:#272f28;--surface-soft:#303931;--ink:#ecf0e6;--secondary:#b6c1b1;--muted:#9baa98;--accent:#b7d18d;--active-ink:#e3f0ca;--pill:#43583d;--border:#3d4a3e;--shadow:0 2px 12px rgba(0,0,0,.13)}
+.device button,.device input,.device textarea{color:inherit}.device button{border:0;background:transparent}.device .ico{width:20px;height:20px;flex:0 0 auto;display:inline-block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.device .ico-16{width:16px;height:16px}.device .ico-18{width:18px;height:18px}.device .ico-22{width:22px;height:22px}
+.phone-status{position:absolute;inset:0 0 auto;z-index:3;display:flex;justify-content:space-between;align-items:center;height:28px;padding:0 25px;font-size:.61em;font-weight:700;color:var(--secondary);pointer-events:none;background:var(--base)}.phone-status .status-icons{display:flex;align-items:center;gap:4px}
+.swipe-viewport{position:absolute;inset:28px 0 var(--nav-total) 0;overflow:hidden;touch-action:pan-y;overscroll-behavior-x:contain}.page{position:absolute;inset:0;visibility:hidden;overflow-y:auto;overflow-x:hidden;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;scrollbar-width:none;will-change:transform}.page::-webkit-scrollbar{display:none}.page.is-current{visibility:visible}.page-inner{min-height:100%;padding:0 16px 26px;display:flex;flex-direction:column;gap:13px}.topbar{padding:14px 1px 4px;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:77px}.topbar h2{font-size:1.78em;margin:0;font-weight:760;letter-spacing:-.035em;line-height:1.16}.topbar p{font-size:.78em;margin:6px 0 0;color:var(--secondary)}.top-actions{display:flex;gap:5px}.icon-action{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;color:var(--secondary)!important}.page h3{font-size:1em;margin:0;line-height:1.35;letter-spacing:-.01em}.card{border:1px solid var(--border);border-radius:18px;background:var(--surface);padding:15px;box-shadow:var(--shadow);min-width:0}.card-header{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:12px}.card-heading{display:flex;align-items:center;gap:9px;min-width:0}.card-title-icon{width:32px;height:32px;display:grid;place-items:center;border-radius:11px;background:var(--surface-soft);color:var(--accent)}.card-header button{display:flex;align-items:center;justify-content:center;gap:2px;min-height:44px;font-size:.78em;color:var(--secondary);white-space:nowrap}.muted{color:var(--secondary)}.tiny{font-size:.75em;line-height:1.55;color:var(--secondary)}.big{font-size:1.77em;font-weight:750;letter-spacing:-.03em}.big small{font-size:.44em;font-weight:550;margin-left:3px}.summary-line{display:flex;justify-content:space-between;align-items:baseline;gap:12px;min-width:0}.meter{height:8px;border-radius:999px;background:var(--surface-soft);overflow:hidden;margin-top:11px}.meter i{display:block;height:100%;width:64%;border-radius:inherit;background:var(--accent)}.metric-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:13px}.metric{border-radius:12px;padding:10px 7px;background:var(--surface-soft);min-width:0}.metric strong{display:block;font-size:.91em;margin-bottom:4px;white-space:nowrap}.metric span{display:block;font-size:.68em;color:var(--secondary);white-space:nowrap}.metric:nth-child(1) strong{color:#6f98a3}.metric:nth-child(2) strong{color:#c29757}.metric:nth-child(3) strong{color:#b57f70}
+.soft-action{display:flex;align-items:center;justify-content:center;min-height:44px;border:1px solid var(--border)!important;border-radius:12px;background:var(--surface-soft)!important;color:var(--accent)!important;font-size:.83em;font-weight:650;padding:8px 12px}.primary-action{display:flex;align-items:center;justify-content:center;min-height:46px;border-radius:12px;background:var(--accent)!important;color:var(--surface)!important;font-weight:700;padding:8px 14px;font-size:.85em}.device[data-theme="dark"] .primary-action{color:#182219!important}.inline-actions{display:flex;gap:9px;margin-top:13px}.inline-actions>button{flex:1;min-width:0}.record-row{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:43px;border-top:1px solid var(--border);padding:7px 0}.record-row:first-of-type{border-top:0}.record-row strong{font-size:.88em}.record-row small{display:block;color:var(--secondary);font-size:.74em;margin-top:4px}.record-row .right{font-size:.82em;font-weight:650;white-space:nowrap}
+.plan-hero{display:flex;gap:10px;justify-content:space-between;align-items:center}.plan-hero .stat{font-size:1.5em;font-weight:760}.plan-hero p{margin:5px 0 0}.task-item{display:flex;gap:9px;align-items:center;min-height:54px;padding:9px 0;border-bottom:1px solid var(--border)}.task-item:last-child{border-bottom:0}.task-item input{width:20px;height:20px;accent-color:var(--accent);flex:0 0 auto}.task-item label{flex:1;font-size:.87em;line-height:1.45}.task-item small{display:block;color:var(--secondary);font-size:.81em;margin-top:4px}.tag{display:inline-block;color:var(--accent);background:var(--pill);font-size:.68em;font-weight:650;padding:5px 8px;border-radius:8px}
+/* Food has its own horizontal gesture domain, nested inside the five main tabs. */
+.food-date-gesture-help{line-height:1.55}.food-date-rail{--food-cell:clamp(104px,calc(var(--device-width,390px) * .28),118px);position:relative;width:100%;min-width:0;height:58px;overflow:hidden;touch-action:pan-y;overscroll-behavior-x:contain;user-select:none;-webkit-user-select:none;cursor:grab;mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent)}.food-date-rail.is-dragging{cursor:grabbing}.food-date-rail::before{position:absolute;right:7%;bottom:3px;left:7%;height:1px;content:"";background:linear-gradient(90deg,transparent,var(--border) 22%,var(--border) 78%,transparent);pointer-events:none}.food-date-rail::after{position:absolute;z-index:2;left:calc(50% - 7px);bottom:1px;width:14px;height:2px;border-radius:2px;background:var(--accent);content:"";pointer-events:none}.food-date-track{display:flex;position:absolute;left:0;top:2px;width:max-content;will-change:transform;transform:translate3d(0,0,0)}.food-date-item{flex:0 0 var(--food-cell);min-width:0;min-height:50px;padding:2px 5px;border:0!important;background:transparent!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--secondary)!important;font-size:.74em;line-height:1.2;white-space:nowrap;opacity:.43;transform:scale(.91)}.food-date-item strong{font-size:1.1em;font-weight:700}.food-date-item span{font-size:.92em}.food-date-item[aria-current="date"]{color:var(--active-ink)!important;opacity:1;transform:scale(1)}.food-date-item.is-preview{color:var(--active-ink)!important;opacity:.84}.food-date-item:focus-visible{outline:2px solid var(--accent);outline-offset:-3px;border-radius:10px}.food-date-rail.is-dragging .food-date-item[aria-current="date"]{color:var(--secondary)!important;opacity:.80}
+.food-day-viewport{position:relative;overflow:hidden;min-width:0;min-height:450px;touch-action:pan-y;overscroll-behavior-x:contain;border-radius:2px}.food-day-panel{position:absolute;top:0;left:0;width:100%;display:grid;gap:13px;align-content:start;will-change:transform;transform:translate3d(0,0,0)}.food-day-panel.is-neighbor{visibility:hidden;pointer-events:none}.food-day-panel .date-preview-tag{font-size:.68em;color:var(--secondary);font-weight:500}.food-day-panel .card{min-width:0}.food-day-panel .record-row{min-width:0}.device[data-large-font="true"] .food-day-panel .summary-line{flex-wrap:wrap}.device[data-large-font="true"] .food-day-panel .summary-line>span{flex-basis:100%;text-align:left}.device[data-large-font="true"] .food-day-panel .summary-line .big{margin-top:5px}
+.food-section-heading{display:flex;justify-content:space-between;align-items:center;gap:8px}.food-section-heading span{font-size:.78em;color:var(--secondary)}
+.workout-stat{display:grid;grid-template-columns:1fr 1fr;gap:8px}.workout-stat>div{border-radius:12px;background:var(--surface-soft);padding:12px}.workout-stat strong{font-size:1.3em}.workout-stat small{display:block;margin-top:5px;font-size:.74em;color:var(--secondary)}.draft-field{display:grid;gap:8px;margin-top:11px}.draft-field label{font-weight:650;font-size:.85em}.draft-field textarea{resize:vertical;min-height:76px;width:100%;border:1px solid var(--border);border-radius:12px;background:var(--surface-soft);padding:12px;font-size:max(16px,.95em);line-height:1.5}.draft-hint{font-size:.73em;color:var(--secondary);line-height:1.6}
+.chart-scroller{overflow-x:auto;overflow-y:hidden;touch-action:pan-x;overscroll-behavior-x:contain;scrollbar-width:none;cursor:grab;border-radius:11px;background:var(--surface-soft);margin-top:12px}.chart-scroller::-webkit-scrollbar{display:none}.chart-data{display:flex;align-items:flex-end;justify-content:space-around;gap:14px;height:132px;width:770px;padding:19px 10px 24px;background-image:repeating-linear-gradient(to top,transparent 0,transparent 35px,var(--border) 36px)}.chart-data i{flex:0 0 10px;border-radius:6px 6px 2px 2px;background:var(--accent);height:var(--h,40%);opacity:.72}.chart-data i:nth-child(3n){opacity:.47}.chart-data i:nth-child(4n){opacity:.88}.trend-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.trend-head strong{font-size:1.32em;white-space:nowrap}.range-tabs{display:flex;gap:3px}.range-tabs button{font-size:.74em;border-radius:9px;min-width:40px;min-height:35px;color:var(--secondary)}.range-tabs button.chosen{background:var(--pill);color:var(--active-ink);font-weight:700}
+.month-header{display:flex;justify-content:space-between;align-items:center;gap:9px}.month-header button{width:44px;height:44px;display:grid;place-items:center;border-radius:11px;color:var(--secondary)}.month-header strong{font-size:.94em}.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;text-align:center;font-size:.72em}.calendar-grid .week{font-weight:650;color:var(--secondary);padding:8px 0}.calendar-grid button{min-height:44px;border-radius:9px;font-size:1em;color:var(--ink)}.calendar-grid button.has-demo{background:var(--surface-soft)}.calendar-grid button.selected{background:var(--pill);color:var(--active-ink);font-weight:750}.calendar-grid button:disabled{opacity:.3}
+.bottom-nav{position:absolute;inset:auto 0 0;z-index:5;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;padding:4px 8px calc(4px + var(--safe));height:var(--nav-total);border:1px solid var(--border);border-bottom:0;border-radius:20px 20px 0 0;background:var(--surface);box-shadow:0 -3px 16px rgba(38,70,51,.045)}.nav-pill{position:absolute;z-index:0;top:7px;left:0;width:10px;height:42px;border-radius:11px;background:var(--pill);pointer-events:none;will-change:transform;transform:translate3d(0,0,0)}.bottom-nav button{position:relative;z-index:1;min-width:0;min-height:var(--nav-row);padding:3px 0;display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center;border-radius:13px;background:transparent;white-space:nowrap;color:var(--secondary);font-size:.7em;font-weight:500}.bottom-nav button.active{color:var(--active-ink);font-weight:700}.bottom-nav button .ico{width:20px;height:20px}.bottom-nav button:focus-visible{outline:2px solid var(--accent);outline-offset:-1px}.phone-home-indicator{position:absolute;z-index:8;bottom:5px;left:50%;transform:translateX(-50%);width:95px;height:3px;border-radius:4px;background:var(--ink);opacity:.20;pointer-events:none}
+.sheet-mask{position:absolute;inset:0;z-index:10;background:rgba(26,35,29,.34);display:flex;align-items:flex-end;justify-content:center}.sheet{max-height:78%;min-height:305px;width:100%;display:flex;flex-direction:column;overflow:hidden;background:var(--surface);border-radius:24px 24px 0 0;padding:16px 18px calc(21px + var(--safe));box-shadow:0 -8px 35px #0002}.sheet-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:15px}.sheet-head h3{margin:0;font-size:1.08em}.sheet-head button{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;color:var(--secondary)}.sheet-body{overflow-y:auto;flex:1;display:grid;align-content:start;gap:13px}.sheet-body input,.sheet-body textarea{width:100%;border:1px solid var(--border);border-radius:12px;background:var(--surface-soft);color:var(--ink);font-size:max(16px,.95em);padding:10px 12px;min-height:46px}.sheet-body label{font-weight:650;font-size:.83em}.sheet-body textarea{min-height:100px}.sheet-footer{padding-top:12px}.sheet-footer button{width:100%}.device.sheet-is-open .bottom-nav{pointer-events:none}
+@media (max-width:760px){.workspace{display:flex;flex-direction:column-reverse;align-items:stretch;justify-content:start;gap:0;padding:0}.stage{display:block}.device{width:100%!important;height:100dvh;min-height:520px;max-width:none;border:0;border-radius:0;box-shadow:none;--safe:env(safe-area-inset-bottom, 18px)}.controls{padding:25px 17px 45px;max-width:none}.controls h1{font-size:1.2rem}.settings{grid-template-columns:repeat(2,minmax(0,1fr))}.settings .toggle{grid-column:1/-1}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+
+/* v0.3 — one existing large-Sheet geometry for all three initial training surfaces. */
+.device .quiet-preview{display:block;min-height:44px;width:100%;text-align:center;color:var(--accent)!important;font-size:.76em;padding:9px 4px;line-height:1.45}
+.sheet{max-height:calc(100% - 12px)}
+.sheet[data-sheet-mode="large"]{height:min(820px,calc(100% - 12px));max-height:calc(100% - 12px);min-height:0;padding:0 0 calc(10px + var(--safe));gap:0}
+.sheet-handle{width:36px;height:4px;border-radius:99px;background:var(--border);margin:9px auto 3px;flex:0 0 auto}
+.sheet[data-sheet-mode="large"] .sheet-head{min-height:60px;flex:0 0 auto;padding:5px 18px;margin:0}
+.sheet[data-sheet-mode="large"] .sheet-body{padding:7px 18px 12px;flex:1 1 auto;min-height:0;overscroll-behavior:contain;gap:12px}
+.sheet[data-sheet-mode="large"] .sheet-footer{padding:12px 18px 4px;flex:0 0 auto;border-top:1px solid var(--border)}
+.sheet[data-sheet-mode="large"] .sheet-head h3{font-size:1.22em;line-height:1.35;min-width:0}
+.device[data-large-font="true"] .sheet[data-sheet-mode="large"] .sheet-head h3{font-size:1.06em;letter-spacing:-.02em;overflow-wrap:normal}
+.sheet .sheet-head button:focus-visible,.execution-header button:focus-visible{outline:2px solid var(--accent)}
+.sheet-body .training-intro{font-size:.77em;line-height:1.55;color:var(--secondary);margin:0}
+.sheet-body .train-option{display:grid;gap:5px;padding:13px 14px;min-height:65px;border:1px solid var(--border);border-radius:14px;background:var(--surface-soft)}
+.sheet-body .train-option strong{font-size:.88em}
+.sheet-body .train-option span{font-size:.76em;color:var(--secondary);line-height:1.45}
+.sheet-body .train-headline{font-size:.84em;font-weight:750;margin:8px 0 0}
+.sheet-body .train-cards{display:grid;gap:9px}
+.sheet-body .train-samples{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.sheet-body .train-samples>div{background:var(--surface-soft);border:1px solid var(--border);padding:13px 10px;border-radius:12px;min-width:0}
+.sheet-body .train-samples span,.sheet-body .train-samples strong{display:block;font-size:.76em;line-height:1.4}
+.sheet-body .train-samples strong{font-size:.98em;color:var(--accent);margin:4px 0 0}
+.sheet-body .train-activity-picker{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--surface-soft);border-radius:13px;padding:4px}
+.sheet-body .train-activity-picker button{min-height:44px;font-size:.82em;border-radius:10px;color:var(--secondary)}
+.sheet-body .train-activity-picker button[aria-pressed="true"]{background:var(--pill);color:var(--active-ink);font-weight:700}
+.sheet-body .train-field{display:grid;gap:6px;margin-top:2px;font-size:.82em;font-weight:650}
+.sheet-body .train-field input,.sheet-body .train-field textarea{min-height:48px;font-size:16px;width:100%;padding:10px 13px;border-radius:12px;border:1px solid var(--border);background:var(--surface-soft);color:var(--ink)}
+.sheet-body .train-field textarea{min-height:105px;resize:vertical}
+.sheet-body .train-feature{border-radius:18px;background:var(--pill);padding:16px;display:grid;gap:12px;border:1px solid color-mix(in srgb,var(--accent) 36%,var(--border))}
+.sheet-body .train-feature h4{font-size:1.02em;margin:0;color:var(--active-ink)}
+.sheet-body .train-feature p{font-size:.77em;line-height:1.5;color:var(--secondary);margin:0}
+.sheet-body .train-stage-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.sheet-body .train-stage-grid button{display:grid;place-items:center;align-content:center;gap:4px;min-height:68px;border:1px solid var(--border);border-radius:12px;font-size:.78em;padding:8px 3px;color:var(--secondary)}
+.sheet-body .train-stage-grid button[aria-pressed="true"]{color:var(--active-ink);border-color:var(--accent);background:var(--pill)}
+.sheet-body .train-stage-grid small{font-size:.76em}
+.sheet-body .train-stage-grid button:disabled{opacity:.55}
+.sheet-body .train-safety{font-size:.77em;line-height:1.6;color:var(--secondary)}
+.sheet-body .train-safety summary{min-height:44px;display:flex;align-items:center}
+.sheet-body .train-safety p{margin:0 0 5px}
+.sheet-body .train-specialties{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.sheet-body .train-specialties button{min-height:82px;display:grid;gap:4px;align-content:center;text-align:left;padding:11px;border-radius:13px;border:1px solid var(--border);font-size:.78em}
+.sheet-body .train-specialties strong{font-size:1.05em}
+.sheet-body .train-specialties span{color:var(--secondary)}
+.sheet[data-sheet-mode="large"] .sheet-footer .primary-action{font-size:.92em;min-height:48px}
+.execution-mask{position:absolute;inset:0;z-index:12;background:var(--base);color:var(--ink);padding:28px 0 0;overflow:hidden}
+.execution-scroll{height:100%;overflow-y:auto;overscroll-behavior:contain;padding:0 16px calc(36px + var(--safe))}
+.execution-header{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.execution-header h2{font-size:1.54em;margin:4px 0 0}
+.execution-eyebrow{font-size:.69em;color:var(--secondary)}
+.execution-header button{width:44px;height:44px;flex:0 0 44px;color:var(--secondary);display:grid;place-items:center}
+.execution-content{display:grid;gap:13px}
+.execution-content .card{display:grid;gap:10px}
+.execution-content .demo-count{font-size:3.3em;color:var(--accent);font-weight:780;letter-spacing:-.05em;text-align:center;margin:12px 0 5px}
+.execution-content .demo-rep{font-size:.79em;text-align:center;color:var(--secondary)}
+.execution-content .demo-buttons{display:flex;gap:8px}
+.execution-content .demo-buttons button{flex:1}
+.device.execution-is-open .bottom-nav,.device.execution-is-open .phone-home-indicator{pointer-events:none}
+@media (max-width:340px){.sheet-body .train-specialties{gap:6px}.sheet-body .train-feature{padding:13px}}
+
+/* v0.4: unified Sheet entrance/exit. No scale, bounce, blur or layout animation. */
+.sheet-mask{opacity:0;pointer-events:none;transition:opacity 210ms ease-out}
+.sheet-mask.is-visible{opacity:1;pointer-events:auto}
+.sheet-mask .sheet{transform:translate3d(0,58px,0);opacity:.96;transition:transform 275ms cubic-bezier(.2,.78,.2,1),opacity 200ms ease-out;will-change:transform;backface-visibility:hidden}
+.sheet-mask.is-visible .sheet{transform:translate3d(0,0,0);opacity:1}
+@media(prefers-reduced-motion:reduce){.sheet-mask,.sheet-mask .sheet{transition:none!important;transform:none!important;opacity:1!important}}
+.device[data-reduced-motion="true"] .sheet-mask,.device[data-reduced-motion="true"] .sheet-mask .sheet{transition:none!important;transform:none!important;opacity:1!important}
+</style>
+</head>
+<body>
+<svg width="0" height="0" aria-hidden="true" style="position:absolute"><defs>
+<symbol id="ic-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z"/></symbol>
+<symbol id="ic-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18m-13 4h3m-3 3h6"/></symbol>
+<symbol id="ic-food" viewBox="0 0 24 24"><path d="M4 3v7a4 4 0 0 0 8 0V3M8 3v18M17 3c-2 3-3 5-3 9h5V3zM19 12v9"/></symbol>
+<symbol id="ic-workout" viewBox="0 0 24 24"><path d="M3 9v6m3-9v12m3-8v4m6-4v4m3-8v12m3-9v6M9 12h6M1 9h4m14 0h4M1 15h4m14 0h4"/></symbol>
+<symbol id="ic-trend" viewBox="0 0 24 24"><path d="M3 18h18M4 15l5-6 4 3 7-8"/><path d="M16 4h4v4"/></symbol>
+<symbol id="ic-chevron" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+<symbol id="ic-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="ic-x" viewBox="0 0 24 24"><path d="M5 5 19 19M19 5 5 19"/></symbol>
+<symbol id="ic-moon" viewBox="0 0 24 24"><path d="M19 15A8 8 0 0 1 9 5 8 8 0 1 0 19 15Z"/></symbol>
+<symbol id="ic-droplet" viewBox="0 0 24 24"><path d="M12 3c-3 5-7 8-7 12a7 7 0 0 0 14 0c0-4-4-7-7-12z"/></symbol>
+<symbol id="ic-leaf" viewBox="0 0 24 24"><path d="M20 4C9 3 4 9 4 16c0 3 3 5 6 4 6-2 10-7 10-16zM4 20c2-5 7-9 12-11"/></symbol>
+<symbol id="ic-weight" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 11a4 4 0 0 1 8 0m-4 0 2-2"/></symbol>
+<symbol id="ic-edit" viewBox="0 0 24 24"><path d="m4 18 0 3 4-1 11-11-3-3zM14 7l3 3"/></symbol>
+</defs></svg>
+<div class="workspace">
+<aside class="controls" aria-label="原型控制和说明">
+ <div><div class="eyebrow">Interactive prototype · v0.3</div><h1>导航跟手 · 训练 Sheet 统一<small>五个主 Tab＋饮食日期跟手＋三种训练大 Sheet<br>参考示例视频的拖动节奏，沿用 FitLog Lite 原有视觉。</small></h1></div>
+ <div class="settings">
+  <label for="viewport-size">预览宽度<select id="viewport-size"><option value="320">320px</option><option value="375">375px</option><option value="390" selected>390px</option><option value="430">430px</option></select></label>
+  <label for="theme">外观<select id="theme"><option value="light">浅色</option><option value="dark">深色</option></select></label>
+  <label for="font-size">文字放大<select id="font-size"><option value="1">100%</option><option value="1.2">120%</option><option value="1.4">140%</option><option value="2">200%</option></select></label>
+  <label class="toggle" for="reduce-motion">减少动态效果<input id="reduce-motion" type="checkbox"></label>
+ </div>
+ <p class="hint">主页面横向跟手、胶囊同步；饮食日期独立跟手。训练页的力量初始选择、有氧记录、凯格尔选择全部采用同高大 Sheet（最大 820px），执行中的力量训练和凯格尔计时仍是独立执行界面。</p>
+ <p class="log" id="gesture-status" aria-live="polite">当前：今日 · 可开始拖动</p>
+ <div class="tests"><strong>可直接试验的冲突场景</strong><ul><li>饮食页：拖动顶部日期轨或下方饮食卡片空白处，相邻日期内容同步露出，主 Tab 不变。</li><li>进度页：横向滚动趋势图、切换日历月份。</li><li>训练页：分别打开力量初始选择、有氧记录、凯格尔选择，观察弹层顶部是否齐平；尝试内部滚动和关闭。</li><li>从力量选择或凯格尔方案进入执行界面；执行界面不被强制变成 Sheet。</li><li>打开任一 Sheet：主页面滑动被禁止。</li><li>训练页：输入训练备注，切到其他页再返回，草稿仍在。</li><li>从左边缘向右滑、斜向和纵向滑动、首末页边界。</li><li>快速点不同 Tab、点击当前 Tab、切换深色及减少动画。</li></ul></div>
+ <div class="prototype-note">演示专用：所有食物、体重、任务、日期和训练数字均为虚构演示内容；页面切换与表单只操作当前 HTML 的内存状态，不访问 IndexedDB、备份或同步。三种训练弹层只统一外框，内部业务与执行流程仍独立；正式生产实现需专项测试和用户批准。</div>
+</aside>
+<main class="stage">
+<div id="device" class="device" data-theme="light" style="--device-width:390px" aria-label="FitLog Lite 原型预览">
+ <div class="phone-status" aria-hidden="true"><span>9:41</span><span class="status-icons">● ▰ ▰</span></div>
+ <div class="swipe-viewport" id="swipe-viewport">
+  <section class="page is-current" data-page="today" data-index="0" aria-label="今日页面"><div class="page-inner">
+   <div class="topbar"><div><h2>早上好</h2><p>10月22日 · 今天也继续保持</p></div><div class="top-actions"><button class="icon-action" data-open-sheet="今日记录" aria-label="记录今日数据"><svg class="ico"><use href="#ic-plus"/></svg></button></div></div>
+   <div class="card"><div class="card-header"><div class="card-heading"><span class="card-title-icon"><svg class="ico"><use href="#ic-food"/></svg></span><h3>今日饮食</h3></div><button type="button" data-nav-to="food">查看<svg class="ico ico-16"><use href="#ic-chevron"/></svg></button></div><div class="summary-line"><div><div class="big">1,680<small>kcal</small></div><div class="tiny">今日摄入 · 演示</div></div><div class="tiny">目标 2,200 kcal</div></div><div class="meter"><i></i></div><div class="metric-grid"><div class="metric"><strong>96 g</strong><span>蛋白质</span></div><div class="metric"><strong>185 g</strong><span>碳水</span></div><div class="metric"><strong>56 g</strong><span>脂肪</span></div></div></div>
+   <div class="card"><div class="card-header"><div class="card-heading"><span class="card-title-icon"><svg class="ico"><use href="#ic-workout"/></svg></span><h3>训练</h3></div><button data-nav-to="workout">查看<svg class="ico ico-16"><use href="#ic-chevron"/></svg></button></div><div class="record-row"><div><strong>今日尚未完成训练</strong><small>已保留进行中的训练草稿</small></div><span class="tag">可继续</span></div><div class="inline-actions"><button class="soft-action" data-nav-to="workout">记录训练</button></div></div>
+   <div class="card"><div class="card-header"><div class="card-heading"><span class="card-title-icon"><svg class="ico"><use href="#ic-moon"/></svg></span><h3>恢复</h3></div><button data-nav-to="progress">查看趋势<svg class="ico ico-16"><use href="#ic-chevron"/></svg></button></div><div class="record-row"><div><strong>睡眠</strong><small>昨晚的已保存记录 · 演示</small></div><div class="right">7小时 30分</div></div><div class="record-row"><div><strong>饮水</strong><small>今日累计 · 演示</small></div><div class="right">1,200 ml</div></div></div>
+   <div class="card"><div class="card-header"><h3>今日计划</h3><button data-nav-to="plan">查看<svg class="ico ico-16"><use href="#ic-chevron"/></svg></button></div><div class="record-row"><div><strong>整理本周训练安排</strong><small>待完成</small></div><div class="right">今天</div></div></div>
+  </div></section>
+  <section class="page" data-page="plan" data-index="1" aria-label="计划页面"><div class="page-inner">
+   <div class="topbar"><div><h2>计划</h2><p>让今天的安排更清晰</p></div><button class="icon-action" data-open-sheet="新建计划" aria-label="新建计划"><svg class="ico"><use href="#ic-plus"/></svg></button></div>
+   <div class="card"><div class="plan-hero"><div><h3>今日待办</h3><p class="tiny">本页交互数据仅为示意</p></div><div class="stat" id="plan-progress">1 / 3</div></div><div class="meter" style="margin-top:14px"><i id="plan-progress-meter" style="width:33%"></i></div></div>
+   <div class="card"><div class="card-header"><h3>今天</h3><span class="tag">10月22日</span></div><div class="task-item"><input type="checkbox" id="task-a" checked><label for="task-a">晨间补水<small>例行 · 已完成</small></label></div><div class="task-item"><input type="checkbox" id="task-b"><label for="task-b">下肢训练<small>训练 · 下午</small></label></div><div class="task-item"><input type="checkbox" id="task-c"><label for="task-c">准备明日饮食计划<small>生活 · 晚上</small></label></div><button class="soft-action" data-open-sheet="新建计划" style="width:100%;margin-top:10px">＋ 新建计划</button></div>
+   <div class="card"><div class="card-header"><h3>接下来</h3></div><div class="record-row"><div><strong>周末复盘</strong><small>10月24日 · 演示</small></div><span class="tag">待安排</span></div><div class="record-row"><div><strong>记录身体感受</strong><small>10月25日 · 演示</small></div><span class="tag">待安排</span></div></div>
+  </div></section>
+  <section class="page" data-page="food" data-index="2" aria-label="饮食页面"><div class="page-inner">
+   <div class="topbar"><div><h2>饮食</h2><p>按日期查看与记录</p></div><button class="icon-action" data-open-sheet="添加饮食" aria-label="添加饮食"><svg class="ico"><use href="#ic-plus"/></svg></button></div>
+   <div class="tiny food-date-gesture-help">在顶部日期轨或下方记录卡片空白处左右拖动：当日内容和相邻日期跟手切换，主 Tab 保持“饮食”。点击任一日期可直接跳转。</div>
+   <div id="food-date-rail" class="food-date-rail" data-horizontal-owner aria-label="饮食日期导航，左右拖动或点击选择日期"><div id="food-date-track" class="food-date-track"></div></div>
+   <div id="food-day-viewport" class="food-day-viewport" data-horizontal-owner aria-label="按日期滑动浏览饮食记录"><div class="food-day-panel" id="food-day-current"></div><div class="food-day-panel is-neighbor" id="food-day-neighbor" aria-hidden="true" inert></div></div>
+  </div></section>
+  <section class="page" data-page="workout" data-index="3" aria-label="训练页面"><div class="page-inner">
+   <div class="topbar"><div><h2>训练</h2><p>10月22日 · 记录每一次坚持</p></div><button class="icon-action" data-open-sheet="训练编辑" aria-label="训练编辑"><svg class="ico"><use href="#ic-edit"/></svg></button></div>
+   <div class="card"><div class="card-header"><div class="card-heading"><span class="card-title-icon"><svg class="ico"><use href="#ic-workout"/></svg></span><h3>力量训练</h3></div><span class="tag">草稿进行中</span></div><div class="workout-stat"><div><strong>3</strong><small>动作数 · 演示</small></div><div><strong>8</strong><small>训练组数 · 演示</small></div></div><div class="draft-field"><label for="workout-draft">训练笔记（未保存草稿）</label><textarea id="workout-draft" placeholder="记录本次训练的主观感受……">今天状态不错，动作保持稳定。</textarea><span class="draft-hint" id="draft-summary">草稿仅保留在原型内存中。切换主 Tab 后返回仍会存在。</span></div><div class="inline-actions"><button class="primary-action" type="button" data-demo-execution="strength">继续力量训练</button></div><button type="button" class="quiet-preview" data-training-sheet="strength">预览「开始力量训练」大 Sheet（初始选择）</button></div>
+   <div class="card"><div class="card-header"><div class="card-heading"><span class="card-title-icon"><svg class="ico"><use href="#ic-trend"/></svg></span><h3>有氧训练</h3></div></div><div class="tiny">记录实际时长和感受，保持原有服务语义。</div><div class="inline-actions"><button class="soft-action" data-training-sheet="cardio">记录有氧训练</button></div></div>
+   <div class="card"><div class="card-header"><div class="card-heading"><span class="card-title-icon"><svg class="ico"><use href="#ic-leaf"/></svg></span><h3>凯格尔训练</h3></div></div><div class="tiny">计时中的真实会话不得因切换主页面而丢失。</div><div class="inline-actions"><button class="soft-action" data-training-sheet="pelvic">选择训练方案</button></div></div>
+  </div></section>
+  <section class="page" data-page="progress" data-index="4" aria-label="进度页面"><div class="page-inner">
+   <div class="topbar"><div><h2>进度</h2><p>看见每一次积累</p></div><button class="icon-action" data-open-sheet="新增体重记录" aria-label="新增记录"><svg class="ico"><use href="#ic-plus"/></svg></button></div>
+   <div class="tiny">趋势图自带横向滚动，不触发主 Tab 切换。试着拖动任一图表。</div>
+   <div class="card trend-module"><div class="card-header"><div class="card-heading"><span class="card-title-icon"><svg class="ico"><use href="#ic-weight"/></svg></span><h3>体重趋势</h3></div><button data-open-sheet="体重历史">历史<svg class="ico ico-16"><use href="#ic-chevron"/></svg></button></div><div class="trend-head"><strong>65.2 <small style="font-size:.56em">kg</small></strong><div class="range-tabs"><button data-range="7">7天</button><button data-range="30" class="chosen">30天</button><button data-range="90">90天</button></div></div><div class="chart-scroller" data-horizontal-owner aria-label="体重趋势图横向滚动"><div class="chart-data" id="chart-weight"></div></div><div class="tiny" style="margin-top:9px">演示数值 · 横向滚动区域</div></div>
+   <div class="card trend-module"><div class="card-header"><div class="card-heading"><span class="card-title-icon"><svg class="ico"><use href="#ic-droplet"/></svg></span><h3>饮水趋势</h3></div></div><div class="trend-head"><strong>1,200 <small style="font-size:.56em">ml</small></strong><div class="range-tabs"><button data-range="7">7天</button><button data-range="30" class="chosen">30天</button><button data-range="90">90天</button></div></div><div class="chart-scroller" data-horizontal-owner aria-label="饮水趋势图横向滚动"><div class="chart-data" id="chart-water"></div></div></div>
+   <div class="card trend-module"><div class="card-header"><div class="card-heading"><span class="card-title-icon"><svg class="ico"><use href="#ic-moon"/></svg></span><h3>睡眠趋势</h3></div></div><div class="trend-head"><strong>7小时30分</strong><div class="range-tabs"><button data-range="7">7天</button><button data-range="30" class="chosen">30天</button><button data-range="90">90天</button></div></div><div class="chart-scroller" data-horizontal-owner aria-label="睡眠趋势图横向滚动"><div class="chart-data" id="chart-sleep"></div></div></div>
+   <div class="card"><div class="month-header"><button id="month-prev" aria-label="上个月"><svg class="ico"><path d="m15 6-6 6 6 6"/></svg></button><strong id="month-label">2026年10月</strong><button id="month-next" aria-label="下个月"><svg class="ico"><use href="#ic-chevron"/></svg></button></div><div class="calendar-grid" id="calendar-grid"></div><p class="tiny" id="calendar-selection" style="margin:10px 0 0">日历演示 · 已选10月22日</p></div>
+  </div></section>
+ </div>
+ <nav id="bottom-nav" class="bottom-nav" aria-label="主导航"><div id="nav-pill" class="nav-pill" aria-hidden="true"></div>
+  <button class="active" data-tab="today" aria-current="page" aria-label="今日，当前页面"><svg class="ico"><use href="#ic-home"/></svg><span>今日</span></button>
+  <button data-tab="plan" aria-label="计划"><svg class="ico"><use href="#ic-calendar"/></svg><span>计划</span></button>
+  <button data-tab="food" aria-label="饮食"><svg class="ico"><use href="#ic-food"/></svg><span>饮食</span></button>
+  <button data-tab="workout" aria-label="训练"><svg class="ico"><use href="#ic-workout"/></svg><span>训练</span></button>
+  <button data-tab="progress" aria-label="进度"><svg class="ico"><use href="#ic-trend"/></svg><span>进度</span></button>
+ </nav>
+ <div class="phone-home-indicator" aria-hidden="true"></div>
+ <div id="sheet-mask" class="sheet-mask" hidden>
+  <div id="demo-sheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" tabindex="-1">
+   <div class="sheet-handle" aria-hidden="true"></div>
+   <div class="sheet-head"><h3 id="sheet-title" tabindex="-1">记录</h3><button id="sheet-close" type="button" aria-label="关闭弹层"><svg class="ico"><use href="#ic-x"/></svg></button></div>
+   <div class="sheet-body"><p class="tiny">Sheet 演示：所有表单为内存草稿，不会写入业务数据库。</p><label for="sheet-input">备注</label><textarea id="sheet-input" placeholder="在这里输入草稿……"></textarea><label for="sheet-number">示例数量</label><input id="sheet-number" type="number" value="1" min="0"></div>
+   <div class="sheet-footer"><button id="sheet-save" class="primary-action" type="button">关闭演示表单</button></div>
+  </div>
+ </div>
+ <div id="execution-mask" class="execution-mask" role="dialog" aria-modal="true" aria-labelledby="execution-title" tabindex="-1" hidden>
+  <div class="execution-scroll"><header class="execution-header"><div><span class="execution-eyebrow">原有训练执行界面 · 演示</span><h2 id="execution-title" tabindex="-1">力量训练</h2></div><button type="button" id="execution-close" aria-label="返回训练页"><svg class="ico"><use href="#ic-x"/></svg></button></header>
+   <div id="execution-body" class="execution-content"></div>
+  </div>
+ </div>
+</div>
+</main>
+</div>
+<script>
+(()=>{
+'use strict';
+const device=document.getElementById('device'), viewport=document.getElementById('swipe-viewport'), nav=document.getElementById('bottom-nav'), pill=document.getElementById('nav-pill'), status=document.getElementById('gesture-status');
+const pages=[...viewport.querySelectorAll('.page')], buttons=[...nav.querySelectorAll('[data-tab]')], names=['今日','计划','饮食','训练','进度'];
+let current=0, gesture=null, animation=null, pending=null, suppressClickUntil=0, sheetOpen=false, previousFocus=null, preferredReduce=false;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const ease=t=>1-Math.pow(1-t,3);
+const prefersReduced=window.matchMedia?.('(prefers-reduced-motion: reduce)');
+function isReduced(){return preferredReduce||Boolean(prefersReduced?.matches)}
+function report(text){status.textContent=text}
+function clearColors(){buttons.forEach(b=>b.style.removeProperty('color'))}
+function pillAt(from,to,fraction){
+  const a=buttons[from],b=buttons[to]||a, t=clamp(fraction,0,1);
+  const ax=a.offsetLeft+5,bx=b.offsetLeft+5,aw=a.offsetWidth-10,bw=b.offsetWidth-10;
+  pill.style.width=`${Math.max(1,aw+(bw-aw)*t)}px`;
+  pill.style.transform=`translate3d(${ax+(bx-ax)*t}px,0,0)`;
+  pill.style.top=`${a.offsetTop+3}px`;
+  pill.style.height=`${Math.max(1,a.offsetHeight-6)}px`;
+  clearColors();
+  if(from!==to){
+    buttons[from].style.color=`color-mix(in srgb,var(--active-ink) ${(1-t)*100}%,var(--secondary))`;
+    buttons[to].style.color=`color-mix(in srgb,var(--active-ink) ${t*100}%,var(--secondary))`;
+  }
+}
+function idle(){
+  pages.forEach((p,i)=>{p.classList.toggle('is-current',i===current);p.style.visibility=i===current?'visible':'hidden';p.style.transform='translate3d(0px,0,0)';p.style.pointerEvents=i===current?'auto':'none';p.setAttribute('aria-hidden',i===current?'false':'true');p.inert=i!==current});
+  buttons.forEach((b,i)=>{const selected=i===current;b.classList.toggle('active',selected);if(selected){b.setAttribute('aria-current','page');b.setAttribute('aria-label',`${names[i]}，当前页面`)}else{b.removeAttribute('aria-current');b.setAttribute('aria-label',names[i])}});
+  pillAt(current,current,0);
+}
+function draw(from,to,delta){
+ const direction=to>from?-1:1, width=viewport.clientWidth;
+ pages.forEach((p,i)=>{
+  const showing=i===from||i===to;
+  p.style.visibility=showing?'visible':'hidden';p.style.pointerEvents='none';p.setAttribute('aria-hidden',showing?'false':'true');p.inert=true;
+  if(i===from)p.style.transform=`translate3d(${delta}px,0,0)`;
+  else if(i===to)p.style.transform=`translate3d(${delta-direction*width}px,0,0)`;
+ });
+ pillAt(from,to,Math.abs(delta)/width);
+}
+function complete(to){current=to;animation=null;idle();report(`当前：${names[current]} · 页面与胶囊已同步`);if(pending!==null){const target=pending;pending=null;if(target!==current)goTo(target)}}
+function animate(from,to,start,end,duration){
+ if(animation){cancelAnimationFrame(animation.frame);animation=null}
+ const startTime=performance.now();
+ if(isReduced()||duration<=0){complete(end===0?from:to);return}
+ animation={from,to,start,end,frame:0};
+ const frame=now=>{if(!animation)return;const t=clamp((now-startTime)/duration,0,1);const d=start+(end-start)*ease(t);draw(from,to,d);
+  if(t>=1)complete(end===0?from:to);else animation.frame=requestAnimationFrame(frame);
+ };
+ animation.frame=requestAnimationFrame(frame);
+}
+function goTo(to){
+ if(to<0||to>=pages.length||sheetOpen||executionOpen)return;
+ if(to!==current&&(foodAnimation||foodGesture)){if(foodAnimation)cancelAnimationFrame(foodAnimation.frame);foodAnimation=null;foodGesture=null;foodRest()}
+ if(animation){pending=to;return}
+ if(gesture?.axis==='horizontal')return;
+ if(to===current){report(`当前：${names[current]} · 未重复播放整页动画`);return}
+ const dir=to>current?-1:1;
+ report(`点击切换：${names[current]} → ${names[to]}`);
+ if(isReduced()){current=to;idle();report(`当前：${names[current]} · 减少动态效果`);return}
+ draw(current,to,0);animate(current,to,0,dir*viewport.clientWidth,245);
+}
+function blockedTarget(t){return Boolean(t?.closest('button,a,input,textarea,select,summary,[contenteditable="true"],[data-horizontal-owner],[data-no-page-swipe]'))}
+function editableFocused(){return Boolean(document.activeElement?.matches('input,textarea,select,[contenteditable="true"]'))}
+viewport.addEventListener('pointerdown',e=>{
+ if(sheetOpen||executionOpen||animation||gesture||!e.isPrimary||(e.pointerType==='mouse'&&e.button!==0)||editableFocused()||blockedTarget(e.target))return;
+ const r=viewport.getBoundingClientRect(),x=e.clientX-r.left;
+ // Avoid taking ownership of the system's interactive left-edge back gesture.
+ if(x<26)return;
+ gesture={id:e.pointerId,x:e.clientX,y:e.clientY,t:performance.now(),axis:'pending',samples:[{x:e.clientX,t:performance.now()}],target:current};
+},{passive:true});
+viewport.addEventListener('pointermove',e=>{
+ if(!gesture||e.pointerId!==gesture.id)return;
+ const g=gesture,dx=e.clientX-g.x,dy=e.clientY-g.y,ax=Math.abs(dx),ay=Math.abs(dy);
+ if(g.axis==='pending'){
+  if(ay>12&&ay>ax*.90){gesture=null;return}
+  if(ax>12&&ax>ay*1.40){g.axis='horizontal';try{viewport.setPointerCapture(e.pointerId)}catch(_){};suppressClickUntil=performance.now()+450}else return;
+ }
+ if(g.axis!=='horizontal')return;
+ if(e.cancelable)e.preventDefault();
+ const width=viewport.clientWidth, to=dx<0?current+1:current-1;
+ g.samples.push({x:e.clientX,t:performance.now()});g.samples=g.samples.filter(p=>performance.now()-p.t<130);
+ if(to<0||to>=pages.length){draw(current,current,0);report(`边界：${names[current]}，不能继续切换`);g.target=current;return}
+ g.target=to;draw(current,to,clamp(dx,-width,width));report(`拖动：${names[current]} → ${names[to]} · ${Math.round(Math.abs(dx)/width*100)}%`);
+},{passive:false});
+function finishGesture(e,cancel=false){
+ if(!gesture||e.pointerId!==gesture.id)return;
+ const g=gesture;gesture=null;
+ if(g.axis!=='horizontal')return;
+ suppressClickUntil=performance.now()+420;
+ const dx=e.clientX-g.x,width=viewport.clientWidth,to=dx<0?current+1:current-1;
+ if(to<0||to>=pages.length||cancel){idle();report(`当前：${names[current]} · 边界或取消`);return}
+ const recent=g.samples;const earliest=recent[0]||{x:g.x,t:g.t};const latest=recent[recent.length-1]||{x:e.clientX,t:performance.now()};const velocity=(latest.x-earliest.x)/Math.max(1,latest.t-earliest.t);
+ const commit=Math.abs(dx)>=width*.28||(Math.abs(dx)>=40&&Math.abs(velocity)>.48&&Math.sign(velocity)===Math.sign(dx));
+ const dir=to>current?-1:1, start=clamp(dx,-width,width),end=commit?dir*width:0;
+ report(`${commit?'吸附':'回弹'}：${names[current]}${commit?' → '+names[to]:''}`);
+ animate(current,to,start,end,commit?225:205);
+}
+viewport.addEventListener('pointerup',e=>finishGesture(e));viewport.addEventListener('pointercancel',e=>finishGesture(e,true));
+viewport.addEventListener('lostpointercapture',e=>{if(e.target===viewport&&gesture?.id===e.pointerId)finishGesture(e,true)});
+viewport.addEventListener('click',e=>{if(performance.now()<suppressClickUntil){e.preventDefault();e.stopImmediatePropagation()}},true);
+nav.addEventListener('click',e=>{const button=e.target.closest('[data-tab]');if(!button)return;goTo(buttons.indexOf(button))});
+viewport.addEventListener('click',e=>{
+ const navButton=e.target.closest('[data-nav-to]');if(navButton){const i=buttons.findIndex(b=>b.dataset.tab===navButton.dataset.navTo);if(i>=0)goTo(i)}
+ const sheetButton=e.target.closest('[data-open-sheet]');if(sheetButton)openSheet(sheetButton.dataset.openSheet);
+ const trainingButton=e.target.closest('[data-training-sheet]');if(trainingButton)openTrainingSheet(trainingButton.dataset.trainingSheet);
+ const executionButton=e.target.closest('[data-demo-execution]');if(executionButton)openExecution(executionButton.dataset.demoExecution);
+});
+const sheetMask=document.getElementById('sheet-mask'),demoSheet=document.getElementById('demo-sheet'),sheetTitle=document.getElementById('sheet-title'),sheetBody=demoSheet.querySelector('.sheet-body'),sheetFooter=demoSheet.querySelector('.sheet-footer');
+const defaultBody=sheetBody.innerHTML,defaultFooter=sheetFooter.innerHTML;
+const executionMask=document.getElementById('execution-mask'),executionBody=document.getElementById('execution-body'),executionTitle=document.getElementById('execution-title');
+let executionOpen=false,executionKind=null,demoSeconds=0,demoInterval=null;
+let trainingDraft={cardioDuration:'',cardioSpeed:'',cardioNote:'',selectedCardio:'stair_climber',pelvicLevel:'foundation',strengthNote:''};
+let sheetHideTimer=null,sheetEnterFrame=null;
+function hideSheetNow(){
+ if(sheetHideTimer!==null){clearTimeout(sheetHideTimer);sheetHideTimer=null}
+ if(sheetEnterFrame!==null){cancelAnimationFrame(sheetEnterFrame);sheetEnterFrame=null}
+ sheetMask.classList.remove('is-visible');sheetMask.hidden=true;
+}
+function openSheet(title){
+ if(sheetOpen||executionOpen)return;
+ if(foodAnimation){cancelAnimationFrame(foodAnimation.frame);foodAnimation=null;foodRest()}
+ // An immediate reopen cancels the preceding exit rather than hiding the new Sheet later.
+ hideSheetNow();
+ sheetOpen=true;previousFocus=document.activeElement;sheetTitle.textContent=title;sheetMask.hidden=false;device.classList.add('sheet-is-open');demoSheet.removeAttribute('data-sheet-mode');demoSheet.removeAttribute('data-sheet-kind');
+ sheetBody.innerHTML=defaultBody;sheetFooter.innerHTML=defaultFooter;
+ sheetTitle.focus({preventScroll:true});
+ if(isReduced())sheetMask.classList.add('is-visible');
+ else sheetEnterFrame=requestAnimationFrame(()=>{sheetEnterFrame=null;if(sheetOpen)sheetMask.classList.add('is-visible')});
+ report(`Sheet 自底向上进入 · 主页面横向切换锁定`);
+}
+function closeSheet(immediate=false){
+ if(!sheetOpen)return;
+ sheetOpen=false;
+ if(sheetEnterFrame!==null){cancelAnimationFrame(sheetEnterFrame);sheetEnterFrame=null}
+ sheetMask.classList.remove('is-visible');
+ // Page execution owns the next frame; never overlay it with a lingering Sheet.
+ if(immediate||isReduced())hideSheetNow();
+ else sheetHideTimer=setTimeout(()=>{sheetMask.hidden=true;sheetHideTimer=null},290);
+ device.classList.remove('sheet-is-open');
+ if(previousFocus?.isConnected&&typeof previousFocus.focus==='function')previousFocus.focus({preventScroll:true});
+ report(`Sheet 平滑关闭 · 当前仍为${names[current]}`);
+}
+function openTrainingSheet(kind){
+ const titles={strength:'开始训练',cardio:'记录有氧训练',pelvic:'凯格尔训练'};
+ if(!titles[kind])return;
+ openSheet(titles[kind]);if(!sheetOpen)return;
+ demoSheet.dataset.sheetMode='large';demoSheet.dataset.sheetKind=kind;
+ renderTrainingSheet(kind);requestAnimationFrame(()=>{sheetBody.scrollTop=0});
+ report(`训练弹层：${titles[kind]} · 共享 Large Sheet 高度 · 仅模拟界面`);
+}
+function renderTrainingSheet(kind){
+ if(kind==='strength'){
+  sheetBody.innerHTML=`<p class="training-intro">初始力量训练选择 · 与有氧／凯格尔同高。已有训练时继续执行页，不重置状态；此处只演示首次进入。</p>
+    <h4 class="train-headline">选择一种开始方式</h4><div class="train-cards"><div class="train-option"><strong>空白训练</strong><span>自行添加动作与组数，进入原有力量执行页面。</span></div><div class="train-option"><strong>上肢力量 · 示例模板</strong><span>卧推 / 划船 / 肩推 · 3 个动作（仅演示）</span></div><div class="train-option"><strong>全身基础 · 示例模板</strong><span>深蹲 / 硬拉 / 推举 · 3 个动作（仅演示）</span></div></div>
+    <div class="train-samples"><div><span>开始方式</span><strong>模板 / 空白</strong></div><div><span>业务数据</span><strong>不做写入</strong></div></div>
+    <p class="training-intro">选择模板或空白训练后，原 App 仍由训练服务创建真实记录并打开既有执行界面。本原型不创建记录。</p>`;
+  sheetFooter.innerHTML='<button type="button" class="primary-action" data-demo-execution="strength">模拟选择空白训练 → 执行界面</button>';
+ }else if(kind==='cardio'){
+  sheetBody.innerHTML=`<p class="training-intro">有氧记录 · 表单内容独立滚动，Sheet 外框高度与另外两种训练严格一致。</p>
+   <div class="train-headline">训练类型</div><div class="train-activity-picker" role="group" aria-label="训练类型"><button type="button" data-cardio-pick="stair_climber" aria-pressed="true">爬楼机</button><button type="button" data-cardio-pick="treadmill" aria-pressed="false">跑步机</button></div>
+   <label class="train-field">时间（分钟）<input data-train-input="cardioDuration" type="number" inputmode="decimal" min="0.01" step="any" placeholder="25"></label>
+   <label class="train-field">速度<input data-train-input="cardioSpeed" type="number" inputmode="decimal" min="0.01" step="any" placeholder="6.5"></label>
+   <label class="train-field" data-cardio-incline hidden>坡度 %<input type="number" inputmode="decimal" min="0" placeholder="8"></label>
+   <label class="train-field">训练笔记（可选）<textarea data-train-input="cardioNote" placeholder="记录主观感受，不做自动评估"></textarea></label><p class="train-safety">数据演示专用。生产版仍由原有有氧服务验证并保存实际训练事实。</p>`;
+  sheetFooter.innerHTML='<button type="button" class="primary-action" data-cardio-save>模拟保存并关闭（不写数据库）</button>';
+  for(const el of sheetBody.querySelectorAll('[data-train-input]'))el.value=trainingDraft[el.dataset.trainInput]||'';
+  setCardioType(trainingDraft.selectedCardio);
+ }else{
+  sheetBody.innerHTML=`<p class="training-intro">凯格尔训练方案 · 统一大 Sheet 框架，内容可上下滚动；正式开始后进入既有独立计时页面。</p>
+   <div class="train-feature"><h4 id="demo-pelvic-name">渐进计划 · 基础阶段</h4><p>耐力控制 → 休息 → 快速脉冲，循序练习且保持自然呼吸。</p><div class="train-samples"><div><span>耐力控制</span><strong>10 次</strong></div><div><span>快速脉冲</span><strong>10 次</strong></div></div></div>
+   <h4 class="train-headline">训练进度</h4><div class="train-stage-grid" role="group" aria-label="渐进训练阶段"><button type="button" data-pelvic-level="foundation" aria-pressed="true">基础<small>可选择</small></button><button type="button" data-pelvic-level="standard" aria-pressed="false">标准<small>示例已解锁</small></button><button type="button" disabled>进阶<small>未解锁</small></button></div>
+   <details class="train-safety"><summary>查看当前训练说明</summary><p>每次收缩后充分放松，保持自然呼吸。此处为界面演示，不提供医疗判断。</p></details>
+   <h4 class="train-headline">专项训练</h4><div class="train-specialties"><button type="button" data-demo-execution="pelvic"><strong>基础耐力</strong><span>动作与放松节奏 · 演示</span></button><button type="button" data-demo-execution="pelvic"><strong>快速脉冲</strong><span>规律收缩与放松 · 演示</span></button><button type="button" data-demo-execution="pelvic"><strong>耐力强化</strong><span>专项训练 · 演示</span></button><button type="button" data-demo-execution="pelvic"><strong>综合练习</strong><span>多种节奏 · 演示</span></button></div><p class="train-safety">正式训练中的计时、锁与记录数据仍归原控制器所有；此原型不执行真实计时写入。</p>`;
+  sheetFooter.innerHTML='<button type="button" class="primary-action" data-demo-execution="pelvic">开始今日训练 → 原计时界面</button>';
+  setPelvicLevel(trainingDraft.pelvicLevel);
+ }
+}
+function setCardioType(type){trainingDraft.selectedCardio=type;for(const b of sheetBody.querySelectorAll('[data-cardio-pick]'))b.setAttribute('aria-pressed',String(b.dataset.cardioPick===type));const incline=sheetBody.querySelector('[data-cardio-incline]');if(incline)incline.hidden=type!=='treadmill'}
+function setPelvicLevel(level){trainingDraft.pelvicLevel=level;for(const b of sheetBody.querySelectorAll('[data-pelvic-level]'))b.setAttribute('aria-pressed',String(b.dataset.pelvicLevel===level));const label=sheetBody.querySelector('#demo-pelvic-name');if(label)label.textContent=`渐进计划 · ${level==='foundation'?'基础':'标准'}阶段`}
+function saveCardioDraft(){for(const e of sheetBody.querySelectorAll('[data-train-input]'))trainingDraft[e.dataset.trainInput]=e.value}
+sheetBody.addEventListener('input',e=>{if(e.target?.matches('[data-train-input]'))saveCardioDraft()});
+sheetMask.addEventListener('click',e=>{const type=e.target.closest('[data-cardio-pick]');if(type)setCardioType(type.dataset.cardioPick);const level=e.target.closest('[data-pelvic-level]');if(level&&!level.disabled)setPelvicLevel(level.dataset.pelvicLevel);const jump=e.target.closest('[data-demo-execution]');if(jump)openExecution(jump.dataset.demoExecution);const save=e.target.closest('[data-cardio-save]');if(save){saveCardioDraft();closeSheet();report('有氧表单已关闭 · 演示草稿仍在内存，未保存真实记录')}});
+function stopDemoTimer(){if(demoInterval!==null)clearInterval(demoInterval);demoInterval=null}
+function renderDemoTimer(){const node=executionBody.querySelector('#demo-seconds');if(node)node.textContent=String(demoSeconds).padStart(2,'0')}
+function openExecution(kind){if(kind!=='strength'&&kind!=='pelvic')return;if(executionOpen)return;if(sheetOpen)closeSheet(true);executionOpen=true;executionKind=kind;executionMask.hidden=false;device.classList.add('execution-is-open');
+ executionTitle.textContent=kind==='strength'?'力量训练 · 执行':'凯格尔训练 · 计时';
+ if(kind==='strength'){
+  executionBody.innerHTML=`<div class="card"><div class="card-header"><h3>训练动作 · 演示</h3><span class="tag">正在记录</span></div><div class="train-samples"><div><span>动作</span><strong>3 项</strong></div><div><span>训练组</span><strong>8 组</strong></div></div><div class="record-row"><div><strong>深蹲</strong><small>3 组 · 80 kg</small></div><span class="tag">记录中</span></div><div class="record-row"><div><strong>平板卧推</strong><small>3 组 · 45 kg</small></div><span class="tag">记录中</span></div><div class="record-row"><div><strong>划船</strong><small>2 组</small></div></div><label class="train-field">训练笔记（演示草稿）<textarea id="strength-execution-note" placeholder="仅本原型内存">${trainingDraft.strengthNote.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea></label><p class="train-safety">这是现有独立力量训练执行界面的概念示意；不将力量训练执行页统一为弹层，也不生成真实 Workout。</p></div>`;
+ }else{
+  demoSeconds=0;executionBody.innerHTML=`<div class="card"><h3 style="text-align:center">${trainingDraft.pelvicLevel==='foundation'?'基础':'标准'}阶段 · 示范计时</h3><p class="demo-rep">收紧 · 保持 · 释放 · 放松（模拟）</p><div class="demo-count" id="demo-seconds">00</div><p class="demo-rep">演示计数（秒），不写训练历史</p><div class="demo-buttons"><button type="button" class="soft-action" id="demo-pause">暂停</button><button type="button" class="primary-action" id="demo-finish">结束演示</button></div></div><div class="card"><p class="train-safety">本层仅用于验证原有沉浸式计时界面保持独立。真实计时器的状态机、锁、自动保全仍由现有生产代码负责。</p></div>`;
+  demoInterval=setInterval(()=>{demoSeconds++;renderDemoTimer()},1000);
+ }
+ executionTitle.focus({preventScroll:true});report(`${kind==='strength'?'力量执行页':'凯格尔计时页'}仍为独立页面 · 未被大 Sheet 替代`);
+}
+function closeExecution(){if(!executionOpen)return;if(executionKind==='strength'){const n=executionBody.querySelector('#strength-execution-note');if(n)trainingDraft.strengthNote=n.value}stopDemoTimer();executionOpen=false;executionKind=null;executionMask.hidden=true;device.classList.remove('execution-is-open');report('已返回训练页 · 未修改任何业务记录');}
+executionMask.addEventListener('click',e=>{if(e.target.closest('#execution-close,#demo-finish'))closeExecution();const pause=e.target.closest('#demo-pause');if(pause){if(demoInterval!==null){stopDemoTimer();pause.textContent='继续'}else{demoInterval=setInterval(()=>{demoSeconds++;renderDemoTimer()},1000);pause.textContent='暂停'}}});
+executionMask.addEventListener('input',e=>{if(e.target?.id==='strength-execution-note')trainingDraft.strengthNote=e.target.value});
+document.getElementById('execution-close').addEventListener('click',closeExecution);
+document.getElementById('sheet-close').addEventListener('click',()=>closeSheet());
+sheetFooter.addEventListener('click',e=>{if(e.target.closest('#sheet-save'))closeSheet()});
+sheetMask.addEventListener('click',e=>{if(e.target===sheetMask)closeSheet()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(sheetOpen){e.preventDefault();closeSheet()}else if(executionOpen){e.preventDefault();closeExecution()}}});
+// Exact conflict owners are excluded from main-page gesture detection.
+// Food date navigation is a second, independent, local-date state machine.
+// No business records, IndexedDB, or live FoodLog services are accessed in this standalone prototype.
+const dateRail=document.getElementById('food-date-rail'),dateTrack=document.getElementById('food-date-track'),dateViewport=document.getElementById('food-day-viewport');
+const foodDayCurrent=document.getElementById('food-day-current'),foodDayNeighbor=document.getElementById('food-day-neighbor');
+const DEMO_TODAY='2026-10-22';
+let chosenFoodDate=DEMO_TODAY,foodGesture=null,foodAnimation=null,foodPending=null,foodClickSuppressUntil=0,railDates=[];
+function localDayShift(date,difference){const [y,m,d]=date.split('-').map(Number),v=new Date(y,m-1,d,12);v.setDate(v.getDate()+difference);return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}-${String(v.getDate()).padStart(2,'0')}`}
+function localDayDistance(a,b){const x=a.split('-').map(Number),y=b.split('-').map(Number);return Math.round((Date.UTC(y[0],y[1]-1,y[2])-Date.UTC(x[0],x[1]-1,x[2]))/86400000)}
+function dateName(date){if(date===DEMO_TODAY)return '今天';if(date===localDayShift(DEMO_TODAY,-1))return '昨天';if(date===localDayShift(DEMO_TODAY,1))return '明天';const [y,m,d]=date.split('-').map(Number);return ['周日','周一','周二','周三','周四','周五','周六'][new Date(y,m-1,d,12).getDay()]}
+function dateDisplay(date){const m=+date.slice(5,7),d=+date.slice(8,10);return `${m}月${d}日`}
+function dateWindow(center){railDates=Array.from({length:93},(_,i)=>localDayShift(center,i-46));dateTrack.innerHTML=railDates.map(date=>`<button type="button" class="food-date-item" tabindex="-1" data-food-date="${date}" aria-label="${dateName(date)}，${dateDisplay(date)}"><strong>${dateName(date)}</strong><span>${dateDisplay(date)}</span></button>`).join('')}
+function railPosition(from,to,t){
+ let ai=railDates.indexOf(from),bi=railDates.indexOf(to);if(ai<0||bi<0){dateWindow(from);ai=railDates.indexOf(from);bi=railDates.indexOf(to)}
+ const cells=dateTrack.querySelectorAll('.food-date-item');const a=cells[ai],b=cells[bi]||a;if(!a)return;
+ const ac=a.offsetLeft+a.offsetWidth/2,bc=b.offsetLeft+b.offsetWidth/2;
+ dateTrack.style.transform=`translate3d(${dateRail.clientWidth/2-(ac+(bc-ac)*clamp(t,0,1))}px,0,0)`;
+ cells.forEach((el,i)=>{const value=i===ai?1-t:i===bi?t:0;el.classList.toggle('is-preview',value>.2&&!el.hasAttribute('aria-current'))});
+}
+function setChosenRail(){
+ if(railDates.indexOf(chosenFoodDate)<3||railDates.indexOf(chosenFoodDate)>railDates.length-4)dateWindow(chosenFoodDate);
+ dateTrack.querySelectorAll('.food-date-item').forEach(b=>{if(b.dataset.foodDate===chosenFoodDate){b.setAttribute('aria-current','date');b.tabIndex=0}else{b.removeAttribute('aria-current');b.tabIndex=-1}b.classList.remove('is-preview')});
+ railPosition(chosenFoodDate,chosenFoodDate,0);
+}
+function demoFoodContent(date){
+ const offset=localDayDistance(DEMO_TODAY,date),mod=((offset%5)+5)%5;
+ const variants=[{k:1680,p:96,c:185,f:56,breakfast:['燕麦与牛奶','香蕉'],lunch:['米饭','鸡胸肉与蔬菜']},{k:1525,p:88,c:177,f:47,breakfast:['全麦面包','酸奶'],lunch:['荞麦面','清炒时蔬']},{k:1840,p:107,c:210,f:57,breakfast:['鸡蛋','牛奶'],lunch:['糙米饭','鱼肉']},{k:0,p:0,c:0,f:0,breakfast:[],lunch:[]},{k:1350,p:80,c:148,f:42,breakfast:['燕麦粥'],lunch:['杂粮饭','豆腐']}] ;
+ const v=variants[mod],recordRow=(name,i)=>`<div class="record-row"><div><strong>${name}</strong><small>仅用于原型的示意记录</small></div><span class="right">${180+i*120} kcal</span></div>`;
+ const meal=(label,items)=>`<div class="card"><div class="food-section-heading"><h3>${label}</h3><span>${items.length} 项 · 演示</span></div>${items.length?items.map(recordRow).join(''):'<p class="tiny" style="margin:14px 0 3px">这天尚无演示记录；真实项目显示实际已保存的记录。</p>'}<button class="soft-action" style="width:100%;margin-top:10px" data-open-sheet="添加饮食">＋ 记录${label}</button></div>`;
+ return `<div class="card"><div class="summary-line"><div><div class="tiny">${dateDisplay(date)} · ${dateName(date)} <span class="date-preview-tag">演示数据</span></div><div class="big">${v.k.toLocaleString('zh-CN')}<small>kcal</small></div></div><span class="tiny">目标 2,200 kcal</span></div><div class="meter"><i style="width:${Math.max(0,Math.min(100,v.k/2200*100))}%"></i></div><div class="metric-grid"><div class="metric"><strong>${v.p} g</strong><span>蛋白质</span></div><div class="metric"><strong>${v.c} g</strong><span>碳水</span></div><div class="metric"><strong>${v.f} g</strong><span>脂肪</span></div></div></div>${meal('早餐',v.breakfast)}${meal('午餐',v.lunch)}<div class="card"><div class="card-header"><h3>剩余营养目标</h3></div><div class="tiny">此处为交互演示占位。实际页面读取真实日期、营养目标和历史快照，不以模拟数据替换。</div><div class="inline-actions"><button class="soft-action" data-open-sheet="补齐营养">指定食物</button><button class="soft-action" data-open-sheet="补齐营养">智能补齐</button></div></div>`;
+}
+function resizeFoodHeight(showNeighbor=false){const h=Math.max(360,foodDayCurrent.scrollHeight,showNeighbor?foodDayNeighbor.scrollHeight:0);dateViewport.style.height=`${h+2}px`}
+function prepareNeighbor(date){if(foodDayNeighbor.dataset.date===date)return;foodDayNeighbor.dataset.date=date;foodDayNeighbor.innerHTML=demoFoodContent(date)}
+function foodDraw(from,to,dx){
+ const width=dateViewport.clientWidth,progress=clamp(Math.abs(dx)/Math.max(1,width),0,1),isNext=to>from;
+ prepareNeighbor(to);foodDayNeighbor.style.visibility='visible';foodDayNeighbor.style.transform=`translate3d(${dx+(isNext?width:-width)}px,0,0)`;
+ foodDayCurrent.style.transform=`translate3d(${dx}px,0,0)`;railPosition(from,to,progress);resizeFoodHeight(true);
+}
+function foodRest(){
+ foodDayCurrent.style.transform='translate3d(0,0,0)';foodDayNeighbor.style.visibility='hidden';foodDayNeighbor.style.transform='translate3d(0,0,0)';foodDayNeighbor.innerHTML='';foodDayNeighbor.dataset.date='';
+ foodDayCurrent.innerHTML=demoFoodContent(chosenFoodDate);setChosenRail();resizeFoodHeight();
+}
+function foodComplete(target){foodAnimation=null;chosenFoodDate=target;foodRest();report(`饮食日期：${dateDisplay(chosenFoodDate)} · 日期内容与顶部导航已同步，主 Tab 不变`);if(foodPending!==null){const next=foodPending;foodPending=null;if(next!==chosenFoodDate)foodGoTo(next)}}
+function foodAnimate(from,to,start,end,duration){
+ if(foodAnimation){cancelAnimationFrame(foodAnimation.frame);foodAnimation=null}
+ if(isReduced()||duration<=0){foodComplete(end===0?from:to);return}
+ const at=performance.now();foodAnimation={from,to,frame:0};
+ const frame=now=>{if(!foodAnimation)return;const t=clamp((now-at)/duration,0,1);foodDraw(from,to,start+(end-start)*ease(t));if(t>=1)foodComplete(end===0?from:to);else foodAnimation.frame=requestAnimationFrame(frame)};
+ foodAnimation.frame=requestAnimationFrame(frame);
+}
+function foodGoTo(target){
+ if(sheetOpen||activeFoodBusy()||target===chosenFoodDate||!/^\d{4}-\d\d-\d\d$/.test(target))return;
+ if(foodAnimation){foodPending=target;return}
+ if(!railDates.includes(target))dateWindow(chosenFoodDate);
+ const direction=target>chosenFoodDate?-1:1;const from=chosenFoodDate;
+ report(`点击日期：${dateDisplay(from)} → ${dateDisplay(target)} · 主 Tab 保持饮食`);
+ if(isReduced()){chosenFoodDate=target;foodRest();return}
+ foodDraw(from,target,0);foodAnimate(from,target,0,direction*dateViewport.clientWidth,240);
+}
+function activeFoodBusy(){return Boolean(foodGesture?.axis==='horizontal')}
+function beginFood(e,source){
+ if(current!==2||sheetOpen||executionOpen||foodAnimation||foodGesture||!e.isPrimary||(e.pointerType==='mouse'&&e.button!==0)||editableFocused())return;
+ if(source===dateViewport&&e.target.closest('button,a,input,textarea,select,summary,[contenteditable="true"]'))return;
+ const rect=device.getBoundingClientRect();if(e.clientX-rect.left<26)return;
+ foodGesture={id:e.pointerId,source,x:e.clientX,y:e.clientY,t:performance.now(),axis:'pending',samples:[{x:e.clientX,t:performance.now()}],target:chosenFoodDate};
+}
+function moveFood(e){
+ if(!foodGesture||e.pointerId!==foodGesture.id)return;
+ const g=foodGesture,dx=e.clientX-g.x,dy=e.clientY-g.y,ax=Math.abs(dx),ay=Math.abs(dy);
+ if(g.axis==='pending'){
+  if(ay>12&&ay>ax*.9){foodGesture=null;return}
+  if(ax>11&&ax>ay*1.4){g.axis='horizontal';try{g.source.setPointerCapture(e.pointerId)}catch(_){};foodClickSuppressUntil=performance.now()+80;g.source.classList.add('is-dragging')}
+  else return;
+ }
+ if(e.cancelable)e.preventDefault();
+ const target=localDayShift(chosenFoodDate,dx<0?1:-1);g.target=target;
+ g.samples.push({x:e.clientX,t:performance.now()});g.samples=g.samples.filter(s=>performance.now()-s.t<150);
+ foodDraw(chosenFoodDate,target,clamp(dx,-dateViewport.clientWidth,dateViewport.clientWidth));
+ report(`日期跟手：${dateDisplay(chosenFoodDate)} → ${dateDisplay(target)} · ${Math.round(Math.abs(dx)/dateViewport.clientWidth*100)}% · 主 Tab 不变`);
+}
+function finishFood(e,cancel=false){
+ if(!foodGesture||e.pointerId!==foodGesture.id)return;
+ const g=foodGesture;foodGesture=null;g.source.classList.remove('is-dragging');if(g.axis!=='horizontal')return;
+ foodClickSuppressUntil=performance.now()+80;
+ const dx=e.clientX-g.x,w=dateViewport.clientWidth,target=localDayShift(chosenFoodDate,dx<0?1:-1);
+ const recent=g.samples,last=recent[recent.length-1]||{x:e.clientX,t:performance.now()},first=recent[0]||{x:g.x,t:g.t};const speed=(last.x-first.x)/Math.max(1,last.t-first.t);
+ const commit=!cancel&&(Math.abs(dx)>=w*.28||(Math.abs(dx)>=40&&Math.abs(speed)>.48&&Math.sign(speed)===Math.sign(dx)));
+ const direction=target>chosenFoodDate?-1:1;
+ report(`饮食日期${commit?'吸附':'回弹'}：${dateDisplay(chosenFoodDate)}${commit?' → '+dateDisplay(target):''} · 主 Tab 不变`);
+ foodAnimate(chosenFoodDate,target,clamp(dx,-w,w),commit?direction*w:0,commit?230:205);
+}
+for(const area of [dateRail,dateViewport]){
+ area.addEventListener('pointerdown',e=>beginFood(e,area),{passive:true});
+ area.addEventListener('pointermove',moveFood,{passive:false});
+ area.addEventListener('pointerup',e=>finishFood(e));
+ area.addEventListener('pointercancel',e=>finishFood(e,true));
+ area.addEventListener('lostpointercapture',e=>{if(e.target===area&&foodGesture?.id===e.pointerId)finishFood(e,true)});
+ area.addEventListener('click',e=>{if(performance.now()<foodClickSuppressUntil){e.preventDefault();e.stopImmediatePropagation()}},true);
+}
+dateRail.addEventListener('click',e=>{const button=e.target.closest('[data-food-date]');if(button)foodGoTo(button.dataset.foodDate)});
+dateRail.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight'].includes(e.key))return;const btn=e.target.closest('[data-food-date]');if(!btn)return;const index=railDates.indexOf(btn.dataset.foodDate),next=dateTrack.querySelectorAll('[data-food-date]')[index+(e.key==='ArrowLeft'?-1:1)];if(!next)return;e.preventDefault();next.focus({preventScroll:true});foodGoTo(next.dataset.foodDate)});
+// Install demo food data once and retain other app page DOM and form drafts.
+dateWindow(chosenFoodDate);foodRest();
+
+for(const module of document.querySelectorAll('.trend-module'))module.querySelectorAll('[data-range]').forEach(b=>b.addEventListener('click',()=>{module.querySelectorAll('[data-range]').forEach(other=>other.classList.toggle('chosen',b===other));const count=Number(b.dataset.range),chart=module.querySelector('.chart-data');chart.style.width=count===7?'100%':count===30?'770px':'1800px';report(`趋势图选择 ${count} 天 · 主 Tab 不变`)}));
+for(let n=0;n<3;n++){const el=document.getElementById(['chart-weight','chart-water','chart-sleep'][n]);el.innerHTML=Array.from({length:24},(_,i)=>`<i style="--h:${Math.round(24+26*(1+Math.sin(i*.8+n)))}%"></i>`).join('')}
+let calYear=2026,calMonth=9,selectedDay=22;
+function renderCalendar(){
+ const c=document.getElementById('calendar-grid'),label=document.getElementById('month-label');label.textContent=`${calYear}年${calMonth+1}月`;
+ const weekdays=['一','二','三','四','五','六','日'];const first=(new Date(calYear,calMonth,1).getDay()+6)%7,len=new Date(calYear,calMonth+1,0).getDate();
+ c.innerHTML=weekdays.map(x=>`<span class="week">${x}</span>`).join('')+Array.from({length:42},(_,i)=>{const d=i-first+1;return d<1||d>len?'<span></span>':`<button type="button" data-day="${d}" class="${d===selectedDay?'selected':(d%4===0?'has-demo':'')}">${d}</button>`}).join('');
+ c.querySelectorAll('[data-day]').forEach(b=>b.addEventListener('click',()=>{selectedDay=Number(b.dataset.day);renderCalendar();document.getElementById('calendar-selection').textContent=`日历演示 · 已选${calMonth+1}月${selectedDay}日` }));
+}
+function stepMonth(n){calMonth+=n;if(calMonth<0){calMonth=11;calYear--}else if(calMonth>11){calMonth=0;calYear++}selectedDay=1;renderCalendar();document.getElementById('calendar-selection').textContent=`日历演示 · 已选${calMonth+1}月1日`;report(`日历月份已切换 · 主 Tab 不变`)}
+document.getElementById('month-prev').addEventListener('click',()=>stepMonth(-1));document.getElementById('month-next').addEventListener('click',()=>stepMonth(1));renderCalendar();
+const taskInputs=[...document.querySelectorAll('.task-item input')];taskInputs.forEach(x=>x.addEventListener('change',()=>{const done=taskInputs.filter(x=>x.checked).length;document.getElementById('plan-progress').textContent=`${done} / 3`;document.getElementById('plan-progress-meter').style.width=`${done/3*100}%`}));
+document.getElementById('workout-draft').addEventListener('input',()=>{document.getElementById('draft-summary').textContent='草稿已在页面内存中更新；切页后返回仍可恢复。'});
+const size=document.getElementById('viewport-size'),theme=document.getElementById('theme'),fontSize=document.getElementById('font-size'),reduce=document.getElementById('reduce-motion');
+function refreshGeometry(){if(animation||gesture||foodGesture||foodAnimation)return;idle();foodRest()}
+size.addEventListener('change',()=>{device.style.setProperty('--device-width',`${size.value}px`);requestAnimationFrame(refreshGeometry)});
+theme.addEventListener('change',()=>{device.dataset.theme=theme.value;requestAnimationFrame(refreshGeometry)});
+fontSize.addEventListener('change',()=>{device.style.setProperty('--font-factor',fontSize.value);device.dataset.largeFont=Number(fontSize.value)>=1.4?'true':'false';requestAnimationFrame(refreshGeometry)});
+reduce.addEventListener('change',()=>{preferredReduce=reduce.checked;device.dataset.reducedMotion=String(isReduced());if(animation){cancelAnimationFrame(animation.frame);const to=animation.to;animation=null;current=to;idle()}if(foodAnimation){cancelAnimationFrame(foodAnimation.frame);const to=foodAnimation.to;foodAnimation=null;chosenFoodDate=to;foodRest()}report(`减少动态效果：${isReduced()?'开':'关'}`)});
+window.addEventListener('resize',refreshGeometry);prefersReduced?.addEventListener?.('change',refreshGeometry);
+// No IndexedDB, network requests, localStorage, or user business-record writes are used anywhere in this prototype.
+idle();
+})();
+</script>
+</body>
+</html>

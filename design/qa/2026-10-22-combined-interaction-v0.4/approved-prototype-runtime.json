@@ -1,0 +1,189 @@
+{
+  "receipts": [
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "theme": "light",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "sheets": [
+        {
+          "kind": "strength",
+          "top": 24,
+          "localTop": 24,
+          "height": 820,
+          "width": 390,
+          "background": "rgb(255, 254, 250)",
+          "radius": "24px 24px 0px 0px",
+          "animation": "none",
+          "duration": "0s"
+        },
+        {
+          "kind": "cardio",
+          "top": 24,
+          "localTop": 24,
+          "height": 820,
+          "width": 390,
+          "background": "rgb(255, 254, 250)",
+          "radius": "24px 24px 0px 0px",
+          "animation": "none",
+          "duration": "0s"
+        },
+        {
+          "kind": "pelvic",
+          "top": 24,
+          "localTop": 24,
+          "height": 820,
+          "width": 390,
+          "background": "rgb(255, 254, 250)",
+          "radius": "24px 24px 0px 0px",
+          "animation": "none",
+          "duration": "0s"
+        }
+      ],
+      "status": "PASS",
+      "prototypeOnly": true
+    },
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "theme": "dark",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "sheets": [
+        {
+          "kind": "strength",
+          "top": 24,
+          "localTop": 24,
+          "height": 820,
+          "width": 390,
+          "background": "rgb(39, 47, 40)",
+          "radius": "24px 24px 0px 0px",
+          "animation": "none",
+          "duration": "0s"
+        },
+        {
+          "kind": "cardio",
+          "top": 24,
+          "localTop": 24,
+          "height": 820,
+          "width": 390,
+          "background": "rgb(39, 47, 40)",
+          "radius": "24px 24px 0px 0px",
+          "animation": "none",
+          "duration": "0s"
+        },
+        {
+          "kind": "pelvic",
+          "top": 24,
+          "localTop": 24,
+          "height": 820,
+          "width": 390,
+          "background": "rgb(39, 47, 40)",
+          "radius": "24px 24px 0px 0px",
+          "animation": "none",
+          "duration": "0s"
+        }
+      ],
+      "status": "PASS",
+      "prototypeOnly": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "theme": "light",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "sheets": [
+        {
+          "kind": "strength",
+          "top": 23.984375,
+          "localTop": 23.984375,
+          "height": 820,
+          "width": 390,
+          "background": "rgb(255, 254, 250)",
+          "radius": "24px 24px 0px 0px",
+          "animation": "none",
+          "duration": "0s"
+        },
+        {
+          "kind": "cardio",
+          "top": 23.984375,
+          "localTop": 23.984375,
+          "height": 820,
+          "width": 390,
+          "background": "rgb(255, 254, 250)",
+          "radius": "24px 24px 0px 0px",
+          "animation": "none",
+          "duration": "0s"
+        },
+        {
+          "kind": "pelvic",
+          "top": 23.984375,
+          "localTop": 23.984375,
+          "height": 820,
+          "width": 390,
+          "background": "rgb(255, 254, 250)",
+          "radius": "24px 24px 0px 0px",
+          "animation": "none",
+          "duration": "0s"
+        }
+      ],
+      "status": "PASS",
+      "prototypeOnly": true
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "theme": "dark",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "sheets": [
+        {
+          "kind": "strength",
+          "top": 23.984375,
+          "localTop": 23.984375,
+          "height": 820,
+          "width": 390,
+          "background": "rgb(39, 47, 40)",
+          "radius": "24px 24px 0px 0px",
+          "animation": "none",
+          "duration": "0s"
+        },
+        {
+          "kind": "cardio",
+          "top": 23.984375,
+          "localTop": 23.984375,
+          "height": 820,
+          "width": 390,
+          "background": "rgb(39, 47, 40)",
+          "radius": "24px 24px 0px 0px",
+          "animation": "none",
+          "duration": "0s"
+        },
+        {
+          "kind": "pelvic",
+          "top": 23.984375,
+          "localTop": 23.984375,
+          "height": 820,
+          "width": 390,
+          "background": "rgb(39, 47, 40)",
+          "radius": "24px 24px 0px 0px",
+          "animation": "none",
+          "duration": "0s"
+        }
+      ],
+      "status": "PASS",
+      "prototypeOnly": true
+    }
+  ],
+  "note": "Uses the actual prototype theme selector. Initial desktop prototype-evidence colorScheme alone did not select its dark device theme; those attempts are retained and superseded for dark-theme evidence."
+}

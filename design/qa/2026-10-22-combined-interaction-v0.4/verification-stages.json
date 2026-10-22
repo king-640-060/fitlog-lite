@@ -1,0 +1,104 @@
+{
+  "base44": "Complete44 original gates; original source hashes freeze-source-before-execution-replacement.json; failed semantic fixture refresh adapted then rerun.",
+  "finalDelta": "Only two existing src/main.ts close paths set replacing before entering Strength execution. No other source changes.",
+  "diff": "execution-replacement.diff",
+  "finalAffectedOriginalGates": [
+    "trainingRecoveryExperience",
+    "trainingRecoveryLifecycle",
+    "trainingJournal",
+    "motionPolish"
+  ],
+  "finalNewGates": [
+    "combinedInteractionV04 (all68+2)",
+    "combinedInteractionTraining (both engines3routes)",
+    "combinedInteractionMotion"
+  ],
+  "results": [
+    {
+      "name": "trainingJournal",
+      "command": [
+        "node",
+        "tests/browser/trainingJournal.mjs"
+      ],
+      "start": "2026-10-22T09:07:52.445Z",
+      "end": "2026-10-22T09:07:54.787Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-affected/trainingJournal"
+    },
+    {
+      "name": "trainingRecoveryLifecycle",
+      "command": [
+        "node",
+        "tests/browser/trainingRecoveryLifecycle.mjs"
+      ],
+      "start": "2026-10-22T09:07:52.445Z",
+      "end": "2026-10-22T09:08:13.257Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-affected/trainingRecoveryLifecycle"
+    },
+    {
+      "name": "combinedInteractionTraining",
+      "command": [
+        "node",
+        "tests/browser/combinedInteractionTraining.mjs"
+      ],
+      "start": "2026-10-22T09:08:13.258Z",
+      "end": "2026-10-22T09:08:29.557Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-affected/combinedInteractionTraining"
+    },
+    {
+      "name": "combinedInteractionMotion",
+      "command": [
+        "node",
+        "tests/browser/combinedInteractionMotion.mjs"
+      ],
+      "start": "2026-10-22T09:08:29.558Z",
+      "end": "2026-10-22T09:08:37.331Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-affected/combinedInteractionMotion"
+    },
+    {
+      "name": "motionPolish",
+      "command": [
+        "node",
+        "tests/browser/motionPolish.mjs"
+      ],
+      "start": "2026-10-22T09:07:52.445Z",
+      "end": "2026-10-22T09:11:54.436Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-affected/motionPolish"
+    },
+    {
+      "name": "combinedInteractionV04",
+      "command": [
+        "node",
+        "tests/browser/combinedInteractionV04.mjs"
+      ],
+      "start": "2026-10-22T09:07:54.788Z",
+      "end": "2026-10-22T09:14:51.431Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-affected/combinedInteractionV04"
+    },
+    {
+      "name": "trainingRecoveryExperience",
+      "command": [
+        "node",
+        "tests/browser/trainingRecoveryExperience.mjs"
+      ],
+      "start": "2026-10-22T09:07:52.445Z",
+      "end": "2026-10-22T09:21:32.084Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "artifacts": "<round-work>/regression-affected/trainingRecoveryExperience"
+    }
+  ],
+  "unchangedSourceFiles": 170,
+  "status": "PASS"
+}

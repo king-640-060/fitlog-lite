@@ -1,3 +1,4 @@
+import { waitForMainNavigation } from './navigationSettlement.mjs'
 // Isolated synthetic data + intercepted mock providers. Never uses real credentials.
 import assert from 'node:assert/strict'
 const { chromium } = await import(process.env.FITLOG_PLAYWRIGHT_MODULE)
@@ -27,7 +28,7 @@ for (const [width,height] of sizes) {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(result) }).catch(() => {})
   })
   await page.goto(base, { waitUntil: 'networkidle' }); await page.waitForSelector('#open-ai-assistant')
-  const nav = async tab => { await page.locator(`[data-tab=${tab}]`).click(); await page.waitForTimeout(100) }
+  const nav = async tab => { await page.locator(`[data-tab=${tab}]`).click(); await waitForMainNavigation(page,tab) }
   const close = async () => { await page.locator('dialog [data-close]').click() }
   const layout = async name => {
     await page.waitForTimeout(280)

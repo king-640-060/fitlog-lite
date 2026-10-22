@@ -1,0 +1,594 @@
+[
+  {
+    "path": "tests/browser/aiAssistant.mjs",
+    "sha256": "05c3e46fa167450f7f2451f371fd81c487588a56ddd6ac6947a5a11f867dc8bc"
+  },
+  {
+    "path": "tests/browser/aiDualModelRouting.mjs",
+    "sha256": "96868367e2a28670df6df129f198acb5907e906c6cabb4baee9a34085ba8e5cd"
+  },
+  {
+    "path": "tests/browser/aiStreaming.mjs",
+    "sha256": "17aaae1d1d241860117f6c809abfdc9fc1fdc2f048a34f6336893a62a5c0c861"
+  },
+  {
+    "path": "tests/browser/aiVoice.mjs",
+    "sha256": "cf44b53a89f54a20f9177b2c58d9da9dbcdf075308be2f014b2a86091122b9e2"
+  },
+  {
+    "path": "tests/browser/aiVoicePreservation.mjs",
+    "sha256": "d16a7fa603c55c637dfce0ac0509f82891868b4ac1ae16753200a80da5635728"
+  },
+  {
+    "path": "tests/browser/approvedJointPreservation.mjs",
+    "sha256": "f16f82c8755122049b704b3a6ba55275c3b411e3cbbb3e48e2fd0c44617ab715"
+  },
+  {
+    "path": "tests/browser/approvedJointV05.mjs",
+    "sha256": "c80e2160f194ce86a6d5e8c0a1f19d36941c2f23d2c66d16e8154752f7b25277"
+  },
+  {
+    "path": "tests/browser/autoPortionGoalDeselect.mjs",
+    "sha256": "4cc5a9e6fd95b0c058e46745bc6cae61d01eb119c8f3807a78b34e98d89db04e"
+  },
+  {
+    "path": "tests/browser/catalogRecovery.mjs",
+    "sha256": "cde29ad02c992c8b3ae4c9c523f03714bfd3b1d5d787feb597fdea8d2734ccec"
+  },
+  {
+    "path": "tests/browser/coachReportExperience.mjs",
+    "sha256": "44f8b60a7bb14ad411e9130065e3cef17c0d992ad10beb55f34e0681462be10a"
+  },
+  {
+    "path": "tests/browser/coachReportPreservation.mjs",
+    "sha256": "af1c2d38d8f999b403eee791d3688b03c988b4b795972da18e384abd459e262d"
+  },
+  {
+    "path": "tests/browser/combinedHandoff.mjs",
+    "sha256": "ca96f095e79ecf5410c037122c3daba59f3991baf51ea1f0e4cdbf37c158adfd"
+  },
+  {
+    "path": "tests/browser/combinedInteractionConcurrency.mjs",
+    "sha256": "8c94034bddfeac48ab16e1107f48648a061b600d34d907c0d8099c8767aa6aee"
+  },
+  {
+    "path": "tests/browser/combinedInteractionDates.mjs",
+    "sha256": "0b19ec9f64270eeb5ba04069e2a75b70078441cbadaef1dd6c38756b5fffd0d3"
+  },
+  {
+    "path": "tests/browser/combinedInteractionLifecycle.mjs",
+    "sha256": "db6c5efbd122c51804c2efe4bff69b1205829b17fab7abeb0652747f1a93b410"
+  },
+  {
+    "path": "tests/browser/combinedInteractionMotion.mjs",
+    "sha256": "bad7ba976f977d0043873956856a9773a36353caadeb4857e69759d97197f26c"
+  },
+  {
+    "path": "tests/browser/combinedInteractionRail.mjs",
+    "sha256": "93ba8c01aaa46b6a5019598c985bf4353995d86ef54505ebe22e33398744d0d0"
+  },
+  {
+    "path": "tests/browser/combinedInteractionTraining.mjs",
+    "sha256": "e4b30de1a9d36dcd167468783b03a49c1dff6ef29af24f749f58b787b156213f"
+  },
+  {
+    "path": "tests/browser/combinedInteractionV04.mjs",
+    "sha256": "10c9e99195abc99fe78e3ca6f7c6f9747dbfae8fe205192da363ac309ce5a552"
+  },
+  {
+    "path": "tests/browser/combinedPrototype.mjs",
+    "sha256": "c0495cbaca22fb6f8f2701a71ad13b3ac99b593171fdc5daada79504ebccbb98"
+  },
+  {
+    "path": "tests/browser/dailyRecordsExperience.mjs",
+    "sha256": "a56f9f72bbb51bc70a8ef1c4ea695c88a6b9500fdc38dae899f7d09d3df19b3c"
+  },
+  {
+    "path": "tests/browser/dietEvents.mjs",
+    "sha256": "b44a696bfa4385f18f4895cce9b6a6f155caf86e45dcf1d96ee76381d14159b1"
+  },
+  {
+    "path": "tests/browser/foodRecovery.mjs",
+    "sha256": "523438ccd3e6e0fd321bae79de0e79600bbafd1e17fa5f67d88a77539beb68dd"
+  },
+  {
+    "path": "tests/browser/foodServing.mjs",
+    "sha256": "98fff82114231b151cf2b98f7bc36c02ff86f542a9915fb7dcda336ef916fbdf"
+  },
+  {
+    "path": "tests/browser/foodVision.mjs",
+    "sha256": "8dca9e4459087739fb1028d559370c4736f795388c66fc7a22d0e557122bd00b"
+  },
+  {
+    "path": "tests/browser/foodVisionPreservation.mjs",
+    "sha256": "bf42ddf6691d8df34b169857c3c3a5e7c5e732c4201b379d72b149196e847c77"
+  },
+  {
+    "path": "tests/browser/foodWaterBackupV04.mjs",
+    "sha256": "0d4b288faf454eef058e449178b6277c733cddbc4aa93254a4a5a091e540cefc"
+  },
+  {
+    "path": "tests/browser/foodWaterDayV04.mjs",
+    "sha256": "f1533737c859b949c6c09a84367e84dea54cb5bbdac399948af4e76ec1c4691f"
+  },
+  {
+    "path": "tests/browser/foodWaterPreservationV04.mjs",
+    "sha256": "771d12515cd78b72203d2d993bd25e06be9cabceb0ef9ad5ac8b45572320c1fb"
+  },
+  {
+    "path": "tests/browser/githubSyncSafety.mjs",
+    "sha256": "75c71f0e2b05ab9e43718de9da552d8cbe138bb03d9802677aa56cb3cdd086f6"
+  },
+  {
+    "path": "tests/browser/habitDeletion.mjs",
+    "sha256": "0a9dfb233f71756555163eb48d544766ff90b381151140981e442cccb48c1288"
+  },
+  {
+    "path": "tests/browser/habitEditorLayout.mjs",
+    "sha256": "4b9faa0bb22720c76a4b5728092d89c0c0dd754add2400357ea54e11f9be9cb5"
+  },
+  {
+    "path": "tests/browser/interactionStabilization.mjs",
+    "sha256": "d9983a38c2d74e3488358d413dd778e1555b953ccce91b1686ece7989b5d9318"
+  },
+  {
+    "path": "tests/browser/jointReportRanges.mjs",
+    "sha256": "f882868c1817484076aca7e20437f4e3b59a5928dfaae92f5b45674fabb1fb7b"
+  },
+  {
+    "path": "tests/browser/jointUxPreservation.mjs",
+    "sha256": "754eaa0e531a47dc3bbeda2e18da1ddffd1f23dabfc8c75916df66ba1fe459ab"
+  },
+  {
+    "path": "tests/browser/jointUxReportsRange.mjs",
+    "sha256": "7ea698f64c0b12d6dca2375d561db2b8cf5ccdfc336259d46ac96c4da4617105"
+  },
+  {
+    "path": "tests/browser/macroNutritionSummary.mjs",
+    "sha256": "fd0c9267fee0362c901d82608eda1064c2e623d42e0b6354e140d1868b2e441c"
+  },
+  {
+    "path": "tests/browser/managementVisualConsistency.mjs",
+    "sha256": "bb0c2bfb1cea9f05ecb47092ed238f0db22e2f452f367f95a9d2201cb96ab10b"
+  },
+  {
+    "path": "tests/browser/managementWorkspace.mjs",
+    "sha256": "2afccbb8ba0e3c960d8a5ae48c770b76754720edca1fdaa06108b0fc462f5d83"
+  },
+  {
+    "path": "tests/browser/mobileLayout.mjs",
+    "sha256": "13c0fdcf26ea401cf8007ed0cce6ba45249335ff022033bee1f5677aa7a94046"
+  },
+  {
+    "path": "tests/browser/motionPolish.mjs",
+    "sha256": "634fb9ee13d328e28aa17a2bc9642d95a5decc92598730febd3ce950e96d6a4a"
+  },
+  {
+    "path": "tests/browser/navigationSettlement.mjs",
+    "sha256": "66a12684a25a63b5ac4865c45e915b22eadbe476536a0d72ebabe5b1aac2b34c"
+  },
+  {
+    "path": "tests/browser/nutritionGauge.mjs",
+    "sha256": "f0517166f7d34a10dca1e48199f831b2d41b2e36a1cb39c6421c166880271811"
+  },
+  {
+    "path": "tests/browser/nutritionGoalTemplate.mjs",
+    "sha256": "f92e221491aea5ed68f3346800f3fa6235fc299c8277b97dca6ba6c34d80ffe8"
+  },
+  {
+    "path": "tests/browser/nutritionGoalTemplateKeyboard.mjs",
+    "sha256": "3499a350ff0c9ee515626984a225d61ccb4ffa664806233e49d75df9409b4601"
+  },
+  {
+    "path": "tests/browser/nutritionTemplates.mjs",
+    "sha256": "8da6bcde0e815b5d399f8ad6bcc8b2abebb5b9ff356355209c9a004d572d1f65"
+  },
+  {
+    "path": "tests/browser/productionAssets.mjs",
+    "sha256": "f1104cd63a809aec3c82759caeaac3fe33f29843560069038a14fa43e69c4d00"
+  },
+  {
+    "path": "tests/browser/pwaUpgrade.mjs",
+    "sha256": "15683032f2d6a64694e1e3bc7cc8c861e40727b12c642fee39e5004f66c6fa56"
+  },
+  {
+    "path": "tests/browser/rangeCascadeFixture.mjs",
+    "sha256": "5e5370d9e817b3fc5fcdd68977ff9f3042b0533d5144b0885a0191bdb001670f"
+  },
+  {
+    "path": "tests/browser/recoveryPreservation.mjs",
+    "sha256": "bdba2be987c19b11efdf043939567984cd7f3fed430f28f31247ecf6c9947921"
+  },
+  {
+    "path": "tests/browser/remainingPrototype.mjs",
+    "sha256": "d49e3bdaa55945bb8b4885db9bc5af651c82036ec43c75a077e89c4d3e054ae7"
+  },
+  {
+    "path": "tests/browser/reportDisclosure.mjs",
+    "sha256": "c3e5e52702d1fdf1c3a04cb5efbbcdec719b767b967963d79473d8635b98368b"
+  },
+  {
+    "path": "tests/browser/sharedDatePicker.mjs",
+    "sha256": "52e48626126785bcb8b333f156b0e45f2d3f9233060634525d88e0acd8e92643"
+  },
+  {
+    "path": "tests/browser/todayWaterButton.mjs",
+    "sha256": "97ac32a16baa75ac15ee3e2a0b18199c96a3d3d1a08a15b1d495c8ee36a379b4"
+  },
+  {
+    "path": "tests/browser/trainingJournal.mjs",
+    "sha256": "52ae47fea1eec40a1a656f0608b67558e9761fc3db7a1d9d41c72990408849af"
+  },
+  {
+    "path": "tests/browser/trainingRecoveryExperience.mjs",
+    "sha256": "57ed14da062890dd1d585f427b6d382a963939f3fca65f92012d493f851595a3"
+  },
+  {
+    "path": "tests/browser/trainingRecoveryLifecycle.mjs",
+    "sha256": "e9c1c709ffaa2aa4be6ccee73baef4861ca77336d7327d99acaca4b21d55c8b5"
+  },
+  {
+    "path": "tests/browser/trainingRecoveryPreservation.mjs",
+    "sha256": "f3195e9d5099b2e9ca7c615f78e4d3bd4d5957f29ef8914222467773bb87b1c0"
+  },
+  {
+    "path": "tests/browser/uiQualityAudit.mjs",
+    "sha256": "e3049691069f20f98555a9c02b2c0a9350872e3c10b0c37bde06839fc6311e53"
+  },
+  {
+    "path": "tests/browser/uiSemanticConsistency.mjs",
+    "sha256": "3145ad620290559ff82fe8a3d4849766694a473321cf313ddbebd6d985a42e2e"
+  },
+  {
+    "path": "tests/browser/unifiedExperience.mjs",
+    "sha256": "2a451e005ac41d467fa6fa7d2bbb66c90f8f87cf511625b2ea80e34fe8be7c1d"
+  },
+  {
+    "path": "tests/browser/unifiedExperiencePreservation.mjs",
+    "sha256": "536238f2396a5868b15acf1baffc2cb19c3fee93062742e2d933df33caccba94"
+  },
+  {
+    "path": "tests/browser/uxWaterCascade.mjs",
+    "sha256": "4a0b1beab109d0cc84b1514d2c22b1c91e968135fb0169856c91bdad633f262b"
+  },
+  {
+    "path": "tests/browser/uxWaterCascadeBackup.mjs",
+    "sha256": "7bda9f9822900eb06b65b1d85e646dc794dd5902e36143ed9170d0b3e8230ef6"
+  },
+  {
+    "path": "tests/browser/uxWaterCascadePreservation.mjs",
+    "sha256": "76f42c8520dae59c290784080d2ad5e8a53e2a57c10cc7ccf2e29c394e6c47c3"
+  },
+  {
+    "path": "tests/browser/v421Consistency.mjs",
+    "sha256": "2cf88bd594e65b6db16b5405fbcffee0908656ca50020a2572bdd17484b49d68"
+  },
+  {
+    "path": "tests/browser/v4FoodPlanToday.mjs",
+    "sha256": "c8472479d98cef237ea4e8cbc1048fe4ec92add254b14f377775c23a8b8491b8"
+  },
+  {
+    "path": "tests/browser/v4Preservation.mjs",
+    "sha256": "b44549f8df11638448686584cac43e03ffe6074c2e3dc53eb2b3865a565f2310"
+  },
+  {
+    "path": "tests/browser/videoRetirementPreservation.mjs",
+    "sha256": "01b72487e08bc27def395c54e8c5899b25b73259aac98f79d0880c12d9fad098"
+  },
+  {
+    "path": "tests/browser/voiceMode.mjs",
+    "sha256": "cc4e957ac9614019fd4cd0dc1e7b48709ab7374d51ae9bf3e438f08f713d2cdd"
+  },
+  {
+    "path": "tests/aiCatalog.test.ts",
+    "sha256": "173924884a32245150a5b4cf20deccc983651d875f455c5227aee4ab65d65ff5"
+  },
+  {
+    "path": "tests/aiDualModelRouting.test.ts",
+    "sha256": "12b8ea7665141c611de83240a90d181d293265ebdd92ea85c8f79775742b72b8"
+  },
+  {
+    "path": "tests/aiOrchestrator.test.ts",
+    "sha256": "78e46ca27545a50c8ab2176436aeeeeb006b0d75e1d95c350302bc63cd1f79ea"
+  },
+  {
+    "path": "tests/aiProfiles.test.ts",
+    "sha256": "720ad1c6e633c80e856b4282d35f0b0f711f1ba499222df79b1d4af305101757"
+  },
+  {
+    "path": "tests/aiProposals.test.ts",
+    "sha256": "354bda607bbd9fa9cf373bd14d14da14c794c836d19dd6f44afaabb76b5aed52"
+  },
+  {
+    "path": "tests/aiProvider.test.ts",
+    "sha256": "2bb7a4639c0ac96b6bdbd657bbb7d50b7840a018011c5322c55b42d5368b6c2b"
+  },
+  {
+    "path": "tests/aiSecurity.test.ts",
+    "sha256": "7408c07799425215336561545e7efa8d5b60e108520a1918bd4c02da684acdfb"
+  },
+  {
+    "path": "tests/aiStreaming.test.ts",
+    "sha256": "66cad2bd5abfd7226212cc6dfb2334fe547399886f07240c2189a143a4cb25da"
+  },
+  {
+    "path": "tests/aiTools.test.ts",
+    "sha256": "5b1c0c938a4d212fe757026c28d7b9cdd4e9f27911f943e6a5a57ce828820f70"
+  },
+  {
+    "path": "tests/aiUiHelpers.test.ts",
+    "sha256": "0964eb7cc9bb3cd423e5c7ecabb457be154a75f77bc2ff8a06af4a84b1026edd"
+  },
+  {
+    "path": "tests/aiVisionFood.test.ts",
+    "sha256": "77674dfa57f4b4e6b6e8f48976c2baba87abe26932b338770492ac1e3d87d5c5"
+  },
+  {
+    "path": "tests/aiVoiceInput.test.ts",
+    "sha256": "fc5dac2f13280557a1693752e385145824f68c7fa1b2180e4f1aac0bef7d990e"
+  },
+  {
+    "path": "tests/approvedJointV05.test.ts",
+    "sha256": "677a7bcb715623d3bd0fe79298c12f4d5bf1455a749da31f246d57b01f4a61c0"
+  },
+  {
+    "path": "tests/autoPortionGoalDeselect.test.ts",
+    "sha256": "073026f3933d5e421fda183001cdc55c556cd06ccef1c228a35672422cb84a59"
+  },
+  {
+    "path": "tests/calendarVisual.test.ts",
+    "sha256": "ad38bddf61a7009e0a604e3727e274b69c1ab00f70361fd35d144fc93b29e589"
+  },
+  {
+    "path": "tests/calorieGaugeGeometry.test.ts",
+    "sha256": "e2ded5db37d4a1c5e4efca62814b23007e90b9e212e78247b4280ea3910b1186"
+  },
+  {
+    "path": "tests/cardio.test.ts",
+    "sha256": "5933775e2f66d6b622898d4c9d1edb9d7d87daf38b00c4f94ea709f55170ff58"
+  },
+  {
+    "path": "tests/core.test.ts",
+    "sha256": "a230f0cc40339bbe94a28a7a4b6b7ae707dd960e3cef28124c2e3d6eb5590184"
+  },
+  {
+    "path": "tests/dailyRecordsSummary.test.ts",
+    "sha256": "84e37c3686e948bb0815f8951de825f7875b1caf4093c2d5a3b225ae90db7189"
+  },
+  {
+    "path": "tests/dataPreservation.test.ts",
+    "sha256": "ab5a20ed9f931e1b93ff86297a2289b6a19319b880c74e0601c888d4c5956745"
+  },
+  {
+    "path": "tests/datePicker.test.ts",
+    "sha256": "b9b7aa422ff5b2a45d0b2d39474c0fff9c202c90d766f0e532cd411c4d8df0f3"
+  },
+  {
+    "path": "tests/dayDetail.test.ts",
+    "sha256": "5c7e8c50dc6e10b3474fe11d3659b0d4d5ae509748f399da6781fb7da9db71d4"
+  },
+  {
+    "path": "tests/dayRecordDeletion.test.ts",
+    "sha256": "706c4ee4e25fbd3876c6d7732415a0daaa7bc539f4562fddcc679c6dc586492a"
+  },
+  {
+    "path": "tests/dayRecords.test.ts",
+    "sha256": "81e06817f7ea21da36c6efd06c9e79d2868599f3a46cf7e558bcb54bc6b3a5e9"
+  },
+  {
+    "path": "tests/designReference.test.ts",
+    "sha256": "67e2d6f6c7e672e8e5a65ffa60eee8c8124a228b89af873c125ca5ec3323c1b8"
+  },
+  {
+    "path": "tests/dietEvents.test.ts",
+    "sha256": "f0da9a5934691bbe3cb2e4a043484ba62b525e5cb500935ed669535085f8764c"
+  },
+  {
+    "path": "tests/energy.test.ts",
+    "sha256": "471e4dfedeaa8e4550ef1f04850c4e46eb6ec462e1ee62fde03469b926e9df02"
+  },
+  {
+    "path": "tests/exercisePerformanceAnalysis.test.ts",
+    "sha256": "7d10a277e00311a0bce59f1a1659bbf840cf7eaef1f75f4ec4dbfe9d4aa84658"
+  },
+  {
+    "path": "tests/foodMeals.test.ts",
+    "sha256": "cda08b705d18a0d998b0b65e3b25f4942603352fca5f126102fc2a265d595702"
+  },
+  {
+    "path": "tests/foodServing.test.ts",
+    "sha256": "a6e209d46eb1e6bbbf6dcaad9b1c3df0c97ec6c03fb722d52dd27d8863394b83"
+  },
+  {
+    "path": "tests/foodVisionImport.test.ts",
+    "sha256": "8888d679972619f5164e92a024a1dbdac30d7c9fd7997e922976f1f0ff8be51a"
+  },
+  {
+    "path": "tests/foodWaterDayV04.test.ts",
+    "sha256": "195c4656e0ff68588fa2a5199bc8fb619e277881e8c1b56f5eecee96008eb697"
+  },
+  {
+    "path": "tests/githubManualSync.test.ts",
+    "sha256": "42d20f692d2e7ea90309a7a361b24180898d49390e1d04fbe00b99b4c2989004"
+  },
+  {
+    "path": "tests/githubSyncDecision.test.ts",
+    "sha256": "5c498a106b5e2bad79f09a56f29e1b20b16743841998cf6a237e9a5b648b94bb"
+  },
+  {
+    "path": "tests/githubSyncService.test.ts",
+    "sha256": "9dc70696158891df857773b51096d54f357bb67e415492bea6c32c9f4374a7ae"
+  },
+  {
+    "path": "tests/githubSyncSetup.test.ts",
+    "sha256": "315cf8c215a8bb5fbb83914cb3d385691e10f1e3826310fdf6411c75a1f654e2"
+  },
+  {
+    "path": "tests/habitPresentation.test.ts",
+    "sha256": "c66bdcf554132e24e7b9abdcaf8d3275a4144bd97c45f820558ad3ac184f69ba"
+  },
+  {
+    "path": "tests/habits.test.ts",
+    "sha256": "f6f8a1c2cf4d679ca49052208fd6e0e4802cb62816d0edacc5def9687ac1d9b0"
+  },
+  {
+    "path": "tests/horizontalNavigation.test.ts",
+    "sha256": "4f870ba350484240c94ab4597becdab520b3d6ebc515f9934f31fcdc96e8ad2a"
+  },
+  {
+    "path": "tests/interactionSystem.test.ts",
+    "sha256": "6bf68c8cfb82c82bd9014a831a98706851ae7a9388cf72a68ae9ba4012d158ba"
+  },
+  {
+    "path": "tests/jointReports.test.ts",
+    "sha256": "27ee9aa45d4760c2f3b7e6808c0e0a03b109f10be9003a5350d9234eccfad646"
+  },
+  {
+    "path": "tests/macroNutritionSummary.test.ts",
+    "sha256": "e7a7644ec0f40ac3b3d13fc720d939a17d9d19dafbede2e33e3a99616854ce78"
+  },
+  {
+    "path": "tests/mealDelete.test.ts",
+    "sha256": "62b76dc35d8b4b83a157c7a8e3c8c23fe5feb07f6444433a174b81d990aa38b7"
+  },
+  {
+    "path": "tests/mealPhotoEstimate.test.ts",
+    "sha256": "84f39f509955769efb05444126e01889ed940bf7bf8ac0a7768764d9f8fb4e1f"
+  },
+  {
+    "path": "tests/motion.test.ts",
+    "sha256": "dabbded5aa853a6dcbe756dd891060bf9e53e69fb1e2926f3e448dd998b3f7da"
+  },
+  {
+    "path": "tests/nativeDateInput.test.ts",
+    "sha256": "0bb13e8c8171d0092c6520106d9396e4153f404cef6f80c3503001cc587b473c"
+  },
+  {
+    "path": "tests/nutritionCompletion.test.ts",
+    "sha256": "0892701bb521ee7e4853acce2da928e062c39961b2eea95e003a2589b4e84360"
+  },
+  {
+    "path": "tests/nutritionCompletionService.test.ts",
+    "sha256": "7cb740cc25c3ab42c2caddb51640d0ceab9b238421f33fb97921210f09ca2aae"
+  },
+  {
+    "path": "tests/nutritionCycles.test.ts",
+    "sha256": "33d0ca190523be66d447302862d6a6bd82e2f87766d31a269b92fa9ca522ff36"
+  },
+  {
+    "path": "tests/nutritionGoalTemplate.test.ts",
+    "sha256": "a3347594f53b55cc538248f0c01271d4c8861c9539e4d14828e807513acbc413"
+  },
+  {
+    "path": "tests/nutritionRangeCascade.test.ts",
+    "sha256": "878d2f02d7e546b3a6d924eada19aaa46ede9ffe6df7d7ca204a768ce155fa51"
+  },
+  {
+    "path": "tests/nutritionStrategies.test.ts",
+    "sha256": "d4d25a6385945e7a8a88b40108db1720312f6e5999c5061a3db97b43b5bb6d74"
+  },
+  {
+    "path": "tests/nutritionStrategyCascade.test.ts",
+    "sha256": "551c2666864347b1f55eac3da8be67e32629e9480490a470bd877feb05187028"
+  },
+  {
+    "path": "tests/nutritionStrategyPreservation.test.ts",
+    "sha256": "8d4c03d365604a75550f2888ab31ef2ec85e7f7578792d3f3642b0958b79d779"
+  },
+  {
+    "path": "tests/pelvicPlan.test.ts",
+    "sha256": "1a2948c282d4cf5fdcb30100246fde3f6df75e1e8e629540131da4577c3df8ff"
+  },
+  {
+    "path": "tests/pelvicRoutines.test.ts",
+    "sha256": "446e9f21da7803a71bd0b14a0ecc58e0056c2b14eed976afb7ec5c18eb309a91"
+  },
+  {
+    "path": "tests/phase2.test.ts",
+    "sha256": "49605f2ad7d83b5bcabe40eab5bc7b16216e333fe3d4f6f8427fed68a065591a"
+  },
+  {
+    "path": "tests/phase3.test.ts",
+    "sha256": "a206fad695ffef01e0f9c73c6ddd4bc91b2ae75bde56912fd2bae079cef995dc"
+  },
+  {
+    "path": "tests/progressRing.test.ts",
+    "sha256": "151fbc9b100a47dd6f7194eba43b1ad9a229d3f0209e493ee71f1c0c82a7808a"
+  },
+  {
+    "path": "tests/pwaDiagnostics.test.ts",
+    "sha256": "b713d0d2e73eaed23ec15456f4852c9c73fe7fd13f4c26c3ca9722c9f637339f"
+  },
+  {
+    "path": "tests/quickLaunch.test.ts",
+    "sha256": "30f22ee8b55cd407fd16f63d0232bf944f346b2e76875758425af02bfec2b417"
+  },
+  {
+    "path": "tests/recovery.test.ts",
+    "sha256": "2d1f2d324fe9eed1b47c428a80edac13eb81de2034e50daa89a4d3e0d0672a35"
+  },
+  {
+    "path": "tests/reporting.test.ts",
+    "sha256": "f2ff68b35dbac109ca785fbc950846eaebc323fdf2e44f87d3b38d0c9c81e0ef"
+  },
+  {
+    "path": "tests/sheetViewport.test.ts",
+    "sha256": "a95fd85424b0ae407f016b6bc4151d7efa2f08093a64bccd1ea793f290950d0c"
+  },
+  {
+    "path": "tests/speechRecognition.test.ts",
+    "sha256": "ca740f7c768279f1e7494f7351986b4739372b67c41a6ab61294970e3330f949"
+  },
+  {
+    "path": "tests/stability.test.ts",
+    "sha256": "c7d7e0d4774145b38def3e4cd93fb7b6f86b3e53b219475017d8a889240bc347"
+  },
+  {
+    "path": "tests/syncCrypto.test.ts",
+    "sha256": "9746eaedc0c260d95a7c6f39fd6250076d86b08128a08967f194d430c9fc9c84"
+  },
+  {
+    "path": "tests/syncDataHash.test.ts",
+    "sha256": "87d85160fc0f061d6e056f62f4e515193d1cf6aca0e51b476aab1defad8be6d7"
+  },
+  {
+    "path": "tests/tasks.test.ts",
+    "sha256": "f9d3ec04b420d9ef155a21989cd8c0fac9b4893c52adf9950f93fc7ff1d22dab"
+  },
+  {
+    "path": "tests/todayActivity.test.ts",
+    "sha256": "4ae40662c84be379bf23576f5b63f71c7a8d5509fe91cd913f156aa7542c4db9"
+  },
+  {
+    "path": "tests/trainingJournal.test.ts",
+    "sha256": "afcfa1cb3f04e0c8f552784ba93f92819ca366242d8ac57c088ce4a7b1ea0d0e"
+  },
+  {
+    "path": "tests/trainingRecovery.test.ts",
+    "sha256": "bb74e59f250f5d151c8333994290caf658b6f81d932fd94b3d1b8eb46878b581"
+  },
+  {
+    "path": "tests/uiQualityPolicy.test.ts",
+    "sha256": "eb50c98a1a013ea25b4f70167f8a1e5d6e0f278d70af0c2fa68dbbda1dd31b57"
+  },
+  {
+    "path": "tests/unifiedExperience.test.ts",
+    "sha256": "cc1e4daa4765a231e4862d241a457fa487bba1c09cd12a4b75ba57fb1b09165b"
+  },
+  {
+    "path": "tests/v4Nutrition.test.ts",
+    "sha256": "59b0b59d5e95d353a3ba6bffef7e0bbd2a7d0b9b34476442e0b5e953854577e5"
+  },
+  {
+    "path": "tests/videoRetirement.test.ts",
+    "sha256": "bbb132e383e845c71feb0f0d4b9fd02a09bae3f6d17d5a56b7267bd3c20e3fa5"
+  },
+  {
+    "path": "tests/voiceMode.test.ts",
+    "sha256": "f7e179c4f8872ec30d2952940a8bf29d60477451be25598ead5ecdc6049bda20"
+  },
+  {
+    "path": "tests/waterReference.test.ts",
+    "sha256": "745b7334bef1375c8c80c37dd35e023e354714a648d11cc2e6afd6d9987be781"
+  }
+]

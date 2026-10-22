@@ -1,3 +1,4 @@
+import {waitForMainNavigation} from './navigationSettlement.mjs'
 // Keyboard/backdrop draft ownership; isolated fresh contexts, never an existing personal profile.
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -8,7 +9,7 @@ for(const engine of ['chromium','webkit']){
  const browser=await pw[engine].launch({headless:true,...(engine==='chromium'?{executablePath:process.env.FITLOG_CHROME}:{})})
  try{const c=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true,timezoneId:'Asia/Shanghai',serviceWorkers:'block'}),p=await c.newPage();p.setDefaultTimeout(15000)
  try{
-  await p.clock.setFixedTime(new Date('2026-10-20T04:00:00.000Z'));await p.goto(url,{waitUntil:'networkidle'});await p.locator('[data-tab=food]').tap();await p.locator('[data-edit-nutrition-target]').waitFor()
+  await p.clock.setFixedTime(new Date('2026-10-20T04:00:00.000Z'));await p.goto(url,{waitUntil:'networkidle'});await p.locator('[data-tab=food]').tap();await waitForMainNavigation(p,'food');await p.locator('[data-edit-nutrition-target]').waitFor()
   const read=()=>p.evaluate(async()=>{const d=await new Promise(r=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>r(q.result)}),data={};for(const n of [...d.objectStoreNames].sort())data[n]=await new Promise(r=>{const q=d.transaction(n).objectStore(n).getAll();q.onsuccess=()=>r(q.result.sort((a,b)=>a.id.localeCompare(b.id)))});d.close();return data})
   const before=await read();await p.locator('[data-edit-nutrition-target]').focus();await p.keyboard.press('Enter');await p.locator('#goal-template-create').tap();await p.locator('[name=name]').fill('未提交模板');await p.locator('#strategy-add-variant').tap();await p.locator('[name=variantName]').fill('未提交日方案');await p.locator('[form=strategy-variant-form]').tap();await p.locator('#strategy-variant-subview .strategy-error:not([hidden])').waitFor();assert.deepEqual(await read(),before)
   await p.keyboard.press('Escape');await p.locator('.confirm-dialog').waitFor();await p.locator('.confirm-dialog [data-cancel]').tap();assert.equal(await p.locator('[name=variantName]').inputValue(),'未提交日方案');await p.keyboard.press('Escape');await p.locator('.confirm-dialog [data-confirm]').tap();await p.locator('#strategy-editor-root').waitFor();assert.equal(await p.locator('[name=name]').inputValue(),'未提交模板');assert.equal(await p.locator('[data-strategy-variant]').count(),0)

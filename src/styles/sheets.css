@@ -5,6 +5,17 @@
 .sheet[data-sheet-variant="assistant"] { height: calc(var(--sheet-viewport-height, 100dvh) - 12px); }
 .sheet::backdrop, .confirm-dialog::backdrop { background: var(--overlay); }
 @keyframes sheet-in { from { opacity: .85; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.sheet[data-training-sheet] { animation:training-sheet-in 275ms cubic-bezier(.2,.78,.2,1) both; }
+.sheet[data-training-sheet]::backdrop { animation:training-backdrop-in 210ms ease-out both; }
+.sheet[data-training-sheet] .modal-head h2 { text-wrap:balance; }
+.sheet[data-training-sheet="strength"] .template-picker-actions { display:flex; flex-wrap:wrap; }
+.sheet[data-training-sheet="strength"] .template-picker-actions > button { flex:1 1 auto; white-space:nowrap; }
+@keyframes training-sheet-in { from { opacity:.96; transform:translate3d(0,58px,0); } to { opacity:1; transform:none; } }
+@keyframes training-backdrop-in { from { opacity:0; } to { opacity:1; } }
+.training-sheet-exit { position:fixed; inset:0; z-index:70; pointer-events:none; background:var(--overlay); animation:training-backdrop-out 210ms ease-out both; }
+.training-sheet-exit > .sheet { display:flex; flex-direction:column; animation:training-sheet-out 275ms cubic-bezier(.2,.78,.2,1) both; }
+@keyframes training-sheet-out { from { opacity:1; transform:none; } to { opacity:.96; transform:translate3d(0,58px,0); } }
+@keyframes training-backdrop-out { to { background:transparent; } }
 .sheet-handle { flex: 0 0 auto; width: 36px; height: 4px; margin: 9px auto 2px; border-radius: 4px; background: var(--border); }
 .modal-head { display: flex; flex: 0 0 auto; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 18px; background: var(--surface-elevated); }
 .modal-head h2 { font-size: 1.22rem; line-height: 1.35; min-width: 0; }
@@ -14,7 +25,7 @@
 .sheet[data-sheet-variant="large"] .modal-body, .sheet[data-sheet-variant="assistant"] .modal-body { flex: 1 1 auto; }
 .sheet[data-sheet-variant="assistant"] .modal-body { padding: 0 16px 8px; overflow: hidden; }
 .sheet-footer { flex: 0 0 auto; padding: 12px 18px; border-top: 1px solid var(--divider); background: var(--surface-elevated); }
-@media (prefers-reduced-motion: reduce) { .sheet { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .sheet,.sheet[data-training-sheet],.sheet[data-training-sheet]::backdrop { animation: none; } .training-sheet-exit { display:none; } }
 
 /* One persistent frame for the entire Management route stack. */
 .management-workspace .modal-head { gap: 8px; }

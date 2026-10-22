@@ -6,6 +6,8 @@ import { computeSheetViewportState, type SheetViewportState } from './sheetViewp
 /** One app lifetime coordinator; visual movement is coalesced, and closed-keyboard geometry is stable. */
 export function setupSheetViewport(): () => void {
   const events = new AbortController(), viewport = window.visualViewport
+  window.addEventListener('pagehide', () => removeExitVisual?.(), { signal: events.signal })
+  matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', () => removeExitVisual?.(), { signal: events.signal })
   let state: SheetViewportState | undefined, frame = 0, layoutResize = false, revealFocused = false
   const editing = () => document.activeElement instanceof Element && !!document.activeElement.closest('input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=submit]):not([type=range]):not([type=file]), textarea, [contenteditable=true]')
   const update = () => {
@@ -47,6 +49,22 @@ export function setupSheetViewport(): () => void {
   update(); return () => { events.abort(); cancelAnimationFrame(frame) }
 }
 let primary: HTMLDialogElement | undefined
+let removeExitVisual: (() => void) | undefined
+/** Exit is an inert visual snapshot. Domain close/lock/cleanup still run synchronously exactly once. */
+function trainingExitVisual(dialog: HTMLDialogElement): void {
+  removeExitVisual?.()
+  if (!dialog.dataset.trainingSheet || dialog.dataset.replacing || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const layer = document.createElement('div'), sheet = document.createElement('div')
+  layer.className = 'training-sheet-exit'; layer.inert = true; layer.setAttribute('aria-hidden', 'true')
+  sheet.className = dialog.className; sheet.dataset.sheetVariant = dialog.dataset.sheetVariant
+  for (const child of dialog.children) sheet.append(child.cloneNode(true))
+  for (const node of sheet.querySelectorAll('[id],[autofocus]')) { node.removeAttribute('id'); node.removeAttribute('autofocus') }
+  layer.append(sheet); document.body.append(layer)
+  const remove = () => { layer.remove(); if (removeExitVisual === remove) removeExitVisual = undefined }
+  removeExitVisual = remove
+  // CSS owns the finite motion; no delayed domain notification or second close event.
+  layer.addEventListener('animationend', event => { if (event.target === sheet) remove() })
+}
 let locks = 0, scrollX = 0, scrollY = 0, originalStyle = '', originalScrollBehavior = ''
 function lockBackground(): () => void {
   if (locks++ === 0) {
@@ -66,6 +84,8 @@ function lockBackground(): () => void {
 export function setSheetVariant(dialog: HTMLDialogElement, variant: SheetVariant): void { dialog.dataset.sheetVariant = variant }
 /** Normal close notifies consumers synchronously once, before replacement. Native late close is suppressed. */
 export function presentDialog(dialog: HTMLDialogElement, overlay = false): HTMLDialogElement {
+  removeExitVisual?.()
+  document.dispatchEvent(new Event('fitlog-sheet-open'))
   const release = lockBackground(), trigger = document.activeElement instanceof HTMLElement ? document.activeElement : undefined
   if (!overlay && primary) { primary.dataset.replacing = 'true'; primary.close() }
   if (!overlay) primary = dialog
@@ -73,6 +93,7 @@ export function presentDialog(dialog: HTMLDialogElement, overlay = false): HTMLD
   const nativeClose = dialog.close.bind(dialog)
   const finish = () => {
     if (finalized) return; finalized = true
+    trainingExitVisual(dialog)
     if (primary === dialog) primary = undefined
     dialog.remove(); release()
     if (!dialog.dataset.replacing && trigger?.isConnected && inputModality() === 'keyboard') trigger.focus({ preventScroll: true })

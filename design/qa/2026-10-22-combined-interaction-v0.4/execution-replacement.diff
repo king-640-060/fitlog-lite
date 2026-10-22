@@ -1,0 +1,19 @@
+--- before/src/main.ts
++++ after/src/main.ts
+@@ -2134,7 +2134,7 @@
+   dialog.dataset.trainingSheet = 'strength'
+   dialog.querySelector('#continue-open-workout')?.addEventListener('click', async () => {
+     if (!openWorkout) return
+-    dialog.close(); workoutDate = openWorkout.date; currentWorkout = openWorkout; workoutEditorOpen = true; await render()
++    dialog.dataset.replacing = 'true'; dialog.close(); workoutDate = openWorkout.date; currentWorkout = openWorkout; workoutEditorOpen = true; await render()
+   })
+   dialog.querySelector('#blank-workout')?.addEventListener('click', async () => {
+     try {
+@@ -2161,7 +2161,7 @@
+     const openWorkout = (await db.workouts.toArray()).find((item) => !item.finishedAt)
+     if (openWorkout) throw new Error('已有未完成训练，请先继续或完成它')
+     currentWorkout = await startWorkoutFromTemplate(template, workoutDate)
+-    workoutEditorOpen = true; showWorkoutHistory = false; dialog?.close(); await renderWorkoutPage()
++    workoutEditorOpen = true; showWorkoutHistory = false; if (dialog) { dialog.dataset.replacing = 'true'; dialog.close() }; await renderWorkoutPage()
+   } catch (error) { fail(error) }
+ }

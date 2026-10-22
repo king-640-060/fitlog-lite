@@ -1,0 +1,39 @@
+{
+  "results": [
+    {
+      "name": "prior-goal-keyboard",
+      "start": "2026-10-22T08:25:29.338Z",
+      "end": "2026-10-22T08:25:35.773Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "water-full",
+      "start": "2026-10-22T08:25:35.774Z",
+      "end": "2026-10-22T08:31:03.834Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "joint-chromium",
+      "start": "2026-10-22T08:31:03.836Z",
+      "end": "2026-10-22T08:31:44.010Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "joint-webkit",
+      "start": "2026-10-22T08:31:44.010Z",
+      "end": "2026-10-22T08:32:20.801Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "report-ranges",
+      "start": "2026-10-22T08:32:20.802Z",
+      "end": "2026-10-22T08:32:34.386Z",
+      "exitCode": 0,
+      "status": "PASS"
+    }
+  ]
+}

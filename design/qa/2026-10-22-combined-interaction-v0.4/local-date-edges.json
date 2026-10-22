@@ -1,0 +1,58 @@
+{
+  "receipts": [
+    {
+      "engine": "chromium",
+      "zone": "Asia/Shanghai",
+      "time": "2026-01-31T12:00:00+08:00",
+      "date": "2026-01-31",
+      "next": "2026-02-01",
+      "returnToday": "2026-01-31",
+      "status": "PASS"
+    },
+    {
+      "engine": "chromium",
+      "zone": "Asia/Shanghai",
+      "time": "2026-12-31T12:00:00+08:00",
+      "date": "2026-12-31",
+      "next": "2027-01-01",
+      "returnToday": "2026-12-31",
+      "status": "PASS"
+    },
+    {
+      "engine": "chromium",
+      "zone": "America/New_York",
+      "time": "2026-03-08T12:00:00-04:00",
+      "date": "2026-03-08",
+      "next": "2026-03-09",
+      "returnToday": "2026-03-08",
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "zone": "Asia/Shanghai",
+      "time": "2026-01-31T12:00:00+08:00",
+      "date": "2026-01-31",
+      "next": "2026-02-01",
+      "returnToday": "2026-01-31",
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "zone": "Asia/Shanghai",
+      "time": "2026-12-31T12:00:00+08:00",
+      "date": "2026-12-31",
+      "next": "2027-01-01",
+      "returnToday": "2026-12-31",
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "zone": "America/New_York",
+      "time": "2026-03-08T12:00:00-04:00",
+      "date": "2026-03-08",
+      "next": "2026-03-09",
+      "returnToday": "2026-03-08",
+      "status": "PASS"
+    }
+  ]
+}

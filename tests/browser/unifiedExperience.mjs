@@ -1,3 +1,4 @@
+import { waitForMainNavigation } from './navigationSettlement.mjs'
 import { expandReportChapters } from './reportDisclosure.mjs'
 // Visible results and real screen-coordinate touch in isolated invented-data contexts.
 import assert from 'node:assert/strict'
@@ -23,7 +24,7 @@ try{for(const[width,height,scale,colorScheme,reduced]of cases){
  const data=structuredClone(fixture);for(const rows of Object.values(data))for(const row of rows)if(row.date)row.date=today;data.nutritionTargets=data.nutritionTargets.slice(0,1);data.weights=[weight('w8','2026-10-08',86.6),weight('w9','2026-10-09',85.7),weight('old','2025-10-09',88.8)];data.sleepSessions=[sleep('s8','2026-10-09'),sleep('s9','2026-10-10')];data.waterLogs=[water('d8','2026-10-08',1000),water('d91','2026-10-09',250),water('d92','2026-10-09',500),water('d93','2026-10-09',500)]
  await write(page,data);await page.reload({waitUntil:'networkidle'});await page.addStyleTag({content:`html{font-size:${scale}%}`});await page.waitForSelector('.sleep-card')
  const module=k=>page.locator(`[data-trend-module=${k}]`),close=async()=>{if(await page.locator('dialog[open]').count())await page.locator('dialog[open] [data-close]').last().click();await page.waitForFunction(()=>!document.querySelector('dialog'));await page.clock.runFor(32)}
- const nav=async tab=>{await close();await page.locator(`[data-tab=${tab}]`).click();await page.waitForSelector(tab==='today'?'.sleep-card':tab==='workout'?'#start-workout':tab==='food'?'#food-date-picker-open':tab==='plan'?'.plan-page':'[data-progress-view]')}
+ const nav=async tab=>{await close();await page.locator(`[data-tab=${tab}]`).click();await waitForMainNavigation(page,tab);await page.waitForSelector(tab==='today'?'.sleep-card':tab==='workout'?'#start-workout':tab==='food'?'#food-date-picker-open':tab==='plan'?'.plan-page':'[data-progress-view]')}
  const trend=async()=>{await nav('progress');await page.locator('[data-progress-view=trend]').click();await page.waitForFunction(()=>document.querySelectorAll('.trend-module .trend-ranges').length===3)}
  const replaceFacts=async(data)=>{await write(page,data);await page.reload({waitUntil:'networkidle'});await page.addStyleTag({content:`html{font-size:${scale}%}`});await trend()}
  const shot=async(name,selector)=>{await settle(selector||'#view');if(representative||['trend-full','today-full','training-full','report-full','report-dark'].includes(name)||([320,430,844].includes(width)&&scale===200&&reduced))await(selector?page.locator(selector):page).screenshot({path:path.join(dir,prefix+'-'+name+'.png'),animations:'disabled',...(selector?{}:{fullPage:true})})}

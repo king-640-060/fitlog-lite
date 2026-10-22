@@ -1,0 +1,48 @@
+{
+  "product": "FitLog Lite",
+  "package_name": "FitLog_Lite_Combined_Codex_Handoff_v0.4",
+  "package_revision": "1.0",
+  "approval": "User approved combined HTML prototype v0.4 and requested one Codex ZIP for all three modifications",
+  "reference_prototype": {
+    "path": "reference/fitlog_combined_interaction_prototype_v0.4.html",
+    "sha256": "b7be5a11161f138c0182b059bd42ca26d0b56852b309db34b01b5b4792b68419"
+  },
+  "reference_video": {
+    "path": "reference/用户示例视频_仅供交互参考.mp4",
+    "sha256": "03fb843ea73d810422488a8470b3815f6dc9396a4046caa0f5c162ba8f4cdb55"
+  },
+  "repository": "king-640-060/fitlog-lite",
+  "github_main_observed": "01628f7170bae2a68071838a1ddfe7551d428bc7",
+  "application_baseline_observed": "c1dcc087ffa19a0ccf424df8c79c078390841fb9",
+  "scope": [
+    "bottom five-tab realtime drag and selected capsule",
+    "food date rail plus adjacent day content realtime drag",
+    "unified large sheets for strength cardio pelvic with smooth entrance and exit; preserve existing execution surfaces"
+  ],
+  "repo_write_performed": false,
+  "production_tests_performed": false,
+  "physical_iphone_verified": false,
+  "notes": [
+    "Do not treat prototype mocked data as true product data",
+    "Codex must freshly inspect GitHub before implementation",
+    "Current old UI_INTERACTION_SPEC food-body prohibition is narrowly superseded by user-approved v0.4",
+    "All formal tests/deployment still pending"
+  ],
+  "member_hashes_sha256": {
+    "00_README_请先阅读.md": "566fbdda5ce2637895dd9880f1c79d40ffd59f3c5987eee90827d62a79223fa2",
+    "handoff/01_CODEX_正式开发指令_12项.md": "b88bb8b515e92a71b4fec9b7ed53f58c8f998bcdebaab3d3c2ddb6d468461209",
+    "handoff/02_批准行为与实现边界.md": "3464d74de842216021dc5d3d970937424d1511e54c8e3a59818914fbb5d67c09",
+    "handoff/03_手势与状态协调合同.md": "5bacdd361b73af4652fd1f6387cf80e4acdcdb46e87db64c76992bda78d6f2ee",
+    "handoff/04_验收矩阵.md": "5e2c2789954b0056ce755fe26ad660e35ed2e2bb4c232dc54baaa60166cab616",
+    "handoff/05_数据安全与发布核验.md": "39da15372ee010ecc2fb86c2e301d2263c8f235b4b4d5b2d188b13bc74c504b0",
+    "handoff/06_CODEX_十项交付回执模板.md": "48d78639537512de37802200ee54707c4a67fbb9ef8aac2c57011fde7f55d0d1",
+    "handoff/07_基线及证据来源.md": "0d3907277b0397f0b6fb8fc35efad5cca67f90c77de52bf5f26b6ece714589d2",
+    "reference/fitlog_combined_interaction_prototype_v0.4.html": "b7be5a11161f138c0182b059bd42ca26d0b56852b309db34b01b5b4792b68419",
+    "reference/用户示例视频_仅供交互参考.mp4": "03fb843ea73d810422488a8470b3815f6dc9396a4046caa0f5c162ba8f4cdb55",
+    "visual/v04_food_date_light.png": "6a5f7c4339145dfa233d2eba425f1aa34de8c41f177eca97bd9b8fa8f187b7b9",
+    "visual/v04_training_cardio_large_sheet.png": "6a29c169e19fcc0cf64b685cc05050cef220e79a1a2cd8f084272361c8465a2c",
+    "visual/v04_training_pelvic_large_sheet.png": "3cbcf9cfa57aa69688f5cbddfa230b4a32949acf2588b2539458c641ec780282",
+    "visual/v04_training_strength_large_sheet.png": "7eafb39368b3e9aafe1b7fb552c2f57f6d69c2d1dd49519bc8ede4c3e57ae423",
+    "visual/v04_training_three_sheets.png": "55f8a1bcde79e45508cba3e54561cadda54ed7a238d73f30cfcb5d841415a411"
+  }
+}

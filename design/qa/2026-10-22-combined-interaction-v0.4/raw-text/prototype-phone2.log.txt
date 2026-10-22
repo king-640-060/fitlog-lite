@@ -1,0 +1,42 @@
+chromium light [{"kind":"strength","top":24,"localTop":24,"height":820,"width":390,"background":"rgb(255, 254, 250)","radius":"24px 24px 0px 0px","animation":"none","duration":"0s"},{"kind":"cardio","top":24,"localTop":24,"height":820,"width":390,"background":"rgb(255, 254, 250)","radius":"24px 24px 0px 0px","animation":"none","duration":"0s"},{"kind":"pelvic","top":24,"localTop":24,"height":820,"width":390,"background":"rgb(255, 254, 250)","radius":"24px 24px 0px 0px","animation":"none","duration":"0s"}]
+chromium dark [{"kind":"strength","top":24,"localTop":24,"height":820,"width":390,"background":"rgb(39, 47, 40)","radius":"24px 24px 0px 0px","animation":"none","duration":"0s"},{"kind":"cardio","top":24,"localTop":24,"height":820,"width":390,"background":"rgb(39, 47, 40)","radius":"24px 24px 0px 0px","animation":"none","duration":"0s"},{"kind":"pelvic","top":24,"localTop":24,"height":820,"width":390,"background":"rgb(39, 47, 40)","radius":"24px 24px 0px 0px","animation":"none","duration":"0s"}]
+webkit light [{"kind":"strength","top":23.984375,"localTop":23.984375,"height":820,"width":390,"background":"rgb(255, 254, 250)","radius":"24px 24px 0px 0px","animation":"none","duration":"0s"},{"kind":"cardio","top":23.984375,"localTop":23.984375,"height":820,"width":390,"background":"rgb(255, 254, 250)","radius":"24px 24px 0px 0px","animation":"none","duration":"0s"},{"kind":"pelvic","top":23.984375,"localTop":23.984375,"height":820,"width":390,"background":"rgb(255, 254, 250)","radius":"24px 24px 0px 0px","animation":"none","duration":"0s"}]
+webkit dark [{"kind":"strength","top":23.984375,"localTop":23.984375,"height":820,"width":390,"background":"rgb(39, 47, 40)","radius":"24px 24px 0px 0px","animation":"none","duration":"0s"},{"kind":"cardio","top":23.984375,"localTop":23.984375,"height":820,"width":390,"background":"rgb(39, 47, 40)","radius":"24px 24px 0px 0px","animation":"none","duration":"0s"},{"kind":"pelvic","top":23.984375,"localTop":23.984375,"height":820,"width":390,"background":"rgb(39, 47, 40)","radius":"24px 24px 0px 0px","animation":"none","duration":"0s"}]
+[
+  {
+    engine: 'chromium',
+    version: '151.0.7922.34',
+    theme: 'light',
+    viewport: { width: 390, height: 844 },
+    sheets: [ [Object], [Object], [Object] ],
+    status: 'PASS',
+    prototypeOnly: true
+  },
+  {
+    engine: 'chromium',
+    version: '151.0.7922.34',
+    theme: 'dark',
+    viewport: { width: 390, height: 844 },
+    sheets: [ [Object], [Object], [Object] ],
+    status: 'PASS',
+    prototypeOnly: true
+  },
+  {
+    engine: 'webkit',
+    version: '26.5',
+    theme: 'light',
+    viewport: { width: 390, height: 844 },
+    sheets: [ [Object], [Object], [Object] ],
+    status: 'PASS',
+    prototypeOnly: true
+  },
+  {
+    engine: 'webkit',
+    version: '26.5',
+    theme: 'dark',
+    viewport: { width: 390, height: 844 },
+    sheets: [ [Object], [Object], [Object] ],
+    status: 'PASS',
+    prototypeOnly: true
+  }
+]

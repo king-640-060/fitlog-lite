@@ -1,0 +1,25 @@
+
+> fitlog-lite@0.0.0 test
+> vitest run --reporter=dot
+
+
+ RUN  v5.0.1 <repo>
+
+··················stderr | tests/nutritionCycles.test.ts > real nutrition cycle scheduling > stale plan preview and concurrent edit are rejected rather than last-write wins
+Another connection wants to delete database 'cycle-test-d2679903-6af2-42c0-946a-37fb55550a3e'. Closing db now to resume the delete request.
+
+························································································································································································stderr | tests/foodWaterDayV04.test.ts > nutrition strategy permanent deletion uses complete references and one transaction > stale definition and new reference from a second connection reject the old confirmation
+Another connection wants to delete database 'v04-b249331f-8b3e-4b3a-bf83-9b2e4a15c199'. Closing db now to resume the delete request.
+
+···········································································································································································································································································································································································································································································································································································stderr | tests/macroNutritionSummary.test.ts > refreshes both consumers after a second connection commits and unsubscribes cleanly
+Another connection wants to delete database 'macro-6e0455bf-01b0-4c75-9c3e-d409435f37a0'. Closing db now to resume the delete request.
+
+··································································································································································································································································································································································································
+
+ Test Files  78 passed (78)
+      Tests  1143 passed (1143)
+   Start at  17:07:36
+   Duration  3.59s (tests 73%, import 15%, transform 11%, worker 1%)
+
+    Isolate  78 workers spawned · ~109ms startup each (spawn + environment, per file)
+             at least ~839ms faster with isolate: false — reuses workers across files instead of one per file

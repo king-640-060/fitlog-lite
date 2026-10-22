@@ -1,3 +1,4 @@
+import { waitForMainNavigation } from './navigationSettlement.mjs'
 // Fresh synthetic profiles only; actual native Web Animations and persisted state.
 import assert from 'node:assert/strict'
 import fs from 'node:fs/promises'
@@ -35,15 +36,16 @@ try{for(const width of [320,375,390,430])for(const scale of [100,120,140])for(co
  data.nutritionTargets=data.nutritionTargets.slice(0,1)
  data.tasks=[{...data.tasks[0],id:'motion-task',title:'微交互验证任务',date,completedAt:undefined}];data.habits=[{...data.habits[0],id:'motion-habit',name:'验证习惯',active:true}];data.habitCheckIns=[]
  await page.evaluate(async data=>{const d=await new Promise(r=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>r(q.result)});await new Promise((r,j)=>{const t=d.transaction(Object.keys(data),'readwrite');for(const [s,rows]of Object.entries(data)){const st=t.objectStore(s);st.clear();rows.forEach(row=>st.put(row))}t.oncomplete=r;t.onerror=()=>j(t.error)});d.close()},data)
- const nav=async tab=>{await page.locator(`[data-tab=${tab}]`).click();await page.waitForTimeout(200);assert.ok(!/训练视频搜索|B站|YouTube/.test(await page.locator('body').innerText()),'retired names absent from production DOM')}
+ const nav=async tab=>{await page.locator(`[data-tab=${tab}]`).click();await waitForMainNavigation(page,tab);assert.ok(!/训练视频搜索|B站|YouTube/.test(await page.locator('body').innerText()),'retired names absent from production DOM')}
  const close=async()=>{await page.locator('dialog[open] [data-close]').last().click();await page.waitForTimeout(40);assert.equal(await page.locator('dialog[open]').count(),0);assert.equal(await page.evaluate(()=>document.body.classList.contains('sheet-open')),false)}
  const overflow=async()=>assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,`${width}/${scale}/reduce=${reduced}`)
  const capture=async name=>{await overflow();if(!reduced&&((width===390&&scale===100)||(width===320&&scale===140)||(width===430&&scale===100)))await page.screenshot({path:`/tmp/motion-${prod?'prod':'local'}-${width}-${scale}-${name}.png`})}
  const read=async store=>page.evaluate(async store=>{const d=await new Promise(r=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>r(q.result)});const rows=await new Promise(r=>{const q=d.transaction(store).objectStore(store).getAll();q.onsuccess=()=>r(q.result)});d.close();return rows},store)
- await nav('today');await capture('today-before');
+ await nav('plan');await nav('today');await capture('today-before');
+ await page.evaluate(()=>{window.__capsulePositions=new Set();new MutationObserver(()=>__capsulePositions.add(document.querySelector('.nav-capsule')?.style.transform)).observe(document.querySelector('.nav-capsule'),{attributes:true,attributeFilter:['style']})});
  await page.locator('[data-tab=food]').click();await page.waitForTimeout(35);await capture('nav-mid');await page.waitForTimeout(220);await nav('today');
 const navNode=await page.locator('.bottom-nav').elementHandle()
- await page.evaluate(async()=>{for(let i=0;i<20;i++){document.querySelector(`[data-tab=${['food','plan','workout','progress','today'][i%5]}]`).click();await new Promise(r=>setTimeout(r,18))}});await page.waitForTimeout(300)
+ await page.evaluate(async()=>{for(let i=0;i<20;i++){document.querySelector(`[data-tab=${['food','plan','workout','progress','today'][i%5]}]`).click();await new Promise(r=>setTimeout(r,18))}});await waitForMainNavigation(page,'today')
  assert.equal(await navNode.evaluate(e=>e===document.querySelector('.bottom-nav')),true)
  assert.equal(await page.locator('.bottom-nav .active').getAttribute('data-tab'),'today');assert.equal(await page.locator('.today-dashboard #today-habits').count(),1)
  assert.equal(await page.locator('#view').evaluate(e=>getComputedStyle(e).transform),'none');assert.equal(await page.locator('#view').evaluate(e=>getComputedStyle(e).opacity),'1');await overflow()
@@ -65,7 +67,7 @@ const navNode=await page.locator('.bottom-nav').elementHandle()
  for(let i=0;i<6;i++)await page.evaluate(()=>__push('可说明动作要点。'));await page.evaluate(()=>__finish());await page.waitForFunction(()=>!document.querySelector('#ai-send').hidden);await page.waitForTimeout(160);assert.equal(await page.evaluate(()=>__motions.filter(m=>m.classes==='ai-message ai-assistant').length),entrances);assert.ok(!JSON.stringify(await page.evaluate(()=>__requests)).includes('search_training_videos'));await capture('ai-final');await close()
  await page.locator('#open-ai-assistant').click();await page.waitForSelector('#ai-mic');assert.equal(await page.evaluate(()=>__motions.filter(m=>m.classes==='ai-message ai-assistant').length),entrances,'history does not replay')
  await page.locator('#ai-mic').click();await page.waitForFunction(()=>document.querySelector('#ai-mic').getAttribute('aria-pressed')==='true');assert.equal(await page.locator('.ai-voice-status').evaluate(e=>getComputedStyle(e,'::before').animationName),reduced?'none':'recording-dot');await capture('voice-recording');await close();assert.equal(await page.evaluate(()=>__tracks.filter(t=>t.readyState==='live').length),0)
- if(!reduced)assert.ok(await page.evaluate(()=>__transitions.some(t=>t.nav&&t.property==='background-color')),'actual navigation surface transition');
+ if(!reduced)assert.ok(await page.evaluate(()=>__capsulePositions.size>=3),'actual continuous capsule transition has intermediate transforms');
  await nav('progress');await page.locator('[data-progress-view=calendar]').click();await page.waitForSelector('.calendar-day.today');await page.locator('.calendar-day.today').click();await page.waitForSelector('dialog');assert.equal(await page.locator('.calendar-day.today.selected').count(),1);await capture('calendar-day');await close();await capture('calendar')
  const progressTabs=await page.locator('.page-tabs').elementHandle();await page.locator('[data-progress-view=reports]').click();await page.waitForSelector('.report-page');await page.waitForTimeout(180);assert.equal(await progressTabs.evaluate(e=>e===document.querySelector('.page-tabs')),true);await page.locator('[data-progress-view=calendar]').click();await page.waitForSelector('.calendar-day.today');
  await nav('food');await capture('food');await nav('workout');await capture('workout')

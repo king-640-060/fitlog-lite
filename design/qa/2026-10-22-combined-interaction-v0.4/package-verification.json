@@ -1,0 +1,11 @@
+{
+  "zipSHA256": "c2e497bf92b14ba62e3b43156bbf57f303ef5a65481e1c388e055ed41e9bbb4b",
+  "externalZipHashSupplied": false,
+  "initialCRC": "PASS (at extraction)",
+  "immutableMembers": 17,
+  "SHA256SUMS": 16,
+  "manifestEntries": 15,
+  "approvedHTMLSHA256": "b7be5a11161f138c0182b059bd42ca26d0b56852b309db34b01b5b4792b68419",
+  "finalRecheck": "All extracted originals and repository archive byte-identical; all supplied member digests rechecked. Original Downloads ZIP no longer exists at final preflight, so ZIP CRC itself was not repeated.",
+  "status": "PASS"
+}

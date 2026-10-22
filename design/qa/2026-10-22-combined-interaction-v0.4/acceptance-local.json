@@ -1,0 +1,260 @@
+{
+  "rows": [
+    {
+      "id": "NAV-01",
+      "status": "PASS",
+      "evidence": "browser-matrix.json:68 actual App contexts, retained fixed nav/icons20px/44px targets/SafeArea simulation"
+    },
+    {
+      "id": "NAV-02",
+      "status": "PASS",
+      "evidence": "browser-matrix.json + regressions.json:all5 actual settled routes and single aria state"
+    },
+    {
+      "id": "NAV-03",
+      "status": "PASS",
+      "evidence": "chromium-frames.json,webkit-frames.json:4forward×mouse/touch×3intermediateframes per engine, real readonly neighbors"
+    },
+    {
+      "id": "NAV-04",
+      "status": "PASS",
+      "evidence": "chromium-frames.json,webkit-frames.json:4reverse×mouse/touch×3intermediateframes per engine, same-frame capsule transform"
+    },
+    {
+      "id": "NAV-05",
+      "status": "PASS",
+      "evidence": "frames:slow70px bounce; horizontalNavigation.test.ts:distance/velocity sign/threshold matrices"
+    },
+    {
+      "id": "NAV-06",
+      "status": "PASS",
+      "evidence": "frames:one adjacent per gesture; unit threshold/flick and local-day clamping"
+    },
+    {
+      "id": "NAV-07",
+      "status": "PASS",
+      "evidence": "frames:first/last boundary retained and no blank active view"
+    },
+    {
+      "id": "NAV-08",
+      "status": "PASS",
+      "evidence": "actual arbitrary5-tab clicks; only specified readonly target prepared"
+    },
+    {
+      "id": "NAV-09",
+      "status": "PASS",
+      "evidence": "controlled-lifecycle.json:old slow reads/late commit/latest click,12reads12disposals each; actual5click race"
+    },
+    {
+      "id": "NAV-10",
+      "status": "PASS",
+      "evidence": "current-route sameDOM retained; no commit/read replay in controlled lifecycle; perTab scroll saved"
+    },
+    {
+      "id": "NAV-11",
+      "status": "PASS",
+      "evidence": "actual pointercancel/width resize + controlled pagehide/modal/resize pending read and disposal"
+    },
+    {
+      "id": "NAV-12",
+      "status": "PASS",
+      "evidence": "actual vertical160px+20px horizontal touch does not route; axis unit matrices and original native-scroll gates"
+    },
+    {
+      "id": "NAV-13",
+      "status": "Pending",
+      "evidence": "Physical iOS edge-return gesture has no device evidence; local26px exclusion is browser-only."
+    },
+    {
+      "id": "FOOD-01",
+      "status": "PASS",
+      "evidence": "native-rail.json:browser-native Chromium touch and native desktop WebKit wheel drive distinct real panel offsets"
+    },
+    {
+      "id": "FOOD-02",
+      "status": "PASS",
+      "evidence": "frames:real203/444kcal dated snapshots, body native/injected touch and synchronized rail transform"
+    },
+    {
+      "id": "FOOD-03",
+      "status": "PASS",
+      "evidence": "frames:small slow bounce, one local-day commit, one aria-current date"
+    },
+    {
+      "id": "FOOD-04",
+      "status": "PASS",
+      "evidence": "local-date-edges.json + sharedDatePicker/foodRecovery original gates:click/date picker/recenter/Today"
+    },
+    {
+      "id": "FOOD-05",
+      "status": "PASS",
+      "evidence": "frames + date-concurrency.json:body data-food-date/aria and actual FoodLog totals from one date"
+    },
+    {
+      "id": "FOOD-06",
+      "status": "Pending",
+      "evidence": "Native Chromium touch/WebKit desktop wheel and CSSsnap pass. Physical WebKit/iOS touch momentum/feel remains Pending."
+    },
+    {
+      "id": "FOOD-07",
+      "status": "PASS",
+      "evidence": "original44 food/forms/edit/Sheet tests and actual modal/control arbitration; no parentTab capture"
+    },
+    {
+      "id": "FOOD-08",
+      "status": "PASS",
+      "evidence": "local-date-edges.json:6 browser month/year/DST contexts Shanghai/NewYork + local-calendar units"
+    },
+    {
+      "id": "FOOD-09",
+      "status": "PASS",
+      "evidence": "date-concurrency.json:actual IDBIndex.getAll readonly completion held; latest date settles then old result released;22-table equality"
+    },
+    {
+      "id": "GEST-01",
+      "status": "PASS",
+      "evidence": "frames:actual Weight30/90 scrollLeft changes, Progress active unchanged"
+    },
+    {
+      "id": "GEST-02",
+      "status": "PASS",
+      "evidence": "frames:actual Sleep/Water30/90 scrollLeft changes, Progress active unchanged"
+    },
+    {
+      "id": "GEST-03",
+      "status": "PASS",
+      "evidence": "actual Calendar month/day detail plus original calendar/date-picker regression gates"
+    },
+    {
+      "id": "GEST-04",
+      "status": "PASS",
+      "evidence": "actual Cardio modal blocks underlying Tab; original44 native Sheet/internal scroll and domain flows"
+    },
+    {
+      "id": "GEST-05",
+      "status": "Pending",
+      "evidence": "Modal, actual form values and mock VisualViewport pass. Real Chinese/English IME and keyboard remain Pending."
+    },
+    {
+      "id": "GEST-06",
+      "status": "PASS",
+      "evidence": "original trainingRecoveryExperience/Lifecycle + keyboard draft and actual Cardio draft preservation; no business-service edits"
+    },
+    {
+      "id": "GEST-07",
+      "status": "PASS",
+      "evidence": "68 contexts and detailed real-record22-table/config equality; original production profile baseline"
+    },
+    {
+      "id": "SHEET-01",
+      "status": "PASS",
+      "evidence": "browser-matrix.json:68 contexts/204training entries, each three same top/height;390 all24px/820px"
+    },
+    {
+      "id": "SHEET-02",
+      "status": "PASS",
+      "evidence": "motion-frames.json:actual rAF58px/275ms entry, backdrop210ms, finite exit; mid screenshots"
+    },
+    {
+      "id": "SHEET-03",
+      "status": "PASS",
+      "evidence": "actual repeated Strength→close→Cardio5cycles perengine; original20 lifecycle cycles and no ghost/lock"
+    },
+    {
+      "id": "SHEET-04",
+      "status": "PASS",
+      "evidence": "68 contexts including320/200%,shortscreen/landscape; original forms internal scroll/footer reachability"
+    },
+    {
+      "id": "SHEET-05",
+      "status": "Pending",
+      "evidence": "68-context simulated VisualViewport/draft/save-reachability/restored-height pass. Real iPhone keyboard/Safe Area remains Pending."
+    },
+    {
+      "id": "SHEET-06",
+      "status": "PASS",
+      "evidence": "motion/actual Esc/X/exact-once synchronous native close+unlocked body; original confirmations/lifecycle tests"
+    },
+    {
+      "id": "SHEET-07",
+      "status": "PASS",
+      "evidence": "actual CSSanimation:none/reducedmotion functions; controlled cancellation and original reducedmotion matrix"
+    },
+    {
+      "id": "WORK-01",
+      "status": "PASS",
+      "evidence": "trainingRecoveryExperience/trainingRecoveryLifecycle/trainingJournal unchanged domain assertions; currentWorkout/recovery states retained"
+    },
+    {
+      "id": "WORK-02",
+      "status": "PASS",
+      "evidence": "training unit/browser services autosave/multiple editor protection unchanged; existing44 complete"
+    },
+    {
+      "id": "WORK-03",
+      "status": "PASS",
+      "evidence": "original Cardio form/save/error/repeated-click/DB tests; only standalone Large variant changed"
+    },
+    {
+      "id": "WORK-04",
+      "status": "PASS",
+      "evidence": "trainingRecoveryLifecycle timer/audio/locks/pause existing gates; immersive entry skips exit ghost"
+    },
+    {
+      "id": "WORK-05",
+      "status": "PASS",
+      "evidence": "17frozen fixtures + old-history/trend/report/backup/cascade regressions; source-data-scope.json"
+    },
+    {
+      "id": "A11Y-01",
+      "status": "PASS",
+      "evidence": "browser current Tab/date,44px controls/16px editable fields and original keyboard gates. Existing smaller noneditable nav/meta typography intentionally retained by design-lock."
+    },
+    {
+      "id": "A11Y-02",
+      "status": "Pending",
+      "evidence": "Physical Safari VoiceOver, reading/focus and touch feel Pending."
+    },
+    {
+      "id": "VIS-01",
+      "status": "PASS",
+      "evidence": "68 App contexts:2engines×(4width×4font×2theme+short+landscape),actual screenshots inspected"
+    },
+    {
+      "id": "VIS-02",
+      "status": "PASS",
+      "evidence": "96actual main gesture intermediate samples+Food real neighbors/capsule; motion rAF and mid screenshots"
+    },
+    {
+      "id": "VIS-03",
+      "status": "PASS",
+      "evidence": "computed-style-comparison.json:approvedv0.4+START+candidate390light/dark; original production fields/tokens retained, demo content never copied"
+    },
+    {
+      "id": "DATA-01",
+      "status": "PASS",
+      "evidence": "1143units/78files +44 original gates/Backup/Restore/Sync;17fixtures/333protected inputs byte-identical"
+    },
+    {
+      "id": "DATA-02",
+      "status": "Pending",
+      "evidence": "START existing synthetic baseline PASS; Application/END exact same profile/no reset/offline check to be recorded after publication"
+    },
+    {
+      "id": "DATA-03",
+      "status": "PASS",
+      "evidence": "unit.txt/build.txt/raw-text:TypeScript1143unit/build actual exit0"
+    },
+    {
+      "id": "REL-01",
+      "status": "Pending",
+      "evidence": "Application/END CI+production exact assets/App/SW to be recorded after actual publication; local QA does not preclaim release"
+    },
+    {
+      "id": "REL-02",
+      "status": "Pending",
+      "evidence": "Physical iPhone/original installed PWA and personal-data continuity Pending."
+    }
+  ],
+  "note": "51items:local43PASS/8Pending including2publication checks. Final receipt updates actual DATA-02/REL-01 after both deployments;6device-inclusive items remain Pending. Browser portions of mixed items passed."
+}

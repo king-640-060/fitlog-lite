@@ -1,0 +1,30 @@
+{
+  "receipts": [
+    {
+      "engine": "chromium",
+      "method": "actual readonly IDBIndex.getAll completion held, latest date rendered first, old completion released last",
+      "heldRequests": 1,
+      "dates": [
+        "2026-10-21",
+        "2026-10-22",
+        "2026-10-23"
+      ],
+      "finalDate": "2026-10-23",
+      "all22Hash": "f6556bcba5574509948e1263a5178c53d60e790466cb1d757f08a65c716dbf5d",
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "method": "actual readonly IDBIndex.getAll completion held, latest date rendered first, old completion released last",
+      "heldRequests": 1,
+      "dates": [
+        "2026-10-21",
+        "2026-10-22",
+        "2026-10-23"
+      ],
+      "finalDate": "2026-10-23",
+      "all22Hash": "e1199425dd2d0eb86cbe337d51f9b22a24b3216a15deafced497e0f2623b3f3d",
+      "status": "PASS"
+    }
+  ]
+}

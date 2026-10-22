@@ -1,0 +1,8 @@
+{"width":320,"effectiveLabelsABC":true,"editorSaveReopenRestart":true,"probeCannotOverrideLabel":true,"visionOnlyEditorContext":true}
+{"mode":"local","width":320,"height":812,"sharedList":true,"legacy":true,"dualRouting":true,"partialSuccess":true,"staleImage":true,"chatOnlyChange":true,"errors":[]}
+{"width":375,"effectiveLabelsABC":true,"editorSaveReopenRestart":true,"probeCannotOverrideLabel":true,"visionOnlyEditorContext":true}
+{"mode":"local","width":375,"height":812,"sharedList":true,"legacy":true,"dualRouting":true,"partialSuccess":true,"staleImage":true,"chatOnlyChange":true,"errors":[]}
+{"width":390,"effectiveLabelsABC":true,"editorSaveReopenRestart":true,"probeCannotOverrideLabel":true,"visionOnlyEditorContext":true}
+{"mode":"local","width":390,"height":844,"sharedList":true,"legacy":true,"dualRouting":true,"partialSuccess":true,"staleImage":true,"chatOnlyChange":true,"errors":[]}
+{"width":430,"effectiveLabelsABC":true,"editorSaveReopenRestart":true,"probeCannotOverrideLabel":true,"visionOnlyEditorContext":true}
+{"mode":"local","width":430,"height":932,"sharedList":true,"legacy":true,"dualRouting":true,"partialSuccess":true,"staleImage":true,"chatOnlyChange":true,"errors":[]}

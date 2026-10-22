@@ -1,0 +1,26 @@
+chromium slow {
+  active: 'plan',
+  commits: [ 'plan' ],
+  events: [ 'resize', 'abort progress' ],
+  reads: [
+    { tab: 'progress', aborted: true },
+    { tab: 'plan', aborted: false }
+  ]
+}
+chromium slow done
+chromium repeat done
+chromium commit queue done
+{"engine":"chromium","type":"actual-coordinator-controlled-promise-harness","slowPreparation":true,"lastClickDuringCommit":true,"repeatNoCommit":true,"resizePagehideModalAbort":true,"destroyPendingRead":true,"commits":["plan","workout","plan","food","today","workout","today"],"reads":12,"disposals":12,"errors":[],"status":"PASS"}
+webkit slow {
+  active: 'plan',
+  commits: [ 'plan' ],
+  events: [ 'abort progress' ],
+  reads: [
+    { tab: 'progress', aborted: true },
+    { tab: 'plan', aborted: false }
+  ]
+}
+webkit slow done
+webkit repeat done
+webkit commit queue done
+{"engine":"webkit","type":"actual-coordinator-controlled-promise-harness","slowPreparation":true,"lastClickDuringCommit":true,"repeatNoCommit":true,"resizePagehideModalAbort":true,"destroyPendingRead":true,"commits":["plan","workout","plan","food","today","workout","today"],"reads":12,"disposals":12,"errors":[],"status":"PASS"}

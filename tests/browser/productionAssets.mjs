@@ -1,3 +1,4 @@
+import {waitForMainNavigation} from './navigationSettlement.mjs'
 // Compare actual production asset bytes with the local verified Pages build.
 import fs from 'node:fs'
 import crypto from 'node:crypto'
@@ -20,7 +21,7 @@ try{
  for(const file of Object.keys(expected))assert.ok(pwa.sw.includes(`assets/${file}`),'SW precaches index asset '+file)
  assert.ok(pwa.sw.includes(`sw-build-${build}.js`));assert.ok(!pwa.sw.includes('build-info.json'),'deployment metadata stays network-only')
  assert.equal(pwa.sw,fs.readFileSync('dist/sw.js','utf8'),'production SW exact bytes match local')
- for(const tab of ['today','plan','food','workout','progress']){await page.locator(`[data-tab=${tab}]`).click();assert.equal(await page.locator('#open-ai-assistant').count(),1);assert.equal(await page.locator('#open-management').count(),1)}
+ for(const tab of ['today','plan','food','workout','progress']){await page.locator(`[data-tab=${tab}]`).click();await waitForMainNavigation(page,tab);assert.equal(await page.locator('#open-ai-assistant').count(),1);assert.equal(await page.locator('#open-management').count(),1)}
  await page.locator('#open-management').click();await page.locator('#more-ai-settings').click();await page.waitForSelector('.ai-profile-form');await page.locator('dialog [data-close]').click()
  await page.locator('#open-management').click();await page.locator('#more-github-sync').click();await page.waitForSelector('.github-sync');await page.locator('dialog [data-close]').click()
  assert.deepEqual(errors,[]);console.log(JSON.stringify({build,assets,swPrecacheMatches:true,swExactBytes:true,mainViews:5,aiSettings:true,githubSyncEntry:true,errors}))

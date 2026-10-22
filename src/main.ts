@@ -1,3 +1,5 @@
+import { createFoodDateNavigation } from './ui/foodDateNavigation'
+import { createPageNavigation, type NavigationPreview } from './ui/horizontalNavigation'
 import { replaceReportHtml } from './ui/reportChapters'
 import { acquirePelvicRangeLease } from './services/pendingHealthOperations'
 import { loadNutritionCycleReport } from './services/nutritionCycleReportService'
@@ -51,6 +53,7 @@ import './styles/modules.css'
 import './styles/appearance.css'
 import './styles/cycleReport.css'
 import './styles/history.css'
+import './styles/horizontalNavigation.css'
 import { showNutritionStrategyPicker, showNutritionStrategyManager } from './ui/nutritionStrategies'
 import { bindEnergyEditor } from './ui/energyEditor'
 import { showFoodVisionImport } from './ui/foodVisionImport'
@@ -117,6 +120,10 @@ function recoveryUi(): RecoveryUi { return { esc, openModal, confirm: confirmAct
 let activeTab: Tab = 'today'
 let renderedTab: Tab | undefined
 let rootRenderVersion = 0
+const mainTabs = ['today', 'plan', 'food', 'workout', 'progress'] as const
+let pageNavigation: ReturnType<typeof createPageNavigation<Tab>> | undefined
+const previewDisposers = new WeakMap<HTMLElement, () => void>()
+const previewSignals = new WeakMap<HTMLElement, AbortSignal>()
 let planView: PlanView = 'today'
 let planTagFilterId: string | undefined
 let planCompletedOpen = false
@@ -128,6 +135,7 @@ let foodDate = getLocalDateString()
 let foodHeaderEvents: AbortController | undefined
 let foodRailEvents: AbortController | undefined
 let foodContentVersion = 0
+let foodNavigation: ReturnType<typeof createFoodDateNavigation> | undefined
 let workoutDate = getLocalDateString()
 let currentWorkout: Workout | undefined
 let workoutEditorOpen = false
@@ -278,13 +286,22 @@ function chooseNutritionTargetConflict(): Promise<'preserve' | 'replace' | undef
   })
 }
 
+function pageHeaderHtml(tab: Tab): string {
+  const today = getLocalDateString()
+  const hour = new Date().getHours()
+  const title = tab === 'today' ? (hour < 11 ? '早上好' : hour < 18 ? '下午好' : '晚上好') : tab === 'plan' ? '计划' : tab === 'food' ? '饮食' : tab === 'workout' ? '训练' : '进度'
+  const subtitle = tab === 'today' ? `${formatHeaderDate(today).replace('今天 · ', '')} · 今天也继续保持` : tab === 'workout' ? formatHeaderDate(workoutDate) : tab === 'progress' ? '看见每一次积累' : ''
+  return `<header class="topbar${tab === 'today' ? ' today-topbar' : tab === 'food' ? ' food-topbar' : ''}"><div><h1>${title}</h1>${subtitle ? `<p class="header-date">${subtitle}</p>` : ''}</div><div class="topbar-page-actions">${tab === 'food' ? '<button class="food-page-action" id="use-diet-template" type="button">使用模板</button><button class="food-page-action" id="food-library" type="button">食物库</button>' : ''}${tab === 'plan' ? `<button class="icon-btn quiet" id="plan-add-task" type="button" aria-label="新建任务" hidden>${icon('plus', 20)}</button>` : ''}<button class="icon-btn quiet topbar-ai" id="open-ai-assistant" type="button" aria-label="AI 助手">${icon('sparkles', 20)}</button><button class="icon-btn quiet topbar-management" id="open-management" type="button" aria-label="管理与设置">${icon('more', 20)}</button></div></header>`
+}
+
 async function render(): Promise<void> {
+  pageNavigation?.interrupt()
+  foodNavigation?.destroy(); foodNavigation = undefined
   recordsDispose?.();recordsDispose=undefined
   nutritionDispose?.(); nutritionDispose = undefined
   recoveryDispose?.(); recoveryDispose = undefined
   const renderVersion = String(++rootRenderVersion)
   const sameTab = renderedTab === activeTab
-  const navigation = renderedTab !== undefined && renderedTab !== activeTab
   const targetTab = activeTab
   renderedTab = activeTab
   const previousNav = app.querySelector<HTMLElement>('.bottom-nav')
@@ -294,13 +311,10 @@ async function render(): Promise<void> {
   foodContentVersion += 1
   document.body.classList.remove('immersive')
   const today = getLocalDateString()
-  const hour = new Date().getHours()
-  const title = activeTab === 'today' ? (hour < 11 ? '早上好' : hour < 18 ? '下午好' : '晚上好') : activeTab === 'plan' ? '计划' : activeTab === 'food' ? '饮食' : activeTab === 'workout' ? '训练' : '进度'
-  const subtitle = activeTab === 'today' ? `${formatHeaderDate(today).replace('今天 · ', '')} · 今天也继续保持` : activeTab === 'workout' ? formatHeaderDate(workoutDate) : activeTab === 'progress' ? '看见每一次积累' : ''
   const markup = `
     <div class="app-frame">
-      <header class="topbar${activeTab === 'today' ? ' today-topbar' : activeTab === 'food' ? ' food-topbar' : ''}"><div><h1>${title}</h1>${subtitle ? `<p class="header-date">${subtitle}</p>` : ''}</div><div class="topbar-page-actions">${activeTab === 'food' ? '<button class="food-page-action" id="use-diet-template" type="button">使用模板</button><button class="food-page-action" id="food-library" type="button">食物库</button>' : ''}${activeTab === 'plan' ? `<button class="icon-btn quiet" id="plan-add-task" type="button" aria-label="新建任务" hidden>${icon('plus', 20)}</button>` : ''}<button class="icon-btn quiet topbar-ai" id="open-ai-assistant" type="button" aria-label="AI 助手">${icon('sparkles', 20)}</button><button class="icon-btn quiet topbar-management" id="open-management" type="button" aria-label="管理与设置">${icon('more', 20)}</button></div></header>
-      <main id="view" class="${activeTab === 'today' ? 'today-dashboard' : activeTab === 'workout' ? 'workout-page' : ''}" aria-live="polite"></main>
+      <div class="page-swipe-stage"><div class="page-current">${pageHeaderHtml(activeTab)}
+      <main id="view" class="${activeTab === 'today' ? 'today-dashboard' : activeTab === 'workout' ? 'workout-page' : ''}" aria-live="polite"></main></div></div>
       <nav class="bottom-nav" aria-label="主导航">
         <button data-tab="today" class="${activeTab === 'today' ? 'active' : ''}" aria-current="${activeTab === 'today' ? 'page' : 'false'}">${icon('home', 20)}<span>今日</span></button>
         <button data-tab="plan" class="${activeTab === 'plan' ? 'active' : ''}" aria-current="${activeTab === 'plan' ? 'page' : 'false'}">${icon('calendar', 20)}<span>计划</span></button>
@@ -322,10 +336,11 @@ async function render(): Promise<void> {
       button.classList.toggle('active', selected); button.setAttribute('aria-current', selected ? 'page' : 'false')
     })
   }
-  if (!previousNav) document.querySelectorAll<HTMLButtonElement>('[data-tab]').forEach((button) => button.addEventListener('click', () => {
-    activeTab = button.dataset.tab as Tab
-    void render().catch(fail)
-  }))
+  if (!pageNavigation) pageNavigation = createPageNavigation({
+    tabs: mainTabs, stage: app.querySelector('.page-swipe-stage')!, current: app.querySelector('.page-current')!, nav: app.querySelector('.bottom-nav')!,
+    active: () => activeTab, prepare: prepareTabPreview,
+    commit: async tab => { activeTab = tab; await render() }, fail,
+  })
   app.querySelector('#open-ai-assistant')?.addEventListener('click', () => { void launchAssistant().catch(fail) })
   app.querySelector('#open-management')?.addEventListener('click', showManagementHub)
   app.querySelector('#plan-add-task')?.addEventListener('click', () => void showTaskEditor(undefined, planView === 'today' ? today : undefined))
@@ -336,7 +351,43 @@ async function render(): Promise<void> {
     case 'workout': await renderWorkoutPage(); break
     case 'progress': await renderProgressPage(); break
   }
-  if (navigation && currentView.isConnected && targetTab === activeTab && currentView.dataset.renderVersion === renderVersion) animateMotion(currentView, 'navigation')
+  if (currentView.isConnected && targetTab === activeTab && currentView.dataset.renderVersion === renderVersion) pageNavigation.update()
+}
+
+/** Read-only, inert neighbors use the same production renderers, never route activation or write services. */
+async function prepareTabPreview(tab: Tab, signal: AbortSignal): Promise<NavigationPreview> {
+  const element = document.createElement('div'); element.className = 'page-preview'; element.inert = true; element.setAttribute('aria-hidden', 'true')
+  const headerHost = document.createElement('div'); headerHost.innerHTML = pageHeaderHtml(tab); const header = headerHost.firstElementChild!
+  const view = document.createElement('div'); view.className = tab === 'today' ? 'today-dashboard' : tab === 'workout' ? 'workout-page' : ''; view.dataset.previewTab = tab
+  previewSignals.set(view,signal)
+  element.append(header, view); element.style.visibility = 'hidden'; app.querySelector('.page-swipe-stage')!.append(element)
+  const dispose = () => { previewDisposers.get(view)?.(); previewDisposers.delete(view); element.remove() }
+  signal.addEventListener('abort', dispose, { once:true })
+  try {
+    if (tab === 'today') await renderTodayPage(view)
+    else if (tab === 'plan') await renderPlanPage(view)
+    else if (tab === 'food') await renderFoodPage(view)
+    else if (tab === 'workout') await renderWorkoutPage(view)
+    else if (progressView === 'trend') await renderWeightPage(true, view)
+    else if (progressView === 'calendar') await renderCalendarOverview(true, view)
+    else await renderReportsPage(view)
+    if (signal.aborted) throw new DOMException('Navigation canceled','AbortError')
+    // No duplicate document IDs, live regions or focusable preview controls enter the active tree.
+    for (const node of element.querySelectorAll('[id],[aria-live]')) { node.removeAttribute('id'); node.removeAttribute('aria-live') }
+    element.style.removeProperty('visibility'); return { element, dispose }
+  } catch (error) { dispose(); throw error }
+}
+function waitForPreview(root: HTMLElement, selector: string): Promise<void> {
+  if (root.querySelector(selector)) return Promise.resolve()
+  const signal = previewSignals.get(root)
+  return new Promise((resolve, reject) => {
+    const clean = () => { observer.disconnect(); clearTimeout(timer); signal?.removeEventListener('abort', abort) }
+    const abort = () => { clean(); reject(new DOMException('Navigation canceled','AbortError')) }
+    const timer = window.setTimeout(() => { clean(); reject(new Error('相邻页面未能加载，请重试')) }, 10000)
+    const observer = new MutationObserver(() => { if (root.querySelector(selector)) { clean(); resolve() } })
+    observer.observe(root, { childList:true, subtree:true })
+    if (signal?.aborted) abort(); else signal?.addEventListener('abort', abort, { once:true })
+  })
 }
 
 const habitToggleQueue = new Map<string, Promise<void>>()
@@ -491,8 +542,8 @@ async function refreshTodayPlanCard(): Promise<void> {
   bindTodayPlanCard(card)
 }
 
-async function renderTodayPage(): Promise<void> {
-  const view = document.querySelector<HTMLElement>('#view')!
+async function renderTodayPage(preview?: HTMLElement): Promise<void> {
+  const view = preview ?? document.querySelector<HTMLElement>('#view')!
   const viewVersion = view.dataset.renderVersion
   const today = getLocalDateString()
   const [nutrition, workouts, cardioSessions, pelvicSessions, weights, allPelvicSessions, habits, habitCheckIns, todayTasks, taskTags] = await Promise.all([
@@ -523,6 +574,7 @@ async function renderTodayPage(): Promise<void> {
     <section class="today-card today-activity-card weight-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon weight-icon">${icon('scale', 20)}</span><h2>体重</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 16)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(weightState.status)}</strong><span class="today-activity-meta">${esc(weightState.meta)}</span></div><button class="secondary today-activity-action" id="today-record-weight">${esc(weightState.action)}</button></div></section>
     <section class="today-card today-activity-card pelvic-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon pelvic-icon">${icon('leaf', 20)}</span><h2>凯格尔训练</h2></div><button class="text-btn" id="today-pelvic-history">训练记录 ${icon('chevron', 16)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(pelvicState.status)}</strong><span class="today-activity-meta">${esc(pelvicState.meta)}</span></div><button class="secondary today-activity-action" id="today-pelvic">${esc(pelvicState.action)}</button></div></section>
     ${todayHabitCardHtml(habits, habitCheckIns, today)}${recoverySlotHtml()}`
+  if (preview) { previewDisposers.set(view, mountRecovery(view.querySelector('[data-recovery-root]')!, recoveryUi())); await waitForPreview(view, '.water-card'); return }
   view.querySelector('#today-food-details')?.addEventListener('click', () => { activeTab = 'food'; foodDate = today; void render().catch(fail) })
   view.querySelector('#today-workout-details')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = false; void render().catch(fail) })
   view.querySelector('#today-workout')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = openWorkout; workoutEditorOpen = Boolean(openWorkout); showWorkoutHistory = false; void render().then(() => { if (!openWorkout) window.scrollTo({ top: 0, behavior: 'instant' }) }).catch(fail) })
@@ -599,14 +651,15 @@ async function readReportSurface<T>(view:HTMLElement,version:string|undefined,re
  page?.setAttribute('aria-busy','true')
  try{return await read()}finally{if(view.dataset.renderVersion===version){for(const control of controls)if(control.isConnected){control.disabled=reportDisabledBeforeFetch.get(control)??false;reportDisabledBeforeFetch.delete(control)}page?.removeAttribute('aria-busy')}}
 }
-async function renderReportsPage():Promise<void> {
-  const view=document.querySelector<HTMLElement>('#view')!,viewVersion=view.dataset.renderVersion,today=getLocalDateString(),mode=reportMode,anchor=reportAnchorDate
-  if(mode==='cycle'){await renderCycleReportsPage(view,viewVersion,today);return}
+async function renderReportsPage(preview?: HTMLElement):Promise<void> {
+  const view=preview??document.querySelector<HTMLElement>('#view')!,viewVersion=view.dataset.renderVersion,today=getLocalDateString(),mode=reportMode,anchor=reportAnchorDate
+  if(mode==='cycle'){await renderCycleReportsPage(view,viewVersion,today,preview);return}
   const analysisMode=mode==='custom'?'month':mode,override=mode==='custom'?customReportRange:undefined
   let data=await readReportSurface(view,viewVersion,()=>loadCoachReport(analysisMode,anchor,today,db,override)),report=data.report
-  if(activeTab!=='progress'||progressView!=='reports'||!view.isConnected||view.dataset.renderVersion!==viewVersion)return
+  if((!preview&&(activeTab!=='progress'||progressView!=='reports'))||!view.isConnected||view.dataset.renderVersion!==viewVersion)return
   const isCurrent=mode==='custom'||report.range.start===getReportRange(analysisMode,today).start,period=mode==='day'?'天':mode==='week'?'周':'月'
   const retainedTabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page">${reportKindsHtml()}<div class="report-mode" role="group" aria-label="报告周期">${(['day','week','month','custom'] as const).map(m=>`<button data-report-mode="${m}" class="${mode===m?'active':''}" aria-pressed="${mode===m}">${m==='day'?'日报':m==='week'?'周报':m==='month'?'月报':'自定义'}</button>`).join('')}</div><div class="report-period" ${mode==='custom'?'hidden':''}><button id="report-previous" aria-label="上一${period}">‹</button>${mode==='day'?`<button class="text-btn fitlog-date-trigger" id="report-date-picker">${reportPeriodLabel(report)}</button>`:`<strong>${reportPeriodLabel(report)}</strong>`}<button id="report-next" aria-label="下一${period}" ${isCurrent?'disabled':''}>›</button></div>${isCurrent?'':`<button class="report-return" id="report-return">${mode==='day'?'回到今天':'回到本'+period}</button>`}<div class="report-custom-range" ${mode==='custom'?'':'hidden'}><button class="secondary" type="button" data-report-start>开始 ${customReportRange.start}</button><button class="secondary" type="button" data-report-end>结束 ${customReportRange.end}</button><p class="report-note">最多366天；实际统计仅截至今天。</p></div><div class="report-content">${coachReportHtml(data,coachState,analysisMode,esc)}</div></div>`)
+  if (preview) { previewDisposers.set(view, bindCoachPlots(view.querySelector('.report-content')!, () => {})); return }
   if(!retainedTabs)bindProgressTabs(view)
   view.querySelector('[data-report-kind=daily]')?.addEventListener('click',()=>{reportMode='week';void render().catch(fail)})
   view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach(b=>b.addEventListener('click',()=>{reportMode=b.dataset.reportMode as ReportMode|'cycle'|'custom';void render().catch(fail)}))
@@ -639,12 +692,12 @@ async function renderReportsPage():Promise<void> {
 
 }
 
-async function renderCycleReportsPage(view:HTMLElement,version:string|undefined,today:string):Promise<void> {
+async function renderCycleReportsPage(view:HTMLElement,version:string|undefined,today:string,preview?:HTMLElement):Promise<void> {
   let data=await readReportSurface(view,version,()=>loadNutritionCycleReport(selectedCycleReport,today,db,reportTemplateFilter))
-  if(!view.isConnected||view.dataset.renderVersion!==version||progressView!=='reports'||reportMode!=='cycle')return
-  selectedCycleReport=data.selected?.id
-  reportTemplateFilter=data.templateFilter
+  if(!view.isConnected||view.dataset.renderVersion!==version||(!preview&&progressView!=='reports')||reportMode!=='cycle')return
+  if (!preview) { selectedCycleReport=data.selected?.id; reportTemplateFilter=data.templateFilter }
   const tabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page">${reportKindsHtml(true)}<div class="report-content">${nutritionCycleReportHtml(data,esc,coachState)}</div></div>`)
+  if (preview) return
   if(!tabs)bindProgressTabs(view)
   view.querySelector('[data-report-kind=daily]')?.addEventListener('click',()=>{reportMode='week';void render().catch(fail)})
   view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach(b=>b.addEventListener('click',()=>{reportMode=b.dataset.reportMode as ReportMode|'cycle'|'custom';void render().catch(fail)}))
@@ -710,17 +763,17 @@ function planDateHeading(date: string, today: string): string {
 }
 
 let planRenderVersion = 0
-async function renderPlanPage(): Promise<void> {
-  const version = ++planRenderVersion
-  const view = document.querySelector<HTMLElement>('#view')!
+async function renderPlanPage(preview?: HTMLElement): Promise<void> {
+  const version = preview ? planRenderVersion : ++planRenderVersion
+  const view = preview ?? document.querySelector<HTMLElement>('#view')!
   const viewVersion = view.dataset.renderVersion
   const today = getLocalDateString()
   const [tasks, allTags] = await Promise.all([
     planView === 'today' ? getTasksByDate(today) : planView === 'upcoming' ? getUpcomingTasks(today) : getInboxTasks(),
     getTaskTags(),
   ])
-  if (activeTab !== 'plan' || version !== planRenderVersion || !view.isConnected || view.dataset.renderVersion !== viewVersion) return
-  if (planTagFilterId && !allTags.some((tag) => tag.id === planTagFilterId)) planTagFilterId = undefined
+  if ((!preview && (activeTab !== 'plan' || version !== planRenderVersion)) || !view.isConnected || view.dataset.renderVersion !== viewVersion) return
+  if (!preview && planTagFilterId && !allTags.some((tag) => tag.id === planTagFilterId)) planTagFilterId = undefined
   const filtered = sortTasksForPlan(planTagFilterId ? tasks.filter((task) => task.tagIds.includes(planTagFilterId!)) : tasks)
   const tags = new Map(allTags.map((tag) => [tag.id, tag]))
   const currentFilter = allTags.find((tag) => tag.id === planTagFilterId)
@@ -745,6 +798,7 @@ async function renderPlanPage(): Promise<void> {
   const context = planView === 'today' ? planDateHeading(today, today) : planView === 'upcoming' ? '未来安排' : '未安排日期'
   const filter = `<button type="button" id="plan-tag-filter" class="plan-filter-button${currentFilter ? ' is-active' : ''}" aria-label="${currentFilter ? `当前筛选标签 ${esc(currentFilter.name)}，选择其他标签` : '筛选标签'}"><span>${currentFilter ? `#${esc(currentFilter.name)}` : '标签'}</span>${icon('chevron', 14)}</button>`
   const retainedTabs = setTabbedViewHtml(view, `<div class="plan-page"><div class="plan-tabs" role="tablist" aria-label="计划视图"><button role="tab" data-plan-view="today" aria-selected="${planView === 'today'}" class="${planView === 'today' ? 'active' : ''}">今天</button><button role="tab" data-plan-view="upcoming" aria-selected="${planView === 'upcoming'}" class="${planView === 'upcoming' ? 'active' : ''}">近期</button><button role="tab" data-plan-view="inbox" aria-selected="${planView === 'inbox'}" class="${planView === 'inbox' ? 'active' : ''}">收件箱</button></div><div class="plan-context-row"><p class="plan-context-label">${esc(context)}</p><div class="plan-context-actions">${currentFilter ? `<div class="plan-filter-active">${filter}<button type="button" id="plan-tag-filter-clear" class="plan-filter-clear" aria-label="清除标签筛选 ${esc(currentFilter.name)}">${icon('x', 16)}</button></div>` : filter}</div></div>${planProgress}${content}</div>`)
+  if (preview) return
   const topCreate = app.querySelector<HTMLButtonElement>('#plan-add-task')
   if (topCreate) topCreate.hidden = Boolean(view.querySelector('.plan-empty'))
   if (!retainedTabs) view.querySelectorAll<HTMLButtonElement>('[data-plan-view]').forEach((button) => button.addEventListener('click', () => { if (planView === button.dataset.planView) return; planView = button.dataset.planView as PlanView; void renderPlanPage().catch(fail) }))
@@ -952,8 +1006,8 @@ function showManagementHub(): void {
   view.querySelector('#more-about')?.addEventListener('click', () => surface.navigate('关于 FitLog Lite', surface => { managementModal(surface)('关于 FitLog Lite', `<div class="about-card"><span class="brand-mark large">${icon('leaf', 30)}</span><h2>FitLog Lite</h2><p>一款轻盈、安静的本地个人健康记录工具。</p><small>饮食 · 力量训练 · 体重 · 凯格尔训练</small></div>`) }))
 }
 
-async function renderCalendarOverview(withProgressTabs = false): Promise<void> {
-  const view = document.querySelector<HTMLElement>('#view')!
+async function renderCalendarOverview(withProgressTabs = false, preview?: HTMLElement): Promise<void> {
+  const view = preview ?? document.querySelector<HTMLElement>('#view')!
   const viewVersion = view.dataset.renderVersion
   let summaries = await loadMonthSummaries(calendarYear, calendarMonth)
   if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
@@ -967,6 +1021,7 @@ async function renderCalendarOverview(withProgressTabs = false): Promise<void> {
     if(focused)host.querySelector<HTMLButtonElement>(`.calendar-day[data-date="${focused}"]`)?.focus({preventScroll:true})
   }
   draw()
+  if (preview) return
   let signature=JSON.stringify([...summaries])
   const sub=liveQuery(()=>loadMonthSummaries(year,month)).subscribe({next:value=>{if(!host.isConnected||view.dataset.renderVersion!==viewVersion)return;const next=JSON.stringify([...value]);if(next===signature)return;signature=next;summaries=value;draw()},error:fail})
   recordsDispose=()=>sub.unsubscribe()
@@ -1111,9 +1166,10 @@ function updateFoodTodayShortcut(): void {
 }
 
 function commitFoodDate(date: string, forceWindow = false): void {
-  if (!shouldCommitFoodDate(date, foodDate) && !forceWindow) { updateFoodTodayShortcut(); return }
+  if (!shouldCommitFoodDate(date, foodDate) && !forceWindow) { foodNavigation?.reset(); updateFoodTodayShortcut(); return }
   const changed = date !== foodDate
   foodDate = date
+  const content = app.querySelector<HTMLElement>('.food-content'); if (content) { content.inert = true; content.setAttribute('aria-busy','true') }
   updateFoodTodayShortcut()
   const rail = app.querySelector<HTMLElement>('.food-date-rail')
   if (rail) updateFoodRail(rail, date, forceWindow)
@@ -1163,7 +1219,7 @@ function bindFoodRail(rail: HTMLElement): void {
     })
   }
   const settle = () => {
-    if (!rail.isConnected || activeTab !== 'food') return
+    if (!rail.isConnected || activeTab !== 'food' || foodNavigation?.dragging) return
     const center = rail.getBoundingClientRect().left + rail.clientWidth / 2
     let nearest: HTMLButtonElement | undefined
     let distance = Number.POSITIVE_INFINITY
@@ -1177,6 +1233,7 @@ function bindFoodRail(rail: HTMLElement): void {
     scheduleFocus()
   }
   rail.addEventListener('scroll', () => {
+    foodNavigation?.railProgress()
     state(touchActive || pointerId !== undefined ? 'dragging' : 'settling')
     scheduleFocus()
     if (!supportsScrollEnd) {
@@ -1256,18 +1313,17 @@ function bindFoodRail(rail: HTMLElement): void {
   }, { once: true })
 }
 
-async function renderFoodPage(): Promise<void> {
-  nutritionDispose?.(); nutritionDispose = undefined
-  updateFoodTodayShortcut()
-  const requestedDate = foodDate
-  const requestVersion = ++foodContentVersion
-  const view = document.querySelector<HTMLElement>('#view')!
+async function renderFoodPage(preview?: HTMLElement): Promise<void> {
+  if (!preview) { nutritionDispose?.(); nutritionDispose = undefined; updateFoodTodayShortcut() }
+  const requestedDate = preview?.dataset.previewDate ?? foodDate
+  const requestVersion = preview ? foodContentVersion : ++foodContentVersion
+  const view = preview ?? document.querySelector<HTMLElement>('#view')!
   const [nutrition, dietEvents, scheduled] = await Promise.all([
     readDailyNutritionSummary(requestedDate),
     db.dietEvents.where('date').equals(requestedDate).sortBy('createdAt'),
     scheduledNutritionDay(requestedDate),
   ])
-  if (activeTab !== 'food' || !view.isConnected || !isCurrentFoodRender(requestVersion, foodContentVersion, requestedDate, foodDate)) return
+  if (!view.isConnected || (!preview && (activeTab !== 'food' || !isCurrentFoodRender(requestVersion, foodContentVersion, requestedDate, foodDate)))) return
   const { logs, target, totals } = nutrition
   const isToday = requestedDate === getLocalDateString()
   const previous = new Map<string, PreviousRingValue>()
@@ -1294,11 +1350,13 @@ async function renderFoodPage(): Promise<void> {
     view.innerHTML = `<div class="food-date-navigation"><div class="food-date-helper"><button type="button" id="food-date-picker-open" class="food-date-jump fitlog-date-trigger" aria-label="选择饮食记录日期">${icon('calendar', 16)}<span>选择日期</span></button><button class="food-today-shortcut" id="food-return-today" type="button" aria-label="回到今天" hidden>回到今天</button></div><div class="food-date-rail-shell"><div class="food-date-selection" aria-hidden="true"></div><div class="food-date-rail" role="group" aria-label="切换饮食记录日期"><div class="food-date-rail-track"></div></div></div></div><div class="food-content"></div>`
     rail = view.querySelector<HTMLElement>('.food-date-rail')!
     content = view.querySelector<HTMLElement>('.food-content')!
-    updateFoodTodayShortcut()
+    if (!preview) updateFoodTodayShortcut()
     updateFoodRail(rail, requestedDate, true)
-    bindFoodRail(rail)
+    if (!preview) bindFoodRail(rail)
   }
+  if (!preview) { foodNavigation?.destroy(); foodNavigation = undefined }
   content.innerHTML = slotHtml
+  content.inert = false; content.removeAttribute('aria-busy')
   view.dataset.foodContentDate = requestedDate
   const body = content.firstElementChild as HTMLElement
   if (firstAppearance || previousDate === requestedDate) {
@@ -1306,11 +1364,23 @@ async function renderFoodPage(): Promise<void> {
     body.querySelectorAll<SVGCircleElement>('[data-final-offset]').forEach((ring) => { ring.style.strokeDashoffset = ring.dataset.finalOffset ?? '' })
     body.querySelectorAll<HTMLElement>('[data-count-to]').forEach((number) => { number.textContent = formatNumber(Number(number.dataset.countTo)) })
   }
+  if (preview) return
   body.querySelector('[data-food-cycle-target]')?.addEventListener('click',()=>void showScheduledTargetPreview(nutritionStrategyUi(),requestedDate).catch(fail))
   body.querySelector('[data-food-cycle-diet]')?.addEventListener('click',()=>void showScheduledDietPreview(requestedDate).catch(fail))
   bindFoodContent(body, target, logs)
   bindDietEvents(body, requestedDate, dietEvents, dietEventUi())
   bindFoodHeader()
+  foodNavigation = createFoodDateNavigation({ content, rail, date: requestedDate,
+    preview: async date => {
+      const mount = document.createElement('div'); mount.className = 'food-preview-mount'; mount.inert = true; mount.dataset.previewDate = date; mount.setAttribute('aria-hidden','true'); view.append(mount)
+      try { await renderFoodPage(mount); return mount.querySelector<HTMLElement>('.food-content-body')! } finally { mount.remove() }
+    },
+    select: async date => {
+      foodDate = date; content!.inert = true; content!.setAttribute('aria-busy','true')
+      updateFoodTodayShortcut(); updateFoodRail(rail!,date); await renderFoodPage()
+      if (activeTab === 'food' && foodDate === date) { centerFoodRail(rail!,date,'auto',true); paintFoodRailFocus(rail!) }
+    }, fail,
+  })
   const scheduledSignature=JSON.stringify(scheduled)
   const scheduleSub=liveQuery(()=>scheduledNutritionDay(requestedDate)).subscribe({next:next=>{if(activeTab==='food'&&foodDate===requestedDate&&view.isConnected&&JSON.stringify(next)!==scheduledSignature)void renderFoodPage().catch(fail)},error:fail})
   const stopNutrition = observeDailyNutritionSummary(requestedDate, nutrition, () => { if (activeTab === 'food' && foodDate === requestedDate && view.isConnected) void renderFoodPage().catch(fail) }, fail)
@@ -1532,16 +1602,17 @@ function showImportPreview(preview: ImportPreview, existing: Food[], surface?: M
   })
 }
 
-async function renderWorkoutPage(): Promise<void> {
-  const view = document.querySelector<HTMLElement>('#view')!
+async function renderWorkoutPage(preview?: HTMLElement): Promise<void> {
+  const view = preview ?? document.querySelector<HTMLElement>('#view')!
   const viewVersion = view.dataset.renderVersion
-  if (trainingCompletion) { trainingCompletion.render(); return }
-  if (pelvicTimerState && pelvicTimerState.status !== 'completed') { renderPelvicFloorTimer(); return }
-  if (showWorkoutHistory) { await renderWorkoutHistory(); return }
+  if (!preview && trainingCompletion) { trainingCompletion.render(); return }
+  if (!preview && pelvicTimerState && pelvicTimerState.status !== 'completed') { renderPelvicFloorTimer(); return }
+  if (!preview && showWorkoutHistory) { await renderWorkoutHistory(); return }
   if (workoutEditorOpen) {
-    if (!currentWorkout) currentWorkout = await findOpenWorkout(workoutDate)
-    if (currentWorkout) { renderWorkoutEditor(currentWorkout); return }
-    workoutEditorOpen = false
+    const existing = currentWorkout ?? await findOpenWorkout(workoutDate)
+    if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
+    if (existing) { if (!preview) currentWorkout = existing; renderWorkoutEditor(existing, preview); return }
+    if (!preview) workoutEditorOpen = false
   }
   const openWorkout = await findOpenWorkout(workoutDate)
   const [todayWorkouts, cardioSessions, pelvicSessions, allPelvicSessions] = await Promise.all([
@@ -1559,6 +1630,7 @@ async function renderWorkoutPage(): Promise<void> {
     <section class="training-category">${trainingModuleHtml('力量训练','dumbbell','history-workout',`<p class="training-card-note">记录动作与组数</p><div class="training-card-summary">${trainingSummaryTiles('动作数量',`${strengthExercises} 个动作`,'记录组数',`${strengthSets} 组`)}</div><p class="training-card-detail">${openWorkout?'正在记录':todayWorkouts.length?'当日已记录':'今天还没有力量训练'}${todayWorkouts.length?' · '+esc([...new Set(todayWorkouts.flatMap(w=>w.exercises.map(e=>e.exerciseName)))].join(' · ')):''}</p><button class="primary training-card-action" id="start-workout">${openWorkout ? '继续力量训练' : '开始力量训练'}</button>`)}</section>
     <section class="training-category">${cardioCardHtml(cardioSessions)}</section>
     <section class="training-category">${trainingModuleHtml('凯格尔训练','leaf','pelvic-floor-history',`<p class="training-card-note">今日方案 · ${dailyPlanRoutine.name}</p><div class="training-card-summary">${trainingSummaryTiles('当前方案',dailyPlanRoutine.name,'当日完成',`${pelvicSessions.length} 次`)}</div><p class="training-card-detail">${pelvicSessions.length?`累计 ${pelvicSeconds} 秒`: `${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</p><button class="primary training-card-action" id="start-pelvic-floor">开始训练</button>`)}</section>`
+  if (preview) return
   view.querySelector('#workout-date-picker-open')?.addEventListener('click', () => showBusinessDatePicker('选择训练日期', workoutDate, date => { workoutDate = date; currentWorkout = undefined; workoutEditorOpen = false; void render().catch(fail) }))
   view.querySelector('#exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
   view.querySelector('#workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
@@ -1601,7 +1673,8 @@ function showCardioForm(session?: CardioSession,parent?:HTMLDialogElement,entryD
   const selectedType = session ? getCardioActivityType(session) : 'stair_climber'
   const title=session?'编辑有氧训练':'记录有氧训练'
   const html= `<form id="cardio-form" class="form cardio-form"><p class="cardio-form-date">${formatHeaderDate(date)}</p><div class="cardio-type-group" role="group" aria-label="训练类型"><span>训练类型</span><div class="cardio-type-options">${(Object.keys(cardioActivityDefinitions) as CardioActivityType[]).map((type) => `<button type="button" data-cardio-type="${type}" aria-pressed="${selectedType === type}">${cardioActivityDefinitions[type].label}</button>`).join('')}</div></div><input type="hidden" name="activityType" value="${selectedType}"><label>时间<span class="cardio-input-wrap"><input name="duration" type="number" inputmode="decimal" min="0.01" step="any" value="${session?.durationMinutes ?? ''}" placeholder="25" required><span class="cardio-input-suffix">分钟</span></span></label><label>速度<span class="cardio-input-wrap unitless"><input name="speed" type="number" inputmode="decimal" min="0.01" step="any" value="${session?.speed ?? ''}" placeholder="6.5"></span></label><label data-cardio-incline>坡度<span class="cardio-input-wrap unitless"><input name="inclinePercent" type="number" inputmode="decimal" min="0" step="any" value="${session?.inclinePercent ?? ''}" placeholder="8"></span></label>${trainingJournalHtml(session?.note, 'cardio-note')}<div class="cardio-form-actions"><button class="primary" type="submit">${session ? '保存修改' : '保存记录'}</button>${session ? '<button class="danger-button" type="button" id="delete-cardio">删除记录</button>' : ''}</div><p role="alert" data-cardio-error hidden></p></form>`
-  const dialog=parent??openModal(title,html),back=parent?historySubview(parent,title,html):()=>dialog.close()
+  const dialog=parent??openModal(title,html,true),back=parent?historySubview(parent,title,html):()=>dialog.close()
+  if (!parent) dialog.dataset.trainingSheet = 'cardio'
   const formElement = dialog.querySelector<HTMLFormElement>('#cardio-form')!
   const syncType = () => {
     const type = formElement.querySelector<HTMLInputElement>('[name="activityType"]')!.value
@@ -1692,7 +1765,8 @@ async function showPelvicFloorSetup(): Promise<void> {
   const progress = getPelvicFloorPlanProgress(await db.pelvicFloorSessions.toArray())
   let selectedLevel = selectedPelvicPlanLevel(progress)
   const specialty = ['foundation', 'endurance', 'pulse', 'combined'].map((id) => pelvicFloorRoutines.find((item) => item.id === id)!)
-  const dialog = openModal('凯格尔训练', '')
+  const dialog = openModal('凯格尔训练', '', true)
+  dialog.dataset.trainingSheet = 'pelvic'
   let starting = false
   const renderChoices = () => {
     const routine = pelvicPlanRoutine(selectedLevel)
@@ -1727,7 +1801,7 @@ async function showPelvicFloorSetup(): Promise<void> {
         pelvicTimerState = startPelvicFloorTimer(ready, Date.now())
         pelvicTimerDate = workoutDate
         pelvicSessionSaving = false
-        dialog.close()
+        dialog.dataset.replacing = 'true'; dialog.close()
         if (pelvicTimerState.activePhase === 'contract') playPelvicCue('contract')
         await requestPelvicWakeLock()
         renderPelvicFloorTimer()
@@ -1888,12 +1962,13 @@ async function showPelvicFloorHistory(): Promise<void> {
   }))
 }
 
-function renderWorkoutEditor(workout: Workout): void {
+function renderWorkoutEditor(workout: Workout, preview?: HTMLElement): void {
   const completed = Boolean(workout.finishedAt)
-  document.body.classList.add('immersive')
-  const view = document.querySelector<HTMLElement>('#view')!
+  if (!preview) document.body.classList.add('immersive')
+  const view = preview ?? document.querySelector<HTMLElement>('#view')!
   const addExercise = `<button id="add-exercise" class="${workout.exercises.length ? 'secondary' : 'primary'} full-btn">${icon('plus', 18)} 添加动作</button>`
   view.innerHTML = `<header class="active-workout-head"><button class="icon-btn quiet" id="exit-workout" aria-label="返回训练首页">${icon('x')}</button><strong>${completed ? '训练详情' : '力量训练'}</strong>${completed ? '<span class="head-spacer"></span>' : '<button class="finish-text" id="finish-workout">完成</button>'}</header><section class="workout-meta"><span>${formatHeaderDate(workout.date)}</span><span id="autosave-state">${completed ? '可编辑' : '已自动保存'}</span></section><div id="workout-exercises">${workout.exercises.length ? workout.exercises.map(workoutExerciseHtml).join('') : `<div class="empty compact minimal"><div class="empty-icon">${icon('dumbbell', 24)}</div><h3>还没有动作</h3><p>添加第一个动作开始记录。</p>${addExercise}</div>`}</div>${workout.exercises.length ? addExercise : ''}${trainingJournalHtml(workout.note, 'workout-note')}<div class="action-stack workout-actions">${completed ? '<button id="save-workout-template" class="secondary">保存为模板</button><button id="back-history" class="quiet-action">返回历史</button><button id="delete-workout" class="danger-button">删除训练</button>' : '<button id="history-workout">查看历史训练</button>'}</div>`
+  if (preview) return
   bindWorkoutEditor(workout)
 }
 
@@ -2056,14 +2131,15 @@ async function showWorkoutStartSheet(): Promise<void> {
   const templates = sortTemplates(await db.workoutTemplates.toArray())
   const cards = templates.slice(0, 5).map(workoutTemplateCardHtml).join('')
   const dialog = openModal('开始训练', `<div class="template-picker">${openWorkout ? `<div class="warning soft-warning"><strong>有未完成训练</strong><span>${formatShortDate(openWorkout.date)} · ${openWorkout.exercises.length} 个动作</span><button class="primary" id="continue-open-workout">继续训练</button></div>` : ''}${templates.length ? `<div class="template-list">${cards}</div>` : '<div class="empty compact minimal"><h3>还没有训练模板</h3><p>可以先创建模板，或直接开始空白训练。</p></div>'}<div class="template-picker-actions"><button class="secondary" id="blank-workout">空白训练</button><button id="manage-workout-templates">${templates.length ? '管理全部模板' : '创建第一个模板'}</button></div></div>`, true)
+  dialog.dataset.trainingSheet = 'strength'
   dialog.querySelector('#continue-open-workout')?.addEventListener('click', async () => {
     if (!openWorkout) return
-    dialog.close(); workoutDate = openWorkout.date; currentWorkout = openWorkout; workoutEditorOpen = true; await render()
+    dialog.dataset.replacing = 'true'; dialog.close(); workoutDate = openWorkout.date; currentWorkout = openWorkout; workoutEditorOpen = true; await render()
   })
   dialog.querySelector('#blank-workout')?.addEventListener('click', async () => {
     try {
       if (openWorkout) throw new Error('请先完成已有的未完成训练')
-      currentWorkout = await createWorkout(workoutDate); workoutEditorOpen = true; dialog.close(); await renderWorkoutPage()
+      currentWorkout = await createWorkout(workoutDate); workoutEditorOpen = true; dialog.dataset.replacing = 'true'; dialog.close(); await renderWorkoutPage()
     } catch (error) { fail(error) }
   })
   dialog.querySelector('#manage-workout-templates')?.addEventListener('click', () => { dialog.close(); void showWorkoutTemplateManager() })
@@ -2085,7 +2161,7 @@ async function launchWorkoutTemplate(template: WorkoutTemplate, dialog?: HTMLDia
     const openWorkout = (await db.workouts.toArray()).find((item) => !item.finishedAt)
     if (openWorkout) throw new Error('已有未完成训练，请先继续或完成它')
     currentWorkout = await startWorkoutFromTemplate(template, workoutDate)
-    workoutEditorOpen = true; showWorkoutHistory = false; dialog?.close(); await renderWorkoutPage()
+    workoutEditorOpen = true; showWorkoutHistory = false; if (dialog) { dialog.dataset.replacing = 'true'; dialog.close() }; await renderWorkoutPage()
   } catch (error) { fail(error) }
 }
 
@@ -2366,9 +2442,15 @@ async function saveDayAsDietTemplate(logs: FoodLog[]): Promise<void> {
   dialog.querySelector<HTMLFormElement>('#save-day-diet-template-form')?.addEventListener('submit', async (event) => { event.preventDefault(); try { await db.dietTemplates.add(dietTemplateFromLogs(logs, valueOf(new FormData(event.currentTarget as HTMLFormElement), 'name'), target)); dialog.close(); toast(target ? '已保存饮食与营养目标模板' : '已保存为饮食模板') } catch (error) { fail(error) } })
 }
 
-async function renderWeightPage(withProgressTabs = false): Promise<void> {
-  const view=document.querySelector<HTMLElement>('#view')!
+async function renderWeightPage(withProgressTabs = false, preview?: HTMLElement): Promise<void> {
+  const view=preview??document.querySelector<HTMLElement>('#view')!
   const retainedTabs=setTabbedViewHtml(view,`${withProgressTabs?progressTabsHtml():''}<div data-weight-module></div>${withProgressTabs?recoverySlotHtml():''}`)
+  if (preview) {
+    const weight = mountWeightTrend(view.querySelector('[data-weight-module]')!, recoveryUi(), { state: { ...trendStates.weight }, record: () => {} })
+    const recovery = mountRecovery(view.querySelector('[data-recovery-root]')!, recoveryUi(), true, { weight: { ...trendStates.weight }, sleep: { ...trendStates.sleep }, water: { ...trendStates.water } })
+    previewDisposers.set(view, () => { weight(); recovery() })
+    await waitForPreview(view, '[data-trend-module=water]'); return
+  }
   recordsDispose?.();recordsDispose=mountWeightTrend(view.querySelector('[data-weight-module]')!,recoveryUi(),{state:trendStates.weight,record:showWeightForm})
   recoveryDispose?.();recoveryDispose=undefined
   if(withProgressTabs){recoveryDispose=mountRecovery(view.querySelector('[data-recovery-root]')!,recoveryUi(),true);if(!retainedTabs)bindProgressTabs(view)}

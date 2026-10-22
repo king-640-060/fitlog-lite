@@ -1,3 +1,4 @@
+import { waitForMainNavigation } from './navigationSettlement.mjs'
 // Today + Food shared summary, selected-date facts, live freshness and single meal entry.
 // All writes are confined to fresh synthetic contexts; no personal storage or providers.
 import assert from 'node:assert/strict'
@@ -17,7 +18,7 @@ try{for(const[width,height,scale,colorScheme]of matrix){
  const target={id:'target',date,calories:2200,protein:159,carbs:216,fat:50,createdAt:stamp,updatedAt:stamp}
  const weight={id:'weight',date,weightKg:86.4,createdAt:stamp,updatedAt:stamp}
  const reload=async()=>{await page.reload({waitUntil:'networkidle'});await page.addStyleTag({content:`html{font-size:${scale}%}`});await page.waitForSelector('.macro-nutrition-summary')}
- const tab=async name=>{await page.locator(`[data-tab=${name}]`).click();await page.waitForSelector(name==='today'?'.nutrition-today-card .macro-nutrition-summary':'.food-nutrition-hero .macro-nutrition-summary')}
+ const tab=async name=>{await page.locator(`[data-tab=${name}]`).click();await waitForMainNavigation(page,name);await page.waitForSelector(name==='today'?'.nutrition-today-card .macro-nutrition-summary':'.food-nutrition-hero .macro-nutrition-summary')}
  const inspect=async surface=>page.locator(surface==='today'?'.nutrition-today-card':'.food-nutrition-hero').evaluate(root=>{
    const summary=root.querySelector('.macro-nutrition-summary'),cells=[...summary.children],bad=[]
    for(const e of root.querySelectorAll('*')){if(!e.getClientRects().length||e instanceof SVGElement)continue;const r=e.getBoundingClientRect(),c=getComputedStyle(e);if(r.left<-.5||r.right>innerWidth+.5)bad.push('bounds '+e.className);if(e.scrollWidth>e.clientWidth+1)bad.push('clipped '+e.className);if(e.matches('.macro-label,.macro-value,.macro-target,.macro-per-kg')&&(c.textOverflow==='ellipsis'||parseFloat(c.fontSize)<12))bad.push('text '+e.className)}

@@ -1,3 +1,4 @@
+import { waitForMainNavigation } from './navigationSettlement.mjs'
 // Targeted SVG/macros gate. Fresh synthetic data, no real records or keys.
 import assert from 'node:assert/strict'
 import fs from 'node:fs/promises'
@@ -12,7 +13,7 @@ try{for(const width of widths){
  const context=await browser.newContext({viewport:{width,height:932},isMobile:true,hasTouch:true,timezoneId:'Asia/Shanghai',serviceWorkers:'block'})
  try{
   const page=await context.newPage(),errors=[],states=[];page.on('pageerror',e=>errors.push(e.message))
-  await page.goto(base,{waitUntil:'networkidle'});await page.waitForSelector('#open-management')
+  await page.goto(base,{waitUntil:'networkidle'});await page.waitForSelector('#open-management');await page.locator('[data-tab=plan]').click();await waitForMainNavigation(page,'plan')
   const date=await page.evaluate(()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`})
   const put=async data=>page.evaluate(async data=>{const d=await new Promise(resolve=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>resolve(q.result)});await new Promise((resolve,reject)=>{const t=d.transaction(['foodLogs','nutritionTargets'],'readwrite');for(const [name,rows] of Object.entries(data)){const s=t.objectStore(name);s.clear();for(const r of rows)s.put(r)}t.oncomplete=resolve;t.onerror=()=>reject(t.error)});d.close()},data)
   for(const scale of [1,1.2,1.4])for(const [name,actual,goal] of scenarios){
@@ -23,7 +24,7 @@ try{for(const width of widths){
    await page.evaluate(scale=>document.documentElement.style.fontSize=`${16*scale}px`,scale)
    let todaySvg,todayTiles,todayStyles
    for(const surface of ['today','food']){
-    await page.locator(`[data-tab=${surface}]`).click()
+    await page.locator(`[data-tab=${surface}]`).click();await waitForMainNavigation(page,surface)
     const root=surface==='today'?'.nutrition-today-card':'.food-nutrition-hero'
     await page.waitForFunction(({root,actual})=>Number(document.querySelector(root+' .calorie-gauge')?.dataset.actual)===actual,{root,actual})
     const checks=await page.locator(root).evaluate(root=>{
