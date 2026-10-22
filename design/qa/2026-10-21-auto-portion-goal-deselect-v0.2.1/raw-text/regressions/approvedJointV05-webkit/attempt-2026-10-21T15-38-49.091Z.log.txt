@@ -1,0 +1,33 @@
+{"engine":"webkit","width":320,"scale":100,"system":"light","status":"PASS"}
+{"engine":"webkit","width":320,"scale":100,"system":"dark","status":"PASS"}
+{"engine":"webkit","width":320,"scale":200,"system":"light","status":"PASS"}
+{"engine":"webkit","width":320,"scale":200,"system":"dark","status":"PASS"}
+{"engine":"webkit","width":375,"scale":100,"system":"light","status":"PASS"}
+FAIL_STATE {"engine":"webkit","width":375,"scale":100,"system":"dark","mode":"system","theme":"dark","mediaDark":true}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.screenshot: Timeout 29995.795999999995ms exceeded.
+Call log:
+[2m  - taking element screenshot[22m
+[2m    - disabled all CSS animations[22m
+[2m  - waiting for fonts to load...[22m
+[2m  - fonts loaded[22m
+[2m  - attempting scroll into view action[22m
+[2m    - waiting for element to be stable[22m
+
+    at shot (<repo>/tests/browser/approvedJointV05.mjs:28:392)
+    at async file://<repo>/tests/browser/approvedJointV05.mjs:33:1267 {
+  log: [
+    '  - taking element screenshot',
+    '    - disabled all CSS animations',
+    '  - waiting for fonts to load...',
+    '  - fonts loaded',
+    '  - attempting scroll into view action',
+    '    - waiting for element to be stable'
+  ],
+  name: 'TimeoutError'
+}
+
+Node.js v24.16.0

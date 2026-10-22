@@ -1,0 +1,32 @@
+{
+  "receipts": [
+    {
+      "engine": "chromium",
+      "url": "http://127.0.0.1:5370/fitlog-lite/",
+      "build": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+      "invalidDraftZeroWrites": true,
+      "escapeAndBackdropConfirmation": true,
+      "cancelPreservesDraft": true,
+      "parentDraftPreserved": true,
+      "keyboardReturnFocus": true,
+      "managerReturnFreshWithoutWrites": true,
+      "all22Exact": true,
+      "status": "PASS",
+      "physicalVoiceOver": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "url": "http://127.0.0.1:5370/fitlog-lite/",
+      "build": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+      "invalidDraftZeroWrites": true,
+      "escapeAndBackdropConfirmation": true,
+      "cancelPreservesDraft": true,
+      "parentDraftPreserved": true,
+      "keyboardReturnFocus": true,
+      "managerReturnFreshWithoutWrites": true,
+      "all22Exact": true,
+      "status": "PASS",
+      "physicalVoiceOver": "Pending"
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "prototype": "v0.2",
+  "scenarios": [
+    {
+      "width": 320,
+      "height": 700,
+      "theme": "light",
+      "status": "PASS",
+      "goal_select_toggle": true,
+      "phase_unchanged_after_deselect": true,
+      "target_saved_then_deleted_without_phase_mutation": true,
+      "food_scroll_steps": [
+        [
+          "tuna",
+          334,
+          334
+        ],
+        [
+          "oats",
+          352,
+          352
+        ]
+      ],
+      "food_auto_preview": true,
+      "pageErrors": [],
+      "horizontalOverflow": false
+    },
+    {
+      "width": 375,
+      "height": 812,
+      "theme": "light",
+      "status": "PASS",
+      "goal_select_toggle": true,
+      "phase_unchanged_after_deselect": true,
+      "target_saved_then_deleted_without_phase_mutation": true,
+      "food_scroll_steps": [
+        [
+          "tuna",
+          283,
+          283
+        ],
+        [
+          "oats",
+          283,
+          283
+        ]
+      ],
+      "food_auto_preview": true,
+      "pageErrors": [],
+      "horizontalOverflow": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "status": "PASS",
+      "goal_select_toggle": true,
+      "phase_unchanged_after_deselect": true,
+      "target_saved_then_deleted_without_phase_mutation": true,
+      "food_scroll_steps": [
+        [
+          "tuna",
+          267,
+          267
+        ],
+        [
+          "oats",
+          267,
+          267
+        ]
+      ],
+      "food_auto_preview": true,
+      "pageErrors": [],
+      "horizontalOverflow": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "theme": "dark",
+      "status": "PASS",
+      "goal_select_toggle": true,
+      "phase_unchanged_after_deselect": true,
+      "target_saved_then_deleted_without_phase_mutation": true,
+      "food_scroll_steps": [
+        [
+          "tuna",
+          267,
+          267
+        ],
+        [
+          "oats",
+          267,
+          267
+        ]
+      ],
+      "food_auto_preview": true,
+      "pageErrors": [],
+      "horizontalOverflow": false
+    },
+    {
+      "width": 430,
+      "height": 932,
+      "theme": "light",
+      "status": "PASS",
+      "goal_select_toggle": true,
+      "phase_unchanged_after_deselect": true,
+      "target_saved_then_deleted_without_phase_mutation": true,
+      "food_scroll_steps": [
+        [
+          "tuna",
+          263,
+          263
+        ],
+        [
+          "oats",
+          263,
+          263
+        ]
+      ],
+      "food_auto_preview": true,
+      "pageErrors": [],
+      "horizontalOverflow": false
+    }
+  ],
+  "passed": 5,
+  "failed": 0,
+  "physicalIPhone": "Pending",
+  "webKit": "Not run",
+  "note": "两个模块使用独立演示情境和数据；未修改正式应用。"
+}

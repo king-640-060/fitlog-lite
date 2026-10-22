@@ -1,0 +1,167 @@
+FAIL_STATE {
+  text: '饮食\n' +
+    '使用模板\n' +
+    '食物库\n' +
+    '选择日期\n' +
+    '回到今天\n' +
+    '周二\n' +
+    '10月6日\n' +
+    '周三\n' +
+    '10月7日\n' +
+    '周四\n' +
+    '10月8日\n' +
+    '周五\n' +
+    '10月9日\n' +
+    '周六\n' +
+    '10月10日\n' +
+    '周日\n' +
+    '10月11日\n' +
+    '周一\n' +
+    '10月12日\n' +
+    '周二\n' +
+    '10月13日\n' +
+    '周三\n' +
+    '10月14日\n' +
+    '周四\n' +
+    '10月15日\n' +
+    '周五\n' +
+    '10月16日\n' +
+    '周六\n' +
+    '10月17日\n' +
+    '周日\n' +
+    '10月18日\n' +
+    '周一\n' +
+    '10月19日\n' +
+    '昨天\n' +
+    '10月20日\n' +
+    '今天\n' +
+    '10月21日\n' +
+    '明天\n' +
+    '10月22日\n' +
+    '周五\n' +
+    '10月23日\n' +
+    '周六\n' +
+    '10月24日\n' +
+    '周日\n' +
+    '10月25日\n' +
+    '周一\n' +
+    '10月26日\n' +
+    '周二\n' +
+    '10月27日\n' +
+    '周三\n' +
+    '10月28日\n' +
+    '周四\n' +
+    '10月29日\n' +
+    '周五\n' +
+    '10月30日\n' +
+    '周六\n' +
+    '10月31日\n' +
+    '周日\n' +
+    '11月1日\n' +
+    '周一\n' +
+    '11月2日\n' +
+    '周二\n' +
+    '11月3日\n' +
+    '周三\n' +
+    '11月4日\n' +
+    '周四\n' +
+    '11月5日\n' +
+    '饮食总览\n' +
+    '设置目标\n' +
+    '当日热量摄入\n' +
+    '0\n' +
+    'kcal\n' +
+    '设置目标后显示预算\n' +
+    '尚未设置目标\n' +
+    '根据真实饮食记录\n' +
+    '按实际摄入记录\n' +
+    '未设目标\n' +
+    '蛋白质\n' +
+    '0g\n' +
+    '未设目标\n' +
+    '碳水\n' +
+    '0g\n' +
+    '未设目标\n' +
+    '脂肪\n' +
+    '0g\n' +
+    '未设目标\n' +
+    '剩余目标\n' +
+    '按实际记录计算\n' +
+    '热量\n' +
+    '未设置目标\n' +
+    '蛋白质\n' +
+    '未设置目标\n' +
+    '碳水\n' +
+    '未设置目标\n' +
+    '脂肪\n' +
+    '未设置目标\n' +
+    '指定食物\n' +
+    '›\n' +
+    '今日饮食\n' +
+    '按餐次记录，更清楚\n' +
+    '早餐\n' +
+    '0 项记录\n' +
+    '0 kcal\n' +
+    '\n' +
+    '今天还没有记录早餐\n' +
+    '\n' +
+    '＋记录\n' +
+    '午餐\n' +
+    '0 项记录\n' +
+    '0 kcal\n' +
+    '\n' +
+    '今天还没有记录午餐\n' +
+    '\n' +
+    '＋记录\n' +
+    '晚餐\n' +
+    '0 项记录\n' +
+    '0 kcal\n' +
+    '\n' +
+    '今天还没有记录晚餐\n' +
+    '\n' +
+    '＋记录\n' +
+    '加餐\n' +
+    '0 项记录\n' +
+    '0 kcal\n' +
+    '\n' +
+    '今天还没有记录加餐\n' +
+    '\n' +
+    '＋记录\n' +
+    '特殊饮食\n' +
+    '添加标记\n' +
+    '今日\n' +
+    '计划\n' +
+    '饮食\n' +
+    '训练\n' +
+    '进度\n' +
+    '模板已复制',
+  body: '',
+  viewport: { width: 320, height: 932 },
+  build: '87de0ee15eb583f5b8e1f16a86ee28c0f27add4e'
+}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.click: Timeout 15000ms exceeded.
+Call log:
+[2m  - waiting for locator('#use-diet-template')[22m
+[2m    - locator resolved to <button type="button" id="use-diet-template" class="food-page-action">使用模板</button>[22m
+[2m  - attempting click action[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+[2m    - element is visible, enabled and stable[22m
+[2m    - scrolling into view if needed[22m
+
+    at <repo>/tests/browser/foodWaterDayV04.mjs:21:58 {
+  log: [
+    "  - waiting for locator('#use-diet-template')",
+    '    - locator resolved to <button type="button" id="use-diet-template" class="food-page-action">使用模板</button>',
+    '  - attempting click action',
+    '    - waiting for element to be visible, enabled and stable',
+    '    - element is visible, enabled and stable',
+    '    - scrolling into view if needed'
+  ],
+  name: 'TimeoutError'
+}
+
+Node.js v24.16.0

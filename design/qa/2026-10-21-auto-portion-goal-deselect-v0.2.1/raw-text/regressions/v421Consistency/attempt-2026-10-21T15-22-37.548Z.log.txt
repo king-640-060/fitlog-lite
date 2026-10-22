@@ -1,0 +1,64 @@
+320-100-light-no-preference VERIFY
+320-100-light-no-preference PASS
+320-100-light-reduce VERIFY
+320-100-light-reduce PASS
+320-100-dark-no-preference VERIFY
+320-100-dark-no-preference PASS
+320-100-dark-reduce VERIFY
+320-100-dark-reduce PASS
+320-120-light-no-preference VERIFY
+320-120-light-no-preference PASS
+320-120-light-reduce VERIFY
+320-120-light-reduce PASS
+320-120-dark-no-preference VERIFY
+320-120-dark-no-preference PASS
+320-120-dark-reduce VERIFY
+320-120-dark-reduce PASS
+320-140-light-no-preference VERIFY
+320-140-light-no-preference PASS
+320-140-light-reduce VERIFY
+320-140-light-reduce PASS
+320-140-dark-no-preference VERIFY
+320-140-dark-no-preference PASS
+320-140-dark-reduce VERIFY
+320-140-dark-reduce PASS
+320-200-light-no-preference VERIFY
+320-200-light-no-preference PASS
+320-200-light-reduce VERIFY
+320-200-light-reduce PASS
+320-200-dark-no-preference VERIFY
+320-200-dark-no-preference PASS
+320-200-dark-reduce VERIFY
+320-200-dark-reduce PASS
+375-100-light-no-preference VERIFY
+375-100-light-no-preference PASS
+375-100-light-reduce VERIFY
+375-100-light-reduce PASS
+375-100-dark-no-preference VERIFY
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.click: Timeout 15000ms exceeded.
+Call log:
+[2m  - waiting for locator('[data-tab=progress]')[22m
+[2m    - locator resolved to <button class="" data-tab="progress" aria-current="false">…</button>[22m
+[2m  - attempting click action[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+[2m    - element is visible, enabled and stable[22m
+[2m    - scrolling into view if needed[22m
+
+    at nav (<repo>/tests/browser/v421Consistency.mjs:28:64)
+    at <repo>/tests/browser/v421Consistency.mjs:54:188 {
+  log: [
+    "  - waiting for locator('[data-tab=progress]')",
+    '    - locator resolved to <button class="" data-tab="progress" aria-current="false">…</button>',
+    '  - attempting click action',
+    '    - waiting for element to be visible, enabled and stable',
+    '    - element is visible, enabled and stable',
+    '    - scrolling into view if needed'
+  ],
+  name: 'TimeoutError'
+}
+
+Node.js v24.16.0

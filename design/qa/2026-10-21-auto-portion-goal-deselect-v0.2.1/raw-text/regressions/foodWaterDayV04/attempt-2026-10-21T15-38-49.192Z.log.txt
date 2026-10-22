@@ -1,0 +1,13 @@
+{"engine":"chromium","width":320,"theme":"light","scale":100,"status":"PASS"}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.waitForFunction: Timeout 15000ms exceeded.
+    at shot (<repo>/tests/browser/foodWaterDayV04.mjs:16:93)
+    at async file://<repo>/tests/browser/foodWaterDayV04.mjs:34:1496 {
+  log: [],
+  name: 'TimeoutError'
+}
+
+Node.js v24.16.0

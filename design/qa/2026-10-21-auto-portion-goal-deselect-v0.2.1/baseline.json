@@ -1,0 +1,42 @@
+{
+  "receipts": [
+    {
+      "engine": "chromium",
+      "build": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+      "before": {
+        "bodyScroll": 0,
+        "listTop": 351.28125,
+        "listScroll": 0,
+        "portionInputs": 0
+      },
+      "after": {
+        "bodyScroll": 0,
+        "listTop": 512.328125,
+        "listScroll": 0,
+        "portionInputs": 1
+      },
+      "goalPressed": null,
+      "hasUsageBadge": 1,
+      "status": "OBSERVED"
+    },
+    {
+      "engine": "webkit",
+      "build": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+      "before": {
+        "bodyScroll": 0,
+        "listTop": 351.25,
+        "listScroll": 0,
+        "portionInputs": 0
+      },
+      "after": {
+        "bodyScroll": 0,
+        "listTop": 504.3125,
+        "listScroll": 0,
+        "portionInputs": 1
+      },
+      "goalPressed": null,
+      "hasUsageBadge": 1,
+      "status": "OBSERVED"
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{"width":320,"height":812,"scale":100,"colorScheme":"light","reduced":false,"sharedThreePeers":true,"default30":true,"independentRanges":true,"retainedState":true,"weight8_9CoordinateTouch":true,"water8_9CoordinateTouch":true,"sleepCoordinateTouch":true,"equalValueDateHighlight":true,"uniformPlotReadout":true,"denseInternalScroll":true,"allWeightHistory":true,"todayWriteDate":true,"weightWaterSleepBackfillWrites":true,"crossSurfaceFacts":true,"trainingNearby":true,"wholeSiteBounds":true,"stressCycles":0,"noLiveChartTimerListenerLeak":true,"errors":[],"physicalIPhone":"Pending"}
+{"width":320,"height":812,"scale":100,"colorScheme":"light","reduced":true,"sharedThreePeers":true,"default30":true,"independentRanges":true,"retainedState":true,"weight8_9CoordinateTouch":true,"water8_9CoordinateTouch":true,"sleepCoordinateTouch":true,"equalValueDateHighlight":true,"uniformPlotReadout":true,"denseInternalScroll":true,"allWeightHistory":true,"todayWriteDate":true,"weightWaterSleepBackfillWrites":true,"crossSurfaceFacts":true,"trainingNearby":true,"wholeSiteBounds":true,"stressCycles":0,"noLiveChartTimerListenerLeak":true,"errors":[],"physicalIPhone":"Pending"}
+{"width":320,"height":812,"scale":100,"colorScheme":"dark","reduced":false,"sharedThreePeers":true,"default30":true,"independentRanges":true,"retainedState":true,"weight8_9CoordinateTouch":true,"water8_9CoordinateTouch":true,"sleepCoordinateTouch":true,"equalValueDateHighlight":true,"uniformPlotReadout":true,"denseInternalScroll":true,"allWeightHistory":true,"todayWriteDate":true,"weightWaterSleepBackfillWrites":true,"crossSurfaceFacts":true,"trainingNearby":true,"wholeSiteBounds":true,"stressCycles":0,"noLiveChartTimerListenerLeak":true,"errors":[],"physicalIPhone":"Pending"}
+FAILURE_STATE 早上好
+
+10月10日 · 星期六 · 今天也继续保持
+
+今日计划
+查看全部
+
+已完成 0 / 1 项 · 待办 1 项
+
+PRIVATE_TEST_TASK_456
+#Legacy
+18:00–19:00
+今日饮食
+查看详情
+今日热量摄入
+100
+kcal
+目标 2200 kcal
+还差 2100 kcal
+根据真实饮食记录
+5% 已摄入
+目标 2200 kcal
+蛋白质
+10g
+/ 180g
+0.12 g/kg
+碳水
+数据不完整
+未设目标
+脂肪
+数据不完整
+未设目标
+剩余目标
+按当日实际记录计算
+指定食物
+›
+热量
+差 2100 kcal
+蛋白质
+差 170 g
+碳水
+未设置目标
+脂肪
+未设置目标
+训练
+查看训练
+力量训练
+1 次训练
+1 个动作 · 2 组
+记录训练
+有氧训练
+1 次 · 共 20 分钟
+跑步机 · 速度 6 · 坡度 0
+记录有氧
+体重
+查看趋势
+85.6 kg
+较上次 -0.1 kg
+更新体重
+凯格尔训练
+训练记录
+今日已完成 1 次
+基础阶段 · 累计 1:00
+再练一次
+习惯
+管理
+Legacy habit
+
+今天已打卡 1 项
+
+睡眠
+历史记录
+最近完成睡眠
+2026年10月10日晚
+0小时1分钟
+10:00 → 10:01
+开始睡眠
+饮水
+历史记录
+今日累计
+0 ml
+参考 2500 ml
+记录饮水
+今日
+计划
+饮食
+训练
+进度
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.click: Timeout 12000ms exceeded.
+Call log:
+[2m  - waiting for locator('[data-tab=progress]')[22m
+[2m    - locator resolved to <button class="" data-tab="progress" aria-current="false">…</button>[22m
+[2m  - attempting click action[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+
+    at nav (<repo>/tests/browser/unifiedExperience.mjs:26:78)
+    at async trend (<repo>/tests/browser/unifiedExperience.mjs:27:24)
+    at async replaceFacts (<repo>/tests/browser/unifiedExperience.mjs:28:165)
+    at async file://<repo>/tests/browser/unifiedExperience.mjs:58:2 {
+  log: [
+    "  - waiting for locator('[data-tab=progress]')",
+    '    - locator resolved to <button class="" data-tab="progress" aria-current="false">…</button>',
+    '  - attempting click action',
+    '    - waiting for element to be visible, enabled and stable'
+  ],
+  name: 'TimeoutError'
+}
+
+Node.js v24.16.0

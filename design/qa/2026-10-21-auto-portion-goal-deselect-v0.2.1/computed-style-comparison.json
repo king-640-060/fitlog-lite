@@ -1,0 +1,256 @@
+{
+  "receipts": [
+    {
+      "engine": "chromium",
+      "theme": "light",
+      "prototype": {
+        "none": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(63, 98, 49)",
+          "background": "rgb(255, 254, 250)",
+          "border": "rgb(107, 119, 107)",
+          "radius": "50%",
+          "font": "12px"
+        },
+        "selected": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(63, 98, 49)",
+          "background": "rgb(255, 254, 250)",
+          "border": "rgb(63, 98, 49)",
+          "radius": "50%",
+          "font": "12px"
+        }
+      },
+      "actual": {
+        "none": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(40, 46, 40)",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "rgb(105, 115, 105)",
+          "radius": "50%",
+          "font": "16px"
+        },
+        "selected": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(40, 46, 40)",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "rgb(82, 114, 59)",
+          "radius": "50%",
+          "font": "16px"
+        },
+        "row": {
+          "width": 354,
+          "height": 76.1875,
+          "color": "rgb(40, 46, 40)",
+          "background": "oklab(0.996677 -0.000431687 0.00537032)",
+          "border": "rgb(233, 232, 223)",
+          "radius": "16px",
+          "font": "16px"
+        },
+        "continue": {
+          "width": 354,
+          "height": 48,
+          "color": "rgb(255, 255, 255)",
+          "background": "rgb(82, 114, 59)",
+          "border": "rgb(82, 114, 59)",
+          "radius": "12px",
+          "font": "16px"
+        }
+      },
+      "notes": "Same 390x844 and native theme. Production uses shared tokens/large Sheet; names, dates and nutrition come from actual services, not demo fixtures."
+    },
+    {
+      "engine": "chromium",
+      "theme": "dark",
+      "prototype": {
+        "none": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(63, 98, 49)",
+          "background": "rgb(255, 254, 250)",
+          "border": "rgb(107, 119, 107)",
+          "radius": "50%",
+          "font": "12px"
+        },
+        "selected": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(63, 98, 49)",
+          "background": "rgb(255, 254, 250)",
+          "border": "rgb(63, 98, 49)",
+          "radius": "50%",
+          "font": "12px"
+        }
+      },
+      "actual": {
+        "none": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(240, 240, 233)",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "rgb(178, 189, 179)",
+          "radius": "50%",
+          "font": "16px"
+        },
+        "selected": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(240, 240, 233)",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "rgb(159, 185, 122)",
+          "radius": "50%",
+          "font": "16px"
+        },
+        "row": {
+          "width": 354,
+          "height": 76.1875,
+          "color": "rgb(240, 240, 233)",
+          "background": "oklab(0.27188 -0.012693 0.00755282)",
+          "border": "rgb(60, 73, 60)",
+          "radius": "16px",
+          "font": "16px"
+        },
+        "continue": {
+          "width": 354,
+          "height": 48,
+          "color": "rgb(23, 28, 25)",
+          "background": "rgb(159, 185, 122)",
+          "border": "rgb(159, 185, 122)",
+          "radius": "12px",
+          "font": "16px"
+        }
+      },
+      "notes": "Same 390x844 and native theme. Production uses shared tokens/large Sheet; names, dates and nutrition come from actual services, not demo fixtures."
+    },
+    {
+      "engine": "webkit",
+      "theme": "light",
+      "prototype": {
+        "none": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(63, 98, 49)",
+          "background": "rgb(255, 254, 250)",
+          "border": "rgb(107, 119, 107)",
+          "radius": "50%",
+          "font": "12px"
+        },
+        "selected": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(63, 98, 49)",
+          "background": "rgb(255, 254, 250)",
+          "border": "rgb(63, 98, 49)",
+          "radius": "50%",
+          "font": "12px"
+        }
+      },
+      "actual": {
+        "none": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(40, 46, 40)",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "rgb(105, 115, 105)",
+          "radius": "50%",
+          "font": "16px"
+        },
+        "selected": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(40, 46, 40)",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "rgb(82, 114, 59)",
+          "radius": "50%",
+          "font": "16px"
+        },
+        "row": {
+          "width": 354,
+          "height": 72.1875,
+          "color": "rgb(40, 46, 40)",
+          "background": "oklab(0.996683 -0.000477 0.005351)",
+          "border": "rgb(233, 232, 223)",
+          "radius": "16px",
+          "font": "16px"
+        },
+        "continue": {
+          "width": 354,
+          "height": 48,
+          "color": "rgb(255, 255, 255)",
+          "background": "rgb(82, 114, 59)",
+          "border": "rgb(82, 114, 59)",
+          "radius": "12px",
+          "font": "16px"
+        }
+      },
+      "notes": "Same 390x844 and native theme. Production uses shared tokens/large Sheet; names, dates and nutrition come from actual services, not demo fixtures."
+    },
+    {
+      "engine": "webkit",
+      "theme": "dark",
+      "prototype": {
+        "none": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(63, 98, 49)",
+          "background": "rgb(255, 254, 250)",
+          "border": "rgb(107, 119, 107)",
+          "radius": "50%",
+          "font": "12px"
+        },
+        "selected": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(63, 98, 49)",
+          "background": "rgb(255, 254, 250)",
+          "border": "rgb(63, 98, 49)",
+          "radius": "50%",
+          "font": "12px"
+        }
+      },
+      "actual": {
+        "none": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(240, 240, 233)",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "rgb(178, 189, 179)",
+          "radius": "50%",
+          "font": "16px"
+        },
+        "selected": {
+          "width": 20,
+          "height": 20,
+          "color": "rgb(240, 240, 233)",
+          "background": "rgba(0, 0, 0, 0)",
+          "border": "rgb(159, 185, 122)",
+          "radius": "50%",
+          "font": "16px"
+        },
+        "row": {
+          "width": 354,
+          "height": 72.1875,
+          "color": "rgb(240, 240, 233)",
+          "background": "oklab(0.271881 -0.012706 0.007548)",
+          "border": "rgb(60, 73, 60)",
+          "radius": "16px",
+          "font": "16px"
+        },
+        "continue": {
+          "width": 354,
+          "height": 48,
+          "color": "rgb(23, 28, 25)",
+          "background": "rgb(159, 185, 122)",
+          "border": "rgb(159, 185, 122)",
+          "radius": "12px",
+          "font": "16px"
+        }
+      },
+      "notes": "Same 390x844 and native theme. Production uses shared tokens/large Sheet; names, dates and nutrition come from actual services, not demo fixtures."
+    }
+  ]
+}

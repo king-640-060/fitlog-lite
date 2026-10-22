@@ -1,0 +1,94 @@
+{
+  "zipSHA256": "4fde00e22fa65f1aaabd6fe86e00ce8f169565ef11f1ec811f2264f35b7764ab",
+  "members": 22,
+  "FILES": 20,
+  "checksums": [
+    {
+      "path": "00_README_\u8bf7\u5148\u9605\u8bfb.md",
+      "sha256": "fc43165c0a59adb6a5a32d6483d7b69ea2390b84a367cce657d7d0098a9a245e"
+    },
+    {
+      "path": "01_CODEX_EXECUTION_INSTRUCTION.md",
+      "sha256": "ca27d0a35ac3a5b9e228610c0adf5978a0801f476e5f197c1fdd5d82cdf8ebd0"
+    },
+    {
+      "path": "02_DESIGN_LOCK.md",
+      "sha256": "dd2591165a41e4b0d799242221842f01b103a61094d53f2cf6dc8f89b262291e"
+    },
+    {
+      "path": "03_PORTION_RECOMMENDATION_CONTRACT.md",
+      "sha256": "cc478be2efc1abe0b7e4c1382fb0456a197e0ec6d5e47da05438e061f9c14ff0"
+    },
+    {
+      "path": "04_GOAL_SELECTION_STATE_CONTRACT.md",
+      "sha256": "83578f7a8f82e155de6eacf5f12673019f8721bd0d13a6a86f8d476089818ce0"
+    },
+    {
+      "path": "05_SCROLL_FOCUS_SHEET_CONTRACT.md",
+      "sha256": "5d2f5a2dcb97746ee2210f989a81813bd7ac1012bf07eaad74d51814515290a9"
+    },
+    {
+      "path": "06_DATA_PRESERVATION_CONTRACT.md",
+      "sha256": "e9b2309ed1fc43746bfc8d756f0bf74b8d0b364dddf16ab658a7ea229772990c"
+    },
+    {
+      "path": "07_ACCEPTANCE_MATRIX.md",
+      "sha256": "4456b3c9a760896aa637d92c89b7961d188fbd9c8253ad1e2d4fece34a4e566b"
+    },
+    {
+      "path": "08_TEST_RELEASE_REPORT_CONTRACT.md",
+      "sha256": "8088eb526268ac41dfb8a91a6e8cd4bac9b91c68ec61abfd1f4e0eb557b24653"
+    },
+    {
+      "path": "09_CODEX_FORWARD_MESSAGE.md",
+      "sha256": "4c50c26aa38d66c7fe42b391911808c9290d9bc9cb5501fa7c1a5a79bc4ab880"
+    },
+    {
+      "path": "10_SOURCE_MAP.md",
+      "sha256": "ad3dc43df4a1330783964cf4dcf8b762387fce63b060245476831e356b3dc418"
+    },
+    {
+      "path": "FILES.json",
+      "sha256": "98858148d5e30d87fad502245c87aa1e4618d98152fe615fdf1c3ce7a6fb8b61"
+    },
+    {
+      "path": "preview/01_goal_not_selected.png",
+      "sha256": "caa667d11282296722cb5f1d10ee6e42c91ffa331e513dfc6db2ab8dcd7d6a65"
+    },
+    {
+      "path": "preview/02_goal_selected.png",
+      "sha256": "6b88f5f8caba791af9eeae88c8b6933487101315673edfb52603b08ee54f4c87"
+    },
+    {
+      "path": "preview/03_goal_toggle_off.png",
+      "sha256": "d6f71406dd26b57c4aeec22d4a8b75d3387c3582b4778ec2e94fd062b896ffad"
+    },
+    {
+      "path": "preview/04_auto_portion_preview.png",
+      "sha256": "c2330045c0611e1f8553051da286494aeda7d599720148d0613a7c1d16c85428"
+    },
+    {
+      "path": "prototype/FINAL_APPROVED_FitLog_AutoPortion_Goal_Deselect_v0.2.1.html",
+      "sha256": "4b7ffe5034d7f2984acaf68891541edd8be472cfc3b7c5c5e235b01278d6383e"
+    },
+    {
+      "path": "qa/previous_v0.2_browser_qa.json",
+      "sha256": "d9ed7bf1f4782b53be8c1ec85a4d2ff946a06329fd680c525cb13cd52b3e25d0"
+    },
+    {
+      "path": "qa/prototype_browser_qa.json",
+      "sha256": "27b232c9af31021b7f6b63f1608a2ea395ac9507f07d5520a259eb87a7042c70"
+    },
+    {
+      "path": "reference/Previous_AutoPortion_v0.1.html",
+      "sha256": "11871b894241aeb0d39a27cd52153e5a41d9dfada61056db0685f12b2ffca271"
+    },
+    {
+      "path": "reference/Previous_Combined_v0.2.html",
+      "sha256": "36a26357ee705e8ab3336b31999d78f1ea86189c2a0040ffd4652fe4c1467e66"
+    }
+  ],
+  "approvedHTML": "prototype/FINAL_APPROVED_FitLog_AutoPortion_Goal_Deselect_v0.2.1.html",
+  "approvedSHA256": "4b7ffe5034d7f2984acaf68891541edd8be472cfc3b7c5c5e235b01278d6383e",
+  "status": "PASS"
+}

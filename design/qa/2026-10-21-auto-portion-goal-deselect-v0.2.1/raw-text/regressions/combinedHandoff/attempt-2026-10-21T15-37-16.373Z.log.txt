@@ -1,0 +1,33 @@
+{"width":320,"scale":100,"theme":"light","status":"PASS"}
+{"width":320,"scale":100,"theme":"dark","status":"PASS"}
+{"width":320,"scale":120,"theme":"light","status":"PASS"}
+{"width":320,"scale":120,"theme":"dark","status":"PASS"}
+{"width":320,"scale":140,"theme":"light","status":"PASS"}
+{"width":320,"scale":140,"theme":"dark","status":"PASS"}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.click: Timeout 15000ms exceeded.
+Call log:
+[2m  - waiting for locator('dialog[open] [data-close]').last()[22m
+[2m    - locator resolved to <button data-close="" aria-label="关闭" class="icon-btn quiet">…</button>[22m
+[2m  - attempting click action[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+[2m    - element is visible, enabled and stable[22m
+[2m    - scrolling into view if needed[22m
+
+    at close (<repo>/tests/browser/combinedHandoff.mjs:19:125)
+    at async file://<repo>/tests/browser/combinedHandoff.mjs:36:2 {
+  log: [
+    "  - waiting for locator('dialog[open] [data-close]').last()",
+    '    - locator resolved to <button data-close="" aria-label="关闭" class="icon-btn quiet">…</button>',
+    '  - attempting click action',
+    '    - waiting for element to be visible, enabled and stable',
+    '    - element is visible, enabled and stable',
+    '    - scrolling into view if needed'
+  ],
+  name: 'TimeoutError'
+}
+
+Node.js v24.16.0

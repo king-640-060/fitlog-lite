@@ -1,0 +1,142 @@
+{
+  "receipts": [
+    {
+      "engine": "chromium",
+      "width": 390,
+      "theme": "light",
+      "indicator": {
+        "x": 293,
+        "y": 521.6875,
+        "width": 20,
+        "height": 20
+      },
+      "scroll": [
+        {
+          "before": 300,
+          "after": 300
+        },
+        {
+          "before": 300,
+          "after": 300
+        }
+      ],
+      "demoOnly": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "theme": "dark",
+      "indicator": {
+        "x": 293,
+        "y": 521.6875,
+        "width": 20,
+        "height": 20
+      },
+      "scroll": [
+        {
+          "before": 300,
+          "after": 300
+        },
+        {
+          "before": 300,
+          "after": 300
+        }
+      ],
+      "demoOnly": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "chromium",
+      "width": 320,
+      "theme": "light",
+      "indicator": {
+        "x": 232,
+        "y": 514.78125,
+        "width": 20,
+        "height": 20
+      },
+      "scroll": [
+        {
+          "before": 300,
+          "after": 300
+        },
+        {
+          "before": 300,
+          "after": 300
+        }
+      ],
+      "demoOnly": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "width": 390,
+      "theme": "light",
+      "indicator": {
+        "x": 293.234375,
+        "y": 521.6875,
+        "width": 20,
+        "height": 20
+      },
+      "scroll": [
+        {
+          "before": 300,
+          "after": 300
+        },
+        {
+          "before": 300,
+          "after": 300
+        }
+      ],
+      "demoOnly": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "width": 390,
+      "theme": "dark",
+      "indicator": {
+        "x": 293.234375,
+        "y": 521.6875,
+        "width": 20,
+        "height": 20
+      },
+      "scroll": [
+        {
+          "before": 300,
+          "after": 300
+        },
+        {
+          "before": 300,
+          "after": 300
+        }
+      ],
+      "demoOnly": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "width": 320,
+      "theme": "light",
+      "indicator": {
+        "x": 232.234375,
+        "y": 514.78125,
+        "width": 20,
+        "height": 20
+      },
+      "scroll": [
+        {
+          "before": 300,
+          "after": 300
+        },
+        {
+          "before": 300,
+          "after": 300
+        }
+      ],
+      "demoOnly": true,
+      "status": "PASS"
+    }
+  ]
+}

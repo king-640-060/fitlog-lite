@@ -1,0 +1,1644 @@
+{
+  "receipts": [
+    {
+      "engine": "chromium",
+      "browserVersion": "151.0.7922.34",
+      "width": 390,
+      "height": 480,
+      "font": 200,
+      "theme": "dark",
+      "url": "http://127.0.0.1:5370/fitlog-lite/",
+      "build": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+      "status": "PASS",
+      "circle": {
+        "width": 20,
+        "height": 20,
+        "border": "rgb(178, 189, 179)"
+      },
+      "scrolls": [
+        {
+          "id": "portion-10",
+          "before": {
+            "scroll": 980,
+            "top": 143.71875,
+            "body": 442
+          },
+          "after": {
+            "scroll": 980,
+            "top": 143.71875,
+            "body": 442
+          }
+        },
+        {
+          "id": "portion-11",
+          "before": {
+            "scroll": 980,
+            "top": 143.71875,
+            "body": 442
+          },
+          "after": {
+            "scroll": 980,
+            "top": 143.71875,
+            "body": 442
+          }
+        }
+      ],
+      "eventScroll": [
+        {
+          "event": 980,
+          "next": 980,
+          "top": 143.71875
+        },
+        {
+          "event": 980,
+          "next": 980,
+          "top": 143.71875
+        },
+        {
+          "event": 980,
+          "next": 980,
+          "top": 143.71875
+        },
+        {
+          "event": 980,
+          "next": 980,
+          "top": 143.71875
+        }
+      ],
+      "steps": [
+        {
+          "name": "goal-selected",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 390,
+            "height": 468,
+            "top": 12,
+            "right": 390,
+            "bottom": 480,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 148.40625,
+            "width": 390,
+            "height": 258.59375,
+            "top": 148.40625,
+            "right": 390,
+            "bottom": 407,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<button type=\"button\" class=\"secondary goal-template-row\" data-goal-template=\"portion-v1\" aria-press"
+        },
+        {
+          "name": "goal-cancelled",
+          "dialog": {
+            "x": 0,
+            "y": 12.000046730041504,
+            "width": 390,
+            "height": 468,
+            "top": 12.000046730041504,
+            "right": 390,
+            "bottom": 480.0000467300415,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 148.4062957763672,
+            "width": 390,
+            "height": 258.59375,
+            "top": 148.4062957763672,
+            "right": 390,
+            "bottom": 407.0000457763672,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-36f313d4-a792-467e-8a0d-8d"
+        },
+        {
+          "name": "food-middle-selected",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 390,
+            "height": 468,
+            "top": 12,
+            "right": 390,
+            "bottom": 480,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 95.703125,
+            "width": 390,
+            "height": 267.296875,
+            "top": 95.703125,
+            "right": 390,
+            "bottom": 363,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<input type=\"checkbox\" data-designated-food=\"portion-10\">"
+        },
+        {
+          "name": "automatic-preview",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 390,
+            "height": 468,
+            "top": 12,
+            "right": 390,
+            "bottom": 480,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 95.703125,
+            "width": 390,
+            "height": 270.296875,
+            "top": 95.703125,
+            "right": 390,
+            "bottom": 366,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-1720a6e0-7496-42b8-9cf3-44"
+        },
+        {
+          "name": "manual-preview",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 390,
+            "height": 468,
+            "top": 12,
+            "right": 390,
+            "bottom": 480,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 95.703125,
+            "width": 390,
+            "height": 270.296875,
+            "top": 95.703125,
+            "right": 390,
+            "bottom": 366,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<body class=\"sheet-open\" style=\"position: fixed; top: -1240px; left: 0px; right: 0px; width: 100%; o"
+        }
+      ],
+      "all22ReadOnlyChecks": true,
+      "onlyFoodLogsWritten": true,
+      "hashBefore": "80335a93216fc448fa86bd0cf81a12fd3ae80b3d6027379b959022ed0a26f869",
+      "hashAfter": "1d49d4bc48b7ddb32576205fb0201eef92f9d0dbb14793eadad051a469f28791",
+      "physicalIPhone": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "browserVersion": "151.0.7922.34",
+      "width": 844,
+      "height": 390,
+      "font": 200,
+      "theme": "dark",
+      "url": "http://127.0.0.1:5370/fitlog-lite/",
+      "build": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+      "status": "PASS",
+      "circle": {
+        "width": 20,
+        "height": 20,
+        "border": "rgb(178, 189, 179)"
+      },
+      "scrolls": [
+        {
+          "id": "portion-10",
+          "before": {
+            "scroll": 980,
+            "top": 119.328125,
+            "body": 434
+          },
+          "after": {
+            "scroll": 980,
+            "top": 119.328125,
+            "body": 434
+          }
+        },
+        {
+          "id": "portion-11",
+          "before": {
+            "scroll": 980,
+            "top": 119.328125,
+            "body": 434
+          },
+          "after": {
+            "scroll": 980,
+            "top": 119.328125,
+            "body": 434
+          }
+        }
+      ],
+      "eventScroll": [
+        {
+          "event": 980,
+          "next": 980,
+          "top": 119.328125
+        },
+        {
+          "event": 980,
+          "next": 980,
+          "top": 119.328125
+        },
+        {
+          "event": 980,
+          "next": 980,
+          "top": 119.328125
+        },
+        {
+          "event": 980,
+          "next": 980,
+          "top": 119.328125
+        }
+      ],
+      "steps": [
+        {
+          "name": "goal-selected",
+          "dialog": {
+            "x": 102,
+            "y": 12,
+            "width": 640,
+            "height": 378,
+            "top": 12,
+            "right": 742,
+            "bottom": 390,
+            "left": 102
+          },
+          "body": {
+            "x": 102,
+            "y": 95.703125,
+            "width": 640,
+            "height": 221.296875,
+            "top": 95.703125,
+            "right": 742,
+            "bottom": 317,
+            "left": 102
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<button type=\"button\" class=\"secondary goal-template-row\" data-goal-template=\"portion-v1\" aria-press"
+        },
+        {
+          "name": "goal-cancelled",
+          "dialog": {
+            "x": 102,
+            "y": 12,
+            "width": 640,
+            "height": 378,
+            "top": 12,
+            "right": 742,
+            "bottom": 390,
+            "left": 102
+          },
+          "body": {
+            "x": 102,
+            "y": 95.703125,
+            "width": 640,
+            "height": 221.296875,
+            "top": 95.703125,
+            "right": 742,
+            "bottom": 317,
+            "left": 102
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-8e2e3800-3335-4301-bdc8-11"
+        },
+        {
+          "name": "food-middle-selected",
+          "dialog": {
+            "x": 102,
+            "y": 12,
+            "width": 640,
+            "height": 378,
+            "top": 12,
+            "right": 742,
+            "bottom": 390,
+            "left": 102
+          },
+          "body": {
+            "x": 102,
+            "y": 95.703125,
+            "width": 640,
+            "height": 219.296875,
+            "top": 95.703125,
+            "right": 742,
+            "bottom": 315,
+            "left": 102
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<input type=\"checkbox\" data-designated-food=\"portion-10\">"
+        },
+        {
+          "name": "automatic-preview",
+          "dialog": {
+            "x": 102,
+            "y": 12,
+            "width": 640,
+            "height": 378,
+            "top": 12,
+            "right": 742,
+            "bottom": 390,
+            "left": 102
+          },
+          "body": {
+            "x": 102,
+            "y": 95.703125,
+            "width": 640,
+            "height": 208.296875,
+            "top": 95.703125,
+            "right": 742,
+            "bottom": 304,
+            "left": 102
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-58b9669a-8e4b-45cf-9f36-e8"
+        },
+        {
+          "name": "manual-preview",
+          "dialog": {
+            "x": 102,
+            "y": 12,
+            "width": 640,
+            "height": 378,
+            "top": 12,
+            "right": 742,
+            "bottom": 390,
+            "left": 102
+          },
+          "body": {
+            "x": 102,
+            "y": 95.703125,
+            "width": 640,
+            "height": 208.296875,
+            "top": 95.703125,
+            "right": 742,
+            "bottom": 304,
+            "left": 102
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<body class=\"sheet-open\" style=\"position: fixed; top: -786px; left: 0px; right: 0px; width: 100%; ov"
+        }
+      ],
+      "all22ReadOnlyChecks": true,
+      "onlyFoodLogsWritten": true,
+      "hashBefore": "3d0e016a3b39caf6aa2eee0f7c8021aad39d77e399e1dbe89df018309286dbc2",
+      "hashAfter": "2f954d1eceb934284cae178d26a4f8a6bf8e30b5043bb6620c965f961882a2ab",
+      "physicalIPhone": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "browserVersion": "151.0.7922.34",
+      "width": 320,
+      "height": 568,
+      "font": 200,
+      "theme": "dark",
+      "url": "http://127.0.0.1:5370/fitlog-lite/",
+      "build": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+      "status": "PASS",
+      "circle": {
+        "width": 20,
+        "height": 20,
+        "border": "rgb(178, 189, 179)"
+      },
+      "scrolls": [
+        {
+          "id": "portion-10",
+          "before": {
+            "scroll": 1260,
+            "top": 179.03125,
+            "body": 477
+          },
+          "after": {
+            "scroll": 1260,
+            "top": 179.03125,
+            "body": 477
+          }
+        }
+      ],
+      "eventScroll": [
+        {
+          "event": 1260,
+          "next": 1260,
+          "top": 179.03125
+        },
+        {
+          "event": 1260,
+          "next": 1260,
+          "top": 179.03125
+        },
+        {
+          "event": 1260,
+          "next": 1260,
+          "top": 179.03125
+        }
+      ],
+      "steps": [
+        {
+          "name": "goal-selected",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 320,
+            "height": 556,
+            "top": 12,
+            "right": 320,
+            "bottom": 568,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 148.40625,
+            "width": 320,
+            "height": 346.59375,
+            "top": 148.40625,
+            "right": 320,
+            "bottom": 495,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<button type=\"button\" class=\"secondary goal-template-row\" data-goal-template=\"portion-v1\" aria-press"
+        },
+        {
+          "name": "goal-cancelled",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 320,
+            "height": 556,
+            "top": 12,
+            "right": 320,
+            "bottom": 568,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 148.40625,
+            "width": 320,
+            "height": 346.59375,
+            "top": 148.40625,
+            "right": 320,
+            "bottom": 495,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-60c45651-8837-446b-a36a-98"
+        },
+        {
+          "name": "food-middle-selected",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 320,
+            "height": 556,
+            "top": 12,
+            "right": 320,
+            "bottom": 568,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 95.703125,
+            "width": 320,
+            "height": 341.296875,
+            "top": 95.703125,
+            "right": 320,
+            "bottom": 437,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<input type=\"checkbox\" data-designated-food=\"portion-10\">"
+        },
+        {
+          "name": "automatic-preview",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 320,
+            "height": 556,
+            "top": 12,
+            "right": 320,
+            "bottom": 568,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 95.703125,
+            "width": 320,
+            "height": 328.296875,
+            "top": 95.703125,
+            "right": 320,
+            "bottom": 424,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-dfa9d0e7-3635-44b1-9d35-df"
+        },
+        {
+          "name": "manual-preview",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 320,
+            "height": 556,
+            "top": 12,
+            "right": 320,
+            "bottom": 568,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 95.703125,
+            "width": 320,
+            "height": 328.296875,
+            "top": 95.703125,
+            "right": 320,
+            "bottom": 424,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<body class=\"sheet-open\" style=\"position: fixed; top: -1312px; left: 0px; right: 0px; width: 100%; o"
+        }
+      ],
+      "all22ReadOnlyChecks": true,
+      "onlyFoodLogsWritten": true,
+      "hashBefore": "782584846522f24ffe00a546290659b6b2f9773eabfe733f483392206f2910a9",
+      "hashAfter": "2e8d1bfcd4d06d5884f55f9b56bdf46dd6d05ab5c0a7c9e9b62a24dc7030470d",
+      "physicalIPhone": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "browserVersion": "151.0.7922.34",
+      "width": 390,
+      "height": 844,
+      "font": 100,
+      "theme": "light",
+      "url": "http://127.0.0.1:5370/fitlog-lite/",
+      "build": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+      "status": "PASS",
+      "circle": {
+        "width": 20,
+        "height": 20,
+        "border": "rgb(105, 115, 105)"
+      },
+      "scrolls": [
+        {
+          "id": "portion-10",
+          "before": {
+            "scroll": 620,
+            "top": 380.328125,
+            "body": 0
+          },
+          "after": {
+            "scroll": 620,
+            "top": 380.328125,
+            "body": 0
+          }
+        },
+        {
+          "id": "portion-11",
+          "before": {
+            "scroll": 620,
+            "top": 380.328125,
+            "body": 0
+          },
+          "after": {
+            "scroll": 620,
+            "top": 380.328125,
+            "body": 0
+          }
+        }
+      ],
+      "eventScroll": [
+        {
+          "event": 620,
+          "next": 620,
+          "top": 380.328125
+        },
+        {
+          "event": 620,
+          "next": 620,
+          "top": 380.328125
+        },
+        {
+          "event": 620,
+          "next": 620,
+          "top": 380.328125
+        },
+        {
+          "event": 620,
+          "next": 620,
+          "top": 380.328125
+        },
+        {
+          "event": 0,
+          "next": 0,
+          "top": 380.328125
+        },
+        {
+          "event": 0,
+          "next": 0,
+          "top": 380.328125
+        },
+        {
+          "event": 0,
+          "next": 0,
+          "top": 380.328125
+        }
+      ],
+      "steps": [
+        {
+          "name": "goal-selected",
+          "dialog": {
+            "x": 0,
+            "y": 24,
+            "width": 390,
+            "height": 820,
+            "top": 24,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 99,
+            "width": 390,
+            "height": 672,
+            "top": 99,
+            "right": 390,
+            "bottom": 771,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<button type=\"button\" class=\"secondary goal-template-row\" data-goal-template=\"portion-v1\" aria-press"
+        },
+        {
+          "name": "goal-cancelled",
+          "dialog": {
+            "x": 0,
+            "y": 24,
+            "width": 390,
+            "height": 820,
+            "top": 24,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 99,
+            "width": 390,
+            "height": 672,
+            "top": 99,
+            "right": 390,
+            "bottom": 771,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-0a59e27f-7131-4140-be38-ad"
+        },
+        {
+          "name": "food-middle-selected",
+          "dialog": {
+            "x": 0,
+            "y": 24,
+            "width": 390,
+            "height": 820,
+            "top": 24,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 99,
+            "width": 390,
+            "height": 670,
+            "top": 99,
+            "right": 390,
+            "bottom": 769,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<input type=\"checkbox\" data-designated-food=\"portion-10\">"
+        },
+        {
+          "name": "automatic-preview",
+          "dialog": {
+            "x": 0,
+            "y": 24,
+            "width": 390,
+            "height": 820,
+            "top": 24,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 99,
+            "width": 390,
+            "height": 659,
+            "top": 99,
+            "right": 390,
+            "bottom": 758,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-adafe213-64b6-4281-9903-40"
+        },
+        {
+          "name": "manual-preview",
+          "dialog": {
+            "x": 0,
+            "y": 24,
+            "width": 390,
+            "height": 820,
+            "top": 24,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 99,
+            "width": 390,
+            "height": 659,
+            "top": 99,
+            "right": 390,
+            "bottom": 758,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<body class=\"sheet-open\" style=\"position: fixed; top: 0px; left: 0px; right: 0px; width: 100%; overf"
+        }
+      ],
+      "all22ReadOnlyChecks": true,
+      "onlyFoodLogsWritten": true,
+      "hashBefore": "d6659bb9c8d8ac9e18384d24deb6402d33e4101d395d06ac64e5a670f8f2b820",
+      "hashAfter": "46869db8a246a1c448a70522875c693130b3d0ecd9db8a8243f87f3a766a4dbf",
+      "physicalIPhone": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "browserVersion": "26.5",
+      "width": 390,
+      "height": 480,
+      "font": 200,
+      "theme": "dark",
+      "url": "http://127.0.0.1:5370/fitlog-lite/",
+      "build": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+      "status": "PASS",
+      "circle": {
+        "width": 20,
+        "height": 20,
+        "border": "rgb(178, 189, 179)"
+      },
+      "scrolls": [
+        {
+          "id": "portion-10",
+          "before": {
+            "scroll": 1150,
+            "top": 150.640625,
+            "body": 435
+          },
+          "after": {
+            "scroll": 1150,
+            "top": 150.640625,
+            "body": 435
+          }
+        }
+      ],
+      "eventScroll": [
+        {
+          "event": 1150,
+          "next": 1150,
+          "top": 150.640625
+        },
+        {
+          "event": 1150,
+          "next": 1150,
+          "top": 150.640625
+        },
+        {
+          "event": 1150,
+          "next": 1150,
+          "top": 150.640625
+        }
+      ],
+      "steps": [
+        {
+          "name": "goal-selected",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 390,
+            "height": 468,
+            "top": 12,
+            "right": 390,
+            "bottom": 480,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 95.6875,
+            "width": 390,
+            "height": 311.3125,
+            "top": 95.6875,
+            "right": 390,
+            "bottom": 407,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<dialog class=\"sheet sheet-wide management-workspace\" data-sheet-variant=\"large\" aria-labelledby=\"sh"
+        },
+        {
+          "name": "goal-cancelled",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 390,
+            "height": 468,
+            "top": 12,
+            "right": 390,
+            "bottom": 480,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 95.6875,
+            "width": 390,
+            "height": 311.3125,
+            "top": 95.6875,
+            "right": 390,
+            "bottom": 407,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-6bf76c7e-02c6-4b55-85f2-86"
+        },
+        {
+          "name": "food-middle-selected",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 390,
+            "height": 468,
+            "top": 12,
+            "right": 390,
+            "bottom": 480,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 95.6875,
+            "width": 390,
+            "height": 281.3125,
+            "top": 95.6875,
+            "right": 390,
+            "bottom": 377,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<dialog class=\"sheet\" data-sheet-variant=\"large\" aria-labelledby=\"sheet-title-d6ad0cc9-f013-429b-a82"
+        },
+        {
+          "name": "automatic-preview",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 390,
+            "height": 468,
+            "top": 12,
+            "right": 390,
+            "bottom": 480,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 95.6875,
+            "width": 390,
+            "height": 280.3125,
+            "top": 95.6875,
+            "right": 390,
+            "bottom": 376,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-d6ad0cc9-f013-429b-a82e-e0"
+        },
+        {
+          "name": "manual-preview",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 390,
+            "height": 468,
+            "top": 12,
+            "right": 390,
+            "bottom": 480,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 95.6875,
+            "width": 390,
+            "height": 280.3125,
+            "top": 95.6875,
+            "right": 390,
+            "bottom": 376,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<body class=\"sheet-open\" style=\"position: fixed; top: -1225px; left: 0px; right: 0px; width: 100%; o"
+        }
+      ],
+      "all22ReadOnlyChecks": true,
+      "onlyFoodLogsWritten": true,
+      "hashBefore": "c5f8720ea154c4b47a75702368ff88c5ef948434132d5a1bdfe781be5698801a",
+      "hashAfter": "b90364c8ae2e4988733fdbbd947584ad89a55ffce5f87229599bfa93069bd8a8",
+      "physicalIPhone": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "browserVersion": "26.5",
+      "width": 844,
+      "height": 390,
+      "font": 200,
+      "theme": "dark",
+      "url": "http://127.0.0.1:5370/fitlog-lite/",
+      "build": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+      "status": "PASS",
+      "circle": {
+        "width": 20,
+        "height": 20,
+        "border": "rgb(178, 189, 179)"
+      },
+      "scrolls": [
+        {
+          "id": "portion-10",
+          "before": {
+            "scroll": 871,
+            "top": 119.25,
+            "body": 434
+          },
+          "after": {
+            "scroll": 871,
+            "top": 119.25,
+            "body": 434
+          }
+        },
+        {
+          "id": "portion-11",
+          "before": {
+            "scroll": 871,
+            "top": 119.25,
+            "body": 434
+          },
+          "after": {
+            "scroll": 871,
+            "top": 119.25,
+            "body": 434
+          }
+        }
+      ],
+      "eventScroll": [
+        {
+          "event": 871,
+          "next": 871,
+          "top": 119.25
+        },
+        {
+          "event": 871,
+          "next": 871,
+          "top": 119.25
+        },
+        {
+          "event": 871,
+          "next": 871,
+          "top": 119.25
+        },
+        {
+          "event": 871,
+          "next": 871,
+          "top": 119.25
+        }
+      ],
+      "steps": [
+        {
+          "name": "goal-selected",
+          "dialog": {
+            "x": 102,
+            "y": 12,
+            "width": 640,
+            "height": 378,
+            "top": 12,
+            "right": 742,
+            "bottom": 390,
+            "left": 102
+          },
+          "body": {
+            "x": 102,
+            "y": 95.6875,
+            "width": 640,
+            "height": 221.3125,
+            "top": 95.6875,
+            "right": 742,
+            "bottom": 317,
+            "left": 102
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<dialog class=\"sheet sheet-wide management-workspace\" data-sheet-variant=\"large\" aria-labelledby=\"sh"
+        },
+        {
+          "name": "goal-cancelled",
+          "dialog": {
+            "x": 102,
+            "y": 12,
+            "width": 640,
+            "height": 378,
+            "top": 12,
+            "right": 742,
+            "bottom": 390,
+            "left": 102
+          },
+          "body": {
+            "x": 102,
+            "y": 95.6875,
+            "width": 640,
+            "height": 221.3125,
+            "top": 95.6875,
+            "right": 742,
+            "bottom": 317,
+            "left": 102
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-6c29fe8e-cab8-4b4a-9737-4a"
+        },
+        {
+          "name": "food-middle-selected",
+          "dialog": {
+            "x": 102,
+            "y": 12,
+            "width": 640,
+            "height": 378,
+            "top": 12,
+            "right": 742,
+            "bottom": 390,
+            "left": 102
+          },
+          "body": {
+            "x": 102,
+            "y": 95.6875,
+            "width": 640,
+            "height": 219.3125,
+            "top": 95.6875,
+            "right": 742,
+            "bottom": 315,
+            "left": 102
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<dialog class=\"sheet\" data-sheet-variant=\"large\" aria-labelledby=\"sheet-title-d2f97e7d-502f-4b02-950"
+        },
+        {
+          "name": "automatic-preview",
+          "dialog": {
+            "x": 102,
+            "y": 12,
+            "width": 640,
+            "height": 378,
+            "top": 12,
+            "right": 742,
+            "bottom": 390,
+            "left": 102
+          },
+          "body": {
+            "x": 102,
+            "y": 95.6875,
+            "width": 640,
+            "height": 208.3125,
+            "top": 95.6875,
+            "right": 742,
+            "bottom": 304,
+            "left": 102
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-d2f97e7d-502f-4b02-9504-a9"
+        },
+        {
+          "name": "manual-preview",
+          "dialog": {
+            "x": 102,
+            "y": 12,
+            "width": 640,
+            "height": 378,
+            "top": 12,
+            "right": 742,
+            "bottom": 390,
+            "left": 102
+          },
+          "body": {
+            "x": 102,
+            "y": 95.6875,
+            "width": 640,
+            "height": 208.3125,
+            "top": 95.6875,
+            "right": 742,
+            "bottom": 304,
+            "left": 102
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<body class=\"sheet-open\" style=\"position: fixed; top: -781px; left: 0px; right: 0px; width: 100%; ov"
+        }
+      ],
+      "all22ReadOnlyChecks": true,
+      "onlyFoodLogsWritten": true,
+      "hashBefore": "9d573bcd709696c2f6ed1fc39f40490e3c400fe5bd4c54eefb71ee343cd5da00",
+      "hashAfter": "9278c418b1c8a41f42049db7d7e7c5e9aa2c90d63879ade9f4c22f6b4f1909cc",
+      "physicalIPhone": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "browserVersion": "26.5",
+      "width": 320,
+      "height": 568,
+      "font": 200,
+      "theme": "dark",
+      "url": "http://127.0.0.1:5370/fitlog-lite/",
+      "build": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+      "status": "PASS",
+      "circle": {
+        "width": 20,
+        "height": 20,
+        "border": "rgb(178, 189, 179)"
+      },
+      "scrolls": [
+        {
+          "id": "portion-10",
+          "before": {
+            "scroll": 1150,
+            "top": 178.53125,
+            "body": 445
+          },
+          "after": {
+            "scroll": 1150,
+            "top": 178.53125,
+            "body": 445
+          }
+        }
+      ],
+      "eventScroll": [
+        {
+          "event": 1150,
+          "next": 1150,
+          "top": 178.53125
+        },
+        {
+          "event": 1150,
+          "next": 1150,
+          "top": 178.53125
+        },
+        {
+          "event": 1150,
+          "next": 1150,
+          "top": 178.53125
+        }
+      ],
+      "steps": [
+        {
+          "name": "goal-selected",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 320,
+            "height": 556,
+            "top": 12,
+            "right": 320,
+            "bottom": 568,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 148.375,
+            "width": 320,
+            "height": 346.625,
+            "top": 148.375,
+            "right": 320,
+            "bottom": 495,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<dialog class=\"sheet sheet-wide management-workspace\" data-sheet-variant=\"large\" aria-labelledby=\"sh"
+        },
+        {
+          "name": "goal-cancelled",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 320,
+            "height": 556,
+            "top": 12,
+            "right": 320,
+            "bottom": 568,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 148.375,
+            "width": 320,
+            "height": 346.625,
+            "top": 148.375,
+            "right": 320,
+            "bottom": 495,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-7ef96661-03e0-4464-91eb-be"
+        },
+        {
+          "name": "food-middle-selected",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 320,
+            "height": 556,
+            "top": 12,
+            "right": 320,
+            "bottom": 568,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 95.6875,
+            "width": 320,
+            "height": 341.3125,
+            "top": 95.6875,
+            "right": 320,
+            "bottom": 437,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<dialog class=\"sheet\" data-sheet-variant=\"large\" aria-labelledby=\"sheet-title-91b0588e-b63e-43a7-91f"
+        },
+        {
+          "name": "automatic-preview",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 320,
+            "height": 556,
+            "top": 12,
+            "right": 320,
+            "bottom": 568,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 95.6875,
+            "width": 320,
+            "height": 328.3125,
+            "top": 95.6875,
+            "right": 320,
+            "bottom": 424,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-91b0588e-b63e-43a7-91f1-ad"
+        },
+        {
+          "name": "manual-preview",
+          "dialog": {
+            "x": 0,
+            "y": 12,
+            "width": 320,
+            "height": 556,
+            "top": 12,
+            "right": 320,
+            "bottom": 568,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 95.6875,
+            "width": 320,
+            "height": 328.3125,
+            "top": 95.6875,
+            "right": 320,
+            "bottom": 424,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<body class=\"sheet-open\" style=\"position: fixed; top: -1297px; left: 0px; right: 0px; width: 100%; o"
+        }
+      ],
+      "all22ReadOnlyChecks": true,
+      "onlyFoodLogsWritten": true,
+      "hashBefore": "31939c4235cb3cf097c4557480161ff09232735d56cc4500c499b936ebba44aa",
+      "hashAfter": "b5d0559424597507c346ab42f6cba17f2c536e492b6c574029f4c844d0b9de1e",
+      "physicalIPhone": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "browserVersion": "26.5",
+      "width": 390,
+      "height": 844,
+      "font": 100,
+      "theme": "light",
+      "url": "http://127.0.0.1:5370/fitlog-lite/",
+      "build": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+      "status": "PASS",
+      "circle": {
+        "width": 20,
+        "height": 20,
+        "border": "rgb(105, 115, 105)"
+      },
+      "scrolls": [
+        {
+          "id": "portion-10",
+          "before": {
+            "scroll": 570,
+            "top": 380.3125,
+            "body": 0
+          },
+          "after": {
+            "scroll": 570,
+            "top": 380.3125,
+            "body": 0
+          }
+        },
+        {
+          "id": "portion-11",
+          "before": {
+            "scroll": 570,
+            "top": 380.3125,
+            "body": 0
+          },
+          "after": {
+            "scroll": 570,
+            "top": 380.3125,
+            "body": 0
+          }
+        }
+      ],
+      "eventScroll": [
+        {
+          "event": 570,
+          "next": 570,
+          "top": 380.3125
+        },
+        {
+          "event": 570,
+          "next": 570,
+          "top": 380.3125
+        },
+        {
+          "event": 570,
+          "next": 570,
+          "top": 380.3125
+        },
+        {
+          "event": 570,
+          "next": 570,
+          "top": 380.3125
+        },
+        {
+          "event": 0,
+          "next": 0,
+          "top": 380.3125
+        },
+        {
+          "event": 0,
+          "next": 0,
+          "top": 380.3125
+        },
+        {
+          "event": 0,
+          "next": 0,
+          "top": 380.3125
+        }
+      ],
+      "steps": [
+        {
+          "name": "goal-selected",
+          "dialog": {
+            "x": 0,
+            "y": 24,
+            "width": 390,
+            "height": 820,
+            "top": 24,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 99,
+            "width": 390,
+            "height": 672,
+            "top": 99,
+            "right": 390,
+            "bottom": 771,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<dialog class=\"sheet sheet-wide management-workspace\" data-sheet-variant=\"large\" aria-labelledby=\"sh"
+        },
+        {
+          "name": "goal-cancelled",
+          "dialog": {
+            "x": 0,
+            "y": 24,
+            "width": 390,
+            "height": 820,
+            "top": 24,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 99,
+            "width": 390,
+            "height": 672,
+            "top": 99,
+            "right": 390,
+            "bottom": 771,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-ea371360-7fd0-4f36-a360-51"
+        },
+        {
+          "name": "food-middle-selected",
+          "dialog": {
+            "x": 0,
+            "y": 24,
+            "width": 390,
+            "height": 820,
+            "top": 24,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 99,
+            "width": 390,
+            "height": 670,
+            "top": 99,
+            "right": 390,
+            "bottom": 769,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<dialog class=\"sheet\" data-sheet-variant=\"large\" aria-labelledby=\"sheet-title-292b268e-4c9d-4931-b5a"
+        },
+        {
+          "name": "automatic-preview",
+          "dialog": {
+            "x": 0,
+            "y": 24,
+            "width": 390,
+            "height": 820,
+            "top": 24,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 99,
+            "width": 390,
+            "height": 659,
+            "top": 99,
+            "right": 390,
+            "bottom": 758,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<h2 tabindex=\"-1\" class=\"sheet-focus-anchor\" autofocus=\"\" id=\"sheet-title-292b268e-4c9d-4931-b5af-a7"
+        },
+        {
+          "name": "manual-preview",
+          "dialog": {
+            "x": 0,
+            "y": 24,
+            "width": 390,
+            "height": 820,
+            "top": 24,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          },
+          "body": {
+            "x": 0,
+            "y": 99,
+            "width": 390,
+            "height": 659,
+            "top": 99,
+            "right": 390,
+            "bottom": 758,
+            "left": 0
+          },
+          "bad": [],
+          "pageOverflow": false,
+          "keyboard": false,
+          "focus": "<body class=\"sheet-open\" style=\"position: fixed; top: 0px; left: 0px; right: 0px; width: 100%; overf"
+        }
+      ],
+      "all22ReadOnlyChecks": true,
+      "onlyFoodLogsWritten": true,
+      "hashBefore": "ac9adbe20e4062821a3138d80e4c1454d94f672d7ca389c1487a146473c1527d",
+      "hashAfter": "45ee071c2c3f15c229ebcb1e0e0799bafc1ec9f5d35b2d851df6cd2091f04640",
+      "physicalIPhone": "Pending"
+    }
+  ]
+}

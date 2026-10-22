@@ -1,0 +1,160 @@
+{
+  "version": "0.2.1",
+  "mode": "Chromium local HTML set_content; demo data only",
+  "checks": [
+    {
+      "width": 320,
+      "height": 700,
+      "theme": "light",
+      "status": "PASS",
+      "radioDiameterPx": 20,
+      "goalToggle": [
+        "false",
+        "true",
+        "false"
+      ],
+      "phaseAfterDeselect": "v1",
+      "foodScroll": [
+        [
+          175,
+          175
+        ],
+        [
+          255,
+          255
+        ]
+      ],
+      "clickedFoods": [
+        "egg",
+        "banana"
+      ],
+      "portionFields": 2,
+      "pageErrors": [],
+      "horizontalOverflow": false
+    },
+    {
+      "width": 375,
+      "height": 812,
+      "theme": "light",
+      "status": "PASS",
+      "radioDiameterPx": 20,
+      "goalToggle": [
+        "false",
+        "true",
+        "false"
+      ],
+      "phaseAfterDeselect": "v1",
+      "foodScroll": [
+        [
+          175,
+          175
+        ],
+        [
+          255,
+          255
+        ]
+      ],
+      "clickedFoods": [
+        "egg",
+        "banana"
+      ],
+      "portionFields": 2,
+      "pageErrors": [],
+      "horizontalOverflow": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "status": "PASS",
+      "radioDiameterPx": 20,
+      "goalToggle": [
+        "false",
+        "true",
+        "false"
+      ],
+      "phaseAfterDeselect": "v1",
+      "foodScroll": [
+        [
+          175,
+          175
+        ],
+        [
+          255,
+          255
+        ]
+      ],
+      "clickedFoods": [
+        "egg",
+        "banana"
+      ],
+      "portionFields": 2,
+      "pageErrors": [],
+      "horizontalOverflow": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "theme": "dark",
+      "status": "PASS",
+      "radioDiameterPx": 20,
+      "goalToggle": [
+        "false",
+        "true",
+        "false"
+      ],
+      "phaseAfterDeselect": "v1",
+      "foodScroll": [
+        [
+          175,
+          175
+        ],
+        [
+          255,
+          255
+        ]
+      ],
+      "clickedFoods": [
+        "egg",
+        "banana"
+      ],
+      "portionFields": 2,
+      "pageErrors": [],
+      "horizontalOverflow": false
+    },
+    {
+      "width": 430,
+      "height": 932,
+      "theme": "light",
+      "status": "PASS",
+      "radioDiameterPx": 20,
+      "goalToggle": [
+        "false",
+        "true",
+        "false"
+      ],
+      "phaseAfterDeselect": "v1",
+      "foodScroll": [
+        [
+          175,
+          175
+        ],
+        [
+          255,
+          255
+        ]
+      ],
+      "clickedFoods": [
+        "egg",
+        "banana"
+      ],
+      "portionFields": 2,
+      "pageErrors": [],
+      "horizontalOverflow": false
+    }
+  ],
+  "pass": 5,
+  "fail": 0,
+  "webkit": "Not tested",
+  "iPhone": "Pending"
+}

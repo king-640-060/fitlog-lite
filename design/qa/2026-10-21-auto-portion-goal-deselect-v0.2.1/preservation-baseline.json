@@ -1,0 +1,162 @@
+{
+  "phase": "baseline",
+  "syntheticProfile": true,
+  "noResetOrReseed": true,
+  "initialBuild": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+  "build": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+  "workerBuild": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+  "offlineColdBoot": true,
+  "data": {
+    "version": 130,
+    "stores": [
+      "cardioSessions",
+      "dietEvents",
+      "dietTemplates",
+      "exercises",
+      "foodLogs",
+      "foods",
+      "habitCheckIns",
+      "habits",
+      "nutritionCycleDays",
+      "nutritionCycles",
+      "nutritionStrategyPhases",
+      "nutritionStrategyTemplates",
+      "nutritionStrategyVariants",
+      "nutritionTargets",
+      "pelvicFloorSessions",
+      "sleepSessions",
+      "taskTags",
+      "tasks",
+      "waterLogs",
+      "weights",
+      "workoutTemplates",
+      "workouts"
+    ],
+    "allStoreHash": "049bc97a200c585af636db0378c6c72b1c81696208f15b5d30276755c6ba7c1a",
+    "configHash": "609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34",
+    "configKeys": [
+      "fitlog-ai-active-profile-v1",
+      "fitlog-ai-key-v1:training-recovery-preservation",
+      "fitlog-ai-preservation-fixture",
+      "fitlog-ai-privacy-ack-v1",
+      "fitlog-ai-profiles-v1",
+      "fitlog-voice-config-v1",
+      "fitlog-voice-preservation-fixture",
+      "fitlog-water-reference-v1"
+    ],
+    "tables": {
+      "cardioSessions": {
+        "count": 1,
+        "idsHash": "1a325c6a80033d711284661ab319930fcafa0ba61a2544aab8a3e1fa914a44dc",
+        "contentHash": "2fc25604afab155f7bfd77221872ef2a4dd3ae8d67722ee1da13d5dc48f929a3"
+      },
+      "dietEvents": {
+        "count": 3,
+        "idsHash": "70ca5b0fe1a675782d79a6e9354a5e370817479cae0b44d89b6a0170ecaaa501",
+        "contentHash": "ea61ceaeffc043ec5ef2ce0d6417375acec1c966b54f9fd5f7a8bf26250368a5"
+      },
+      "dietTemplates": {
+        "count": 1,
+        "idsHash": "874d072c3333006c72c3ee82d0f8d1ff42a42ccbaae4d31ceb4a4d8456a9b10c",
+        "contentHash": "125d1660ff1e7326d667566995a68c247114775ec7861e32d33c5fc2ed7b4083"
+      },
+      "exercises": {
+        "count": 1,
+        "idsHash": "2ed5c4bbbf2e16b5711695652dbf02bf0b6b41228ea99e155b2dda890b6778ec",
+        "contentHash": "cee831e44b62f08b063ee970c062c49b45b75cd23b76bd235eb39fea10753a6d"
+      },
+      "foodLogs": {
+        "count": 1,
+        "idsHash": "0bfecd3a295f04dacf6392f32faafc34192d6010c1ca93da3b690ba665886d0a",
+        "contentHash": "39530e6ff68fbd0e3f9ed30f708f53237db9aeb605a892cb3217d1bfbbfa2a30"
+      },
+      "foods": {
+        "count": 1,
+        "idsHash": "f543d2051d765ae536cde22fd7b030ff9dbe9313ee0508f2cb5a1207860bc7e2",
+        "contentHash": "6db3a77b4583b9923050b02776b8efa34ba49aceabd8115c9699edeea1d7c70b"
+      },
+      "habitCheckIns": {
+        "count": 1,
+        "idsHash": "ad862a58fa66657f7d24798dae7e0a8ea3c764091b164d83bead2cc9eb09a5e2",
+        "contentHash": "ba0415c3b78a548897e1afaa74ad54ec76dd6476d4a07e2f5732d6c83f15f844"
+      },
+      "habits": {
+        "count": 1,
+        "idsHash": "3ec66cbf26f36e7bae6f334a07eb4240c5d8a6dbe053beb8bf23dfb77f6cce9a",
+        "contentHash": "7967405a2e6d179119b2640aae646d59589aaba288c86ef91573a0d6619f313f"
+      },
+      "nutritionCycleDays": {
+        "count": 0,
+        "idsHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "contentHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "nutritionCycles": {
+        "count": 0,
+        "idsHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "contentHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "nutritionStrategyPhases": {
+        "count": 1,
+        "idsHash": "3f95c8dc4a5e6a8c45ae27844a75244928bbe5ad9d54cd7abb3996be66faf1aa",
+        "contentHash": "b817586db2cffc04fe5b768ea0424d3b6e7b62c50acb4f1b0a80107d33de387a"
+      },
+      "nutritionStrategyTemplates": {
+        "count": 1,
+        "idsHash": "50777aa492abf7d588ff503f68188c15be80b50a2b08015e2ce9a48435eb91d4",
+        "contentHash": "e02bfee9ac8cf7c8f505bd3571f131d143df7b413cc15c832575aa264e994ad4"
+      },
+      "nutritionStrategyVariants": {
+        "count": 1,
+        "idsHash": "cafb9ff044165d634605ac4b804a5a8c9d2f243f17fc6f87ed6b9843363114f2",
+        "contentHash": "83f12a22875545dd5a14f544fcd5beeeb1e1f9852840679d8daec3de0a737347"
+      },
+      "nutritionTargets": {
+        "count": 2,
+        "idsHash": "c61a32e22f8c5d86fcc7c55c6ebf590df1f70943d187822f9af6597422b2df3e",
+        "contentHash": "7d461e53e84e54fb139622c97162cf4d221360b54fbdd08df38572c494fdd7fe"
+      },
+      "pelvicFloorSessions": {
+        "count": 1,
+        "idsHash": "08d7f0eb3cb2d631a1fceb79f34f5f4f4406c87dc81f5f22d0c0b5ef4921894b",
+        "contentHash": "acd4d53c850ee0a72dd3ce6a24c5a5107248cea2780d5ba011f61864c6fa6f2e"
+      },
+      "sleepSessions": {
+        "count": 2,
+        "idsHash": "8795cb2b6e9cd54c39a423ee3ab18498e821f332c6b0010e932c57665f618170",
+        "contentHash": "20130c8df2cc29872cadc94d39c4f2994554d940530db1bdfb32a0066c53ea10"
+      },
+      "taskTags": {
+        "count": 1,
+        "idsHash": "4df8b9cb8c1d3f7d295d3b9ac7e93cec782d5ed61b77556ddaf9a71c1b827e06",
+        "contentHash": "e7edd0ddc2a888e7b054d8b642677d34ba788501b0b13acd3cccbecb37e9ad83"
+      },
+      "tasks": {
+        "count": 2,
+        "idsHash": "3e610eeae8a14f7890fc3c9fd2a64726b62029f3ffe215ce761a4811bc530665",
+        "contentHash": "5433af20718b4dcec9ac643d4e011bd8c205bbdbd53953c8f8f08d35d3b93664"
+      },
+      "waterLogs": {
+        "count": 1,
+        "idsHash": "551422c5fd891b4ed0461d371cbb328bc4f5e0e6e2d31618b1918f29a2a0f8bd",
+        "contentHash": "8e496ff822fae80c0a0cb237f5e7adbf88618073206d85be6bf380a8bb982ed2"
+      },
+      "weights": {
+        "count": 1,
+        "idsHash": "d3b706f6715a59c184f81aef33670545bfa83222fc8b68207de228d1664b0fa8",
+        "contentHash": "bab773112fb72028372f4097d7952d3a09c339ef0955be936313d9ab97180e5e"
+      },
+      "workoutTemplates": {
+        "count": 1,
+        "idsHash": "b5f0ed14c0a0fc349b2bbe6fa49eec2b59fab97dcfd70e5b6a62074ef3157d5b",
+        "contentHash": "1b65fab238fd835bcb99ebfed1c156ca5438d9cd9cdff79cc2c5a78811ead7bf"
+      },
+      "workouts": {
+        "count": 1,
+        "idsHash": "99a9fd2cfffc1077c42bfa7fecee995ad7977d768e71835d38d94a39d18e4fc9",
+        "contentHash": "61cdd1e7bec4f880a59c130e174f31045703990ad3a1c34d726f4708195930fa"
+      }
+    }
+  },
+  "status": "PASS",
+  "physicalIPhone": "Pending"
+}

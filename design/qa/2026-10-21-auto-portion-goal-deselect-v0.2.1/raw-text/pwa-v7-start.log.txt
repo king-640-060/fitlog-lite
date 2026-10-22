@@ -1,0 +1,17 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: test uses distinct build-time Git identities
+    at file://<repo>/tests/browser/pwaUpgrade.mjs:57:29
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at process.processImmediate (node:internal/timers:472:9) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: '87de0ee15eb583f5b8e1f16a86ee28c0f27add4e',
+  expected: '87de0ee15eb583f5b8e1f16a86ee28c0f27add4e',
+  operator: 'notStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.16.0

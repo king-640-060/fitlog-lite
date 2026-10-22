@@ -56,8 +56,9 @@ export function getNutritionCompletionSummary(target: NutritionGoal, logs: reado
 interface State { grams: number[]; added: number[]; count: number; score: number; key: string }
 
 /** Finite deterministic beam search. Calories and each macro are independent dimensions. */
-export function completeNutrition(target: NutritionGoal, logs: readonly FoodLog[], foods: readonly Food[], excludedFoodIds: ReadonlySet<string> = new Set(), allowedFoodIds?: ReadonlySet<string>): NutritionCompletionResult {
+export function completeNutrition(target: NutritionGoal, logs: readonly FoodLog[], foods: readonly Food[], excludedFoodIds: ReadonlySet<string> = new Set(), allowedFoodIds?: ReadonlySet<string>, requiredMinimumGrams = 0): NutritionCompletionResult {
   if (allowedFoodIds && allowedFoodIds.size > completionBounds.maxFoods) throw new Error('一次最多指定 4 种食物')
+  if (!Number.isFinite(requiredMinimumGrams) || requiredMinimumGrams < 0 || requiredMinimumGrams > completionBounds.maxFoodGrams || requiredMinimumGrams % completionBounds.gramStep !== 0 || requiredMinimumGrams * (allowedFoodIds?.size ?? 0) > completionBounds.maxTotalGrams || (requiredMinimumGrams > 0 && !allowedFoodIds?.size)) throw new Error('指定食物份量约束不合法')
   const summary = getNutritionCompletionSummary(target, logs)
   const result: NutritionCompletionResult = { ...summary, excludedFoodCount: 0, plans: [] }
   if (summary.nothingToComplete) return result
@@ -87,12 +88,18 @@ export function completeNutrition(target: NutritionGoal, logs: readonly FoodLog[
   }).sort((a, b) => a.best - b.best || compareText(a.food.name, b.food.name) || compareText(a.food.id, b.food.id))
   const candidates = ranked.slice(0, completionBounds.candidateLimit).map((item) => item.food)
   if (!candidates.length) return result
+  // Required selection is a constrained solve, never an optimizer-selected subset.
+  if (requiredMinimumGrams && (candidates.length !== allowedFoodIds!.size || new Set(candidates.map(f => f.id)).size !== allowedFoodIds!.size)) return result
   const increments = candidates.map((food) => keys.map((key) => food[key]! * (completionBounds.gramStep / food.referenceGrams)))
   const order = (a: State, b: State): number => a.score - b.score || a.count - b.count || compareText(a.key, b.key)
-  let beam: State[] = [{ grams: candidates.map(() => 0), added: keys.map(() => 0), count: 0, score: baseline, key: '' }]
+  const initialGrams = candidates.map(() => requiredMinimumGrams)
+  const initialAdded = keys.map((_, k) => initialGrams.reduce((sum, g, j) => sum + increments[j]![k]! * (g / completionBounds.gramStep), 0))
+  const initial: State = { grams: initialGrams, added: initialAdded, count: requiredMinimumGrams ? candidates.length : 0, score: objective(initialAdded, requiredMinimumGrams ? candidates.length : 0), key: initialGrams.join(',') }
+  let beam: State[] = [initial]
   // At most 793 food sets for 12 candidates / 4 foods. Keep each set's best portion vector.
   const archive = new Map<string, State>()
-  for (let step = 1; step <= completionBounds.maxTotalGrams / completionBounds.gramStep; step++) {
+  if (requiredMinimumGrams && initial.score < baseline) archive.set(candidates.map((_, i) => i).join(','), initial)
+  for (let step = 1; step <= (completionBounds.maxTotalGrams - requiredMinimumGrams * candidates.length) / completionBounds.gramStep; step++) {
     const next = new Map<string, State>()
     for (const state of beam) for (let i = 0; i < candidates.length; i++) {
       if (state.grams[i]! >= completionBounds.maxFoodGrams || (!state.grams[i] && state.count >= completionBounds.maxFoods)) continue

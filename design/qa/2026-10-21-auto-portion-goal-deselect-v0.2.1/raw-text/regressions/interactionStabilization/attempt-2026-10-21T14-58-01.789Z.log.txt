@@ -1,0 +1,5 @@
+{"mode":"local","width":320,"height":812,"modality":true,"sheetLifecycle":true,"keyboardGeometry":true,"settingsHierarchy":true,"models":true,"saveTest":true,"partial":true,"safe400":true,"majorSheets":true,"errors":[]}
+{"mode":"local","width":375,"height":812,"modality":true,"sheetLifecycle":true,"keyboardGeometry":true,"settingsHierarchy":true,"models":true,"saveTest":true,"partial":true,"safe400":true,"majorSheets":true,"errors":[]}
+{"mode":"local","width":390,"height":844,"modality":true,"sheetLifecycle":true,"keyboardGeometry":true,"settingsHierarchy":true,"models":true,"saveTest":true,"partial":true,"safe400":true,"majorSheets":true,"errors":[]}
+{"mode":"local","width":430,"height":932,"modality":true,"sheetLifecycle":true,"keyboardGeometry":true,"settingsHierarchy":true,"models":true,"saveTest":true,"partial":true,"safe400":true,"majorSheets":true,"errors":[]}
+{"desktopHeightResize":true}

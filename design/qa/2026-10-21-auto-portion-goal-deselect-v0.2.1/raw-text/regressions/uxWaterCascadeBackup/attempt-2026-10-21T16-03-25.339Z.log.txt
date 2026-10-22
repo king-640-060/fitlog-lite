@@ -1,0 +1,3 @@
+{"stage":"delete-and-export","url":"http://127.0.0.1:5370/fitlog-lite/","build":"87de0ee15eb583f5b8e1f16a86ee28c0f27add4e","version":130,"stores":22,"postDeleteContentHash":"bcb76f1693b3062d59fdf2ccd73e1daf36a2b3b5e21bf4e2b13d6b7e5e346e02","status":"PASS"}
+{"stage":"prior-client-restore","url":"http://127.0.0.1:5376/fitlog-lite/","build":"120cb0624d0efa06b7ff7ce638e7d02104d4d62c","version":130,"stores":22,"postDeleteContentHash":"bcb76f1693b3062d59fdf2ccd73e1daf36a2b3b5e21bf4e2b13d6b7e5e346e02","status":"PASS"}
+{"stage":"new-client-restore","url":"http://127.0.0.1:5370/fitlog-lite/","build":"87de0ee15eb583f5b8e1f16a86ee28c0f27add4e","version":130,"stores":22,"postDeleteContentHash":"bcb76f1693b3062d59fdf2ccd73e1daf36a2b3b5e21bf4e2b13d6b7e5e346e02","status":"PASS"}

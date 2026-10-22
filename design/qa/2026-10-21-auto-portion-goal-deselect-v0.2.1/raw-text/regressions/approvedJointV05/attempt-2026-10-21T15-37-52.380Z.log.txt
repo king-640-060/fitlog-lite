@@ -1,0 +1,16 @@
+{"engine":"chromium","width":320,"scale":100,"system":"light","status":"PASS"}
+FAIL_STATE {"engine":"chromium","width":320,"scale":100,"system":"dark","mode":null,"theme":"dark","mediaDark":true}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+locator.click: Timeout 12000ms exceeded.
+Call log:
+[2m  - waiting for locator('#open-management')[22m
+
+    at <repo>/tests/browser/approvedJointV05.mjs:29:78 {
+  log: [ "  - waiting for locator('#open-management')" ],
+  name: 'TimeoutError'
+}
+
+Node.js v24.16.0

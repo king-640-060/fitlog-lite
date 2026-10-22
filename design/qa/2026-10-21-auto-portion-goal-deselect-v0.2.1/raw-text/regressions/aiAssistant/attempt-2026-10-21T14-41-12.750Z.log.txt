@@ -1,0 +1,4 @@
+Local AI mock UI 320×812: PASS; 5 tabs, settings, snapshots, proposals, errors, Stop, profile switch, reload, offline core
+Local AI mock UI 375×812: PASS; 5 tabs, settings, snapshots, proposals, errors, Stop, profile switch, reload, offline core
+Local AI mock UI 390×844: PASS; 5 tabs, settings, snapshots, proposals, errors, Stop, profile switch, reload, offline core
+Local AI mock UI 430×932: PASS; 5 tabs, settings, snapshots, proposals, errors, Stop, profile switch, reload, offline core

@@ -1,0 +1,118 @@
+{
+  "results": [
+    {
+      "name": "prior-goal-full",
+      "start": "2026-10-21T14:41:13.839Z",
+      "end": "2026-10-21T14:47:51.478Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "prior-goal-keyboard",
+      "start": "2026-10-21T14:47:51.479Z",
+      "end": "2026-10-21T14:47:56.853Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "water-full",
+      "start": "2026-10-21T14:47:56.854Z",
+      "end": "2026-10-21T14:53:22.795Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "joint-chromium",
+      "start": "2026-10-21T14:53:22.796Z",
+      "end": "2026-10-21T14:53:58.410Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "joint-webkit",
+      "start": "2026-10-21T14:53:58.411Z",
+      "end": "2026-10-21T14:54:31.864Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "report-ranges",
+      "start": "2026-10-21T14:54:31.864Z",
+      "end": "2026-10-21T14:54:42.602Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "pwa-v7-local",
+      "command": "node tests/browser/pwaUpgrade.mjs (FITLOG_PWA_OLD_DIST real V7; no precommit identical-identity PROMPT)",
+      "start": "2026-10-21T14:55:59.969077+00:00",
+      "end": "2026-10-21T14:56:06.467115+00:00",
+      "exitCode": 0,
+      "status": "PASS",
+      "note": "START prompt mode requires the distinct Application Git build and is mandatory in production-application",
+      "timingSource": "raw log filesystem creation/last-write timestamps"
+    }
+  ],
+  "attempts": [
+    {
+      "name": "prior-goal-full",
+      "start": "2026-10-21T14:41:13.839Z",
+      "end": "2026-10-21T14:47:51.478Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "prior-goal-keyboard",
+      "start": "2026-10-21T14:47:51.479Z",
+      "end": "2026-10-21T14:47:56.853Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "water-full",
+      "start": "2026-10-21T14:47:56.854Z",
+      "end": "2026-10-21T14:53:22.795Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "joint-chromium",
+      "start": "2026-10-21T14:53:22.796Z",
+      "end": "2026-10-21T14:53:58.410Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "joint-webkit",
+      "start": "2026-10-21T14:53:58.411Z",
+      "end": "2026-10-21T14:54:31.864Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "report-ranges",
+      "start": "2026-10-21T14:54:31.864Z",
+      "end": "2026-10-21T14:54:42.602Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "pwa-v7-start",
+      "start": "2026-10-21T14:54:42.603Z",
+      "end": "2026-10-21T14:54:49.239Z",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "pwa-v7-local",
+      "command": "node tests/browser/pwaUpgrade.mjs (FITLOG_PWA_OLD_DIST real V7; no precommit identical-identity PROMPT)",
+      "start": "2026-10-21T14:55:59.969077+00:00",
+      "end": "2026-10-21T14:56:06.467115+00:00",
+      "exitCode": 0,
+      "status": "PASS",
+      "note": "START prompt mode requires the distinct Application Git build and is mandatory in production-application",
+      "timingSource": "raw log filesystem creation/last-write timestamps"
+    }
+  ],
+  "note": "First precommit prompt attempt correctly rejected same START/candidate Git identity; V7-only local rerun passes unchanged assertions. START->Application prompt is verified post-commit."
+}

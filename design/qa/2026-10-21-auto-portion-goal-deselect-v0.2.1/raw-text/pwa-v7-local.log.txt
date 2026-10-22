@@ -1,0 +1,27 @@
+[
+  {
+    "mode": "legacy",
+    "baselineDbVersion": 70,
+    "baselineStores": 14,
+    "build": "87de0ee15eb583f5b8e1f16a86ee28c0f27add4e",
+    "waiting": true,
+    "selectedImagePreserved": true,
+    "aiDraftBlocked": false,
+    "pendingProposalBlocked": false,
+    "otherClientBlocked": false,
+    "cancelPreserved": false,
+    "singleConfirmedReload": false,
+    "dbVersion": 130,
+    "stores": 22,
+    "legacyStoresPreserved": 14,
+    "newStrategyStoresEmpty": true,
+    "newDietEventStoreEmpty": true,
+    "newRecoveryStoresEmpty": true,
+    "rows": 15,
+    "businessAndAiHash": "fd1abe66456552342c9260303cdf840d43c459cd498f8240be8ef606e7043cdd",
+    "offlineColdBoot": true,
+    "appearanceColdOffline": true,
+    "physicalSafari": "Pending",
+    "physicalInstalledPwa": "Pending"
+  }
+]

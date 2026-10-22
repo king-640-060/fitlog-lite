@@ -1,0 +1,105 @@
+{
+  "rows": [
+    {
+      "id": "BASE-01",
+      "status": "PASS",
+      "evidence": "START main87de同步；22原成员/21SHA/20FILES一致；批准原型6上下文真实运行"
+    },
+    {
+      "id": "VIS-01",
+      "status": "PASS",
+      "evidence": "40上下文20px圆/10px点/已选中/aria/44px整行；实测computed对照"
+    },
+    {
+      "id": "VIS-02",
+      "status": "PASS",
+      "evidence": "共享tokens/Sheet/footer，真实日期Food/Target/phase，不复制demo"
+    },
+    {
+      "id": "GOAL-01",
+      "status": "PASS",
+      "evidence": "有阶段无目标、已删目标重开均null草稿，中性真实阶段独立"
+    },
+    {
+      "id": "GOAL-02",
+      "status": "PASS",
+      "evidence": "V1→取消→V2→V1逐步aria及Continue；重开重置"
+    },
+    {
+      "id": "GOAL-03",
+      "status": "PASS",
+      "evidence": "每步及关闭全22表精确零变化，无phase写API"
+    },
+    {
+      "id": "GOAL-04",
+      "status": "PASS",
+      "evidence": "手动/策略/周期来源与显式启用/应用分离；旧40上下文目标流程"
+    },
+    {
+      "id": "GOAL-05",
+      "status": "PASS",
+      "evidence": "归档/无方案禁用、同日冲突、源变、回滚、循环/报告/删除完整回归"
+    },
+    {
+      "id": "FOOD-01",
+      "status": "PASS",
+      "evidence": "1–4每项保留，有限正份量，禁止第五项/陌生ID，无前置克数"
+    },
+    {
+      "id": "FOOD-02",
+      "status": "PASS",
+      "evidence": "reference50g、熟重名称/brand、独立kcal/显式0/历史snapshot校验"
+    },
+    {
+      "id": "FOOD-03",
+      "status": "PASS",
+      "evidence": "无目标/已达/未知/不可达/已超脂肪明确回退；折中无完美声明"
+    },
+    {
+      "id": "FOOD-04",
+      "status": "PASS",
+      "evidence": "显式实际记录、分数精度/即时预览；0/空/NaN/极值/1000及2000边界"
+    },
+    {
+      "id": "FOOD-05",
+      "status": "PASS",
+      "evidence": "readonly22表、未来阻断、真正餐次事务、二写回滚/陈旧/并发/双击保护"
+    },
+    {
+      "id": "SCROLL-01",
+      "status": "PASS",
+      "evidence": "真实可见坐标点击+取消，scrollTop/事件后/下一帧实测，无列表重建"
+    },
+    {
+      "id": "SCROLL-02",
+      "status": "PASS",
+      "evidence": "同DOM/query/anchor/focus返回、40上下文含模拟键盘/短屏/横屏；真实键盘另Pending"
+    },
+    {
+      "id": "A11Y-01",
+      "status": "Pending",
+      "evidence": "浏览器44px/16px/aria/焦点/原生缩放通过；实体VoiceOver未实测"
+    },
+    {
+      "id": "REG-01",
+      "status": "PASS",
+      "evidence": "1115单测，TypeScript/build，44命令最终PASS；早期失败/中断另存"
+    },
+    {
+      "id": "REG-02",
+      "status": "PASS",
+      "evidence": "315既有文件保护含17冻结fixture；Backup14/Restore1–14/Sync1；旧profile22表8配置不变"
+    },
+    {
+      "id": "REL-01",
+      "status": "Pending",
+      "evidence": "本地门槛完成；Application/END CI及Pages证据由最终回执/END报告记录"
+    },
+    {
+      "id": "REL-02",
+      "status": "PASS",
+      "evidence": "按十项交付；浏览器/生产/用户物理验收分开，未测设备明确Pending"
+    }
+  ],
+  "note": "REL-01 local preparation only; final publication status is in final receipt and LATEST report. Physical keyboard/Safe Area/VO/personal/PWA/Provider Pending."
+}

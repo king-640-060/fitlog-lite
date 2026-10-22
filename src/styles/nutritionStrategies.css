@@ -81,3 +81,14 @@
 .goal-value-grid dt { color:var(--text-secondary); font-size:.8rem; }
 .goal-value-grid dd { margin:0; color:var(--text-primary); font-size:.9rem; font-weight:650; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
 .sheet:has([data-goal-picker], [data-goal-variants], [data-goal-preview], #strategy-template-form, #strategy-activation-root) .modal-head h2 { white-space:normal; overflow:visible; text-overflow:clip; overflow-wrap:anywhere; }
+
+/* Selection is a transient UI draft, independent of saved goals and real phases. */
+.goal-template-row .goal-choice-state { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 3.5em; }
+.goal-choice-circle { box-sizing: border-box; display: grid; place-items: center; flex: none; width: 20px; height: 20px; border: 1.5px solid var(--text-secondary); border-radius: 50%; }
+.goal-choice-circle::after { content: ''; display: block; width: 10px; height: 10px; border-radius: 50%; background: transparent; }
+.goal-choice-text { visibility: hidden; font-size: .75rem; color: var(--accent); }
+.goal-template-row[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-soft); }
+.goal-template-row[aria-pressed="true"] .goal-choice-circle { border-color: var(--accent); }
+.goal-template-row[aria-pressed="true"] .goal-choice-circle::after { background: var(--accent); }
+.goal-template-row[aria-pressed="true"] .goal-choice-text { visibility: visible; }
+.goal-template-row .goal-phase-note { color: var(--text-secondary); font-weight: 400; }

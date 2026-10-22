@@ -15,12 +15,13 @@ export async function readNutritionCompletionSource(date: string, database: FitL
 export function nutritionCompletionSourceSignature(source: Awaited<ReturnType<typeof readNutritionCompletionSource>>): string {
   return JSON.stringify({ target: source.target, logs: [...source.logs].sort((a, b) => a.id.localeCompare(b.id)), foods: [...source.foods].sort((a, b) => a.id.localeCompare(b.id)) })
 }
-export interface CompletionSourceGuard { signature: string; allowedFoodIds?: readonly string[]; manualPortions?: boolean }
+export interface CompletionSourceGuard { signature: string; allowedFoodIds?: readonly string[]; manualPortions?: boolean; requireAllFoods?: boolean; sourceDate?: string }
 
 export async function applyNutritionCompletionPlan(date: string, meal: MealType | undefined, items: readonly { food: Food; grams: number }[], database: FitLogDatabase = db, guard?: CompletionSourceGuard): Promise<FoodLog[]> {
   const parsed = new Date(`${date}T12:00:00`)
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(parsed.getTime()) || getLocalDateString(parsed) !== date) throw new Error('记录日期不合法')
   if (isFutureBusinessDate(date)) throw new Error('未来日期仅可预览，请在实际吃下后记录')
+  if (guard?.sourceDate !== undefined && guard.sourceDate !== date) throw new Error('源日期已变化，请重新计算建议。')
   if (meal !== undefined && !isMealType(meal)) throw new Error('餐次不合法')
   if (!items.length || items.length > completionBounds.maxFoods || new Set(items.map((item) => item.food.id)).size !== items.length) throw new Error('方案食物不合法')
   if (!guard?.manualPortions && items.reduce((sum, item) => sum + item.grams, 0) > completionBounds.maxTotalGrams) throw new Error('方案克数不合法')
@@ -29,6 +30,7 @@ export async function applyNutritionCompletionPlan(date: string, meal: MealType 
     validateFoodInput(item.food)
   }
   if(guard?.manualPortions){if(!guard.allowedFoodIds?.length)throw Error('请明确指定食物');previewDesignatedNutrition({},[],items)}
+  if(guard?.requireAllFoods && (!guard.allowedFoodIds?.length || new Set(guard.allowedFoodIds).size!==guard.allowedFoodIds.length || guard.allowedFoodIds.length!==items.length || guard.allowedFoodIds.some(id=>!items.some(item=>item.food.id===id))))throw Error('方案必须保留全部指定食物，请重新计算。')
   return database.transaction('rw', database.foodLogs, database.foods, database.nutritionTargets, async () => {
     if (guard) {
       const source = await readNutritionCompletionSource(date, database)
