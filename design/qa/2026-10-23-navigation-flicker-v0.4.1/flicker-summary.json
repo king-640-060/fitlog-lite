@@ -1,0 +1,437 @@
+{
+  "displayContextsPerPhase": 52,
+  "identicalAll22AndConfigHashes": true,
+  "before": {
+    "boundaries": 444,
+    "retained": 0,
+    "maxVerticalDelta": 24
+  },
+  "after": {
+    "boundaries": 444,
+    "retained": 444,
+    "maxVerticalDelta": 0
+  },
+  "nestedBoundaries": 16,
+  "nestedVerticalHeightDelta": 0,
+  "matrix": [
+    {
+      "name": "chromium-320x844-100-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-320x844-100-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-320x844-140-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-320x844-140-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-320x844-200-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-320x844-200-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-375x844-100-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-375x844-100-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-375x844-140-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-375x844-140-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-375x844-200-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-375x844-200-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-390x844-100-light",
+      "boundaries": 15,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-390x844-100-dark",
+      "boundaries": 15,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-390x844-140-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-390x844-140-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-390x844-200-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-390x844-200-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-430x844-100-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-430x844-100-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-430x844-140-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-430x844-140-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-430x844-200-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-430x844-200-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-390x568-200-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "chromium-844x390-140-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-320x844-100-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-320x844-100-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-320x844-140-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-320x844-140-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-320x844-200-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-320x844-200-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-375x844-100-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-375x844-100-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-375x844-140-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-375x844-140-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-375x844-200-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-375x844-200-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-390x844-100-light",
+      "boundaries": 15,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-390x844-100-dark",
+      "boundaries": 15,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-390x844-140-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-390x844-140-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-390x844-200-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-390x844-200-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-430x844-100-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-430x844-100-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-430x844-140-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-430x844-140-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-430x844-200-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-430x844-200-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-390x568-200-dark",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    },
+    {
+      "name": "webkit-844x390-140-light",
+      "boundaries": 8,
+      "maxDelta": 0,
+      "all22Hash": "844c2fbb689d274d02ac23f9456ce4c73f45a0ede6d8ec7652d2e973b4a682a2",
+      "configHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "status": "PASS"
+    }
+  ],
+  "nativeVideoFrames": "25fps encoded video; raw rAF identifies exact DOM boundary. Decoded icon-color heuristic is only an index aid, baseline WebKit misses one later Food tint. All8 direct transition prefixes and all4 after sequences match; contacts manually reviewed.",
+  "systemTime": "Real clock, same local business date; greeting crosses hour boundary in some BEFORE/AFTER contexts. No claim of whole-screen pixel identity across recordings.",
+  "physical": "Pending"
+}

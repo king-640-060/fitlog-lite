@@ -1,8 +1,8 @@
 /* Only the local presentation stages clip their offscreen neighbors; page layout remains measurable. */
 .page-swipe-stage { position:relative; min-height:calc(100dvh - var(--safe-area-top) - var(--page-bottom-reserve)); overflow:clip; isolation:isolate; }
 .page-current { min-width:0; }
-.page-preview { position:absolute; inset:0; pointer-events:none; min-width:0; background:var(--bg); }
-.page-preview > [data-preview-tab] { display:flex; flex-direction:column; gap:12px; min-width:0; }
+.page-preview { position:absolute; top:0; left:0; right:0; pointer-events:none; min-width:0; }
+
 .page-swipe-stage[data-swiping] > .page-current,.page-swipe-stage[data-swiping] > .page-preview { will-change:transform; }
 .bottom-nav .nav-capsule { position:absolute; left:0; border-radius:11px; background:var(--accent-soft); pointer-events:none; }
 .bottom-nav button.active::before { background:transparent; }

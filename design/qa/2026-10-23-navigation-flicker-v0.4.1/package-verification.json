@@ -1,0 +1,9 @@
+{
+  "ZIP_SHA256": "cbfff4162c3f2c76dee2636590c1b031381bee9316c14c00cb4270ac252cf693",
+  "CRC": "PASS",
+  "manifestFiles": 6,
+  "SHA256SUMS": 6,
+  "frozenV04HTML": "b7be5a11161f138c0182b059bd42ca26d0b56852b309db34b01b5b4792b68419",
+  "userVideoFilesIncluded": false,
+  "status": "PASS"
+}

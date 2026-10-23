@@ -15,10 +15,10 @@
 .calendar-overview-head { position:relative; display:grid; grid-template-columns:44px minmax(0,1fr) 44px; align-items:center; gap:0; min-height:48px; margin-inline:-.125rem; }
 .calendar-overview-head .calendar-month { grid-column:2; grid-row:1; justify-self:center; max-width:calc(100% - max(88px,3rem)); text-align:center; font-size:1.0625rem; line-height:1.3; }
 .calendar-month > span { display:inline-block; white-space:nowrap; }
-.calendar-overview-head #calendar-next { grid-column:3; grid-row:1; }
-.calendar-overview-head #calendar-prev { grid-column:1; grid-row:1; }
-.calendar-overview-head #calendar-today { position:absolute; right:44px; top:50%; transform:translateY(-50%); width:auto; min-width:44px; min-height:44px; padding:0; background:transparent; border:0; border-radius:0; box-shadow:none; color:var(--accent-strong); font-size:.75rem; font-weight:580; white-space:nowrap; }
-.calendar-overview-head #calendar-today:active { background:transparent; opacity:.6; }
+.calendar-overview-head :is(#calendar-next,[data-navigation-id="calendar-next"]) { grid-column:3; grid-row:1; }
+.calendar-overview-head :is(#calendar-prev,[data-navigation-id="calendar-prev"]) { grid-column:1; grid-row:1; }
+.calendar-overview-head :is(#calendar-today,[data-navigation-id="calendar-today"]) { position:absolute; right:44px; top:50%; transform:translateY(-50%); width:auto; min-width:44px; min-height:44px; padding:0; background:transparent; border:0; border-radius:0; box-shadow:none; color:var(--accent-strong); font-size:.75rem; font-weight:580; white-space:nowrap; }
+.calendar-overview-head :is(#calendar-today,[data-navigation-id="calendar-today"]):active { background:transparent; opacity:.6; }
 .today-habit-row { display:grid; grid-template-columns:44px minmax(0,1fr); gap:8px; }
 .today-habit-check { display:grid; place-items:center; width:44px; height:44px; border:0; background:transparent; padding:0; }
 .today-habit-detail { display:flex; align-items:center; justify-content:space-between; gap:8px; min-width:0; min-height:44px; text-align:left; border:0; background:transparent; padding:4px 0; }

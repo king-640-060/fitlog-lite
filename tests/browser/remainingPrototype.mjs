@@ -1,3 +1,4 @@
+import {waitForMainNavigation} from './navigationSettlement.mjs'
 // Run the pristine approved HTML, then compare actual DOM/computed styles and original screenshots.
 // Synthetic disposable app contexts only; the prototype file and real profiles are never altered.
 import assert from 'node:assert/strict'
@@ -20,11 +21,11 @@ for(const [width,scale,theme]of cases){
  const target={id:'reference-target',date:today,calories:mock.target.cal,protein:mock.target.p,carbs:mock.target.c,fat:mock.target.f,createdAt:stamp,updatedAt:stamp}
  const write=async data=>a.evaluate(async data=>{const d=await new Promise(r=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>r(q.result)});await new Promise((r,j)=>{const t=d.transaction(Object.keys(data),'readwrite');for(const[n,rows]of Object.entries(data)){const s=t.objectStore(n);s.clear();for(const row of rows)s.put(row)}t.oncomplete=r;t.onerror=()=>j(t.error)});d.close()},data)
  await write({foodLogs:[log],nutritionTargets:[target]});await a.reload({waitUntil:'networkidle'});await a.addStyleTag({content:`html{font-size:${scale}%}`})
- const nav=async tab=>{await a.locator(`[data-tab=${tab}]`).click();await a.waitForSelector('.remaining-goal')};
+ const nav=async tab=>{await a.locator(`[data-tab=${tab}]`).click();await waitForMainNavigation(a,tab);await a.waitForSelector('.remaining-goal')};
  const results={width,scale,theme,syntheticActuals:mock.totals,prototypeFontScaling:scale===100?'original untouched':'runtime computed text sizes × font scale; file untouched',modules:{}}
  for(const tab of ['today','food']){
  await p.evaluate(({tab,theme,scale})=>{state.theme=theme;route(tab);render();if(scale!==100){const elements=[document.querySelector('.remaining'),...document.querySelector('.remaining').querySelectorAll('*')];const sizes=elements.map(e=>parseFloat(getComputedStyle(e).fontSize)*scale/100);elements.forEach((e,i)=>e.style.fontSize=sizes[i]+'px')}},{tab,theme,scale})
- await a.locator(`[data-tab=${tab}]`).click();await a.waitForSelector(tab==='today'?'[data-today-remaining] .food-completion-strip':'.food-remaining');const pl=p.locator('.remaining'),al=a.locator(tab==='today'?'[data-today-remaining] .food-completion-strip':'.food-remaining')
+ await a.locator(`[data-tab=${tab}]`).click();await waitForMainNavigation(a,tab);await a.waitForSelector(tab==='today'?'[data-today-remaining] .food-completion-strip':'.food-remaining');const pl=p.locator('.remaining'),al=a.locator(tab==='today'?'[data-today-remaining] .food-completion-strip':'.food-remaining')
  await pl.evaluate(e=>e.scrollIntoView({block:'center'}));await al.evaluate(e=>e.scrollIntoView({block:'center'}));await pl.screenshot({path:path.join(dir,`${prefix}-${tab}-prototype.png`)});await al.screenshot({path:path.join(dir,`${prefix}-${tab}-app.png`)})
  const proto=await measure(pl),app=await measure(al);results.modules[tab]={prototype:proto,app};if(before)continue
  assert.equal(app.cells.length,4);assert.equal(app.container.border,'1px');assert.equal(app.container.radius,proto.container.radius);if(width<=430)assert.ok(Math.abs(app.container.width-proto.container.width)<.1);assert.equal(app.container.gap,proto.container.gap);assert.equal(app.grid.gap,proto.grid.gap);assert.equal(app.container.padding,proto.container.padding)

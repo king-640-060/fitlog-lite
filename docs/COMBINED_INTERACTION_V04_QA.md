@@ -15,3 +15,8 @@ START:`01628f7170bae2a68071838a1ddfe7551d428bc7`。用户授权的唯一v0.4 HTM
 [冻结证据索引](../design/qa/2026-10-22-combined-interaction-v0.4/README.md)、[51项矩阵](../design/qa/2026-10-22-combined-interaction-v0.4/acceptance-local.json)、[完整44门槛](../design/qa/2026-10-22-combined-interaction-v0.4/regressions.json)、[校验清单](../design/qa/2026-10-22-combined-interaction-v0.4/sha256-manifest.json)。本地矩阵43PASS/8Pending含2发布项；最终发布后另补2项真实结果，6个含真机项目仍Pending。实体iPhone Safari、系统边缘返回、原安装PWA、真实键盘/IME/SafeArea、VoiceOver及个人连续性均无实体证据，不计入自动化PASS。
 
 原Downloads ZIP于最终复核时不存在；最初已核CRC/摘要，最终对保留解压文件与仓库17成员逐字节及全部给定摘要重新核验，不冒称重复检查了不存在的ZIP。未另给外部ZIP摘要。完成本轮Application/END发布验证后停止，等待ChatGPT独立核查。
+
+
+## 2026-10-23 闪帧补充核查边界
+
+此前96个中间帧及旧PASS记录证明的是当时覆盖的拖动/功能路径，没有测量 prepare→commit 的可见 DOM 交接，不能据此否认用户后来报告的闪帧。本轮在 START `c78c428044a5ca80591d049fcf1d00cf680a0eeb` 实际重现：预备页被另一套DOM替换，训练卡片下移8/16/24px，且预备层与正式页背景不同。新的[修复合同](NAVIGATION_FLICKER_V041.md)和[独立QA](NAVIGATION_FLICKER_V041_QA.md)保存本轮真实证据；本文件原结果及冻结QA/原型保持历史记录，不用旧PASS自动继承新FLICKER条目。

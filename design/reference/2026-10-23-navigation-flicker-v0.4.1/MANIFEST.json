@@ -1,0 +1,42 @@
+{
+  "version": "0.4.1-nav-flicker-bugfix-handoff",
+  "type": "developer-handoff-not-implementation",
+  "base_commit": "c78c428044a5ca80591d049fcf1d00cf680a0eeb",
+  "files": {
+    "00_README_先看.md": {
+      "sha256": "e4fd333e4f3ae343fa84743fc29c3a46318b0601f74be4ad962c76e73b7a256c",
+      "bytes": 2460
+    },
+    "01_正式开发指令_12项.md": {
+      "sha256": "bca440db48888ab31ce2f2cbe3d626cb8be22376fa52a38e36649d289ee2397e",
+      "bytes": 9438
+    },
+    "02_技术问题与修复边界.md": {
+      "sha256": "7f82acb92c0a4dc876a19ab58dc2609ec44635177fa8fb4ab2a6e2bfc5500e14",
+      "bytes": 4390
+    },
+    "03_验收矩阵.md": {
+      "sha256": "7e4dbad02779c7f3020205407754b7c3acdc7ccae41df0c2e50bcd1626bf5492",
+      "bytes": 3655
+    },
+    "04_交付回执.md": {
+      "sha256": "68a3deb93bd905be404cbfbfad970513df5d301465285af4420047a30500125e",
+      "bytes": 1429
+    },
+    "05_基线与证据说明.md": {
+      "sha256": "736ccffd5da15dc049bbc4cf14f6e7f74d916bfc3e244d840c96a987e0b1cf02",
+      "bytes": 1726
+    }
+  },
+  "scope": [
+    "five-tab flicker",
+    "workout jump after settle"
+  ],
+  "excluded": [
+    "v0.7 visual redesign",
+    "gradient nutrition",
+    "new progress subnavigation",
+    "business/storage changes"
+  ],
+  "qa_status": "not run"
+}

@@ -72,15 +72,16 @@ export function bindHorizontalSwipe(surface: HTMLElement, options: {
   return { cancel: () => finish(true), destroy: () => { gesture = undefined; events.abort() } }
 }
 
-export interface NavigationPreview { element: HTMLElement; dispose(): void }
+export interface NavigationPreview { element: HTMLElement; dispose(): void; activate?(): void }
 export function createPageNavigation<T extends string>(options: {
   tabs: readonly T[]; stage: HTMLElement; current: HTMLElement; nav: HTMLElement
   active(): T
   prepare(tab: T, signal: AbortSignal): Promise<NavigationPreview>
-  commit(tab: T): Promise<void>
+  commit(tab: T, prepared: NavigationPreview): Promise<HTMLElement | void>
   fail(error: unknown): void
 }) {
-  const { stage, current, nav, tabs } = options, events = new AbortController(), reduced = matchMedia('(prefers-reduced-motion: reduce)')
+  let current = options.current
+  const { stage, nav, tabs } = options, events = new AbortController(), reduced = matchMedia('(prefers-reduced-motion: reduce)')
   const capsule = document.createElement('i'); capsule.className = 'nav-capsule'; capsule.setAttribute('aria-hidden', 'true'); nav.prepend(capsule)
   const buttons = [...nav.querySelectorAll<HTMLElement>('[data-tab]')]
   let revision = 0, frame = 0, preview: NavigationPreview | undefined, ownCommit = false, dx = 0, from = 0, to = 0, ended = false
@@ -116,6 +117,9 @@ export function createPageNavigation<T extends string>(options: {
     paintCapsule(from, to, Math.abs(d) / width)
   }
   const prepare = async (target: number, token: number) => {
+    for (const pending of pendingReads) pending.abort()
+    pendingReads.clear()
+    if (preview) clean()
     const read = new AbortController(); pendingReads.add(read)
     let next: NavigationPreview
     try { next = await options.prepare(tabs[target]!, read.signal) }
@@ -143,7 +147,11 @@ export function createPageNavigation<T extends string>(options: {
       scrollPositions.set(options.active(), window.scrollY)
       const target = tabs[to]!
       ownCommit = true
-      try { await options.commit(target); window.scrollTo({ top: scrollPositions.get(target) ?? 0, behavior: 'instant' }) } finally { ownCommit = false }
+      try {
+        const adopted = await options.commit(target, preview!)
+        if (adopted) { current = adopted; preview = undefined; previewTo = -1 }
+        window.scrollTo({ top: scrollPositions.get(target) ?? 0, behavior: 'instant' })
+      } catch (error) { clean(); throw error } finally { ownCommit = false }
     }
     if (token === revision) { requested = undefined; clean(); measure() }
     if (queued !== undefined) { const latest = queued; queued = undefined; await go(latest) }

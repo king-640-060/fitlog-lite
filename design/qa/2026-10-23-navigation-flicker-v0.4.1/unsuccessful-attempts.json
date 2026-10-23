@@ -1,0 +1,99 @@
+{
+  "first44": [
+    {
+      "name": "foodServing",
+      "command": [
+        "node",
+        "tests/browser/foodServing.mjs"
+      ],
+      "start": "2026-10-23T09:21:16.853Z",
+      "end": "2026-10-23T09:22:07.645Z",
+      "exitCode": 1,
+      "status": "FAIL",
+      "artifacts": "external/work/navigation-flicker-v041-2026-10-23/regression-freeze/foodServing"
+    },
+    {
+      "name": "foodVision",
+      "command": [
+        "node",
+        "tests/browser/foodVision.mjs"
+      ],
+      "start": "2026-10-23T09:22:07.645Z",
+      "end": "2026-10-23T09:22:41.028Z",
+      "exitCode": 1,
+      "status": "FAIL",
+      "artifacts": "external/work/navigation-flicker-v041-2026-10-23/regression-freeze/foodVision"
+    },
+    {
+      "name": "githubSyncSafety",
+      "command": [
+        "node",
+        "tests/browser/githubSyncSafety.mjs"
+      ],
+      "start": "2026-10-23T09:22:41.029Z",
+      "end": "2026-10-23T09:23:13.562Z",
+      "exitCode": 1,
+      "status": "FAIL",
+      "artifacts": "external/work/navigation-flicker-v041-2026-10-23/regression-freeze/githubSyncSafety"
+    },
+    {
+      "name": "managementWorkspace",
+      "command": [
+        "node",
+        "tests/browser/managementWorkspace.mjs"
+      ],
+      "start": "2026-10-23T09:30:04.773Z",
+      "end": "2026-10-23T10:00:04.786Z",
+      "exitCode": 13,
+      "status": "FAIL",
+      "artifacts": "external/work/navigation-flicker-v041-2026-10-23/regression-freeze/managementWorkspace"
+    },
+    {
+      "name": "remainingPrototype",
+      "command": [
+        "node",
+        "tests/browser/remainingPrototype.mjs"
+      ],
+      "start": "2026-10-23T10:15:42.316Z",
+      "end": "2026-10-23T10:15:44.430Z",
+      "exitCode": 1,
+      "status": "FAIL",
+      "artifacts": "external/work/navigation-flicker-v041-2026-10-23/regression-freeze/remainingPrototype"
+    },
+    {
+      "name": "foodWaterDayV04-webkit",
+      "command": [
+        "node",
+        "tests/browser/foodWaterDayV04.mjs"
+      ],
+      "start": "2026-10-23T10:24:03.211Z",
+      "end": "2026-10-23T10:27:07.743Z",
+      "exitCode": 1,
+      "status": "FAIL",
+      "artifacts": "external/work/navigation-flicker-v041-2026-10-23/regression-freeze/foodWaterDayV04-webkit"
+    },
+    {
+      "name": "uxWaterCascade-webkit",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascade.mjs"
+      ],
+      "start": "2026-10-23T10:30:27.797Z",
+      "end": "2026-10-23T10:33:14.267Z",
+      "exitCode": 1,
+      "status": "FAIL",
+      "artifacts": "external/work/navigation-flicker-v041-2026-10-23/regression-freeze/uxWaterCascade-webkit"
+    }
+  ],
+  "newHarnessCorrections": [
+    "Exclude nonpainted transient Food date mounts from visible-node comparison; retained raw failed timeline.",
+    "Warm actual chart globals once, then require stable external listeners through100 switches.",
+    "Wait for async Calendar month before recording expected month.",
+    "Use fixed synthetic catalog IDs in new isolated contexts for exact before/after all22 hashes; production profile never reset.",
+    "Temporary management debug timer was not cleared and failed after page close; discarded; actual unchanged full24 gate passed.",
+    "Ongoing-workout diagnostic compares serialized facts because existing autosave normalizes missing optional fields to undefined; original values/ID and all other tables remain exact.",
+    "Video tint indexing is heuristic; baseline WebKit incomplete later sequence is not labelled full success. Actual DOM boundaries/raw videos remain evidence."
+  ],
+  "driverChanges": "Only explicit disclosure-open setup and actual route settlement; all128 original assertion expressions byte-identical. Other network/WebKit initial failures do not have a proven product cause; full unchanged gates rerun.",
+  "allRawLogsRetained": true
+}

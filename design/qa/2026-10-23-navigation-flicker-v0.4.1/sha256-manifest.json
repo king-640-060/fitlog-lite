@@ -1,0 +1,12 @@
+{
+  "README.md": "6de2ca6c65d95886772508f8113b97ba7e3ab1d02839a20ff10fa092feed53f4",
+  "acceptance-prepublish.json": "277276ee1b2405e41cc36b0155ab2f4fcdd4ad65dfe91f00e4dd1220dec1aead",
+  "combined-regressions.json": "b68522956cff780b1c6baaf3f4a0396d1c9c1fa828efe29497e6236f5fa4f230",
+  "data-protection.json": "19e3f891db3330f78e46006f99f48a4dd072296652a8e6e926c9e4d00bfd4445",
+  "flicker-summary.json": "f1b5f539cd6f223a2331b4a90f4d5e139930037139137b7d4efa1ef5d631f3b9",
+  "package-verification.json": "365dbcb44348e624ea8ef8dd2b03a1aea8f149fbd5462f09d70365d0ca36c72f",
+  "regressions.json": "45bf4cad2dd8c15edf112c9a4ae6daa7b9b22bb4377d4d8bc4f0532478bc3a0b",
+  "resource-ownership.json": "3992e3c4a8592115452131db81aea69687bb76d1d2af0b43303641e1dac34729",
+  "unsuccessful-attempts.json": "ce1c2e076639607c9833a56e5109a9a3f47bbdd757a46b36b2f496ae4168ddb2",
+  "verification-stages.json": "a8b6fe036211b3538995e7db238e8f56960b857f11a63306ca4e99bc3b6a2866"
+}

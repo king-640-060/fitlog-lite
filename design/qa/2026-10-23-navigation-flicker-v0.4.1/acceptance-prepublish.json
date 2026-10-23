@@ -1,0 +1,107 @@
+{
+  "items": [
+    {
+      "id": "FLICKER-01",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-02",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-03",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-04",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-05",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-06",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-07",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-08",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-09",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-10",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-11",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-12",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-13",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-14",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-15",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-16",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-17",
+      "status": "Pending",
+      "reason": "Await actual Application/END same-profile upgrade; START baseline verified."
+    },
+    {
+      "id": "FLICKER-18",
+      "status": "PASS",
+      "reason": "Actual local automated evidence."
+    },
+    {
+      "id": "FLICKER-19",
+      "status": "Pending",
+      "reason": "Await both actual CI/Pages phases."
+    },
+    {
+      "id": "FLICKER-20",
+      "status": "Pending",
+      "reason": "Physical iPhone/original PWA unavailable; never substituted by automation."
+    }
+  ],
+  "PASS": 17,
+  "Pending": 3,
+  "releaseResults": "LATEST_DEV_REPORT and external final receipt record actual publication after this frozen prepublish evidence."
+}

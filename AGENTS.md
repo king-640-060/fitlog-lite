@@ -444,3 +444,8 @@ Follow [v0.2.1 contract](docs/AUTO_PORTION_GOAL_DESELECT_V021.md). This approval
 ## Approved combined interaction v0.4 (2026-10-22)
 
 Follow [combined interaction contract](docs/COMBINED_INTERACTION_V04.md). Five fixed Tabs gain real adjacent readonly previews and a synchronized capsule; committed route/date remain single facts. Native child scroll, controls/selection, edge return, modal/keyboard/immersive state win arbitration. Food content whitespace joins its native date rail through actual local-date previews; this narrowly replaces the old static-body prohibition. Three initial training Sheets share Large geometry and opt-in58px/275ms motion with synchronous exact-once native cleanup; execution/autosave/timers stay unchanged. No schema/service/format/data changes. Retain all previous gates and separate physical-device Pending.
+
+
+## Navigation flicker v0.4.1 (2026-10-23)
+
+Follow [navigation handoff contract](docs/NAVIGATION_FLICKER_V041.md) for the approved v0.4 bugfix. Promote the actual prepared DOM and its owned readonly mounts; never visibly rebuild it at commit. Deferred controls activate once, outgoing/canceled resources dispose once, preview IDs/live regions stay isolated and geometry matches the active page. Keep all existing business/data/visual contracts and every regression gate. Physical-device evidence remains separate.

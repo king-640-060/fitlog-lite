@@ -123,6 +123,7 @@ let rootRenderVersion = 0
 const mainTabs = ['today', 'plan', 'food', 'workout', 'progress'] as const
 let pageNavigation: ReturnType<typeof createPageNavigation<Tab>> | undefined
 const previewDisposers = new WeakMap<HTMLElement, () => void>()
+const previewActivators = new WeakMap<HTMLElement, () => void>()
 const previewSignals = new WeakMap<HTMLElement, AbortSignal>()
 let planView: PlanView = 'today'
 let planTagFilterId: string | undefined
@@ -134,6 +135,8 @@ let calendarMonth = new Date().getMonth()
 let foodDate = getLocalDateString()
 let foodHeaderEvents: AbortController | undefined
 let foodRailEvents: AbortController | undefined
+// Only UI disclosure state, bounded to the most recently visited dates; never persisted as facts.
+const foodMealOpenDates = new Map<string, Set<string>>()
 let foodContentVersion = 0
 let foodNavigation: ReturnType<typeof createFoodDateNavigation> | undefined
 let workoutDate = getLocalDateString()
@@ -310,7 +313,6 @@ async function render(): Promise<void> {
   foodRailEvents?.abort()
   foodContentVersion += 1
   document.body.classList.remove('immersive')
-  const today = getLocalDateString()
   const markup = `
     <div class="app-frame">
       <div class="page-swipe-stage"><div class="page-current">${pageHeaderHtml(activeTab)}
@@ -339,11 +341,9 @@ async function render(): Promise<void> {
   if (!pageNavigation) pageNavigation = createPageNavigation({
     tabs: mainTabs, stage: app.querySelector('.page-swipe-stage')!, current: app.querySelector('.page-current')!, nav: app.querySelector('.bottom-nav')!,
     active: () => activeTab, prepare: prepareTabPreview,
-    commit: async tab => { activeTab = tab; await render() }, fail,
+    commit: async (tab, prepared) => activateTabPreview(tab, prepared), fail,
   })
-  app.querySelector('#open-ai-assistant')?.addEventListener('click', () => { void launchAssistant().catch(fail) })
-  app.querySelector('#open-management')?.addEventListener('click', showManagementHub)
-  app.querySelector('#plan-add-task')?.addEventListener('click', () => void showTaskEditor(undefined, planView === 'today' ? today : undefined))
+  bindPageHeader(app.querySelector('.page-current')!)
   switch (targetTab) {
     case 'today': await renderTodayPage(); break
     case 'plan': await renderPlanPage(); break
@@ -354,15 +354,64 @@ async function render(): Promise<void> {
   if (currentView.isConnected && targetTab === activeTab && currentView.dataset.renderVersion === renderVersion) pageNavigation.update()
 }
 
-/** Read-only, inert neighbors use the same production renderers, never route activation or write services. */
+/** Prepared pages own their real DOM and readonly mounts. Activation only transfers ownership. */
+function bindPageHeader(root: ParentNode): void {
+  root.querySelector('#open-ai-assistant')?.addEventListener('click', () => { void launchAssistant().catch(fail) })
+  root.querySelector('#open-management')?.addEventListener('click', showManagementHub)
+  root.querySelector('#plan-add-task')?.addEventListener('click', () => void showTaskEditor(undefined, planView === 'today' ? getLocalDateString() : undefined))
+}
+function activatePage(view: HTMLElement, preview: HTMLElement | undefined, bind: () => void): void {
+  if (preview) previewActivators.set(view, bind)
+  else bind()
+}
+function activateTabPreview(tab: Tab, prepared: NavigationPreview): HTMLElement {
+  const element = prepared.element, view = element.querySelector<HTMLElement>('[data-preview-tab]')!
+  const bind = previewActivators.get(view)
+  if (!bind || !element.isConnected) throw new Error('预备页面已失效，请重新切换')
+  foodNavigation?.destroy(); foodNavigation = undefined
+  recordsDispose?.(); recordsDispose = undefined
+  nutritionDispose?.(); nutritionDispose = undefined
+  recoveryDispose?.(); recoveryDispose = undefined
+  foodHeaderEvents?.abort(); foodRailEvents?.abort(); foodContentVersion++
+  app.querySelector('.page-current')!.remove()
+  prepared.activate?.()
+  element.className = 'page-current'; element.style.removeProperty('top'); element.style.removeProperty('transform')
+  element.inert = false; element.removeAttribute('aria-hidden'); view.removeAttribute('data-preview-tab')
+  activeTab = tab; renderedTab = tab; document.body.classList.remove('immersive')
+  app.querySelectorAll<HTMLButtonElement>('.bottom-nav [data-tab]').forEach(button => {
+    const selected = button.dataset.tab === tab
+    button.classList.toggle('active', selected); button.setAttribute('aria-current', selected ? 'page' : 'false')
+  })
+  previewActivators.delete(view); previewDisposers.delete(view); previewSignals.delete(view)
+  bindPageHeader(element); bind()
+  return element
+}
 async function prepareTabPreview(tab: Tab, signal: AbortSignal): Promise<NavigationPreview> {
   const element = document.createElement('div'); element.className = 'page-preview'; element.inert = true; element.setAttribute('aria-hidden', 'true')
-  const headerHost = document.createElement('div'); headerHost.innerHTML = pageHeaderHtml(tab); const header = headerHost.firstElementChild!
-  const view = document.createElement('div'); view.className = tab === 'today' ? 'today-dashboard' : tab === 'workout' ? 'workout-page' : ''; view.dataset.previewTab = tab
-  previewSignals.set(view,signal)
-  element.append(header, view); element.style.visibility = 'hidden'; app.querySelector('.page-swipe-stage')!.append(element)
-  const dispose = () => { previewDisposers.get(view)?.(); previewDisposers.delete(view); element.remove() }
-  signal.addEventListener('abort', dispose, { once:true })
+  const headerHost = document.createElement('div'); headerHost.innerHTML = pageHeaderHtml(tab)
+  const view = document.createElement('main'); view.dataset.navigationId = 'view'; view.dataset.previewTab = tab
+  view.className = tab === 'today' ? 'today-dashboard' : tab === 'workout' ? 'workout-page' : ''
+  view.dataset.renderVersion = String(++rootRenderVersion); view.setAttribute('aria-live', 'polite')
+  previewSignals.set(view, signal)
+  element.append(headerHost.firstElementChild!, view); element.style.visibility = 'hidden'
+  let adopted = false, observer: MutationObserver | undefined
+  const namespace = `navigation-${view.dataset.renderVersion}-`
+  const concealIds = () => {
+    for (const node of [view, ...element.querySelectorAll<HTMLElement>('[id],[aria-live]')]) {
+      if (node.id && !node.dataset.navigationId) node.dataset.navigationId = node.id
+      if (node.dataset.navigationId) node.id = namespace + node.dataset.navigationId
+      if (node.hasAttribute('aria-live')) { node.dataset.navigationLive = node.getAttribute('aria-live')!; node.removeAttribute('aria-live') }
+    }
+  }
+  const dispose = () => {
+    if (adopted) return
+    observer?.disconnect(); signal.removeEventListener('abort', dispose)
+    previewDisposers.get(view)?.(); previewDisposers.delete(view); previewActivators.delete(view); element.remove()
+  }
+  concealIds()
+  observer = new MutationObserver(concealIds); observer.observe(element, { childList: true, subtree: true })
+  app.querySelector('.page-swipe-stage')!.append(element)
+  signal.addEventListener('abort', dispose, { once: true })
   try {
     if (tab === 'today') await renderTodayPage(view)
     else if (tab === 'plan') await renderPlanPage(view)
@@ -371,10 +420,19 @@ async function prepareTabPreview(tab: Tab, signal: AbortSignal): Promise<Navigat
     else if (progressView === 'trend') await renderWeightPage(true, view)
     else if (progressView === 'calendar') await renderCalendarOverview(true, view)
     else await renderReportsPage(view)
-    if (signal.aborted) throw new DOMException('Navigation canceled','AbortError')
-    // No duplicate document IDs, live regions or focusable preview controls enter the active tree.
-    for (const node of element.querySelectorAll('[id],[aria-live]')) { node.removeAttribute('id'); node.removeAttribute('aria-live') }
-    element.style.removeProperty('visibility'); return { element, dispose }
+    if (signal.aborted) throw new DOMException('Navigation canceled', 'AbortError')
+    concealIds()
+    // Flush real layout/Chart.js before exposure; no route requery or visible commit render follows.
+    await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
+    if (signal.aborted) throw new DOMException('Navigation canceled', 'AbortError')
+    element.style.removeProperty('visibility')
+    return { element, dispose, activate: () => {
+      adopted = true; observer?.disconnect(); signal.removeEventListener('abort', dispose)
+      for (const node of element.querySelectorAll<HTMLElement>('[data-navigation-id],[data-navigation-live]')) {
+        if (node.dataset.navigationId) { node.id = node.dataset.navigationId; delete node.dataset.navigationId }
+        if (node.dataset.navigationLive) { node.setAttribute('aria-live', node.dataset.navigationLive); delete node.dataset.navigationLive }
+      }
+    } }
   } catch (error) { dispose(); throw error }
 }
 function waitForPreview(root: HTMLElement, selector: string): Promise<void> {
@@ -574,26 +632,30 @@ async function renderTodayPage(preview?: HTMLElement): Promise<void> {
     <section class="today-card today-activity-card weight-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon weight-icon">${icon('scale', 20)}</span><h2>体重</h2></div><button class="text-btn" id="today-weight-details">查看趋势 ${icon('chevron', 16)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(weightState.status)}</strong><span class="today-activity-meta">${esc(weightState.meta)}</span></div><button class="secondary today-activity-action" id="today-record-weight">${esc(weightState.action)}</button></div></section>
     <section class="today-card today-activity-card pelvic-today-card"><div class="card-heading today-activity-head"><div><span class="card-icon pelvic-icon">${icon('leaf', 20)}</span><h2>凯格尔训练</h2></div><button class="text-btn" id="today-pelvic-history">训练记录 ${icon('chevron', 16)}</button></div><div class="today-activity-body"><div class="today-activity-copy"><strong class="today-activity-status">${esc(pelvicState.status)}</strong><span class="today-activity-meta">${esc(pelvicState.meta)}</span></div><button class="secondary today-activity-action" id="today-pelvic">${esc(pelvicState.action)}</button></div></section>
     ${todayHabitCardHtml(habits, habitCheckIns, today)}${recoverySlotHtml()}`
-  if (preview) { previewDisposers.set(view, mountRecovery(view.querySelector('[data-recovery-root]')!, recoveryUi())); await waitForPreview(view, '.water-card'); return }
-  view.querySelector('#today-food-details')?.addEventListener('click', () => { activeTab = 'food'; foodDate = today; void render().catch(fail) })
-  view.querySelector('#today-workout-details')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = false; void render().catch(fail) })
-  view.querySelector('#today-workout')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = openWorkout; workoutEditorOpen = Boolean(openWorkout); showWorkoutHistory = false; void render().then(() => { if (!openWorkout) window.scrollTo({ top: 0, behavior: 'instant' }) }).catch(fail) })
-  view.querySelector('#today-cardio')?.addEventListener('click', () => showCardioForm(undefined, undefined, today))
-  view.querySelector('#today-weight-details')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; void render().catch(fail) })
-  view.querySelector('#today-record-weight')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; void render().then(() => showWeightForm(today, latestValidDayWeight(weights,today))).catch(fail) })
-  view.querySelector('#today-pelvic')?.addEventListener('click', () => { workoutDate = today; void showPelvicFloorSetup().catch(fail) })
-  view.querySelector('#today-pelvic-history')?.addEventListener('click', () => void showPelvicFloorHistory())
-  nutritionDispose?.()
-  nutritionDispose = observeDailyNutritionSummary(today, nutrition, next => {
-    if (activeTab !== 'today' || !view.isConnected || view.dataset.renderVersion !== viewVersion) return
-    view.querySelector('.today-calorie-layout')!.innerHTML = calorieGaugeHtml(next.totals.calories, next.target?.calories, 'today')
-    view.querySelector('[data-macro-summary-host]')!.innerHTML = macroNutritionSummaryForDay(next)
-    view.querySelector('[data-today-remaining]')!.innerHTML = foodCompletionStripHtml(today, getNutritionCompletionSummary(next.target ?? {}, next.logs), false)
-  }, fail)
-  view.addEventListener('click', event => { if ((event.target as Element).closest('[data-today-completion]')) { activeTab = 'food'; foodDate = today; void render().then(() => showNutritionCompletion(today, 'designated')).catch(fail) } })
-  bindTodayPlanCard(view)
-  bindTodayHabitCard(view, today)
-  recoveryDispose?.(); recoveryDispose = mountRecovery(view.querySelector('[data-recovery-root]')!, recoveryUi())
+  const recovery = mountRecovery(view.querySelector('[data-recovery-root]')!, recoveryUi())
+  if (preview) { previewDisposers.set(view, recovery); await waitForPreview(view, '.water-card') }
+  activatePage(view, preview, () => {
+    view.querySelector('#today-food-details')?.addEventListener('click', () => { activeTab = 'food'; foodDate = today; void render().catch(fail) })
+    view.querySelector('#today-workout-details')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = undefined; workoutEditorOpen = false; showWorkoutHistory = false; void render().catch(fail) })
+    view.querySelector('#today-workout')?.addEventListener('click', () => { activeTab = 'workout'; workoutDate = today; currentWorkout = openWorkout; workoutEditorOpen = Boolean(openWorkout); showWorkoutHistory = false; void render().then(() => { if (!openWorkout) window.scrollTo({ top: 0, behavior: 'instant' }) }).catch(fail) })
+    view.querySelector('#today-cardio')?.addEventListener('click', () => showCardioForm(undefined, undefined, today))
+    view.querySelector('#today-weight-details')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; void render().catch(fail) })
+    view.querySelector('#today-record-weight')?.addEventListener('click', () => { activeTab = 'progress'; progressView = 'trend'; void render().then(() => showWeightForm(today, latestValidDayWeight(weights,today))).catch(fail) })
+    view.querySelector('#today-pelvic')?.addEventListener('click', () => { workoutDate = today; void showPelvicFloorSetup().catch(fail) })
+    view.querySelector('#today-pelvic-history')?.addEventListener('click', () => void showPelvicFloorHistory())
+    nutritionDispose?.()
+    nutritionDispose = observeDailyNutritionSummary(today, nutrition, next => {
+      if (activeTab !== 'today' || !view.isConnected || view.dataset.renderVersion !== viewVersion) return
+      view.querySelector('.today-calorie-layout')!.innerHTML = calorieGaugeHtml(next.totals.calories, next.target?.calories, 'today')
+      view.querySelector('[data-macro-summary-host]')!.innerHTML = macroNutritionSummaryForDay(next)
+      view.querySelector('[data-today-remaining]')!.innerHTML = foodCompletionStripHtml(today, getNutritionCompletionSummary(next.target ?? {}, next.logs), false)
+    }, fail)
+    view.addEventListener('click', event => { if ((event.target as Element).closest('[data-today-completion]')) { activeTab = 'food'; foodDate = today; void render().then(() => showNutritionCompletion(today, 'designated')).catch(fail) } })
+    bindTodayPlanCard(view)
+    bindTodayHabitCard(view, today)
+    recoveryDispose?.(); recoveryDispose = recovery
+  })
+
 }
 
 /** Keep tab controls connected so reversible CSS transitions survive content replacement. */
@@ -659,36 +721,39 @@ async function renderReportsPage(preview?: HTMLElement):Promise<void> {
   if((!preview&&(activeTab!=='progress'||progressView!=='reports'))||!view.isConnected||view.dataset.renderVersion!==viewVersion)return
   const isCurrent=mode==='custom'||report.range.start===getReportRange(analysisMode,today).start,period=mode==='day'?'天':mode==='week'?'周':'月'
   const retainedTabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page">${reportKindsHtml()}<div class="report-mode" role="group" aria-label="报告周期">${(['day','week','month','custom'] as const).map(m=>`<button data-report-mode="${m}" class="${mode===m?'active':''}" aria-pressed="${mode===m}">${m==='day'?'日报':m==='week'?'周报':m==='month'?'月报':'自定义'}</button>`).join('')}</div><div class="report-period" ${mode==='custom'?'hidden':''}><button id="report-previous" aria-label="上一${period}">‹</button>${mode==='day'?`<button class="text-btn fitlog-date-trigger" id="report-date-picker">${reportPeriodLabel(report)}</button>`:`<strong>${reportPeriodLabel(report)}</strong>`}<button id="report-next" aria-label="下一${period}" ${isCurrent?'disabled':''}>›</button></div>${isCurrent?'':`<button class="report-return" id="report-return">${mode==='day'?'回到今天':'回到本'+period}</button>`}<div class="report-custom-range" ${mode==='custom'?'':'hidden'}><button class="secondary" type="button" data-report-start>开始 ${customReportRange.start}</button><button class="secondary" type="button" data-report-end>结束 ${customReportRange.end}</button><p class="report-note">最多366天；实际统计仅截至今天。</p></div><div class="report-content">${coachReportHtml(data,coachState,analysisMode,esc)}</div></div>`)
-  if (preview) { previewDisposers.set(view, bindCoachPlots(view.querySelector('.report-content')!, () => {})); return }
-  if(!retainedTabs)bindProgressTabs(view)
-  view.querySelector('[data-report-kind=daily]')?.addEventListener('click',()=>{reportMode='week';void render().catch(fail)})
-  view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach(b=>b.addEventListener('click',()=>{reportMode=b.dataset.reportMode as ReportMode|'cycle'|'custom';void render().catch(fail)}))
-  view.querySelector('#report-previous')?.addEventListener('click',()=>{reportAnchorDate=shiftReportPeriod(analysisMode,anchor,-1);void render().catch(fail)})
-  view.querySelector('#report-next')?.addEventListener('click',()=>{if(isCurrent)return;reportAnchorDate=shiftReportPeriod(analysisMode,anchor,1);void render().catch(fail)})
-  view.querySelector('#report-return')?.addEventListener('click',()=>{reportAnchorDate=today;void render().catch(fail)})
-  view.querySelector('#report-date-picker')?.addEventListener('click',()=>showBusinessDatePicker('选择日报日期',anchor,date=>{reportAnchorDate=date;void render().catch(fail)}))
-  for(const edge of ['start','end'] as const)view.querySelector(`[data-report-${edge}]`)?.addEventListener('click',()=>showBusinessDatePicker(edge==='start'?'报告开始日期':'报告结束日期',customReportRange[edge],date=>{const next={...customReportRange,[edge]:date};if(next.start>next.end||(Date.parse(next.end+'T00:00:00Z')-Date.parse(next.start+'T00:00:00Z'))/86400000>365){toast('日期需先后正确且最多366天');return}customReportRange=next;void render().catch(fail)}))
-  const host=view.querySelector<HTMLElement>('.report-content')!,events=new AbortController()
+  const host=view.querySelector<HTMLElement>('.report-content')!
   let plotsDispose=bindCoachPlots(host,id=>{if(!id.startsWith('weight:'))coachState.point=id})
-  const draw=()=>{const y=scrollY;plotsDispose();replaceReportHtml(host,coachReportHtml(data,coachState,analysisMode,esc));plotsDispose=bindCoachPlots(host,id=>{if(!id.startsWith('weight:'))coachState.point=id});window.scrollTo({top:y,behavior:'instant'})}
-  host.addEventListener('click',e=>{
-    const button=(e.target as Element).closest<HTMLElement>('button');if(!button)return
-    if(button.dataset.coachExercise){coachState.exercise=button.dataset.coachExercise;delete coachState.point;draw()}
-    if(button.dataset.coachChart){coachState.metric=button.dataset.coachChart as CoachState['metric'];draw()}
-    if(button.dataset.coachHistory){const group=data.analysis.groups.find(g=>g.key===button.dataset.coachHistory);if(group)openModal(group.name+' · 训练明细',exerciseHistoryHtml(group,esc))}
-  },{signal:events.signal})
-  const signature=(value:unknown)=>JSON.stringify(value,(_k,v)=>v instanceof Set?[...v]:v)
-  let previous=signature(data)
-  const sub=liveQuery(()=>loadCoachReport(analysisMode,anchor,today,db,override)).subscribe({next:value=>{
-    if(!host.isConnected||view.dataset.renderVersion!==viewVersion)return
-    const next=signature(value);if(next===previous)return;previous=next;data=value;report=data.report
-    if(mode==='day'){
-      const facts=host.querySelector<HTMLElement>('.coach-day-facts')
-      const savedFacts=facts?.cloneNode(true) as HTMLElement|undefined
-      if(facts)updateDailyRecordsHtml(facts,dailyRecordsHtml(report.daily!,esc));const updated=facts??savedFacts;draw();if(updated)host.querySelector('.coach-day-facts')?.replaceWith(updated)
-    }else draw()
-  },error:fail})
-  recordsDispose=()=>{sub.unsubscribe();plotsDispose();events.abort()}
+  if (preview) previewDisposers.set(view, () => plotsDispose())
+  activatePage(view, preview, () => {
+    if(!retainedTabs)bindProgressTabs(view)
+    view.querySelector('[data-report-kind=daily]')?.addEventListener('click',()=>{reportMode='week';void render().catch(fail)})
+    view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach(b=>b.addEventListener('click',()=>{reportMode=b.dataset.reportMode as ReportMode|'cycle'|'custom';void render().catch(fail)}))
+    view.querySelector('#report-previous')?.addEventListener('click',()=>{reportAnchorDate=shiftReportPeriod(analysisMode,anchor,-1);void render().catch(fail)})
+    view.querySelector('#report-next')?.addEventListener('click',()=>{if(isCurrent)return;reportAnchorDate=shiftReportPeriod(analysisMode,anchor,1);void render().catch(fail)})
+    view.querySelector('#report-return')?.addEventListener('click',()=>{reportAnchorDate=today;void render().catch(fail)})
+    view.querySelector('#report-date-picker')?.addEventListener('click',()=>showBusinessDatePicker('选择日报日期',anchor,date=>{reportAnchorDate=date;void render().catch(fail)}))
+    for(const edge of ['start','end'] as const)view.querySelector(`[data-report-${edge}]`)?.addEventListener('click',()=>showBusinessDatePicker(edge==='start'?'报告开始日期':'报告结束日期',customReportRange[edge],date=>{const next={...customReportRange,[edge]:date};if(next.start>next.end||(Date.parse(next.end+'T00:00:00Z')-Date.parse(next.start+'T00:00:00Z'))/86400000>365){toast('日期需先后正确且最多366天');return}customReportRange=next;void render().catch(fail)}))
+    const events=new AbortController()
+    const draw=()=>{const y=scrollY;plotsDispose();replaceReportHtml(host,coachReportHtml(data,coachState,analysisMode,esc));plotsDispose=bindCoachPlots(host,id=>{if(!id.startsWith('weight:'))coachState.point=id});window.scrollTo({top:y,behavior:'instant'})}
+    host.addEventListener('click',e=>{
+      const button=(e.target as Element).closest<HTMLElement>('button');if(!button)return
+      if(button.dataset.coachExercise){coachState.exercise=button.dataset.coachExercise;delete coachState.point;draw()}
+      if(button.dataset.coachChart){coachState.metric=button.dataset.coachChart as CoachState['metric'];draw()}
+      if(button.dataset.coachHistory){const group=data.analysis.groups.find(g=>g.key===button.dataset.coachHistory);if(group)openModal(group.name+' · 训练明细',exerciseHistoryHtml(group,esc))}
+    },{signal:events.signal})
+    const signature=(value:unknown)=>JSON.stringify(value,(_k,v)=>v instanceof Set?[...v]:v)
+    let previous=signature(data)
+    const sub=liveQuery(()=>loadCoachReport(analysisMode,anchor,today,db,override)).subscribe({next:value=>{
+      if(!host.isConnected||view.dataset.renderVersion!==viewVersion)return
+      const next=signature(value);if(next===previous)return;previous=next;data=value;report=data.report
+      if(mode==='day'){
+        const facts=host.querySelector<HTMLElement>('.coach-day-facts')
+        const savedFacts=facts?.cloneNode(true) as HTMLElement|undefined
+        if(facts)updateDailyRecordsHtml(facts,dailyRecordsHtml(report.daily!,esc));const updated=facts??savedFacts;draw();if(updated)host.querySelector('.coach-day-facts')?.replaceWith(updated)
+      }else draw()
+    },error:fail})
+    recordsDispose=()=>{sub.unsubscribe();plotsDispose();events.abort()}
+  })
 
 }
 
@@ -697,17 +762,21 @@ async function renderCycleReportsPage(view:HTMLElement,version:string|undefined,
   if(!view.isConnected||view.dataset.renderVersion!==version||(!preview&&progressView!=='reports')||reportMode!=='cycle')return
   if (!preview) { selectedCycleReport=data.selected?.id; reportTemplateFilter=data.templateFilter }
   const tabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page">${reportKindsHtml(true)}<div class="report-content">${nutritionCycleReportHtml(data,esc,coachState)}</div></div>`)
-  if (preview) return
-  if(!tabs)bindProgressTabs(view)
-  view.querySelector('[data-report-kind=daily]')?.addEventListener('click',()=>{reportMode='week';void render().catch(fail)})
-  view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach(b=>b.addEventListener('click',()=>{reportMode=b.dataset.reportMode as ReportMode|'cycle'|'custom';void render().catch(fail)}))
-  const host=view.querySelector<HTMLElement>('.report-content')!,events=new AbortController()
+  const host=view.querySelector<HTMLElement>('.report-content')!
   let cyclePlots=bindCoachPlots(host,id=>{coachState.point=id})
-  host.addEventListener('change',event=>{const select=event.target as HTMLSelectElement;if(select.hasAttribute('data-report-template')){reportTemplateFilter=select.value||undefined;selectedCycleReport=undefined;void render().catch(fail)}if(select.hasAttribute('data-cycle-report-select')){selectedCycleReport=select.value;void render().catch(fail)}},{signal:events.signal})
-  host.addEventListener('click',event=>{const button=(event.target as Element).closest<HTMLElement>('button');if(!button)return;if(button.hasAttribute('data-cycle-report-manage'))void showNutritionCycles(nutritionStrategyUi()).catch(fail);if(button.dataset.coachExercise){coachState.exercise=button.dataset.coachExercise;delete coachState.point;cyclePlots();replaceReportHtml(host,nutritionCycleReportHtml(data,esc,coachState));cyclePlots=bindCoachPlots(host,id=>{coachState.point=id})}if(button.dataset.coachChart){coachState.metric=button.dataset.coachChart as CoachState['metric'];cyclePlots();replaceReportHtml(host,nutritionCycleReportHtml(data,esc,coachState));cyclePlots=bindCoachPlots(host,id=>{coachState.point=id})}if(button.dataset.coachHistory){const group=data.coach?.analysis.groups.find(g=>g.key===button.dataset.coachHistory);if(group)openModal(group.name+' · 训练明细',exerciseHistoryHtml(group,esc))}},{signal:events.signal})
-  let previous=JSON.stringify(data)
-  const sub=liveQuery(()=>loadNutritionCycleReport(selectedCycleReport,today,db,reportTemplateFilter)).subscribe({next:value=>{if(!host.isConnected||view.dataset.renderVersion!==version)return;const next=JSON.stringify(value);if(next===previous)return;previous=next;data=value;selectedCycleReport=value.selected?.id;reportTemplateFilter=value.templateFilter;cyclePlots();replaceReportHtml(host,nutritionCycleReportHtml(data,esc,coachState));cyclePlots=bindCoachPlots(host,id=>{coachState.point=id})},error:fail})
-  recordsDispose=()=>{events.abort();sub.unsubscribe();cyclePlots()}
+  if (preview) previewDisposers.set(view, () => cyclePlots())
+  activatePage(view, preview, () => {
+    selectedCycleReport=data.selected?.id; reportTemplateFilter=data.templateFilter
+    if(!tabs)bindProgressTabs(view)
+    view.querySelector('[data-report-kind=daily]')?.addEventListener('click',()=>{reportMode='week';void render().catch(fail)})
+    view.querySelectorAll<HTMLButtonElement>('[data-report-mode]').forEach(b=>b.addEventListener('click',()=>{reportMode=b.dataset.reportMode as ReportMode|'cycle'|'custom';void render().catch(fail)}))
+    const events=new AbortController()
+    host.addEventListener('change',event=>{const select=event.target as HTMLSelectElement;if(select.hasAttribute('data-report-template')){reportTemplateFilter=select.value||undefined;selectedCycleReport=undefined;void render().catch(fail)}if(select.hasAttribute('data-cycle-report-select')){selectedCycleReport=select.value;void render().catch(fail)}},{signal:events.signal})
+    host.addEventListener('click',event=>{const button=(event.target as Element).closest<HTMLElement>('button');if(!button)return;if(button.hasAttribute('data-cycle-report-manage'))void showNutritionCycles(nutritionStrategyUi()).catch(fail);if(button.dataset.coachExercise){coachState.exercise=button.dataset.coachExercise;delete coachState.point;cyclePlots();replaceReportHtml(host,nutritionCycleReportHtml(data,esc,coachState));cyclePlots=bindCoachPlots(host,id=>{coachState.point=id})}if(button.dataset.coachChart){coachState.metric=button.dataset.coachChart as CoachState['metric'];cyclePlots();replaceReportHtml(host,nutritionCycleReportHtml(data,esc,coachState));cyclePlots=bindCoachPlots(host,id=>{coachState.point=id})}if(button.dataset.coachHistory){const group=data.coach?.analysis.groups.find(g=>g.key===button.dataset.coachHistory);if(group)openModal(group.name+' · 训练明细',exerciseHistoryHtml(group,esc))}},{signal:events.signal})
+    let previous=JSON.stringify(data)
+    const sub=liveQuery(()=>loadNutritionCycleReport(selectedCycleReport,today,db,reportTemplateFilter)).subscribe({next:value=>{if(!host.isConnected||view.dataset.renderVersion!==version)return;const next=JSON.stringify(value);if(next===previous)return;previous=next;data=value;selectedCycleReport=value.selected?.id;reportTemplateFilter=value.templateFilter;cyclePlots();replaceReportHtml(host,nutritionCycleReportHtml(data,esc,coachState));cyclePlots=bindCoachPlots(host,id=>{coachState.point=id})},error:fail})
+    recordsDispose=()=>{events.abort();sub.unsubscribe();cyclePlots()}
+  })
 }
 
 const expandedSubtasks = new Set<string>()
@@ -798,15 +867,17 @@ async function renderPlanPage(preview?: HTMLElement): Promise<void> {
   const context = planView === 'today' ? planDateHeading(today, today) : planView === 'upcoming' ? '未来安排' : '未安排日期'
   const filter = `<button type="button" id="plan-tag-filter" class="plan-filter-button${currentFilter ? ' is-active' : ''}" aria-label="${currentFilter ? `当前筛选标签 ${esc(currentFilter.name)}，选择其他标签` : '筛选标签'}"><span>${currentFilter ? `#${esc(currentFilter.name)}` : '标签'}</span>${icon('chevron', 14)}</button>`
   const retainedTabs = setTabbedViewHtml(view, `<div class="plan-page"><div class="plan-tabs" role="tablist" aria-label="计划视图"><button role="tab" data-plan-view="today" aria-selected="${planView === 'today'}" class="${planView === 'today' ? 'active' : ''}">今天</button><button role="tab" data-plan-view="upcoming" aria-selected="${planView === 'upcoming'}" class="${planView === 'upcoming' ? 'active' : ''}">近期</button><button role="tab" data-plan-view="inbox" aria-selected="${planView === 'inbox'}" class="${planView === 'inbox' ? 'active' : ''}">收件箱</button></div><div class="plan-context-row"><p class="plan-context-label">${esc(context)}</p><div class="plan-context-actions">${currentFilter ? `<div class="plan-filter-active">${filter}<button type="button" id="plan-tag-filter-clear" class="plan-filter-clear" aria-label="清除标签筛选 ${esc(currentFilter.name)}">${icon('x', 16)}</button></div>` : filter}</div></div>${planProgress}${content}</div>`)
-  if (preview) return
-  const topCreate = app.querySelector<HTMLButtonElement>('#plan-add-task')
+  const topCreate = view.parentElement?.querySelector<HTMLButtonElement>(':is(#plan-add-task,[data-navigation-id=plan-add-task])')
   if (topCreate) topCreate.hidden = Boolean(view.querySelector('.plan-empty'))
-  if (!retainedTabs) view.querySelectorAll<HTMLButtonElement>('[data-plan-view]').forEach((button) => button.addEventListener('click', () => { if (planView === button.dataset.planView) return; planView = button.dataset.planView as PlanView; void renderPlanPage().catch(fail) }))
-  view.querySelector('#plan-tag-filter')?.addEventListener('click', () => void showTaskTagFilter())
-  view.querySelector('#plan-tag-filter-clear')?.addEventListener('click', () => { planTagFilterId = undefined; void renderPlanPage().catch(fail) })
-  view.querySelector('#plan-empty-add')?.addEventListener('click', () => void showTaskEditor(undefined, planView === 'today' ? today : undefined))
-  view.querySelector<HTMLDetailsElement>('#plan-completed')?.addEventListener('toggle', (event) => { planCompletedOpen = (event.currentTarget as HTMLDetailsElement).open })
-  bindTaskRows(view, (task) => { if (task.completedAt) planCompletedOpen = true; return renderPlanPage() })
+  activatePage(view, preview, () => {
+    if (!retainedTabs) view.querySelectorAll<HTMLButtonElement>('[data-plan-view]').forEach((button) => button.addEventListener('click', () => { if (planView === button.dataset.planView) return; planView = button.dataset.planView as PlanView; void renderPlanPage().catch(fail) }))
+    view.querySelector('#plan-tag-filter')?.addEventListener('click', () => void showTaskTagFilter())
+    view.querySelector('#plan-tag-filter-clear')?.addEventListener('click', () => { planTagFilterId = undefined; void renderPlanPage().catch(fail) })
+    view.querySelector('#plan-empty-add')?.addEventListener('click', () => void showTaskEditor(undefined, planView === 'today' ? today : undefined))
+    view.querySelector<HTMLDetailsElement>('#plan-completed')?.addEventListener('toggle', (event) => { planCompletedOpen = (event.currentTarget as HTMLDetailsElement).open })
+    bindTaskRows(view, (task) => { if (task.completedAt) planCompletedOpen = true; return renderPlanPage() })
+  })
+
 }
 
 async function showTaskTagFilter(): Promise<void> {
@@ -1012,7 +1083,6 @@ async function renderCalendarOverview(withProgressTabs = false, preview?: HTMLEl
   let summaries = await loadMonthSummaries(calendarYear, calendarMonth)
   if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
   const retainedTabs = setTabbedViewHtml(view, `${withProgressTabs ? progressTabsHtml() : ''}<section class="calendar-overview-head"><button class="icon-btn quiet calendar-prev" id="calendar-prev" aria-label="上个月">${icon('chevron', 20)}</button><strong class="calendar-month"><span>${calendarYear}年</span> <span>${calendarMonth+1}月</span></strong><button class="text-btn" id="calendar-today" aria-label="回到今天">今天</button><button class="icon-btn quiet" id="calendar-next" aria-label="下个月">${icon('chevron', 20)}</button></section><div id="calendar-host"></div><section class="calendar-legend" aria-label="日历标记说明">${calendarCategories.map((category) => `<span class="calendar-legend-item"><i class="calendar-legend-icon calendar-category-${category}" aria-hidden="true">${icon(calendarCategoryIcons[category], 14)}</i><span>${calendarLegendLabels[category]}</span></span>`).join('')}</section>`)
-  if (withProgressTabs && !retainedTabs) bindProgressTabs(view)
   const host = view.querySelector<HTMLElement>('#calendar-host')!
   const year=calendarYear,month=calendarMonth
   const draw=()=>{
@@ -1021,15 +1091,17 @@ async function renderCalendarOverview(withProgressTabs = false, preview?: HTMLEl
     if(focused)host.querySelector<HTMLButtonElement>(`.calendar-day[data-date="${focused}"]`)?.focus({preventScroll:true})
   }
   draw()
-  if (preview) return
-  let signature=JSON.stringify([...summaries])
-  const sub=liveQuery(()=>loadMonthSummaries(year,month)).subscribe({next:value=>{if(!host.isConnected||view.dataset.renderVersion!==viewVersion)return;const next=JSON.stringify([...value]);if(next===signature)return;signature=next;summaries=value;draw()},error:fail})
-  recordsDispose=()=>sub.unsubscribe()
-  view.querySelector('#calendar-prev')?.addEventListener('click', () => { shiftCalendarMonth(-1); void render().catch(fail) })
-  view.querySelector('#calendar-next')?.addEventListener('click', () => { shiftCalendarMonth(1); void render().catch(fail) })
-  view.querySelector('#calendar-today')?.addEventListener('click', () => {
-    const today = new Date()
-    calendarYear = today.getFullYear(); calendarMonth = today.getMonth(); calendarSelectedDate = getLocalDateString(today); void render().catch(fail)
+  activatePage(view, preview, () => {
+    if (withProgressTabs && !retainedTabs) bindProgressTabs(view)
+    let signature=JSON.stringify([...summaries])
+    const sub=liveQuery(()=>loadMonthSummaries(year,month)).subscribe({next:value=>{if(!host.isConnected||view.dataset.renderVersion!==viewVersion)return;const next=JSON.stringify([...value]);if(next===signature)return;signature=next;summaries=value;draw()},error:fail})
+    recordsDispose=()=>sub.unsubscribe()
+    view.querySelector('#calendar-prev')?.addEventListener('click', () => { shiftCalendarMonth(-1); void render().catch(fail) })
+    view.querySelector('#calendar-next')?.addEventListener('click', () => { shiftCalendarMonth(1); void render().catch(fail) })
+    view.querySelector('#calendar-today')?.addEventListener('click', () => {
+      const today = new Date()
+      calendarYear = today.getFullYear(); calendarMonth = today.getMonth(); calendarSelectedDate = getLocalDateString(today); void render().catch(fail)
+    })
   })
 }
 
@@ -1334,7 +1406,8 @@ async function renderFoodPage(preview?: HTMLElement): Promise<void> {
   const calorieTarget = target?.calories
   const groups = groupFoodLogs(logs)
   const completionStrip = foodCompletionStripHtml(requestedDate, getNutritionCompletionSummary(target ?? {}, logs))
-  const expandedMeals = new Set(Array.from(view.querySelectorAll<HTMLButtonElement>('.food-content-body[data-food-date="' + requestedDate + '"] [data-toggle-meal][aria-expanded="true"]'), button => button.dataset.toggleMeal))
+  const existingBody = view.querySelector('.food-content-body[data-food-date="' + requestedDate + '"]')
+  const expandedMeals = existingBody ? new Set(Array.from(existingBody.querySelectorAll<HTMLButtonElement>('[data-toggle-meal][aria-expanded="true"]'), button => button.dataset.toggleMeal)) : foodMealOpenDates.get(requestedDate) ?? new Set<string>()
   const slotHtml = `<div class="food-content-body" data-food-date="${requestedDate}">
     <section class="nutrition-hero food-nutrition-hero" data-food-date="${requestedDate}" aria-label="${isToday ? '今日' : '当日'}营养汇总"><div class="nutrition-hero-head"><span class="hero-label">饮食总览</span><button class="text-btn" data-edit-nutrition-target>${target ? '编辑目标' : '设置目标'} ${icon('chevron', 16)}</button></div><div class="food-calorie-row">${calorieGaugeHtml(totals.calories, calorieTarget, 'food', previous.get('calories'))}</div><div class="macros" data-macro-summary-host>${macroNutritionSummaryForDay(nutrition)}</div>${target?.strategySelection ? `<p class="strategy-food-source">${esc(target.strategySelection.templateName)} · ${esc(target.strategySelection.variantName)}</p>` : target?.cycleSelection?`<p class="strategy-food-source">${esc(target.cycleSelection.cycleName)} · ${esc(target.cycleSelection.variantName)}</p>`:''}</section>
     ${completionStrip}
@@ -1364,27 +1437,30 @@ async function renderFoodPage(preview?: HTMLElement): Promise<void> {
     body.querySelectorAll<SVGCircleElement>('[data-final-offset]').forEach((ring) => { ring.style.strokeDashoffset = ring.dataset.finalOffset ?? '' })
     body.querySelectorAll<HTMLElement>('[data-count-to]').forEach((number) => { number.textContent = formatNumber(Number(number.dataset.countTo)) })
   }
-  if (preview) return
-  body.querySelector('[data-food-cycle-target]')?.addEventListener('click',()=>void showScheduledTargetPreview(nutritionStrategyUi(),requestedDate).catch(fail))
-  body.querySelector('[data-food-cycle-diet]')?.addEventListener('click',()=>void showScheduledDietPreview(requestedDate).catch(fail))
-  bindFoodContent(body, target, logs)
-  bindDietEvents(body, requestedDate, dietEvents, dietEventUi())
-  bindFoodHeader()
-  foodNavigation = createFoodDateNavigation({ content, rail, date: requestedDate,
-    preview: async date => {
-      const mount = document.createElement('div'); mount.className = 'food-preview-mount'; mount.inert = true; mount.dataset.previewDate = date; mount.setAttribute('aria-hidden','true'); view.append(mount)
-      try { await renderFoodPage(mount); return mount.querySelector<HTMLElement>('.food-content-body')! } finally { mount.remove() }
-    },
-    select: async date => {
-      foodDate = date; content!.inert = true; content!.setAttribute('aria-busy','true')
-      updateFoodTodayShortcut(); updateFoodRail(rail!,date); await renderFoodPage()
-      if (activeTab === 'food' && foodDate === date) { centerFoodRail(rail!,date,'auto',true); paintFoodRailFocus(rail!) }
-    }, fail,
+  const shortcut = view.querySelector<HTMLElement>('#food-return-today'); if (shortcut) shortcut.hidden = isToday
+  activatePage(view, preview, () => {
+    if (preview) bindFoodRail(rail!)
+    body.querySelector('[data-food-cycle-target]')?.addEventListener('click',()=>void showScheduledTargetPreview(nutritionStrategyUi(),requestedDate).catch(fail))
+    body.querySelector('[data-food-cycle-diet]')?.addEventListener('click',()=>void showScheduledDietPreview(requestedDate).catch(fail))
+    bindFoodContent(body, target, logs)
+    bindDietEvents(body, requestedDate, dietEvents, dietEventUi())
+    bindFoodHeader()
+    foodNavigation = createFoodDateNavigation({ content, rail, date: requestedDate,
+      preview: async date => {
+        const mount = document.createElement('div'); mount.className = 'food-preview-mount'; mount.inert = true; mount.dataset.previewDate = date; mount.setAttribute('aria-hidden','true'); view.append(mount)
+        try { await renderFoodPage(mount); return mount.querySelector<HTMLElement>('.food-content-body')! } finally { mount.remove() }
+      },
+      select: async date => {
+        foodDate = date; content!.inert = true; content!.setAttribute('aria-busy','true')
+        updateFoodTodayShortcut(); updateFoodRail(rail!,date); await renderFoodPage()
+        if (activeTab === 'food' && foodDate === date) { centerFoodRail(rail!,date,'auto',true); paintFoodRailFocus(rail!) }
+      }, fail,
+    })
+    const scheduledSignature=JSON.stringify(scheduled)
+    const scheduleSub=liveQuery(()=>scheduledNutritionDay(requestedDate)).subscribe({next:next=>{if(activeTab==='food'&&foodDate===requestedDate&&view.isConnected&&JSON.stringify(next)!==scheduledSignature)void renderFoodPage().catch(fail)},error:fail})
+    const stopNutrition = observeDailyNutritionSummary(requestedDate, nutrition, () => { if (activeTab === 'food' && foodDate === requestedDate && view.isConnected) void renderFoodPage().catch(fail) }, fail)
+    nutritionDispose=()=>{stopNutrition();scheduleSub.unsubscribe()}
   })
-  const scheduledSignature=JSON.stringify(scheduled)
-  const scheduleSub=liveQuery(()=>scheduledNutritionDay(requestedDate)).subscribe({next:next=>{if(activeTab==='food'&&foodDate===requestedDate&&view.isConnected&&JSON.stringify(next)!==scheduledSignature)void renderFoodPage().catch(fail)},error:fail})
-  const stopNutrition = observeDailyNutritionSummary(requestedDate, nutrition, () => { if (activeTab === 'food' && foodDate === requestedDate && view.isConnected) void renderFoodPage().catch(fail) }, fail)
-  nutritionDispose=()=>{stopNutrition();scheduleSub.unsubscribe()}
 }
 
 function bindFoodHeader(): void {
@@ -1404,7 +1480,7 @@ function bindFoodContent(slot: HTMLElement, target: NutritionTarget | undefined,
   slot.querySelector('#food-completion-custom')?.addEventListener('click', () => void showNutritionCompletion(slot.dataset.foodDate!, 'designated').catch(fail))
   slot.querySelectorAll<HTMLButtonElement>('[data-add-meal]').forEach((button) => button.addEventListener('click', () => { const meal = button.dataset.addMeal; if (isMealType(meal)) void showAddFoodLog(meal) }))
   const setMealExpanded = (section: Element, expanded: boolean) => { const list=section.querySelector<HTMLElement>('.meal-log-list');if(!list)return;list.hidden=!expanded;section.querySelectorAll('[data-toggle-meal]').forEach(b=>{b.setAttribute('aria-expanded',String(expanded));b.setAttribute('aria-label',`${expanded ? '收起' : '展开'}${section.querySelector('.meal-title strong')!.textContent}明细`)}) }
-  slot.querySelectorAll<HTMLButtonElement>('[data-toggle-meal]').forEach(button=>button.addEventListener('click',()=>{const section=button.closest('.food-meal')!;setMealExpanded(section,Boolean(section.querySelector<HTMLElement>('.meal-log-list')!.hidden))}))
+  slot.querySelectorAll<HTMLButtonElement>('[data-toggle-meal]').forEach(button=>button.addEventListener('click',()=>{const section=button.closest('.food-meal')!;setMealExpanded(section,Boolean(section.querySelector<HTMLElement>('.meal-log-list')!.hidden));foodMealOpenDates.set(slot.dataset.foodDate!,new Set(Array.from(slot.querySelectorAll<HTMLElement>('[data-toggle-meal][aria-expanded=true]'),b=>b.dataset.toggleMeal!)));if(foodMealOpenDates.size>8)foodMealOpenDates.delete(foodMealOpenDates.keys().next().value!)}))
   slot.querySelectorAll<HTMLButtonElement>('[data-clear-meal]').forEach(button => button.addEventListener('click', async () => {
     const date = slot.dataset.foodDate!, meal = isMealType(button.dataset.clearMeal) ? button.dataset.clearMeal : undefined
     const name = meal ? mealNames[meal] : '未分类', selected = logs.filter(log => meal === undefined ? !isMealType(log.meal) : log.meal === meal)
@@ -1607,7 +1683,7 @@ async function renderWorkoutPage(preview?: HTMLElement): Promise<void> {
   const viewVersion = view.dataset.renderVersion
   if (!preview && trainingCompletion) { trainingCompletion.render(); return }
   if (!preview && pelvicTimerState && pelvicTimerState.status !== 'completed') { renderPelvicFloorTimer(); return }
-  if (!preview && showWorkoutHistory) { await renderWorkoutHistory(); return }
+  if (showWorkoutHistory) { await renderWorkoutHistory(preview); return }
   if (workoutEditorOpen) {
     const existing = currentWorkout ?? await findOpenWorkout(workoutDate)
     if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
@@ -1630,23 +1706,25 @@ async function renderWorkoutPage(preview?: HTMLElement): Promise<void> {
     <section class="training-category">${trainingModuleHtml('力量训练','dumbbell','history-workout',`<p class="training-card-note">记录动作与组数</p><div class="training-card-summary">${trainingSummaryTiles('动作数量',`${strengthExercises} 个动作`,'记录组数',`${strengthSets} 组`)}</div><p class="training-card-detail">${openWorkout?'正在记录':todayWorkouts.length?'当日已记录':'今天还没有力量训练'}${todayWorkouts.length?' · '+esc([...new Set(todayWorkouts.flatMap(w=>w.exercises.map(e=>e.exerciseName)))].join(' · ')):''}</p><button class="primary training-card-action" id="start-workout">${openWorkout ? '继续力量训练' : '开始力量训练'}</button>`)}</section>
     <section class="training-category">${cardioCardHtml(cardioSessions)}</section>
     <section class="training-category">${trainingModuleHtml('凯格尔训练','leaf','pelvic-floor-history',`<p class="training-card-note">今日方案 · ${dailyPlanRoutine.name}</p><div class="training-card-summary">${trainingSummaryTiles('当前方案',dailyPlanRoutine.name,'当日完成',`${pelvicSessions.length} 次`)}</div><p class="training-card-detail">${pelvicSessions.length?`累计 ${pelvicSeconds} 秒`: `${pelvicRoutineMinutes(dailyPlanRoutine)} · 保持自然呼吸`}</p><button class="primary training-card-action" id="start-pelvic-floor">开始训练</button>`)}</section>`
-  if (preview) return
-  view.querySelector('#workout-date-picker-open')?.addEventListener('click', () => showBusinessDatePicker('选择训练日期', workoutDate, date => { workoutDate = date; currentWorkout = undefined; workoutEditorOpen = false; void render().catch(fail) }))
-  view.querySelector('#exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
-  view.querySelector('#workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
-  view.querySelector('#start-pelvic-floor')?.addEventListener('click', () => void showPelvicFloorSetup().catch(fail))
-  view.querySelector('#pelvic-floor-history')?.addEventListener('click', () => void showPelvicFloorHistory())
-  view.querySelector('#add-cardio')?.addEventListener('click', () => showCardioForm())
-  view.querySelector('#cardio-history')?.addEventListener('click', () => void showCardioHistory())
-  view.querySelectorAll<HTMLButtonElement>('[data-cardio-id]').forEach((button) => button.addEventListener('click', () => { const session = cardioSessions.find((item) => item.id === button.dataset.cardioId); if (session) showCardioForm(session) }))
-  view.querySelector('#start-workout')?.addEventListener('click', async () => {
-    try {
-      if (openWorkout) { currentWorkout = openWorkout; workoutEditorOpen = true; await renderWorkoutPage(); return }
-      await showWorkoutStartSheet()
-    } catch (error) { fail(error) }
+  activatePage(view, preview, () => {
+    view.querySelector('#workout-date-picker-open')?.addEventListener('click', () => showBusinessDatePicker('选择训练日期', workoutDate, date => { workoutDate = date; currentWorkout = undefined; workoutEditorOpen = false; void render().catch(fail) }))
+    view.querySelector('#exercise-library')?.addEventListener('click', () => void showExerciseLibrary())
+    view.querySelector('#workout-templates')?.addEventListener('click', () => void showWorkoutTemplateManager())
+    view.querySelector('#start-pelvic-floor')?.addEventListener('click', () => void showPelvicFloorSetup().catch(fail))
+    view.querySelector('#pelvic-floor-history')?.addEventListener('click', () => void showPelvicFloorHistory())
+    view.querySelector('#add-cardio')?.addEventListener('click', () => showCardioForm())
+    view.querySelector('#cardio-history')?.addEventListener('click', () => void showCardioHistory())
+    view.querySelectorAll<HTMLButtonElement>('[data-cardio-id]').forEach((button) => button.addEventListener('click', () => { const session = cardioSessions.find((item) => item.id === button.dataset.cardioId); if (session) showCardioForm(session) }))
+    view.querySelector('#start-workout')?.addEventListener('click', async () => {
+      try {
+        if (openWorkout) { currentWorkout = openWorkout; workoutEditorOpen = true; await renderWorkoutPage(); return }
+        await showWorkoutStartSheet()
+      } catch (error) { fail(error) }
+    })
+    view.querySelector('#history-workout')?.addEventListener('click', () => { showWorkoutHistory = true; void renderWorkoutPage().catch(fail) })
+    view.querySelectorAll<HTMLButtonElement>('[data-workout]').forEach((button) => button.addEventListener('click', async () => { try { currentWorkout = await db.workouts.get(button.dataset.workout!); workoutEditorOpen = true; await renderWorkoutPage() } catch (error) { fail(error) } }))
   })
-  view.querySelector('#history-workout')?.addEventListener('click', () => { showWorkoutHistory = true; void renderWorkoutPage().catch(fail) })
-  view.querySelectorAll<HTMLButtonElement>('[data-workout]').forEach((button) => button.addEventListener('click', async () => { try { currentWorkout = await db.workouts.get(button.dataset.workout!); workoutEditorOpen = true; await renderWorkoutPage() } catch (error) { fail(error) } }))
+
 }
 
 
@@ -1968,8 +2046,7 @@ function renderWorkoutEditor(workout: Workout, preview?: HTMLElement): void {
   const view = preview ?? document.querySelector<HTMLElement>('#view')!
   const addExercise = `<button id="add-exercise" class="${workout.exercises.length ? 'secondary' : 'primary'} full-btn">${icon('plus', 18)} 添加动作</button>`
   view.innerHTML = `<header class="active-workout-head"><button class="icon-btn quiet" id="exit-workout" aria-label="返回训练首页">${icon('x')}</button><strong>${completed ? '训练详情' : '力量训练'}</strong>${completed ? '<span class="head-spacer"></span>' : '<button class="finish-text" id="finish-workout">完成</button>'}</header><section class="workout-meta"><span>${formatHeaderDate(workout.date)}</span><span id="autosave-state">${completed ? '可编辑' : '已自动保存'}</span></section><div id="workout-exercises">${workout.exercises.length ? workout.exercises.map(workoutExerciseHtml).join('') : `<div class="empty compact minimal"><div class="empty-icon">${icon('dumbbell', 24)}</div><h3>还没有动作</h3><p>添加第一个动作开始记录。</p>${addExercise}</div>`}</div>${workout.exercises.length ? addExercise : ''}${trainingJournalHtml(workout.note, 'workout-note')}<div class="action-stack workout-actions">${completed ? '<button id="save-workout-template" class="secondary">保存为模板</button><button id="back-history" class="quiet-action">返回历史</button><button id="delete-workout" class="danger-button">删除训练</button>' : '<button id="history-workout">查看历史训练</button>'}</div>`
-  if (preview) return
-  bindWorkoutEditor(workout)
+  activatePage(view, preview, () => { currentWorkout = workout; document.body.classList.add('immersive'); bindWorkoutEditor(workout) })
 }
 
 function bindJournalDisclosure(root: ParentNode): void {
@@ -2109,16 +2186,19 @@ async function showExerciseForm(exercise?: Exercise, afterSave?: (value: Exercis
   dialog.querySelector('#delete-exercise')?.addEventListener('click', async () => { if (!exercise || !await confirmAction('删除这个动作？', '历史训练会保留，此操作不会改变过去的训练记录。')) return; try { await db.exercises.delete(exercise.id); leaveStandalone(dialog, surface); toast('已删除'); await showExerciseLibrary(surface) } catch (error) { fail(error) } })
 }
 
-async function renderWorkoutHistory(): Promise<void> {
-  const view = document.querySelector<HTMLElement>('#view')!
+async function renderWorkoutHistory(preview?: HTMLElement): Promise<void> {
+  const view = preview ?? document.querySelector<HTMLElement>('#view')!
   const viewVersion = view.dataset.renderVersion
-  document.body.classList.remove('immersive')
+  if (!preview) document.body.classList.remove('immersive')
   const workouts = (await db.workouts.toArray()).filter((item) => item.finishedAt).sort((a, b) => b.date.localeCompare(a.date) || b.startedAt.localeCompare(a.startedAt))
   if (!view.isConnected || view.dataset.renderVersion !== viewVersion) return
   const completedFeedback = ''
   view.innerHTML = `${completedFeedback}<div class="section-head history-head"><div><h2>历史训练</h2><span>${workouts.length} 次训练</span></div><button class="text-btn" id="close-history">返回</button></div><div class="history-list">${workouts.length ? workouts.map((workout) => `<button class="history-card" data-workout="${workout.id}"><div class="history-card-title"><strong>${formatShortDate(workout.date)}</strong><span>${workout.exercises.length} 个动作 · ${workout.exercises.reduce((sum, item) => sum + item.sets.length, 0)} 组${workout.note ? ' · 有日志' : ''}</span></div><div class="history-details">${workout.exercises.map((item) => `<div><strong>${esc(item.exerciseName)}</strong><small>${item.sets.map(workoutSetSummary).join(' · ') || '暂无组数'}</small></div>`).join('')}</div>${icon('chevron', 18)}</button>`).join('') : `<div class="empty minimal"><div class="empty-icon">${icon('activity', 24)}</div><h3>还没有训练历史</h3><p>完成力量训练后，在这里回顾记录。</p></div>`}</div>`
-  view.querySelector('#close-history')?.addEventListener('click', () => { showWorkoutHistory = false; void renderWorkoutPage().catch(fail) })
-  view.querySelectorAll<HTMLButtonElement>('[data-workout]').forEach((button) => button.addEventListener('click', async () => { try { currentWorkout = await db.workouts.get(button.dataset.workout!); workoutEditorOpen = true; showWorkoutHistory = false; await renderWorkoutPage() } catch (error) { fail(error) } }))
+  activatePage(view, preview, () => {
+    view.querySelector('#close-history')?.addEventListener('click', () => { showWorkoutHistory = false; void renderWorkoutPage().catch(fail) })
+    view.querySelectorAll<HTMLButtonElement>('[data-workout]').forEach((button) => button.addEventListener('click', async () => { try { currentWorkout = await db.workouts.get(button.dataset.workout!); workoutEditorOpen = true; showWorkoutHistory = false; await renderWorkoutPage() } catch (error) { fail(error) } }))
+  })
+
 }
 
 function defaultTemplateName(date: string, suffix: string): string {
@@ -2445,15 +2525,16 @@ async function saveDayAsDietTemplate(logs: FoodLog[]): Promise<void> {
 async function renderWeightPage(withProgressTabs = false, preview?: HTMLElement): Promise<void> {
   const view=preview??document.querySelector<HTMLElement>('#view')!
   const retainedTabs=setTabbedViewHtml(view,`${withProgressTabs?progressTabsHtml():''}<div data-weight-module></div>${withProgressTabs?recoverySlotHtml():''}`)
-  if (preview) {
-    const weight = mountWeightTrend(view.querySelector('[data-weight-module]')!, recoveryUi(), { state: { ...trendStates.weight }, record: () => {} })
-    const recovery = mountRecovery(view.querySelector('[data-recovery-root]')!, recoveryUi(), true, { weight: { ...trendStates.weight }, sleep: { ...trendStates.sleep }, water: { ...trendStates.water } })
-    previewDisposers.set(view, () => { weight(); recovery() })
-    await waitForPreview(view, '[data-trend-module=water]'); return
-  }
-  recordsDispose?.();recordsDispose=mountWeightTrend(view.querySelector('[data-weight-module]')!,recoveryUi(),{state:trendStates.weight,record:showWeightForm})
-  recoveryDispose?.();recoveryDispose=undefined
-  if(withProgressTabs){recoveryDispose=mountRecovery(view.querySelector('[data-recovery-root]')!,recoveryUi(),true);if(!retainedTabs)bindProgressTabs(view)}
+  const states = preview ? { weight: { ...trendStates.weight }, sleep: { ...trendStates.sleep }, water: { ...trendStates.water } } : trendStates
+  const weight = mountWeightTrend(view.querySelector('[data-weight-module]')!, recoveryUi(), { state: states.weight, record: showWeightForm })
+  const recovery = withProgressTabs ? mountRecovery(view.querySelector('[data-recovery-root]')!, recoveryUi(), true, states) : undefined
+  if (preview) { previewDisposers.set(view, () => { weight(); recovery?.() }); await waitForPreview(view, '[data-trend-module=water]') }
+  activatePage(view, preview, () => {
+    Object.assign(trendStates, states)
+    recordsDispose?.(); recordsDispose = weight
+    recoveryDispose?.(); recoveryDispose = recovery
+    if (withProgressTabs && !retainedTabs) bindProgressTabs(view)
+  })
 }
 
 function showWeightForm(date: string, value?: number): void {
