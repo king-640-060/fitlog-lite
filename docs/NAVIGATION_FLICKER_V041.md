@@ -18,3 +18,8 @@
 不改服务/数据库/迁移/seed/快照/WorkoutAutosave/计时/音频/计划/Sheet业务；不改变颜色、主题、信息层级或导航结构。fitlog-lite-db、Dexie13、IDB130、22表、Backup14、Restore1–14、Sync/envelope1不变。原17冻结fixture、原批准原型与旧冻结QA不变。所有测试写入仅限新建隔离合成context；旧生产合成档案仅比较摘要，绝不重置或恢复。
 
 [本轮QA](NAVIGATION_FLICKER_V041_QA.md)分开记录自动化、真实生产、失败/重跑和实体Pending。原WebKit饮水Undo−128px未声称解决；iPhone Safari/原安装PWA/真实键盘SafeArea/VoiceOver/个人连续性无实体证据继续Pending。完成授权发布后停止，交还ChatGPT独立核查。
+
+
+## 恢复后失效标签的同范围补充修正
+
+预备Plan必须按本次实际可用的标签计算effective filter。Restore/Sync后原标签消失时，预备内容显示真实无筛选任务，接管时仅清理失效的内存筛选草稿；取消预备页不改当前全局草稿。不改Restore/Sync、Task/Tag表或数据合同，这恢复原active renderer已有的清理语义。新增实际Backup14 Restore双引擎回归精确比较22表事实，避免“记录存在但被失效筛选隐藏”。

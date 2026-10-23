@@ -842,10 +842,12 @@ async function renderPlanPage(preview?: HTMLElement): Promise<void> {
     getTaskTags(),
   ])
   if ((!preview && (activeTab !== 'plan' || version !== planRenderVersion)) || !view.isConnected || view.dataset.renderVersion !== viewVersion) return
-  if (!preview && planTagFilterId && !allTags.some((tag) => tag.id === planTagFilterId)) planTagFilterId = undefined
-  const filtered = sortTasksForPlan(planTagFilterId ? tasks.filter((task) => task.tagIds.includes(planTagFilterId!)) : tasks)
+  // Restore/Sync may remove a saved filter's tag. Prepare the same unfiltered view as an active render.
+  const filterId = allTags.some((tag) => tag.id === planTagFilterId) ? planTagFilterId : undefined
+  if (!preview) planTagFilterId = filterId
+  const filtered = sortTasksForPlan(filterId ? tasks.filter((task) => task.tagIds.includes(filterId)) : tasks)
   const tags = new Map(allTags.map((tag) => [tag.id, tag]))
-  const currentFilter = allTags.find((tag) => tag.id === planTagFilterId)
+  const currentFilter = allTags.find((tag) => tag.id === filterId)
   let content = ''
   if (planView === 'today' || planView === 'inbox') {
     const pending = filtered.filter((task) => !task.completedAt)
@@ -870,6 +872,7 @@ async function renderPlanPage(preview?: HTMLElement): Promise<void> {
   const topCreate = view.parentElement?.querySelector<HTMLButtonElement>(':is(#plan-add-task,[data-navigation-id=plan-add-task])')
   if (topCreate) topCreate.hidden = Boolean(view.querySelector('.plan-empty'))
   activatePage(view, preview, () => {
+    planTagFilterId = filterId
     if (!retainedTabs) view.querySelectorAll<HTMLButtonElement>('[data-plan-view]').forEach((button) => button.addEventListener('click', () => { if (planView === button.dataset.planView) return; planView = button.dataset.planView as PlanView; void renderPlanPage().catch(fail) }))
     view.querySelector('#plan-tag-filter')?.addEventListener('click', () => void showTaskTagFilter())
     view.querySelector('#plan-tag-filter-clear')?.addEventListener('click', () => { planTagFilterId = undefined; void renderPlanPage().catch(fail) })

@@ -15,3 +15,12 @@ Chromium151.0.7922.34/WebKit26.5，前后各52显示上下文（4宽×3字体×2
 825受保护文件仅授权5产品文件变化，其余820及17冻结fixture、旧设计参考/冻结QA、全部service/DB/seed/Autosave未变。Dexie13/IDB130/22表、Backup14/Restore1–14/Sync与envelope1不变。原生产专用合成档案START在线/离线22表与8配置摘要通过，绝不重置或恢复该档案。新增隔离context的fixture准备与显式保存，不涉及个人档案。
 
 [冻结证据](../design/qa/2026-10-23-navigation-flicker-v0.4.1/README.md)在发布前为17PASS/3Pending：17待升级、19待双CI/Pages、20待实体设备。Application与END实际线上结果由LATEST与外部正式十项回执记录，不能提前填成功。iPhone Safari/原安装PWA/真实键盘SafeArea/VoiceOver/个人连续性继续Pending，ChatGPT独立核查另Pending。原WebKit饮水Undo−128px未声称修复。此前用户F1–F5 36/36及已结案轮次不重开。
+
+
+## 最终Application前的恢复筛选补充
+
+初次Application `9d965c6d06cfb1b2bffdaa0a31e3e50f36bd20fc` 的CI/9项生产验证均已真实通过，但补充Restore检查发现未覆盖的状态：Plan原筛选标签消失，目标仍存在却被失效草稿隐藏。已在该实际发布版本上用两个新合成context执行Backup14 Restore重现，22表仍精确等于备份，证明是显示状态而非记录丢失；原记录/截图保留。
+
+修正只在renderPlanPage计算可用filterId，准备页用此值渲染，接管时才归一化内存草稿。其余173源文件与初次Application逐字一致，没有更改Restore/Sync或任何业务数据/服务。追加双引擎实际Restore/22表精确断言、原interactionStabilization完整4宽、combinedInteraction的4显示+2完整手势定向、TypeScript/1143单测/Pages build全部通过。不是声称把原44全部再次重跑；原44完整阶段保留，最终版本另对受影响路径复验并完整执行正式Pages52矩阵/100切换/16内部区域及新Restore门槛。
+
+[独立补充证据](../design/qa/2026-10-23-navigation-flicker-v0.4.1/restore-filter-addendum.json)及其[SHA256](../design/qa/2026-10-23-navigation-flicker-v0.4.1/restore-filter-addendum.sha256)另行保存，不改写此前冻结文件和原manifest。后续Application/END的实际SHA与CI/Pages由LATEST和正式回执记录。实体Pending保持原边界。
