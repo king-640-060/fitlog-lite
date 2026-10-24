@@ -1,3 +1,4 @@
+import { openManagementEntry } from './managementEntry.mjs'
 import { waitForMainNavigation } from './navigationSettlement.mjs'
 // Fresh synthetic browser contexts and mock providers only. No real image/key/data.
 import assert from 'node:assert/strict'
@@ -31,7 +32,7 @@ for (const [width,height] of sizes) {
   const file={name:'synthetic-package.png',mimeType:'image/png',buffer:png}
   const library=async()=>{await nav('food');await page.locator('#food-library').click();await page.locator('#food-vision-import').click()}
   await library();assert.ok((await page.locator('.vision-provider').innerText()).includes('先配置一个支持图片识别的 AI 服务。'));assert.equal(requests.length,0);await layout('unconfigured');await close()
-  await page.locator('#open-management').click();await page.locator('#more-ai-settings').click();await page.locator('.ai-advanced summary').click();await page.locator('[name=preset]').selectOption('custom')
+  await page.locator('#open-management').click();await openManagementEntry(page,'#more-ai-settings','click');await page.locator('.ai-advanced summary').click();await page.locator('[name=preset]').selectOption('custom')
   await page.locator('[name=name]').fill('图片服务');await page.locator('[name=baseUrl]').fill('https://mock-vision.invalid/v1');await page.locator('[name=apiKey]').fill('synthetic-vision-key');await page.locator('#ai-manual-model').click();await page.locator('[name=model]').fill('editable-vision-model');await page.locator('#ai-privacy-ack').check()
   await page.locator('#ai-test-vision').click();await page.getByText('图片识别已验证，保存后可拍包装录入',{exact:true}).waitFor()
   assert.equal(requests[0].messages.length,1);assert.equal(requests[0].tools,undefined);assert.equal(requests[0].messages[0].content[0].text.includes('731'),false);assert.ok(requests[0].messages[0].content[1].image_url.url.startsWith('data:image/png;base64,'))

@@ -1,0 +1,239 @@
+{
+  "baseline": {
+    "build": {
+      "build": "87dad7206829238540c33fd82fb05cf24dd478e4",
+      "local": false,
+      "base": "/fitlog-lite/",
+      "assets": [
+        "assets/index-ciSzpRks.js",
+        "assets/index-DrokVmoB.css"
+      ]
+    },
+    "focused390Font200": "PASS"
+  },
+  "firstCandidateFailure": {
+    "labelClientWidth": 326,
+    "labelScrollWidth": 336,
+    "excessPx": 10,
+    "log": "regressions/combinedHandoff/"
+  },
+  "finalCorrection": {
+    "onlyOneStaticLabelTextWrapper": true,
+    "allOtherUiAndBusinessCodeByteIdentical": true
+  },
+  "chromium33": {
+    "status": "PASS",
+    "cases": [
+      {
+        "width": 320,
+        "scale": 100,
+        "theme": "light"
+      },
+      {
+        "width": 320,
+        "scale": 100,
+        "theme": "dark"
+      },
+      {
+        "width": 320,
+        "scale": 120,
+        "theme": "light"
+      },
+      {
+        "width": 320,
+        "scale": 120,
+        "theme": "dark"
+      },
+      {
+        "width": 320,
+        "scale": 140,
+        "theme": "light"
+      },
+      {
+        "width": 320,
+        "scale": 140,
+        "theme": "dark"
+      },
+      {
+        "width": 320,
+        "scale": 200,
+        "theme": "light"
+      },
+      {
+        "width": 320,
+        "scale": 200,
+        "theme": "dark"
+      },
+      {
+        "width": 375,
+        "scale": 100,
+        "theme": "light"
+      },
+      {
+        "width": 375,
+        "scale": 100,
+        "theme": "dark"
+      },
+      {
+        "width": 375,
+        "scale": 120,
+        "theme": "light"
+      },
+      {
+        "width": 375,
+        "scale": 120,
+        "theme": "dark"
+      },
+      {
+        "width": 375,
+        "scale": 140,
+        "theme": "light"
+      },
+      {
+        "width": 375,
+        "scale": 140,
+        "theme": "dark"
+      },
+      {
+        "width": 375,
+        "scale": 200,
+        "theme": "light"
+      },
+      {
+        "width": 375,
+        "scale": 200,
+        "theme": "dark"
+      },
+      {
+        "width": 390,
+        "scale": 100,
+        "theme": "light"
+      },
+      {
+        "width": 390,
+        "scale": 100,
+        "theme": "dark"
+      },
+      {
+        "width": 390,
+        "scale": 120,
+        "theme": "light"
+      },
+      {
+        "width": 390,
+        "scale": 120,
+        "theme": "dark"
+      },
+      {
+        "width": 390,
+        "scale": 140,
+        "theme": "light"
+      },
+      {
+        "width": 390,
+        "scale": 140,
+        "theme": "dark"
+      },
+      {
+        "width": 390,
+        "scale": 200,
+        "theme": "light"
+      },
+      {
+        "width": 390,
+        "scale": 200,
+        "theme": "dark"
+      },
+      {
+        "width": 430,
+        "scale": 100,
+        "theme": "light"
+      },
+      {
+        "width": 430,
+        "scale": 100,
+        "theme": "dark"
+      },
+      {
+        "width": 430,
+        "scale": 120,
+        "theme": "light"
+      },
+      {
+        "width": 430,
+        "scale": 120,
+        "theme": "dark"
+      },
+      {
+        "width": 430,
+        "scale": 140,
+        "theme": "light"
+      },
+      {
+        "width": 430,
+        "scale": 140,
+        "theme": "dark"
+      },
+      {
+        "width": 430,
+        "scale": 200,
+        "theme": "light"
+      },
+      {
+        "width": 430,
+        "scale": 200,
+        "theme": "dark"
+      },
+      {
+        "width": 844,
+        "scale": 140,
+        "theme": "dark"
+      }
+    ]
+  },
+  "webkit6": {
+    "status": "PASS",
+    "cases": [
+      {
+        "width": 390,
+        "scale": 100,
+        "theme": "light"
+      },
+      {
+        "width": 320,
+        "scale": 200,
+        "theme": "dark"
+      },
+      {
+        "width": 430,
+        "scale": 140,
+        "theme": "dark"
+      },
+      {
+        "width": 844,
+        "scale": 140,
+        "theme": "dark"
+      },
+      {
+        "width": 390,
+        "scale": 200,
+        "theme": "light"
+      },
+      {
+        "width": 390,
+        "scale": 200,
+        "theme": "dark"
+      }
+    ]
+  },
+  "actualFinalLocalBuild": {
+    "build": "87dad7206829238540c33fd82fb05cf24dd478e4",
+    "local": true,
+    "base": "/fitlog-lite/",
+    "assets": [
+      "assets/index-BKGJ_jWx.js",
+      "assets/index-BeEbuKEW.css"
+    ]
+  },
+  "publication": "Pending at local freeze"
+}

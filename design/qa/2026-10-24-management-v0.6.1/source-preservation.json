@@ -1,0 +1,69 @@
+{
+  "existingSourceFiles": 174,
+  "modifiedExistingSource": [
+    "src/main.ts",
+    "src/ui/managementWorkspace.ts",
+    "src/ui/nutritionCycles.ts"
+  ],
+  "unchangedSource": 171,
+  "newSource": [
+    "src/ui/managementHub.ts",
+    "src/styles/management.css"
+  ],
+  "frozenFixtures": 17,
+  "modifiedFrozenFixtures": [],
+  "oldDesignFiles": 637,
+  "modifiedOldDesignFiles": [],
+  "dataContracts": {
+    "database": "fitlog-lite-db",
+    "Dexie": 13,
+    "IDB": 130,
+    "stores": 22,
+    "Backup": 14,
+    "Restore": "1-14",
+    "Sync": 1,
+    "envelope": 1
+  },
+  "differentTracked": [
+    "AGENTS.md",
+    "docs/UI_INTERACTION_SPEC.md",
+    "docs/UI_QA_MATRIX.md",
+    "src/main.ts",
+    "src/ui/managementWorkspace.ts",
+    "src/ui/nutritionCycles.ts",
+    "tests/browser/README.md",
+    "tests/browser/aiAssistant.mjs",
+    "tests/browser/aiDualModelRouting.mjs",
+    "tests/browser/approvedJointV05.mjs",
+    "tests/browser/catalogRecovery.mjs",
+    "tests/browser/combinedHandoff.mjs",
+    "tests/browser/foodServing.mjs",
+    "tests/browser/foodVision.mjs",
+    "tests/browser/foodWaterBackupV04.mjs",
+    "tests/browser/foodWaterDayV04.mjs",
+    "tests/browser/githubSyncSafety.mjs",
+    "tests/browser/habitEditorLayout.mjs",
+    "tests/browser/interactionStabilization.mjs",
+    "tests/browser/jointReportRanges.mjs",
+    "tests/browser/jointUxReportsRange.mjs",
+    "tests/browser/managementVisualConsistency.mjs",
+    "tests/browser/managementWorkspace.mjs",
+    "tests/browser/mobileLayout.mjs",
+    "tests/browser/motionPolish.mjs",
+    "tests/browser/navigationFilterRestore.mjs",
+    "tests/browser/nutritionGoalTemplate.mjs",
+    "tests/browser/nutritionTemplates.mjs",
+    "tests/browser/productionAssets.mjs",
+    "tests/browser/pwaUpgrade.mjs",
+    "tests/browser/todayWaterButton.mjs",
+    "tests/browser/uiQualityAudit.mjs",
+    "tests/browser/uiSemanticConsistency.mjs",
+    "tests/browser/unifiedExperience.mjs",
+    "tests/browser/uxWaterCascade.mjs",
+    "tests/browser/uxWaterCascadeBackup.mjs"
+  ],
+  "cycleUiChange": {
+    "onlyOneStaticLabelTextWrapper": true,
+    "allOtherUiAndBusinessCodeByteIdentical": true
+  }
+}

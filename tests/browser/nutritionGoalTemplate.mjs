@@ -1,3 +1,4 @@
+import { prepareManagementEntry } from './managementEntry.mjs'
 // v0.2 approved flow: real services/transactions in isolated synthetic contexts only.
 import assert from 'node:assert/strict'
 import fs from 'node:fs/promises'
@@ -29,7 +30,7 @@ for(const engine of ['chromium','webkit']){
    const defects=await p.locator('.sheet[open]').evaluate(d=>{const rr=d.getBoundingClientRect(),bad=[];for(const e of d.querySelectorAll('button,input,textarea')){const r=e.getBoundingClientRect();if(!r.width||!r.height||e.closest('[hidden]'))continue;if(r.left<rr.left-1||r.right>rr.right+1)bad.push('horizontal '+e.outerHTML.slice(0,100));if(e.matches('button')&&(r.height<43.5||r.width<43.5))bad.push('target '+e.id);if(e.matches('input,textarea')&&parseFloat(getComputedStyle(e).fontSize)<16)bad.push('input font')}return bad});assert.deepEqual(defects,[],prefix+'/'+name)
    if(shot)await p.screenshot({path:path.join(root,prefix+'-'+name+'.png')});return g
   }
-  const tap=async s=>{const el=p.locator(s).first();if(s.includes('data-goal-template')){if(await el.getAttribute('aria-pressed')!=='true')await el.tap();await p.locator('#goal-template-continue').tap()}else await el.tap();await settle()}
+  const tap=async s=>{await prepareManagementEntry(p,s);const el=p.locator(s).first();if(s.includes('data-goal-template')){if(await el.getAttribute('aria-pressed')!=='true')await el.tap();await p.locator('#goal-template-continue').tap()}else await el.tap();await settle()}
   const picker=async()=>{await p.evaluate(()=>window.qaGoalDialog=undefined);if(await p.locator('.sheet[open]').count())await tap('.sheet[open] [data-close]');await p.locator('[data-tab=food]').tap();await tap('[data-edit-nutrition-target]');await p.locator('[data-goal-picker] #goal-template-create').waitFor();await settle()}
   const keyboard=async open=>{await p.evaluate(open=>{qaVV.height=open?Math.min(innerHeight-180,420):innerHeight;qaVV.offsetTop=0;qaVV.dispatchEvent(new Event('resize'))},open);await settle()}
   try{

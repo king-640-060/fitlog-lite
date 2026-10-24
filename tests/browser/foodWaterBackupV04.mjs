@@ -1,3 +1,4 @@
+import { openManagementEntry } from './managementEntry.mjs'
 // Actual previous production build rejects Backup14; candidate restores/exports it, with isolated synthetic data only.
 import assert from 'node:assert/strict'
 import fs from 'node:fs/promises'
@@ -10,7 +11,7 @@ const sorted=data=>Object.fromEntries(Object.entries(data).sort(([a],[b])=>a.loc
 try{for(const stage of ['baseline','candidate']){const c=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block',timezoneId:'Asia/Shanghai'}),p=await c.newPage();try{
  const url=stage==='baseline'?(process.env.FITLOG_V04_BASELINE_URL||'http://127.0.0.1:5301/fitlog-lite/'):(process.env.FITLOG_QA_URL||'http://127.0.0.1:5297/fitlog-lite/');await p.goto(url,{waitUntil:'networkidle'});await p.waitForSelector('#open-management')
  const read=()=>p.evaluate(async()=>{const d=await new Promise(r=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>r(q.result)}),data={};for(const key of [...d.objectStoreNames].sort())data[key]=await new Promise(r=>{const q=d.transaction(key).objectStore(key).getAll();q.onsuccess=()=>r(q.result.sort((a,b)=>a.id.localeCompare(b.id)))});const result={version:d.version,data};d.close();return result})
- const open=async()=>{if(await p.locator('dialog.sheet[open]').count())await p.locator('dialog.sheet[open] [data-close]').click();await p.locator('#open-management').click();await p.locator('#more-backup').click();await p.locator('#backup-file').waitFor({state:'attached'})}
+ const open=async()=>{if(await p.locator('dialog.sheet[open]').count())await p.locator('dialog.sheet[open] [data-close]').click();await p.locator('#open-management').click();await openManagementEntry(p,'#more-backup','click');await p.locator('#backup-file').waitFor({state:'attached'})}
  const file=async data=>{await p.locator('#backup-file').setInputFiles({name:'synthetic-backup.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(data))})}
  const restore=async data=>{await open();await file(data);await p.locator('#confirm-restore').click();await p.locator('[data-confirm]').click();await p.waitForFunction(()=>!document.querySelector('dialog[open]'))}
  await restore(legacy);let value=await read();assert.equal(value.version,130);assert.deepEqual(value.data,sorted(legacy.data));const oldHash=hash(value.data);await open();await file(meal)

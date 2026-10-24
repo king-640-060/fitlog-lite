@@ -29,6 +29,7 @@ import { mountRecovery, recoverySlotHtml, showSleepBackfill, showWaterEditor, ty
 import { readDailyNutritionSummary, observeDailyNutritionSummary } from './services/dailyNutritionSummary'
 import { macroNutritionSummaryForDay } from './ui/macroNutritionSummary'
 import { managerToolbarHtml, managerSearchHtml, managerListHtml, managerRowHtml, managerEmptyHtml, managerNoResultsHtml, managerUtilitiesHtml, managerSectionHtml } from './ui/managerPrimitives'
+import { mountManagementHub } from './ui/managementHub'
 import { createManagementWorkspace, type ManagedSurfaceContext } from './ui/managementWorkspace'
 import { retireLegacyVideoSearchStorage } from './services/retiredVideoStorage'
 import { animateMotion, setupMotionInteractions, stabilizeSheetSubview } from './ui/motion'
@@ -54,6 +55,7 @@ import './styles/appearance.css'
 import './styles/cycleReport.css'
 import './styles/history.css'
 import './styles/horizontalNavigation.css'
+import './styles/management.css'
 import { showNutritionStrategyPicker, showNutritionStrategyManager } from './ui/nutritionStrategies'
 import { bindEnergyEditor } from './ui/energyEditor'
 import { showFoodVisionImport } from './ui/foodVisionImport'
@@ -1044,27 +1046,21 @@ async function showTaskEditor(task?: Task, defaultDate?: string): Promise<void> 
 }
 
 function showManagementHub(): void {
-  const surface = createManagementWorkspace(esc)
-  const dialog = managementModal(surface)('管理与设置', '<div id="management-hub"></div>', true)
-  const view = dialog.querySelector<HTMLElement>('#management-hub')!
-  const row = (id: string, iconName: IconName, title: string, detail: string) => `<button id="${id}"><span class="setting-icon">${icon(iconName, 18)}</span><span><strong>${title}</strong><small>${detail}</small></span>${icon('chevron', 18)}</button>`
-  view.innerHTML = `<section class="settings-section"><h3>内容与模板</h3><div class="settings-group">${row('more-food-library', 'utensils', '食物库', '管理食物与营养数据')}${row('more-exercise-library', 'dumbbell', '动作库', '管理力量训练动作')}${row('more-workout-templates', 'activity', '训练模板', '管理常用训练组合')}${row('more-diet-templates', 'archive', '饮食模板', '管理常用饮食组合')}${row('more-nutrition-strategies', 'leaf', '营养模板', '管理营养目标方案')}</div></section><section class="settings-section"><h3>个人管理</h3><div class="settings-group">${row('more-habits', 'leaf', '习惯', '管理打卡习惯与计划')}</div></section><section class="settings-section"><h3>数据与备份</h3><div class="settings-group">${row('more-import', 'upload', '导入数据', '从文件导入食物数据')}${row('more-backup', 'download', '备份与恢复', '导出或恢复本地数据')}${row('more-github-sync', 'archive', 'GitHub 同步', esc(githubSyncDetail()))}</div><p class="settings-section-note" role="note">数据保存在当前设备。更换设备或清除浏览器数据前，请先备份。</p></section><section class="settings-section"><h3>应用</h3><div class="settings-group">${row('more-appearance', 'leaf', '外观', '跟随系统 / 始终浅色 / 始终深色')}${row('more-ai-settings', 'sparkles', 'AI 设置', esc(aiSettingsDetail()))}${row('more-diagnostics', 'info', '版本诊断', '查看版本、更新与 Service Worker 状态')}${row('more-about', 'info', '关于 FitLog Lite', '应用信息与版本说明')}</div></section>`
-  surface.onResume(() => {
-    view.querySelector('#more-github-sync small')!.textContent = githubSyncDetail()
-    view.querySelector('#more-ai-settings small')!.textContent = aiSettingsDetail()
-  })
-  view.querySelector('#more-food-library')?.addEventListener('click', () => surface.navigate('食物库', surface => showFoodLibrary('', surface)))
-  view.querySelector('#more-exercise-library')?.addEventListener('click', () => surface.navigate('动作库', surface => showExerciseLibrary(surface)))
-  view.querySelector('#more-workout-templates')?.addEventListener('click', () => surface.navigate('训练模板', surface => showWorkoutTemplateManager('', surface)))
-  view.querySelector('#more-diet-templates')?.addEventListener('click', () => surface.navigate('饮食模板', surface => showDietTemplateManager('', surface)))
-  view.querySelector('#more-habits')?.addEventListener('click', () => surface.navigate('习惯', surface => showHabitManager(false, surface)))
-  view.querySelector('#more-import')?.addEventListener('click', () => surface.navigate('导入数据', surface => db.foods.orderBy('name').toArray().then(foods => showFoodImportChooser(foods, '', surface)).catch(fail)))
-  view.querySelector('#more-backup')?.addEventListener('click', () => surface.navigate('备份与恢复', surface => showSettings(surface).catch(fail)))
-  view.querySelector('#more-nutrition-strategies')?.addEventListener('click', () => surface.navigate('营养模板', surface => { return showNutritionStrategyManager(nutritionStrategyUi(surface)).catch(fail) }))
-  view.querySelector('#more-github-sync')?.addEventListener('click', () => surface.navigate('GitHub 同步', surface => { return flushWorkoutAutosave().then(() => { if (!surface.alive) return; showGitHubSync({ surface, openModal: managementModal(surface), esc, toast, restored: async () => { workoutAutosave.cancel(); currentWorkout = undefined; workoutEditorOpen = false; await render() } }) }).catch(fail) }))
-  view.querySelector('#more-appearance')?.addEventListener('click',()=>surface.navigate('外观',showAppearance))
-  view.querySelector('#more-ai-settings')?.addEventListener('click', () => surface.navigate('AI 设置', surface => showAiSettings({ surface, openModal: managementModal(surface), esc, changed: () => aiAssistant.settingsChanged() }, aiAssistant.profiles)))
-  view.querySelector('#more-diagnostics')?.addEventListener('click', () => surface.navigate('版本诊断', surface => showPwaDiagnostics(pwaRuntime, {
+  const surface = createManagementWorkspace(esc, '管理中心')
+  const destinations = new Map<string, () => void>()
+  const register = (id: string, action: () => void) => { destinations.set(id, action) }
+  register('more-food-library', () => surface.navigate('食物库', surface => showFoodLibrary('', surface)))
+  register('more-exercise-library', () => surface.navigate('动作库', surface => showExerciseLibrary(surface)))
+  register('more-workout-templates', () => surface.navigate('训练模板', surface => showWorkoutTemplateManager('', surface)))
+  register('more-diet-templates', () => surface.navigate('饮食模板', surface => showDietTemplateManager('', surface)))
+  register('more-habits', () => surface.navigate('习惯', surface => showHabitManager(false, surface)))
+  register('more-import', () => surface.navigate('导入数据', surface => db.foods.orderBy('name').toArray().then(foods => showFoodImportChooser(foods, '', surface)).catch(fail)))
+  register('more-backup', () => surface.navigate('备份与恢复', surface => showSettings(surface).catch(fail)))
+  register('more-nutrition-strategies', () => surface.navigate('营养模板', surface => { return showNutritionStrategyManager(nutritionStrategyUi(surface)).catch(fail) }))
+  register('more-github-sync', () => surface.navigate('GitHub 同步', surface => { return flushWorkoutAutosave().then(() => { if (!surface.alive) return; showGitHubSync({ surface, openModal: managementModal(surface), esc, toast, restored: async () => { workoutAutosave.cancel(); currentWorkout = undefined; workoutEditorOpen = false; await render() } }) }).catch(fail) }))
+  register('more-appearance',()=>surface.navigate('外观',showAppearance))
+  register('more-ai-settings', () => surface.navigate('AI 设置', surface => showAiSettings({ surface, openModal: managementModal(surface), esc, changed: () => aiAssistant.settingsChanged() }, aiAssistant.profiles)))
+  register('more-diagnostics', () => surface.navigate('版本诊断', surface => showPwaDiagnostics(pwaRuntime, {
     surface, openModal: managementModal(surface), esc,
     confirm: () => confirmAction('更新应用？', '已保存的本地记录会保留。应用将重新打开，当前 AI 对话会结束。', '确认更新', false),
     blockReason: dialog => updateBlockReason({
@@ -1077,7 +1073,8 @@ function showManagementHub(): void {
     }),
     drainWrites: async () => { await flushWorkoutAutosave(); await db.transaction('r', db.tables, async () => {}) },
   })))
-  view.querySelector('#more-about')?.addEventListener('click', () => surface.navigate('关于 FitLog Lite', surface => { managementModal(surface)('关于 FitLog Lite', `<div class="about-card"><span class="brand-mark large">${icon('leaf', 30)}</span><h2>FitLog Lite</h2><p>一款轻盈、安静的本地个人健康记录工具。</p><small>饮食 · 力量训练 · 体重 · 凯格尔训练</small></div>`) }))
+  register('more-about', () => surface.navigate('关于 FitLog Lite', surface => { managementModal(surface)('关于 FitLog Lite', `<div class="about-card"><span class="brand-mark large">${icon('leaf', 30)}</span><h2>FitLog Lite</h2><p>一款轻盈、安静的本地个人健康记录工具。</p><small>饮食 · 力量训练 · 体重 · 凯格尔训练</small></div>`) }))
+  mountManagementHub(surface, esc, { sync: githubSyncDetail, ai: aiSettingsDetail }, id => destinations.get(id)?.())
 }
 
 async function renderCalendarOverview(withProgressTabs = false, preview?: HTMLElement): Promise<void> {

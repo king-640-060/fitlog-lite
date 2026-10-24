@@ -1,3 +1,4 @@
+import { openManagementEntry } from './managementEntry.mjs'
 // Real generated SW/assets, same origin deployment switch, synthetic frozen data only.
 import fs from 'node:fs'
 import path from 'node:path'
@@ -50,7 +51,7 @@ const seed=async page=>page.evaluate(async fixture=>{
 },fixture)
 const open=async page=>{await page.goto(base,{waitUntil:'networkidle'});await page.waitForSelector('#open-management');await page.waitForFunction(()=>!!navigator.serviceWorker.controller)}
 const close=page=>page.locator('dialog[open] [data-close]').click()
-const diagnostics=async page=>{await page.locator('#open-management').click();await page.locator('#more-diagnostics').click();await page.waitForSelector('[data-diagnostic="App build"]')}
+const diagnostics=async page=>{await page.locator('#open-management').click();await openManagementEntry(page,'#more-diagnostics','click');await page.waitForSelector('[data-diagnostic="App build"]')}
 try{
  for(const mode of ['legacy',...(prompt?['prompt']:[])]){
   serving=mode==='legacy'?old:path.resolve(prompt)
@@ -114,7 +115,7 @@ try{
    const gap=await page.locator('#library-search').evaluate(e=>e.getBoundingClientRect().left+parseFloat(getComputedStyle(e).paddingLeft)-e.parentElement.querySelector('.icon').getBoundingClientRect().right)
    assert.ok(gap>=8);await page.locator('#food-vision-import').click();assert.ok((await page.locator('.vision-provider').innerText()).includes('智谱 · glm-5.3-flash · 图片：glm-5.3-flash'));await close(page)
    // Appearance persists outside the business archive, including a cold offline boot.
-   await page.locator('#open-management').click();await page.locator('#more-appearance').click();await page.locator('[name=appearance][value=dark]').check();await close(page);assert.equal(await page.locator('html').getAttribute('data-effective-theme'),'dark');verifyMigration(before,await read(page));
+   await page.locator('#open-management').click();await openManagementEntry(page,'#more-appearance','click');await page.locator('[name=appearance][value=dark]').check();await close(page);assert.equal(await page.locator('html').getAttribute('data-effective-theme'),'dark');verifyMigration(before,await read(page));
    // Cold page creation offline; original origin data and SW retained.
    await page.close();await context.setOffline(true);page=await context.newPage();await open(page)
    assert.equal(await page.locator('meta[name=fitlog-build]').getAttribute('content'),expected);verifyMigration(before,await read(page));assert.equal(await workerBuild(page),expected)

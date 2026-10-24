@@ -40,8 +40,8 @@ export interface ManagedSurfaceContext {
 }
 
 /** A route stack for this Sheet only. No business records or general page routing. */
-export function createManagementWorkspace(escape: (value: unknown) => string): ManagedSurfaceContext {
-  const dialog = openSheet(escape('管理与设置'), '', icon('x'), true)
+export function createManagementWorkspace(escape: (value: unknown) => string, rootTitle = '管理与设置'): ManagedSurfaceContext {
+  const dialog = openSheet(escape(rootTitle), '', icon('x'), true)
   dialog.classList.add('management-workspace')
   const host = dialog.querySelector<HTMLElement>('.modal-body')!
   const heading = dialog.querySelector<HTMLElement>('.modal-head h2')!
@@ -143,7 +143,7 @@ export function createManagementWorkspace(escape: (value: unknown) => string): M
     },
     restoreScroll() { if (!closed) host.scrollTop = current().scroll },
   }
-  routes.push(make('管理与设置')); header()
+  routes.push(make(rootTitle)); header()
   backButton.addEventListener('click', () => { const action = current().back?.action; if (action) action(); else surface.back() })
   const events = new AbortController()
   dialog.addEventListener('cancel', event => { if (routes.length > 1) { event.preventDefault(); event.stopImmediatePropagation(); backButton.click() } }, { signal: events.signal })

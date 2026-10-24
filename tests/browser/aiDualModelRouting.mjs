@@ -1,3 +1,4 @@
+import { openManagementEntry } from './managementEntry.mjs'
 // All settings, credentials, pictures and requests are synthetic in isolated contexts.
 import assert from 'node:assert/strict'
 const { chromium } = await import(process.env.FITLOG_PLAYWRIGHT_MODULE)
@@ -27,7 +28,7 @@ for(const [width,height] of sizes){
   await page.goto(base,{waitUntil:'networkidle'});await page.waitForSelector('#open-management')
   const file={name:'synthetic-label.png',mimeType:'image/png',buffer:Buffer.from(await page.evaluate(()=>{const c=document.createElement('canvas');c.width=400;c.height=300;const x=c.getContext('2d');x.fillStyle='white';x.fillRect(0,0,400,300);x.fillStyle='black';x.font='24px sans-serif';x.fillText('每100g 能量100kcal',20,100);return c.toDataURL('image/png').split(',')[1]}),'base64')}
   const close=async()=>{await page.locator('dialog [data-close]').click();await page.waitForFunction(()=>!document.querySelector('dialog'))}
-  const settings=async()=>{await page.locator('#open-management').click();await page.locator('#more-ai-settings').click()}
+  const settings=async()=>{await page.locator('#open-management').click();await openManagementEntry(page,'#more-ai-settings','click')}
   const saved=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('fitlog-ai-profiles-v1'))[0])
   const modify=change=>page.evaluate(change=>{const rows=JSON.parse(localStorage.getItem('fitlog-ai-profiles-v1'));Object.assign(rows[0],change);localStorage.setItem('fitlog-ai-profiles-v1',JSON.stringify(rows))},change)
   const layout=async name=>{await page.waitForTimeout(220);assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.equal(await page.locator('.modal-body').evaluate(e=>e.scrollWidth<=e.clientWidth),true);assert.equal(await page.locator('[name=apiKey]').inputValue(),'');await page.screenshot({path:`/tmp/dual-${prod?'prod':'local'}-${width}-${name}.png`})}

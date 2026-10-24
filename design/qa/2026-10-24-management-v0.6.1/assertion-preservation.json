@@ -1,0 +1,182 @@
+[
+  {
+    "file": "tests/browser/README.md",
+    "originalAssertions": 0,
+    "currentAssertions": 0,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/aiAssistant.mjs",
+    "originalAssertions": 55,
+    "currentAssertions": 55,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/aiDualModelRouting.mjs",
+    "originalAssertions": 54,
+    "currentAssertions": 54,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/approvedJointV05.mjs",
+    "originalAssertions": 61,
+    "currentAssertions": 61,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/catalogRecovery.mjs",
+    "originalAssertions": 42,
+    "currentAssertions": 42,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/combinedHandoff.mjs",
+    "originalAssertions": 65,
+    "currentAssertions": 65,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/foodServing.mjs",
+    "originalAssertions": 84,
+    "currentAssertions": 84,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/foodVision.mjs",
+    "originalAssertions": 79,
+    "currentAssertions": 79,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/foodWaterBackupV04.mjs",
+    "originalAssertions": 10,
+    "currentAssertions": 10,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/foodWaterDayV04.mjs",
+    "originalAssertions": 55,
+    "currentAssertions": 55,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/githubSyncSafety.mjs",
+    "originalAssertions": 0,
+    "currentAssertions": 0,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/habitEditorLayout.mjs",
+    "originalAssertions": 32,
+    "currentAssertions": 32,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/interactionStabilization.mjs",
+    "originalAssertions": 83,
+    "currentAssertions": 83,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/jointReportRanges.mjs",
+    "originalAssertions": 11,
+    "currentAssertions": 11,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/jointUxReportsRange.mjs",
+    "originalAssertions": 44,
+    "currentAssertions": 44,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/managementVisualConsistency.mjs",
+    "originalAssertions": 40,
+    "currentAssertions": 40,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/managementWorkspace.mjs",
+    "originalAssertions": 49,
+    "currentAssertions": 49,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/mobileLayout.mjs",
+    "originalAssertions": 34,
+    "currentAssertions": 34,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/motionPolish.mjs",
+    "originalAssertions": 42,
+    "currentAssertions": 42,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/navigationFilterRestore.mjs",
+    "originalAssertions": 6,
+    "currentAssertions": 6,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/nutritionGoalTemplate.mjs",
+    "originalAssertions": 63,
+    "currentAssertions": 63,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/nutritionTemplates.mjs",
+    "originalAssertions": 35,
+    "currentAssertions": 35,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/productionAssets.mjs",
+    "originalAssertions": 13,
+    "currentAssertions": 13,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/pwaUpgrade.mjs",
+    "originalAssertions": 36,
+    "currentAssertions": 36,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/todayWaterButton.mjs",
+    "originalAssertions": 48,
+    "currentAssertions": 48,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/uiQualityAudit.mjs",
+    "originalAssertions": 37,
+    "currentAssertions": 37,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/uiSemanticConsistency.mjs",
+    "originalAssertions": 78,
+    "currentAssertions": 78,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/unifiedExperience.mjs",
+    "originalAssertions": 68,
+    "currentAssertions": 68,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/uxWaterCascade.mjs",
+    "originalAssertions": 27,
+    "currentAssertions": 27,
+    "byteIdentical": true
+  },
+  {
+    "file": "tests/browser/uxWaterCascadeBackup.mjs",
+    "originalAssertions": 10,
+    "currentAssertions": 10,
+    "byteIdentical": true
+  }
+]

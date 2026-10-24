@@ -1,3 +1,4 @@
+import { prepareManagementEntry } from './managementEntry.mjs'
 import { waitForMainNavigation } from './navigationSettlement.mjs'
 // Serving, exact meal deletion, Calendar glyphs, Cardio presentation and Today states.
 // All writes use fresh synthetic contexts; viewport/keyboard are explicitly emulated.
@@ -18,7 +19,7 @@ try{for(const [width,height] of sizes){
   const dates=await page.evaluate(()=>{const local=n=>{const d=new Date();d.setDate(d.getDate()+n);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};return {today:local(0),old:local(-1)}})
   const put=async data=>page.evaluate(async data=>{const d=await new Promise(resolve=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>resolve(q.result)});await new Promise((resolve,reject)=>{const t=d.transaction(Object.keys(data),'readwrite');for(const [name,rows] of Object.entries(data)){const s=t.objectStore(name);s.clear();for(const row of rows)s.put(row)}t.oncomplete=resolve;t.onerror=()=>reject(t.error)});d.close()},data)
   const read=async store=>page.evaluate(async store=>{const d=await new Promise(resolve=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>resolve(q.result)});const rows=await new Promise(resolve=>{const q=d.transaction(store).objectStore(store).getAll();q.onsuccess=()=>resolve(q.result)});d.close();return rows},store)
-  const click=async selector=>{await page.locator(selector).first().click();await page.waitForTimeout(70)}
+  const click=async selector=>{await prepareManagementEntry(page,selector);await page.locator(selector).first().click();await page.waitForTimeout(70)}
   // Revisited dates retain disclosure state; establish the intended open state without toggling it shut.
   const expandMeal=async meal=>{const selector='[data-toggle-meal='+meal+']';if(await page.locator(selector).getAttribute('aria-expanded')==='false')await click(selector)}
   const close=async()=>{if(await page.locator('.sheet[open]').count())await page.locator('.sheet[open] [data-close]').click();await page.waitForFunction(()=>!document.querySelector('dialog[open]'))}

@@ -112,3 +112,7 @@ Retain all44 previous gates, the six combined-interaction gates plus date-bounda
 
 
 `navigationFilterRestore.mjs` is an additional actual Backup14 Restore gate on two fresh synthetic engines. Select a Plan tag, restore a valid snapshot whose tags no longer contain it while Food is active, then revisit Plan twice. The restored untagged task must appear and all22 serialized stores must exactly match the requested backup. `FITLOG_FILTER_RESTORE_BASELINE=1` only records reproduction, never PASS. It never opens or resets the persistent preservation profile. Original44/combined assertions remain mandatory.
+
+## Management v0.6.1
+
+`managementV061.mjs` uses the existing FITLOG_PLAYWRIGHT_MODULE/FITLOG_CHROME/FITLOG_QA_URL/FITLOG_QA_ARTIFACT_ROOT settings. Default52 contexts: two engines, four portrait widths×three fonts×two themes, plus short/landscape per engine. FITLOG_MANAGEMENT_SMOKE=1 is diagnostic four-context smoke, never the full gate. FITLOG_MANAGEMENT_ENGINE can shard engines; require both complete result sets. Actual same-dialog category routes,13 destinations, six New editors, search/clear/no-result/direct Back, Safari Option+Tab vs Chromium Tab,20 editor round trips,44px/16px and22-table/config hash equality are recorded. Old drivers use managementEntry.mjs's visible real search shortcut, retaining frozen-build direct-entry support for baseline/update tests. Services and original assertions are not bypassed. Physical iPhone/original PWA/IME/Safe Area/VoiceOver remain separate Pending.

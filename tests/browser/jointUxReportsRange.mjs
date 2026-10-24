@@ -1,3 +1,4 @@
+import { openManagementEntry } from './managementEntry.mjs'
 import {waitForMainNavigation} from './navigationSettlement.mjs'
 import { expandReportChapters } from './reportDisclosure.mjs'
 // Real application, isolated invented-data contexts. No physical-device/personal-data claims.
@@ -20,11 +21,11 @@ try{for(const width of (selectedWidths??((process.env.FITLOG_JOINT_DIAGNOSTIC===
  const close=async()=>{if(await p.locator('.confirm-dialog').count())await p.locator('.confirm-dialog [data-cancel]').click();if(await p.locator('dialog.sheet[open]').count())await p.locator('dialog.sheet[open] [data-close]').click();await p.waitForFunction(()=>!document.querySelector('dialog[open]'))}
  const nav=async tab=>{await close();await p.locator(`[data-tab=${tab}]`).click();await waitForMainNavigation(p,tab);await p.waitForFunction(tab=>document.querySelector('.bottom-nav .active')?.dataset.tab===tab,tab)}
  const progress=async mode=>{await nav('progress');await p.locator(`[data-progress-view=${mode}]`).click();await p.locator(mode==='trend'?'[data-trend-module=water]':mode==='reports'?'.report-page':'.calendar-grid').waitFor()}
- const manager=async()=>{await close();await p.locator('#open-management').click();await p.locator('#more-nutrition-strategies').click();await p.locator('[data-delete-strategy=ux-a]').waitFor()}
+ const manager=async()=>{await close();await p.locator('#open-management').click();await openManagementEntry(p,'#more-nutrition-strategies','click');await p.locator('[data-delete-strategy=ux-a]').waitFor()}
  const preview=async()=>{await manager();await p.locator('[data-delete-strategy=ux-a]').click();await p.locator('[data-cascade-root]').waitFor()}
  const full=width===390&&theme==='light'&&font===100,scenes=[];let waterOwnerEvidence
  const shot=async(name,selector)=>{if(full||width===320&&font===200||width===844&&font===140){const file=`${engine}-${width}-${theme}-${font}-${name}.png`;await p.waitForTimeout(250);await p.screenshot({path:path.join(root,file),animations:'disabled',fullPage:!selector.includes('dialog')});scenes.push(file)}}
- await p.locator('#open-management').click();await p.locator('#more-backup').click();await p.locator('#backup-file').setInputFiles({name:'joint-synthetic.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(fixture))});await p.locator('#confirm-restore').click();await p.locator('.confirm-dialog [data-confirm]').click();await p.waitForFunction(()=>!document.querySelector('dialog[open]'))
+ await p.locator('#open-management').click();await openManagementEntry(p,'#more-backup','click');await p.locator('#backup-file').setInputFiles({name:'joint-synthetic.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(fixture))});await p.locator('#confirm-restore').click();await p.locator('.confirm-dialog [data-confirm]').click();await p.waitForFunction(()=>!document.querySelector('dialog[open]'))
  await p.evaluate(font=>{document.documentElement.style.fontSize=16*font/100+'px';document.documentElement.style.setProperty('--safe-area-bottom','34px')},font)
  const baseline=await read(),configBefore=await config(),normal=Object.fromEntries(['weights','waterLogs','sleepSessions'].map(n=>[n,baseline[n]]))
  await progress('trend')

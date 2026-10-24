@@ -449,3 +449,7 @@ Follow [combined interaction contract](docs/COMBINED_INTERACTION_V04.md). Five f
 ## Navigation flicker v0.4.1 (2026-10-23)
 
 Follow [navigation handoff contract](docs/NAVIGATION_FLICKER_V041.md) for the approved v0.4 bugfix. Promote the actual prepared DOM and its owned readonly mounts; never visibly rebuild it at commit. Deferred controls activate once, outgoing/canceled resources dispose once, preview IDs/live regions stay isolated and geometry matches the active page. Keep all existing business/data/visual contracts and every regression gate. Physical-device evidence remains separate.
+
+## Management v0.6.1 (2026-10-24)
+
+Follow [approved vertical Management contract](docs/MANAGEMENT_V061.md). It replaces only the flat Hub with four category routes plus Personal Plan/Habits and ephemeral search across thirteen real destinations. Keep the existing native workspace/stack/real renderers, scoped visual treatment and all data/navigation contracts. Physical-device evidence remains separate.

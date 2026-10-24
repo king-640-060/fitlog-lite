@@ -1,3 +1,4 @@
+import { prepareManagementEntry } from './managementEntry.mjs'
 // Full UI workflow and layout matrix; isolated synthetic data and mocked viewport only.
 import assert from 'node:assert/strict'
 import fs from 'node:fs/promises'
@@ -23,7 +24,7 @@ try{for(const [width,height] of sizes){
    await put({nutritionStrategyTemplates:count?[template]:[],nutritionStrategyVariants:variants,nutritionStrategyPhases:count&&active?[{id:'phase-v1',templateId:template.id,templateName:template.name,startDate:dates.start,createdAt:now}]:[],nutritionTargets:[],weights})
   }
   const close=async()=>{if(await page.locator('.sheet[open]').count())await page.locator('.sheet[open] [data-close]').click();await page.waitForFunction(()=>!document.querySelector('dialog[open]'))}
-  const click=async selector=>{await page.locator(selector).first().click();await page.waitForTimeout(30)}
+  const click=async selector=>{await prepareManagementEntry(page,selector);await page.locator(selector).first().click();await page.waitForTimeout(30)}
   const manager=async()=>{await close();await click('#open-management');await click('#more-nutrition-strategies');await page.waitForSelector('#strategy-create:visible,#strategy-empty-create')}
   const food=async()=>{await close();await click('[data-tab=today]');await click('[data-tab=food]');await page.waitForSelector('[data-edit-nutrition-target]')}
   const openDetail=async selector=>{await click(selector);await page.waitForSelector('#strategy-template-form');await click('#strategy-show-detail');await page.waitForSelector('#strategy-detail-back:visible,[data-workspace-back]:visible')}

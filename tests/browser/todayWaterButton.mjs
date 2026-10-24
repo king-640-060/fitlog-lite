@@ -1,3 +1,4 @@
+import { openManagementEntry } from './managementEntry.mjs'
 import {waitForMainNavigation} from './navigationSettlement.mjs'
 // Approved v0.1 shared Sheet. Synthetic contexts only; no personal profile or provider.
 import assert from 'node:assert/strict'
@@ -22,7 +23,7 @@ for(const engine of ['chromium','webkit']){
    const read=()=>p.evaluate(async()=>{const d=await new Promise((r,j)=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)}),data={};for(const n of [...d.objectStoreNames].sort())data[n]=await new Promise(r=>{const q=d.transaction(n).objectStore(n).getAll();q.onsuccess=()=>r(q.result.sort((a,b)=>a.id.localeCompare(b.id)))});d.close();return data})
    if(width===390&&height===844&&font===100){
     const fixture=JSON.parse(await fs.readFile('tests/fixtures/legacyV13Data.json','utf8'));fixture.sleepSessions=fixture.sleepSessions.filter(s=>s.endTime);fixture.workouts=fixture.workouts.filter(w=>w.finishedAt)
-    await p.locator('#open-management').tap();await p.locator('#more-backup').tap();await p.locator('#backup-file').setInputFiles({name:'sheet-synthetic.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({app:'FitLog Lite',schemaVersion:13,exportedAt:'2026-10-18T04:00:00.000Z',data:fixture}))});await p.locator('#confirm-restore').tap();await p.locator('.confirm-dialog [data-confirm]').tap();await p.waitForFunction(()=>!document.querySelector('dialog[open]'));await p.locator('[data-today-water-record]').waitFor();await p.locator('.toast').waitFor({state:'detached'})
+    await p.locator('#open-management').tap();await openManagementEntry(p,'#more-backup','tap');await p.locator('#backup-file').setInputFiles({name:'sheet-synthetic.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({app:'FitLog Lite',schemaVersion:13,exportedAt:'2026-10-18T04:00:00.000Z',data:fixture}))});await p.locator('#confirm-restore').tap();await p.locator('.confirm-dialog [data-confirm]').tap();await p.waitForFunction(()=>!document.querySelector('dialog[open]'));await p.locator('[data-today-water-record]').waitFor();await p.locator('.toast').waitFor({state:'detached'})
    }
    const initial=await read();assert.equal(Object.keys(initial).length,22)
    const settle=()=>p.waitForTimeout(250)

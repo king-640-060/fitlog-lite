@@ -1,3 +1,4 @@
+import { openManagementEntry } from './managementEntry.mjs'
 import { waitForMainNavigation } from './navigationSettlement.mjs'
 // Isolated synthetic data + intercepted mock providers. Never uses real credentials.
 import assert from 'node:assert/strict'
@@ -49,7 +50,7 @@ for (const [width,height] of sizes) {
     assert.equal(await page.locator('.ai-welcome').innerText().then(text => text.includes('连接你自己的 AI 服务')), true)
     await layout(`empty-${tab}`); await close()
   }
-  await nav('food'); await page.locator('#open-management').click(); await page.locator('#more-ai-settings').click(); await page.locator('.ai-advanced summary').click()
+  await nav('food'); await page.locator('#open-management').click(); await openManagementEntry(page,'#more-ai-settings','click'); await page.locator('.ai-advanced summary').click()
   await page.locator('[name=name]').fill('服务 A'); await page.locator('[name=preset]').selectOption('zhipu')
   assert.equal(await page.locator('[name=baseUrl]').inputValue(),'https://open.bigmodel.cn/api/paas/v4')
   await page.locator('[name=preset]').selectOption('custom'); await page.locator('[name=baseUrl]').fill('https://mock-fitlog-a.invalid/v1/')

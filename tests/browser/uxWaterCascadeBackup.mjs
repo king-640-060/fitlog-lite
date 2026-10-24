@@ -1,3 +1,4 @@
+import { openManagementEntry } from './managementEntry.mjs'
 import { rangeCascadeQaFixture } from './rangeCascadeFixture.mjs'
 // Actual Backup UI after a confirmed synthetic cascade, on both new and prior Backup14 clients.
 import fs from 'node:fs/promises'
@@ -15,12 +16,12 @@ try{for(const stage of ['delete-and-export','prior-client-restore','new-client-r
   const url=stage==='prior-client-restore'?(process.env.FITLOG_UX_BASELINE_URL||'http://127.0.0.1:5320/fitlog-lite/'):(process.env.FITLOG_QA_URL||'http://127.0.0.1:5297/fitlog-lite/')
   await p.goto(url,{waitUntil:'networkidle'});await p.locator('#open-management').waitFor()
   const read=()=>p.evaluate(async()=>{const d=await new Promise(r=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>r(q.result)}),rows={};for(const n of [...d.objectStoreNames].sort())rows[n]=await new Promise(r=>{const q=d.transaction(n).objectStore(n).getAll();q.onsuccess=()=>r(q.result.sort((a,b)=>a.id.localeCompare(b.id)))});const version=d.version;d.close();return{rows,version}})
-  const open=async()=>{if(await p.locator('dialog.sheet[open]').count())await p.locator('dialog.sheet[open] [data-close]').click();await p.locator('#open-management').click();await p.locator('#more-backup').click()}
+  const open=async()=>{if(await p.locator('dialog.sheet[open]').count())await p.locator('dialog.sheet[open] [data-close]').click();await p.locator('#open-management').click();await openManagementEntry(p,'#more-backup','click')}
   const file=async value=>p.locator('#backup-file').setInputFiles({name:'synthetic.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(value))})
   const restore=async value=>{await open();await file(value);await p.locator('#confirm-restore').click();await p.locator('.confirm-dialog [data-confirm]').click();await p.waitForFunction(()=>!document.querySelector('dialog[open]'))}
   await restore(stage==='delete-and-export'?input:exported)
   if(stage==='delete-and-export'){
-   await p.locator('#open-management').click();await p.locator('#more-nutrition-strategies').click();await p.locator('[data-delete-strategy=ux-a]').click();await p.locator('[data-cascade-ack]').check();await p.locator('[data-cascade-confirm]').click();await p.locator('.confirm-dialog [data-confirm]').click();await p.locator('#strategy-manager').waitFor();assert.equal((await read()).rows.nutritionStrategyTemplates.some(t=>t.id==='ux-a'),false)
+   await p.locator('#open-management').click();await openManagementEntry(p,'#more-nutrition-strategies','click');await p.locator('[data-delete-strategy=ux-a]').click();await p.locator('[data-cascade-ack]').check();await p.locator('[data-cascade-confirm]').click();await p.locator('.confirm-dialog [data-confirm]').click();await p.locator('#strategy-manager').waitFor();assert.equal((await read()).rows.nutritionStrategyTemplates.some(t=>t.id==='ux-a'),false)
    await open();const pending=p.waitForEvent('download');await p.locator('#export-backup').click();exported=JSON.parse(await fs.readFile(await(await pending).path()));assert.equal(exported.schemaVersion,14);assert.deepEqual(sort(exported.data),(await read()).rows);assert.equal(JSON.stringify(exported).includes('synthetic-not-a-real-key'),false);await fs.writeFile(path.join(root,engine+'-actual-post-cascade-export14.json'),JSON.stringify(exported,null,2))
   }else{
    const before=await read();assert.equal(before.version,130);assert.equal(Object.keys(before.rows).length,22);assert.deepEqual(before.rows,sort(exported.data));await p.reload({waitUntil:'networkidle'});assert.deepEqual(await read(),before)

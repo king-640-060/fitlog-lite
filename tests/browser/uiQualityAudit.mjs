@@ -1,3 +1,5 @@
+import { waitForMainNavigation } from './navigationSettlement.mjs'
+import { prepareManagementEntry } from './managementEntry.mjs'
 // Reusable geometry/state gate. Fresh synthetic contexts, mock provider, no real credentials.
 import assert from 'node:assert/strict'
 import fs from 'node:fs/promises'
@@ -69,9 +71,9 @@ try { for (const [width,height] of sizes) {
    states.push(name)
    await page.screenshot({path:`/tmp/ui-quality-${prod?'prod':'local'}-${width}-${name}.png`})
   }
-  const nav=async tab=>{await page.locator(`[data-tab=${tab}]`).click();await page.waitForTimeout(80);await page.evaluate(()=>scrollTo(0,0))}
+  const nav=async tab=>{await page.locator(`[data-tab=${tab}]`).click();await waitForMainNavigation(page,tab);await page.waitForTimeout(80);await page.evaluate(()=>scrollTo(0,0))}
   const close=async()=>{if(await page.locator('dialog[open]').count())await page.locator('dialog[open] [data-close]').click();await page.waitForTimeout(40)}
-  const click=async selector=>{await page.locator(selector).first().click();await page.waitForTimeout(90)}
+  const click=async selector=>{await prepareManagementEntry(page,selector);await page.locator(selector).first().click();await page.waitForTimeout(90)}
   const management=async(id)=>{await close();await click('#open-management');if(id)await click('#'+id)}
   const searchAudit=async scale=>{
    await click('#food-library')

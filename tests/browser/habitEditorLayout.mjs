@@ -1,3 +1,4 @@
+import { openManagementEntry } from './managementEntry.mjs'
 // Isolated synthetic profiles only; real Habit UI, shared viewport with a mocked keyboard.
 import assert from 'node:assert/strict'
 import fs from 'node:fs/promises'
@@ -44,7 +45,7 @@ try{for(const [width,height] of [[320,812],[375,812],[390,844],[430,932]])for(co
  // B: Today empty-state invokes showHabitManager(true).
  await page.locator('#today-habit-create').click();await form.waitFor();await scrollCheck('direct');const directDom=await form.innerHTML();const directFrame=await frame();assert.equal(await form.locator('.habit-status-section').count(),0);await close()
  // A: the actual topbar Management -> Habit Manager -> New entry.
- await page.locator('#open-management').click();await page.locator('#more-habits').click();await page.locator('#habit-new:visible,#habit-empty-new').waitFor();await settle();const managerFrame=await frame()
+ await page.locator('#open-management').click();await openManagementEntry(page,'#more-habits','click');await page.locator('#habit-new:visible,#habit-empty-new').waitFor();await settle();const managerFrame=await frame()
  await page.locator('#habit-new:visible,#habit-empty-new').click();await form.waitFor();await settle();stable(managerFrame,await frame());stable(directFrame,await frame());assert.equal(await form.innerHTML(),directDom)
  const samples=await scrollCheck('new',true)
  // Name focus and software keyboard open/close, using the shared viewport contract only.
@@ -62,7 +63,7 @@ try{for(const [width,height] of [[320,812],[375,812],[390,844],[430,932]])for(co
  await page.locator('#habit-delete').evaluate(e=>{const s=e.closest('.modal-body');s.scrollTop=s.scrollHeight});await measure();await body.evaluate(e=>e.scrollTop=0);await measure();await page.locator('#habit-form-back:visible,[data-workspace-back]:visible').click();await page.locator('#habit-new:visible,#habit-empty-new').waitFor();await settle()
  // Real populated manager to exercise a nonzero saved parent scroll.
  await page.evaluate(async()=>{const d=await new Promise(r=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>r(q.result)});await new Promise((r,j)=>{const t=d.transaction('habits','readwrite');for(let i=0;i<20;i++)t.objectStore('habits').put({id:'layout-extra-'+i,name:'管理列表滚动验证 '+i,active:true,sortOrder:100+i,createdAt:'2026-10-07T00:00:00Z',updatedAt:'2026-10-07T00:00:00Z'});t.oncomplete=r;t.onerror=()=>j(t.error)});d.close()})
- await close();await page.locator('#open-management').click();await page.locator('#more-habits').click();await page.locator('[data-habit-edit=layout-extra-19]').waitFor();await settle()
+ await close();await page.locator('#open-management').click();await openManagementEntry(page,'#more-habits','click');await page.locator('[data-habit-edit=layout-extra-19]').waitFor();await settle()
  const parentFrame=await frame();const parentScroll=await body.evaluate(e=>{e.scrollTop=180;return e.scrollTop});assert.ok(parentScroll>0)
  for(let i=0;i<20;i++){
   // Dispatch the real toolbar action without Playwright auto-scrolling it to the top first.

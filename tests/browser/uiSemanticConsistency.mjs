@@ -43,7 +43,7 @@ try { for (const [width,height] of sizes) {
    await page.evaluate(()=>scrollTo(0,document.documentElement.scrollHeight))
    for(let i=0;i<2;i++){
     await page.locator('#open-management').click();await page.waitForTimeout(230)
-    const v=await page.locator('.modal-body').evaluate(body=>{const r=body.getBoundingClientRect(),f=body.querySelector('#more-food-library').getBoundingClientRect();return {scrollTop:body.scrollTop,firstVisible:f.top>=r.top&&f.bottom<=r.bottom}})
+    const v=await page.locator('.modal-body').evaluate(body=>{const r=body.getBoundingClientRect(),f=body.querySelector('[data-management-group=food],#more-food-library').getBoundingClientRect();return {scrollTop:body.scrollTop,firstVisible:f.top>=r.top&&f.bottom<=r.bottom}})
     assert.equal(v.scrollTop,0);assert.ok(v.firstVisible);scrollChecks.push(v)
     if(!baseline){assert.ok(await page.locator('.settings-section-note').evaluate(e=>e.tagName==='P'&&e.getAttribute('role')==='note'&&!e.closest('.settings-group')&&e.closest('.settings-section')&&!e.querySelector('svg,strong,button,.setting-icon')&&!e.hasAttribute('tabindex')));assert.equal(await page.locator('.management-local-note').count(),0)}
     await capture(name+'-'+i)
