@@ -1,0 +1,28 @@
+[
+  {
+    "engine": "chromium",
+    "version": "151.0.7922.34",
+    "frozenStart": "68f4747994fd84bd2ef965c93ee3b009a3b52b72",
+    "oldRestoreReexport": true,
+    "oldAutosavePreservesUnknownName": true,
+    "newRestoreFromOldClient": true,
+    "all22StoresExact": true,
+    "backup14": true,
+    "encryptedSync1": true,
+    "titleLength": 3200,
+    "status": "PASS"
+  },
+  {
+    "engine": "webkit",
+    "version": "26.5",
+    "frozenStart": "68f4747994fd84bd2ef965c93ee3b009a3b52b72",
+    "oldRestoreReexport": true,
+    "oldAutosavePreservesUnknownName": true,
+    "newRestoreFromOldClient": true,
+    "all22StoresExact": true,
+    "backup14": true,
+    "encryptedSync1": true,
+    "titleLength": 3200,
+    "status": "PASS"
+  }
+]

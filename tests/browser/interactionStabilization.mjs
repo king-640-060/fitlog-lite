@@ -1,4 +1,4 @@
-import {waitForSurfaceSettlement} from './navigationSettlement.mjs'
+import {waitForSurfaceSettlement,waitForMainNavigation} from './navigationSettlement.mjs'
 import { openManagementEntry } from './managementEntry.mjs'
 // Isolated synthetic profiles, mock providers and records only. Physical Safari remains a separate gate.
 import assert from 'node:assert/strict'
@@ -24,7 +24,7 @@ for (const [width,height] of sizes) {
     await route.fulfill({json:{choices:[{message:tools?{content:null,tool_calls:[{id:'probe',type:'function',function:{name:'fitlog_capability_probe',arguments:'{}'}}]}:{content:image?'731':'OK'}}]}}).catch(()=>{})
   })
   await page.goto(base,{waitUntil:'networkidle'});await page.waitForSelector('#open-management');await page.evaluate(()=>{qaViewport.height=innerHeight;qaViewport.width=innerWidth;qaViewport.dispatchEvent(new Event('resize'))})
-  const nav=async tab=>{await page.locator(`[data-tab=${tab}]`).tap();await page.waitForTimeout(30)}
+  const nav=async tab=>{await page.locator(`[data-tab=${tab}]`).tap();await waitForMainNavigation(page,tab)}
   const close=async()=>{await page.locator('.sheet [data-close]').tap();await page.waitForFunction(()=>!document.querySelector('dialog'));assert.equal(await page.evaluate(()=>document.body.classList.contains('sheet-open')),false);assert.equal(await page.evaluate(()=>getComputedStyle(document.activeElement).outlineStyle),'none')}
   const checkInputs=async selectors=>{
     await waitForSurfaceSettlement(page)

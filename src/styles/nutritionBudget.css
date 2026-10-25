@@ -28,7 +28,7 @@
 .food-remaining { margin-inline:-1px; }
 .today-remaining { margin-top:12px; padding:10px 12px 12px; gap:8px; }
 .remaining-heading { display:flex; align-items:baseline; justify-content:space-between; gap:8px; flex-wrap:wrap; }
-.food-completion-strip .remaining-title { margin:0; font-size:.8125rem; font-weight:740; letter-spacing:0; line-height:1.3; }
+.food-completion-strip .remaining-title { margin:0; font-size:.8125rem; font-weight:740; letter-spacing:0; line-height:1.3; text-wrap:balance; }
 .remaining-caption,.goal-compact-heading small { font-size:.625rem; color:var(--text-secondary); line-height:1.45; }
 .goal-compact-top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
 .goal-compact-heading { display:grid; gap:2px; min-width:0; }

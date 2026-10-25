@@ -1,0 +1,22 @@
+{
+  "README.md": "5212bfb9d2fb7ec340268b03311bd2413d325463b07b6760400f30b38bc7f370",
+  "build.txt": "a3502479ea40c885ce6cf4e2f808f64f4ad74aa4bc4ad2e30cb35a51e1160938",
+  "candidate-source-and-assets.json": "771770133b3b8238e6867c7b82519bb773b3a6c080797b34e9a44857cfe76a45",
+  "compatibility-long.json": "8ad8ea7534d3d8e6bfd98745aa7982f6fc32939305ef7b5c3530695cbac907aa",
+  "compatibility-short.json": "f79f4128b159fb5211649bcf9aa7d902696bbe83e9a8a51420992b4979143985",
+  "copy-decisions.json": "11f24a63ab6da101f73a138664902cca877573277c2c849ac3e796db6a191bba",
+  "input-verification.json": "54c1751c5010e7f450c171dbaee5fe40282aa15e000cce32fc678fbbb21972d0",
+  "local-before-after-styles.json": "a2f2afbf472ac764da399f31361bfdda22f3b399f9d6eedf83d330a337d3e466",
+  "local-contact-classic-dark.jpg": "51c86721b7ed02c0fa1e4d3ad0c374331ac7b37a414089b17f0097554706b2ce",
+  "local-contact-classic-light.jpg": "14af9e596416eec8d48c19542b6d9b9fc163e3d20152431b9d29e2a670bf51b6",
+  "local-contact-light-native.jpg": "2f4cf7087e7666b7c6c51528dbbd174dd421954af52351d7142ce8e076eb0de2",
+  "local-long-theme-time.json": "85e107367af431b1fce388202bc02560c484d69493b8b0646e5521851f81995e",
+  "prototype-runtime.json": "04f613c99d05ae2ed01819763809b5f65c3ca10cb7a262fbdb04dc87d5586603",
+  "remote-qa-candidate.json": "0bb6ac4b4d8c7538aa09e417a451b8fc6ab0c1cbd50fb68f9b0c3e07b1fbc3cc",
+  "scope-preservation.json": "703dd5a8f3e6715d8b55d3fb6bcbcbeeae1a3b2857a4a3a6f50f05686eaf9092",
+  "sleep-clock-check.json": "6cff7073a87d7a8d4d1f35e7f8180319e8b4cc3aed01eabda84c2446cf2a9699",
+  "sleep-events.txt": "58e64a4678c165026ea911459b04a64ec8da545c17e7103b0f8d667fdd144b21",
+  "superseded-release-attempt.json": "56d424dee0f50bb24a5c6c3280797fdf3618d686e4b56067dbbd8fd519416a34",
+  "typecheck.txt": "71e9696712d8a6ac6e10955633641e90ffbe0f22331092ac0f60da8781e47f40",
+  "units-1190.txt": "40065c7e929285478c6cff92a4881b4f8c7e5f4dc81481459e720d674aebdde7"
+}

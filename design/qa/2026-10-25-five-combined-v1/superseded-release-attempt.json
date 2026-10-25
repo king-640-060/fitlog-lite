@@ -1,0 +1,1249 @@
+{
+  "inventory": [
+    "aiAssistant",
+    "aiDualModelRouting",
+    "aiStreaming",
+    "aiVoice",
+    "catalogRecovery",
+    "coachReportExperience",
+    "dailyRecordsExperience",
+    "dietEvents",
+    "foodRecovery",
+    "foodServing",
+    "foodVision",
+    "githubSyncSafety",
+    "habitDeletion",
+    "habitEditorLayout",
+    "interactionStabilization",
+    "macroNutritionSummary",
+    "managementVisualConsistency",
+    "managementWorkspace",
+    "mobileLayout",
+    "motionPolish",
+    "nutritionGauge",
+    "nutritionTemplates",
+    "sharedDatePicker",
+    "trainingJournal",
+    "trainingRecoveryExperience",
+    "trainingRecoveryLifecycle",
+    "uiQualityAudit",
+    "uiSemanticConsistency",
+    "unifiedExperience",
+    "v421Consistency",
+    "v4FoodPlanToday",
+    "voiceMode",
+    "remainingPrototype",
+    "combinedHandoff",
+    "approvedJointV05",
+    "approvedJointV05-webkit",
+    "foodWaterDayV04",
+    "foodWaterDayV04-webkit",
+    "foodWaterBackupV04",
+    "foodWaterBackupV04-webkit",
+    "uxWaterCascade",
+    "uxWaterCascade-webkit",
+    "uxWaterCascadeBackup",
+    "uxWaterCascadeBackup-webkit"
+  ],
+  "old14": [
+    "prior-goal",
+    "prior-keyboard",
+    "prior-portion",
+    "water",
+    "joint-chromium",
+    "joint-webkit",
+    "report-ranges",
+    "interaction-full",
+    "native-rail",
+    "date-race",
+    "training-motion",
+    "training-execution",
+    "navigation-flicker",
+    "restore-filter"
+  ],
+  "selected": [
+    "aiAssistant",
+    "aiDualModelRouting",
+    "aiStreaming",
+    "aiVoice",
+    "catalogRecovery",
+    "coachReportExperience",
+    "dailyRecordsExperience",
+    "dietEvents",
+    "foodRecovery",
+    "foodServing",
+    "foodVision",
+    "githubSyncSafety",
+    "habitDeletion",
+    "habitEditorLayout",
+    "interactionStabilization",
+    "macroNutritionSummary",
+    "managementVisualConsistency",
+    "managementWorkspace",
+    "mobileLayout",
+    "motionPolish",
+    "nutritionGauge",
+    "nutritionTemplates",
+    "sharedDatePicker",
+    "trainingJournal",
+    "trainingRecoveryExperience",
+    "trainingRecoveryLifecycle",
+    "uiQualityAudit",
+    "uiSemanticConsistency",
+    "unifiedExperience",
+    "v421Consistency",
+    "v4FoodPlanToday",
+    "voiceMode",
+    "remainingPrototype",
+    "combinedHandoff",
+    "approvedJointV05",
+    "approvedJointV05-webkit",
+    "foodWaterDayV04",
+    "foodWaterDayV04-webkit",
+    "foodWaterBackupV04",
+    "foodWaterBackupV04-webkit",
+    "uxWaterCascade",
+    "uxWaterCascade-webkit",
+    "uxWaterCascadeBackup",
+    "uxWaterCascadeBackup-webkit",
+    "prior-goal",
+    "prior-keyboard",
+    "prior-portion",
+    "water",
+    "joint-chromium",
+    "joint-webkit",
+    "report-ranges",
+    "interaction-full",
+    "native-rail",
+    "date-race",
+    "training-motion",
+    "training-execution",
+    "navigation-flicker",
+    "restore-filter",
+    "five-functional",
+    "theme-explicit",
+    "history-and-sheets",
+    "light-native-full",
+    "management-default",
+    "management-classic"
+  ],
+  "results": [
+    {
+      "name": "aiDualModelRouting",
+      "file": "aiDualModelRouting",
+      "command": [
+        "node",
+        "tests/browser/aiDualModelRouting.mjs"
+      ],
+      "start": "2026-10-25T16:21:21.594Z",
+      "end": "2026-10-25T16:39:08.153Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "383953f30ab9f3aa87cf9cc3362386e3fa72c0d3e812517f1018501da10da60a",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/aiDualModelRouting/attempt-2026-10-25T16-21-21.594Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "aiAssistant",
+      "file": "aiAssistant",
+      "command": [
+        "node",
+        "tests/browser/aiAssistant.mjs"
+      ],
+      "start": "2026-10-25T16:21:21.594Z",
+      "end": "2026-10-25T16:40:33.991Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "81239573afe2ac5bdcd3f0d79ca5c13c4a5c39d6adca71fe472efefaee60052e",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/aiAssistant/attempt-2026-10-25T16-21-21.594Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "aiStreaming",
+      "file": "aiStreaming",
+      "command": [
+        "node",
+        "tests/browser/aiStreaming.mjs"
+      ],
+      "start": "2026-10-25T16:21:21.594Z",
+      "end": "2026-10-25T16:40:33.998Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "17aaae1d1d241860117f6c809abfdc9fc1fdc2f048a34f6336893a62a5c0c861",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/aiStreaming/attempt-2026-10-25T16-21-21.594Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "aiVoice",
+      "file": "aiVoice",
+      "command": [
+        "node",
+        "tests/browser/aiVoice.mjs"
+      ],
+      "start": "2026-10-25T16:39:08.153Z",
+      "end": "2026-10-25T16:40:34.000Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "cf44b53a89f54a20f9177b2c58d9da9dbcdf075308be2f014b2a86091122b9e2",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/aiVoice/attempt-2026-10-25T16-39-08.153Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "catalogRecovery",
+      "file": "catalogRecovery",
+      "command": [
+        "node",
+        "tests/browser/catalogRecovery.mjs"
+      ],
+      "start": "2026-10-25T16:40:33.991Z",
+      "end": "2026-10-25T16:51:31.985Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "12676b00d21de2f837b8b8245d250909ee51ea38cfd12f07efecd570b979d97b",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/catalogRecovery/attempt-2026-10-25T16-40-33.991Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "dietEvents",
+      "file": "dietEvents",
+      "command": [
+        "node",
+        "tests/browser/dietEvents.mjs"
+      ],
+      "start": "2026-10-25T16:51:31.985Z",
+      "end": "2026-10-25T16:54:13.516Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "b44a696bfa4385f18f4895cce9b6a6f155caf86e45dcf1d96ee76381d14159b1",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/dietEvents/attempt-2026-10-25T16-51-31.985Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "foodRecovery",
+      "file": "foodRecovery",
+      "command": [
+        "node",
+        "tests/browser/foodRecovery.mjs"
+      ],
+      "start": "2026-10-25T16:54:13.517Z",
+      "end": "2026-10-25T16:57:34.061Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "740920a03d9b480f8da75353cd97b4a0b44c39dcb878b172cd90cc502ecb2190",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/foodRecovery/attempt-2026-10-25T16-54-13.517Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "coachReportExperience",
+      "file": "coachReportExperience",
+      "command": [
+        "node",
+        "tests/browser/coachReportExperience.mjs"
+      ],
+      "start": "2026-10-25T16:40:33.998Z",
+      "end": "2026-10-25T16:57:34.061Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "44f8b60a7bb14ad411e9130065e3cef17c0d992ad10beb55f34e0681462be10a",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/coachReportExperience/attempt-2026-10-25T16-40-33.998Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "foodVision",
+      "file": "foodVision",
+      "command": [
+        "node",
+        "tests/browser/foodVision.mjs"
+      ],
+      "start": "2026-10-25T16:57:34.062Z",
+      "end": "2026-10-25T16:58:22.985Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "5ddc8297018e0c5806c329d1b2bb94fba57289584e92235a2aacfe35ddf9bcfc",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/foodVision/attempt-2026-10-25T16-57-34.062Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "dailyRecordsExperience",
+      "file": "dailyRecordsExperience",
+      "command": [
+        "node",
+        "tests/browser/dailyRecordsExperience.mjs"
+      ],
+      "start": "2026-10-25T16:40:34.001Z",
+      "end": "2026-10-25T16:58:23.019Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "a56f9f72bbb51bc70a8ef1c4ea695c88a6b9500fdc38dae899f7d09d3df19b3c",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/dailyRecordsExperience/attempt-2026-10-25T16-40-34.001Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "habitDeletion",
+      "file": "habitDeletion",
+      "command": [
+        "node",
+        "tests/browser/habitDeletion.mjs"
+      ],
+      "start": "2026-10-25T16:58:23.019Z",
+      "end": "2026-10-25T16:59:04.624Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "0a9dfb233f71756555163eb48d544766ff90b381151140981e442cccb48c1288",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/habitDeletion/attempt-2026-10-25T16-58-23.019Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "githubSyncSafety",
+      "file": "githubSyncSafety",
+      "command": [
+        "node",
+        "tests/browser/githubSyncSafety.mjs"
+      ],
+      "start": "2026-10-25T16:58:22.986Z",
+      "end": "2026-10-25T16:59:05.529Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "3a43e8591b177695ecaf06276dc6ee053f5b7f95839f6ce3caef161f27198c95",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/githubSyncSafety/attempt-2026-10-25T16-58-22.986Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "habitEditorLayout",
+      "file": "habitEditorLayout",
+      "command": [
+        "node",
+        "tests/browser/habitEditorLayout.mjs"
+      ],
+      "start": "2026-10-25T16:59:04.624Z",
+      "end": "2026-10-25T17:00:18.857Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "93625e7bfe32307585916992e04206f6f408204dafc7b8227cc5dd6226f79a14",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/habitEditorLayout/attempt-2026-10-25T16-59-04.624Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "foodServing",
+      "file": "foodServing",
+      "command": [
+        "node",
+        "tests/browser/foodServing.mjs"
+      ],
+      "start": "2026-10-25T16:57:34.061Z",
+      "end": "2026-10-25T17:02:07.451Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "89b4b8af2b366a1f9e5c199c483e4e3ae2eac5adc6ebb1f025aabcd655af3a9f",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/foodServing/attempt-2026-10-25T16-57-34.061Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "interactionStabilization",
+      "file": "interactionStabilization",
+      "command": [
+        "node",
+        "tests/browser/interactionStabilization.mjs"
+      ],
+      "start": "2026-10-25T16:59:05.529Z",
+      "end": "2026-10-25T17:02:07.451Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "0ef3786d4308ab2f4b7b0997e311000311eba9de4a2eceb10eeb9743bbbb0d41",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/interactionStabilization/attempt-2026-10-25T16-59-05.529Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "managementWorkspace",
+      "file": "managementWorkspace",
+      "command": [
+        "node",
+        "tests/browser/managementWorkspace.mjs"
+      ],
+      "start": "2026-10-25T17:02:07.452Z",
+      "end": "2026-10-25T17:05:20.905Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "88fff6876bfd34eab05fe6ccec000a08349f6d4e772a7ce6a67a842da6797afa",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/managementWorkspace/attempt-2026-10-25T17-02-07.452Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "managementVisualConsistency",
+      "file": "managementVisualConsistency",
+      "command": [
+        "node",
+        "tests/browser/managementVisualConsistency.mjs"
+      ],
+      "start": "2026-10-25T17:02:07.452Z",
+      "end": "2026-10-25T17:06:55.668Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "10c14ed38bf3e8c33f571bdf1982d8b04dae105cdd879bae1f62547cb4748f1a",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/managementVisualConsistency/attempt-2026-10-25T17-02-07.452Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "mobileLayout",
+      "file": "mobileLayout",
+      "command": [
+        "node",
+        "tests/browser/mobileLayout.mjs"
+      ],
+      "start": "2026-10-25T17:05:20.906Z",
+      "end": "2026-10-25T17:06:55.668Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "583db29a3f6fd5b7c11ff6f14e1708fa1373544932cc42b47c057587e3b86a75",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/mobileLayout/attempt-2026-10-25T17-05-20.906Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "motionPolish",
+      "file": "motionPolish",
+      "command": [
+        "node",
+        "tests/browser/motionPolish.mjs"
+      ],
+      "start": "2026-10-25T17:06:55.668Z",
+      "end": "2026-10-25T17:24:14.191Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "08810424fd21a0447b4e67364212d986b133c9ab57c364c06f4ef9bda706c84c",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/motionPolish/attempt-2026-10-25T17-06-55.668Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "nutritionGauge",
+      "file": "nutritionGauge",
+      "command": [
+        "node",
+        "tests/browser/nutritionGauge.mjs"
+      ],
+      "start": "2026-10-25T17:06:55.668Z",
+      "end": "2026-10-25T17:25:55.818Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "f0517166f7d34a10dca1e48199f831b2d41b2e36a1cb39c6421c166880271811",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/nutritionGauge/attempt-2026-10-25T17-06-55.668Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "macroNutritionSummary",
+      "file": "macroNutritionSummary",
+      "command": [
+        "node",
+        "tests/browser/macroNutritionSummary.mjs"
+      ],
+      "start": "2026-10-25T17:00:18.857Z",
+      "end": "2026-10-25T17:26:06.337Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "f1099bab459bc13353431dfa45080a6a8dabec5bbc877e23b65dc6c6fdf29394",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/macroNutritionSummary/attempt-2026-10-25T17-00-18.857Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "trainingJournal",
+      "file": "trainingJournal",
+      "command": [
+        "node",
+        "tests/browser/trainingJournal.mjs"
+      ],
+      "start": "2026-10-25T17:26:06.337Z",
+      "end": "2026-10-25T17:26:09.154Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "52ae47fea1eec40a1a656f0608b67558e9761fc3db7a1d9d41c72990408849af",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/trainingJournal/attempt-2026-10-25T17-26-06.337Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "trainingRecoveryExperience",
+      "file": "trainingRecoveryExperience",
+      "command": [
+        "node",
+        "tests/browser/trainingRecoveryExperience.mjs"
+      ],
+      "start": "2026-10-25T17:26:09.154Z",
+      "end": "2026-10-25T17:27:08.658Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "57ed14da062890dd1d585f427b6d382a963939f3fca65f92012d493f851595a3",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/trainingRecoveryExperience/attempt-2026-10-25T17-26-09.154Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "sharedDatePicker",
+      "file": "sharedDatePicker",
+      "command": [
+        "node",
+        "tests/browser/sharedDatePicker.mjs"
+      ],
+      "start": "2026-10-25T17:25:55.819Z",
+      "end": "2026-10-25T17:27:09.982Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "52e48626126785bcb8b333f156b0e45f2d3f9233060634525d88e0acd8e92643",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/sharedDatePicker/attempt-2026-10-25T17-25-55.819Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "trainingRecoveryLifecycle",
+      "file": "trainingRecoveryLifecycle",
+      "command": [
+        "node",
+        "tests/browser/trainingRecoveryLifecycle.mjs"
+      ],
+      "start": "2026-10-25T17:27:08.658Z",
+      "end": "2026-10-25T17:27:31.047Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "e9c1c709ffaa2aa4be6ccee73baef4861ca77336d7327d99acaca4b21d55c8b5",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/trainingRecoveryLifecycle/attempt-2026-10-25T17-27-08.658Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "nutritionTemplates",
+      "file": "nutritionTemplates",
+      "command": [
+        "node",
+        "tests/browser/nutritionTemplates.mjs"
+      ],
+      "start": "2026-10-25T17:24:14.195Z",
+      "end": "2026-10-25T17:29:14.129Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "34401fea099ecbd3ee7882fcca96e4f678c40821e6d9fb04936cdc24795f9b1b",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/nutritionTemplates/attempt-2026-10-25T17-24-14.195Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "uiSemanticConsistency",
+      "file": "uiSemanticConsistency",
+      "command": [
+        "node",
+        "tests/browser/uiSemanticConsistency.mjs"
+      ],
+      "start": "2026-10-25T17:27:31.047Z",
+      "end": "2026-10-25T17:33:37.181Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "4f9a9d9f6e5e2ac7d57f3ab041c5c02f74779007253180dc6f54356be19cb102",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/uiSemanticConsistency/attempt-2026-10-25T17-27-31.047Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "unifiedExperience",
+      "file": "unifiedExperience",
+      "command": [
+        "node",
+        "tests/browser/unifiedExperience.mjs"
+      ],
+      "start": "2026-10-25T17:29:14.130Z",
+      "end": "2026-10-25T17:33:52.648Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "488a709896ea4bf738a8e1171fa2318a5ba9038c693574d2577ea02b4ca5b3e9",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/unifiedExperience/attempt-2026-10-25T17-29-14.130Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "v4FoodPlanToday",
+      "file": "v4FoodPlanToday",
+      "command": [
+        "node",
+        "tests/browser/v4FoodPlanToday.mjs"
+      ],
+      "start": "2026-10-25T17:33:52.649Z",
+      "end": "2026-10-25T17:36:31.152Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "c8472479d98cef237ea4e8cbc1048fe4ec92add254b14f377775c23a8b8491b8",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/v4FoodPlanToday/attempt-2026-10-25T17-33-52.649Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "voiceMode",
+      "file": "voiceMode",
+      "command": [
+        "node",
+        "tests/browser/voiceMode.mjs"
+      ],
+      "start": "2026-10-25T17:36:31.153Z",
+      "end": "2026-10-25T17:37:13.279Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "cc4e957ac9614019fd4cd0dc1e7b48709ab7374d51ae9bf3e438f08f713d2cdd",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/voiceMode/attempt-2026-10-25T17-36-31.153Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "v421Consistency",
+      "file": "v421Consistency",
+      "command": [
+        "node",
+        "tests/browser/v421Consistency.mjs"
+      ],
+      "start": "2026-10-25T17:33:37.181Z",
+      "end": "2026-10-25T17:40:43.122Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "2cf88bd594e65b6db16b5405fbcffee0908656ca50020a2572bdd17484b49d68",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/v421Consistency/attempt-2026-10-25T17-33-37.181Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "uiQualityAudit",
+      "file": "uiQualityAudit",
+      "command": [
+        "node",
+        "tests/browser/uiQualityAudit.mjs"
+      ],
+      "start": "2026-10-25T17:27:09.982Z",
+      "end": "2026-10-25T17:40:43.129Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "5a34ca458761baa6fe6e2f1babe71115b7c640175208e5e82529206a3c466a18",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/uiQualityAudit/attempt-2026-10-25T17-27-09.982Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "remainingPrototype",
+      "file": "remainingPrototype",
+      "command": [
+        "node",
+        "tests/browser/remainingPrototype.mjs"
+      ],
+      "start": "2026-10-25T17:37:13.280Z",
+      "end": "2026-10-25T17:41:48.176Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "b5756604a72e966fca5f3a15fba80e3a75d94c752f3a6ea6a0313170e0ca3720",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/remainingPrototype/attempt-2026-10-25T17-37-13.280Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "approvedJointV05-webkit",
+      "file": "approvedJointV05",
+      "command": [
+        "node",
+        "tests/browser/approvedJointV05.mjs"
+      ],
+      "start": "2026-10-25T17:41:48.176Z",
+      "end": "2026-10-25T17:42:57.891Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {
+        "FITLOG_JOINT_ENGINE": "webkit",
+        "FITLOG_V04_ENGINE": "webkit",
+        "FITLOG_UX_ENGINE": "webkit"
+      },
+      "testSourceSha": "f13083dc049dbf97857940b87c505aca06934cdd62e665b04fc924f2422fad03",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/approvedJointV05-webkit/attempt-2026-10-25T17-41-48.176Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "approvedJointV05",
+      "file": "approvedJointV05",
+      "command": [
+        "node",
+        "tests/browser/approvedJointV05.mjs"
+      ],
+      "start": "2026-10-25T17:40:43.130Z",
+      "end": "2026-10-25T17:42:57.933Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "f13083dc049dbf97857940b87c505aca06934cdd62e665b04fc924f2422fad03",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/approvedJointV05/attempt-2026-10-25T17-40-43.130Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "combinedHandoff",
+      "file": "combinedHandoff",
+      "command": [
+        "node",
+        "tests/browser/combinedHandoff.mjs"
+      ],
+      "start": "2026-10-25T17:40:43.123Z",
+      "end": "2026-10-25T17:54:30.105Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "8c2946555691ec5a6f8d89900298972fe91cfd62e0a2cdcf8a630d40da798dd3",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/combinedHandoff/attempt-2026-10-25T17-40-43.123Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "foodWaterDayV04",
+      "file": "foodWaterDayV04",
+      "command": [
+        "node",
+        "tests/browser/foodWaterDayV04.mjs"
+      ],
+      "start": "2026-10-25T17:42:57.892Z",
+      "end": "2026-10-25T17:54:32.095Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "8ae61597fef9da26e38e095bf672b2973d56356665c24da33d20fb9edd30aec6",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/foodWaterDayV04/attempt-2026-10-25T17-42-57.892Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "foodWaterBackupV04",
+      "file": "foodWaterBackupV04",
+      "command": [
+        "node",
+        "tests/browser/foodWaterBackupV04.mjs"
+      ],
+      "start": "2026-10-25T17:54:30.105Z",
+      "end": "2026-10-25T17:54:34.553Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "93159c99a85a7f02d0bbe0dee6d2e5265a9f52ce2a471c2ee14bdbbc63726039",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/foodWaterBackupV04/attempt-2026-10-25T17-54-30.105Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "foodWaterBackupV04-webkit",
+      "file": "foodWaterBackupV04",
+      "command": [
+        "node",
+        "tests/browser/foodWaterBackupV04.mjs"
+      ],
+      "start": "2026-10-25T17:54:32.095Z",
+      "end": "2026-10-25T17:54:37.499Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {
+        "FITLOG_JOINT_ENGINE": "webkit",
+        "FITLOG_V04_ENGINE": "webkit",
+        "FITLOG_UX_ENGINE": "webkit"
+      },
+      "testSourceSha": "93159c99a85a7f02d0bbe0dee6d2e5265a9f52ce2a471c2ee14bdbbc63726039",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/foodWaterBackupV04-webkit/attempt-2026-10-25T17-54-32.095Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "uxWaterCascade-webkit",
+      "file": "uxWaterCascade",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascade.mjs"
+      ],
+      "start": "2026-10-25T17:54:37.499Z",
+      "end": "2026-10-25T17:58:51.433Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {
+        "FITLOG_JOINT_ENGINE": "webkit",
+        "FITLOG_V04_ENGINE": "webkit",
+        "FITLOG_UX_ENGINE": "webkit"
+      },
+      "testSourceSha": "badd6bacab994862c4e44118e4a52c40f399117bed011101f05362b40fa46008",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/uxWaterCascade-webkit/attempt-2026-10-25T17-54-37.499Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "foodWaterDayV04-webkit",
+      "file": "foodWaterDayV04",
+      "command": [
+        "node",
+        "tests/browser/foodWaterDayV04.mjs"
+      ],
+      "start": "2026-10-25T17:42:57.934Z",
+      "end": "2026-10-25T17:58:51.444Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {
+        "FITLOG_JOINT_ENGINE": "webkit",
+        "FITLOG_V04_ENGINE": "webkit",
+        "FITLOG_UX_ENGINE": "webkit"
+      },
+      "testSourceSha": "8ae61597fef9da26e38e095bf672b2973d56356665c24da33d20fb9edd30aec6",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/foodWaterDayV04-webkit/attempt-2026-10-25T17-42-57.934Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "uxWaterCascade",
+      "file": "uxWaterCascade",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascade.mjs"
+      ],
+      "start": "2026-10-25T17:54:34.555Z",
+      "end": "2026-10-25T17:58:51.446Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "badd6bacab994862c4e44118e4a52c40f399117bed011101f05362b40fa46008",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/uxWaterCascade/attempt-2026-10-25T17-54-34.555Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "uxWaterCascadeBackup",
+      "file": "uxWaterCascadeBackup",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascadeBackup.mjs"
+      ],
+      "start": "2026-10-25T17:58:51.433Z",
+      "end": "2026-10-25T17:58:58.095Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "e0977096cfd2206ee80565e531c57b8d35e8ce6d6af34ef772014bc7bcd11d0f",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/uxWaterCascadeBackup/attempt-2026-10-25T17-58-51.433Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "uxWaterCascadeBackup-webkit",
+      "file": "uxWaterCascadeBackup",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascadeBackup.mjs"
+      ],
+      "start": "2026-10-25T17:58:51.445Z",
+      "end": "2026-10-25T17:58:58.176Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {
+        "FITLOG_JOINT_ENGINE": "webkit",
+        "FITLOG_V04_ENGINE": "webkit",
+        "FITLOG_UX_ENGINE": "webkit"
+      },
+      "testSourceSha": "e0977096cfd2206ee80565e531c57b8d35e8ce6d6af34ef772014bc7bcd11d0f",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/uxWaterCascadeBackup-webkit/attempt-2026-10-25T17-58-51.445Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "prior-keyboard",
+      "file": "nutritionGoalTemplateKeyboard",
+      "command": [
+        "node",
+        "tests/browser/nutritionGoalTemplateKeyboard.mjs"
+      ],
+      "start": "2026-10-25T17:58:58.095Z",
+      "end": "2026-10-25T17:59:04.375Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "3499a350ff0c9ee515626984a225d61ccb4ffa664806233e49d75df9409b4601",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/prior-keyboard/attempt-2026-10-25T17-58-58.095Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "prior-portion",
+      "file": "autoPortionGoalDeselect",
+      "command": [
+        "node",
+        "tests/browser/autoPortionGoalDeselect.mjs"
+      ],
+      "start": "2026-10-25T17:58:58.176Z",
+      "end": "2026-10-25T18:01:25.444Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "c06bda99e21ae88917c220ae449f892afca4e7d4754b17a3d416334d61115b49",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/prior-portion/attempt-2026-10-25T17-58-58.176Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "joint-chromium",
+      "file": "jointUxReportsRange",
+      "command": [
+        "node",
+        "tests/browser/jointUxReportsRange.mjs"
+      ],
+      "start": "2026-10-25T18:01:25.444Z",
+      "end": "2026-10-25T18:02:06.942Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {
+        "FITLOG_JOINT_ONE": "1"
+      },
+      "testSourceSha": "cf99e5b98caa87b1478c54351be8f8d94d9661039abedea44609c9342ca0136b",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/joint-chromium/attempt-2026-10-25T18-01-25.444Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "joint-webkit",
+      "file": "jointUxReportsRange",
+      "command": [
+        "node",
+        "tests/browser/jointUxReportsRange.mjs"
+      ],
+      "start": "2026-10-25T18:02:06.942Z",
+      "end": "2026-10-25T18:03:10.583Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {
+        "FITLOG_JOINT_ONE": "1",
+        "FITLOG_JOINT_ENGINE": "webkit"
+      },
+      "testSourceSha": "cf99e5b98caa87b1478c54351be8f8d94d9661039abedea44609c9342ca0136b",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/joint-webkit/attempt-2026-10-25T18-02-06.942Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "water",
+      "file": "todayWaterButton",
+      "command": [
+        "node",
+        "tests/browser/todayWaterButton.mjs"
+      ],
+      "start": "2026-10-25T17:59:04.375Z",
+      "end": "2026-10-25T18:03:10.583Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "1f821c97a213b87295ad0b830273ed8f7536fedd0b8d261bb705c9d6ec93b7d7",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/water/attempt-2026-10-25T17-59-04.375Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "report-ranges",
+      "file": "jointReportRanges",
+      "command": [
+        "node",
+        "tests/browser/jointReportRanges.mjs"
+      ],
+      "start": "2026-10-25T18:03:10.584Z",
+      "end": "2026-10-25T18:03:23.794Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "f89374947d030dc17cf6df8f433685c7f95e68eb5f176d512916a7dfe0e0a403",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/report-ranges/attempt-2026-10-25T18-03-10.584Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "native-rail",
+      "file": "combinedInteractionRail",
+      "command": [
+        "node",
+        "tests/browser/combinedInteractionRail.mjs"
+      ],
+      "start": "2026-10-25T18:03:23.794Z",
+      "end": "2026-10-25T18:03:29.724Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "93ba8c01aaa46b6a5019598c985bf4353995d86ef54505ebe22e33398744d0d0",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/native-rail/attempt-2026-10-25T18-03-23.794Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "date-race",
+      "file": "combinedInteractionConcurrency",
+      "command": [
+        "node",
+        "tests/browser/combinedInteractionConcurrency.mjs"
+      ],
+      "start": "2026-10-25T18:03:29.725Z",
+      "end": "2026-10-25T18:03:34.778Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "8c94034bddfeac48ab16e1107f48648a061b600d34d907c0d8099c8767aa6aee",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/date-race/attempt-2026-10-25T18-03-29.725Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "training-motion",
+      "file": "combinedInteractionMotion",
+      "command": [
+        "node",
+        "tests/browser/combinedInteractionMotion.mjs"
+      ],
+      "start": "2026-10-25T18:03:34.778Z",
+      "end": "2026-10-25T18:03:42.440Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "bad7ba976f977d0043873956856a9773a36353caadeb4857e69759d97197f26c",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/training-motion/attempt-2026-10-25T18-03-34.778Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "training-execution",
+      "file": "combinedInteractionTraining",
+      "command": [
+        "node",
+        "tests/browser/combinedInteractionTraining.mjs"
+      ],
+      "start": "2026-10-25T18:03:42.441Z",
+      "end": "2026-10-25T18:13:33.773Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "e4b30de1a9d36dcd167468783b03a49c1dff6ef29af24f749f58b787b156213f",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/training-execution/attempt-2026-10-25T18-03-42.441Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "prior-goal",
+      "file": "nutritionGoalTemplate",
+      "command": [
+        "node",
+        "tests/browser/nutritionGoalTemplate.mjs"
+      ],
+      "start": "2026-10-25T17:58:51.446Z",
+      "end": "2026-10-25T18:28:14.421Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "41ee6d4130416b2096095749c28bab30cd1dd74a1c3e9f6044104a8dbfa25531",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/prior-goal/attempt-2026-10-25T17-58-51.446Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "restore-filter",
+      "file": "navigationFilterRestore",
+      "command": [
+        "node",
+        "tests/browser/navigationFilterRestore.mjs"
+      ],
+      "start": "2026-10-25T18:28:14.421Z",
+      "end": "2026-10-25T18:32:36.183Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "5839ca221441877e620d3fce81cd30919b8493562b2f8f4b663bd1046c6795b6",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/restore-filter/attempt-2026-10-25T18-28-14.421Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "five-functional",
+      "file": "fiveCombinedV1",
+      "command": [
+        "node",
+        "tests/browser/fiveCombinedV1.mjs"
+      ],
+      "start": "2026-10-25T18:32:36.184Z",
+      "end": "2026-10-25T18:32:57.435Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {
+        "FITLOG_FIVE_FUNCTIONAL_ONLY": "1"
+      },
+      "testSourceSha": "34dc0d501defc5588ef4cbe1058ade73184e408ba85a543249bad2cbf2749198",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/five-functional/attempt-2026-10-25T18-32-36.184Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "theme-explicit",
+      "file": "fiveThemePolicy",
+      "command": [
+        "node",
+        "tests/browser/fiveThemePolicy.mjs"
+      ],
+      "start": "2026-10-25T18:32:57.435Z",
+      "end": "2026-10-25T18:33:11.122Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "0f7545cbb402a67fe1d264562eb26c6cf097f60f324ca0a7f7f1f719141e42db",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/theme-explicit/attempt-2026-10-25T18-32-57.435Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "interaction-full",
+      "file": "combinedInteractionV04",
+      "command": [
+        "node",
+        "tests/browser/combinedInteractionV04.mjs"
+      ],
+      "start": "2026-10-25T18:03:10.584Z",
+      "end": "2026-10-25T18:34:42.330Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "01e96f7730f676eee1a6af7db7e91b710b51dabf95983d01ce2f80cd2ed7a06c",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/interaction-full/attempt-2026-10-25T18-03-10.584Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "light-native-full",
+      "file": "lightNativeV051",
+      "command": [
+        "node",
+        "tests/browser/lightNativeV051.mjs"
+      ],
+      "start": "2026-10-25T18:34:42.331Z",
+      "end": "2026-10-25T18:34:55.794Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "11decee6c744651956b1449205ecfaf644ed0c3c19de5672a789c5850ee5e1c6",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/light-native-full/attempt-2026-10-25T18-34-42.331Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "management-default",
+      "file": "managementV061",
+      "command": [
+        "node",
+        "tests/browser/managementV061.mjs"
+      ],
+      "start": "2026-10-25T18:34:55.794Z",
+      "end": "2026-10-25T18:37:41.873Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "770958e013aeb533b491261ca9864d4db9cbc3d6a44b5a5a77d05e82bc38dcce",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/management-default/attempt-2026-10-25T18-34-55.794Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    },
+    {
+      "name": "navigation-flicker",
+      "file": "navigationFlicker",
+      "command": [
+        "node",
+        "tests/browser/navigationFlicker.mjs"
+      ],
+      "start": "2026-10-25T18:13:33.774Z",
+      "end": "2026-10-25T18:39:04.937Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "a2e8e57856c6756dc3b9101282bc509d01bb0f41309eeff65bddd7e6f286d687",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/navigation-flicker/attempt-2026-10-25T18-13-33.774Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "history-and-sheets",
+      "file": "fiveWorkoutHistoryProtection",
+      "command": [
+        "node",
+        "tests/browser/fiveWorkoutHistoryProtection.mjs"
+      ],
+      "start": "2026-10-25T18:33:11.122Z",
+      "end": "2026-10-25T18:40:39.367Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "9ab7cc5a2a7c2fb7575ec10a07dc8282a1b59c6b166f32fa51e4934f1126bfda",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/history-and-sheets/attempt-2026-10-25T18-33-11.122Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "management-classic",
+      "file": "managementV061",
+      "command": [
+        "node",
+        "tests/browser/managementV061.mjs"
+      ],
+      "start": "2026-10-25T18:37:41.874Z",
+      "end": "2026-10-25T18:51:24.285Z",
+      "url": "http://127.0.0.1:5458/fitlog-lite/",
+      "extra": {
+        "FITLOG_MANAGEMENT_VISUAL_THEME": "classic"
+      },
+      "testSourceSha": "770958e013aeb533b491261ca9864d4db9cbc3d6a44b5a5a77d05e82bc38dcce",
+      "productSourceManifest": "candidate-release-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/release-gates/management-classic/attempt-2026-10-25T18-37-41.874Z.log",
+      "exitCode": 1,
+      "status": "FAIL"
+    }
+  ]
+}
