@@ -1,3 +1,4 @@
+import { normalizeWorkoutName } from '../utils/workoutName'
 import { validateCycleCollection } from './nutritionCycleService'
 import { validateSleepSession, validateWaterLog } from '../utils/recovery'
 import { validateDietEvent } from './dietEventService'
@@ -120,6 +121,7 @@ function validateExercise(record: UnknownRecord, index: number): void {
 
 function validateWorkout(record: UnknownRecord, index: number): void {
   const location = `训练记录第 ${index + 1} 项`
+  normalizeWorkoutName(record.name)
   dateString(record.date, `${location} date`)
   timestamp(record.startedAt, `${location} startedAt`)
   if (record.finishedAt !== undefined) timestamp(record.finishedAt, `${location} finishedAt`)

@@ -132,3 +132,13 @@ Seven prior presentation assertions update with the approval: four legacy remain
 `motionPolish.mjs` waits for the actual ordinary Sheet entrance to finish before its stable-frame parent-scroll measurement, replacing the old fixed230ms assumption (approved entrance is now240ms). The original50px scroll and every other assertion remain unchanged; separate lightNativeSheetMotion records the actual moving frames.
 
 `remainingPrototype.mjs` still hashes/runs the immutable V4.2 HTML for structure, spacing, typography, controls and real-data assertions. Light Native supersedes its four warm-palette expectations (cell white, border slate, container pale blue-gray, calorie-dot blue); protein/carbs/fat and dark colors still compare to the old reference. Run the full33 contexts after this approved presentation update.
+
+## Five-part combined v1
+
+`fiveCombinedV1.mjs`: Chromium/WebKit, four widths ×100/140/200% ×Classic light/dark/Native, five actual Tabs and independent7/30/90 trend inner/outer geometry, plus real single-exercise completion/name/clear/template, theme DOM identity and native sleep date return. Default74 contexts; `FITLOG_FIVE_POPULATED=1` repeats with populated records. `FITLOG_FIVE_FUNCTIONAL_ONLY=1` is the two functional flows, not a full geometry gate.
+
+`fiveWorkoutHistoryProtection.mjs`: two raw legacy history flows (rename → hidden → exit → reopen → clear → exit → template sync), exact set/journal/other21-store comparison, followed by72 contexts for name/template Sheet geometry. `FITLOG_HISTORY_SHEET_SMOKE=1` and flow-only flags are diagnostic subsets. Keep first failure evidence and the deliberately failing old-candidate negative control; never normalize expected legacy data to make it pass.
+
+`fiveThemePolicy.mjs`: eight real UI contexts covering explicit selection of already-checked implicit Classic, keyboard radio selection, all three old Classic modes and reload. Both visual keys remain device-only; absent visual preference follows the compatibility policy without startup writes. Existing `approvedJointV05` explicitly selects Classic before its old three-mode assertions; its light meta now checks the approved frozen Classic #f5f2eb, retaining all original business checks. Optional `FITLOG_MANAGEMENT_VISUAL_THEME=classic` repeats the complete existing Management gate under Classic.
+
+All use existing FITLOG_QA_URL/FITLOG_PLAYWRIGHT_MODULE/FITLOG_CHROME/FITLOG_QA_ARTIFACT_ROOT. Stable geometry checks wait for the real finite surface animation; separate motion gates still inspect the animation itself. Mock keyboards, system-color emulation and WebKit do not verify real iPhone settings, native picker skin, VoiceOver, Safe Area or original installed PWA continuity.

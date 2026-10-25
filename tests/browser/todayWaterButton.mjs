@@ -1,5 +1,5 @@
 import { openManagementEntry } from './managementEntry.mjs'
-import {waitForMainNavigation} from './navigationSettlement.mjs'
+import {waitForMainNavigation,waitForSurfaceSettlement} from './navigationSettlement.mjs'
 // Approved v0.1 shared Sheet. Synthetic contexts only; no personal profile or provider.
 import assert from 'node:assert/strict'
 import fs from 'node:fs/promises'
@@ -41,6 +41,7 @@ for(const engine of ['chromium','webkit']){
    const states={}
    if(width===390&&height===844&&font===100){for(const[name,s]of Object.entries(selectors)){const e=p.locator(s);await e.scrollIntoViewIfNeeded();const r=await e.boundingBox();await p.mouse.move(r.x+r.width/2,r.y+r.height/2);await p.mouse.down();states[name]={pressed:await e.evaluate((e,keys)=>Object.fromEntries(keys.map(k=>[k,getComputedStyle(e)[k]])),keys)};await p.mouse.move(0,0);await p.mouse.up();await e.evaluate(e=>e.disabled=true);states[name].disabled=await e.evaluate((e,keys)=>Object.fromEntries(keys.map(k=>[k,getComputedStyle(e)[k]])),keys);await e.evaluate(e=>e.disabled=false);await p.keyboard.press('Tab');await e.focus();states[name].focus=await e.evaluate(e=>({width:getComputedStyle(e).outlineWidth,style:getComputedStyle(e).outlineStyle,color:getComputedStyle(e).outlineColor}));assert.equal(states[name].focus.width,'2px')};for(const name of ['weight','sleep','training'])assert.deepEqual(states.water,states[name]);await p.mouse.click(0,0)}
    await p.locator(selectors.water).scrollIntoViewIfNeeded();await settle();const preOpen=await geom();await open();const opened=await geom();assert(Math.abs(opened.card.height-preOpen.card.height)<.5);assert(Math.abs(opened.anchor-preOpen.anchor)<1)
+   await waitForSurfaceSettlement(p)
    const sheet=await p.locator('dialog[open]').evaluate(d=>{const r=d.getBoundingClientRect(),body=d.querySelector('.modal-body'),quick=[...d.querySelectorAll('[data-water-quick]')].map(e=>{const r=e.getBoundingClientRect();return{width:r.width,height:r.height,x:r.x,y:r.y}});return{top:r.top,bottom:r.bottom,height:r.height,viewport:innerHeight,quick,bodyOverflow:getComputedStyle(body).overflowY,scrollHeight:body.scrollHeight,clientHeight:body.clientHeight}})
    assert(sheet.top>=-.5&&sheet.bottom<=height+.5);assert(sheet.quick.every(q=>q.height>=44));assert(Math.abs(sheet.quick[0].width-sheet.quick[1].width)<1);assert.equal(sheet.bodyOverflow,'auto');await shot('sheet')
    const bg=await geom();if(engine==='chromium')await p.mouse.wheel(0,200);else await p.locator('dialog[open] .modal-body').evaluate(e=>e.scrollTop+=200);await settle();assert.equal((await geom()).scroll,bg.scroll,'background lock');await close();assert.deepEqual(await read(),initial);assert(Math.abs((await geom()).scroll-preOpen.scroll)<1,'close restores exact page scroll')

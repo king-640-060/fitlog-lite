@@ -1,3 +1,4 @@
+import {waitForSurfaceSettlement} from './navigationSettlement.mjs'
 import { openManagementEntry } from './managementEntry.mjs'
 // Isolated synthetic profiles, mock providers and records only. Physical Safari remains a separate gate.
 import assert from 'node:assert/strict'
@@ -26,11 +27,13 @@ for (const [width,height] of sizes) {
   const nav=async tab=>{await page.locator(`[data-tab=${tab}]`).tap();await page.waitForTimeout(30)}
   const close=async()=>{await page.locator('.sheet [data-close]').tap();await page.waitForFunction(()=>!document.querySelector('dialog'));assert.equal(await page.evaluate(()=>document.body.classList.contains('sheet-open')),false);assert.equal(await page.evaluate(()=>getComputedStyle(document.activeElement).outlineStyle),'none')}
   const checkInputs=async selectors=>{
+    await waitForSurfaceSettlement(page)
     for(const selector of selectors){
       const field=page.locator(selector);await field.focus()
       await page.evaluate(()=>{qaViewport.height=innerHeight-60;qaViewport.offsetTop=0;qaViewport.dispatchEvent(new Event('resize'))});await page.waitForTimeout(45)
       assert.equal(await page.evaluate(()=>document.body.classList.contains('keyboard-open')),false,`${selector} toolbar not keyboard`)
       await page.evaluate(()=>{qaViewport.height=innerHeight-300;qaViewport.offsetTop=20;qaViewport.dispatchEvent(new Event('resize'))});await page.waitForTimeout(45)
+      await page.waitForFunction(()=>document.body.classList.contains('keyboard-open'))
       assert.equal(await page.evaluate(()=>document.body.classList.contains('keyboard-open')),true)
       assert.equal(await field.evaluate(e=>{const r=e.getBoundingClientRect();return r.bottom<=visualViewport.height+visualViewport.offsetTop+1&&r.top>=visualViewport.offsetTop-1}),true,`${selector} visible above keyboard`)
       await page.locator('.sheet-focus-anchor').focus();await page.waitForTimeout(30)

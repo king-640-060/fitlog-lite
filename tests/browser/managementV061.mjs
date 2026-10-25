@@ -23,7 +23,7 @@ for(const engine of (process.env.FITLOG_MANAGEMENT_ENGINE?[process.env.FITLOG_MA
   const c=await browser.newContext({viewport:{width,height},isMobile:true,hasTouch:true,colorScheme:theme,timezoneId:'Asia/Shanghai',serviceWorkers:'block'})
   const p=await c.newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));p.setDefaultTimeout(15000)
   try{
-   await p.goto(url,{waitUntil:'networkidle'});await p.locator('#today-food-details').waitFor();await p.addStyleTag({content:`html{font-size:${font}%}`})
+   if(process.env.FITLOG_MANAGEMENT_VISUAL_THEME)await c.addInitScript(theme=>localStorage.setItem('fitlog-visual-theme-v1',theme),process.env.FITLOG_MANAGEMENT_VISUAL_THEME);await p.goto(url,{waitUntil:'networkidle'});await p.locator('#today-food-details').waitFor();await p.addStyleTag({content:`html{font-size:${font}%}`})
    const read=()=>p.evaluate(async()=>{const d=await new Promise((r,j)=>{const q=indexedDB.open('fitlog-lite-db');q.onsuccess=()=>r(q.result);q.onerror=()=>j(q.error)}),rows={};for(const n of [...d.objectStoreNames].sort())rows[n]=await new Promise(r=>{const q=d.transaction(n).objectStore(n).getAll();q.onsuccess=()=>r(q.result.sort((a,b)=>a.id.localeCompare(b.id)))});const version=d.version;d.close();return{version,rows,config:Object.fromEntries(Object.keys(localStorage).filter(k=>k.startsWith('fitlog-')).sort().map(k=>[k,localStorage.getItem(k)]))}})
    const before=await read();assert.equal(before.version,130);assert.equal(Object.keys(before.rows).length,22)
    const settle=()=>p.evaluate(async()=>{await new Promise(requestAnimationFrame);await Promise.all(document.querySelector('dialog[open]').getAnimations({subtree:true}).map(a=>a.finished.catch(()=>{})))})

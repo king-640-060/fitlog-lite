@@ -1,0 +1,49 @@
+# 五项联合改造 v1：本轮验证记录
+
+2026-10-25 开始，Asia/Shanghai；批准输入及起点见[设计基准](../design/reference/2026-10-25-five-combined-v1/DESIGN_REFERENCE.md)，实现见[合同](FIVE_COMBINED_V1.md)。本文件正在归集实际结果，**尚未完成最终浏览器门槛、提交与发布，不代表已交付**。最终Application/END身份、两次Actions、正式资源/离线与同档案验证须由实际执行补齐。
+
+## 输入与实际环境
+
+- ZIP SHA256：`ae0dcbb25b80916c1e9742356c5dcf1fb567a74b3c7594b4fec54e4d6aae6e98`；7成员CRC、SHA清单6/6匹配，原始文件完整冻结。
+- 唯一批准v1 HTML已在Chromium/WebKit ×320/375/390/430实际运行，共8个隔离上下文，五Tab、名称、模板同步、两主题和原生时间值均执行。包内32项旧演示检查仅为输入资料，不算生产测试。
+- Node24.16.0、Chromium151.0.7922.34、WebKit26.5。所有写操作仅新建隔离合成上下文或既有专用合成QA profile，未读取或修改个人健康数据、真实Key或真实Provider。
+- 起点与冻结旧客户端为`68f4747994fd84bd2ef965c93ee3b009a3b52b72`；Classic精确视觉基准为`7110564631b6e40f59485cb1a12543ea59b3a2df`。候选build记录完整source/resource SHA，实际await build成功、确认源未变后复制dist；本地build的local标识不当作正式发布身份。
+
+## 已实际通过的验证
+
+|检查|本轮实际结果|边界|
+|---|---|---|
+|TypeScript|`npm run typecheck` PASS|tsc --noEmit|
+|完整单元测试|`npm test -- --maxWorkers=4`：79文件1190/1190 PASS|原78文件1143不改，新增47；不是浏览器或真机数量|
+|生产构建|`GITHUB_REPOSITORY=king-640-060/fitlog-lite npm run build` PASS|发布仍需clean commit重建与线上比对|
+|原型实际运行|双引擎8上下文PASS|独立演示不写业务数据|
+|短名称兼容|双引擎2组PASS|真实冻结旧客户端Restore→Export/Autosave→新Restore→加密Sync1|
+|3200字符旧名称兼容|双引擎2组PASS|全22表完整比较；不以新手工输入限制截断旧模板快照|
+|睡眠时钟服务|12上下文84场景PASS|NY/Paris DST、跨年、凌晨0–5:59/6:00、手动归属；en-US/en-GB是浏览器locale，不是iPhone系统12/24小时设置|
+|源码与冻结保护|PASS|原17冻结输入、78旧单测、691旧设计文件不改，160旧src/41服务完整相同，数据库schema不改|
+
+全量浏览器回归与本轮最终矩阵仍在执行，不能把之前候选的PASS计为最终源码PASS。空/有记录的双引擎完整矩阵、历史原始字段保护、主题显式选择、既有44+14、LightNative52以及Management两套52的最终结果必须逐项汇总，任何失败不得遗漏。
+
+## 视觉核对与必要差异
+
+最新冻结候选在390/100下实际截图：双引擎×Classic浅/深与Native×空/有记录，共12对，五Tab及管理中心均包含before/after。15个palette变量以及存在的代表控件颜色/背景/圆角/边框/阴影/字号与对应冻结基准逐项相同。已目视检查三种外观的今日/训练/进度拼图；删除重复教学后真实卡片缩回，三图不以删除绘图区换取紧凑。Classic精确颜色优先于演示近似色。
+
+旧版本本地冻结截图不能称为旧正式站截图；本轮正式截图尚待Application发布后获取。日期/星期以完整片段换行；真实动作、起止时刻、日志/来源与安全说明仍可访问。新模板勾选使用20px原生checkbox与>=44px label，200%时完整语句均衡换行。原生time输入>=16px/44px，系统picker内部皮肤不承诺逐像素染色。
+
+## 实际失败、修复与复测原则
+
+- 历史名称专项的旧候选负对照真实FAIL：只命名后后台/退出触发强制全量Autosave，旧日志首尾空白及未知set字段被归一化丢失。产品改为只排空真实待保存编辑；名称专用事务只写name/updatedAt。双引擎开发流复测PASS；最终冻结完整专项仍需独立汇总。
+- 主题负对照真实FAIL：隐式Classic已勾选，点击同一radio没有change而未固定显式选择。新增click/change去重与Classic旧模式动作固定选择；双引擎8组开发复测PASS，最终冻结专项另记。
+- 200%模板同步短句出现单字孤行，已通过原生checkbox独立布局、清除共用数字后缀padding及均衡文本换行修复；保留原图及双引擎复测。
+- 原有测试驱动只适配实际过渡完成、异步保存/跨页刷新就绪和本轮批准的Classic模式设置。所有原业务/结构assert保持逐字一致，唯一呈现assert由Native浅色meta恢复到冻结Classic `#f5f2eb`。独立motion套件仍量测运动本身，不用静态等待绕过动画要求。
+- 最终回归出现多项locator稳定性超时。系统日志同期多次Sleep/DarkWake；诊断中Node已超时10秒，页面performance/动画仅经过约1秒。已保留原始失败和电源事件，保持唤醒后应完整复跑；不能把休眠关联推测为每个失败的确定原因，也不能直接改为PASS。
+
+## 数据与部署门槛
+
+`fitlog-lite-db`、Dexie13/IDB130/22、Backup14/Restore1–14、Sync/envelope1保持。可选name是独立快照；旧客户端完整对象通路保留新字段。名称、模板事务检查source fingerprint/repeat ID，失败零部分写；未完成训练与模板快照并发也在事务中重查。原food/nutrition/report/range-delete/plan/恢复服务及其断言不扩大。
+
+同一个既有专用合成Chrome profile已取得START基线，未reset/reseed/Restore。22表hash `049bc97a200c585af636db0378c6c72b1c81696208f15b5d30276755c6ba7c1a`；8配置hash `609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34`。Application与END仍需分别取得真实App=activeSW=该SHA、HTTP资源SHA、离线冷启动和上述摘要不变的证据。START成功不能代替新版本成功。
+
+## Pending
+
+尚未完成的最终自动化/CI/Pages不能记为PASS。实体iPhone Safari、原安装PWA、真实键盘/原生滚轮/系统12或24小时设置、Safe Area、VoiceOver、个人历史数据连续性、真实Provider及ChatGPT独立核查继续Pending。旧WebKit饮水Undo−128px不冒充本轮已解决；此前已结案任务不重开。

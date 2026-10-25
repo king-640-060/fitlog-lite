@@ -1,0 +1,287 @@
+{
+  "cases": 32,
+  "passed": 32,
+  "failed": [],
+  "results": [
+    {
+      "width": 320,
+      "test": "tab today",
+      "pass": true,
+      "metrics": {
+        "sw": 320,
+        "cw": 320,
+        "inner": 320,
+        "clip": 320
+      }
+    },
+    {
+      "width": 320,
+      "test": "tab plan",
+      "pass": true,
+      "metrics": {
+        "sw": 320,
+        "cw": 320,
+        "inner": 320,
+        "clip": 320
+      }
+    },
+    {
+      "width": 320,
+      "test": "tab food",
+      "pass": true,
+      "metrics": {
+        "sw": 320,
+        "cw": 320,
+        "inner": 320,
+        "clip": 320
+      }
+    },
+    {
+      "width": 320,
+      "test": "tab workout",
+      "pass": true,
+      "metrics": {
+        "sw": 320,
+        "cw": 320,
+        "inner": 320,
+        "clip": 320
+      }
+    },
+    {
+      "width": 320,
+      "test": "tab progress",
+      "pass": true,
+      "metrics": {
+        "sw": 320,
+        "cw": 320,
+        "inner": 320,
+        "clip": 320
+      }
+    },
+    {
+      "width": 320,
+      "test": "theme switch preserve old mode",
+      "pass": true
+    },
+    {
+      "width": 320,
+      "test": "explicit workout name preserved after template save",
+      "pass": true
+    },
+    {
+      "width": 320,
+      "test": "native time input and sheet close",
+      "pass": true
+    },
+    {
+      "width": 375,
+      "test": "tab today",
+      "pass": true,
+      "metrics": {
+        "sw": 375,
+        "cw": 375,
+        "inner": 375,
+        "clip": 375
+      }
+    },
+    {
+      "width": 375,
+      "test": "tab plan",
+      "pass": true,
+      "metrics": {
+        "sw": 375,
+        "cw": 375,
+        "inner": 375,
+        "clip": 375
+      }
+    },
+    {
+      "width": 375,
+      "test": "tab food",
+      "pass": true,
+      "metrics": {
+        "sw": 375,
+        "cw": 375,
+        "inner": 375,
+        "clip": 375
+      }
+    },
+    {
+      "width": 375,
+      "test": "tab workout",
+      "pass": true,
+      "metrics": {
+        "sw": 375,
+        "cw": 375,
+        "inner": 375,
+        "clip": 375
+      }
+    },
+    {
+      "width": 375,
+      "test": "tab progress",
+      "pass": true,
+      "metrics": {
+        "sw": 375,
+        "cw": 375,
+        "inner": 375,
+        "clip": 375
+      }
+    },
+    {
+      "width": 375,
+      "test": "theme switch preserve old mode",
+      "pass": true
+    },
+    {
+      "width": 375,
+      "test": "explicit workout name preserved after template save",
+      "pass": true
+    },
+    {
+      "width": 375,
+      "test": "native time input and sheet close",
+      "pass": true
+    },
+    {
+      "width": 390,
+      "test": "tab today",
+      "pass": true,
+      "metrics": {
+        "sw": 390,
+        "cw": 390,
+        "inner": 390,
+        "clip": 390
+      }
+    },
+    {
+      "width": 390,
+      "test": "tab plan",
+      "pass": true,
+      "metrics": {
+        "sw": 390,
+        "cw": 390,
+        "inner": 390,
+        "clip": 390
+      }
+    },
+    {
+      "width": 390,
+      "test": "tab food",
+      "pass": true,
+      "metrics": {
+        "sw": 390,
+        "cw": 390,
+        "inner": 390,
+        "clip": 390
+      }
+    },
+    {
+      "width": 390,
+      "test": "tab workout",
+      "pass": true,
+      "metrics": {
+        "sw": 390,
+        "cw": 390,
+        "inner": 390,
+        "clip": 390
+      }
+    },
+    {
+      "width": 390,
+      "test": "tab progress",
+      "pass": true,
+      "metrics": {
+        "sw": 390,
+        "cw": 390,
+        "inner": 390,
+        "clip": 390
+      }
+    },
+    {
+      "width": 390,
+      "test": "theme switch preserve old mode",
+      "pass": true
+    },
+    {
+      "width": 390,
+      "test": "explicit workout name preserved after template save",
+      "pass": true
+    },
+    {
+      "width": 390,
+      "test": "native time input and sheet close",
+      "pass": true
+    },
+    {
+      "width": 430,
+      "test": "tab today",
+      "pass": true,
+      "metrics": {
+        "sw": 430,
+        "cw": 430,
+        "inner": 410,
+        "clip": 410
+      }
+    },
+    {
+      "width": 430,
+      "test": "tab plan",
+      "pass": true,
+      "metrics": {
+        "sw": 430,
+        "cw": 430,
+        "inner": 410,
+        "clip": 410
+      }
+    },
+    {
+      "width": 430,
+      "test": "tab food",
+      "pass": true,
+      "metrics": {
+        "sw": 430,
+        "cw": 430,
+        "inner": 410,
+        "clip": 410
+      }
+    },
+    {
+      "width": 430,
+      "test": "tab workout",
+      "pass": true,
+      "metrics": {
+        "sw": 430,
+        "cw": 430,
+        "inner": 410,
+        "clip": 410
+      }
+    },
+    {
+      "width": 430,
+      "test": "tab progress",
+      "pass": true,
+      "metrics": {
+        "sw": 430,
+        "cw": 430,
+        "inner": 410,
+        "clip": 410
+      }
+    },
+    {
+      "width": 430,
+      "test": "theme switch preserve old mode",
+      "pass": true
+    },
+    {
+      "width": 430,
+      "test": "explicit workout name preserved after template save",
+      "pass": true
+    },
+    {
+      "width": 430,
+      "test": "native time input and sheet close",
+      "pass": true
+    }
+  ]
+}

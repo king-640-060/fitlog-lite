@@ -1,5 +1,6 @@
 import { db, type FitLogDatabase } from '../db/database'
 import type { Exercise, Workout, WorkoutSet } from '../db/types'
+import { normalizeWorkoutName, WORKOUT_NAME_MAX_LENGTH } from '../utils/workoutName'
 import { finiteNumber, optionalNumber, requiredText } from '../utils/validation'
 
 export const TRAINING_JOURNAL_MAX_LENGTH = 2000
@@ -40,6 +41,7 @@ function isBlankWorkoutSet(set: WorkoutSet): boolean {
 export function normalizeWorkoutForSave(workout: Workout): Workout {
   return {
     ...workout,
+    ...(workout.name === undefined ? {} : { name: normalizeWorkoutName(workout.name) }),
     note: normalizeTrainingJournal(workout.note),
     exercises: workout.exercises.map((exercise) => ({
       ...exercise,
@@ -52,30 +54,54 @@ export function normalizeWorkoutForSave(workout: Workout): Workout {
   }
 }
 
-export async function createWorkout(date: string): Promise<Workout> {
+export async function createWorkout(date: string, database: FitLogDatabase = db): Promise<Workout> {
   const now = new Date().toISOString()
   const workout: Workout = { id: crypto.randomUUID(), date, startedAt: now, exercises: [], createdAt: now, updatedAt: now }
-  await db.workouts.add(workout)
+  await database.transaction('rw', database.workouts, async () => {
+    if ((await database.workouts.where('date').equals(date).toArray()).some(row => !row.finishedAt)) throw new Error('这一天已有未完成训练，请先继续或完成它')
+    await database.workouts.add(workout)
+  })
   return workout
 }
 
-async function persistWorkout(normalized:Workout,database:FitLogDatabase,requireExisting=false):Promise<Workout>{
-  const write=async()=>{if(requireExisting&&!await database.workouts.get(normalized.id))throw new Error('这条训练记录已删除；草稿未重新创建，请返回查看现有记录');await database.workouts.put(normalized);return normalized}
-  return requireExisting?database.transaction('rw',database.workouts,write):write()
+export interface WorkoutSaveOptions { requireExisting?: boolean; expectedFingerprint?: string }
+export function workoutFingerprint(workout: Workout): string { return JSON.stringify(workout) }
+async function persistWorkout(normalized: Workout, database: FitLogDatabase, options: WorkoutSaveOptions): Promise<Workout> {
+  if (!options.requireExisting && options.expectedFingerprint === undefined) { await database.workouts.put(normalized); return normalized }
+  return database.transaction('rw', database.workouts, async () => {
+    const existing = await database.workouts.get(normalized.id)
+    if (options.requireExisting && !existing) throw new Error('这条训练记录已删除；草稿未重新创建，请返回查看现有记录')
+    if (options.expectedFingerprint !== undefined && (!existing || workoutFingerprint(existing) !== options.expectedFingerprint)) throw new Error('训练记录已变化，请重新打开；当前草稿未覆盖已保存记录')
+    await database.workouts.put(normalized)
+    return normalized
+  })
 }
-
-export async function saveWorkout(workout: Workout, database: FitLogDatabase = db, options:{requireExisting?:boolean}={}): Promise<Workout> {
+/** Name-only edit intentionally bypasses set/journal normalization. */
+export async function saveWorkoutName(id: string, value: unknown, expectedFingerprint: string, database: FitLogDatabase = db): Promise<Workout> {
+  const name = normalizeWorkoutName(value)
+  return database.transaction('rw', database.workouts, async () => {
+    const current = await database.workouts.get(id)
+    if (!current || workoutFingerprint(current) !== expectedFingerprint) throw new Error('训练记录已变化，请重新打开；名称未保存')
+    if (name === current.name) return current
+    if (name && name.length > WORKOUT_NAME_MAX_LENGTH) throw new Error(`本次训练名称最多 ${WORKOUT_NAME_MAX_LENGTH} 个字符`)
+    const saved = { ...current, updatedAt: new Date().toISOString() }
+    if (name) saved.name = name
+    else delete saved.name
+    await database.workouts.put(saved)
+    return saved
+  })
+}
+export async function saveWorkout(workout: Workout, database: FitLogDatabase = db, options: WorkoutSaveOptions = {}): Promise<Workout> {
   const normalized = normalizeWorkoutForSave(workout)
   normalized.updatedAt = new Date().toISOString()
-  return persistWorkout(normalized,database,options.requireExisting)
+  return persistWorkout(normalized, database, options)
 }
-
-export async function finishWorkout(workout: Workout, database: FitLogDatabase = db, options:{requireExisting?:boolean}={}): Promise<Workout> {
+export async function finishWorkout(workout: Workout, database: FitLogDatabase = db, options: WorkoutSaveOptions = {}): Promise<Workout> {
   const normalized = normalizeWorkoutForSave(workout)
-  if (!normalized.exercises.length) throw new Error('请至少添加一个动作')
+  if (!normalized.exercises.length || !normalized.exercises.some(exercise => exercise.sets.length)) throw new Error('请至少添加一个动作和有效组数')
   normalized.finishedAt = new Date().toISOString()
   normalized.updatedAt = normalized.finishedAt
-  return persistWorkout(normalized,database,options.requireExisting)
+  return persistWorkout(normalized, database, options)
 }
 
 export async function findOpenWorkout(date: string): Promise<Workout | undefined> {
