@@ -1,5 +1,7 @@
 # FitLog Interaction & Visual System
 
+Current approved light appearance and ordinary Sheet motion: [Light Native v0.5.1](LIGHT_NATIVE_V051.md). It supersedes historical warm/olive light values, flat-card-only styling and16px/200ms entrance below. Existing dark theme, semantic colors, geometry/lifecycle/data protections remain; safe finite exits are content-free, never sensitive DOM clones.
+
 ## Mobile quality invariants
 
 `docs/UI_QA_MATRIX.md` and `tests/browser/uiQualityAudit.mjs` define the reusable release audit. Root clipping is not a substitute for child overflow checks. Main content reserves bottom navigation/Safe Area; Sheet body owns ordinary long forms and pickers. Keep Chinese action labels intact and task time metadata below the title.

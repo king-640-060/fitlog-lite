@@ -1,0 +1,282 @@
+{
+  "source": "local Chromium Playwright, fictional data",
+  "results": [
+    {
+      "action": "tab today",
+      "ok": true
+    },
+    {
+      "action": "tab plan",
+      "ok": true
+    },
+    {
+      "action": "tab food",
+      "ok": true
+    },
+    {
+      "action": "tab workout",
+      "ok": true
+    },
+    {
+      "action": "tab progress",
+      "ok": true
+    },
+    {
+      "action": "original/new restore copy",
+      "ok": true
+    },
+    {
+      "action": "cardio sheet enter and close",
+      "ok": true
+    },
+    {
+      "action": "management group back close",
+      "ok": true
+    },
+    {
+      "action": "populated/empty states",
+      "ok": true
+    },
+    {
+      "action": "layout 320px 1x today",
+      "metrics": {
+        "deviceWidth": 320,
+        "pageWidth": 318,
+        "scrollWidth": 318,
+        "clientWidth": 318
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 320px 1x workout",
+      "metrics": {
+        "deviceWidth": 320,
+        "pageWidth": 318,
+        "scrollWidth": 318,
+        "clientWidth": 318
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 320px 1.4x today",
+      "metrics": {
+        "deviceWidth": 320,
+        "pageWidth": 318,
+        "scrollWidth": 318,
+        "clientWidth": 318
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 320px 1.4x workout",
+      "metrics": {
+        "deviceWidth": 320,
+        "pageWidth": 318,
+        "scrollWidth": 318,
+        "clientWidth": 318
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 320px 2x today",
+      "metrics": {
+        "deviceWidth": 320,
+        "pageWidth": 318,
+        "scrollWidth": 318,
+        "clientWidth": 318
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 320px 2x workout",
+      "metrics": {
+        "deviceWidth": 320,
+        "pageWidth": 318,
+        "scrollWidth": 318,
+        "clientWidth": 318
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 375px 1x today",
+      "metrics": {
+        "deviceWidth": 375,
+        "pageWidth": 373,
+        "scrollWidth": 373,
+        "clientWidth": 373
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 375px 1x workout",
+      "metrics": {
+        "deviceWidth": 375,
+        "pageWidth": 373,
+        "scrollWidth": 373,
+        "clientWidth": 373
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 375px 1.4x today",
+      "metrics": {
+        "deviceWidth": 375,
+        "pageWidth": 373,
+        "scrollWidth": 373,
+        "clientWidth": 373
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 375px 1.4x workout",
+      "metrics": {
+        "deviceWidth": 375,
+        "pageWidth": 373,
+        "scrollWidth": 373,
+        "clientWidth": 373
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 375px 2x today",
+      "metrics": {
+        "deviceWidth": 375,
+        "pageWidth": 373,
+        "scrollWidth": 373,
+        "clientWidth": 373
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 375px 2x workout",
+      "metrics": {
+        "deviceWidth": 375,
+        "pageWidth": 372.9999694824219,
+        "scrollWidth": 373,
+        "clientWidth": 373
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 390px 1x today",
+      "metrics": {
+        "deviceWidth": 390,
+        "pageWidth": 388,
+        "scrollWidth": 388,
+        "clientWidth": 388
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 390px 1x workout",
+      "metrics": {
+        "deviceWidth": 390,
+        "pageWidth": 388,
+        "scrollWidth": 388,
+        "clientWidth": 388
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 390px 1.4x today",
+      "metrics": {
+        "deviceWidth": 390,
+        "pageWidth": 388,
+        "scrollWidth": 388,
+        "clientWidth": 388
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 390px 1.4x workout",
+      "metrics": {
+        "deviceWidth": 390,
+        "pageWidth": 388,
+        "scrollWidth": 388,
+        "clientWidth": 388
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 390px 2x today",
+      "metrics": {
+        "deviceWidth": 390,
+        "pageWidth": 388,
+        "scrollWidth": 388,
+        "clientWidth": 388
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 390px 2x workout",
+      "metrics": {
+        "deviceWidth": 390,
+        "pageWidth": 388,
+        "scrollWidth": 388,
+        "clientWidth": 388
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 430px 1x today",
+      "metrics": {
+        "deviceWidth": 430,
+        "pageWidth": 428.0000305175781,
+        "scrollWidth": 428,
+        "clientWidth": 428
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 430px 1x workout",
+      "metrics": {
+        "deviceWidth": 430,
+        "pageWidth": 428,
+        "scrollWidth": 428,
+        "clientWidth": 428
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 430px 1.4x today",
+      "metrics": {
+        "deviceWidth": 430,
+        "pageWidth": 428,
+        "scrollWidth": 428,
+        "clientWidth": 428
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 430px 1.4x workout",
+      "metrics": {
+        "deviceWidth": 430,
+        "pageWidth": 428,
+        "scrollWidth": 428,
+        "clientWidth": 428
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 430px 2x today",
+      "metrics": {
+        "deviceWidth": 430,
+        "pageWidth": 428,
+        "scrollWidth": 428,
+        "clientWidth": 428
+      },
+      "ok": true
+    },
+    {
+      "action": "layout 430px 2x workout",
+      "metrics": {
+        "deviceWidth": 430,
+        "pageWidth": 428,
+        "scrollWidth": 428,
+        "clientWidth": 428
+      },
+      "ok": true
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,68 @@
+{
+  "status": "PASS",
+  "START": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+  "oldBrowserFiles": 74,
+  "originalAssertionCalls": 2493,
+  "unchangedAssertions": 2486,
+  "updatedPresentationAssertionsOnly": [
+    {
+      "file": "tests/browser/approvedJointV05.mjs",
+      "index": 4,
+      "before": "assert.equal(await page.locator('meta[name=theme-color]').getAttribute('content'),nativeTheme==='dark'?'#171c19':'#f5f2eb')",
+      "after": "assert.equal(await page.locator('meta[name=theme-color]').getAttribute('content'),nativeTheme==='dark'?'#171c19':'#f5f7fa')"
+    },
+    {
+      "file": "tests/browser/managementVisualConsistency.mjs",
+      "index": 16,
+      "before": "assert.equal(m.listShadow,'none')",
+      "after": "assert.equal(m.listShadow,m.theme==='dark'?'none':'rgba(48, 69, 97, 0.04) 0px 2px 12px 0px')"
+    },
+    {
+      "file": "tests/browser/remainingPrototype.mjs",
+      "index": 11,
+      "before": "assert.equal(app.cells[i].background,proto.cells[i].background)",
+      "after": "assert.equal(app.cells[i].background,theme==='light'?'rgb(255, 255, 255)':proto.cells[i].background)"
+    },
+    {
+      "file": "tests/browser/remainingPrototype.mjs",
+      "index": 12,
+      "before": "assert.equal(app.cells[i].borderColor,proto.cells[i].borderColor)",
+      "after": "assert.equal(app.cells[i].borderColor,theme==='light'?'rgb(231, 235, 242)':proto.cells[i].borderColor)"
+    },
+    {
+      "file": "tests/browser/remainingPrototype.mjs",
+      "index": 17,
+      "before": "assert.equal(app.container.background,proto.container.background)",
+      "after": "assert.equal(app.container.background,'rgb(243, 246, 251)')"
+    },
+    {
+      "file": "tests/browser/remainingPrototype.mjs",
+      "index": 21,
+      "before": "assert.equal(app.dots[i].background,proto.dots[i].background)",
+      "after": "assert.equal(app.dots[i].background,theme==='light'&&i===0?'rgb(66, 123, 232)':proto.dots[i].background)"
+    },
+    {
+      "file": "tests/browser/todayWaterButton.mjs",
+      "index": 15,
+      "before": "assert(before.stats.right<=before.button.left-7)",
+      "after": "assert(before.stats.right<=before.button.left-7 || before.stats.bottom<=before.button.top-7,'v0.5.1: right action and complete metric blocks do not overlap, including wrapped large text')"
+    }
+  ],
+  "mainStatements": 313,
+  "mainUnchangedStatements": 309,
+  "mainChangedUiFunctions": [
+    "cardioCardHtml",
+    "foodMealSectionHtml",
+    "pageHeaderHtml",
+    "renderWorkoutPage"
+  ],
+  "oneNewCssImport": true,
+  "indexOnlyThemeColors": true,
+  "manifestOnlyColorChanges": [
+    "background_color",
+    "theme_color"
+  ],
+  "manifestIdentityPreserved": true,
+  "unitAssertionFilesUnchanged": true,
+  "motionDriverOnlyWaitsForActualEntrance": true
+}

@@ -453,3 +453,7 @@ Follow [navigation handoff contract](docs/NAVIGATION_FLICKER_V041.md) for the ap
 ## Management v0.6.1 (2026-10-24)
 
 Follow [approved vertical Management contract](docs/MANAGEMENT_V061.md). It replaces only the flat Hub with four category routes plus Personal Plan/Habits and ephemeral search across thirteen real destinations. Keep the existing native workspace/stack/real renderers, scoped visual treatment and all data/navigation contracts. Physical-device evidence remains separate.
+
+## Approved Light Native v0.5.1 (2026-10-25)
+
+Follow [Light Native contract](docs/LIGHT_NATIVE_V051.md) and [state/copy audit](docs/LIGHT_NATIVE_V051_COPY_AUDIT.md). The new light-only visual approval supersedes older warm/olive light surfaces and card-shadow restrictions, preserving old dark/system preference, semantic category colors, five-tab IA, thirteen real Management destinations, native workspace and all business/data contracts. Remove only redundant introductions using actual record state; preserve risks, unknowns, source dates and full saved facts. Long labels and numeric/unit blocks wrap accessibly rather than shrinking inputs or hiding data. Ordinary Sheet entrance28px/240ms reuses the200ms token plus40ms; training58px/275ms stays. Exit uses only a finite content-free inert shell, never cloned form/credential/image/voice content; synchronous exactly-once close/disposal/lock semantics remain. Real-device evidence is separate.

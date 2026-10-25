@@ -290,3 +290,12 @@ Follow [approved contract](COMBINED_INTERACTION_V04.md) and [execution evidence]
 ## Management v0.6.1 (2026-10-24)
 
 [Round QA](MANAGEMENT_V061_QA.md) distinguishes current executions, original failures and final release. `managementV061.mjs` adds Chromium/WebKit ×320/375/390/430 ×100/140/200% ×light/dark plus short and landscape (52 total), matching actual category/search/real-entry/Back/X routes, native nodes/frame/overflow/44px/16px and all22-store/config before/after equality. Safari/macOS keyboard traversal uses Option+Tab; Chromium uses Tab. Existing Workspace/VisualConsistency retain all assertions and20-cycle checks, adapting only real search-entry drivers/root title. Keep all44 old gates plus applicable later suites, exact production bytes/App/SW/offline and the original synthetic preservation profile. Mocked keyboard/Safe Area, WebKit and local screenshots cannot pass physical iPhone/original PWA/VoiceOver/personal continuity; these remain Pending without evidence.
+
+
+## Light Native v0.5.1 (2026-10-25)
+
+本轮范围与原型差异见[实施合同](LIGHT_NATIVE_V051.md)、[真实文案审核](LIGHT_NATIVE_V051_COPY_AUDIT.md)和[实际QA](LIGHT_NATIVE_V051_QA.md)。新增52组双引擎浅色/减少动态矩阵，四宽×100/140/200加短屏横屏、5状态×5Tab与代表Calendar/Reports，共1380实页状态检查。实际坐标、44px、数值单位、中文孤字、完整展开记录及22表/config只读相同均PASS；不把受限状态当作真实Provider错误。
+
+管理52浅深和13入口/六编辑器/搜索/父状态/200完整往返通过；普通Sheet双引擎×motion4组16场景验证真实入场240ms、同步closeonce、无敏感内容inert退场壳及有限清理；历史4组真实Restore13/日期/完整旧记录/非法负体重零写通过。原44及14补充仍逐项执行，原FAIL和完整复测分列，七条呈现期望与一次实际入场等待适配不改原业务断言。
+
+浅色主按钮572样本最低4.96:1；旧深色token及代表共享样式与START一致。入口/编辑/事务/导航/数据合同保留。实际Application/END发布、资源与同档案结果由LATEST及正式回执补充；本地JSON不推断发布。实体iPhone、原安装PWA、真实IME/Safe Area、VoiceOver与个人连续性仍Pending，真实Provider未执行，旧WebKit Undo−128px不宣称解决。

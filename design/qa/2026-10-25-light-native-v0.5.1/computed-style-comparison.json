@@ -1,0 +1,2747 @@
+{
+  "phase": "local",
+  "status": "PASS",
+  "darkSharedStylesExact": true,
+  "results": [
+    {
+      "version": "before",
+      "theme": "light",
+      "tab": "today",
+      "url": "http://127.0.0.1:5421/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "24px",
+            "fontWeight": "760",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(40, 46, 40)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 30,
+            "top": 20,
+            "right": 274,
+            "bottom": 50,
+            "left": 18
+          }
+        },
+        ".today-card": {
+          "style": {
+            "backgroundColor": "rgb(255, 254, 250)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "18px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "118px",
+            "padding": "12px 14px",
+            "borderColor": "rgb(233, 232, 223)"
+          },
+          "rect": {
+            "x": 16,
+            "y": 85,
+            "width": 358,
+            "height": 122,
+            "top": 85,
+            "right": 374,
+            "bottom": 207,
+            "left": 16
+          }
+        },
+        ".secondary": {
+          "style": {
+            "backgroundColor": "rgb(233, 240, 220)",
+            "color": "rgb(82, 114, 59)",
+            "borderRadius": "12px",
+            "boxShadow": "none",
+            "fontSize": "14px",
+            "fontWeight": "700",
+            "minHeight": "44px",
+            "padding": "0px 11px",
+            "borderColor": "rgb(82, 114, 59)"
+          },
+          "rect": {
+            "x": 267,
+            "y": 150,
+            "width": 92,
+            "height": 44,
+            "top": 150,
+            "right": 359,
+            "bottom": 194,
+            "left": 267
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(255, 254, 250)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "20px 20px 0px 0px",
+            "boxShadow": "rgba(38, 70, 51, 0.035) 0px 2px 10px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(233, 232, 223) rgb(233, 232, 223) rgb(40, 46, 40)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(233, 240, 220)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "11px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(40, 46, 40)"
+          },
+          "rect": {
+            "x": 14,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 77,
+            "bottom": 837,
+            "left": 14
+          }
+        },
+        ".nutrition-metric": {
+          "style": {
+            "backgroundColor": "rgb(255, 254, 250)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "15px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "12px 6px",
+            "borderColor": "rgb(233, 232, 223)"
+          },
+          "rect": {
+            "x": 33,
+            "y": 443.078125,
+            "width": 102.65625,
+            "height": 108,
+            "top": 443.078125,
+            "right": 135.65625,
+            "bottom": 551.078125,
+            "left": 33
+          }
+        },
+        "[data-today-water-record]": {
+          "style": {
+            "backgroundColor": "rgb(233, 240, 220)",
+            "color": "rgb(82, 114, 59)",
+            "borderRadius": "12px",
+            "boxShadow": "none",
+            "fontSize": "14px",
+            "fontWeight": "700",
+            "minHeight": "44px",
+            "padding": "0px 11px",
+            "borderColor": "rgb(82, 114, 59)"
+          },
+          "rect": {
+            "x": 267,
+            "y": 1604.4375,
+            "width": 92,
+            "height": 44,
+            "top": 1604.4375,
+            "right": 359,
+            "bottom": 1648.4375,
+            "left": 267
+          }
+        },
+        "tokens": {
+          "--bg": "#f5f2eb",
+          "--surface": "#fffefa",
+          "--text-primary": "#282e28",
+          "--accent": "#52723b",
+          "--protein": "#6f98a3",
+          "--carbs": "#c29757",
+          "--fat": "#b57f70",
+          "--danger": "#a65840",
+          "--cardio": "#c29757",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "before",
+      "theme": "light",
+      "tab": "plan",
+      "url": "http://127.0.0.1:5421/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "24px",
+            "fontWeight": "700",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(40, 46, 40)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 30,
+            "top": 20,
+            "right": 274,
+            "bottom": 50,
+            "left": 18
+          }
+        },
+        ".primary": {
+          "style": {
+            "backgroundColor": "rgb(82, 114, 59)",
+            "color": "rgb(255, 255, 255)",
+            "borderRadius": "12px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "700",
+            "minHeight": "44px",
+            "padding": "0px 14px",
+            "borderColor": "rgb(82, 114, 59)"
+          },
+          "rect": {
+            "x": 264,
+            "y": 226.140625,
+            "width": 94,
+            "height": 44,
+            "top": 226.140625,
+            "right": 358,
+            "bottom": 270.140625,
+            "left": 264
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(255, 254, 250)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "20px 20px 0px 0px",
+            "boxShadow": "rgba(38, 70, 51, 0.035) 0px 2px 10px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(233, 232, 223) rgb(233, 232, 223) rgb(40, 46, 40)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(233, 240, 220)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "11px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(40, 46, 40)"
+          },
+          "rect": {
+            "x": 89,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 152,
+            "bottom": 837,
+            "left": 89
+          }
+        },
+        "tokens": {
+          "--bg": "#f5f2eb",
+          "--surface": "#fffefa",
+          "--text-primary": "#282e28",
+          "--accent": "#52723b",
+          "--protein": "#6f98a3",
+          "--carbs": "#c29757",
+          "--fat": "#b57f70",
+          "--danger": "#a65840",
+          "--cardio": "#c29757",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "before",
+      "theme": "light",
+      "tab": "food",
+      "url": "http://127.0.0.1:5421/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "24px",
+            "fontWeight": "700",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(40, 46, 40)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 27,
+            "width": 150.625,
+            "height": 30,
+            "top": 27,
+            "right": 168.625,
+            "bottom": 57,
+            "left": 18
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(255, 254, 250)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "20px 20px 0px 0px",
+            "boxShadow": "rgba(38, 70, 51, 0.035) 0px 2px 10px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(233, 232, 223) rgb(233, 232, 223) rgb(40, 46, 40)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(233, 240, 220)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "11px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(40, 46, 40)"
+          },
+          "rect": {
+            "x": 164,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 227,
+            "bottom": 837,
+            "left": 164
+          }
+        },
+        ".nutrition-metric": {
+          "style": {
+            "backgroundColor": "rgb(255, 254, 250)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "15px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "12px 6px",
+            "borderColor": "rgb(233, 232, 223)"
+          },
+          "rect": {
+            "x": 31,
+            "y": 389.796875,
+            "width": 104,
+            "height": 108,
+            "top": 389.796875,
+            "right": 135,
+            "bottom": 497.796875,
+            "left": 31
+          }
+        },
+        "tokens": {
+          "--bg": "#f5f2eb",
+          "--surface": "#fffefa",
+          "--text-primary": "#282e28",
+          "--accent": "#52723b",
+          "--protein": "#6f98a3",
+          "--carbs": "#c29757",
+          "--fat": "#b57f70",
+          "--danger": "#a65840",
+          "--cardio": "#c29757",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "before",
+      "theme": "light",
+      "tab": "workout",
+      "url": "http://127.0.0.1:5421/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "24px",
+            "fontWeight": "700",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(40, 46, 40)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 30,
+            "top": 20,
+            "right": 274,
+            "bottom": 50,
+            "left": 18
+          }
+        },
+        ".training-card": {
+          "style": {
+            "backgroundColor": "rgb(255, 254, 250)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "18px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "16px",
+            "borderColor": "rgb(233, 232, 223)"
+          },
+          "rect": {
+            "x": 16,
+            "y": 153,
+            "width": 358,
+            "height": 274.984375,
+            "top": 153,
+            "right": 374,
+            "bottom": 427.984375,
+            "left": 16
+          }
+        },
+        ".primary": {
+          "style": {
+            "backgroundColor": "rgb(82, 114, 59)",
+            "color": "rgb(255, 255, 255)",
+            "borderRadius": "14px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "700",
+            "minHeight": "48px",
+            "padding": "0px 16px",
+            "borderColor": "rgb(82, 114, 59)"
+          },
+          "rect": {
+            "x": 33,
+            "y": 362.984375,
+            "width": 324,
+            "height": 48,
+            "top": 362.984375,
+            "right": 357,
+            "bottom": 410.984375,
+            "left": 33
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(255, 254, 250)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "20px 20px 0px 0px",
+            "boxShadow": "rgba(38, 70, 51, 0.035) 0px 2px 10px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(233, 232, 223) rgb(233, 232, 223) rgb(40, 46, 40)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(233, 240, 220)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "11px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(40, 46, 40)"
+          },
+          "rect": {
+            "x": 238,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 301,
+            "bottom": 837,
+            "left": 238
+          }
+        },
+        "tokens": {
+          "--bg": "#f5f2eb",
+          "--surface": "#fffefa",
+          "--text-primary": "#282e28",
+          "--accent": "#52723b",
+          "--protein": "#6f98a3",
+          "--carbs": "#c29757",
+          "--fat": "#b57f70",
+          "--danger": "#a65840",
+          "--cardio": "#c29757",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "before",
+      "theme": "light",
+      "tab": "progress",
+      "url": "http://127.0.0.1:5421/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "24px",
+            "fontWeight": "700",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(40, 46, 40)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 30,
+            "top": 20,
+            "right": 274,
+            "bottom": 50,
+            "left": 18
+          }
+        },
+        ".trend-module": {
+          "style": {
+            "backgroundColor": "rgb(255, 254, 250)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "18px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "16px",
+            "borderColor": "rgb(233, 232, 223)"
+          },
+          "rect": {
+            "x": 16,
+            "y": 146,
+            "width": 358,
+            "height": 582.5,
+            "top": 146,
+            "right": 374,
+            "bottom": 728.5,
+            "left": 16
+          }
+        },
+        ".primary": {
+          "style": {
+            "backgroundColor": "rgb(82, 114, 59)",
+            "color": "rgb(255, 255, 255)",
+            "borderRadius": "12px",
+            "boxShadow": "none",
+            "fontSize": "14px",
+            "fontWeight": "700",
+            "minHeight": "48px",
+            "padding": "10px 12px",
+            "borderColor": "rgb(82, 114, 59)"
+          },
+          "rect": {
+            "x": 33,
+            "y": 663.5,
+            "width": 324,
+            "height": 48,
+            "top": 663.5,
+            "right": 357,
+            "bottom": 711.5,
+            "left": 33
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(255, 254, 250)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "20px 20px 0px 0px",
+            "boxShadow": "rgba(38, 70, 51, 0.035) 0px 2px 10px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(233, 232, 223) rgb(233, 232, 223) rgb(40, 46, 40)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(233, 240, 220)",
+            "color": "rgb(40, 46, 40)",
+            "borderRadius": "11px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(40, 46, 40)"
+          },
+          "rect": {
+            "x": 313,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 376,
+            "bottom": 837,
+            "left": 313
+          }
+        },
+        "tokens": {
+          "--bg": "#f5f2eb",
+          "--surface": "#fffefa",
+          "--text-primary": "#282e28",
+          "--accent": "#52723b",
+          "--protein": "#6f98a3",
+          "--carbs": "#c29757",
+          "--fat": "#b57f70",
+          "--danger": "#a65840",
+          "--cardio": "#c29757",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "before",
+      "theme": "dark",
+      "tab": "today",
+      "url": "http://127.0.0.1:5421/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "24px",
+            "fontWeight": "760",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 30,
+            "top": 20,
+            "right": 274,
+            "bottom": 50,
+            "left": 18
+          }
+        },
+        ".today-card": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "18px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "118px",
+            "padding": "12px 14px",
+            "borderColor": "rgb(60, 73, 60)"
+          },
+          "rect": {
+            "x": 16,
+            "y": 85,
+            "width": 358,
+            "height": 122,
+            "top": 85,
+            "right": 374,
+            "bottom": 207,
+            "left": 16
+          }
+        },
+        ".secondary": {
+          "style": {
+            "backgroundColor": "rgb(48, 65, 42)",
+            "color": "rgb(184, 214, 141)",
+            "borderRadius": "12px",
+            "boxShadow": "none",
+            "fontSize": "14px",
+            "fontWeight": "700",
+            "minHeight": "44px",
+            "padding": "0px 11px",
+            "borderColor": "rgb(184, 214, 141)"
+          },
+          "rect": {
+            "x": 267,
+            "y": 150,
+            "width": 92,
+            "height": 44,
+            "top": 150,
+            "right": 359,
+            "bottom": 194,
+            "left": 267
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "20px 20px 0px 0px",
+            "boxShadow": "rgba(38, 70, 51, 0.035) 0px 2px 10px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(60, 73, 60) rgb(60, 73, 60) rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(48, 65, 42)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "11px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 14,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 77,
+            "bottom": 837,
+            "left": 14
+          }
+        },
+        ".nutrition-metric": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "15px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "12px 6px",
+            "borderColor": "rgb(60, 73, 60)"
+          },
+          "rect": {
+            "x": 33,
+            "y": 443.078125,
+            "width": 102.65625,
+            "height": 108,
+            "top": 443.078125,
+            "right": 135.65625,
+            "bottom": 551.078125,
+            "left": 33
+          }
+        },
+        "[data-today-water-record]": {
+          "style": {
+            "backgroundColor": "rgb(48, 65, 42)",
+            "color": "rgb(184, 214, 141)",
+            "borderRadius": "12px",
+            "boxShadow": "none",
+            "fontSize": "14px",
+            "fontWeight": "700",
+            "minHeight": "44px",
+            "padding": "0px 11px",
+            "borderColor": "rgb(184, 214, 141)"
+          },
+          "rect": {
+            "x": 267,
+            "y": 1604.4375,
+            "width": 92,
+            "height": 44,
+            "top": 1604.4375,
+            "right": 359,
+            "bottom": 1648.4375,
+            "left": 267
+          }
+        },
+        "tokens": {
+          "--bg": "#171c19",
+          "--surface": "#222923",
+          "--text-primary": "#f0f0e9",
+          "--accent": "#9fb97a",
+          "--protein": "#95b8c1",
+          "--carbs": "#d5ae76",
+          "--fat": "#d3a090",
+          "--danger": "#e2a28b",
+          "--cardio": "#d5ae76",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "before",
+      "theme": "dark",
+      "tab": "plan",
+      "url": "http://127.0.0.1:5421/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "24px",
+            "fontWeight": "700",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 30,
+            "top": 20,
+            "right": 274,
+            "bottom": 50,
+            "left": 18
+          }
+        },
+        ".primary": {
+          "style": {
+            "backgroundColor": "rgb(159, 185, 122)",
+            "color": "rgb(23, 28, 25)",
+            "borderRadius": "12px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "700",
+            "minHeight": "44px",
+            "padding": "0px 14px",
+            "borderColor": "rgb(159, 185, 122)"
+          },
+          "rect": {
+            "x": 264,
+            "y": 226.140625,
+            "width": 94,
+            "height": 44,
+            "top": 226.140625,
+            "right": 358,
+            "bottom": 270.140625,
+            "left": 264
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "20px 20px 0px 0px",
+            "boxShadow": "rgba(38, 70, 51, 0.035) 0px 2px 10px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(60, 73, 60) rgb(60, 73, 60) rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(48, 65, 42)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "11px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 89,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 152,
+            "bottom": 837,
+            "left": 89
+          }
+        },
+        "tokens": {
+          "--bg": "#171c19",
+          "--surface": "#222923",
+          "--text-primary": "#f0f0e9",
+          "--accent": "#9fb97a",
+          "--protein": "#95b8c1",
+          "--carbs": "#d5ae76",
+          "--fat": "#d3a090",
+          "--danger": "#e2a28b",
+          "--cardio": "#d5ae76",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "before",
+      "theme": "dark",
+      "tab": "food",
+      "url": "http://127.0.0.1:5421/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "24px",
+            "fontWeight": "700",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 27,
+            "width": 150.625,
+            "height": 30,
+            "top": 27,
+            "right": 168.625,
+            "bottom": 57,
+            "left": 18
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "20px 20px 0px 0px",
+            "boxShadow": "rgba(38, 70, 51, 0.035) 0px 2px 10px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(60, 73, 60) rgb(60, 73, 60) rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(48, 65, 42)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "11px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 164,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 227,
+            "bottom": 837,
+            "left": 164
+          }
+        },
+        ".nutrition-metric": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "15px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "12px 6px",
+            "borderColor": "rgb(60, 73, 60)"
+          },
+          "rect": {
+            "x": 31,
+            "y": 389.796875,
+            "width": 104,
+            "height": 108,
+            "top": 389.796875,
+            "right": 135,
+            "bottom": 497.796875,
+            "left": 31
+          }
+        },
+        "tokens": {
+          "--bg": "#171c19",
+          "--surface": "#222923",
+          "--text-primary": "#f0f0e9",
+          "--accent": "#9fb97a",
+          "--protein": "#95b8c1",
+          "--carbs": "#d5ae76",
+          "--fat": "#d3a090",
+          "--danger": "#e2a28b",
+          "--cardio": "#d5ae76",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "before",
+      "theme": "dark",
+      "tab": "workout",
+      "url": "http://127.0.0.1:5421/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "24px",
+            "fontWeight": "700",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 30,
+            "top": 20,
+            "right": 274,
+            "bottom": 50,
+            "left": 18
+          }
+        },
+        ".training-card": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "18px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "16px",
+            "borderColor": "rgb(60, 73, 60)"
+          },
+          "rect": {
+            "x": 16,
+            "y": 153,
+            "width": 358,
+            "height": 274.984375,
+            "top": 153,
+            "right": 374,
+            "bottom": 427.984375,
+            "left": 16
+          }
+        },
+        ".primary": {
+          "style": {
+            "backgroundColor": "rgb(159, 185, 122)",
+            "color": "rgb(23, 28, 25)",
+            "borderRadius": "14px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "700",
+            "minHeight": "48px",
+            "padding": "0px 16px",
+            "borderColor": "rgb(159, 185, 122)"
+          },
+          "rect": {
+            "x": 33,
+            "y": 362.984375,
+            "width": 324,
+            "height": 48,
+            "top": 362.984375,
+            "right": 357,
+            "bottom": 410.984375,
+            "left": 33
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "20px 20px 0px 0px",
+            "boxShadow": "rgba(38, 70, 51, 0.035) 0px 2px 10px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(60, 73, 60) rgb(60, 73, 60) rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(48, 65, 42)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "11px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 238,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 301,
+            "bottom": 837,
+            "left": 238
+          }
+        },
+        "tokens": {
+          "--bg": "#171c19",
+          "--surface": "#222923",
+          "--text-primary": "#f0f0e9",
+          "--accent": "#9fb97a",
+          "--protein": "#95b8c1",
+          "--carbs": "#d5ae76",
+          "--fat": "#d3a090",
+          "--danger": "#e2a28b",
+          "--cardio": "#d5ae76",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "before",
+      "theme": "dark",
+      "tab": "progress",
+      "url": "http://127.0.0.1:5421/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "24px",
+            "fontWeight": "700",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 30,
+            "top": 20,
+            "right": 274,
+            "bottom": 50,
+            "left": 18
+          }
+        },
+        ".trend-module": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "18px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "16px",
+            "borderColor": "rgb(60, 73, 60)"
+          },
+          "rect": {
+            "x": 16,
+            "y": 146,
+            "width": 358,
+            "height": 582.5,
+            "top": 146,
+            "right": 374,
+            "bottom": 728.5,
+            "left": 16
+          }
+        },
+        ".primary": {
+          "style": {
+            "backgroundColor": "rgb(159, 185, 122)",
+            "color": "rgb(23, 28, 25)",
+            "borderRadius": "12px",
+            "boxShadow": "none",
+            "fontSize": "14px",
+            "fontWeight": "700",
+            "minHeight": "48px",
+            "padding": "10px 12px",
+            "borderColor": "rgb(159, 185, 122)"
+          },
+          "rect": {
+            "x": 33,
+            "y": 663.5,
+            "width": 324,
+            "height": 48,
+            "top": 663.5,
+            "right": 357,
+            "bottom": 711.5,
+            "left": 33
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "20px 20px 0px 0px",
+            "boxShadow": "rgba(38, 70, 51, 0.035) 0px 2px 10px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(60, 73, 60) rgb(60, 73, 60) rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(48, 65, 42)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "11px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 313,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 376,
+            "bottom": 837,
+            "left": 313
+          }
+        },
+        "tokens": {
+          "--bg": "#171c19",
+          "--surface": "#222923",
+          "--text-primary": "#f0f0e9",
+          "--accent": "#9fb97a",
+          "--protein": "#95b8c1",
+          "--carbs": "#d5ae76",
+          "--fat": "#d3a090",
+          "--danger": "#e2a28b",
+          "--cardio": "#d5ae76",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "after",
+      "theme": "light",
+      "tab": "today",
+      "url": "http://127.0.0.1:5431/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(24, 36, 56)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "28.48px",
+            "fontWeight": "770",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(24, 36, 56)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 35.59375,
+            "top": 20,
+            "right": 274,
+            "bottom": 55.59375,
+            "left": 18
+          }
+        },
+        ".today-card": {
+          "style": {
+            "backgroundColor": "rgb(255, 255, 255)",
+            "color": "rgb(34, 43, 60)",
+            "borderRadius": "19px",
+            "boxShadow": "rgba(37, 54, 82, 0.043) 0px 4px 16px 0px, rgba(37, 54, 82, 0.024) 0px 1px 3px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "118px",
+            "padding": "12px 14px",
+            "borderColor": "rgb(230, 234, 241)"
+          },
+          "rect": {
+            "x": 16,
+            "y": 90.59375,
+            "width": 358,
+            "height": 122,
+            "top": 90.59375,
+            "right": 374,
+            "bottom": 212.59375,
+            "left": 16
+          }
+        },
+        ".secondary": {
+          "style": {
+            "backgroundColor": "rgb(238, 244, 255)",
+            "color": "rgb(40, 104, 201)",
+            "borderRadius": "12px",
+            "boxShadow": "none",
+            "fontSize": "14px",
+            "fontWeight": "700",
+            "minHeight": "44px",
+            "padding": "0px 11px",
+            "borderColor": "rgb(226, 235, 251)"
+          },
+          "rect": {
+            "x": 267,
+            "y": 155.59375,
+            "width": 92,
+            "height": 44,
+            "top": 155.59375,
+            "right": 359,
+            "bottom": 199.59375,
+            "left": 267
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(255, 255, 255)",
+            "color": "rgb(34, 43, 60)",
+            "borderRadius": "21px 21px 0px 0px",
+            "boxShadow": "rgba(59, 88, 134, 0.075) 0px -3px 21px 0px, rgb(255, 255, 255) 0px 1px 0px 0px inset",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(226, 232, 242)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(232, 240, 254)",
+            "color": "rgb(34, 43, 60)",
+            "borderRadius": "13px",
+            "boxShadow": "rgb(218, 231, 253) 0px 0px 0px 1px inset",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(34, 43, 60)"
+          },
+          "rect": {
+            "x": 14,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 77,
+            "bottom": 837,
+            "left": 14
+          }
+        },
+        ".nutrition-metric": {
+          "style": {
+            "backgroundColor": "rgb(247, 249, 252)",
+            "color": "rgb(34, 43, 60)",
+            "borderRadius": "15px",
+            "boxShadow": "rgb(232, 237, 246) 0px 0px 0px 1px inset",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "12px 6px",
+            "borderColor": "rgb(231, 235, 242)"
+          },
+          "rect": {
+            "x": 33,
+            "y": 448.671875,
+            "width": 102.65625,
+            "height": 108,
+            "top": 448.671875,
+            "right": 135.65625,
+            "bottom": 556.671875,
+            "left": 33
+          }
+        },
+        "[data-today-water-record]": {
+          "style": {
+            "backgroundColor": "rgb(238, 244, 255)",
+            "color": "rgb(40, 104, 201)",
+            "borderRadius": "12px",
+            "boxShadow": "none",
+            "fontSize": "14px",
+            "fontWeight": "700",
+            "minHeight": "44px",
+            "padding": "0px 11px",
+            "borderColor": "rgb(226, 235, 251)"
+          },
+          "rect": {
+            "x": 267,
+            "y": 1610.03125,
+            "width": 92,
+            "height": 44,
+            "top": 1610.03125,
+            "right": 359,
+            "bottom": 1654.03125,
+            "left": 267
+          }
+        },
+        "tokens": {
+          "--bg": "#f5f7fa",
+          "--surface": "#fff",
+          "--text-primary": "#222b3c",
+          "--accent": "#286bdd",
+          "--protein": "#6f98a3",
+          "--carbs": "#c29757",
+          "--fat": "#b57f70",
+          "--danger": "#a65840",
+          "--cardio": "#c29757",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "after",
+      "theme": "light",
+      "tab": "plan",
+      "url": "http://127.0.0.1:5431/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(24, 36, 56)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "28.48px",
+            "fontWeight": "770",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(24, 36, 56)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 35.59375,
+            "top": 20,
+            "right": 274,
+            "bottom": 55.59375,
+            "left": 18
+          }
+        },
+        ".primary": {
+          "style": {
+            "backgroundColor": "rgb(40, 107, 221)",
+            "color": "rgb(255, 255, 255)",
+            "borderRadius": "12px",
+            "boxShadow": "rgba(255, 255, 255, 0.21) 0px 1px 0px 0px inset, rgba(55, 120, 234, 0.086) 0px 3px 8px 0px",
+            "fontSize": "16px",
+            "fontWeight": "700",
+            "minHeight": "44px",
+            "padding": "0px 14px",
+            "borderColor": "rgb(40, 107, 221)"
+          },
+          "rect": {
+            "x": 264,
+            "y": 226.140625,
+            "width": 94,
+            "height": 44,
+            "top": 226.140625,
+            "right": 358,
+            "bottom": 270.140625,
+            "left": 264
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(255, 255, 255)",
+            "color": "rgb(34, 43, 60)",
+            "borderRadius": "21px 21px 0px 0px",
+            "boxShadow": "rgba(59, 88, 134, 0.075) 0px -3px 21px 0px, rgb(255, 255, 255) 0px 1px 0px 0px inset",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(226, 232, 242)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(232, 240, 254)",
+            "color": "rgb(34, 43, 60)",
+            "borderRadius": "13px",
+            "boxShadow": "rgb(218, 231, 253) 0px 0px 0px 1px inset",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(34, 43, 60)"
+          },
+          "rect": {
+            "x": 89,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 152,
+            "bottom": 837,
+            "left": 89
+          }
+        },
+        "tokens": {
+          "--bg": "#f5f7fa",
+          "--surface": "#fff",
+          "--text-primary": "#222b3c",
+          "--accent": "#286bdd",
+          "--protein": "#6f98a3",
+          "--carbs": "#c29757",
+          "--fat": "#b57f70",
+          "--danger": "#a65840",
+          "--cardio": "#c29757",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "after",
+      "theme": "light",
+      "tab": "food",
+      "url": "http://127.0.0.1:5431/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(24, 36, 56)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "28.48px",
+            "fontWeight": "770",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(24, 36, 56)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 24.203125,
+            "width": 150.625,
+            "height": 35.59375,
+            "top": 24.203125,
+            "right": 168.625,
+            "bottom": 59.796875,
+            "left": 18
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(255, 255, 255)",
+            "color": "rgb(34, 43, 60)",
+            "borderRadius": "21px 21px 0px 0px",
+            "boxShadow": "rgba(59, 88, 134, 0.075) 0px -3px 21px 0px, rgb(255, 255, 255) 0px 1px 0px 0px inset",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(226, 232, 242)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(232, 240, 254)",
+            "color": "rgb(34, 43, 60)",
+            "borderRadius": "13px",
+            "boxShadow": "rgb(218, 231, 253) 0px 0px 0px 1px inset",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(34, 43, 60)"
+          },
+          "rect": {
+            "x": 164,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 227,
+            "bottom": 837,
+            "left": 164
+          }
+        },
+        ".nutrition-metric": {
+          "style": {
+            "backgroundColor": "rgb(247, 249, 252)",
+            "color": "rgb(34, 43, 60)",
+            "borderRadius": "15px",
+            "boxShadow": "rgb(232, 237, 246) 0px 0px 0px 1px inset",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "12px 6px",
+            "borderColor": "rgb(231, 235, 242)"
+          },
+          "rect": {
+            "x": 31,
+            "y": 389.796875,
+            "width": 104,
+            "height": 108,
+            "top": 389.796875,
+            "right": 135,
+            "bottom": 497.796875,
+            "left": 31
+          }
+        },
+        "tokens": {
+          "--bg": "#f5f7fa",
+          "--surface": "#fff",
+          "--text-primary": "#222b3c",
+          "--accent": "#286bdd",
+          "--protein": "#6f98a3",
+          "--carbs": "#c29757",
+          "--fat": "#b57f70",
+          "--danger": "#a65840",
+          "--cardio": "#c29757",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "after",
+      "theme": "light",
+      "tab": "workout",
+      "url": "http://127.0.0.1:5431/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(24, 36, 56)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "28.48px",
+            "fontWeight": "770",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(24, 36, 56)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 35.59375,
+            "top": 20,
+            "right": 274,
+            "bottom": 55.59375,
+            "left": 18
+          }
+        },
+        ".training-card": {
+          "style": {
+            "backgroundColor": "rgb(255, 255, 255)",
+            "color": "rgb(34, 43, 60)",
+            "borderRadius": "19px",
+            "boxShadow": "rgba(37, 54, 82, 0.043) 0px 4px 16px 0px, rgba(37, 54, 82, 0.024) 0px 1px 3px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "16px",
+            "borderColor": "rgb(230, 234, 241)"
+          },
+          "rect": {
+            "x": 16,
+            "y": 158.59375,
+            "width": 358,
+            "height": 274.984375,
+            "top": 158.59375,
+            "right": 374,
+            "bottom": 433.578125,
+            "left": 16
+          }
+        },
+        ".primary": {
+          "style": {
+            "backgroundColor": "rgb(40, 107, 221)",
+            "color": "rgb(255, 255, 255)",
+            "borderRadius": "14px",
+            "boxShadow": "rgba(255, 255, 255, 0.21) 0px 1px 0px 0px inset, rgba(55, 120, 234, 0.086) 0px 3px 8px 0px",
+            "fontSize": "16px",
+            "fontWeight": "700",
+            "minHeight": "48px",
+            "padding": "0px 16px",
+            "borderColor": "rgb(40, 107, 221)"
+          },
+          "rect": {
+            "x": 33,
+            "y": 368.578125,
+            "width": 324,
+            "height": 48,
+            "top": 368.578125,
+            "right": 357,
+            "bottom": 416.578125,
+            "left": 33
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(255, 255, 255)",
+            "color": "rgb(34, 43, 60)",
+            "borderRadius": "21px 21px 0px 0px",
+            "boxShadow": "rgba(59, 88, 134, 0.075) 0px -3px 21px 0px, rgb(255, 255, 255) 0px 1px 0px 0px inset",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(226, 232, 242)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(232, 240, 254)",
+            "color": "rgb(34, 43, 60)",
+            "borderRadius": "13px",
+            "boxShadow": "rgb(218, 231, 253) 0px 0px 0px 1px inset",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(34, 43, 60)"
+          },
+          "rect": {
+            "x": 238,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 301,
+            "bottom": 837,
+            "left": 238
+          }
+        },
+        "tokens": {
+          "--bg": "#f5f7fa",
+          "--surface": "#fff",
+          "--text-primary": "#222b3c",
+          "--accent": "#286bdd",
+          "--protein": "#6f98a3",
+          "--carbs": "#c29757",
+          "--fat": "#b57f70",
+          "--danger": "#a65840",
+          "--cardio": "#c29757",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "after",
+      "theme": "light",
+      "tab": "progress",
+      "url": "http://127.0.0.1:5431/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(24, 36, 56)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "28.48px",
+            "fontWeight": "770",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(24, 36, 56)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 35.59375,
+            "top": 20,
+            "right": 274,
+            "bottom": 55.59375,
+            "left": 18
+          }
+        },
+        ".trend-module": {
+          "style": {
+            "backgroundColor": "rgb(255, 255, 255)",
+            "color": "rgb(34, 43, 60)",
+            "borderRadius": "19px",
+            "boxShadow": "rgba(37, 54, 82, 0.043) 0px 4px 16px 0px, rgba(37, 54, 82, 0.024) 0px 1px 3px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "16px",
+            "borderColor": "rgb(230, 234, 241)"
+          },
+          "rect": {
+            "x": 16,
+            "y": 133,
+            "width": 358,
+            "height": 563,
+            "top": 133,
+            "right": 374,
+            "bottom": 696,
+            "left": 16
+          }
+        },
+        ".primary": {
+          "style": {
+            "backgroundColor": "rgb(40, 107, 221)",
+            "color": "rgb(255, 255, 255)",
+            "borderRadius": "12px",
+            "boxShadow": "rgba(255, 255, 255, 0.21) 0px 1px 0px 0px inset, rgba(55, 120, 234, 0.086) 0px 3px 8px 0px",
+            "fontSize": "14px",
+            "fontWeight": "700",
+            "minHeight": "48px",
+            "padding": "10px 12px",
+            "borderColor": "rgb(40, 107, 221)"
+          },
+          "rect": {
+            "x": 33,
+            "y": 631,
+            "width": 324,
+            "height": 48,
+            "top": 631,
+            "right": 357,
+            "bottom": 679,
+            "left": 33
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(255, 255, 255)",
+            "color": "rgb(34, 43, 60)",
+            "borderRadius": "21px 21px 0px 0px",
+            "boxShadow": "rgba(59, 88, 134, 0.075) 0px -3px 21px 0px, rgb(255, 255, 255) 0px 1px 0px 0px inset",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(226, 232, 242)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(232, 240, 254)",
+            "color": "rgb(34, 43, 60)",
+            "borderRadius": "13px",
+            "boxShadow": "rgb(218, 231, 253) 0px 0px 0px 1px inset",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(34, 43, 60)"
+          },
+          "rect": {
+            "x": 313,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 376,
+            "bottom": 837,
+            "left": 313
+          }
+        },
+        "tokens": {
+          "--bg": "#f5f7fa",
+          "--surface": "#fff",
+          "--text-primary": "#222b3c",
+          "--accent": "#286bdd",
+          "--protein": "#6f98a3",
+          "--carbs": "#c29757",
+          "--fat": "#b57f70",
+          "--danger": "#a65840",
+          "--cardio": "#c29757",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "after",
+      "theme": "dark",
+      "tab": "today",
+      "url": "http://127.0.0.1:5431/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "24px",
+            "fontWeight": "760",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 30,
+            "top": 20,
+            "right": 274,
+            "bottom": 50,
+            "left": 18
+          }
+        },
+        ".today-card": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "18px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "118px",
+            "padding": "12px 14px",
+            "borderColor": "rgb(60, 73, 60)"
+          },
+          "rect": {
+            "x": 16,
+            "y": 85,
+            "width": 358,
+            "height": 122,
+            "top": 85,
+            "right": 374,
+            "bottom": 207,
+            "left": 16
+          }
+        },
+        ".secondary": {
+          "style": {
+            "backgroundColor": "rgb(48, 65, 42)",
+            "color": "rgb(184, 214, 141)",
+            "borderRadius": "12px",
+            "boxShadow": "none",
+            "fontSize": "14px",
+            "fontWeight": "700",
+            "minHeight": "44px",
+            "padding": "0px 11px",
+            "borderColor": "rgb(184, 214, 141)"
+          },
+          "rect": {
+            "x": 267,
+            "y": 150,
+            "width": 92,
+            "height": 44,
+            "top": 150,
+            "right": 359,
+            "bottom": 194,
+            "left": 267
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "20px 20px 0px 0px",
+            "boxShadow": "rgba(38, 70, 51, 0.035) 0px 2px 10px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(60, 73, 60) rgb(60, 73, 60) rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(48, 65, 42)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "11px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 14,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 77,
+            "bottom": 837,
+            "left": 14
+          }
+        },
+        ".nutrition-metric": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "15px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "12px 6px",
+            "borderColor": "rgb(60, 73, 60)"
+          },
+          "rect": {
+            "x": 33,
+            "y": 443.078125,
+            "width": 102.65625,
+            "height": 108,
+            "top": 443.078125,
+            "right": 135.65625,
+            "bottom": 551.078125,
+            "left": 33
+          }
+        },
+        "[data-today-water-record]": {
+          "style": {
+            "backgroundColor": "rgb(48, 65, 42)",
+            "color": "rgb(184, 214, 141)",
+            "borderRadius": "12px",
+            "boxShadow": "none",
+            "fontSize": "14px",
+            "fontWeight": "700",
+            "minHeight": "44px",
+            "padding": "0px 11px",
+            "borderColor": "rgb(184, 214, 141)"
+          },
+          "rect": {
+            "x": 267,
+            "y": 1604.4375,
+            "width": 92,
+            "height": 44,
+            "top": 1604.4375,
+            "right": 359,
+            "bottom": 1648.4375,
+            "left": 267
+          }
+        },
+        "tokens": {
+          "--bg": "#171c19",
+          "--surface": "#222923",
+          "--text-primary": "#f0f0e9",
+          "--accent": "#9fb97a",
+          "--protein": "#95b8c1",
+          "--carbs": "#d5ae76",
+          "--fat": "#d3a090",
+          "--danger": "#e2a28b",
+          "--cardio": "#d5ae76",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "after",
+      "theme": "dark",
+      "tab": "plan",
+      "url": "http://127.0.0.1:5431/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "24px",
+            "fontWeight": "700",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 30,
+            "top": 20,
+            "right": 274,
+            "bottom": 50,
+            "left": 18
+          }
+        },
+        ".primary": {
+          "style": {
+            "backgroundColor": "rgb(159, 185, 122)",
+            "color": "rgb(23, 28, 25)",
+            "borderRadius": "12px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "700",
+            "minHeight": "44px",
+            "padding": "0px 14px",
+            "borderColor": "rgb(159, 185, 122)"
+          },
+          "rect": {
+            "x": 264,
+            "y": 226.140625,
+            "width": 94,
+            "height": 44,
+            "top": 226.140625,
+            "right": 358,
+            "bottom": 270.140625,
+            "left": 264
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "20px 20px 0px 0px",
+            "boxShadow": "rgba(38, 70, 51, 0.035) 0px 2px 10px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(60, 73, 60) rgb(60, 73, 60) rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(48, 65, 42)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "11px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 89,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 152,
+            "bottom": 837,
+            "left": 89
+          }
+        },
+        "tokens": {
+          "--bg": "#171c19",
+          "--surface": "#222923",
+          "--text-primary": "#f0f0e9",
+          "--accent": "#9fb97a",
+          "--protein": "#95b8c1",
+          "--carbs": "#d5ae76",
+          "--fat": "#d3a090",
+          "--danger": "#e2a28b",
+          "--cardio": "#d5ae76",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "after",
+      "theme": "dark",
+      "tab": "food",
+      "url": "http://127.0.0.1:5431/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "24px",
+            "fontWeight": "700",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 27,
+            "width": 150.625,
+            "height": 30,
+            "top": 27,
+            "right": 168.625,
+            "bottom": 57,
+            "left": 18
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "20px 20px 0px 0px",
+            "boxShadow": "rgba(38, 70, 51, 0.035) 0px 2px 10px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(60, 73, 60) rgb(60, 73, 60) rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(48, 65, 42)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "11px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 164,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 227,
+            "bottom": 837,
+            "left": 164
+          }
+        },
+        ".nutrition-metric": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "15px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "12px 6px",
+            "borderColor": "rgb(60, 73, 60)"
+          },
+          "rect": {
+            "x": 31,
+            "y": 389.796875,
+            "width": 104,
+            "height": 108,
+            "top": 389.796875,
+            "right": 135,
+            "bottom": 497.796875,
+            "left": 31
+          }
+        },
+        "tokens": {
+          "--bg": "#171c19",
+          "--surface": "#222923",
+          "--text-primary": "#f0f0e9",
+          "--accent": "#9fb97a",
+          "--protein": "#95b8c1",
+          "--carbs": "#d5ae76",
+          "--fat": "#d3a090",
+          "--danger": "#e2a28b",
+          "--cardio": "#d5ae76",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "after",
+      "theme": "dark",
+      "tab": "workout",
+      "url": "http://127.0.0.1:5431/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "24px",
+            "fontWeight": "700",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 30,
+            "top": 20,
+            "right": 274,
+            "bottom": 50,
+            "left": 18
+          }
+        },
+        ".training-card": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "18px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "16px",
+            "borderColor": "rgb(60, 73, 60)"
+          },
+          "rect": {
+            "x": 16,
+            "y": 153,
+            "width": 358,
+            "height": 274.984375,
+            "top": 153,
+            "right": 374,
+            "bottom": 427.984375,
+            "left": 16
+          }
+        },
+        ".primary": {
+          "style": {
+            "backgroundColor": "rgb(159, 185, 122)",
+            "color": "rgb(23, 28, 25)",
+            "borderRadius": "14px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "700",
+            "minHeight": "48px",
+            "padding": "0px 16px",
+            "borderColor": "rgb(159, 185, 122)"
+          },
+          "rect": {
+            "x": 33,
+            "y": 362.984375,
+            "width": 324,
+            "height": 48,
+            "top": 362.984375,
+            "right": 357,
+            "bottom": 410.984375,
+            "left": 33
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "20px 20px 0px 0px",
+            "boxShadow": "rgba(38, 70, 51, 0.035) 0px 2px 10px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(60, 73, 60) rgb(60, 73, 60) rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(48, 65, 42)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "11px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 238,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 301,
+            "bottom": 837,
+            "left": 238
+          }
+        },
+        "tokens": {
+          "--bg": "#171c19",
+          "--surface": "#222923",
+          "--text-primary": "#f0f0e9",
+          "--accent": "#9fb97a",
+          "--protein": "#95b8c1",
+          "--carbs": "#d5ae76",
+          "--fat": "#d3a090",
+          "--danger": "#e2a28b",
+          "--cardio": "#d5ae76",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    },
+    {
+      "version": "after",
+      "theme": "dark",
+      "tab": "progress",
+      "url": "http://127.0.0.1:5431/fitlog-lite/",
+      "build": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+      "computed": {
+        ".topbar h1": {
+          "style": {
+            "backgroundColor": "rgba(0, 0, 0, 0)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "0px",
+            "boxShadow": "none",
+            "fontSize": "24px",
+            "fontWeight": "700",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 18,
+            "y": 20,
+            "width": 256,
+            "height": 30,
+            "top": 20,
+            "right": 274,
+            "bottom": 50,
+            "left": 18
+          }
+        },
+        ".trend-module": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "18px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "auto",
+            "padding": "16px",
+            "borderColor": "rgb(60, 73, 60)"
+          },
+          "rect": {
+            "x": 16,
+            "y": 133,
+            "width": 358,
+            "height": 563,
+            "top": 133,
+            "right": 374,
+            "bottom": 696,
+            "left": 16
+          }
+        },
+        ".primary": {
+          "style": {
+            "backgroundColor": "rgb(159, 185, 122)",
+            "color": "rgb(23, 28, 25)",
+            "borderRadius": "12px",
+            "boxShadow": "none",
+            "fontSize": "14px",
+            "fontWeight": "700",
+            "minHeight": "48px",
+            "padding": "10px 12px",
+            "borderColor": "rgb(159, 185, 122)"
+          },
+          "rect": {
+            "x": 33,
+            "y": 631,
+            "width": 324,
+            "height": 48,
+            "top": 631,
+            "right": 357,
+            "bottom": 679,
+            "left": 33
+          }
+        },
+        ".bottom-nav": {
+          "style": {
+            "backgroundColor": "rgb(34, 41, 35)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "20px 20px 0px 0px",
+            "boxShadow": "rgba(38, 70, 51, 0.035) 0px 2px 10px 0px",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "57px",
+            "padding": "4px 8px",
+            "borderColor": "rgb(60, 73, 60) rgb(60, 73, 60) rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 0,
+            "y": 787,
+            "width": 390,
+            "height": 57,
+            "top": 787,
+            "right": 390,
+            "bottom": 844,
+            "left": 0
+          }
+        },
+        ".nav-capsule": {
+          "style": {
+            "backgroundColor": "rgb(48, 65, 42)",
+            "color": "rgb(240, 240, 233)",
+            "borderRadius": "11px",
+            "boxShadow": "none",
+            "fontSize": "16px",
+            "fontWeight": "400",
+            "minHeight": "0px",
+            "padding": "0px",
+            "borderColor": "rgb(240, 240, 233)"
+          },
+          "rect": {
+            "x": 313,
+            "y": 795,
+            "width": 63,
+            "height": 42,
+            "top": 795,
+            "right": 376,
+            "bottom": 837,
+            "left": 313
+          }
+        },
+        "tokens": {
+          "--bg": "#171c19",
+          "--surface": "#222923",
+          "--text-primary": "#f0f0e9",
+          "--accent": "#9fb97a",
+          "--protein": "#95b8c1",
+          "--carbs": "#d5ae76",
+          "--fat": "#d3a090",
+          "--danger": "#e2a28b",
+          "--cardio": "#d5ae76",
+          "--sleep": "",
+          "--motion-sheet": ".2s"
+        }
+      }
+    }
+  ]
+}

@@ -9,7 +9,7 @@ export function applyAppearance(): void {
   const theme = effectiveAppearance(readAppearance(), matchMedia('(prefers-color-scheme: dark)').matches)
   document.documentElement.dataset.effectiveTheme = theme
   document.documentElement.style.colorScheme = theme
-  const color = theme === 'dark' ? '#171c19' : '#f5f2eb'
+  const color = theme === 'dark' ? '#171c19' : '#f5f7fa'
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', color)
   document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]')?.setAttribute('content', theme === 'dark' ? 'black' : 'default')
   document.dispatchEvent(new Event(appearanceEvent))

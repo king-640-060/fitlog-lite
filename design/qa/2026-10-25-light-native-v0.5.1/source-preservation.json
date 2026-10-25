@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "START": "7110564631b6e40f59485cb1a12543ea59b3a2df",
+  "protectedFiles": 1022,
+  "modifiedExistingProtectedFiles": [
+    "src/main.ts",
+    "src/services/appearanceConfig.ts",
+    "src/styles/sheets.css",
+    "src/ui/managementHub.ts",
+    "src/ui/recovery.ts",
+    "src/ui/sheetController.ts",
+    "src/ui/trendModule.ts",
+    "tests/browser/README.md",
+    "tests/browser/approvedJointV05.mjs",
+    "tests/browser/managementVisualConsistency.mjs",
+    "tests/browser/motionPolish.mjs",
+    "tests/browser/remainingPrototype.mjs",
+    "tests/browser/todayWaterButton.mjs",
+    "vite.config.ts"
+  ],
+  "businessServicesUnchangedExceptAppearanceHex": true,
+  "appearanceHexOnly": true,
+  "viteTwoHexOnly": true,
+  "schemaAndFrozenFixturesChanged": false,
+  "oldDesignAndQaChanged": false,
+  "unitTestFilesChanged": false,
+  "currentSourceEqualsI2": true
+}

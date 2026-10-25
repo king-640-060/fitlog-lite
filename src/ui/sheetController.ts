@@ -50,20 +50,24 @@ export function setupSheetViewport(): () => void {
 }
 let primary: HTMLDialogElement | undefined
 let removeExitVisual: (() => void) | undefined
-/** Exit is an inert visual snapshot. Domain close/lock/cleanup still run synchronously exactly once. */
-function trainingExitVisual(dialog: HTMLDialogElement): void {
+/** A content-free visual shell: never clone credentials, images, voice or form facts.
+ * Domain close/lock/cleanup still run synchronously exactly once. */
+function trainingExitVisual(dialog: HTMLDialogElement, frame?: DOMRect): void {
   removeExitVisual?.()
-  if (!dialog.dataset.trainingSheet || dialog.dataset.replacing || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  if (!dialog.classList.contains('sheet') || !frame?.height || dialog.dataset.replacing || document.querySelector('dialog[open]') || matchMedia('(prefers-reduced-motion: reduce)').matches) return
   const layer = document.createElement('div'), sheet = document.createElement('div')
-  layer.className = 'training-sheet-exit'; layer.inert = true; layer.setAttribute('aria-hidden', 'true')
-  sheet.className = dialog.className; sheet.dataset.sheetVariant = dialog.dataset.sheetVariant
-  for (const child of dialog.children) sheet.append(child.cloneNode(true))
-  for (const node of sheet.querySelectorAll('[id],[autofocus]')) { node.removeAttribute('id'); node.removeAttribute('autofocus') }
+  layer.className = dialog.dataset.trainingSheet ? 'training-sheet-exit' : 'sheet-exit-visual'
+  layer.inert = true; layer.setAttribute('aria-hidden', 'true')
+  sheet.className = 'sheet sheet-exit-shell'
+  Object.assign(sheet.style, { width: `${frame.width}px`, height: `${frame.height}px`, bottom: `${Math.max(0, innerHeight - frame.bottom)}px` })
+  const handle = document.createElement('div'); handle.className = 'sheet-handle'; sheet.append(handle)
   layer.append(sheet); document.body.append(layer)
-  const remove = () => { layer.remove(); if (removeExitVisual === remove) removeExitVisual = undefined }
+  let fallback = 0
+  const remove = () => { clearTimeout(fallback); layer.remove(); if (removeExitVisual === remove) removeExitVisual = undefined }
   removeExitVisual = remove
-  // CSS owns the finite motion; no delayed domain notification or second close event.
+  // Finite decoration only. Escape without a measured frame closes immediately.
   layer.addEventListener('animationend', event => { if (event.target === sheet) remove() })
+  fallback = window.setTimeout(remove, 350)
 }
 let locks = 0, scrollX = 0, scrollY = 0, originalStyle = '', originalScrollBehavior = ''
 function lockBackground(): () => void {
@@ -89,11 +93,11 @@ export function presentDialog(dialog: HTMLDialogElement, overlay = false): HTMLD
   const release = lockBackground(), trigger = document.activeElement instanceof HTMLElement ? document.activeElement : undefined
   if (!overlay && primary) { primary.dataset.replacing = 'true'; primary.close() }
   if (!overlay) primary = dialog
-  let finalized = false, delivered = false
+  let finalized = false, delivered = false, exitFrame: DOMRect | undefined
   const nativeClose = dialog.close.bind(dialog)
   const finish = () => {
     if (finalized) return; finalized = true
-    trainingExitVisual(dialog)
+    trainingExitVisual(dialog, exitFrame)
     if (primary === dialog) primary = undefined
     dialog.remove(); release()
     if (!dialog.dataset.replacing && trigger?.isConnected && inputModality() === 'keyboard') trigger.focus({ preventScroll: true })
@@ -104,6 +108,7 @@ export function presentDialog(dialog: HTMLDialogElement, overlay = false): HTMLD
   }, { capture: true })
   dialog.close = (value?: string) => {
     if (finalized) return
+    exitFrame = dialog.getBoundingClientRect()
     nativeClose(value); dialog.dispatchEvent(new Event('close'))
   }
   // Native Escape emits close unless a domain subview prevents cancel. Do not pre-empt that event.

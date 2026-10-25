@@ -2,6 +2,8 @@
 
 Read this before changing UI or interaction code. This document holds durable product rules; current implementation and data semantics remain authoritative.
 
+2026-10-25: [Light Native v0.5.1](LIGHT_NATIVE_V051.md) now owns the approved light presentation, state-dependent copy and ordinary Sheet motion. Earlier warm/olive descriptions below retain historical hierarchy/data semantics; their light color/shadow values are superseded. Existing dark preference and semantic fact distinctions remain; the approved light calorie/action blue supersedes the former accent.
+
 ## Comprehensive mobile quality gate
 
 - Use `docs/UI_QA_MATRIX.md` for screen/state inventory and explicit applicability. Local320/375/390/430, production390/430, fonts100/120/140%, core landscape812×375/844×390. Read actual screenshots in addition to geometry assertions.
@@ -14,11 +16,11 @@ Read this before changing UI or interaction code. This document holds durable pr
 
 ## Visual direction
 
-The interface is entirely Chinese and iPhone first: 浅、柔、净、暖、绿、稳. Use warm ivory surfaces, fresh leaf emphasis, quiet spacing, clear numbers, and restrained feedback. Standard units such as kg, g, kcal, cm, s, and min may remain Latin. Do not show Workout, Nutrition, Progress, Set, Reps or RIR as UI labels. Saved legacy RPE may appear only in complete Daily Records details.
+The interface is entirely Chinese and iPhone first. Approved light presentation uses cool pearl white, pale blue-gray planes, deep slate text, restrained accessible cobalt actions, quiet boundaries and static subtle shadows. Preserve the existing dark presentation; do not invent a new dark brand. Standard units such as kg, g, kcal, cm, s, and min may remain Latin. Do not show Workout, Nutrition, Progress, Set, Reps or RIR as UI labels. Saved legacy RPE may appear only in complete Daily Records details.
 
 Do not use human training illustrations, anatomical diagrams, food photography, large illustrations, large black areas, oppressive dark styling, esports styling, hard gym styling, 3D art, complex textures, large gradients, or persistent glow.
 
-The shared page backdrop keeps the warm white base, restrained asymmetric glows, and extremely faint organic contour lines. Decoration is static, noninteractive, and lightweight; never place texture on cards, forms, charts, calendar surfaces, sheets, or controls, or reduce legibility. Avoid raster textures, animated decoration, blur filters, and repeating patterns.
+The approved light backdrop uses the restrained cool opaque plane from the frozen prototype; no old contour texture remains in light mode. Decoration stays static, noninteractive and lightweight; never compromise legibility of forms, charts or controls. Avoid raster textures, animated decoration, blur filters, and repeating patterns.
 
 ## Color and status
 
@@ -426,3 +428,7 @@ Each newly opened goal picker starts with no draft selection even when a real ph
 ## Management v0.6.1 (2026-10-24)
 
 [Approved vertical management contract](MANAGEMENT_V061.md) supersedes only the old flat Management Hub layout/root title. Keep the topbar's accessible Management entry; root title is 管理中心, with four category routes plus Personal Plan/Habits, thirteen real destinations, ephemeral search/clear/no-results and direct result navigation. One existing native dialog/stack owns category→manager→editor/Back/X and query/scroll/draft retention. Search shortcuts return to the real root parent. Scoped header/body/list/create/editor treatment follows the frozen v0.6.1 reference while retaining actual service-owned fields, six shared manager primitives,44px controls,16px inputs and Habit static Save. No v0.7/global theme, page navigation, service/data/format or shared viewport change. Physical evidence remains separate.
+
+## Light Native v0.5.1 (2026-10-25)
+
+[Implementation contract](LIGHT_NATIVE_V051.md) and [copy/state audit](LIGHT_NATIVE_V051_COPY_AUDIT.md) specify the two frozen reference roles, AA blue adjustment, preserved native/real-field differences and safe exit-shell boundary. No five-tab layout reorganization or fake prototype save/data enters production. Actual records drive introduction visibility, while missing-data limitations, plan/fact boundaries, source dates, privacy, irreversible confirmations and full editor fields stay. Enlarged text can move whole blocks into another row, with right-side compact actions and2D nonoverlap; short menu labels avoid single-character orphans. Existing compact disclosures retain full detail access. Ordinary Sheet28px/240ms plus finite content-free exit replaces older16px/200ms/immediate-only descriptions; synchronous native lifecycle and training58px/275ms remain. Physical iPhone/original PWA/IME/Safe Area/VoiceOver/personal continuity are separately Pending without evidence.
