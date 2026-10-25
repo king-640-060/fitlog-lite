@@ -1,39 +1,49 @@
-# FitLog Lite Development Report — 管理中心 v0.6.1
+# FitLog Lite Development Report — Light Native v0.5.1
 
-2026-10-24，Asia/Shanghai。批准的竖向管理中心已开发、测试并完成Application发布验证。本文件为独立END文档提交；自身SHA、第二次CI和最终Pages/SW/离线结果由提交后的实际验证及十项正式回执记录，不预写未来成功。实体设备验收及ChatGPT独立核查仍Pending。
+2026-10-25，Asia/Shanghai。批准v0.5浅色视觉及v0.5.1真实状态文案已开发、自动化测试并完成Application正式发布验证。本文件为独立END文档提交；自身SHA、第二次CI与最终Pages/SW/离线结果由提交后的实际核验和十项正式回执记录，不预写未来成功。实体设备与ChatGPT独立核查仍Pending。
 
-## Git与批准基准
+## Git、批准基准与范围
 
-- START：`87dad7206829238540c33fd82fb05cf24dd478e4`。干净main，fresh fetch、ff-only pull，Application提交前及END前再次fetch确认，没有覆盖他人提交。
-- Application：[2a42e1308908afbff4c5f07eb8b8cb7e87008476](https://github.com/king-640-060/fitlog-lite/commit/2a42e1308908afbff4c5f07eb8b8cb7e87008476)，正常非强推main；[Application CI/Pages](https://github.com/king-640-060/fitlog-lite/actions/runs/40104097472)实际success，TypeScript、1143单测、生产build和Pages部署成功。
-- [正式站](https://king-640-060.github.io/fitlog-lite/)、[冻结批准包与SHA](design/reference/2026-10-24-management-v0.6.1/DESIGN_REFERENCE.md)。ZIP摘要 `301b650470ae5712fb76040a1d7993da6487fec34136d4588514dc5153baa09a`，6成员CRC及5/5Manifest SHA通过。唯一v0.6.1 HTML摘要 `d572212a46b40c6751b0df13b24339c70ca7c2fd9ab03f47dfc319695a55849c`，双引擎实际运行，原文件未改。未采用v0.7。
+- START：`7110564631b6e40f59485cb1a12543ea59b3a2df`，fresh fetch/ff-only确认干净main；提交前重新fetch保护他人修改，无强推。
+- Application：[e0ae027fd0e538c71ac7ecac368f20bf6124e7b1](https://github.com/king-640-060/fitlog-lite/commit/e0ae027fd0e538c71ac7ecac368f20bf6124e7b1)；[Application CI/Pages](https://github.com/king-640-060/fitlog-lite/actions/runs/40173225034)实际success，安装/TypeScript/1143单测/生产build/Pages部署成功。
+- [正式站](https://king-640-060.github.io/fitlog-lite/)、[冻结原包与SHA](design/reference/2026-10-25-light-native-v0.5.1/DESIGN_REFERENCE.md)、[实施合同](docs/LIGHT_NATIVE_V051.md)。ZIP SHA047ae0a16055ca0964b8892247748245617ea339005c6be4b0f33d4c2c00469d；10成员CRC、9/9 SHA一致。v0.5视觉HTML与v0.5.1审核HTML均在Chromium/WebKit实际运行，原件未改；包内33项演示QA不冒充生产QA。
 
-## 实现与保留规则
+仅全局浅色视觉、真实状态文案及共用Sheet可见过渡。五Tab名称/顺序/模块分组、日期/编辑/保存流程，管理v0.6.1四分区+独立习惯/13真实目的地、75px分区/38px字标/同dialog栈保留。不实施被放弃的信息架构重排，不复制演示数据、状态开关、侧栏或假保存，不新建深色品牌方案。原dark/system偏好及数据配置保留。
 
-根页按批准HTML为说明卡、搜索、四个单列分区及独立个人计划/习惯，合计五组13真实目的地。搜索/清空/无结果只改变当前UI草稿。分区、列表、真实编辑器、AI→语音及Back复用同一个原生managementWorkspace dialog与原路由栈，保留父节点、合法查询、滚动及未保存非敏感草稿；X退出，重开从空查询根页顶部开始。动态摘要和保存仍由原真实服务提供。
+## 实现、源码与必要视觉差异
 
-5产品文件：main仅管理入口接线；workspace仅可选根标题；新增managementHub和限定作用域的management.css；nutritionCycles仅给一个完整静态长标签包裹span，解决390px/200%文字溢出，没有改周期逻辑。main其余310顶层语句逐字不变，cycle UI逆向去除该span后整份文件与START逐字相同。174旧源文件中171不变，所有service/DB/seed/导航协调器/训练/Autosave/计时器不改。17冻结fixture、637旧设计与QA文件未改。六类真实管理器保留原字段、66px列表/17px圆角、Habit52px静态保存及危险操作确认，没有用演示假表单替代。
+10产品/构建呈现文件：main、lightNative.css、sheets.css、sheetController、managementHub、recovery、trendModule、appearanceConfig、index、vite。main313顶层语句中309逐字不变，4个UI文案函数和1个CSS import变化。176旧src仅7个呈现修改+1新CSS；45服务只有appearance一处浅色hex，其余服务/DB/seed/导航/训练/Autosave/计时不变；17冻结fixtures、672旧设计/QA文件不改。无依赖升级、模式迁移或新业务存储。
 
-## 实际自动化与视觉验证
+浅色采用冷白/蓝灰/克制钴蓝、极轻静态投影；各营养、饮水/有氧/危险等语义事实与真实数字保留。依真实记录去掉重复介绍，保留来源、日期、未知、保存/风险/隐私/粗估不计入实际摄入/删除恢复确认。长标签/日期/数字单位允许完整语义块换行，输入不缩小、触控>=44px。63个UI源文件1315中文字符串/模板的静态初筛及实际文案显隐依据见[审核表](docs/LIGHT_NATIVE_V051_COPY_AUDIT.md)，自动分类不冒充逐句人工验收。
 
-- npm ci、TypeScript、78文件1143/1143单测、生产构建PASS，无依赖更新。
-- 44既有浏览器命令全部执行：首次40PASS/4FAIL，分别完成入口驱动、真实周期标签修复、两引擎旧Backup基准服务的完整复跑，最终44项有效通过。14补充门槛首次13PASS，饮水缺少对照参数在启动前失败，补齐后完整64场景通过。原失败与复跑均保留。30份旧测试仅适配真实入口/根标题/导航提交等待，1261个原断言调用的AST文本逐字相同。
-- 最终本地管理专项52上下文PASS：Chromium151.0.7922.34/WebKit26.5，320/375/390/430px、100/140/200%、浅深及短屏/横屏。13真实入口和六新建编辑器、搜索/键盘、Back/X、22表与配置前后摘要通过；554次稳定路由采样外框top/height均0px偏移，10代表上下文各20轮，共200轮。管理Workspace24、VisualConsistency24、mobile4、UIQuality4宽各144状态及既有资源/监听/真实保存回归通过。
-- 最终周期标签修正后，Chromium完整33、WebKit6（含390/200浅深）通过；另从独立报告→周期管理入口实跑390/200浅色通过。重复搜索清空图标已仅在该字段修复。候选A/B/C/D/E的失败、作用范围及复测分列于[QA](docs/MANAGEMENT_V061_QA.md)，没有声称所有旧门槛都在最终同一字节构建重跑。
-- 390浅深的批准原型与真实Application正式站截图/computed style已对照并目视检查：75px分区最小行高、12px/13px内边距、12px间隔、38px字标/12px圆角、14.24px标题、11.52px辅助文字及颜色一致。原生SVG、真实文案导致部分纵向位置约1.375px差异；不是全屏像素完全相同声明。真实列表与字段保留原业务结构。
+普通Sheet入口28px/240ms，训练入口58px/275ms保留。close/dispose/源验证/锁释放同步且exactly once；退出仅有限的无内容inert/aria-hidden外壳，不复制字段、ID、Key、图片、语音或用户事实，350ms兜底且新Sheet/pagehide/reduce清理。Back保留父节点/草稿/搜索/滚动。
 
-## 数据保护与正式环境
+本地与实际Application正式站的390/100浅深五Tab、Hub/真实列表/普通Sheet截图及computed style已对照并目视检查。左侧修改前为本地冻结START，右侧为实际正式站，不能将本地对照称为旧正式站截图。新浅色572主按钮样本最低4.9559:1；批准参考#397cf0白字约3.95不足AA，正式同向蓝#286bdd达到AA，次级4.86:1。双引擎普通/hover/pressed/focus实际测量通过，disabled单列。原生Sheet26px顶圆角对演示24px；真实Cardio字段/渐进日志、Today原模块顺序保留，不追求演示假表单或整屏像素一致。旧深色共享token及代表控件computed styles与START相同，通用长文本排版也适用旧主题。
 
-fitlog-lite-db、Dexie13/IDB130/22表、Backup14/Restore1–14、Sync1/envelope1不变，没有迁移、重置、清库、历史重算或个人数据操作。旧格式、Restore/Sync、删除事务/回滚及并发保护由原单测和浏览器门槛验证；新客户端实际Restore13/14、Export14、重开、非法meal零变更，旧冻结Backup13客户端拒绝14且数据不变。
+## 实际自动化
 
-START与Application使用同一个既有专用合成Chrome profile，正式站在线及离线冷启实际PASS：22表摘要 `049bc97a200c585af636db0378c6c72b1c81696208f15b5d30276755c6ba7c1a`、8配置摘要 `609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34`完全相同，未reset/reseed/Restore。它不是个人真实历史；所有写入/Restore回归均用隔离合成context。END仍将再次检查该profile。
+Node24.16.0、Chromium151.0.7922.34、WebKit26.5；仅隔离合成context/假Provider。npm ci、typecheck、78文件1143/1143单测、生产buildPASS，lock未改。
 
-Application共12项发布检查全部PASS：11项真实正式站（精确资源、同档案、管理52、workspace、visual consistency、UIQuality、两引擎周期各6、Restore筛选、导航闪帧、联合交互）；另1项是本地隔离的V7/实际START升级与提示更新，不冒充原安装PWA或正式站旧客户端升级。正式站App/active SW均为Application SHA，JS/CSS与干净Pages构建及SW/precache字节一致。构建通过 `GITHUB_REPOSITORY=king-640-060/fitlog-lite`，base `/fitlog-lite/`、local=false。END发布后须重新验证身份与离线，最终结果看十项回执。
+- 原44命令全部执行：首次43PASS/1FAIL；旧remainingPrototype暖白颜色期望与本轮批准冷白冲突，仅4浅色颜色assert适配、完整33复跑通过，最终44项有效PASS。
+- 14补充全部执行：首次13PASS/1FAIL；饮水首次Chromium横屏精确44px测量FAIL，产品/该断言不改，完整64与另6横屏复跑PASS、最低44px，最终14项有效PASS。原失败/截图保留，不假称根除所有偶发量测。
+- 新浅色完整52/52上下文、1380次页面状态检查PASS：双引擎、四宽×100/140/200×普通/reduce加短/横屏、五状态×五Tab及代表Calendar/Reports；实际坐标/目标/裁切/中文孤字/单位/完整展开记录和22表/config只读相同。
+- 管理完整52/52、554稳定路由样本top/height偏移0px、200完整编辑往返PASS；普通Sheet4组16场景、真实历史Restore13/历史快照/无效负体重零写4组PASS。
+- 原74浏览器文件2493个assert数量不变，2486逐字保留，7条仅批准呈现期望更新（颜色/极轻shadow/放大饮水二维不重叠），全部原业务/权限/事务断言保留；motionPolish只将230ms假设换为实际240ms入场完成等待，原50px返回滚动assert及完整24场景通过。
 
-## 文档、边界与ChatGPT Baseline
+初始基础motion token单测FAIL已恢复原200ms词汇、普通calc+40后全量1143复跑通过。A–H早期构建复制时序有映射风险，仅作中间诊断；最终I2真实await build成功→核对源SHA不变→复制immutable dist→HTTP逐资源SHA。最终44+14及新矩阵均在同一I2产品源码执行；其后只改测试期望/等待和文档。原编译、布局诊断、量测失败与完整复测分列在[QA](docs/LIGHT_NATIVE_V051_QA.md)和[本地冻结证据](design/qa/2026-10-25-light-native-v0.5.1/README.md)，不沿用旧轮数量或隐去FAIL。
 
-[实施合同](docs/MANAGEMENT_V061.md)、[QA](docs/MANAGEMENT_V061_QA.md)、[本地冻结证据](design/qa/2026-10-24-management-v0.6.1/README.md)、UI_INTERACTION_SPEC、UI_QA_MATRIX、AGENTS入口及browser README已更新。冻结QA保留冻结时的发布Pending，不倒写历史；实际发布结果由本文件及最终回执补充。
+## 数据与实际正式环境
 
-实体iPhone Safari、原安装PWA、真实IME/Safe Area、VoiceOver、个人数据连续性继续Pending；真实Provider未执行，ChatGPT独立核查待进行。浏览器模拟不等于真机验收。旧WebKit饮水Undo−128px未声称解决；此前F1–F5用户36/36及其他已结案任务未重开。
+fitlog-lite-db、Dexie13/IDB130/22、Backup14/Restore1–14、Sync/envelope1不变；无清库、数据库改名、历史重算、自动写入/上传或个人健康数据操作。旧格式/Restore/Sync、旧客户端拒绝V14且原数据不变、新Restore13/14/Export14/重开、删除失败回滚/并发保护等原门槛实际通过。写入/Restore均在新的隔离合成context。
 
-新聊天先读AGENTS、本文件、协作流程及本轮合同，再核对实际main/SHA。本轮只改管理中心及必要管理UI，不改五Tab/业务/数据库。完整原始日志（含失败）、前后与正式站截图、computed style、源码保护和合成档案证据在外部 `work/management-v061-2026-10-24/`；最终十项回执、两次CI、App/END实际身份及带SHA256证据包位于 `outputs/management-v061/`。完成END发布验证后停止，等待ChatGPT独立核查。
+START与Application用同一个既有专用合成Chrome profile，未reset/reseed/Restore：22表摘要 `049bc97a200c585af636db0378c6c72b1c81696208f15b5d30276755c6ba7c1a`，8配置摘要 `609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34` 完全一致；实际App=active SW=Application、在线与离线冷启动通过。它不是个人真实连续性或原安装iPhone证明；END还要复验。
+
+Application16项发布检查最终有效PASS（首次14PASS/2FAIL：UI总审计动作库边界、联合交互310ms退场层量测；原完整268状态与6场景分别未改产品/断言复跑通过，原图/日志保留，不声称单独修复了具体时序根因）：15真实正式站（精确JS/CSS/SW/precache、原合成profile、管理52/workspace/样式/UIQuality、双引擎周期、Restore筛选、导航闪帧/联合交互、新浅色/Sheet/历史专项）+1本地V7/实际START升级harness，后者不算原安装PWA验收。另对正式站HTML、manifest、图标、SW标记等全部静态文件逐一HTTP SHA比对本地clean Application build通过，PWA身份字段不变。base=/fitlog-lite/、local=false。END发布后须再核对其真实资源/App/SW/离线/数据。
+
+## 文档、Pending与ChatGPT Baseline
+
+已更新AGENTS、UI_INTERACTION_SPEC、INTERACTION_VISUAL_SYSTEM、UI_QA_MATRIX、Light Native合同/文案审核/QA、browser README及冻结原包/本地证据。冻结QA保留当时发布Pending，不倒写历史；本文件记录Application实际验证，END第二次CI和最终身份由十项回执补充。
+
+实体iPhone Safari、原安装PWA、真实IME/键盘/Safe Area、VoiceOver和个人数据连续性继续Pending；真实Provider未执行；ChatGPT独立核查待进行。旧WebKit饮水Undo−128px不宣称解决，本轮0px样本不作为旧问题结案；此前F1–F5用户36/36及其他已结案任务不重开。
+
+新聊天先读AGENTS、本文件、协作流程及本轮合同/QA，再核对实际main/END。完整实际日志（含FAIL与复跑）、1380原图/坐标、前后与正式站对照、源码保护及同档案证据位于外部work/light-native-v051-2026-10-25；十项正式回执、两次CI、最终App/END身份与SHA256证据包位于outputs/light-native-v051。完成END验证后停止，等待ChatGPT独立核查，不提前开发其他需求。
