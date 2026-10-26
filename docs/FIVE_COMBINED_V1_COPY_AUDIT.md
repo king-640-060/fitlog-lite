@@ -22,6 +22,7 @@
 |src/main.ts:1709 → [1720](../src/main.ts#L1720)|训练/凯格尔概览|当前方案、当日完成、实际记录|保留|基线已无重复宣传式简介，不制造修复|执行安全/不适停止、真实计时完整|workout/before-after|
 |src/main.ts:584 → [595](../src/main.ts#L595)|今日/已有任务|已完成、总数、待办|保留|三种数字是不同实际状态；并非教学|不把计划当健康完成事实|today/before-after|
 |src/main.ts:1180 → [1191](../src/main.ts#L1191)|饮食/空餐次与已有餐次|0项记录 + 今日/当日未记录；真实食物摘要|合并/条件化|空餐次删除重复零条数小字；保留未记录与kcal单位及真实记录入口，已有餐次保留真实数量/全部摘要|未分类历史不得猜餐次|food/before-after|
+|src/styles/nutritionBudget.css:47 → [47](../src/styles/nutritionBudget.css#L47)|今日剩余目标/320px与200%|剩余目标、未设置目标的末字孤行|保留/均衡断行|标题和静态目标状态均衡换行；实测未设置目/标变为未设置/目标|未知含义、数字单位绑定与原计算不改|today/before-after|
 |src/ui/macroNutritionSummary.ts:21 → [21](../src/ui/macroNutritionSummary.ts#L21)|今日/饮食/未知宏量与体重|数据不完整、单位、同日g/kg|保留|未知与零不同；计算依据不能当冗余说明删除|不改热量/宏量/体重快照|food/before-after|
 |src/ui/calorieBudget.ts:7 → [7](../src/ui/calorieBudget.ts#L7)|今日/饮食/无目标与超额|实际、目标、超额、尚未设置|保留|不同状态具有业务意义，非重复介绍|不把计划/估计并入实际摄入|today/before-after|
 |src/main.ts:2161 → [2174](../src/main.ts#L2174)|动作库/新建编辑删除|字段、可选备注、历史会保留|保留|动作名/备注是事实来源，删除边界需可见|历史动作快照与当前库分离|management/before-after|
