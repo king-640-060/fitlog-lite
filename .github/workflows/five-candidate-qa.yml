@@ -13,8 +13,8 @@ jobs:
       max-parallel: 4
       matrix:
         include:
-          - tag: ai-streaming-owned-delivery
-            task: 'aiStreaming'
+          - tag: daily-settled-keyboard-geometry
+            task: 'dailyRecordsExperience'
             full: '0'
             width: '390'
             shard: '0'
