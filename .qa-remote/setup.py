@@ -21,5 +21,5 @@ for port,base in [(5459,site),(5443,r),(5456,q/'v13'),(5450,q/'v14')]:
    if attempt==99: raise
    time.sleep(.1)
 
-with tarfile.open(w/'start.tgz') as t:t.extractall(w/'start')
-subprocess.Popen(['python3','-m','http.server','5441','--bind','127.0.0.1','--directory',str(w/'start')],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
+with tarfile.open(q/'start.tgz') as t:t.extractall(q/'start')
+subprocess.Popen(['python3','-m','http.server','5441','--bind','127.0.0.1','--directory',str(q/'start')],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,start_new_session=True)
