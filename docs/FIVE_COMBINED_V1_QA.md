@@ -82,3 +82,7 @@ foodNavigationPreservation fails on frozen START; all6 fixed contexts pass acros
 |编译/单元/构建|最终源typecheck、79文件1190/1190、生产build全部PASS；原1143单测不改，新增47|
 
 最终证据见[冻结证据目录](../design/qa/2026-10-25-five-combined-v1/README.md)：每个driver SHA、失败和复验链接、182文件一致性、完整高度原值、源/资源SHA、截图和原始日志均可核查。临时QA workflow与旧基线支持资产不会进入正式main。Application与END必须另行取得实际CI/Pages、全部HTTP资源、App=active SW、离线冷启动及同一专用合成profile数据/配置摘要，当前自动化通过不替代发布或实体iPhone验收。
+
+### 首次正式发布后的升级驱动入口修订
+
+Application `d27ca90c62809b769456a6546275b08e0fa8f0d4` 的CI/Pages成功，15个正式静态文件HTTP SHA与clean build完全相同，同一专用合成档案App=active SW、离线冷启动及数据/配置摘要不变。旧PWA升级harness第一次在直接选择深色时FAIL：新版默认Native会隐藏Classic明暗组。仅在原测试中通过实际UI先选Classic，再执行原深色/离线/数据断言；完整V7旧客户端及START提示式客户端两组复验PASS，所有原assert逐字不变，产品代码无修改。这次测试/文档修订单独提交并另行CI，最终END仍仅更新LATEST，不隐去额外提交或首次失败。正式站截图与computed style已完成12对双引擎对照，不能把本地升级harness称为实体PWA验收。
