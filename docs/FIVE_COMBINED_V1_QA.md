@@ -37,6 +37,9 @@
 - 200%模板同步短句出现单字孤行，已通过原生checkbox独立布局、清除共用数字后缀padding及均衡文本换行修复；保留原图及双引擎复测。
 - 原有测试驱动只适配实际过渡完成、异步保存/跨页刷新就绪和本轮批准的Classic模式设置。所有原业务/结构assert保持逐字一致，唯一呈现assert由Native浅色meta恢复到冻结Classic `#f5f2eb`。独立motion套件仍量测运动本身，不用静态等待绕过动画要求。
 - 最终回归出现多项locator稳定性超时。系统日志同期多次Sleep/DarkWake；诊断中Node已超时10秒，页面performance/动画仅经过约1秒。已保留原始失败和电源事件，保持唤醒后应完整复跑；不能把休眠关联推测为每个失败的确定原因，也不能直接改为PASS。
+- 冻结候选实际发现今日新增训练名称的长英文撑宽卡片，现仅为`[data-today-workout-names]`增加`overflow-wrap:anywhere`；320px长名称实页重新测量卡片288px、内部无越界。其后本地LightNative前22上下文通过，整套因40分钟环境超时终止，不能记完整52PASS。
+- 为绕过本机合盖休眠，使用临时非发布QA分支运行隔离macOS runner；未改变main或Pages。[首次完整66项](https://github.com/king-640-060/fitlog-lite/actions/runs/40223821878)实际60PASS/6FAIL，产物及所有失败保留。失败为AI初次网络就绪超时、Food/宏观营养旧驱动取样早于真实刷新、原趋势边界取样、原减少动态导航时序，以及320px/200%“剩余目标”单字孤行。最后一项已用标题均衡换行修复；驱动仅补充真实源/路由就绪，原assert不降低。不能把此60/66称为交付通过。
+- [下一次完整66项](https://github.com/king-640-060/fitlog-lite/actions/runs/40244745123)对应临时候选`3ef390f4af8fe45f328ed6c1e49e008b27331d68`，仍待实际完成与核对。该SHA不是Application或END；临时workflow/旧baseline支持资产不会进入正式main。小文本产物与完整截图分开上传，便于复核。
 
 ## 数据与部署门槛
 

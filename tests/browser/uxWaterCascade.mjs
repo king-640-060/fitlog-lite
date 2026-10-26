@@ -1,4 +1,5 @@
 import { openManagementEntry } from './managementEntry.mjs'
+import { waitForSurfaceSettlement } from './navigationSettlement.mjs'
 import { rangeCascadeQaFixture, expectedRangeDeleted } from './rangeCascadeFixture.mjs'
 // All writes use isolated synthetic contexts; never the user's daily profile.
 import fs from 'node:fs/promises'
@@ -31,7 +32,7 @@ try{for(const width of [320,375,390,430,844])for(const theme of ['light','dark']
  const collapsed=await p.locator('.water-card').boundingBox(),peer=await p.locator('.sleep-card').boundingBox();assert(Math.abs(collapsed.width-peer.width)<1)
  if(scale===100)assert(collapsed.height<200,'default card remains compact')
  await audit('.water-card');await shot('today-idle','.water-card');await p.locator('[data-today-water-record]').click()
- const styles=await p.locator('[data-water-quick]').evaluateAll(es=>es.map(e=>{const s=getComputedStyle(e),r=e.getBoundingClientRect();return{background:s.backgroundColor,color:s.color,width:r.width,height:r.height,font:s.fontSize}}));assert.equal(styles.length,2);assert(Math.abs(styles[0].width-styles[1].width)<.1);assert.deepEqual({...styles[0],width:0},{...styles[1],width:0});if(scale===100)assert(styles[0].height<58)
+ await waitForSurfaceSettlement(p);const styles=await p.locator('[data-water-quick]').evaluateAll(es=>es.map(e=>{const s=getComputedStyle(e),r=e.getBoundingClientRect();return{background:s.backgroundColor,color:s.color,width:r.width,height:r.height,font:s.fontSize}}));assert.equal(styles.length,2);assert(Math.abs(styles[0].width-styles[1].width)<.1);assert.deepEqual({...styles[0],width:0},{...styles[1],width:0});if(scale===100)assert(styles[0].height<58)
  await audit('dialog.sheet[open]');await shot('today-sheet','dialog.sheet[open]');await close();await p.locator('[data-today-water-record]').click()
  const expandedGeometry=await p.locator('.water-card').boundingBox(),oldWater=(await read()).waterLogs;await p.locator('[data-water-quick="500"]').evaluate(e=>{e.click();e.click()});await p.waitForFunction(()=>document.querySelector('[data-water-total]').textContent==='500');assert.equal((await read()).waterLogs.length,oldWater.length+1);assert.equal(await p.locator('dialog[open]').count(),0);assert(Math.abs((await p.locator('.water-card').boundingBox()).height-expandedGeometry.height)<.1,'0 to500 card invariant')
  await p.locator('.water-undo button').click();await p.waitForFunction(()=>document.querySelector('[data-water-total]').textContent==='0');assert.deepEqual((await read()).waterLogs,oldWater);assert(Math.abs((await p.locator('.water-card').boundingBox()).height-expandedGeometry.height)<.1,'Undo card invariant')

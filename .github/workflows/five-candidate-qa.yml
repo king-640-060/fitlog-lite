@@ -12,9 +12,81 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+        include:
+          - tag: retry-aiAssistant
+            task: aiAssistant
+            full: '0'
+            width: '390'
+          - tag: retry-foodRecovery
+            task: foodRecovery
+            full: '0'
+            width: '390'
+          - tag: retry-macroNutritionSummary
+            task: macroNutritionSummary
+            full: '0'
+            width: '390'
+          - tag: retry-light-native-full
+            task: light-native-full
+            full: '0'
+            width: '390'
+          - tag: retry-interactionStabilization
+            task: interactionStabilization
+            full: '0'
+            width: '390'
+          - tag: retry-catalogRecovery
+            task: catalogRecovery
+            full: '0'
+            width: '390'
+          - tag: retry-uxWaterCascade-webkit
+            task: uxWaterCascade-webkit
+            full: '0'
+            width: '390'
+          - tag: joint-chromium-320
+            task: joint-chromium
+            full: '1'
+            width: '320'
+          - tag: joint-chromium-375
+            task: joint-chromium
+            full: '1'
+            width: '375'
+          - tag: joint-chromium-390
+            task: joint-chromium
+            full: '1'
+            width: '390'
+          - tag: joint-chromium-430
+            task: joint-chromium
+            full: '1'
+            width: '430'
+          - tag: joint-chromium-844
+            task: joint-chromium
+            full: '1'
+            width: '844'
+          - tag: joint-webkit-320
+            task: joint-webkit
+            full: '1'
+            width: '320'
+          - tag: joint-webkit-375
+            task: joint-webkit
+            full: '1'
+            width: '375'
+          - tag: joint-webkit-390
+            task: joint-webkit
+            full: '1'
+            width: '390'
+          - tag: joint-webkit-430
+            task: joint-webkit
+            full: '1'
+            width: '430'
+          - tag: joint-webkit-844
+            task: joint-webkit
+            full: '1'
+            width: '844'
     env:
-      QA_SHARD: ${{ matrix.shard }}
+      QA_SHARD: '0'
+      QA_TAG: ${{ matrix.tag }}
+      QA_ONLY: ${{ matrix.task }}
+      QA_FULL_JOINT: ${{ matrix.full }}
+      QA_WIDTH: ${{ matrix.width }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
@@ -43,7 +115,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
-          name: five-candidate-shard-${{ matrix.shard }}
+          name: five-candidate-shard-${{ matrix.tag }}
           path: |
             qa-results/
             .qa-remote/source-manifest.json
@@ -55,6 +127,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
-          name: five-candidate-text-shard-${{ matrix.shard }}
+          name: five-candidate-text-shard-${{ matrix.tag }}
           path: qa-text/
           retention-days: 14
