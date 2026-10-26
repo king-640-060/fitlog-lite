@@ -13,17 +13,22 @@ jobs:
       max-parallel: 4
       matrix:
         include:
-          - tag: dailyRecordsExperience
-            task: 'dailyRecordsExperience'
-            full: '0'
-            width: '390'
-            shard: '0'
-          - tag: foodRecovery
+          - tag: baseline-foodRecovery
             task: 'foodRecovery'
             full: '0'
             width: '390'
             shard: '0'
-          - tag: macroNutritionSummary
+          - tag: baseline-macroNutritionSummary
+            task: 'macroNutritionSummary'
+            full: '0'
+            width: '390'
+            shard: '0'
+          - tag: candidate-foodRecovery
+            task: 'foodRecovery'
+            full: '0'
+            width: '390'
+            shard: '0'
+          - tag: candidate-macroNutritionSummary
             task: 'macroNutritionSummary'
             full: '0'
             width: '390'
