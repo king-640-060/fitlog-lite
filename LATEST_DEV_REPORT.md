@@ -52,3 +52,5 @@ E：复用原生`type=time`、日期子页、共享Sheet/VisualViewport与真实
 实体iPhone Safari、原安装PWA、真实IME/键盘/原生时间picker/系统12或24小时设置、Safe Area、VoiceOver、个人历史连续性、真实Provider及ChatGPT独立核查均Pending。WebKit旧饮水Undo−128px没有在本轮解决或结案，不将本轮零偏移样本当作旧问题已修复。
 
 ChatGPT Baseline：先读AGENTS、本报告、协作流程和五项合同/QA，再核对实际main/本报告END及其CI。开发与授权发布完成后停止，等待独立核查，不提前做新设计或其他开发。
+
+归档校正：此前END `6caa9daa67e441d9bd4e713b671120c4b0c65a8f` 的CI、15资源、同档案/离线、最终页面核验实际通过；交付清单校验另发现8份已列SHA的.log被全局忽略。证据提交 `77edcc861fd09b25d75181f2d88dd45ab075fd9f` 补齐原字节，SHA与原清单逐一相同，未改产品、断言、测试结果或原型。当前本报告提交重新作为最终END，仍只修改本文件；最后的CI/正式身份由实际回执列明。
