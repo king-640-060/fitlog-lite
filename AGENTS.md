@@ -461,3 +461,8 @@ Follow [Light Native contract](docs/LIGHT_NATIVE_V051.md) and [state/copy audit]
 ## Approved five-part combined v1 (2026-10-25)
 
 Follow [five-part contract](docs/FIVE_COMBINED_V1.md) and its immutable reference. This approval restores the frozen Classic palette alongside existing fixed-light Native using a separate device-only visual key; preserve the old three-state appearance key and implicit upgrade behavior until an explicit choice. Optional Workout.name is an independent snapshot, never a live template link or inferred persisted title. Name-only writes preserve every historical set/journal field; exit/hidden drains actual pending autosave without forcing normalization. Template creation and optional unnamed-workout naming are atomic with source/repeat guards. Existing unlimited template-name snapshots remain compatible with Backup14/Restore1–14/Sync1; manual naming has its own input bound. Free training accepts a single real exercise with valid sets and does not require a template. Remove only audited redundant copy, retain full facts/safety, keep native sleep time inputs and existing date/Sheet ownership. No schema/index/format change, third theme or unrelated redesign. Real iPhone/native picker/original PWA evidence remains separate Pending.
+
+
+## Native scroll preservation release guard
+
+Prepared main-tab pages already mounted for layout must not be appended again on promotion. Preserve native child scroll and the selected Food date; append only if the prepared node is not already in the stage. Keep existing preview ownership/disposal/motion and test full Chromium as well as headless-shell/WebKit.

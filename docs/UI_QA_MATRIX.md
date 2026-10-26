@@ -307,3 +307,8 @@ Follow [approved contract](COMBINED_INTERACTION_V04.md) and [execution evidence]
 `fiveWorkoutHistoryProtection.mjs` 用真实旧记录原始空白/换行日志、RPE/精度和未知set字段，逐步比较名称保存、后台、退出、重开、清空与模板同步后精确事实和其余21表；两种新Sheet再跑双引擎四宽×三字号×三种外观。保留历史失真负对照及首次失败；命名不能靠普通Autosave归一化旧事实。模板勾选保留20px原生控件、44px label与200%完整短语。
 
 保留全部既有44+14门槛以及LightNative52与管理两套完整矩阵。原17冻结输入、78旧单测、数据库13/130/22、Backup14/Restore1–14/Sync1不改；短名及3200字符旧模板名通过真实旧客户端Restore/Export/Autosave、新客户端Restore及加密Sync验证。实际执行数量、失败/复测、生产发布与实体Pending分别记录；原型32项演示不算生产结果。
+
+
+## Native scroll preservation release guard
+
+Additional five-part v1 gate: foodNavigationPreservation.mjs verifies three browser runtimes x320px/140%,200% =6 contexts, selected Today/historical Food dates and native rail centering over8 return cycles per date, with all22 store hashes unchanged. Valid frozen START negative control fails; fixed source passes6/6. Final77-call regression is rerun on the new source; prior2ab results do not substitute for it.

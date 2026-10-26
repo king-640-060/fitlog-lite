@@ -16,8 +16,8 @@ try { for(const [width,height] of (prod?[[390,844],[430,932]]:[[320,812],[375,81
    if(!String(url).startsWith('https://mock-stream.invalid/'))return native(url,options)
    const body=JSON.parse(options.body);window.__requests.push(body)
    let c,cancelled=false;const timers=[];const stream=new ReadableStream({start(controller){c=controller},cancel(){cancelled=true;timers.forEach(clearTimeout)}})
-   const push=delta=>{if(delta.content)s.text=true;if(!cancelled)c.enqueue(enc.encode('data: '+JSON.stringify({choices:[{delta}]})+'\n\n'))}
-   const s={push,c,text:false,fail:()=>{cancelled=true;timers.forEach(clearTimeout);c.error(new TypeError('private diagnostic'))},done:()=>{if(!cancelled)c.enqueue(enc.encode('data: [DONE]\n\n'))},get cancelled(){return cancelled}}
+   const push=delta=>{if(delta.content)s.text=true;if(delta.tool_calls?.some(call=>call.function?.name))s.toolHead=true;if(!cancelled)c.enqueue(enc.encode('data: '+JSON.stringify({choices:[{delta}]})+'\n\n'))}
+   const s={push,c,text:false,toolHead:false,fail:()=>{cancelled=true;timers.forEach(clearTimeout);c.error(new TypeError('private diagnostic'))},done:()=>{if(!cancelled)c.enqueue(enc.encode('data: [DONE]\n\n'))},get cancelled(){return cancelled}}
    window.__streams.push(s)
    const mode=window.__mode
    if(mode==='tool'&&body.messages.at(-1).role==='user')timers.push(setTimeout(()=>push({tool_calls:[{index:0,id:'context',type:'function',function:{name:'get_current_context',arguments:'{'}}]}),150))
@@ -49,9 +49,9 @@ try { for(const [width,height] of (prod?[[390,844],[430,932]]:[[320,812],[375,81
  await clear();await send('中途停止');await page.waitForFunction(()=>document.querySelector('.ai-conversation .ai-assistant p')?.textContent.includes('首段'))
  await page.locator('#ai-stop').click();await idle();assert.equal(await page.evaluate(()=>__streams.at(-1).cancelled),true);assert.ok((await page.locator('.ai-error').innerText()).includes('已停止'));assert.equal(await page.locator('.ai-conversation .ai-assistant').count(),1)
  await send('停止后的新问题');await page.waitForFunction(()=>__requests.at(-1).messages.at(-1).content==='停止后的新问题');assert.equal(await page.evaluate(()=>JSON.stringify(__requests.at(-1).messages).includes('首段中文')),false);await finish();await idle()
- await clear();await send('工具完整前不得执行','tool');await page.waitForTimeout(250);assert.equal(await page.evaluate(()=>__requests.at(-1).messages.some(m=>m.role==='tool')),false);assert.equal(await page.locator('.ai-proposal').count(),0)
+ await clear();await send('工具完整前不得执行','tool');await page.waitForFunction(()=>__streams.at(-1)?.toolHead);assert.equal(await page.evaluate(()=>__requests.at(-1).messages.some(m=>m.role==='tool')),false);assert.equal(await page.locator('.ai-proposal').count(),0)
  await page.locator('#ai-stop').click();await idle();assert.equal(await page.evaluate(()=>__streams.at(-1).cancelled),true)
- await clear();let n=await page.evaluate(()=>__requests.length);await send('查询上下文','tool');await page.waitForTimeout(250)
+ await clear();let n=await page.evaluate(()=>__requests.length);await send('查询上下文','tool');await page.waitForFunction(n=>__requests.length===n+1&&__streams.at(-1)?.toolHead,n)
  await page.evaluate(()=>{__streams.at(-1).push({tool_calls:[{index:0,id:'context',type:'function',function:{arguments:'}'}}]});__streams.at(-1).done()})
  await page.waitForFunction(n=>__requests.length===n+2,n);assert.equal(await page.evaluate(()=>__requests.at(-1).messages.at(-1).tool_call_id),'context');assert.equal(await page.evaluate(()=>__requests.at(-1).stream),true)
  await page.waitForFunction(()=>document.querySelector('.ai-conversation .ai-assistant p')?.textContent.includes('首段'));await finish();await idle();assert.equal(await page.locator('.ai-conversation .ai-assistant').count(),1);assert.equal((await page.locator('.ai-conversation').innerText()).includes('"arguments"'),false)

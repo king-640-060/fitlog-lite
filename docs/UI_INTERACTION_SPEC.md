@@ -439,3 +439,8 @@ Each newly opened goal picker starts with no draft selection even when a real ph
 Follow [implementation/data contract](FIVE_COMBINED_V1.md) and [copy/state audit](FIVE_COMBINED_V1_COPY_AUDIT.md). A title snapshot is optional and independent from templates; inferred single-exercise/Free Training fallback stays presentation-only. Explicit unchecked-by-default sync can name only an unnamed workout in the same template transaction. Guard stale writes, creation, repeated completion and repeated confirmation without altering factual sets/logs. Full saved times remain reachable.
 
 Use root visual tokens, never a second renderer. Preserve old appearance preference, first-upgrade effective look, native theme fixed light, page/workspace nodes and drafts. Names/visual preference must not rewrite other data. Sleep keeps native type=time and the shared viewport/date stack; no web wheel or private keyboard lifecycle. Technical graph teaching stays accessible without occupying visible space, including all-history; missing never becomes zero. Group date/weekday tokens under scaling rather than leave a single character. All legacy interaction/data gates remain; physical verification stays separate.
+
+
+## Native scroll preservation release guard
+
+Prepared main-tab pages already mounted for layout must not be appended again. Preserve native child scroll and the selected Food date during promotion; insert only an unattached result, retaining existing ownership, cleanup and motion.

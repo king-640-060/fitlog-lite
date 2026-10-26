@@ -142,3 +142,8 @@ Seven prior presentation assertions update with the approval: four legacy remain
 `fiveThemePolicy.mjs`: eight real UI contexts covering explicit selection of already-checked implicit Classic, keyboard radio selection, all three old Classic modes and reload. Both visual keys remain device-only; absent visual preference follows the compatibility policy without startup writes. Existing `approvedJointV05` explicitly selects Classic before its old three-mode assertions; its light meta now checks the approved frozen Classic #f5f2eb, retaining all original business checks. Optional `FITLOG_MANAGEMENT_VISUAL_THEME=classic` repeats the complete existing Management gate under Classic.
 
 All use existing FITLOG_QA_URL/FITLOG_PLAYWRIGHT_MODULE/FITLOG_CHROME/FITLOG_QA_ARTIFACT_ROOT. Stable geometry checks wait for the real finite surface animation; separate motion gates still inspect the animation itself. Mock keyboards, system-color emulation and WebKit do not verify real iPhone settings, native picker skin, VoiceOver, Safe Area or original installed PWA continuity.
+
+
+## Native scroll preservation release guard
+
+foodNavigationPreservation.mjs: fresh synthetic contexts, readonly22 stores. Default headless-shell Chromium, full Chromium and WebKit at320px/140%,200%; repeated Today/Food promotion preserves Today and selected historical dates and native scroll. No date resets or production hooks. Frozen START is a failing negative control.

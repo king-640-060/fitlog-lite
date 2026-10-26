@@ -13,95 +13,10 @@ jobs:
       max-parallel: 4
       matrix:
         include:
-          - tag: all-0
-            task: ''
+          - tag: ai-streaming-owned-delivery
+            task: 'aiStreaming'
             full: '0'
             width: '390'
-            shard: '0'
-          - tag: all-1
-            task: ''
-            full: '0'
-            width: '390'
-            shard: '1'
-          - tag: all-2
-            task: ''
-            full: '0'
-            width: '390'
-            shard: '2'
-          - tag: all-3
-            task: ''
-            full: '0'
-            width: '390'
-            shard: '3'
-          - tag: all-4
-            task: ''
-            full: '0'
-            width: '390'
-            shard: '4'
-          - tag: all-5
-            task: ''
-            full: '0'
-            width: '390'
-            shard: '5'
-          - tag: all-6
-            task: ''
-            full: '0'
-            width: '390'
-            shard: '6'
-          - tag: all-7
-            task: ''
-            full: '0'
-            width: '390'
-            shard: '7'
-          - tag: joint-chromium-320
-            task: 'joint-chromium'
-            full: '1'
-            width: '320'
-            shard: '0'
-          - tag: joint-chromium-375
-            task: 'joint-chromium'
-            full: '1'
-            width: '375'
-            shard: '0'
-          - tag: joint-chromium-390
-            task: 'joint-chromium'
-            full: '1'
-            width: '390'
-            shard: '0'
-          - tag: joint-chromium-430
-            task: 'joint-chromium'
-            full: '1'
-            width: '430'
-            shard: '0'
-          - tag: joint-chromium-844
-            task: 'joint-chromium'
-            full: '1'
-            width: '844'
-            shard: '0'
-          - tag: joint-webkit-320
-            task: 'joint-webkit'
-            full: '1'
-            width: '320'
-            shard: '0'
-          - tag: joint-webkit-375
-            task: 'joint-webkit'
-            full: '1'
-            width: '375'
-            shard: '0'
-          - tag: joint-webkit-390
-            task: 'joint-webkit'
-            full: '1'
-            width: '390'
-            shard: '0'
-          - tag: joint-webkit-430
-            task: 'joint-webkit'
-            full: '1'
-            width: '430'
-            shard: '0'
-          - tag: joint-webkit-844
-            task: 'joint-webkit'
-            full: '1'
-            width: '844'
             shard: '0'
     env:
       QA_SHARD: ${{ matrix.shard }}

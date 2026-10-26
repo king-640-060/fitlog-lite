@@ -39,3 +39,8 @@
 新增独立冻结 [命名 V14 合成备份](../tests/fixtures/fiveCombinedNamedBackupV14.json)，原17份冻结输入不改。Restore1–14、Sync/envelope1、FoodLog/NutritionTarget、删除范围/事务、计划、训练计时、三图、两报告以及 AI/Voice/PWA 更新合同不扩展。自动化仅操作隔离合成上下文及既有专用 QA profile，不触碰个人健康记录。
 
 完整执行记录、首次失败/复测、候选源指纹、原型/实际截图及发布状态见 [QA](FIVE_COMBINED_V1_QA.md)。实体 iPhone、原安装 PWA、真实键盘/滚轮/Safe Area、VoiceOver、个人连续性和真实 Provider，没有实际证据均保持 Pending。已知 WebKit 饮水 Undo −128px 不冒充本轮解决。
+
+
+## Native scroll preservation release guard
+
+Release compatibility repair: a valid frozen START and candidate control both reproduce native Food rail scrollLeft resetting to zero when an already mounted preview DOM is appended again. Its scrollend selects Sep24 instead of Oct9. Only append when the node is not already a stage child. Preserve the node, bindings, cleanup, cancellation,245ms motion and date semantics; no date reset, timer workaround or business write. foodNavigationPreservation covers headless-shell Chromium, full Chromium and WebKit at320px/140% and200%, two selected dates and8 return cycles each with all22 stores unchanged. Old-client negative control FAIL; fixed6/6 PASS. Product source is frozen again and all existing gates rerun. This is a measured release compatibility repair, not a reopened visual-flicker project.

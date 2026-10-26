@@ -20,14 +20,14 @@
 |短名称兼容|双引擎2组PASS|真实冻结旧客户端Restore→Export/Autosave→新Restore→加密Sync1|
 |3200字符旧名称兼容|双引擎2组PASS|全22表完整比较；不以新手工输入限制截断旧模板快照|
 |睡眠时钟服务|12上下文84场景PASS|NY/Paris DST、跨年、凌晨0–5:59/6:00、手动归属；en-US/en-GB是浏览器locale，不是iPhone系统12/24小时设置|
-|源码与冻结保护|PASS|原17冻结输入、78旧单测、691旧设计文件不改，159旧src/41服务完整相同，数据库schema不改|
+|源码与冻结保护|PASS|原17冻结输入、78旧单测、691旧设计文件不改，最终修复后158旧src/41服务完整相同，数据库schema不改|
 
-最终产品源冻结为临时QA提交`2ab91597b41cef204cddf669db5862f5d30f0455`，全部src与index/vite/package/lock共182文件SHA与本地stable build逐一相同。之后只调整测试驱动固定Date与真实界面就绪，不改产品源码。
+以下为日期保持兼容修复前的历史结果，产品源为临时QA提交`2ab91597b41cef204cddf669db5862f5d30f0455`，全部src与index/vite/package/lock共182文件SHA与本地stable build逐一相同。后续定位到下文DOM重复移动缺陷，最终源已重新冻结为`fb9f49a867e2be68226f74aa05ecfed7233ab6b2`并重跑全部77调用，历史PASS不能替代新源验证。
 
 - [完整远程76项](https://github.com/king-640-060/fitlog-lite/actions/runs/40250994923)：**73 PASS / 3 FAIL**，整次CI是failure，不能称为全绿。原44+14、本轮8专项共66调用，加完整Joint矩阵10宽度/引擎分片。失败为dailyRecordsExperience、foodRecovery、macroNutritionSummary，原日志和SHA保留。
 - 同182文件SHA本地`stable`完整复验：Food/Recovery **35/35**、宏量营养 **40/40**、每日记录 **65/65**（含20次实际压力往返）、WebKit饮水级联 **30/30**，全部exit0。不是smoke，也没有启用宽度筛选；未删除原断言。原模拟时钟会随长测试前进，实际负对照456分钟变458分钟，固定Date仅冻结业务日期，原生timer/rAF保持运行；Calendar等待当天格子脱离outside-month再点击。
 - 采用远程73通过与本地三完整复验补齐的**有效76调用覆盖**，不是单次76/76 CI。额外WebKit完整复验不重复扩大数量。远程固定Date重跑仍出现Food选定日期/宏量更新等待失败，不能假称每个远程失败已被时钟修复；旧正式版与当前候选只读对照诊断另行记录。
-- 新五项空库**74/74**、历史合成数据**74/74**（各2功能流+72显示上下文）、主题显式策略**8/8**、原始历史保护+命名/模板Sheet**74/74**、既有Light Native **52/52**、Management默认与Classic各**52/52**均在最终产品源远程完整通过。历史合成fixture不等于当前Today有记录；后者由原LightNative套件另有覆盖。
+- 新五项空库**74/74**、历史合成数据**74/74**（各2功能流+72显示上下文）、主题显式策略**8/8**、原始历史保护+命名/模板Sheet**74/74**、既有Light Native **52/52**、Management默认与Classic各**52/52**均在2ab历史源远程完整通过。历史合成fixture不等于当前Today有记录；后者由原LightNative套件另有覆盖。
 - 三图完整矩阵：2引擎×5宽320/375/390/430/844×明暗×100/140/200，**60/60**；每组6状态、每状态3图、每图7/30/90，**1080组实际高度量测**。每个runner因单宽筛选标diagnostic，归集已验证60个组合无缺失；另两次旧Joint one-context诊断不当作完整矩阵。原始heights值随证据归档。
 
 ## 视觉核对与必要差异
@@ -57,3 +57,10 @@
 ## Pending
 
 尚未完成的最终自动化/CI/Pages不能记为PASS。实体iPhone Safari、原安装PWA、真实键盘/原生滚轮/系统12或24小时设置、Safe Area、VoiceOver、个人历史数据连续性、真实Provider及ChatGPT独立核查继续Pending。旧WebKit饮水Undo−128px不冒充本轮已解决；此前已结案任务不重开。
+
+
+## Final source after native-scroll compatibility repair
+
+A valid local full-Chromium control loaded frozen START68 and the2ab candidate; both reproduce Sep24 selection after the rail briefly resets to scrollLeft0 on DOM reinsertion. Earlier remote baseline load failures were invalid controls, never evidence of equivalence. Actual loaded-page traces, screenshots and facts are retained. horizontalNavigation now skips append when the prepared page is already a stage child. No new date listener/timer/controller or business semantics.
+
+foodNavigationPreservation fails on frozen START; all6 fixed contexts pass across3 runtimes and2 fonts with18 measurements per context and all22 stores unchanged. Existing full-Chromium macro/Food/daily suites and all77 remote gates are being rerun on this newly frozen source. Publication remains Pending. Previous2ab PASS results cannot be relabelled as final-source PASS.
