@@ -1,0 +1,1 @@
+{"journalProgressive":true,"expandCollapse":true,"draftPreserved":true,"unicodeNewline":true}

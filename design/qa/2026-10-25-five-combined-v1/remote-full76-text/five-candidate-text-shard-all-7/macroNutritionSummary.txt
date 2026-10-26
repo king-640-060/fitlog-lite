@@ -1,0 +1,15 @@
+{"width":320,"height":932,"scale":100,"colorScheme":"light","sharedExactHtml":true,"ratiosAndTargets":true,"noWeightHidden":true,"unknownMacroHidden":true,"historicalDate":true,"liveCrossPageWeight":true,"all20Editable":true,"singleMealEntry":true,"largeValues":true,"noOverflowOverlapOrOrphan":true,"textContrast45":true,"errors":[],"physicalIPhone":"Pending"}
+{"width":320,"height":932,"scale":100,"colorScheme":"dark","sharedExactHtml":true,"ratiosAndTargets":true,"noWeightHidden":true,"unknownMacroHidden":true,"historicalDate":true,"liveCrossPageWeight":true,"all20Editable":true,"singleMealEntry":true,"largeValues":true,"noOverflowOverlapOrOrphan":true,"textContrast45":true,"errors":[],"physicalIPhone":"Pending"}
+{"width":320,"height":932,"scale":120,"colorScheme":"light","sharedExactHtml":true,"ratiosAndTargets":true,"noWeightHidden":true,"unknownMacroHidden":true,"historicalDate":true,"liveCrossPageWeight":true,"all20Editable":true,"singleMealEntry":true,"largeValues":true,"noOverflowOverlapOrOrphan":true,"textContrast45":true,"errors":[],"physicalIPhone":"Pending"}
+{"width":320,"height":932,"scale":120,"colorScheme":"dark","sharedExactHtml":true,"ratiosAndTargets":true,"noWeightHidden":true,"unknownMacroHidden":true,"historicalDate":true,"liveCrossPageWeight":true,"all20Editable":true,"singleMealEntry":true,"largeValues":true,"noOverflowOverlapOrOrphan":true,"textContrast45":true,"errors":[],"physicalIPhone":"Pending"}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.waitForFunction: Timeout 12000ms exceeded.
+    at /Users/runner/work/fitlog-lite/fitlog-lite/tests/browser/macroNutritionSummary.mjs:42:436 {
+  log: [],
+  name: 'TimeoutError'
+}
+
+Node.js v24.16.0

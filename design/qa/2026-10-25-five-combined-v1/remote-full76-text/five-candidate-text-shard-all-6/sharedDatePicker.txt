@@ -1,0 +1,4 @@
+{"mode":"local","width":320,"height":812,"foodDraftCancelCommit":true,"taskPreserved":true,"inbox":true,"workoutBusinessDate":true,"crossYear":true,"keyboard":true,"reducedMotion":true,"errors":[]}
+{"mode":"local","width":375,"height":812,"foodDraftCancelCommit":true,"taskPreserved":true,"inbox":true,"workoutBusinessDate":true,"crossYear":true,"keyboard":true,"reducedMotion":true,"errors":[]}
+{"mode":"local","width":390,"height":844,"foodDraftCancelCommit":true,"taskPreserved":true,"inbox":true,"workoutBusinessDate":true,"crossYear":true,"keyboard":true,"reducedMotion":true,"errors":[]}
+{"mode":"local","width":430,"height":932,"foodDraftCancelCommit":true,"taskPreserved":true,"inbox":true,"workoutBusinessDate":true,"crossYear":true,"keyboard":true,"reducedMotion":true,"errors":[]}

@@ -9,7 +9,7 @@
     {
       "file": "src/main.ts",
       "before": "d48680686b2f2f662dc232c80eb376ed98827883e9cc6301bc29c3c63e35b5eb",
-      "after": "5f89bafee2f0553dd49fd761df90221ddf620c3a9e51841ba33b11b6b12f3ab0"
+      "after": "0cc7993c949e66c20ebba7ff933cfdc410e4c99a914741b7e4805e345add9829"
     },
     {
       "file": "src/services/appearanceConfig.ts",
@@ -45,6 +45,11 @@
       "file": "src/styles/main.css",
       "before": "e1ec0436c8f9cf4bb1f8e2eb94649816f6cd120601e3d4eb3b37ef459430bd09",
       "after": "4f03b375ab1a8a924504f4c093e89763a8c569e16452e93b35bd13a4631a0d6a"
+    },
+    {
+      "file": "src/styles/nutritionBudget.css",
+      "before": "87c523b3ee052aba15c56bd800a9ad421a78dd05bde06718fbd38a5e5bb82b8a",
+      "after": "b0686c0b4261ac618f3cbf5397f0163171812f946c81f2af716bdcebfd8f11b1"
     },
     {
       "file": "src/styles/recovery.css",
@@ -102,14 +107,24 @@
       "after": "c06bda99e21ae88917c220ae449f892afca4e7d4754b17a3d416334d61115b49"
     },
     {
+      "file": "tests/browser/catalogRecovery.mjs",
+      "before": "12676b00d21de2f837b8b8245d250909ee51ea38cfd12f07efecd570b979d97b",
+      "after": "df130997eba3441202248b158129d2b60cba8a87b900e62d75a8db9af650119a"
+    },
+    {
       "file": "tests/browser/combinedInteractionV04.mjs",
       "before": "10c9e99195abc99fe78e3ca6f7c6f9747dbfae8fe205192da363ac309ce5a552",
       "after": "01e96f7730f676eee1a6af7db7e91b710b51dabf95983d01ce2f80cd2ed7a06c"
     },
     {
+      "file": "tests/browser/dailyRecordsExperience.mjs",
+      "before": "a56f9f72bbb51bc70a8ef1c4ea695c88a6b9500fdc38dae899f7d09d3df19b3c",
+      "after": "7b0bfcbca85585fd6b3b2cb4cd5184e163888beafb2fff06aa2a24e3a227460b"
+    },
+    {
       "file": "tests/browser/foodRecovery.mjs",
       "before": "523438ccd3e6e0fd321bae79de0e79600bbafd1e17fa5f67d88a77539beb68dd",
-      "after": "740920a03d9b480f8da75353cd97b4a0b44c39dcb878b172cd90cc502ecb2190"
+      "after": "95e8af64b7dc617ec475605fed50fa775d18e7a15e5b4da5f33a9e4f849e414f"
     },
     {
       "file": "tests/browser/foodServing.mjs",
@@ -119,12 +134,12 @@
     {
       "file": "tests/browser/interactionStabilization.mjs",
       "before": "9c89898f6d05f723abc7979e2f646a14440abbae90db810832094c0b996bdfc3",
-      "after": "0ef3786d4308ab2f4b7b0997e311000311eba9de4a2eceb10eeb9743bbbb0d41"
+      "after": "bafa53f296efc7e7ba32045d6aa03523d1e3a45e8ac30cdb33293a368c8fb4e3"
     },
     {
       "file": "tests/browser/macroNutritionSummary.mjs",
       "before": "fd0c9267fee0362c901d82608eda1064c2e623d42e0b6354e140d1868b2e441c",
-      "after": "f1099bab459bc13353431dfa45080a6a8dabec5bbc877e23b65dc6c6fdf29394"
+      "after": "c78a8ebbfcd522a27cf9a3ddf5d9947ce670f378b9f62fc80def369a9da93149"
     },
     {
       "file": "tests/browser/managementV061.mjs",
@@ -150,6 +165,11 @@
       "file": "tests/browser/todayWaterButton.mjs",
       "before": "5430bba67504c44574c4530efd30f656b368979c78eb910f8edc5b06846531f0",
       "after": "1f821c97a213b87295ad0b830273ed8f7536fedd0b8d261bb705c9d6ec93b7d7"
+    },
+    {
+      "file": "tests/browser/uxWaterCascade.mjs",
+      "before": "badd6bacab994862c4e44118e4a52c40f399117bed011101f05362b40fa46008",
+      "after": "a905fbd22f5c1eccf673a645fb171a8779c29e70f3c3bba7d545ea3a7c66f673"
     }
   ],
   "originalAssertions": [
@@ -172,8 +192,20 @@
       "approvedPresentationChange": null
     },
     {
+      "file": "tests/browser/catalogRecovery.mjs",
+      "originalAssertions": 42,
+      "businessAndStructuralAssertionsUnchanged": true,
+      "approvedPresentationChange": null
+    },
+    {
       "file": "tests/browser/combinedInteractionV04.mjs",
       "originalAssertions": 50,
+      "businessAndStructuralAssertionsUnchanged": true,
+      "approvedPresentationChange": null
+    },
+    {
+      "file": "tests/browser/dailyRecordsExperience.mjs",
+      "originalAssertions": 74,
       "businessAndStructuralAssertionsUnchanged": true,
       "approvedPresentationChange": null
     },
@@ -230,6 +262,12 @@
       "originalAssertions": 68,
       "businessAndStructuralAssertionsUnchanged": true,
       "approvedPresentationChange": null
+    },
+    {
+      "file": "tests/browser/uxWaterCascade.mjs",
+      "originalAssertions": 37,
+      "businessAndStructuralAssertionsUnchanged": true,
+      "approvedPresentationChange": null
     }
   ],
   "oldFixtureJson": {
@@ -281,7 +319,7 @@
   "oldUnitFiles": 78,
   "oldDesignFiles": 691,
   "oldQaFiles": 0,
-  "unchangedSources": 160,
+  "unchangedSources": 159,
   "unchangedServices": 41,
   "protectedFiles": [
     {
@@ -3349,10 +3387,6 @@
       "sha256": "4219f65ed0d22c707e09d358328ee751181c51cf2b51f9199fb154ab2d80837e"
     },
     {
-      "file": "src/styles/nutritionBudget.css",
-      "sha256": "87c523b3ee052aba15c56bd800a9ad421a78dd05bde06718fbd38a5e5bb82b8a"
-    },
-    {
       "file": "src/styles/nutritionCycles.css",
       "sha256": "3eaf5302d0e66773ec63fd7b679a38d8dad5f01925fba23471630cceeb455a11"
     },
@@ -3769,10 +3803,6 @@
       "sha256": "f16f82c8755122049b704b3a6ba55275c3b411e3cbbb3e48e2fd0c44617ab715"
     },
     {
-      "file": "tests/browser/catalogRecovery.mjs",
-      "sha256": "12676b00d21de2f837b8b8245d250909ee51ea38cfd12f07efecd570b979d97b"
-    },
-    {
       "file": "tests/browser/coachReportExperience.mjs",
       "sha256": "44f8b60a7bb14ad411e9130065e3cef17c0d992ad10beb55f34e0681462be10a"
     },
@@ -3811,10 +3841,6 @@
     {
       "file": "tests/browser/combinedPrototype.mjs",
       "sha256": "c0495cbaca22fb6f8f2701a71ad13b3ac99b593171fdc5daada79504ebccbb98"
-    },
-    {
-      "file": "tests/browser/dailyRecordsExperience.mjs",
-      "sha256": "a56f9f72bbb51bc70a8ef1c4ea695c88a6b9500fdc38dae899f7d09d3df19b3c"
     },
     {
       "file": "tests/browser/dietEvents.mjs",
@@ -3971,10 +3997,6 @@
     {
       "file": "tests/browser/unifiedExperiencePreservation.mjs",
       "sha256": "536238f2396a5868b15acf1baffc2cb19c3fee93062742e2d933df33caccba94"
-    },
-    {
-      "file": "tests/browser/uxWaterCascade.mjs",
-      "sha256": "badd6bacab994862c4e44118e4a52c40f399117bed011101f05362b40fa46008"
     },
     {
       "file": "tests/browser/uxWaterCascadeBackup.mjs",

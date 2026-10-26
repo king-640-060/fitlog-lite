@@ -1,0 +1,1 @@
+{"cycles":20,"globalListeners":{"window":28,"document":12},"resources":{"intervals":0,"frames":0},"deleteLastAcrossTodayTrendCalendarDayMonth":true,"sameSheetBackgroundWritesPreserveDrafts":true,"stableListenerCounts":true,"noTimerResidue":true,"exactly20DistinctManualSessions":true,"noOrphanSheetOrLocks":true,"physicalIPhone":"Pending"}

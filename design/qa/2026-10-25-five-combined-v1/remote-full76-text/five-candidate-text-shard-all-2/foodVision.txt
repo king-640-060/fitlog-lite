@@ -1,0 +1,4 @@
+{"mode":"local","width":320,"height":812,"threeEntrances":true,"probe":true,"preprocessing":true,"explicitWrites":true,"dualUnits":true,"mlGuard":true,"stopErrors":true,"errors":[]}
+{"mode":"local","width":375,"height":812,"threeEntrances":true,"probe":true,"preprocessing":true,"explicitWrites":true,"dualUnits":true,"mlGuard":true,"stopErrors":true,"errors":[]}
+{"mode":"local","width":390,"height":844,"threeEntrances":true,"probe":true,"preprocessing":true,"explicitWrites":true,"dualUnits":true,"mlGuard":true,"stopErrors":true,"errors":[]}
+{"mode":"local","width":430,"height":932,"threeEntrances":true,"probe":true,"preprocessing":true,"explicitWrites":true,"dualUnits":true,"mlGuard":true,"stopErrors":true,"errors":[]}

@@ -1,0 +1,4 @@
+{"suite":"mobileLayout","width":320,"height":812,"safeAreaMock":true,"mainTabs":5,"navReserve":true,"imports":["CSV","JSON"],"macros":3,"font120":true,"errors":[]}
+{"suite":"mobileLayout","width":375,"height":812,"safeAreaMock":true,"mainTabs":5,"navReserve":true,"imports":["CSV","JSON"],"macros":3,"font120":true,"errors":[]}
+{"suite":"mobileLayout","width":390,"height":844,"safeAreaMock":true,"mainTabs":5,"navReserve":true,"imports":["CSV","JSON"],"macros":3,"font120":true,"errors":[]}
+{"suite":"mobileLayout","width":430,"height":932,"safeAreaMock":true,"mainTabs":5,"navReserve":true,"imports":["CSV","JSON"],"macros":3,"font120":true,"errors":[]}

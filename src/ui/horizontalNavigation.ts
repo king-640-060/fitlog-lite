@@ -128,7 +128,9 @@ export function createPageNavigation<T extends string>(options: {
     if (revision !== token || navigationBlocked(false)) { next.dispose(); next.element.remove(); return false }
     preview?.dispose(); preview?.element.remove(); preview = next; to = target; previewTo = target
     next.element.style.top = `${window.scrollY - (scrollPositions.get(tabs[target]!) ?? 0)}px`
-    stage.append(next.element); return true
+    // Prepared pages may already be mounted for layout; moving the same DOM resets native scroll in Chromium.
+    if (next.element.parentElement !== stage) stage.append(next.element)
+    return true
   }
   const finish = async (distance: number, commit: boolean, token: number) => {
     if (token !== revision) return

@@ -11,10 +11,10 @@ dist/build-info.json                                           0.15 kB │ gzip:
 dist/manifest.webmanifest                                      0.38 kB
 dist/sw-build-68f4747994fd84bd2ef965c93ee3b009a3b52b72.js      0.42 kB
 dist/index.html                                                1.86 kB │ gzip:   0.89 kB
-dist/assets/index-CdJPxcMt.css                               196.19 kB │ gzip:  35.01 kB
-dist/assets/index-Cgjwb7Qd.js                              1,011.34 kB │ gzip: 320.89 kB
+dist/assets/index-CSACRS7e.css                               196.22 kB │ gzip:  35.02 kB
+dist/assets/index-DPg7v74o.js                              1,011.35 kB │ gzip: 320.89 kB
 
-✓ built in 142ms
+✓ built in 154ms
 [plugin builtin:vite-reporter] 
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
@@ -23,7 +23,7 @@ dist/assets/index-Cgjwb7Qd.js                              1,011.34 kB │ gzip:
 
 PWA v1.3.0
 mode      generateSW
-precache  17 entries (1210.25 KiB)
+precache  17 entries (1210.30 KiB)
 files generated
   dist/sw.js
   dist/workbox-9c191d2f.js

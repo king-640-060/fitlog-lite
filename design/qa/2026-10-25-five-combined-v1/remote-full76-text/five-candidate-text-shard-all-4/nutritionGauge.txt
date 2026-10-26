@@ -1,0 +1,4 @@
+{"width":320,"states":66,"fonts":[100,120,140],"horizontalBudget":true,"mainHeight":10,"excessTrackRatio":0.13,"macroDonuts":0,"sharedSvgAndTiles":true,"noOverflowOrClipping":true,"noReplay":true,"errors":[]}
+{"width":375,"states":66,"fonts":[100,120,140],"horizontalBudget":true,"mainHeight":10,"excessTrackRatio":0.13,"macroDonuts":0,"sharedSvgAndTiles":true,"noOverflowOrClipping":true,"noReplay":true,"errors":[]}
+{"width":390,"states":66,"fonts":[100,120,140],"horizontalBudget":true,"mainHeight":10,"excessTrackRatio":0.13,"macroDonuts":0,"sharedSvgAndTiles":true,"noOverflowOrClipping":true,"noReplay":true,"errors":[]}
+{"width":430,"states":66,"fonts":[100,120,140],"horizontalBudget":true,"mainHeight":10,"excessTrackRatio":0.13,"macroDonuts":0,"sharedSvgAndTiles":true,"noOverflowOrClipping":true,"noReplay":true,"errors":[]}

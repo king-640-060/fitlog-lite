@@ -1,0 +1,91 @@
+{
+  "commit": "2ab91597b41cef204cddf669db5862f5d30f0455",
+  "shard": 4,
+  "tag": "all-4",
+  "fullJoint": false,
+  "width": "390",
+  "selected": [
+    "catalogRecovery",
+    "habitDeletion",
+    "nutritionGauge",
+    "unifiedExperience",
+    "foodWaterDayV04",
+    "prior-goal",
+    "native-rail",
+    "five-functional"
+  ],
+  "results": [
+    {
+      "name": "catalogRecovery",
+      "file": "catalogRecovery",
+      "start": "2026-10-26T01:08:19.457Z",
+      "end": "2026-10-26T01:10:56.785Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "df130997eba3441202248b158129d2b60cba8a87b900e62d75a8db9af650119a"
+    },
+    {
+      "name": "habitDeletion",
+      "file": "habitDeletion",
+      "start": "2026-10-26T01:10:56.846Z",
+      "end": "2026-10-26T01:12:01.130Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "0a9dfb233f71756555163eb48d544766ff90b381151140981e442cccb48c1288"
+    },
+    {
+      "name": "nutritionGauge",
+      "file": "nutritionGauge",
+      "start": "2026-10-26T01:12:01.198Z",
+      "end": "2026-10-26T01:14:32.281Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "f0517166f7d34a10dca1e48199f831b2d41b2e36a1cb39c6421c166880271811"
+    },
+    {
+      "name": "unifiedExperience",
+      "file": "unifiedExperience",
+      "start": "2026-10-26T01:14:32.341Z",
+      "end": "2026-10-26T01:33:33.055Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "488a709896ea4bf738a8e1171fa2318a5ba9038c693574d2577ea02b4ca5b3e9"
+    },
+    {
+      "name": "foodWaterDayV04",
+      "file": "foodWaterDayV04",
+      "start": "2026-10-26T01:33:33.115Z",
+      "end": "2026-10-26T01:43:25.840Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "8ae61597fef9da26e38e095bf672b2973d56356665c24da33d20fb9edd30aec6"
+    },
+    {
+      "name": "prior-goal",
+      "file": "nutritionGoalTemplate",
+      "start": "2026-10-26T01:43:25.874Z",
+      "end": "2026-10-26T01:51:30.588Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "41ee6d4130416b2096095749c28bab30cd1dd74a1c3e9f6044104a8dbfa25531"
+    },
+    {
+      "name": "native-rail",
+      "file": "combinedInteractionRail",
+      "start": "2026-10-26T01:51:30.634Z",
+      "end": "2026-10-26T01:51:38.522Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "93ba8c01aaa46b6a5019598c985bf4353995d86ef54505ebe22e33398744d0d0"
+    },
+    {
+      "name": "five-functional",
+      "file": "fiveCombinedV1",
+      "start": "2026-10-26T01:51:38.533Z",
+      "end": "2026-10-26T01:52:02.783Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "5ee63c5b8ceb25bbe1965be1e28089aa2ecc8bc301dc63fa2122c249d8344ba2"
+    }
+  ]
+}

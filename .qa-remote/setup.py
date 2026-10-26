@@ -20,15 +20,3 @@ for port,base in [(5459,site),(5443,r),(5456,q/'v13'),(5450,q/'v14')]:
   except Exception:
    if attempt==99: raise
    time.sleep(.1)
-
-with tarfile.open(q/'start.tgz') as t:t.extractall(q/'start')
-subprocess.Popen(['python3','-m','http.server','5461','--bind','127.0.0.1','--directory',str(q/'start')],stdout=(q/'server-5461.txt').open('w'),stderr=subprocess.STDOUT,start_new_session=True)
-
-for attempt in range(100):
- try:
-  with urllib.request.urlopen('http://127.0.0.1:5461/fitlog-lite/build-info.json',timeout=3) as response:
-   info=json.load(response);assert info['build']=='68f4747994fd84bd2ef965c93ee3b009a3b52b72'
-  print('Frozen actual HTTP identity',info,flush=True);break
- except Exception:
-  if attempt==99:raise
-  time.sleep(.1)

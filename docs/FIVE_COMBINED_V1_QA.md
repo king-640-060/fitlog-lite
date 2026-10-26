@@ -20,9 +20,15 @@
 |短名称兼容|双引擎2组PASS|真实冻结旧客户端Restore→Export/Autosave→新Restore→加密Sync1|
 |3200字符旧名称兼容|双引擎2组PASS|全22表完整比较；不以新手工输入限制截断旧模板快照|
 |睡眠时钟服务|12上下文84场景PASS|NY/Paris DST、跨年、凌晨0–5:59/6:00、手动归属；en-US/en-GB是浏览器locale，不是iPhone系统12/24小时设置|
-|源码与冻结保护|PASS|原17冻结输入、78旧单测、691旧设计文件不改，160旧src/41服务完整相同，数据库schema不改|
+|源码与冻结保护|PASS|原17冻结输入、78旧单测、691旧设计文件不改，159旧src/41服务完整相同，数据库schema不改|
 
-全量浏览器回归与本轮最终矩阵仍在执行，不能把之前候选的PASS计为最终源码PASS。空/有记录的双引擎完整矩阵、历史原始字段保护、主题显式选择、既有44+14、LightNative52以及Management两套52的最终结果必须逐项汇总，任何失败不得遗漏。
+最终产品源冻结为临时QA提交`2ab91597b41cef204cddf669db5862f5d30f0455`，全部src与index/vite/package/lock共182文件SHA与本地stable build逐一相同。之后只调整测试驱动固定Date与真实界面就绪，不改产品源码。
+
+- [完整远程76项](https://github.com/king-640-060/fitlog-lite/actions/runs/40250994923)：**73 PASS / 3 FAIL**，整次CI是failure，不能称为全绿。原44+14、本轮8专项共66调用，加完整Joint矩阵10宽度/引擎分片。失败为dailyRecordsExperience、foodRecovery、macroNutritionSummary，原日志和SHA保留。
+- 同182文件SHA本地`stable`完整复验：Food/Recovery **35/35**、宏量营养 **40/40**、每日记录 **65/65**（含20次实际压力往返）、WebKit饮水级联 **30/30**，全部exit0。不是smoke，也没有启用宽度筛选；未删除原断言。原模拟时钟会随长测试前进，实际负对照456分钟变458分钟，固定Date仅冻结业务日期，原生timer/rAF保持运行；Calendar等待当天格子脱离outside-month再点击。
+- 采用远程73通过与本地三完整复验补齐的**有效76调用覆盖**，不是单次76/76 CI。额外WebKit完整复验不重复扩大数量。远程固定Date重跑仍出现Food选定日期/宏量更新等待失败，不能假称每个远程失败已被时钟修复；旧正式版与当前候选只读对照诊断另行记录。
+- 新五项空库**74/74**、历史合成数据**74/74**（各2功能流+72显示上下文）、主题显式策略**8/8**、原始历史保护+命名/模板Sheet**74/74**、既有Light Native **52/52**、Management默认与Classic各**52/52**均在最终产品源远程完整通过。历史合成fixture不等于当前Today有记录；后者由原LightNative套件另有覆盖。
+- 三图完整矩阵：2引擎×5宽320/375/390/430/844×明暗×100/140/200，**60/60**；每组6状态、每状态3图、每图7/30/90，**1080组实际高度量测**。每个runner因单宽筛选标diagnostic，归集已验证60个组合无缺失；另两次旧Joint one-context诊断不当作完整矩阵。原始heights值随证据归档。
 
 ## 视觉核对与必要差异
 
@@ -32,14 +38,15 @@
 
 ## 实际失败、修复与复测原则
 
-- 历史名称专项的旧候选负对照真实FAIL：只命名后后台/退出触发强制全量Autosave，旧日志首尾空白及未知set字段被归一化丢失。产品改为只排空真实待保存编辑；名称专用事务只写name/updatedAt。双引擎开发流复测PASS；最终冻结完整专项仍需独立汇总。
-- 主题负对照真实FAIL：隐式Classic已勾选，点击同一radio没有change而未固定显式选择。新增click/change去重与Classic旧模式动作固定选择；双引擎8组开发复测PASS，最终冻结专项另记。
+- 历史名称专项的旧候选负对照真实FAIL：只命名后后台/退出触发强制全量Autosave，旧日志首尾空白及未知set字段被归一化丢失。产品改为只排空真实待保存编辑；名称专用事务只写name/updatedAt。双引擎开发流复测PASS；最终冻结完整专项74/74已通过。
+- 主题负对照真实FAIL：隐式Classic已勾选，点击同一radio没有change而未固定显式选择。新增click/change去重与Classic旧模式动作固定选择；双引擎8组开发复测PASS，最终冻结策略8/8已通过。
 - 200%模板同步短句出现单字孤行，已通过原生checkbox独立布局、清除共用数字后缀padding及均衡文本换行修复；保留原图及双引擎复测。
 - 原有测试驱动只适配实际过渡完成、异步保存/跨页刷新就绪和本轮批准的Classic模式设置。所有原业务/结构assert保持逐字一致，唯一呈现assert由Native浅色meta恢复到冻结Classic `#f5f2eb`。独立motion套件仍量测运动本身，不用静态等待绕过动画要求。
 - 最终回归出现多项locator稳定性超时。系统日志同期多次Sleep/DarkWake；诊断中Node已超时10秒，页面performance/动画仅经过约1秒。已保留原始失败和电源事件，保持唤醒后应完整复跑；不能把休眠关联推测为每个失败的确定原因，也不能直接改为PASS。
 - 冻结候选实际发现今日新增训练名称的长英文撑宽卡片，现仅为`[data-today-workout-names]`增加`overflow-wrap:anywhere`；320px长名称实页重新测量卡片288px、内部无越界。其后本地LightNative前22上下文通过，整套因40分钟环境超时终止，不能记完整52PASS。
 - 为绕过本机合盖休眠，使用临时非发布QA分支运行隔离macOS runner；未改变main或Pages。[首次完整66项](https://github.com/king-640-060/fitlog-lite/actions/runs/40223821878)实际60PASS/6FAIL，产物及所有失败保留。失败为AI初次网络就绪超时、Food/宏观营养旧驱动取样早于真实刷新、原趋势边界取样、原减少动态导航时序，以及320px/200%“剩余目标”单字孤行。最后一项已用标题均衡换行修复；驱动仅补充真实源/路由就绪，原assert不降低。不能把此60/66称为交付通过。
-- [下一次完整66项](https://github.com/king-640-060/fitlog-lite/actions/runs/40244745123)对应临时候选`3ef390f4af8fe45f328ed6c1e49e008b27331d68`，仍待实际完成与核对。该SHA不是Application或END；临时workflow/旧baseline支持资产不会进入正式main。小文本产物与完整截图分开上传，便于复核。
+- [第二次完整66项](https://github.com/king-640-060/fitlog-lite/actions/runs/40244745123)候选`3ef390f4af8fe45f328ed6c1e49e008b27331d68`实际62PASS/4FAIL，非最终发布源。后续最后的目标短句均衡换行和空餐重复0项文案也已纳入最终2ab源码；临时QA workflow/旧基线资产不进入main。
+- 320px/200%正式START实页的“未设置目标”出现“未设置目 / 标”已实际截图；正式实现用text-wrap:balance保留完整字号和目标语义。空餐仅移除重复0项计数，kcal、未记录和真实记录入口保留。本地双引擎通过；Application/END实际正式站复验仍须在部署后取得。
 
 ## 数据与部署门槛
 

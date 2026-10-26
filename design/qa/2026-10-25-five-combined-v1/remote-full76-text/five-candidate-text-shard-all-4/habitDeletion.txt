@@ -1,0 +1,12 @@
+{"width":320,"scale":100,"counts":[0,1,100],"cancelPreserves":true,"quietDanger":true,"allHistoryDeleted":true,"unrelatedPreserved":true,"todayManagerCalendarReports":true}
+{"width":320,"scale":120,"counts":[0,1,100],"cancelPreserves":true,"quietDanger":true,"allHistoryDeleted":true,"unrelatedPreserved":true,"todayManagerCalendarReports":true}
+{"width":320,"scale":140,"counts":[0,1,100],"cancelPreserves":true,"quietDanger":true,"allHistoryDeleted":true,"unrelatedPreserved":true,"todayManagerCalendarReports":true}
+{"width":375,"scale":100,"counts":[0,1,100],"cancelPreserves":true,"quietDanger":true,"allHistoryDeleted":true,"unrelatedPreserved":true,"todayManagerCalendarReports":true}
+{"width":375,"scale":120,"counts":[0,1,100],"cancelPreserves":true,"quietDanger":true,"allHistoryDeleted":true,"unrelatedPreserved":true,"todayManagerCalendarReports":true}
+{"width":375,"scale":140,"counts":[0,1,100],"cancelPreserves":true,"quietDanger":true,"allHistoryDeleted":true,"unrelatedPreserved":true,"todayManagerCalendarReports":true}
+{"width":390,"scale":100,"counts":[0,1,100],"cancelPreserves":true,"quietDanger":true,"allHistoryDeleted":true,"unrelatedPreserved":true,"todayManagerCalendarReports":true}
+{"width":390,"scale":120,"counts":[0,1,100],"cancelPreserves":true,"quietDanger":true,"allHistoryDeleted":true,"unrelatedPreserved":true,"todayManagerCalendarReports":true}
+{"width":390,"scale":140,"counts":[0,1,100],"cancelPreserves":true,"quietDanger":true,"allHistoryDeleted":true,"unrelatedPreserved":true,"todayManagerCalendarReports":true}
+{"width":430,"scale":100,"counts":[0,1,100],"cancelPreserves":true,"quietDanger":true,"allHistoryDeleted":true,"unrelatedPreserved":true,"todayManagerCalendarReports":true}
+{"width":430,"scale":120,"counts":[0,1,100],"cancelPreserves":true,"quietDanger":true,"allHistoryDeleted":true,"unrelatedPreserved":true,"todayManagerCalendarReports":true}
+{"width":430,"scale":140,"counts":[0,1,100],"cancelPreserves":true,"quietDanger":true,"allHistoryDeleted":true,"unrelatedPreserved":true,"todayManagerCalendarReports":true}

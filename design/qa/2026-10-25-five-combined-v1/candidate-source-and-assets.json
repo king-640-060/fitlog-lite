@@ -29,7 +29,7 @@
     "src/build.d.ts": "99b7d47576a729f20d569d1369b0c80deb55a558de90b85347aef8e953f76164",
     "src/db/database.ts": "cd72bbc24447bfa6626cc91e332f69e0c5a6d9a3b8a4ff95cbb6f2ca8ea0b79f",
     "src/db/types.ts": "9accb4f5f34304dd2f6ef8d6b7ffbad5f45191520990aa846ab5ad7af2ed143f",
-    "src/main.ts": "5f89bafee2f0553dd49fd761df90221ddf620c3a9e51841ba33b11b6b12f3ab0",
+    "src/main.ts": "0cc7993c949e66c20ebba7ff933cfdc410e4c99a914741b7e4805e345add9829",
     "src/pwa/diagnostics.ts": "1dbab9f49f96ce8233646e9c7f678eef47952b6c84e9fa5659b9f6c6e91d0185",
     "src/pwa/runtime.ts": "6bcd3fe7f20ab821eb5382fd22335227fa4722acfdc304f0ebdc7ca489253740",
     "src/services/aiProfiles.ts": "ec369b493352d3d7c2a046c3894effc6eb88854f8e437e090a9119289bc00091",
@@ -90,7 +90,7 @@
     "src/styles/main.css": "4f03b375ab1a8a924504f4c093e89763a8c569e16452e93b35bd13a4631a0d6a",
     "src/styles/management.css": "793146fcecede3a41a12e9d8e4d3c53e24e9e8af1bab584514162a38032acf53",
     "src/styles/modules.css": "4219f65ed0d22c707e09d358328ee751181c51cf2b51f9199fb154ab2d80837e",
-    "src/styles/nutritionBudget.css": "87c523b3ee052aba15c56bd800a9ad421a78dd05bde06718fbd38a5e5bb82b8a",
+    "src/styles/nutritionBudget.css": "b0686c0b4261ac618f3cbf5397f0163171812f946c81f2af716bdcebfd8f11b1",
     "src/styles/nutritionCycles.css": "3eaf5302d0e66773ec63fd7b679a38d8dad5f01925fba23471630cceeb455a11",
     "src/styles/nutritionStrategies.css": "51c97a9c2cebd117158554b8f07f59484f00ee0b09d1c3ef15e16c49ef04dc4d",
     "src/styles/plan.css": "078b8699b992a932663c45bde4d9134019ce24c7f7be298619c959de595d1dbf",
@@ -191,14 +191,14 @@
     "local": true,
     "base": "/fitlog-lite/",
     "assets": [
-      "assets/index-Cgjwb7Qd.js",
-      "assets/index-CdJPxcMt.css"
+      "assets/index-DPg7v74o.js",
+      "assets/index-CSACRS7e.css"
     ]
   },
   "resources": {
-    "build-info.json": "832a48b0de1932f36bed9c51592f86c41c96501aefa44879d6deeafeff9b756f",
+    "build-info.json": "097747960da4c554045c0cab01cc9286303ae6277beb6446f1f2a5a3fc853212",
     "pwa-512.svg": "479df2bed0bb05a34fbfd5e4ce33ff610eb42636c86a4d48b571e8009a88c8eb",
-    "index.html": "ba248d3bdbb5f1b4dc4e2431b7cbd4ba2752b8815eadcb02ecd3b840883dd372",
+    "index.html": "282f78a6863e61ae2c6d0ec078ce38c878dd9ac9d985b0ca4bc209debd25b662",
     "apple-touch-icon.png": "71d298fc04dc1953f0437af24737d02632ef0613f13828923b1d67c33e4755ae",
     "sw-build-68f4747994fd84bd2ef965c93ee3b009a3b52b72.js": "154d9624b7e1318834a2b8be426c3d4c3bc92eb4d8a8dc0f1b69016ed7926524",
     "workbox-9c191d2f.js": "04b086f1b2f4215ee4b659a7bc9c76162894abdb43fa876247bc7c0bd6fd1c37",
@@ -208,8 +208,8 @@
     "manifest.webmanifest": "b8bce2719693cea3c36c7e244a5facf64225a285b290bcb15dd47fcb0161d54e",
     "icons.svg": "b45fa506195cfcdef406ba9f0c77b36ddc1a7c224040926ec70abc2fdea7b93a",
     "favicon.svg": "222da72a02c3074ea9267b0b8fcd27588c2e32811074da6ab32432458db1a70d",
-    "sw.js": "b999b2c9315330dca07aa7d7b43b20667ac3b09102cab06bfc352ee1a2101b60",
-    "assets/index-CdJPxcMt.css": "580f9aed06cb629d496a8f3aad04eea45f0d025a5216e7369ea2e35cc0414593",
-    "assets/index-Cgjwb7Qd.js": "8d8b8e517dae538e364e61274b18347a6762d87c07d1422ea621acd2eb432775"
+    "sw.js": "9466df6fae2ff7681d90948945cca291ef979891154ca40eca66b3d9b6f0fae6",
+    "assets/index-CSACRS7e.css": "90a16677f18c80aa97be63a5a7067bf40ae5e498a84b833e78bafd29de56d60d",
+    "assets/index-DPg7v74o.js": "1e365e69e224c4c7b69e263dc4c8243fe3777bfa2eb072e8b64be28df0025f34"
   }
 }

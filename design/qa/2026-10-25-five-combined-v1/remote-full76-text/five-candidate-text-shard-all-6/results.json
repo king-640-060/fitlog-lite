@@ -1,0 +1,91 @@
+{
+  "commit": "2ab91597b41cef204cddf669db5862f5d30f0455",
+  "shard": 6,
+  "tag": "all-6",
+  "fullJoint": false,
+  "width": "390",
+  "selected": [
+    "dailyRecordsExperience",
+    "interactionStabilization",
+    "sharedDatePicker",
+    "v4FoodPlanToday",
+    "foodWaterBackupV04",
+    "prior-portion",
+    "training-motion",
+    "history-and-sheets"
+  ],
+  "results": [
+    {
+      "name": "dailyRecordsExperience",
+      "file": "dailyRecordsExperience",
+      "start": "2026-10-26T01:15:47.453Z",
+      "end": "2026-10-26T01:27:29.087Z",
+      "exitCode": 1,
+      "status": "FAIL",
+      "testSourceSha": "a56f9f72bbb51bc70a8ef1c4ea695c88a6b9500fdc38dae899f7d09d3df19b3c"
+    },
+    {
+      "name": "interactionStabilization",
+      "file": "interactionStabilization",
+      "start": "2026-10-26T01:27:29.132Z",
+      "end": "2026-10-26T01:31:17.172Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "bafa53f296efc7e7ba32045d6aa03523d1e3a45e8ac30cdb33293a368c8fb4e3"
+    },
+    {
+      "name": "sharedDatePicker",
+      "file": "sharedDatePicker",
+      "start": "2026-10-26T01:31:17.195Z",
+      "end": "2026-10-26T01:31:52.231Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "52e48626126785bcb8b333f156b0e45f2d3f9233060634525d88e0acd8e92643"
+    },
+    {
+      "name": "v4FoodPlanToday",
+      "file": "v4FoodPlanToday",
+      "start": "2026-10-26T01:31:52.253Z",
+      "end": "2026-10-26T01:45:30.401Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "c8472479d98cef237ea4e8cbc1048fe4ec92add254b14f377775c23a8b8491b8"
+    },
+    {
+      "name": "foodWaterBackupV04",
+      "file": "foodWaterBackupV04",
+      "start": "2026-10-26T01:45:30.471Z",
+      "end": "2026-10-26T01:45:38.424Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "93159c99a85a7f02d0bbe0dee6d2e5265a9f52ce2a471c2ee14bdbbc63726039"
+    },
+    {
+      "name": "prior-portion",
+      "file": "autoPortionGoalDeselect",
+      "start": "2026-10-26T01:45:38.440Z",
+      "end": "2026-10-26T01:50:46.326Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "c06bda99e21ae88917c220ae449f892afca4e7d4754b17a3d416334d61115b49"
+    },
+    {
+      "name": "training-motion",
+      "file": "combinedInteractionMotion",
+      "start": "2026-10-26T01:50:46.388Z",
+      "end": "2026-10-26T01:50:57.383Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "bad7ba976f977d0043873956856a9773a36353caadeb4857e69759d97197f26c"
+    },
+    {
+      "name": "history-and-sheets",
+      "file": "fiveWorkoutHistoryProtection",
+      "start": "2026-10-26T01:50:57.398Z",
+      "end": "2026-10-26T01:54:27.453Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "9ab7cc5a2a7c2fb7575ec10a07dc8282a1b59c6b166f32fa51e4934f1126bfda"
+    }
+  ]
+}
