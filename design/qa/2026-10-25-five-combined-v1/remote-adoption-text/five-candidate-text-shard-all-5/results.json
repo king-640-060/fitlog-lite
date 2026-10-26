@@ -1,0 +1,91 @@
+{
+  "commit": "fb9f49a867e2be68226f74aa05ecfed7233ab6b2",
+  "shard": 5,
+  "tag": "all-5",
+  "fullJoint": false,
+  "width": "390",
+  "selected": [
+    "coachReportExperience",
+    "habitEditorLayout",
+    "nutritionTemplates",
+    "v421Consistency",
+    "foodWaterDayV04-webkit",
+    "prior-keyboard",
+    "date-race",
+    "five-functional"
+  ],
+  "results": [
+    {
+      "name": "coachReportExperience",
+      "file": "coachReportExperience",
+      "start": "2026-10-26T03:05:08.802Z",
+      "end": "2026-10-26T03:16:03.966Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "44f8b60a7bb14ad411e9130065e3cef17c0d992ad10beb55f34e0681462be10a"
+    },
+    {
+      "name": "habitEditorLayout",
+      "file": "habitEditorLayout",
+      "start": "2026-10-26T03:16:04.005Z",
+      "end": "2026-10-26T03:17:33.183Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "93625e7bfe32307585916992e04206f6f408204dafc7b8227cc5dd6226f79a14"
+    },
+    {
+      "name": "nutritionTemplates",
+      "file": "nutritionTemplates",
+      "start": "2026-10-26T03:17:33.210Z",
+      "end": "2026-10-26T03:21:36.718Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "34401fea099ecbd3ee7882fcca96e4f678c40821e6d9fb04936cdc24795f9b1b"
+    },
+    {
+      "name": "v421Consistency",
+      "file": "v421Consistency",
+      "start": "2026-10-26T03:21:36.729Z",
+      "end": "2026-10-26T03:30:24.032Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "2cf88bd594e65b6db16b5405fbcffee0908656ca50020a2572bdd17484b49d68"
+    },
+    {
+      "name": "foodWaterDayV04-webkit",
+      "file": "foodWaterDayV04",
+      "start": "2026-10-26T03:30:24.076Z",
+      "end": "2026-10-26T03:39:59.956Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "8ae61597fef9da26e38e095bf672b2973d56356665c24da33d20fb9edd30aec6"
+    },
+    {
+      "name": "prior-keyboard",
+      "file": "nutritionGoalTemplateKeyboard",
+      "start": "2026-10-26T03:40:00.020Z",
+      "end": "2026-10-26T03:40:11.380Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "3499a350ff0c9ee515626984a225d61ccb4ffa664806233e49d75df9409b4601"
+    },
+    {
+      "name": "date-race",
+      "file": "combinedInteractionConcurrency",
+      "start": "2026-10-26T03:40:11.403Z",
+      "end": "2026-10-26T03:40:18.640Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "8c94034bddfeac48ab16e1107f48648a061b600d34d907c0d8099c8767aa6aee"
+    },
+    {
+      "name": "five-functional",
+      "file": "fiveCombinedV1",
+      "start": "2026-10-26T03:40:18.650Z",
+      "end": "2026-10-26T03:40:43.092Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "5ee63c5b8ceb25bbe1965be1e28089aa2ecc8bc301dc63fa2122c249d8344ba2"
+    }
+  ]
+}

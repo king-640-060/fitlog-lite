@@ -2,7 +2,7 @@
 
 Read this before changing UI or interaction code. This document holds durable product rules; current implementation and data semantics remain authoritative.
 
-2026-10-25: [Light Native v0.5.1](LIGHT_NATIVE_V051.md) now owns the approved light presentation, state-dependent copy and ordinary Sheet motion. Earlier warm/olive descriptions below retain historical hierarchy/data semantics; their light color/shadow values are superseded. Existing dark preference and semantic fact distinctions remain; the approved light calorie/action blue supersedes the former accent.
+2026-10-25: [Five combined v1](FIVE_COMBINED_V1.md) adds exactly Classic and Light Native visual themes, an independent optional Workout name, the existing Free Training entry, scoped copy cleanup and native sleep-time styling. Classic restores the frozen v0.6.1 palette and original system/light/dark; Light Native retains the v0.5.1 fixed light presentation and ordinary Sheet motion. The absent new theme key preserves the previous effective appearance and system response without autowrite. Historical hierarchy/data/motion semantics remain authoritative.
 
 ## Comprehensive mobile quality gate
 
@@ -432,3 +432,15 @@ Each newly opened goal picker starts with no draft selection even when a real ph
 ## Light Native v0.5.1 (2026-10-25)
 
 [Implementation contract](LIGHT_NATIVE_V051.md) and [copy/state audit](LIGHT_NATIVE_V051_COPY_AUDIT.md) specify the two frozen reference roles, AA blue adjustment, preserved native/real-field differences and safe exit-shell boundary. No five-tab layout reorganization or fake prototype save/data enters production. Actual records drive introduction visibility, while missing-data limitations, plan/fact boundaries, source dates, privacy, irreversible confirmations and full editor fields stay. Enlarged text can move whole blocks into another row, with right-side compact actions and2D nonoverlap; short menu labels avoid single-character orphans. Existing compact disclosures retain full detail access. Ordinary Sheet28px/240ms plus finite content-free exit replaces older16px/200ms/immediate-only descriptions; synchronous native lifecycle and training58px/275ms remain. Physical iPhone/original PWA/IME/Safe Area/VoiceOver/personal continuity are separately Pending without evidence.
+
+
+## Five combined v1 (2026-10-25)
+
+Follow [implementation/data contract](FIVE_COMBINED_V1.md) and [copy/state audit](FIVE_COMBINED_V1_COPY_AUDIT.md). A title snapshot is optional and independent from templates; inferred single-exercise/Free Training fallback stays presentation-only. Explicit unchecked-by-default sync can name only an unnamed workout in the same template transaction. Guard stale writes, creation, repeated completion and repeated confirmation without altering factual sets/logs. Full saved times remain reachable.
+
+Use root visual tokens, never a second renderer. Preserve old appearance preference, first-upgrade effective look, native theme fixed light, page/workspace nodes and drafts. Names/visual preference must not rewrite other data. Sleep keeps native type=time and the shared viewport/date stack; no web wheel or private keyboard lifecycle. Technical graph teaching stays accessible without occupying visible space, including all-history; missing never becomes zero. Group date/weekday tokens under scaling rather than leave a single character. All legacy interaction/data gates remain; physical verification stays separate.
+
+
+## Native scroll preservation release guard
+
+Prepared main-tab pages already mounted for layout must not be appended again. Preserve native child scroll and the selected Food date during promotion; insert only an unattached result, retaining existing ownership, cleanup and motion.

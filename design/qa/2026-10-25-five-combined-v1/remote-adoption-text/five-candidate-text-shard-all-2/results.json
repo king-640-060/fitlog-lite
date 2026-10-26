@@ -1,0 +1,101 @@
+{
+  "commit": "fb9f49a867e2be68226f74aa05ecfed7233ab6b2",
+  "shard": 2,
+  "tag": "all-2",
+  "fullJoint": false,
+  "width": "390",
+  "selected": [
+    "aiStreaming",
+    "foodVision",
+    "mobileLayout",
+    "uiQualityAudit",
+    "approvedJointV05",
+    "uxWaterCascadeBackup",
+    "report-ranges",
+    "food-navigation-preservation",
+    "management-classic"
+  ],
+  "results": [
+    {
+      "name": "aiStreaming",
+      "file": "aiStreaming",
+      "start": "2026-10-26T02:40:19.759Z",
+      "end": "2026-10-26T02:40:40.955Z",
+      "exitCode": 1,
+      "status": "FAIL",
+      "testSourceSha": "17aaae1d1d241860117f6c809abfdc9fc1fdc2f048a34f6336893a62a5c0c861"
+    },
+    {
+      "name": "foodVision",
+      "file": "foodVision",
+      "start": "2026-10-26T02:40:40.975Z",
+      "end": "2026-10-26T02:41:54.582Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "5ddc8297018e0c5806c329d1b2bb94fba57289584e92235a2aacfe35ddf9bcfc"
+    },
+    {
+      "name": "mobileLayout",
+      "file": "mobileLayout",
+      "start": "2026-10-26T02:41:54.594Z",
+      "end": "2026-10-26T02:42:58.633Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "583db29a3f6fd5b7c11ff6f14e1708fa1373544932cc42b47c057587e3b86a75"
+    },
+    {
+      "name": "uiQualityAudit",
+      "file": "uiQualityAudit",
+      "start": "2026-10-26T02:42:58.639Z",
+      "end": "2026-10-26T02:49:26.930Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "5a34ca458761baa6fe6e2f1babe71115b7c640175208e5e82529206a3c466a18"
+    },
+    {
+      "name": "approvedJointV05",
+      "file": "approvedJointV05",
+      "start": "2026-10-26T02:49:26.943Z",
+      "end": "2026-10-26T02:53:23.909Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "f13083dc049dbf97857940b87c505aca06934cdd62e665b04fc924f2422fad03"
+    },
+    {
+      "name": "uxWaterCascadeBackup",
+      "file": "uxWaterCascadeBackup",
+      "start": "2026-10-26T02:53:23.916Z",
+      "end": "2026-10-26T02:53:31.996Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "e0977096cfd2206ee80565e531c57b8d35e8ce6d6af34ef772014bc7bcd11d0f"
+    },
+    {
+      "name": "report-ranges",
+      "file": "jointReportRanges",
+      "start": "2026-10-26T02:53:32.002Z",
+      "end": "2026-10-26T02:53:48.554Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "f89374947d030dc17cf6df8f433685c7f95e68eb5f176d512916a7dfe0e0a403"
+    },
+    {
+      "name": "food-navigation-preservation",
+      "file": "foodNavigationPreservation",
+      "start": "2026-10-26T02:53:48.562Z",
+      "end": "2026-10-26T02:54:25.130Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "b59cd19e263a851ceaec9c93bd05afef0994dd3abb80cd0d7dee386bdc5bfad1"
+    },
+    {
+      "name": "management-classic",
+      "file": "managementV061",
+      "start": "2026-10-26T02:54:25.140Z",
+      "end": "2026-10-26T02:58:53.034Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "770958e013aeb533b491261ca9864d4db9cbc3d6a44b5a5a77d05e82bc38dcce"
+    }
+  ]
+}

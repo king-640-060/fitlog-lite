@@ -1,0 +1,144 @@
+{
+  "inventory": [
+    "aiAssistant",
+    "aiDualModelRouting",
+    "aiStreaming",
+    "aiVoice",
+    "catalogRecovery",
+    "coachReportExperience",
+    "dailyRecordsExperience",
+    "dietEvents",
+    "foodRecovery",
+    "foodServing",
+    "foodVision",
+    "githubSyncSafety",
+    "habitDeletion",
+    "habitEditorLayout",
+    "interactionStabilization",
+    "macroNutritionSummary",
+    "managementVisualConsistency",
+    "managementWorkspace",
+    "mobileLayout",
+    "motionPolish",
+    "nutritionGauge",
+    "nutritionTemplates",
+    "sharedDatePicker",
+    "trainingJournal",
+    "trainingRecoveryExperience",
+    "trainingRecoveryLifecycle",
+    "uiQualityAudit",
+    "uiSemanticConsistency",
+    "unifiedExperience",
+    "v421Consistency",
+    "v4FoodPlanToday",
+    "voiceMode",
+    "remainingPrototype",
+    "combinedHandoff",
+    "approvedJointV05",
+    "approvedJointV05-webkit",
+    "foodWaterDayV04",
+    "foodWaterDayV04-webkit",
+    "foodWaterBackupV04",
+    "foodWaterBackupV04-webkit",
+    "uxWaterCascade",
+    "uxWaterCascade-webkit",
+    "uxWaterCascadeBackup",
+    "uxWaterCascadeBackup-webkit"
+  ],
+  "old14": [
+    "prior-goal",
+    "prior-keyboard",
+    "prior-portion",
+    "water",
+    "joint-chromium",
+    "joint-webkit",
+    "report-ranges",
+    "interaction-full",
+    "native-rail",
+    "date-race",
+    "training-motion",
+    "training-execution",
+    "navigation-flicker",
+    "restore-filter"
+  ],
+  "selected": [
+    "dailyRecordsExperience",
+    "foodRecovery",
+    "macroNutritionSummary",
+    "uxWaterCascade-webkit"
+  ],
+  "results": [
+    {
+      "name": "foodRecovery",
+      "file": "foodRecovery",
+      "command": [
+        "node",
+        "tests/browser/foodRecovery.mjs"
+      ],
+      "start": "2026-10-26T02:11:28.690Z",
+      "end": "2026-10-26T02:16:00.616Z",
+      "url": "http://127.0.0.1:5460/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "95e8af64b7dc617ec475605fed50fa775d18e7a15e5b4da5f33a9e4f849e414f",
+      "productSourceManifest": "candidate-stable-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/stable-rerun/foodRecovery/attempt-2026-10-26T02-11-28.690Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "macroNutritionSummary",
+      "file": "macroNutritionSummary",
+      "command": [
+        "node",
+        "tests/browser/macroNutritionSummary.mjs"
+      ],
+      "start": "2026-10-26T02:16:00.616Z",
+      "end": "2026-10-26T02:20:41.296Z",
+      "url": "http://127.0.0.1:5460/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "c78a8ebbfcd522a27cf9a3ddf5d9947ce670f378b9f62fc80def369a9da93149",
+      "productSourceManifest": "candidate-stable-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/stable-rerun/macroNutritionSummary/attempt-2026-10-26T02-16-00.616Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "dailyRecordsExperience",
+      "file": "dailyRecordsExperience",
+      "command": [
+        "node",
+        "tests/browser/dailyRecordsExperience.mjs"
+      ],
+      "start": "2026-10-26T02:11:28.689Z",
+      "end": "2026-10-26T02:23:06.470Z",
+      "url": "http://127.0.0.1:5460/fitlog-lite/",
+      "extra": {},
+      "testSourceSha": "7b0bfcbca85585fd6b3b2cb4cd5184e163888beafb2fff06aa2a24e3a227460b",
+      "productSourceManifest": "candidate-stable-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/stable-rerun/dailyRecordsExperience/attempt-2026-10-26T02-11-28.689Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "name": "uxWaterCascade-webkit",
+      "file": "uxWaterCascade",
+      "command": [
+        "node",
+        "tests/browser/uxWaterCascade.mjs"
+      ],
+      "start": "2026-10-26T02:20:41.297Z",
+      "end": "2026-10-26T02:23:43.867Z",
+      "url": "http://127.0.0.1:5460/fitlog-lite/",
+      "extra": {
+        "FITLOG_JOINT_ENGINE": "webkit",
+        "FITLOG_V04_ENGINE": "webkit",
+        "FITLOG_UX_ENGINE": "webkit"
+      },
+      "testSourceSha": "a905fbd22f5c1eccf673a645fb171a8779c29e70f3c3bba7d545ea3a7c66f673",
+      "productSourceManifest": "candidate-stable-identity.json",
+      "log": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/five-combined-v1-2026-10-25/stable-rerun/uxWaterCascade-webkit/attempt-2026-10-26T02-20-41.297Z.log",
+      "exitCode": 0,
+      "status": "PASS"
+    }
+  ]
+}

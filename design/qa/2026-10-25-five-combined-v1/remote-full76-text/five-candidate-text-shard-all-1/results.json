@@ -1,0 +1,101 @@
+{
+  "commit": "2ab91597b41cef204cddf669db5862f5d30f0455",
+  "shard": 1,
+  "tag": "all-1",
+  "fullJoint": false,
+  "width": "390",
+  "selected": [
+    "aiDualModelRouting",
+    "foodServing",
+    "managementWorkspace",
+    "trainingRecoveryLifecycle",
+    "combinedHandoff",
+    "uxWaterCascade-webkit",
+    "joint-webkit",
+    "restore-filter",
+    "management-classic"
+  ],
+  "results": [
+    {
+      "name": "aiDualModelRouting",
+      "file": "aiDualModelRouting",
+      "start": "2026-10-26T00:47:39.305Z",
+      "end": "2026-10-26T00:49:06.241Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "383953f30ab9f3aa87cf9cc3362386e3fa72c0d3e812517f1018501da10da60a"
+    },
+    {
+      "name": "foodServing",
+      "file": "foodServing",
+      "start": "2026-10-26T00:49:06.252Z",
+      "end": "2026-10-26T00:56:13.647Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "89b4b8af2b366a1f9e5c199c483e4e3ae2eac5adc6ebb1f025aabcd655af3a9f"
+    },
+    {
+      "name": "managementWorkspace",
+      "file": "managementWorkspace",
+      "start": "2026-10-26T00:56:13.655Z",
+      "end": "2026-10-26T00:59:20.621Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "88fff6876bfd34eab05fe6ccec000a08349f6d4e772a7ce6a67a842da6797afa"
+    },
+    {
+      "name": "trainingRecoveryLifecycle",
+      "file": "trainingRecoveryLifecycle",
+      "start": "2026-10-26T00:59:20.629Z",
+      "end": "2026-10-26T00:59:47.927Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "e9c1c709ffaa2aa4be6ccee73baef4861ca77336d7327d99acaca4b21d55c8b5"
+    },
+    {
+      "name": "combinedHandoff",
+      "file": "combinedHandoff",
+      "start": "2026-10-26T00:59:47.935Z",
+      "end": "2026-10-26T01:04:54.117Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "8c2946555691ec5a6f8d89900298972fe91cfd62e0a2cdcf8a630d40da798dd3"
+    },
+    {
+      "name": "uxWaterCascade-webkit",
+      "file": "uxWaterCascade",
+      "start": "2026-10-26T01:04:54.125Z",
+      "end": "2026-10-26T01:08:17.064Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "a905fbd22f5c1eccf673a645fb171a8779c29e70f3c3bba7d545ea3a7c66f673"
+    },
+    {
+      "name": "joint-webkit",
+      "file": "jointUxReportsRange",
+      "start": "2026-10-26T01:08:17.075Z",
+      "end": "2026-10-26T01:08:59.551Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "cf99e5b98caa87b1478c54351be8f8d94d9661039abedea44609c9342ca0136b"
+    },
+    {
+      "name": "restore-filter",
+      "file": "navigationFilterRestore",
+      "start": "2026-10-26T01:08:59.560Z",
+      "end": "2026-10-26T01:09:08.148Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "5839ca221441877e620d3fce81cd30919b8493562b2f8f4b663bd1046c6795b6"
+    },
+    {
+      "name": "management-classic",
+      "file": "managementV061",
+      "start": "2026-10-26T01:09:08.156Z",
+      "end": "2026-10-26T01:13:33.820Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "770958e013aeb533b491261ca9864d4db9cbc3d6a44b5a5a77d05e82bc38dcce"
+    }
+  ]
+}

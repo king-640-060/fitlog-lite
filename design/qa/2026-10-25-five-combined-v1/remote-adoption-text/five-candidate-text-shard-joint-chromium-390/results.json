@@ -1,0 +1,21 @@
+{
+  "commit": "fb9f49a867e2be68226f74aa05ecfed7233ab6b2",
+  "shard": 0,
+  "tag": "joint-chromium-390",
+  "fullJoint": true,
+  "width": "390",
+  "selected": [
+    "joint-chromium"
+  ],
+  "results": [
+    {
+      "name": "joint-chromium",
+      "file": "jointUxReportsRange",
+      "start": "2026-10-26T03:45:26.056Z",
+      "end": "2026-10-26T03:48:24.401Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "cf99e5b98caa87b1478c54351be8f8d94d9661039abedea44609c9342ca0136b"
+    }
+  ]
+}

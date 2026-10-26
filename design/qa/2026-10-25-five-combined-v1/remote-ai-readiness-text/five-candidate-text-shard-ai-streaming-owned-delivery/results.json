@@ -1,0 +1,21 @@
+{
+  "commit": "b62afc7d3017779601533e8a4affda70e9c0f572",
+  "shard": 0,
+  "tag": "ai-streaming-owned-delivery",
+  "fullJoint": false,
+  "width": "390",
+  "selected": [
+    "aiStreaming"
+  ],
+  "results": [
+    {
+      "name": "aiStreaming",
+      "file": "aiStreaming",
+      "start": "2026-10-26T03:34:30.115Z",
+      "end": "2026-10-26T03:35:07.736Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "aa32506eeaddca41f61fbf5d701751e8fba4ddbd24afa45587810662685e8c67"
+    }
+  ]
+}

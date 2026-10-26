@@ -1,0 +1,725 @@
+{
+  "status": "PASS",
+  "files": [
+    "AGENTS.md",
+    "LATEST_DEV_REPORT.md",
+    "docs/DATA_PRESERVATION.md",
+    "docs/UI_INTERACTION_SPEC.md",
+    "docs/UI_QA_MATRIX.md",
+    "tests/browser/README.md",
+    "design/qa/2026-10-25-five-combined-v1/README.md",
+    "design/reference/2026-10-25-five-combined-v1/DESIGN_REFERENCE.md",
+    "docs/FIVE_COMBINED_V1.md",
+    "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+    "docs/FIVE_COMBINED_V1_QA.md"
+  ],
+  "checked": 141,
+  "missing": [],
+  "results": [
+    {
+      "file": "AGENTS.md",
+      "target": "docs/CHAT_CODEX_WORKFLOW.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/DAILY_RECORDS_UX_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/TRAINING_RECOVERY_UX_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/UNIFIED_MODULE_VISUAL_HIERARCHY_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/PROFESSIONAL_FITNESS_REPORT_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/V4_2_IMPLEMENTATION_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/V4_2_1_VISUAL_REPAIR_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/NUTRITION_CYCLE_SCHEDULE.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "design/reference/2026-10-11-combined/DESIGN_REFERENCE.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/APPROVED_JOINT_V05.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "design/reference/2026-10-12-approved-v0.5/README.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/FOOD_WATER_DAY_V04.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "design/reference/2026-10-15-food-water-v0.4/README.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/UX_WATER_CASCADE_V04.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "design/reference/2026-10-17-ux01-03-v0.4/README.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/JOINT_UX_REPORTS_RANGE_V03.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/TODAY_WATER_SHEET_V01.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/NUTRITION_GOAL_TEMPLATE_V02.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/AUTO_PORTION_GOAL_DESELECT_V021.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/COMBINED_INTERACTION_V04.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/NAVIGATION_FLICKER_V041.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/MANAGEMENT_V061.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/LIGHT_NATIVE_V051.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/LIGHT_NATIVE_V051_COPY_AUDIT.md",
+      "exists": true
+    },
+    {
+      "file": "AGENTS.md",
+      "target": "docs/FIVE_COMBINED_V1.md",
+      "exists": true
+    },
+    {
+      "file": "LATEST_DEV_REPORT.md",
+      "target": "docs/FIVE_COMBINED_V1_QA.md",
+      "exists": true
+    },
+    {
+      "file": "LATEST_DEV_REPORT.md",
+      "target": "design/reference/2026-10-25-light-native-v0.5.1/DESIGN_REFERENCE.md",
+      "exists": true
+    },
+    {
+      "file": "LATEST_DEV_REPORT.md",
+      "target": "docs/LIGHT_NATIVE_V051.md",
+      "exists": true
+    },
+    {
+      "file": "LATEST_DEV_REPORT.md",
+      "target": "docs/LIGHT_NATIVE_V051_COPY_AUDIT.md",
+      "exists": true
+    },
+    {
+      "file": "LATEST_DEV_REPORT.md",
+      "target": "docs/LIGHT_NATIVE_V051_QA.md",
+      "exists": true
+    },
+    {
+      "file": "LATEST_DEV_REPORT.md",
+      "target": "design/qa/2026-10-25-light-native-v0.5.1/README.md",
+      "exists": true
+    },
+    {
+      "file": "docs/DATA_PRESERVATION.md",
+      "target": "APPROVED_JOINT_V05.md",
+      "exists": true
+    },
+    {
+      "file": "docs/DATA_PRESERVATION.md",
+      "target": "FOOD_WATER_DAY_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/DATA_PRESERVATION.md",
+      "target": "UX_WATER_CASCADE_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/DATA_PRESERVATION.md",
+      "target": "JOINT_UX_REPORTS_RANGE_V03.md",
+      "exists": true
+    },
+    {
+      "file": "docs/DATA_PRESERVATION.md",
+      "target": "FIVE_COMBINED_V1.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "FIVE_COMBINED_V1.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "COMBINED_INTERACTION_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "INTERACTION_VISUAL_SYSTEM.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "PWA_RUNTIME.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "DAILY_RECORDS_UX_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "TRAINING_RECOVERY_UX_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "UNIFIED_MODULE_VISUAL_HIERARCHY_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "PROFESSIONAL_FITNESS_REPORT_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "V4_2_IMPLEMENTATION_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "V4_2_1_VISUAL_REPAIR_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "../design/reference/2026-10-11-combined/DESIGN_REFERENCE.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "NUTRITION_CYCLE_SCHEDULE.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "APPROVED_JOINT_V05.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "FOOD_WATER_DAY_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "UX_WATER_CASCADE_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "JOINT_UX_REPORTS_RANGE_V03.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "TODAY_WATER_SHEET_V01.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "NUTRITION_GOAL_TEMPLATE_V02.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "AUTO_PORTION_GOAL_DESELECT_V021.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "COMBINED_INTERACTION_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "NAVIGATION_FLICKER_V041.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "MANAGEMENT_V061.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "LIGHT_NATIVE_V051.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "LIGHT_NATIVE_V051_COPY_AUDIT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "FIVE_COMBINED_V1.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "DAILY_RECORDS_UX_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "TRAINING_RECOVERY_UX_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "UNIFIED_MODULE_VISUAL_HIERARCHY_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "../design/reference/2026-10-11-combined/ACCEPTANCE_MATRIX.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "APPROVED_JOINT_V05.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "FOOD_WATER_DAY_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "UX_WATER_CASCADE_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "JOINT_UX_REPORTS_RANGE_V03_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "../design/reference/2026-10-17-joint-v0.3/05_ACCEPTANCE_MATRIX.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "TODAY_WATER_SHEET_V01.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "../design/reference/2026-10-18-today-water-sheet-v0.1/04_ACCEPTANCE_MATRIX.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "TODAY_WATER_SHEET_V01_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "../design/reference/2026-10-20-nutrition-goal-sheet-v0.2/05_ACCEPTANCE_MATRIX.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "NUTRITION_GOAL_TEMPLATE_V02_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "AUTO_PORTION_GOAL_DESELECT_V021_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "COMBINED_INTERACTION_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "COMBINED_INTERACTION_V04_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "MANAGEMENT_V061_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "LIGHT_NATIVE_V051.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "LIGHT_NATIVE_V051_COPY_AUDIT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "LIGHT_NATIVE_V051_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "FIVE_COMBINED_V1.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "FIVE_COMBINED_V1_QA.md",
+      "exists": true
+    },
+    {
+      "file": "design/qa/2026-10-25-five-combined-v1/README.md",
+      "target": "../../reference/2026-10-25-five-combined-v1/DESIGN_REFERENCE.md",
+      "exists": true
+    },
+    {
+      "file": "design/qa/2026-10-25-five-combined-v1/README.md",
+      "target": "../../../docs/FIVE_COMBINED_V1.md",
+      "exists": true
+    },
+    {
+      "file": "design/qa/2026-10-25-five-combined-v1/README.md",
+      "target": "../../../docs/FIVE_COMBINED_V1_QA.md",
+      "exists": true
+    },
+    {
+      "file": "design/qa/2026-10-25-five-combined-v1/README.md",
+      "target": "../../../LATEST_DEV_REPORT.md",
+      "exists": true
+    },
+    {
+      "file": "design/reference/2026-10-25-five-combined-v1/DESIGN_REFERENCE.md",
+      "target": "INPUT_VERIFICATION.json",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1.md",
+      "target": "../design/reference/2026-10-25-five-combined-v1/DESIGN_REFERENCE.md",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1.md",
+      "target": "FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1.md",
+      "target": "FIVE_COMBINED_V1_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1.md",
+      "target": "../tests/fixtures/fiveCombinedNamedBackupV14.json",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1.md",
+      "target": "FIVE_COMBINED_V1_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/weightChart.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/recoveryLineChart.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/trendModule.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/trendModule.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/managementHub.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/styles/nutritionBudget.css",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/macroNutritionSummary.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/calorieBudget.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/nutritionStrategies.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/nutritionCycles.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/nutritionStrategyCascade.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/main.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/githubSync.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/aiSettings.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/aiAssistant.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/voiceSettings.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/pwaDiagnostics.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/coachReport.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/nutritionCycleReport.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/dayDetail.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/recovery.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/recovery.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/trainingCompletion.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "../src/ui/managerPrimitives.ts",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "target": "FIVE_COMBINED_V1_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_QA.md",
+      "target": "../design/reference/2026-10-25-five-combined-v1/DESIGN_REFERENCE.md",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_QA.md",
+      "target": "FIVE_COMBINED_V1.md",
+      "exists": true
+    },
+    {
+      "file": "docs/FIVE_COMBINED_V1_QA.md",
+      "target": "../design/qa/2026-10-25-five-combined-v1/README.md",
+      "exists": true
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "commit": "2ab91597b41cef204cddf669db5862f5d30f0455",
+  "shard": 0,
+  "tag": "joint-webkit-375",
+  "fullJoint": true,
+  "width": "375",
+  "selected": [
+    "joint-webkit"
+  ],
+  "results": [
+    {
+      "name": "joint-webkit",
+      "file": "jointUxReportsRange",
+      "start": "2026-10-26T02:01:42.417Z",
+      "end": "2026-10-26T02:04:25.643Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "cf99e5b98caa87b1478c54351be8f8d94d9661039abedea44609c9342ca0136b"
+    }
+  ]
+}

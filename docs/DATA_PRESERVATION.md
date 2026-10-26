@@ -45,3 +45,9 @@ Follow [Approved joint v0.5 contract](APPROVED_JOINT_V05.md). It supersedes prio
 [Joint v0.3 contract](JOINT_UX_REPORTS_RANGE_V03.md) supersedes six-only deletion **only** at its new explicitly acknowledged management danger path. All owned phase/cycle closed-date unions, including archived/future sources and local-today-truncated open phases, select the six nutrition categories plus nine actual-health tables. NutritionTargets include owned references plus all sources in the date union; preview discloses both counts. Sleep follows its captured/legacy business night as a whole ID. Seven protected plan/shared-definition tables, other owners and outside facts remain exact.
 
 Use one22-table transaction for fresh source fingerprint/conflicts, exact15-table ID deletes and complete survivor postconditions; any failure/cancellation rolls back all writes. Current-client running timers and stale background Workout saves cannot silently recreate removed records. Foreign overlaps, mixed/missing provenance and active sleep/unfinished Workout reject without mutation. Old unused-only, six-only API and ordinary clear-day boundaries remain unchanged. DB13/130/22, Backup14/Restore1–14/Sync1/envelope1/configs and frozen historical fixtures remain unchanged. This permission never authorizes deployment/startup deletion or actual personal-data QA.
+
+## 五项联合 v1：Workout 可选名称（2026-10-25）
+
+[实现与证据](FIVE_COMBINED_V1.md) 追加独立 `Workout.name?: string`，不增加索引/store 或更改历史事实。名称专用事务保留组数、日志、IDs、起止时间；从模板创建时保存名称快照。模板与可选同步命名原子执行，完整 source fingerprint/operation ID 防止过时覆盖与重复确认。显示 fallback 不写入数据库。
+
+DB13/130/22、Backup14/Restore1–14、Sync/envelope1 保持。V14 validator/exporter/Restore 的完整对象保留策略经 frozen START 旧客户端 Restore/Export/Autosave 与新客户端加密往返实际核对；新字段不是只存本地偏好。新增命名 V14 fixture，既有冻结输入不改。主题两轴仅设备偏好，不能进入业务备份或同步。发布仍须同一既有合成 profile、22表与配置摘要、真实 active SW/离线核对。

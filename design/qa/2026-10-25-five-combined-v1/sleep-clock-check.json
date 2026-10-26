@@ -1,0 +1,1478 @@
+[
+  {
+    "engine": "chromium",
+    "timezoneId": "Asia/Shanghai",
+    "locale": "en-US",
+    "hourCycle": "h12",
+    "checks": [
+      {
+        "label": "year-end",
+        "row": {
+          "id": "e05b3b16-b0aa-4512-bb45-ade9988fee75",
+          "startTime": "2025-12-31T15:00:00.000Z",
+          "endTime": "2025-12-31T23:30:00.000Z",
+          "durationMinutes": 510,
+          "recordDate": "2026-01-01",
+          "sleepNightDate": "2025-12-31",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-12-31",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 510,
+        "expectedNight": "2025-12-31T04:00:00.000Z"
+      },
+      {
+        "label": "spring-DST",
+        "row": {
+          "id": "41ad7836-86e5-4271-8d3a-595b2585ae6d",
+          "startTime": "2026-03-07T17:30:00.000Z",
+          "endTime": "2026-03-07T19:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-08",
+          "sleepNightDate": "2026-03-07",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-08",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-08T04:00:00.000Z"
+      },
+      {
+        "label": "fall-DST",
+        "row": {
+          "id": "00d74ce4-996e-4d5a-af63-c467a35a3acd",
+          "startTime": "2025-11-01T16:30:00.000Z",
+          "endTime": "2025-11-01T18:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2025-11-02",
+          "sleepNightDate": "2025-11-01",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-11-02",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2025-11-02T04:00:00.000Z"
+      },
+      {
+        "label": "Paris-DST",
+        "row": {
+          "id": "2a10955f-f740-40e9-b3f7-723cc635ab6b",
+          "startTime": "2026-03-28T17:30:00.000Z",
+          "endTime": "2026-03-28T19:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-29",
+          "sleepNightDate": "2026-03-28",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-29",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-29T04:00:00.000Z"
+      },
+      {
+        "label": "00:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "bc5a011a-02f0-45bc-a93d-99ef37458eaa",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T16:00:00.000Z",
+          "endTime": "2026-01-01T17:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "05:59",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "82ff1c79-0b43-4323-a90f-e54a9d633cc0",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T21:59:00.000Z",
+          "endTime": "2026-01-01T22:59:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "06:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "a406ab5f-5a23-4d65-ba09-439d5263fbc4",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T22:00:00.000Z",
+          "endTime": "2026-01-01T23:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      }
+    ],
+    "status": "PASS",
+    "nativePicker": "Pending"
+  },
+  {
+    "engine": "chromium",
+    "timezoneId": "Asia/Shanghai",
+    "locale": "en-GB",
+    "hourCycle": "h23",
+    "checks": [
+      {
+        "label": "year-end",
+        "row": {
+          "id": "e07a74df-6052-440b-b83c-5f4d4135d5fc",
+          "startTime": "2025-12-31T15:00:00.000Z",
+          "endTime": "2025-12-31T23:30:00.000Z",
+          "durationMinutes": 510,
+          "recordDate": "2026-01-01",
+          "sleepNightDate": "2025-12-31",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-12-31",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 510,
+        "expectedNight": "2025-12-31T04:00:00.000Z"
+      },
+      {
+        "label": "spring-DST",
+        "row": {
+          "id": "c7b02a5b-e957-454f-9068-e209b2d2c2ef",
+          "startTime": "2026-03-07T17:30:00.000Z",
+          "endTime": "2026-03-07T19:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-08",
+          "sleepNightDate": "2026-03-07",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-08",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-08T04:00:00.000Z"
+      },
+      {
+        "label": "fall-DST",
+        "row": {
+          "id": "792f5e3a-5882-46e4-a102-30a2da183f93",
+          "startTime": "2025-11-01T16:30:00.000Z",
+          "endTime": "2025-11-01T18:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2025-11-02",
+          "sleepNightDate": "2025-11-01",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-11-02",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2025-11-02T04:00:00.000Z"
+      },
+      {
+        "label": "Paris-DST",
+        "row": {
+          "id": "26d60061-e7f6-442f-b7bc-87cbdabab619",
+          "startTime": "2026-03-28T17:30:00.000Z",
+          "endTime": "2026-03-28T19:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-29",
+          "sleepNightDate": "2026-03-28",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-29",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-29T04:00:00.000Z"
+      },
+      {
+        "label": "00:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "8da5547b-d043-46e0-90a3-fbdfa33d267b",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T16:00:00.000Z",
+          "endTime": "2026-01-01T17:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "05:59",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "5c280a38-4bc9-4425-a91b-d722eb9f22b2",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T21:59:00.000Z",
+          "endTime": "2026-01-01T22:59:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "06:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "924b3f01-3680-4a22-ac6f-b52fb81b244b",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T22:00:00.000Z",
+          "endTime": "2026-01-01T23:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      }
+    ],
+    "status": "PASS",
+    "nativePicker": "Pending"
+  },
+  {
+    "engine": "chromium",
+    "timezoneId": "America/New_York",
+    "locale": "en-US",
+    "hourCycle": "h12",
+    "checks": [
+      {
+        "label": "year-end",
+        "row": {
+          "id": "37b2cd6a-a03c-4daf-aaaa-0eb312079772",
+          "startTime": "2026-01-01T04:00:00.000Z",
+          "endTime": "2026-01-01T12:30:00.000Z",
+          "durationMinutes": 510,
+          "recordDate": "2026-01-01",
+          "sleepNightDate": "2025-12-31",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-12-31",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 510,
+        "expectedNight": "2025-12-31T17:00:00.000Z"
+      },
+      {
+        "label": "spring-DST",
+        "row": {
+          "id": "a5f44d0c-17ce-47cd-9b71-0edd7b94277f",
+          "startTime": "2026-03-08T06:30:00.000Z",
+          "endTime": "2026-03-08T07:30:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-03-08",
+          "sleepNightDate": "2026-03-07",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-08",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 60,
+        "expectedNight": "2026-03-08T16:00:00.000Z"
+      },
+      {
+        "label": "fall-DST",
+        "row": {
+          "id": "9090f2c5-1cf8-4bc2-8134-195168fb5273",
+          "startTime": "2025-11-02T04:30:00.000Z",
+          "endTime": "2025-11-02T07:30:00.000Z",
+          "durationMinutes": 180,
+          "recordDate": "2025-11-02",
+          "sleepNightDate": "2025-11-01",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-11-02",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 180,
+        "expectedNight": "2025-11-02T17:00:00.000Z"
+      },
+      {
+        "label": "Paris-DST",
+        "row": {
+          "id": "e7b2c01e-76d9-4fe1-9882-3c6d3003799e",
+          "startTime": "2026-03-29T05:30:00.000Z",
+          "endTime": "2026-03-29T07:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-29",
+          "sleepNightDate": "2026-03-28",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-29",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-29T16:00:00.000Z"
+      },
+      {
+        "label": "00:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "fa0390ec-6c98-4b85-8646-921fde013015",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T05:00:00.000Z",
+          "endTime": "2026-01-02T06:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "05:59",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "1d59c389-0090-49b6-add4-815111be9a2d",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T10:59:00.000Z",
+          "endTime": "2026-01-02T11:59:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "06:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "2d79fc68-4349-40e4-a56b-6a7d5adaa48c",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T11:00:00.000Z",
+          "endTime": "2026-01-02T12:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      }
+    ],
+    "status": "PASS",
+    "nativePicker": "Pending"
+  },
+  {
+    "engine": "chromium",
+    "timezoneId": "America/New_York",
+    "locale": "en-GB",
+    "hourCycle": "h23",
+    "checks": [
+      {
+        "label": "year-end",
+        "row": {
+          "id": "b08f1c72-9a56-4553-9df5-be4dd72380aa",
+          "startTime": "2026-01-01T04:00:00.000Z",
+          "endTime": "2026-01-01T12:30:00.000Z",
+          "durationMinutes": 510,
+          "recordDate": "2026-01-01",
+          "sleepNightDate": "2025-12-31",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-12-31",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 510,
+        "expectedNight": "2025-12-31T17:00:00.000Z"
+      },
+      {
+        "label": "spring-DST",
+        "row": {
+          "id": "c640c996-32a4-47a3-8891-f5fec6f8e16e",
+          "startTime": "2026-03-08T06:30:00.000Z",
+          "endTime": "2026-03-08T07:30:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-03-08",
+          "sleepNightDate": "2026-03-07",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-08",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 60,
+        "expectedNight": "2026-03-08T16:00:00.000Z"
+      },
+      {
+        "label": "fall-DST",
+        "row": {
+          "id": "13933016-2dda-4558-a4e4-f827938f33a1",
+          "startTime": "2025-11-02T04:30:00.000Z",
+          "endTime": "2025-11-02T07:30:00.000Z",
+          "durationMinutes": 180,
+          "recordDate": "2025-11-02",
+          "sleepNightDate": "2025-11-01",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-11-02",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 180,
+        "expectedNight": "2025-11-02T17:00:00.000Z"
+      },
+      {
+        "label": "Paris-DST",
+        "row": {
+          "id": "efeb26d0-7b9c-463b-b57c-80c87fe42aee",
+          "startTime": "2026-03-29T05:30:00.000Z",
+          "endTime": "2026-03-29T07:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-29",
+          "sleepNightDate": "2026-03-28",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-29",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-29T16:00:00.000Z"
+      },
+      {
+        "label": "00:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "13691c7c-9ca9-48ab-b903-910b8c0255f5",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T05:00:00.000Z",
+          "endTime": "2026-01-02T06:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "05:59",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "442933fa-018f-448d-b7fc-616d367fece7",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T10:59:00.000Z",
+          "endTime": "2026-01-02T11:59:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "06:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "0727fb0b-79cd-4e88-92ab-1162c9935dfd",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T11:00:00.000Z",
+          "endTime": "2026-01-02T12:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      }
+    ],
+    "status": "PASS",
+    "nativePicker": "Pending"
+  },
+  {
+    "engine": "chromium",
+    "timezoneId": "Europe/Paris",
+    "locale": "en-US",
+    "hourCycle": "h12",
+    "checks": [
+      {
+        "label": "year-end",
+        "row": {
+          "id": "d2fc0f46-7ae0-4299-97ff-4623f0311c3d",
+          "startTime": "2025-12-31T22:00:00.000Z",
+          "endTime": "2026-01-01T06:30:00.000Z",
+          "durationMinutes": 510,
+          "recordDate": "2026-01-01",
+          "sleepNightDate": "2025-12-31",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-12-31",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 510,
+        "expectedNight": "2025-12-31T11:00:00.000Z"
+      },
+      {
+        "label": "spring-DST",
+        "row": {
+          "id": "d0da0119-eeb4-4312-bc01-9032accaa87f",
+          "startTime": "2026-03-08T00:30:00.000Z",
+          "endTime": "2026-03-08T02:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-08",
+          "sleepNightDate": "2026-03-07",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-08",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-08T11:00:00.000Z"
+      },
+      {
+        "label": "fall-DST",
+        "row": {
+          "id": "60b16d4e-43f9-4db4-9652-a49aaaf94480",
+          "startTime": "2025-11-01T23:30:00.000Z",
+          "endTime": "2025-11-02T01:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2025-11-02",
+          "sleepNightDate": "2025-11-01",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-11-02",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2025-11-02T11:00:00.000Z"
+      },
+      {
+        "label": "Paris-DST",
+        "row": {
+          "id": "56752d54-e926-48a6-984c-0937edca769b",
+          "startTime": "2026-03-29T00:30:00.000Z",
+          "endTime": "2026-03-29T01:30:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-03-29",
+          "sleepNightDate": "2026-03-28",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-29",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 60,
+        "expectedNight": "2026-03-29T10:00:00.000Z"
+      },
+      {
+        "label": "00:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "ec04d723-a8b4-45b0-8cc7-9c5539e89b65",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T23:00:00.000Z",
+          "endTime": "2026-01-02T00:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "05:59",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "14d07c1f-3552-4189-b9e9-463152781932",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T04:59:00.000Z",
+          "endTime": "2026-01-02T05:59:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "06:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "f9ffa916-e4f4-4a10-9c6a-1cae386fd7cc",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T05:00:00.000Z",
+          "endTime": "2026-01-02T06:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      }
+    ],
+    "status": "PASS",
+    "nativePicker": "Pending"
+  },
+  {
+    "engine": "chromium",
+    "timezoneId": "Europe/Paris",
+    "locale": "en-GB",
+    "hourCycle": "h23",
+    "checks": [
+      {
+        "label": "year-end",
+        "row": {
+          "id": "8ff45d7d-5959-46c7-a77f-935532537495",
+          "startTime": "2025-12-31T22:00:00.000Z",
+          "endTime": "2026-01-01T06:30:00.000Z",
+          "durationMinutes": 510,
+          "recordDate": "2026-01-01",
+          "sleepNightDate": "2025-12-31",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-12-31",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 510,
+        "expectedNight": "2025-12-31T11:00:00.000Z"
+      },
+      {
+        "label": "spring-DST",
+        "row": {
+          "id": "52249aa0-46cf-46e7-9444-e46c3a474eb2",
+          "startTime": "2026-03-08T00:30:00.000Z",
+          "endTime": "2026-03-08T02:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-08",
+          "sleepNightDate": "2026-03-07",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-08",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-08T11:00:00.000Z"
+      },
+      {
+        "label": "fall-DST",
+        "row": {
+          "id": "7834167a-ecf8-460e-8c4c-6e55428e0c0e",
+          "startTime": "2025-11-01T23:30:00.000Z",
+          "endTime": "2025-11-02T01:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2025-11-02",
+          "sleepNightDate": "2025-11-01",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-11-02",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2025-11-02T11:00:00.000Z"
+      },
+      {
+        "label": "Paris-DST",
+        "row": {
+          "id": "ed9c7f7b-683b-4b04-9d24-bb26792ddb4b",
+          "startTime": "2026-03-29T00:30:00.000Z",
+          "endTime": "2026-03-29T01:30:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-03-29",
+          "sleepNightDate": "2026-03-28",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-29",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 60,
+        "expectedNight": "2026-03-29T10:00:00.000Z"
+      },
+      {
+        "label": "00:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "74955f1b-fbaf-4256-93b9-248afe1e8087",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T23:00:00.000Z",
+          "endTime": "2026-01-02T00:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "05:59",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "d658b30c-4d16-4764-abd3-83db9e3683e8",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T04:59:00.000Z",
+          "endTime": "2026-01-02T05:59:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "06:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "501f5515-2ebd-4b72-b7bf-ad5cc50f68c0",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T05:00:00.000Z",
+          "endTime": "2026-01-02T06:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      }
+    ],
+    "status": "PASS",
+    "nativePicker": "Pending"
+  },
+  {
+    "engine": "webkit",
+    "timezoneId": "Asia/Shanghai",
+    "locale": "en-US",
+    "hourCycle": "h12",
+    "checks": [
+      {
+        "label": "year-end",
+        "row": {
+          "id": "69433a20-439f-4460-b8b7-cee3a785388b",
+          "startTime": "2025-12-31T15:00:00.000Z",
+          "endTime": "2025-12-31T23:30:00.000Z",
+          "durationMinutes": 510,
+          "recordDate": "2026-01-01",
+          "sleepNightDate": "2025-12-31",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-12-31",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 510,
+        "expectedNight": "2025-12-31T04:00:00.000Z"
+      },
+      {
+        "label": "spring-DST",
+        "row": {
+          "id": "dcb8a7d3-9ec1-4445-99e0-61c9b7c147b6",
+          "startTime": "2026-03-07T17:30:00.000Z",
+          "endTime": "2026-03-07T19:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-08",
+          "sleepNightDate": "2026-03-07",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-08",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-08T04:00:00.000Z"
+      },
+      {
+        "label": "fall-DST",
+        "row": {
+          "id": "da24f9d2-1f77-4874-b942-e32037814525",
+          "startTime": "2025-11-01T16:30:00.000Z",
+          "endTime": "2025-11-01T18:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2025-11-02",
+          "sleepNightDate": "2025-11-01",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-11-02",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2025-11-02T04:00:00.000Z"
+      },
+      {
+        "label": "Paris-DST",
+        "row": {
+          "id": "a971a41e-1d7d-4fe5-8ece-2713736a617d",
+          "startTime": "2026-03-28T17:30:00.000Z",
+          "endTime": "2026-03-28T19:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-29",
+          "sleepNightDate": "2026-03-28",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-29",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-29T04:00:00.000Z"
+      },
+      {
+        "label": "00:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "17ba0fdc-487f-4825-8d22-72c192428186",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T16:00:00.000Z",
+          "endTime": "2026-01-01T17:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "05:59",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "3af5a0ec-c8c9-4740-a1a6-543c517ed4b0",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T21:59:00.000Z",
+          "endTime": "2026-01-01T22:59:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "06:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "1d505a23-eaa9-402b-b786-3c5bc3de1cd3",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T22:00:00.000Z",
+          "endTime": "2026-01-01T23:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      }
+    ],
+    "status": "PASS",
+    "nativePicker": "Pending"
+  },
+  {
+    "engine": "webkit",
+    "timezoneId": "Asia/Shanghai",
+    "locale": "en-GB",
+    "hourCycle": "h23",
+    "checks": [
+      {
+        "label": "year-end",
+        "row": {
+          "id": "086c82cd-611a-4646-8477-523e0a2b4cf3",
+          "startTime": "2025-12-31T15:00:00.000Z",
+          "endTime": "2025-12-31T23:30:00.000Z",
+          "durationMinutes": 510,
+          "recordDate": "2026-01-01",
+          "sleepNightDate": "2025-12-31",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-12-31",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 510,
+        "expectedNight": "2025-12-31T04:00:00.000Z"
+      },
+      {
+        "label": "spring-DST",
+        "row": {
+          "id": "cc640190-e0db-4b84-a6af-431d8612aa65",
+          "startTime": "2026-03-07T17:30:00.000Z",
+          "endTime": "2026-03-07T19:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-08",
+          "sleepNightDate": "2026-03-07",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-08",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-08T04:00:00.000Z"
+      },
+      {
+        "label": "fall-DST",
+        "row": {
+          "id": "a5c2b3f7-024a-49db-8075-1937b4653f8a",
+          "startTime": "2025-11-01T16:30:00.000Z",
+          "endTime": "2025-11-01T18:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2025-11-02",
+          "sleepNightDate": "2025-11-01",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-11-02",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2025-11-02T04:00:00.000Z"
+      },
+      {
+        "label": "Paris-DST",
+        "row": {
+          "id": "121bfc37-8f7c-483e-b47b-77b16279c9e7",
+          "startTime": "2026-03-28T17:30:00.000Z",
+          "endTime": "2026-03-28T19:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-29",
+          "sleepNightDate": "2026-03-28",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-29",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-29T04:00:00.000Z"
+      },
+      {
+        "label": "00:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "7f2d30d3-b92b-4404-8a5b-779292ddc2fb",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T16:00:00.000Z",
+          "endTime": "2026-01-01T17:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "05:59",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "c7da1c3d-1c33-4be8-b1ef-0bf08ff2dd48",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T21:59:00.000Z",
+          "endTime": "2026-01-01T22:59:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "06:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "90c8eea8-c39e-46f1-aadc-8b688e35386e",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T22:00:00.000Z",
+          "endTime": "2026-01-01T23:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      }
+    ],
+    "status": "PASS",
+    "nativePicker": "Pending"
+  },
+  {
+    "engine": "webkit",
+    "timezoneId": "America/New_York",
+    "locale": "en-US",
+    "hourCycle": "h12",
+    "checks": [
+      {
+        "label": "year-end",
+        "row": {
+          "id": "0e8e40d3-9cc5-486d-9ace-13c9ae9ce96c",
+          "startTime": "2026-01-01T04:00:00.000Z",
+          "endTime": "2026-01-01T12:30:00.000Z",
+          "durationMinutes": 510,
+          "recordDate": "2026-01-01",
+          "sleepNightDate": "2025-12-31",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-12-31",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 510,
+        "expectedNight": "2025-12-31T17:00:00.000Z"
+      },
+      {
+        "label": "spring-DST",
+        "row": {
+          "id": "f9d9b0bc-4b2d-4b82-91a5-81f3843fe33b",
+          "startTime": "2026-03-08T06:30:00.000Z",
+          "endTime": "2026-03-08T07:30:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-03-08",
+          "sleepNightDate": "2026-03-07",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-08",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 60,
+        "expectedNight": "2026-03-08T16:00:00.000Z"
+      },
+      {
+        "label": "fall-DST",
+        "row": {
+          "id": "ed460b52-3097-4863-84b8-2f29675ee3d3",
+          "startTime": "2025-11-02T04:30:00.000Z",
+          "endTime": "2025-11-02T07:30:00.000Z",
+          "durationMinutes": 180,
+          "recordDate": "2025-11-02",
+          "sleepNightDate": "2025-11-01",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-11-02",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 180,
+        "expectedNight": "2025-11-02T17:00:00.000Z"
+      },
+      {
+        "label": "Paris-DST",
+        "row": {
+          "id": "ca090df1-5a0a-4f2b-985f-6c5fec8cf367",
+          "startTime": "2026-03-29T05:30:00.000Z",
+          "endTime": "2026-03-29T07:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-29",
+          "sleepNightDate": "2026-03-28",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-29",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-29T16:00:00.000Z"
+      },
+      {
+        "label": "00:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "9625a812-a2a9-442b-92e9-934b8222221d",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T05:00:00.000Z",
+          "endTime": "2026-01-02T06:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "05:59",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "3aa95910-833d-4768-8622-b013b2c3aa98",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T10:59:00.000Z",
+          "endTime": "2026-01-02T11:59:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "06:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "d401c5e0-b6f5-4c09-b79b-227b182d0125",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T11:00:00.000Z",
+          "endTime": "2026-01-02T12:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      }
+    ],
+    "status": "PASS",
+    "nativePicker": "Pending"
+  },
+  {
+    "engine": "webkit",
+    "timezoneId": "America/New_York",
+    "locale": "en-GB",
+    "hourCycle": "h23",
+    "checks": [
+      {
+        "label": "year-end",
+        "row": {
+          "id": "6f110346-a76c-4dc0-9c72-8ac3cd2fa1a3",
+          "startTime": "2026-01-01T04:00:00.000Z",
+          "endTime": "2026-01-01T12:30:00.000Z",
+          "durationMinutes": 510,
+          "recordDate": "2026-01-01",
+          "sleepNightDate": "2025-12-31",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-12-31",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 510,
+        "expectedNight": "2025-12-31T17:00:00.000Z"
+      },
+      {
+        "label": "spring-DST",
+        "row": {
+          "id": "99f73f45-96f6-45c9-9518-e0f6ce451310",
+          "startTime": "2026-03-08T06:30:00.000Z",
+          "endTime": "2026-03-08T07:30:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-03-08",
+          "sleepNightDate": "2026-03-07",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-08",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 60,
+        "expectedNight": "2026-03-08T16:00:00.000Z"
+      },
+      {
+        "label": "fall-DST",
+        "row": {
+          "id": "84efdc9e-722f-46bb-a67b-4afe22b19520",
+          "startTime": "2025-11-02T04:30:00.000Z",
+          "endTime": "2025-11-02T07:30:00.000Z",
+          "durationMinutes": 180,
+          "recordDate": "2025-11-02",
+          "sleepNightDate": "2025-11-01",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-11-02",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 180,
+        "expectedNight": "2025-11-02T17:00:00.000Z"
+      },
+      {
+        "label": "Paris-DST",
+        "row": {
+          "id": "4f911c01-6078-40cc-a101-1bbbbc9be52b",
+          "startTime": "2026-03-29T05:30:00.000Z",
+          "endTime": "2026-03-29T07:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-29",
+          "sleepNightDate": "2026-03-28",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-29",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-29T16:00:00.000Z"
+      },
+      {
+        "label": "00:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "2b284b65-fab4-48cd-bcdc-1ff41f43b307",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T05:00:00.000Z",
+          "endTime": "2026-01-02T06:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "05:59",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "8271a5c5-0732-44a2-8706-d1b35eb0ca16",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T10:59:00.000Z",
+          "endTime": "2026-01-02T11:59:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "06:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "6f281639-0c47-4eb0-aef8-3fcee848acd1",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T11:00:00.000Z",
+          "endTime": "2026-01-02T12:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      }
+    ],
+    "status": "PASS",
+    "nativePicker": "Pending"
+  },
+  {
+    "engine": "webkit",
+    "timezoneId": "Europe/Paris",
+    "locale": "en-US",
+    "hourCycle": "h12",
+    "checks": [
+      {
+        "label": "year-end",
+        "row": {
+          "id": "5ca21d38-f63a-4321-a580-99228ee24ff4",
+          "startTime": "2025-12-31T22:00:00.000Z",
+          "endTime": "2026-01-01T06:30:00.000Z",
+          "durationMinutes": 510,
+          "recordDate": "2026-01-01",
+          "sleepNightDate": "2025-12-31",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-12-31",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 510,
+        "expectedNight": "2025-12-31T11:00:00.000Z"
+      },
+      {
+        "label": "spring-DST",
+        "row": {
+          "id": "0a542dd4-294f-4edd-856d-f7efc5962112",
+          "startTime": "2026-03-08T00:30:00.000Z",
+          "endTime": "2026-03-08T02:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-08",
+          "sleepNightDate": "2026-03-07",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-08",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-08T11:00:00.000Z"
+      },
+      {
+        "label": "fall-DST",
+        "row": {
+          "id": "8c0a0cae-7441-4400-bbfa-31f047dd6436",
+          "startTime": "2025-11-01T23:30:00.000Z",
+          "endTime": "2025-11-02T01:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2025-11-02",
+          "sleepNightDate": "2025-11-01",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-11-02",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2025-11-02T11:00:00.000Z"
+      },
+      {
+        "label": "Paris-DST",
+        "row": {
+          "id": "624cb085-ff1f-4043-855d-a7b7994c3e04",
+          "startTime": "2026-03-29T00:30:00.000Z",
+          "endTime": "2026-03-29T01:30:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-03-29",
+          "sleepNightDate": "2026-03-28",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-29",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 60,
+        "expectedNight": "2026-03-29T10:00:00.000Z"
+      },
+      {
+        "label": "00:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "b33eb511-e032-4bbc-8aa2-36679d3a743c",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T23:00:00.000Z",
+          "endTime": "2026-01-02T00:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "05:59",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "956b4c3f-2586-4fdc-9d64-d9e8f212e056",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T04:59:00.000Z",
+          "endTime": "2026-01-02T05:59:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "06:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "0ccb401f-9cae-4324-83e0-be43fa4d88ff",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T05:00:00.000Z",
+          "endTime": "2026-01-02T06:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      }
+    ],
+    "status": "PASS",
+    "nativePicker": "Pending"
+  },
+  {
+    "engine": "webkit",
+    "timezoneId": "Europe/Paris",
+    "locale": "en-GB",
+    "hourCycle": "h23",
+    "checks": [
+      {
+        "label": "year-end",
+        "row": {
+          "id": "94461539-ad06-4889-82ce-920fd3b664f5",
+          "startTime": "2025-12-31T22:00:00.000Z",
+          "endTime": "2026-01-01T06:30:00.000Z",
+          "durationMinutes": 510,
+          "recordDate": "2026-01-01",
+          "sleepNightDate": "2025-12-31",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-12-31",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 510,
+        "expectedNight": "2025-12-31T11:00:00.000Z"
+      },
+      {
+        "label": "spring-DST",
+        "row": {
+          "id": "b8acff64-544b-47bd-b52c-2832d90863d0",
+          "startTime": "2026-03-08T00:30:00.000Z",
+          "endTime": "2026-03-08T02:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2026-03-08",
+          "sleepNightDate": "2026-03-07",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-08",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2026-03-08T11:00:00.000Z"
+      },
+      {
+        "label": "fall-DST",
+        "row": {
+          "id": "ba642387-4b31-455e-a1e8-bc47942a73e1",
+          "startTime": "2025-11-01T23:30:00.000Z",
+          "endTime": "2025-11-02T01:30:00.000Z",
+          "durationMinutes": 120,
+          "recordDate": "2025-11-02",
+          "sleepNightDate": "2025-11-01",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2025-11-02",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 120,
+        "expectedNight": "2025-11-02T11:00:00.000Z"
+      },
+      {
+        "label": "Paris-DST",
+        "row": {
+          "id": "26923d06-9efe-4db7-a34c-809fd2ec0a6f",
+          "startTime": "2026-03-29T00:30:00.000Z",
+          "endTime": "2026-03-29T01:30:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-03-29",
+          "sleepNightDate": "2026-03-28",
+          "sleepNightDateSource": "auto",
+          "sleepStartLocalDate": "2026-03-29",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z"
+        },
+        "expectedMinutes": 60,
+        "expectedNight": "2026-03-29T10:00:00.000Z"
+      },
+      {
+        "label": "00:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "3e21859c-f859-479d-9801-1ffb3f3d1d28",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-01T23:00:00.000Z",
+          "endTime": "2026-01-02T00:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "05:59",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "fffdba67-ebe8-4e50-9ef8-871afbc958f0",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T04:59:00.000Z",
+          "endTime": "2026-01-02T05:59:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      },
+      {
+        "label": "06:00",
+        "row": {
+          "sleepNightDate": "2026-01-02",
+          "sleepNightDateSource": "manual",
+          "sleepStartLocalDate": "2026-01-02",
+          "id": "434f0c87-33fa-4fe3-88c4-a82061c880a7",
+          "createdAt": "2026-10-25T12:00:00.000Z",
+          "updatedAt": "2026-10-25T12:00:00.000Z",
+          "startTime": "2026-01-02T05:00:00.000Z",
+          "endTime": "2026-01-02T06:00:00.000Z",
+          "durationMinutes": 60,
+          "recordDate": "2026-01-02"
+        }
+      }
+    ],
+    "status": "PASS",
+    "nativePicker": "Pending"
+  }
+]

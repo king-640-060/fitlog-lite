@@ -1,0 +1,114 @@
+{"width":320,"height":812,"scale":100,"colorScheme":"light","reduced":false,"tenCalendar":true,"detailAllTen":true,"historySnapshots":true,"inactiveCheckIn":true,"multiEpisode":true,"activeExcluded":true,"adjacent":true,"liveSheetIdentity":true,"expandedFocusScrollPreserved":true,"lineRanges":[7,30,90],"preciseSelectablePoints":true,"missingSplit":true,"internalScroll":true,"dayWeekMonth":true,"waterExactUndo":true,"threeIndependentWrites":true,"stableCard":true,"keyboardToast":true,"selectiveDeletionKeepsRecoveryPlan":true,"stressCycles":0,"noOverflow":true,"errors":[],"physicalIPhone":"Pending"}
+{"width":320,"height":812,"scale":100,"colorScheme":"light","reduced":true,"tenCalendar":true,"detailAllTen":true,"historySnapshots":true,"inactiveCheckIn":true,"multiEpisode":true,"activeExcluded":true,"adjacent":true,"liveSheetIdentity":true,"expandedFocusScrollPreserved":true,"lineRanges":[7,30,90],"preciseSelectablePoints":true,"missingSplit":true,"internalScroll":true,"dayWeekMonth":true,"waterExactUndo":true,"threeIndependentWrites":true,"stableCard":true,"keyboardToast":true,"selectiveDeletionKeepsRecoveryPlan":true,"stressCycles":0,"noOverflow":true,"errors":[],"physicalIPhone":"Pending"}
+{"width":320,"height":812,"scale":100,"colorScheme":"dark","reduced":false,"tenCalendar":true,"detailAllTen":true,"historySnapshots":true,"inactiveCheckIn":true,"multiEpisode":true,"activeExcluded":true,"adjacent":true,"liveSheetIdentity":true,"expandedFocusScrollPreserved":true,"lineRanges":[7,30,90],"preciseSelectablePoints":true,"missingSplit":true,"internalScroll":true,"dayWeekMonth":true,"waterExactUndo":true,"threeIndependentWrites":true,"stableCard":true,"keyboardToast":true,"selectiveDeletionKeepsRecoveryPlan":true,"stressCycles":0,"noOverflow":true,"errors":[],"physicalIPhone":"Pending"}
+{"width":320,"height":812,"scale":100,"colorScheme":"dark","reduced":true,"tenCalendar":true,"detailAllTen":true,"historySnapshots":true,"inactiveCheckIn":true,"multiEpisode":true,"activeExcluded":true,"adjacent":true,"liveSheetIdentity":true,"expandedFocusScrollPreserved":true,"lineRanges":[7,30,90],"preciseSelectablePoints":true,"missingSplit":true,"internalScroll":true,"dayWeekMonth":true,"waterExactUndo":true,"threeIndependentWrites":true,"stableCard":true,"keyboardToast":true,"selectiveDeletionKeepsRecoveryPlan":true,"stressCycles":0,"noOverflow":true,"errors":[],"physicalIPhone":"Pending"}
+FAILURE_STATE 下午好
+
+10月9日 · 星期五
+
+今日计划
+查看全部
+
+已完成 0 / 1 项 · 待办 1 项
+
+PRIVATE_TEST_TASK_456
+#Legacy
+18:00–19:00
+今日饮食
+查看详情
+今日热量摄入
+100
+kcal
+目标 2200 kcal
+还差 2100 kcal
+根据真实饮食记录
+5% 已摄入
+目标 2200 kcal
+蛋白质
+10g
+/ 180g
+0.14 g/kg
+碳水
+数据不完整
+未设目标
+脂肪
+数据不完整
+未设目标
+剩余目标
+按当日实际记录计算
+指定食物
+›
+热量
+差 2100 kcal
+蛋白质
+差 170 g
+碳水
+未设置目标
+脂肪
+未设置目标
+训练
+查看训练
+力量训练
+1 次训练
+1 个动作 · 2 组
+Historical exercise snapshot
+记录训练
+有氧训练
+1 次 · 共 20 分钟
+跑步机 · 速度 6 · 坡度 0
+记录有氧
+体重
+查看趋势
+72.4 kg
+今日已记录
+更新体重
+凯格尔训练
+训练记录
+今日已完成 1 次
+基础阶段 · 累计 1:00
+再练一次
+习惯
+管理
+还没有习惯
+完成时轻触打卡即可
+新建习惯
+睡眠
+历史记录
+睡眠记录中
+14:00 开始
+已记录 1小时0分钟
+我醒了
+
+最近完成 · 2026年10月9日晚 · 1小时0分钟
+
+修正开始时间
+取消本次记录
+饮水
+历史记录
+今日累计
+5000 ml
+参考 2500 ml
+记录饮水
+记录饮水
+
+2026-10-09 · 记录实际饮水
+
+饮水量（ml）
+保存饮水记录
+已记录 500 ml
+撤销
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: {"width":320,"scale":120,"visible":{"x":50.84375,"y":277.5406799316406,"width":218.3125,"height":54},"field":{"x":18,"y":329.68023681640625,"width":284,"height":46}}
+    at file:///Users/runner/work/fitlog-lite/fitlog-lite/tests/browser/dailyRecordsExperience.mjs:68:794 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.16.0

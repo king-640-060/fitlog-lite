@@ -59,6 +59,8 @@ export interface WorkoutExercise {
 }
 
 export interface Workout {
+  /** Optional user title snapshot, independent of template and exercise names. */
+  name?: string
   id: string
   date: string
   startedAt: string

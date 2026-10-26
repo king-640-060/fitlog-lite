@@ -1,0 +1,91 @@
+{
+  "commit": "fb9f49a867e2be68226f74aa05ecfed7233ab6b2",
+  "shard": 7,
+  "tag": "all-7",
+  "fullJoint": false,
+  "width": "390",
+  "selected": [
+    "dietEvents",
+    "macroNutritionSummary",
+    "trainingJournal",
+    "voiceMode",
+    "foodWaterBackupV04-webkit",
+    "water",
+    "training-execution",
+    "history-and-sheets"
+  ],
+  "results": [
+    {
+      "name": "dietEvents",
+      "file": "dietEvents",
+      "start": "2026-10-26T03:35:10.030Z",
+      "end": "2026-10-26T03:39:55.391Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "b44a696bfa4385f18f4895cce9b6a6f155caf86e45dcf1d96ee76381d14159b1"
+    },
+    {
+      "name": "macroNutritionSummary",
+      "file": "macroNutritionSummary",
+      "start": "2026-10-26T03:39:55.449Z",
+      "end": "2026-10-26T03:45:57.394Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "c78a8ebbfcd522a27cf9a3ddf5d9947ce670f378b9f62fc80def369a9da93149"
+    },
+    {
+      "name": "trainingJournal",
+      "file": "trainingJournal",
+      "start": "2026-10-26T03:45:57.435Z",
+      "end": "2026-10-26T03:46:02.186Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "52ae47fea1eec40a1a656f0608b67558e9761fc3db7a1d9d41c72990408849af"
+    },
+    {
+      "name": "voiceMode",
+      "file": "voiceMode",
+      "start": "2026-10-26T03:46:02.203Z",
+      "end": "2026-10-26T03:46:56.095Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "cc4e957ac9614019fd4cd0dc1e7b48709ab7374d51ae9bf3e438f08f713d2cdd"
+    },
+    {
+      "name": "foodWaterBackupV04-webkit",
+      "file": "foodWaterBackupV04",
+      "start": "2026-10-26T03:46:56.116Z",
+      "end": "2026-10-26T03:47:07.538Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "93159c99a85a7f02d0bbe0dee6d2e5265a9f52ce2a471c2ee14bdbbc63726039"
+    },
+    {
+      "name": "water",
+      "file": "todayWaterButton",
+      "start": "2026-10-26T03:47:07.554Z",
+      "end": "2026-10-26T03:54:08.363Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "1f821c97a213b87295ad0b830273ed8f7536fedd0b8d261bb705c9d6ec93b7d7"
+    },
+    {
+      "name": "training-execution",
+      "file": "combinedInteractionTraining",
+      "start": "2026-10-26T03:54:08.387Z",
+      "end": "2026-10-26T03:54:30.414Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "e4b30de1a9d36dcd167468783b03a49c1dff6ef29af24f749f58b787b156213f"
+    },
+    {
+      "name": "history-and-sheets",
+      "file": "fiveWorkoutHistoryProtection",
+      "start": "2026-10-26T03:54:30.428Z",
+      "end": "2026-10-26T03:57:58.415Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "9ab7cc5a2a7c2fb7575ec10a07dc8282a1b59c6b166f32fa51e4934f1126bfda"
+    }
+  ]
+}

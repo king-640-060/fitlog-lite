@@ -1,0 +1,21 @@
+{
+  "commit": "06d60b352ad9c97a2f811b8c4b8579b033d33426",
+  "shard": 0,
+  "tag": "daily-settled-keyboard-geometry",
+  "fullJoint": false,
+  "width": "390",
+  "selected": [
+    "dailyRecordsExperience"
+  ],
+  "results": [
+    {
+      "name": "dailyRecordsExperience",
+      "file": "dailyRecordsExperience",
+      "start": "2026-10-26T03:40:27.457Z",
+      "end": "2026-10-26T03:55:48.943Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "b5a0d02ecaa8bd031ddbef1dc74c8160048d099fdd6fa428aa782be89e3b07e1"
+    }
+  ]
+}

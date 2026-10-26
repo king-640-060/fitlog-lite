@@ -1,0 +1,37 @@
+{
+  "zipSha256": "ae0dcbb25b80916c1e9742356c5dcf1fb567a74b3c7594b4fec54e4d6aae6e98",
+  "crc": "PASS",
+  "members": 7,
+  "sha256Checks": [
+    {
+      "file": "CODEX_五项联合开发正式合同.md",
+      "sha256": "8644e7194adba4e3d2c3794447c9ed221725411e62498b8ef57f7a01b4f674ef",
+      "status": "PASS"
+    },
+    {
+      "file": "README_下载后先读.md",
+      "sha256": "bbfb855b2eb0835b6f17dec96ee8d694199544e0adb3007e07601ac4d9e59c32",
+      "status": "PASS"
+    },
+    {
+      "file": "FitLog_五项联合交互原型_v1.html",
+      "sha256": "ebceb18d35a6e1c16fa4d2bdd02cba528ab289aec6826bf1dfa6bc8d65240176",
+      "status": "PASS"
+    },
+    {
+      "file": "LOCAL_PROTOTYPE_QA.json",
+      "sha256": "9db1a8b81821d2eda49aa0b2095732a65a29019bf0d2039a330e422ed5c1b3df",
+      "status": "PASS"
+    },
+    {
+      "file": "PREVIEW_LightNative_Today.png",
+      "sha256": "d07b12e8f4acfaf5c894769f26b642868cee3774b7c14740a9c6ee256236a4a9",
+      "status": "PASS"
+    },
+    {
+      "file": "PREVIEW_ThemeSelector.png",
+      "sha256": "a34186c45447b446ac39b21b29ce2bc8f7b28ce59674b76328c19e29648580b6",
+      "status": "PASS"
+    }
+  ]
+}

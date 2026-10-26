@@ -1,0 +1,4 @@
+{"mode":"local-mocked","width":320,"writes":5,"attempts":6,"stores":22,"errors":[]}
+{"mode":"local-mocked","width":375,"writes":5,"attempts":6,"stores":22,"errors":[]}
+{"mode":"local-mocked","width":390,"writes":5,"attempts":6,"stores":22,"errors":[]}
+{"mode":"local-mocked","width":430,"writes":5,"attempts":6,"stores":22,"errors":[]}

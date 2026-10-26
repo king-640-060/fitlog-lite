@@ -1,4 +1,6 @@
 import { isMealType } from '../utils/foodMeals'
+import { normalizeWorkoutName } from '../utils/workoutName'
+import { workoutFingerprint } from './workoutService'
 import { getLocalDateString } from '../utils/date'
 import { strategyBusinessDate } from './nutritionStrategyService'
 import type {
@@ -65,6 +67,21 @@ export function workoutTemplateFromWorkout(workout: Workout, name: string): Work
   })
 }
 
+/** One confirmation, one transaction; stale/deleted source or a repeated ID writes nothing. */
+export async function saveWorkoutAsTemplateSnapshot(source: Workout, name: string, syncUnnamed: boolean, operationId: string, database: FitLogDatabase = db): Promise<{template: WorkoutTemplate; workout: Workout}> {
+  const template = workoutTemplateFromWorkout(source, name)
+  template.id = operationId
+  const syncedName = syncUnnamed && !source.name?.trim() ? normalizeWorkoutName(template.name) : undefined
+  return database.transaction('rw', [database.workouts, database.workoutTemplates], async () => {
+    const current = await database.workouts.get(source.id)
+    if (!current || workoutFingerprint(current) !== workoutFingerprint(source)) throw new Error('训练记录已变化，请重新打开后保存模板')
+    await database.workoutTemplates.add(template)
+    const workout = syncedName ? { ...current, name: syncedName, updatedAt: new Date().toISOString() } : current
+    if (syncedName) await database.workouts.put(workout)
+    return { template, workout }
+  })
+}
+
 export function duplicateWorkoutTemplate(template: WorkoutTemplate): WorkoutTemplate {
   const now = new Date().toISOString()
   return {
@@ -83,6 +100,7 @@ export async function startWorkoutFromTemplate(template: WorkoutTemplate, date: 
   const now = new Date().toISOString()
   const workout: Workout = {
     id: crypto.randomUUID(), date, startedAt: now, createdAt: now, updatedAt: now,
+    name: normalizeWorkoutName(template.name),
     exercises: template.exercises.map((exercise) => {
       const current = exercise.exerciseId ? exerciseMap.get(exercise.exerciseId) : undefined
       return {
@@ -92,6 +110,9 @@ export async function startWorkoutFromTemplate(template: WorkoutTemplate, date: 
     }),
   }
   await database.transaction('rw', [database.workouts, database.workoutTemplates], async () => {
+    if ((await database.workouts.where('date').equals(date).toArray()).some(row => !row.finishedAt)) throw new Error('这一天已有未完成训练，请先继续或完成它')
+    const current = await database.workoutTemplates.get(template.id)
+    if (!current || JSON.stringify(current) !== JSON.stringify(template)) throw new Error('训练模板已变化，请重新选择')
     await database.workouts.add(workout)
     await database.workoutTemplates.update(template.id, { lastUsedAt: now })
   })

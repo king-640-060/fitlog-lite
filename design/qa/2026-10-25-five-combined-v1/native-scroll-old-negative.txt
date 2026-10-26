@@ -1,0 +1,23 @@
+PASS chromium-headless-shell-140
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: chromium-headless-shell-200 active content date
++ actual - expected
+
++ '2026-09-24'
+- '2026-10-09'
+        ^
+
+    at inspect (file:///Users/zhaozhantian/Documents/Codex/2026-09-24/files-pasted-by-the-user-king/work/fitlog-lite/tests/browser/foodNavigationPreservation.mjs:25:12)
+    at async file:///Users/zhaozhantian/Documents/Codex/2026-09-24/files-pasted-by-the-user-king/work/fitlog-lite/tests/browser/foodNavigationPreservation.mjs:31:63 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: '2026-09-24',
+  expected: '2026-10-09',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.16.0

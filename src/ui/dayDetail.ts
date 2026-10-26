@@ -1,3 +1,4 @@
+import { workoutDisplayName, workoutTimeFacts } from '../utils/workoutName'
 import { sleepTimelineHtml } from './sleepTimeline'
 import { sleepNightLabel, resolveSleepBusinessDate } from '../utils/sleepBusinessDate'
 import type { DailyRecords } from '../services/dailyRecordsSummary'
@@ -110,7 +111,7 @@ export function dailyRecordsHtml(records:DailyRecords,esc:(value:unknown)=>strin
   }
   const contents:Record<CalendarCategory,string>={
     food:nutritionGrid('actual')+nutritionGrid('target')+s.foodLogs.map(l=>detail(`${l.meal?mealNames[l.meal]:'未分类'} · ${l.foodName}${l.brand?' · '+l.brand:''}`,[`${formatNumber(l.grams)} g · ${formatEnergyInputValue(l.totalCalories)} kcal`,`蛋白质 ${macro(l.totalProtein)} · 碳水 ${macro(l.totalCarbs)} · 脂肪 ${macro(l.totalFat)}`,`保存的每${formatNumber(l.referenceGrams)}g快照：${formatEnergyInputValue(l.caloriesPerReference)} kcal · 蛋白质 ${macro(l.proteinPerReference)} · 碳水 ${macro(l.carbsPerReference)} · 脂肪 ${macro(l.fatPerReference)}`])).join(''),
-    strength:s.workouts.map((w,i)=>detail(`第${i+1}次训练${w.finishedAt?'':' · 记录中'}`,[`${w.exercises.length} 个动作`,...(w.note?[w.note]:[])])+w.exercises.map(e=>detail(e.exerciseName,e.sets.length?e.sets.map((set,j)=>`第${j+1}组 · ${set.reps}次 · ${set.weightKg===undefined?'重量未记录':formatNumber(set.weightKg)+' kg'}${set.rpe===undefined?'':' · RPE '+formatNumber(set.rpe)}${set.note?' · '+set.note:''}`):['组数未记录'])).join('')).join(''),
+    strength:s.workouts.map(w=>detail(`${workoutDisplayName(w)}${w.finishedAt?'':' · 记录中'}`,[`${w.exercises.length} 个动作`,...workoutTimeFacts(w).map(([label,time])=>`${label} · ${time}`),...(w.note?[w.note]:[])])+w.exercises.map(e=>detail(e.exerciseName,e.sets.length?e.sets.map((set,j)=>`第${j+1}组 · ${set.reps}次 · ${set.weightKg===undefined?'重量未记录':formatNumber(set.weightKg)+' kg'}${set.rpe===undefined?'':' · RPE '+formatNumber(set.rpe)}${set.note?' · '+set.note:''}`):['组数未记录'])).join('')).join(''),
     cardio:s.cardioSessions.map(c=>detail(getCardioActivityLabel(c),[`${formatNumber(c.durationMinutes)} 分钟`,...formatCardioMetrics(c),...(c.note?[c.note]:[])])).join(''),
     pelvic:s.pelvicFloorSessions.map(p=>detail(p.routine?.name??'基础训练',[`${duration(pelvicFloorSessionDurationSeconds(p))} · ${p.completedRepetitions} 次收缩`,`${instant(p.startedAt)} → ${instant(p.finishedAt)}`,...p.phases.map(phase=>`${({prepare:'准备',contract:'收缩',hold:'保持',release:'释放',relax:'放松',rest:'休息'} as const)[phase.type]} ${phase.durationSeconds} 秒`),`记录方式：${p.completionType==='manual'?'手动结束':'完成'}`])).join(''),
     weight:s.weights.map(w=>detail(`${formatNumber(w.weightKg)} kg`,[w.date])).join(''),

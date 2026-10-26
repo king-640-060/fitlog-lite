@@ -1,0 +1,91 @@
+{
+  "commit": "2ab91597b41cef204cddf669db5862f5d30f0455",
+  "shard": 2,
+  "tag": "all-2",
+  "fullJoint": false,
+  "width": "390",
+  "selected": [
+    "aiStreaming",
+    "foodVision",
+    "mobileLayout",
+    "uiQualityAudit",
+    "approvedJointV05",
+    "uxWaterCascadeBackup",
+    "report-ranges",
+    "five-empty-full"
+  ],
+  "results": [
+    {
+      "name": "aiStreaming",
+      "file": "aiStreaming",
+      "start": "2026-10-26T00:47:41.654Z",
+      "end": "2026-10-26T00:48:18.067Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "17aaae1d1d241860117f6c809abfdc9fc1fdc2f048a34f6336893a62a5c0c861"
+    },
+    {
+      "name": "foodVision",
+      "file": "foodVision",
+      "start": "2026-10-26T00:48:18.103Z",
+      "end": "2026-10-26T00:49:30.996Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "5ddc8297018e0c5806c329d1b2bb94fba57289584e92235a2aacfe35ddf9bcfc"
+    },
+    {
+      "name": "mobileLayout",
+      "file": "mobileLayout",
+      "start": "2026-10-26T00:49:31.083Z",
+      "end": "2026-10-26T00:50:32.392Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "583db29a3f6fd5b7c11ff6f14e1708fa1373544932cc42b47c057587e3b86a75"
+    },
+    {
+      "name": "uiQualityAudit",
+      "file": "uiQualityAudit",
+      "start": "2026-10-26T00:50:32.414Z",
+      "end": "2026-10-26T00:56:54.545Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "5a34ca458761baa6fe6e2f1babe71115b7c640175208e5e82529206a3c466a18"
+    },
+    {
+      "name": "approvedJointV05",
+      "file": "approvedJointV05",
+      "start": "2026-10-26T00:56:54.659Z",
+      "end": "2026-10-26T01:01:28.303Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "f13083dc049dbf97857940b87c505aca06934cdd62e665b04fc924f2422fad03"
+    },
+    {
+      "name": "uxWaterCascadeBackup",
+      "file": "uxWaterCascadeBackup",
+      "start": "2026-10-26T01:01:28.318Z",
+      "end": "2026-10-26T01:01:38.672Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "e0977096cfd2206ee80565e531c57b8d35e8ce6d6af34ef772014bc7bcd11d0f"
+    },
+    {
+      "name": "report-ranges",
+      "file": "jointReportRanges",
+      "start": "2026-10-26T01:01:38.684Z",
+      "end": "2026-10-26T01:02:03.417Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "f89374947d030dc17cf6df8f433685c7f95e68eb5f176d512916a7dfe0e0a403"
+    },
+    {
+      "name": "five-empty-full",
+      "file": "fiveCombinedV1",
+      "start": "2026-10-26T01:02:03.469Z",
+      "end": "2026-10-26T01:06:42.139Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "5ee63c5b8ceb25bbe1965be1e28089aa2ecc8bc301dc63fa2122c249d8344ba2"
+    }
+  ]
+}

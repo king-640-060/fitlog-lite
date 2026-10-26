@@ -1,0 +1,15 @@
+
+> fitlog-lite@0.0.0 test
+> vitest run --maxWorkers=4
+
+
+ RUN  v5.0.1 /Users/zhaozhantian/Documents/Codex/2026-09-24/files-pasted-by-the-user-king/work/fitlog-lite
+
+
+ Test Files  79 passed (79)
+      Tests  1190 passed (1190)
+   Start at  10:36:21
+   Duration  6.88s (tests 71%, import 18%, transform 9%, worker 1%)
+
+    Isolate  79 workers spawned · ~115ms startup each (spawn + environment, per file)
+             at least ~2.15s faster with isolate: false — reuses workers across files instead of one per file

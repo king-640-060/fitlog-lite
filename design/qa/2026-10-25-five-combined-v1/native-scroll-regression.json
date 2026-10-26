@@ -1,0 +1,838 @@
+{
+  "results": [
+    {
+      "runtime": "chromium-headless-shell",
+      "version": "151.0.7922.34",
+      "font": 140,
+      "width": 320,
+      "build": "68f4747994fd84bd2ef965c93ee3b009a3b52b72",
+      "measurements": [
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 1881,
+          "centerDelta": 0.4609375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        }
+      ],
+      "datesPreserved": true,
+      "all22Hash": "5b1c5a0da9b7758f2d8bed0b4180ffc56803e7c0c9d303760e03293059838044",
+      "status": "PASS",
+      "physicalIPhone": "Pending"
+    },
+    {
+      "runtime": "chromium-headless-shell",
+      "version": "151.0.7922.34",
+      "font": 200,
+      "width": 320,
+      "build": "68f4747994fd84bd2ef965c93ee3b009a3b52b72",
+      "measurements": [
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2688,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        }
+      ],
+      "datesPreserved": true,
+      "all22Hash": "95c7ea175ad6bb8964773c399e797485671fe0b727fe712a3ed1e84c8ccedbf6",
+      "status": "PASS",
+      "physicalIPhone": "Pending"
+    },
+    {
+      "runtime": "chromium-full",
+      "version": "151.0.7922.34",
+      "font": 140,
+      "width": 320,
+      "build": "68f4747994fd84bd2ef965c93ee3b009a3b52b72",
+      "measurements": [
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 1881,
+          "centerDelta": 0.4609375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        }
+      ],
+      "datesPreserved": true,
+      "all22Hash": "6a8acc423bd152cb2fa1367e130576750c869156f8a8723cf81c0fd57f67e3c1",
+      "status": "PASS",
+      "physicalIPhone": "Pending"
+    },
+    {
+      "runtime": "chromium-full",
+      "version": "151.0.7922.34",
+      "font": 200,
+      "width": 320,
+      "build": "68f4747994fd84bd2ef965c93ee3b009a3b52b72",
+      "measurements": [
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2688,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        }
+      ],
+      "datesPreserved": true,
+      "all22Hash": "bcca95156f1de44c0ccd9b77f02833ecfa64a07c2ec51401b626b878626e1451",
+      "status": "PASS",
+      "physicalIPhone": "Pending"
+    },
+    {
+      "runtime": "webkit",
+      "version": "26.5",
+      "font": 140,
+      "width": 320,
+      "build": "68f4747994fd84bd2ef965c93ee3b009a3b52b72",
+      "measurements": [
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 1881,
+          "centerDelta": 0.4609375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2016,
+          "centerDelta": -0.1484375
+        }
+      ],
+      "datesPreserved": true,
+      "all22Hash": "d8878037aadd16eceeef43d040f851bb325ad602bc462657d5e9d83125963979",
+      "status": "PASS",
+      "physicalIPhone": "Pending"
+    },
+    {
+      "runtime": "webkit",
+      "version": "26.5",
+      "font": 200,
+      "width": 320,
+      "build": "68f4747994fd84bd2ef965c93ee3b009a3b52b72",
+      "measurements": [
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-09",
+          "selected": "2026-10-09",
+          "body": "2026-10-09",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2688,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        },
+        {
+          "date": "2026-10-08",
+          "selected": "2026-10-08",
+          "body": "2026-10-08",
+          "left": 2880,
+          "centerDelta": 0
+        }
+      ],
+      "datesPreserved": true,
+      "all22Hash": "21b3dde7384ade889150dddebf0b2e4c2128b3f4275fc6240ecd753c34823bf9",
+      "status": "PASS",
+      "physicalIPhone": "Pending"
+    }
+  ]
+}

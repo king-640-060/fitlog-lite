@@ -1,0 +1,26 @@
+[
+  {
+    "readingCopy": "build.txt",
+    "rawGzip": "build.txt.gz",
+    "rawSha256": "302a7dae1882ba9d63f1a9e8894a1cfc207a4df117b0a5ed9b95050134c7febc",
+    "readingSha256": "0762fa37f7d41dcba63bdce2a87c3fce7bf8713be5ce93a023f07c93ed3d6783"
+  },
+  {
+    "readingCopy": "sleep-events.txt",
+    "rawGzip": "sleep-events.txt.gz",
+    "rawSha256": "58e64a4678c165026ea911459b04a64ec8da545c17e7103b0f8d667fdd144b21",
+    "readingSha256": "9c2f9780769964709e704938691bf105bf0d6d2f9fabff3084b700054fcd0032"
+  },
+  {
+    "readingCopy": "typecheck.txt",
+    "rawGzip": "typecheck.txt.gz",
+    "rawSha256": "71e9696712d8a6ac6e10955633641e90ffbe0f22331092ac0f60da8781e47f40",
+    "readingSha256": "3e07b80c5eabe43e8addc1f3eac8a985e94ff976a972bb0263bf6df51c9d2018"
+  },
+  {
+    "readingCopy": "units-1190.txt",
+    "rawGzip": "units-1190.txt.gz",
+    "rawSha256": "397c53b4abb9123f14145b376612bfa3ce3111d87b7f3125a7c6660b767cfe80",
+    "readingSha256": "e4e25d0459a1b11dc12f2e818fae9d1736e08ab1d299eff86a31cb6b197e20ee"
+  }
+]

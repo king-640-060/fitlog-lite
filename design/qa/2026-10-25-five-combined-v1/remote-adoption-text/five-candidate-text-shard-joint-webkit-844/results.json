@@ -1,0 +1,21 @@
+{
+  "commit": "fb9f49a867e2be68226f74aa05ecfed7233ab6b2",
+  "shard": 0,
+  "tag": "joint-webkit-844",
+  "fullJoint": true,
+  "width": "844",
+  "selected": [
+    "joint-webkit"
+  ],
+  "results": [
+    {
+      "name": "joint-webkit",
+      "file": "jointUxReportsRange",
+      "start": "2026-10-26T03:55:24.704Z",
+      "end": "2026-10-26T03:58:19.727Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "cf99e5b98caa87b1478c54351be8f8d94d9661039abedea44609c9342ca0136b"
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "commit": "2ab91597b41cef204cddf669db5862f5d30f0455",
+  "shard": 0,
+  "tag": "all-0",
+  "fullJoint": false,
+  "width": "390",
+  "selected": [
+    "aiAssistant",
+    "foodRecovery",
+    "managementVisualConsistency",
+    "trainingRecoveryExperience",
+    "remainingPrototype",
+    "uxWaterCascade",
+    "joint-chromium",
+    "navigation-flicker",
+    "management-default"
+  ],
+  "results": [
+    {
+      "name": "aiAssistant",
+      "file": "aiAssistant",
+      "start": "2026-10-26T00:48:13.015Z",
+      "end": "2026-10-26T00:49:23.063Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "81239573afe2ac5bdcd3f0d79ca5c13c4a5c39d6adca71fe472efefaee60052e"
+    },
+    {
+      "name": "foodRecovery",
+      "file": "foodRecovery",
+      "start": "2026-10-26T00:49:23.126Z",
+      "end": "2026-10-26T00:52:23.338Z",
+      "exitCode": 1,
+      "status": "FAIL",
+      "testSourceSha": "05e5241591623930adea8dc76e420f5fe23952522ed6c56f3799544aae173a93"
+    },
+    {
+      "name": "managementVisualConsistency",
+      "file": "managementVisualConsistency",
+      "start": "2026-10-26T00:52:23.375Z",
+      "end": "2026-10-26T00:57:10.815Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "10c14ed38bf3e8c33f571bdf1982d8b04dae105cdd879bae1f62547cb4748f1a"
+    },
+    {
+      "name": "trainingRecoveryExperience",
+      "file": "trainingRecoveryExperience",
+      "start": "2026-10-26T00:57:10.839Z",
+      "end": "2026-10-26T01:15:20.591Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "57ed14da062890dd1d585f427b6d382a963939f3fca65f92012d493f851595a3"
+    },
+    {
+      "name": "remainingPrototype",
+      "file": "remainingPrototype",
+      "start": "2026-10-26T01:15:20.649Z",
+      "end": "2026-10-26T01:17:37.110Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "b5756604a72e966fca5f3a15fba80e3a75d94c752f3a6ea6a0313170e0ca3720"
+    },
+    {
+      "name": "uxWaterCascade",
+      "file": "uxWaterCascade",
+      "start": "2026-10-26T01:17:37.122Z",
+      "end": "2026-10-26T01:21:22.853Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "a905fbd22f5c1eccf673a645fb171a8779c29e70f3c3bba7d545ea3a7c66f673"
+    },
+    {
+      "name": "joint-chromium",
+      "file": "jointUxReportsRange",
+      "start": "2026-10-26T01:21:22.864Z",
+      "end": "2026-10-26T01:22:13.488Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "cf99e5b98caa87b1478c54351be8f8d94d9661039abedea44609c9342ca0136b"
+    },
+    {
+      "name": "navigation-flicker",
+      "file": "navigationFlicker",
+      "start": "2026-10-26T01:22:13.517Z",
+      "end": "2026-10-26T01:30:46.899Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "a2e8e57856c6756dc3b9101282bc509d01bb0f41309eeff65bddd7e6f286d687"
+    },
+    {
+      "name": "management-default",
+      "file": "managementV061",
+      "start": "2026-10-26T01:30:46.933Z",
+      "end": "2026-10-26T01:35:27.472Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "770958e013aeb533b491261ca9864d4db9cbc3d6a44b5a5a77d05e82bc38dcce"
+    }
+  ]
+}

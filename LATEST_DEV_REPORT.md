@@ -1,5 +1,7 @@
 # FitLog Lite Development Report — Light Native v0.5.1
 
+> 五项联合v1开发与自动化已补齐，正式Application/END发布核验尚待执行；完整77调用原始75PASS/2FAIL和两次完整专项复验分别记录于[本轮QA](docs/FIVE_COMBINED_V1_QA.md)，不冒充一次全绿。当前已验证生产基线仍为本报告LightNative END `68f4747994fd84bd2ef965c93ee3b009a3b52b72`；正式发布证据取得后以独立END报告更新。
+
 2026-10-25，Asia/Shanghai。批准v0.5浅色视觉及v0.5.1真实状态文案已开发、自动化测试并完成Application正式发布验证。本文件为独立END文档提交；自身SHA、第二次CI与最终Pages/SW/离线结果由提交后的实际核验和十项正式回执记录，不预写未来成功。实体设备与ChatGPT独立核查仍Pending。
 
 ## Git、批准基准与范围

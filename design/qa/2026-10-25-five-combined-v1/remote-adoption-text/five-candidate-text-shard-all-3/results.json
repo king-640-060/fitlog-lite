@@ -1,0 +1,91 @@
+{
+  "commit": "fb9f49a867e2be68226f74aa05ecfed7233ab6b2",
+  "shard": 3,
+  "tag": "all-3",
+  "fullJoint": false,
+  "width": "390",
+  "selected": [
+    "aiVoice",
+    "githubSyncSafety",
+    "motionPolish",
+    "uiSemanticConsistency",
+    "approvedJointV05-webkit",
+    "uxWaterCascadeBackup-webkit",
+    "interaction-full",
+    "five-empty-full"
+  ],
+  "results": [
+    {
+      "name": "aiVoice",
+      "file": "aiVoice",
+      "start": "2026-10-26T02:37:07.548Z",
+      "end": "2026-10-26T02:38:02.054Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "cf44b53a89f54a20f9177b2c58d9da9dbcdf075308be2f014b2a86091122b9e2"
+    },
+    {
+      "name": "githubSyncSafety",
+      "file": "githubSyncSafety",
+      "start": "2026-10-26T02:38:02.108Z",
+      "end": "2026-10-26T02:38:59.863Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "3a43e8591b177695ecaf06276dc6ee053f5b7f95839f6ce3caef161f27198c95"
+    },
+    {
+      "name": "motionPolish",
+      "file": "motionPolish",
+      "start": "2026-10-26T02:38:59.887Z",
+      "end": "2026-10-26T02:44:36.993Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "08810424fd21a0447b4e67364212d986b133c9ab57c364c06f4ef9bda706c84c"
+    },
+    {
+      "name": "uiSemanticConsistency",
+      "file": "uiSemanticConsistency",
+      "start": "2026-10-26T02:44:37.109Z",
+      "end": "2026-10-26T02:47:15.841Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "4f9a9d9f6e5e2ac7d57f3ab041c5c02f74779007253180dc6f54356be19cb102"
+    },
+    {
+      "name": "approvedJointV05-webkit",
+      "file": "approvedJointV05",
+      "start": "2026-10-26T02:47:15.888Z",
+      "end": "2026-10-26T02:51:17.483Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "f13083dc049dbf97857940b87c505aca06934cdd62e665b04fc924f2422fad03"
+    },
+    {
+      "name": "uxWaterCascadeBackup-webkit",
+      "file": "uxWaterCascadeBackup",
+      "start": "2026-10-26T02:51:17.601Z",
+      "end": "2026-10-26T02:51:30.259Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "e0977096cfd2206ee80565e531c57b8d35e8ce6d6af34ef772014bc7bcd11d0f"
+    },
+    {
+      "name": "interaction-full",
+      "file": "combinedInteractionV04",
+      "start": "2026-10-26T02:51:30.272Z",
+      "end": "2026-10-26T02:59:38.971Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "01e96f7730f676eee1a6af7db7e91b710b51dabf95983d01ce2f80cd2ed7a06c"
+    },
+    {
+      "name": "five-empty-full",
+      "file": "fiveCombinedV1",
+      "start": "2026-10-26T02:59:39.006Z",
+      "end": "2026-10-26T03:04:03.756Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "5ee63c5b8ceb25bbe1965be1e28089aa2ecc8bc301dc63fa2122c249d8344ba2"
+    }
+  ]
+}

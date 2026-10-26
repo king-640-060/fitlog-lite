@@ -1,0 +1,305 @@
+{
+  "phase": "before",
+  "expected": "68f4747994fd84bd2ef965c93ee3b009a3b52b72",
+  "results": [
+    {
+      "engine": "chromium",
+      "version": "151.0.7922.34",
+      "phase": "before",
+      "build": "68f4747994fd84bd2ef965c93ee3b009a3b52b72",
+      "source": "Actual HTTPS Pages; isolated synthetic context; no personal profile; SW blocked for exact current response",
+      "tabs": [
+        {
+          "tab": "today",
+          "labels": [
+            {
+              "text": "剩余目标",
+              "rows": {
+                "1511": "剩余目标"
+              },
+              "style": {
+                "font": "26px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1643": "未设置目",
+                "1672": "标"
+              },
+              "style": {
+                "font": "22px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1643": "未设置目",
+                "1672": "标"
+              },
+              "style": {
+                "font": "22px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1747": "未设置目",
+                "1776": "标"
+              },
+              "style": {
+                "font": "22px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1747": "未设置目",
+                "1776": "标"
+              },
+              "style": {
+                "font": "22px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            }
+          ],
+          "emptyMeals": [],
+          "documentWidth": 320,
+          "screenshot": "chromium-today-320-200.png"
+        },
+        {
+          "tab": "food",
+          "labels": [
+            {
+              "text": "剩余目标",
+              "rows": {
+                "1255": "剩余目标"
+              },
+              "style": {
+                "font": "26px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1336": "未设置目",
+                "1368": "标"
+              },
+              "style": {
+                "font": "24px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1336": "未设置目",
+                "1368": "标"
+              },
+              "style": {
+                "font": "24px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1453": "未设置目",
+                "1485": "标"
+              },
+              "style": {
+                "font": "24px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1453": "未设置目",
+                "1485": "标"
+              },
+              "style": {
+                "font": "24px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            }
+          ],
+          "emptyMeals": [
+            "早餐\n0 项记录\n0 kcal\n\n今日未记录\n\n＋记录",
+            "午餐\n0 项记录\n0 kcal\n\n今日未记录\n\n＋记录",
+            "晚餐\n0 项记录\n0 kcal\n\n今日未记录\n\n＋记录",
+            "加餐\n0 项记录\n0 kcal\n\n今日未记录\n\n＋记录"
+          ],
+          "documentWidth": 320,
+          "screenshot": "chromium-food-320-200.png"
+        }
+      ],
+      "status": "BASELINE_OBSERVED"
+    },
+    {
+      "engine": "webkit",
+      "version": "26.5",
+      "phase": "before",
+      "build": "68f4747994fd84bd2ef965c93ee3b009a3b52b72",
+      "source": "Actual HTTPS Pages; isolated synthetic context; no personal profile; SW blocked for exact current response",
+      "tabs": [
+        {
+          "tab": "today",
+          "labels": [
+            {
+              "text": "剩余目标",
+              "rows": {
+                "1435": "剩余目标"
+              },
+              "style": {
+                "font": "26px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1567": "未设置目",
+                "1595": "标"
+              },
+              "style": {
+                "font": "22px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1567": "未设置目",
+                "1595": "标"
+              },
+              "style": {
+                "font": "22px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1671": "未设置目",
+                "1699": "标"
+              },
+              "style": {
+                "font": "22px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1671": "未设置目",
+                "1699": "标"
+              },
+              "style": {
+                "font": "22px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            }
+          ],
+          "emptyMeals": [],
+          "documentWidth": 320,
+          "screenshot": "webkit-today-320-200.png"
+        },
+        {
+          "tab": "food",
+          "labels": [
+            {
+              "text": "剩余目标",
+              "rows": {
+                "1223": "剩余目标"
+              },
+              "style": {
+                "font": "26px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1303": "未设置目",
+                "1335": "标"
+              },
+              "style": {
+                "font": "24px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1303": "未设置目",
+                "1335": "标"
+              },
+              "style": {
+                "font": "24px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1420": "未设置目",
+                "1452": "标"
+              },
+              "style": {
+                "font": "24px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            },
+            {
+              "text": "未设置目标",
+              "rows": {
+                "1420": "未设置目",
+                "1452": "标"
+              },
+              "style": {
+                "font": "24px",
+                "color": "rgb(34, 43, 60)",
+                "wrap": "wrap"
+              }
+            }
+          ],
+          "emptyMeals": [
+            "早餐\n0 项记录\n0 kcal\n\n今日未记录\n\n＋记录",
+            "午餐\n0 项记录\n0 kcal\n\n今日未记录\n\n＋记录",
+            "晚餐\n0 项记录\n0 kcal\n\n今日未记录\n\n＋记录",
+            "加餐\n0 项记录\n0 kcal\n\n今日未记录\n\n＋记录"
+          ],
+          "documentWidth": 320,
+          "screenshot": "webkit-food-320-200.png"
+        }
+      ],
+      "status": "BASELINE_OBSERVED"
+    }
+  ],
+  "physicalIPhone": "Pending"
+}

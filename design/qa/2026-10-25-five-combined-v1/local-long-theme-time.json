@@ -1,0 +1,1159 @@
+{
+  "url": "http://127.0.0.1:5458/fitlog-lite/",
+  "results": [
+    {
+      "engine": "chromium",
+      "width": 320,
+      "font": 200,
+      "look": "classic-light",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 284,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 284,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 284,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "width": 320,
+      "font": 200,
+      "look": "classic-dark",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 284,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 284,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 284,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "width": 320,
+      "font": 200,
+      "look": "light-native",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 284,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 284,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 284,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "width": 375,
+      "font": 200,
+      "look": "classic-light",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 339,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 339,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 339,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "width": 375,
+      "font": 200,
+      "look": "classic-dark",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 339,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 339,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 339,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "width": 375,
+      "font": 200,
+      "look": "light-native",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 339,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 339,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 339,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "font": 200,
+      "look": "classic-light",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 354,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 354,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 354,
+          "height": 62.000030517578125,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "font": 200,
+      "look": "classic-dark",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 354,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 354,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 354,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "width": 390,
+      "font": 200,
+      "look": "light-native",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 354,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 354,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 354,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "width": 430,
+      "font": 200,
+      "look": "classic-light",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 394,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 394,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 394,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "width": 430,
+      "font": 200,
+      "look": "classic-dark",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 394,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 394,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 394,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "width": 430,
+      "font": 200,
+      "look": "light-native",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 394,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 394,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 394,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "kind": "initial-legacy-policy",
+      "mode": "system",
+      "systemDark": false,
+      "noPreferenceAutowrite": true,
+      "systemResponse": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "chromium",
+      "kind": "initial-legacy-policy",
+      "mode": "system",
+      "systemDark": true,
+      "noPreferenceAutowrite": true,
+      "systemResponse": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "chromium",
+      "kind": "initial-legacy-policy",
+      "mode": "light",
+      "systemDark": false,
+      "noPreferenceAutowrite": true,
+      "systemResponse": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "chromium",
+      "kind": "initial-legacy-policy",
+      "mode": "light",
+      "systemDark": true,
+      "noPreferenceAutowrite": true,
+      "systemResponse": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "chromium",
+      "kind": "initial-legacy-policy",
+      "mode": "dark",
+      "systemDark": false,
+      "noPreferenceAutowrite": true,
+      "systemResponse": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "chromium",
+      "kind": "initial-legacy-policy",
+      "mode": "dark",
+      "systemDark": true,
+      "noPreferenceAutowrite": true,
+      "systemResponse": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "chromium",
+      "kind": "storage-denied",
+      "bootstrapMatchesRuntime": true,
+      "failedSaveNoFalseSuccess": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "width": 320,
+      "font": 200,
+      "look": "classic-light",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 284,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 284,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 284,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "width": 320,
+      "font": 200,
+      "look": "classic-dark",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 284,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 284,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 284,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "width": 320,
+      "font": 200,
+      "look": "light-native",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 284,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 284,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 284,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "width": 375,
+      "font": 200,
+      "look": "classic-light",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 339,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 339,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 339,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "width": 375,
+      "font": 200,
+      "look": "classic-dark",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 339,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 339,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 339,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "width": 375,
+      "font": 200,
+      "look": "light-native",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 339,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 339,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 339,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "width": 390,
+      "font": 200,
+      "look": "classic-light",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 354,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 354,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 354,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "width": 390,
+      "font": 200,
+      "look": "classic-dark",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 354,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 354,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 354,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "width": 390,
+      "font": 200,
+      "look": "light-native",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 354,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 354,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 354,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "width": 430,
+      "font": 200,
+      "look": "classic-light",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 394,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 394,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 394,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "width": 430,
+      "font": 200,
+      "look": "classic-dark",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 394,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 394,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 394,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "dark"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "width": 430,
+      "font": 200,
+      "look": "light-native",
+      "date": [
+        {
+          "text": "10月26日",
+          "lineCount": 1
+        },
+        {
+          "text": "· 星期一",
+          "lineCount": 1
+        }
+      ],
+      "fullHistoricalName": true,
+      "nameInput": {
+        "width": 394,
+        "height": 60,
+        "font": 32,
+        "maxLength": 2000
+      },
+      "clocks": [
+        {
+          "type": "time",
+          "value": "23:59",
+          "width": 394,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        },
+        {
+          "type": "time",
+          "value": "07:30",
+          "width": 394,
+          "height": 62,
+          "font": 32,
+          "colorScheme": "light"
+        }
+      ],
+      "status": "PASS",
+      "iPhonePicker": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "kind": "initial-legacy-policy",
+      "mode": "system",
+      "systemDark": false,
+      "noPreferenceAutowrite": true,
+      "systemResponse": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "kind": "initial-legacy-policy",
+      "mode": "system",
+      "systemDark": true,
+      "noPreferenceAutowrite": true,
+      "systemResponse": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "kind": "initial-legacy-policy",
+      "mode": "light",
+      "systemDark": false,
+      "noPreferenceAutowrite": true,
+      "systemResponse": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "kind": "initial-legacy-policy",
+      "mode": "light",
+      "systemDark": true,
+      "noPreferenceAutowrite": true,
+      "systemResponse": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "kind": "initial-legacy-policy",
+      "mode": "dark",
+      "systemDark": false,
+      "noPreferenceAutowrite": true,
+      "systemResponse": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "kind": "initial-legacy-policy",
+      "mode": "dark",
+      "systemDark": true,
+      "noPreferenceAutowrite": true,
+      "systemResponse": true,
+      "status": "PASS"
+    },
+    {
+      "engine": "webkit",
+      "kind": "storage-denied",
+      "bootstrapMatchesRuntime": true,
+      "failedSaveNoFalseSuccess": true,
+      "status": "PASS"
+    }
+  ]
+}
