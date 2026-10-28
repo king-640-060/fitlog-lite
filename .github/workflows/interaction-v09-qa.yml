@@ -1,0 +1,154 @@
+name: Isolated interaction v09 candidate QA
+on:
+  push:
+    branches: ['codex/interaction-v09-qa-*']
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: macos-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include:
+          - tag: '0'
+            task: ''
+            full: '0'
+            width: ''
+            shard: '0'
+          - tag: '1'
+            task: ''
+            full: '0'
+            width: ''
+            shard: '1'
+          - tag: '2'
+            task: ''
+            full: '0'
+            width: ''
+            shard: '2'
+          - tag: '3'
+            task: ''
+            full: '0'
+            width: ''
+            shard: '3'
+          - tag: '4'
+            task: ''
+            full: '0'
+            width: ''
+            shard: '4'
+          - tag: '5'
+            task: ''
+            full: '0'
+            width: ''
+            shard: '5'
+          - tag: '6'
+            task: ''
+            full: '0'
+            width: ''
+            shard: '6'
+          - tag: '7'
+            task: ''
+            full: '0'
+            width: ''
+            shard: '7'
+          - tag: 'joint-chromium-320'
+            task: 'joint-chromium'
+            full: '1'
+            width: '320'
+            shard: '0'
+          - tag: 'joint-chromium-375'
+            task: 'joint-chromium'
+            full: '1'
+            width: '375'
+            shard: '0'
+          - tag: 'joint-chromium-390'
+            task: 'joint-chromium'
+            full: '1'
+            width: '390'
+            shard: '0'
+          - tag: 'joint-chromium-430'
+            task: 'joint-chromium'
+            full: '1'
+            width: '430'
+            shard: '0'
+          - tag: 'joint-chromium-844'
+            task: 'joint-chromium'
+            full: '1'
+            width: '844'
+            shard: '0'
+          - tag: 'joint-webkit-320'
+            task: 'joint-webkit'
+            full: '1'
+            width: '320'
+            shard: '0'
+          - tag: 'joint-webkit-375'
+            task: 'joint-webkit'
+            full: '1'
+            width: '375'
+            shard: '0'
+          - tag: 'joint-webkit-390'
+            task: 'joint-webkit'
+            full: '1'
+            width: '390'
+            shard: '0'
+          - tag: 'joint-webkit-430'
+            task: 'joint-webkit'
+            full: '1'
+            width: '430'
+            shard: '0'
+          - tag: 'joint-webkit-844'
+            task: 'joint-webkit'
+            full: '1'
+            width: '844'
+            shard: '0'
+    env:
+      QA_SHARD: ${{ matrix.shard }}
+      QA_TAG: ${{ matrix.tag }}
+      QA_ONLY: ${{ matrix.task }}
+      QA_FULL_JOINT: ${{ matrix.full }}
+      QA_WIDTH: ${{ matrix.width }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '24.16.0'
+          cache: npm
+      - run: npm ci
+      - name: Check and build identical product source
+        run: |
+          npm run typecheck
+          npm test -- --maxWorkers=4
+          npm run build
+      - name: Install isolated browser runtime
+        run: |
+          npm install --prefix "$RUNNER_TEMP/fitlog-pw" --no-save playwright@1.62.1
+          node "$RUNNER_TEMP/fitlog-pw/node_modules/playwright/cli.js" install chromium webkit
+          echo "FITLOG_PLAYWRIGHT_MODULE=$RUNNER_TEMP/fitlog-pw/node_modules/playwright/index.mjs" >> "$GITHUB_ENV"
+      - name: Serve current and frozen old builds
+        run: |
+          python3 .qa-remote/setup.py
+          sw_vers > .qa-remote/runner.txt
+          node --version >> .qa-remote/runner.txt
+      - name: Full nonpublishing regression shard
+        run: node .qa-remote/run.mjs
+      - name: Preserve actual evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: interaction-v09-candidate-shard-${{ matrix.tag }}
+          path: |
+            qa-results/
+            .qa-remote/source-manifest.json
+            .qa-remote/runner.txt
+            dist/build-info.json
+          include-hidden-files: true
+          retention-days: 14
+      - name: Small complete text evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: interaction-v09-candidate-text-shard-${{ matrix.tag }}
+          path: qa-text/
+          retention-days: 14
