@@ -36,6 +36,9 @@
 .exercise-card .sets { padding-inline:10px; }
 .exercise-card .set-note { margin-top:2px; }
 .progress-deck-root { display:flex; flex-direction:column; min-height:0; min-width:0; }
+/* Progress owns internal scrollers. The document's general 120px focus reserve
+   must not scroll all ancestor navigation when a visible period button is focused. */
+html:has(#view > .progress-deck-root) { scroll-padding-block:0; }
 .progress-deck-root > .page-tabs { flex:none; }
 .progress-deck-root > .local-deck-stage, .report-deck-shell > .local-deck-stage, .report-daily-shell > .local-deck-stage { flex:1 1 auto; min-height:0; }
 .progress-deck-root .local-deck-page { height:100%; }
