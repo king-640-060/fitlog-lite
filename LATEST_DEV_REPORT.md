@@ -1,56 +1,54 @@
-# FitLog Lite Development Report — 五项联合改造 v1
+# FitLog Lite Development Report — Interaction v0.9
 
-2026-10-26，Asia/Shanghai。五项生产实现、完整必要自动化和Application正式环境验证已完成；实体iPhone与ChatGPT独立核查仍Pending。本文件为独立END报告提交，仅修改本文件。自身END SHA、对应CI及最终Pages/App/active SW/离线结果须由提交后的实际验证和十项正式回执确认，不预写未来成功。
+2026-10-29，Asia/Shanghai。批准交互实现、必要自动化与Application正式环境验证已完成；实体设备和ChatGPT独立核查仍Pending。本文件是只修改LATEST的独立END报告提交。自身END SHA、第二次CI及最终正式身份/数据/离线须由提交后的实际十项回执确认，不预写未来成功。
 
-## Git、批准输入与范围
+## Git与批准基准
 
-- START：`68f4747994fd84bd2ef965c93ee3b009a3b52b72`；实施与提交前fresh fetch确认main，保护其他修改，全部正常非强制推送。
-- 产品Application：[d27ca90c62809b769456a6546275b08e0fa8f0d4](https://github.com/king-640-060/fitlog-lite/commit/d27ca90c62809b769456a6546275b08e0fa8f0d4)；[CI/Pages success](https://github.com/king-640-060/fitlog-lite/actions/runs/40267200483)。21个产品/构建文件变化，另有必要测试、文档、批准原件与可核查证据。
-- 测试入口修订：[6f20141918fb199c8b07b1b138de15f45d3406ea](https://github.com/king-640-060/fitlog-lite/commit/6f20141918fb199c8b07b1b138de15f45d3406ea)；[额外CI/Pages success](https://github.com/king-640-060/fitlog-lite/actions/runs/40268000562)。仅PWA升级测试先通过真实UI选择Classic及QA说明，产品源码未改。它是额外实际提交/CI，不隐藏为只有两次提交。
-- [正式站](https://king-640-060.github.io/fitlog-lite/) · [批准原件与SHA](design/reference/2026-10-25-five-combined-v1/DESIGN_REFERENCE.md) · [实现合同](docs/FIVE_COMBINED_V1.md) · [完整QA和首败/复验](docs/FIVE_COMBINED_V1_QA.md) · [冻结证据](design/qa/2026-10-25-five-combined-v1/README.md)。
-- ZIP SHA256 `ae0dcbb25b80916c1e9742356c5dcf1fb567a74b3c7594b4fec54e4d6aae6e98`；7成员CRC、6/6 SHA匹配。唯一v1 HTML SHA256 `ebceb18d35a6e1c16fa4d2bdd02cba528ab289aec6826bf1dfa6bc8d65240176`。双引擎×4宽实际运行8上下文；包内32项演示检查不当作生产测试。原型及基准未改。
+- START：`8dac27a4399f6ab0a279308ad5f298bf25ca1482`。fresh fetch确认main，无覆盖他人修改；正常非强制推送。
+- Application：[d9a009f271648a4d02742bbb5b17c13d92ac6048](https://github.com/king-640-060/fitlog-lite/commit/d9a009f271648a4d02742bbb5b17c13d92ac6048)，[CI及Pages success](https://github.com/king-640-060/fitlog-lite/actions/runs/40883537171)。288个实际文件中只有9个产品源文件，其余为必要测试、文档、批准原件与证据；[完整清单](design/qa/2026-10-26-interaction-v09/MODIFIED_FILES.csv)。没有合并QA临时workflow/payload。
+- [正式站](https://king-640-060.github.io/fitlog-lite/) · [批准原件/SHA](design/reference/2026-10-26-interaction-v09/DESIGN_REFERENCE.md) · [实现与有限审计](docs/INTERACTION_V09.md) · [39项证据索引、首败和复验](docs/INTERACTION_V09_QA.md) · [冻结证据](design/qa/2026-10-26-interaction-v09/README.md)。
+- ZIP初次核对SHA256 `da0ed4e621df46d9542a7e3c9626255d93e74845a5fa2fe3d582d9e918889a3c`、14成员CRC/路径、13/13 SHA通过。最终又核对14个提取原件与仓库逐字节一致、13/13 SHA；下载ZIP当前不在原路径，不虚称重新读取了原ZIP。唯一v0.9 HTML SHA256 `d41171fc85af521cd6d6c1b3a7a249eb20aee369941296a117ee474d261f480d`，原件和既有基准未改。
 
 ## 实现与保留语义
 
-A：63个UI源文件1325个中文节点静态筛查与41项实际文案决策分开记录，见[文案审核](docs/FIVE_COMBINED_V1_COPY_AUDIT.md)。只去掉已审计的重复介绍/空态计数，缩回实际空间；未知、风险、单位、真实日期、估算/实际边界、隐私和删除/恢复警示保留。日期/星期完整语义块换行；静态目标短句均衡排版，空餐保留kcal、未记录与真实记录入口。
+A：整日饮食模板为四餐次等宽页，只显示当前组；旧combo/缺mode/未分类保持真实语义。左44px把手移动原节点、保留占位与相邻让位，释放才改草稿，取消恢复原序，键盘上下可替代。显式餐次调整入口、全部名称/品牌/克数/说明/可选目标保留；拖动不暗改meal。保存走真实服务和源指纹事务。
 
-B/C：可选`Workout.name`是独立快照；手工名称上限2000，旧3200字符模板快照不截断或拒绝。名称专用事务只改name/updatedAt，保留原始set/RPE/日志/未知字段；关闭/后台只排空真实待保存编辑，不强制归一化历史。现有Autosave排空、完整source fingerprint、删除源/重复操作/并发守卫及模板+可选未命名同步两表原子回滚已验证。自由训练沿用真实服务，一个实际动作及有效组即可完成，不要求模板。模板改名/删除不追溯改名历史。
+B：当前训练与训练模板采用同类紧凑动作卡/把手，保留重量、次数、组ID、RPE和原文备注。本次动作名称修改WorkoutExercise.exerciseName快照，不能修改Exercise.name、整次Workout.name或其他历史。先排空既有Autosave，重检来源，名称/换序专用路径保留未编辑未知字段和精度；真实组编辑仍执行原验证。模板使用独立事务和克隆合同。
 
-D：仅Classic与Light Native，两主题使用独立设备偏好键，旧system/light/dark不改写；缺新键保持旧升级行为直到显式选择。Classic精确palette来自`7110564631b6e40f59485cb1a12543ea59b3a2df`，Native来自START。初始head与运行时策略一致；切换保留页面/工作区节点和草稿，不写业务表。兼容态已勾选radio再次点击也固定显式选择。
+C：趋势/日历/报告、报告种类、日常报告周期分别拥有真实邻页、指示器、异步取消和滚动状态。晋升同一预备DOM，隔离预备ID/引用，晚到只读结果不得覆盖新选中。图表/日期轨/控件/选择文字/边缘与原生滚动优先，子层不移动上层或五主Tab。非滚动clip防止程序化滚父层；短横屏按实际三级导航及44px可操作内容区测量共同最低高度，必要时原生外层滚动。仅活动Progress取消文档通用120px焦点预留，修复已测11px祖先偏移。
 
-E：复用原生`type=time`、日期子页、共享Sheet/VisualViewport与真实睡眠服务；>=16px/44px，不手搓滚轮或新建键盘控制器。凌晨/跨午夜/跨年/DST/手动夜晚归属不改。
-
-发布回归另在真实冻结旧版与候选中定位到重复append已挂载预备DOM造成完整Chromium原生日期条归零、错选日期。只在节点尚非stage子节点时插入；不增加日期重置、监听器或计时兜底，保留节点、激活/取消/清理及245ms动效。旧版负对照FAIL、新回归6/6 PASS；不是重开旧视觉闪帧项目。
+D：指定食物两步继续共用既有Sheet/footer/viewport和真实推荐/确认服务。主次按钮统一宽高、间距和大字体换行，选择/推荐/返回不记账，真实餐次确认才原子写入。没有复制演示保存逻辑、改报告算法或扩展业务。有限审计保留不同业务的习惯排序模式和Task子项操作。
 
 ## 实际自动化
 
-本地Node24.16.0、Chromium151.0.7922.34、WebKit26.5；远程独立macOS runner及浏览器版本见各原始产物。仅新隔离合成上下文、假Provider及既有专用合成profile，无个人健康数据或真实Key操作。
+本地Node24.16.0、Chromium151.0.7922.34、WebKit26.5；独立macOS runner版本与来源保留。仅新隔离合成上下文、假Provider和既有专用合成profile；没有个人浏览器/健康记录或真实Key操作。
 
-- `npm ci`、typecheck、79文件1190/1190单测、生产build PASS；原78文件1143单测不改，新增47。DB schema、依赖/lock不变。
-- 最终182个产品/构建/依赖文件SHA与冻结QA源、两次驱动复验及Application逐一相同。原17冻结输入、691旧设计文件不改，158旧src/41服务逐字相同。原业务/结构assert AST不改，唯一旧呈现预期恢复批准Classic meta颜色。
-- [完整77调用](https://github.com/king-640-060/fitlog-lite/actions/runs/40259901467)实际75PASS/2FAIL，原始CI为failure；[AI流式完整4宽复验](https://github.com/king-640-060/fitlog-lite/actions/runs/40264645142)和[每日记录完整65上下文复验](https://github.com/king-640-060/fitlog-lite/actions/runs/40265113049)均success。驱动分别等模拟流真实首片段及Sheet/Toast有限动画完成，替代固定250/40ms假设，原严格断言保留。补齐有效77调用覆盖，不能声称单次77/77全绿，重复不扩大唯一数量。
-- 新五项空库74/74、历史合成库74/74（各2功能流+72显示上下文）、主题策略8/8、历史字段及名称/模板Sheet74/74；既有LightNative52/52、Management默认52/52、Classic52/52。历史fixture不等于当前Today有记录，后者由原LightNative套件另验。
-- 三图2引擎×5宽×明暗×3字体共60/60，6状态×3图共1080组实际高度量测，7→30→90→7所有内部/外部高度最大差0px。单宽runner的diagnostic标记及完整并集证明均保留。
-- 完整Chromium最终源Food35/35、宏量营养40/40、每日记录65/65及20压力往返；原生日期保持三运行方式×两字体6/6。短名与3200字符名各双引擎，真实旧客户端Restore/Export/Autosave→新Restore/加密Sync1，22表完整比较PASS。睡眠时钟12上下文84场景PASS，locale不冒充真实系统12/24小时设置。
+- npm ci、TypeScript、80文件1199单测、生产build PASS。原1190单测不改，新增9项验证原始字段/精度、源删除/旧草稿、故障回滚、模板冲突和Backup14/加密Sync1往返。Application clean build `local=false`、base=/fitlog-lite/。
+- 原C82调用57PASS/25FAIL、D82调用73PASS/9FAIL、F32调用28PASS/4FAIL均保留原failure。E被替代并取消。最终G [完整十分片CI success](https://github.com/king-640-060/fitlog-lite/actions/runs/40879663483)，十个runner的181/181产品源SHA逐一匹配Application。F至G只有限定Progress的焦点CSS变化，180/181源文件及全部TS/服务相同，不伪称F全绿。
+- [85份有效suite-call覆盖对账](design/qa/2026-10-26-interaction-v09/regressions/effective-coverage.json)分别保留D未受影响既有门槛、F受影响完整门槛、G完整/定向复验来源；不是85独立功能或一次全绿CI。业务断言AST、原始首败、重测和实际来源均可核对。
+- G双引擎146/146几何矩阵；四宽×三字号×Classic浅/深及Native×普通/减少动态，另横屏。原生Chromium触摸和WebKit触摸事件分支、pointercancel/blur、按ID草稿/保存、迟到原生getAll、每引擎20滚动恢复/跨模块资源循环均通过。WebKit合成touch事件不冒充实体触摸。
+- G名称Sheet双引擎×三种代表宽度/字体/外观6上下文，含320/200深色；空名拦截、合成composition、取消/确认、故障保留输入、真实组和其余21表保真。原生触摸排序保留起点/30px/跨两行/释放图片及clientY/row top/占位索引；真实IME仍Pending。
+- G主导航52/52上下文、444个预备→active边界、两引擎各100切换及资源/数据/晚到原生读取通过；G完整65场景统一体验通过。所有旧饮水、饮食、报告、训练、计划、AI/Voice、恢复/Sync等适用门槛来源见覆盖清单。
+- 三图完整60个引擎/宽度/颜色/字号上下文、6数据状态×3图共1080组；7→30→90→7的整体及全部9个内部/外部高度字段最大差均0px，见[实测](design/qa/2026-10-26-interaction-v09/geometry/trend-height-summary.json)。
+- 最终G报告trace RunTask最大20.287ms、Layout3.605ms、RAF3.033ms，无>50ms任务。未改排序代码/非Progress样式的F40项长列表5轮样本为9.253/2.073/5.467ms，无>50ms。压缩原始trace和解压SHA均保留，不承诺模拟环境恒定60fps。
+- 156个修改文档本地链接、git diff --check、范围/保护路径和全部231个QA校验条目通过；232份QA文件均已入Git，包括原本被忽略的日志。大JSON无损压缩，原字节SHA和小摘要独立保留。
 
-原休眠/DarkWake、长标题溢出、静态目标孤字、旧强制Autosave、隐式主题radio、日期条重复DOM移动，以及所有测试时序首败/复验均保留，不能笼统归因为休眠。原始日志work不改；Git证据阅读副本仅去行尾空白，同名.gz及RAW_LOG_COPIES保存原字节/SHA。Markdown本地链接、修改范围及git diff --check实际通过。
+首败处理：24px拖拽包含块、Escape归属、重复导航/ID、footer高度、320/200周期标签、横屏可达性和焦点偏移均有实际复验。旧驱动改等真实导航/筛选就绪，不用空option数组every或暂时缺节点当作完成；保留原业务断言。原生纵向>20px检查改用批准的真实deck-scroll所有者并增加正起点；WebKit同级按钮高度的0.000015px舍入噪声统一到0.001px后仍严格比较。没有吞失败、清库或关闭动画伪造通过。
 
 ## 实际正式环境与视觉
 
-当前已验证版本`6f20141918fb199c8b07b1b138de15f45d3406ea`，clean build `local=false`、base=/fitlog-lite/。11项发布检查全部PASS：10项真实HTTPS（精确资源、同profile、两套Management、双引擎功能、主题、原始历史、UI总审计268状态、恢复筛选、导航闪帧）及1项本地V7/真实START升级harness。harness第一次旧深色入口FAIL，补齐Classic选择后两组完整PASS，未改产品/原断言；不能把它当成原安装iPhone实测。
+Application13项发布检查全部PASS：12项实际HTTPS和1项真实旧版升级harness。包括15静态资源逐字节/SHA匹配clean build、同profile、双引擎核心/名称Sheet/触摸/手势、两主题管理、UI总审计、导航/报告及真实生产截图。PWA harness用冻结V7与真实START8dac clean assets；不是原安装iPhone验证。
 
-正式HTML、JS/CSS、manifest、图标、SW标记等全部15静态文件逐一HTTP字节/SHA匹配clean build，安装identity/start_url/scope保持。相同既有专用合成Chrome profile未reset/reseed/Restore：App=active SW=6f20141、离线冷启动PASS；22表摘要`049bc97a200c585af636db0378c6c72b1c81696208f15b5d30276755c6ba7c1a`、8配置摘要`609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34`与START/首个Application完全相同。END还须按最终SHA复验。
+同一既有专用合成Chrome profile未reset/reseed/Restore：App=activeSW=`d9a009f271648a4d02742bbb5b17c13d92ac6048`，离线冷启动PASS。22表ID/内容摘要 `049bc97a200c585af636db0378c6c72b1c81696208f15b5d30276755c6ba7c1a`、8配置摘要 `609f5c195402cad718a2d928eebde4a57b843dedb318f02c88a277d3af9e0b34`与START完全相同。END仍须按其最终SHA复验。
 
-首次Application d27的双引擎×Classic浅/深及Native×空/历史fixture共12对正式站after与本地冻结before截图，五Tab及Hub均覆盖；15个palette token与代表控件颜色/背景/字体/边框/圆角/阴影精确相同。已实际查看三种外观的今日/训练/进度前后拼图，重复文案消失、实际空间缩回，图形绘图区未被删小。旧本地截图不称为旧正式站照片；另有真实旧HTTPS320px/200%目标孤字before和实际Application after。实际训练命名/模板勾选/时间表单截图另存。跨主题过渡中的瞬时截图不当作静态可读性证明；原生time六种引擎/主题稳定组合（含跨标签页切换）另测，12字段值保留、>=16px/44px、最低对比度11.436:1。系统picker皮肤仍待实体设备。
+原型初次8上下文运行，另双引擎×四宽×三字号24上下文、120张原图；固定px文本只在浏览器内放大，文件未改。before为冻结START本地构建；本地最终G各外观after独立保留。正式Pages另双引擎28上下文、140张五场景原图及computed style，使用隔离合成数据和真实fixture日期2026-09-28。保留模板真实字段、全部组备注和系统既有主题；不把演示值、虚拟statusbar或模拟菜单复制为生产事实，不伪称逐像素相同。正式原型/生产对照及每类中间帧在交付包中。
 
-## 数据、文档与Pending
+## 数据、文档和Pending
 
-`fitlog-lite-db`、Dexie13/IDB130/22、Backup14/Restore1–14、Sync/envelope1保持；无清库、数据库改名、历史重算或自动同步。三图、两类专业报告、营养模板区间级联删除/回滚、计划、训练计时及AI/Voice权限合同保留。真实Provider未执行。
+`fitlog-lite-db`、Dexie13/IDB130/22表、Backup14/Restore1–14、Sync/envelope1保持；schema、依赖/lock、冻结fixture、旧设计、Sheet控制器、报告分析、营养模板范围删除、计划、AI/Voice服务均未改。真实旧客户端Restore/Export→新本次快照→Backup14/加密Sync1→旧Restore/Export，双引擎22表精确往返通过。没有重命名数据库、清库、历史重算、扩大删除或自动Sync。
 
-已更新AGENTS、UI_INTERACTION_SPEC、UI_QA_MATRIX、DATA_PRESERVATION、五项合同/文案审核/QA、browser README及批准原件/冻结证据。完整实际CI/日志、原始FAIL与复验、所有文件清单、源码保护、正式图片/computed style及App/END最终身份放在`outputs/five-combined-v1`正式十项回执与SHA证据包；work目录保留大图和全部中间证据。
+更新AGENTS、UI_INTERACTION_SPEC、UI_QA_MATRIX、browser README、交互合同/QA、批准原件与冻结证据，本文件为END。完整39行实测状态、文件清单、两次正式CI/最终线上身份和交付ZIP/SHA保存在本聊天outputs/interaction-v09；最终结果由实际回执列明。
 
-实体iPhone Safari、原安装PWA、真实IME/键盘/原生时间picker/系统12或24小时设置、Safe Area、VoiceOver、个人历史连续性、真实Provider及ChatGPT独立核查均Pending。WebKit旧饮水Undo−128px没有在本轮解决或结案，不将本轮零偏移样本当作旧问题已修复。
+实体iPhone Safari、原安装PWA、真实系统键盘/IME/Safe Area/系统返回、VoiceOver、个人历史连续性、真实Provider与ChatGPT独立核查均Pending。W03合成composition和X05浏览器键盘部分通过不代表真实IME/VoiceOver通过。WebKit旧饮水Undo−128px未在本轮解决或结案。
 
-ChatGPT Baseline：先读AGENTS、本报告、协作流程和五项合同/QA，再核对实际main/本报告END及其CI。开发与授权发布完成后停止，等待独立核查，不提前做新设计或其他开发。
-
-归档校正：此前END `6caa9daa67e441d9bd4e713b671120c4b0c65a8f` 的CI、15资源、同档案/离线、最终页面核验实际通过；交付清单校验另发现8份已列SHA的.log被全局忽略。证据提交 `77edcc861fd09b25d75181f2d88dd45ab075fd9f` 补齐原字节，SHA与原清单逐一相同，未改产品、断言、测试结果或原型。当前本报告提交重新作为最终END，仍只修改本文件；最后的CI/正式身份由实际回执列明。
+ChatGPT Baseline：先读AGENTS、本报告、协作流程、INTERACTION_V09及QA，再fresh fetch核对main/最终END和CI。批准交互与授权发布完成后停止；由ChatGPT独立核查，不提前实施其他UX或新原型。
