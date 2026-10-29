@@ -17,7 +17,7 @@ const metrics=p=>p.locator('.progress-deck-root').evaluate(root=>{
    dates:[...page.querySelectorAll('.report-period .fitlog-date-trigger')].map(e=>({id:e.id,rect:rect(e),css:css(e)}))}
  })
  const navs=[...root.querySelectorAll('.page-tabs,.report-kinds,.report-mode')].map(e=>({class:e.className,rect:rect(e)}))
- const ranges=[...root.querySelectorAll('.report-custom-range:not([hidden]) > button')].map(e=>({rect:rect(e),scroll:e.scrollWidth,client:e.clientWidth}))
+ const ranges=[...root.querySelectorAll('.report-custom-range:not([hidden]) > button')].map(e=>({rect:rect(e),scroll:e.scrollWidth,client:e.clientWidth,scrollHeight:e.scrollHeight,clientHeight:e.clientHeight}))
  const period=root.querySelector('.report-daily-shell > .report-mode'),stage=root.querySelector('.report-period-stage'),leaf=stage?.querySelector(':scope > .local-deck-page:not(.local-deck-neighbor)'),date=leaf?.querySelector('.report-period:not([hidden]),.report-custom-range:not([hidden])')
  return {active,navs,ranges,dateGap:date&&period?rect(date).y-rect(period).bottom:null,leaf:rect(leaf),stage:rect(stage),documentWidth:document.documentElement.scrollWidth,viewport:innerWidth,windowY:scrollY}
 })
@@ -40,11 +40,12 @@ for(const engine of process.env.FITLOG_LAYOUT_ENGINE?[process.env.FITLOG_LAYOUT_
     await touch('start',0)
     for(const f of [0,.25,.5,.75,1]){await touch('move',Math.max(12,(bounds.width-1)*f));await p.waitForTimeout(100);const m=await metrics(p);samples.push({name:'calendar-frame-'+f,...m});await p.screenshot({path:path.join(root,key+'-calendar-frame-'+f+'.png')});const cal=m.active.find(a=>a.calendar);if(f>0)check(!!cal,'prepared calendar exists',failures);if(cal){gap(m);const [prev,month,today,next]=cal.calendar.controls;check(next.css.gridRow==='1'&&next.css.gridColumn==='3','next arrow prepared grid',failures);check(today.css.position==='absolute','today prepared absolute',failures);check(Math.max(...[prev,month,today,next].map(e=>e.rect.y+e.rect.height/2))-Math.min(...[prev,month,today,next].map(e=>e.rect.y+e.rect.height/2))<=1,'month header one row',failures)}}
     await touch('end',0);await p.waitForTimeout(300);await frame(p);await cdp?.detach();const cal=await capture('calendar-active',true);gap(cal)
-    const reference=cal.active[0].calendar
-    for(let i=0;i<20;i++){await clickProgressNavigation(p,'[data-progress-view=trend]');gap(await capture('return-trend-'+i));await clickProgressNavigation(p,'[data-progress-view=calendar]');const m=await capture('return-calendar-'+i);gap(m);check(Math.abs(m.active[0].calendar.grid.y-reference.grid.y)<=1,'calendar grid stable '+i,failures)}
+    const reference=cal.active[0].calendar,prepared=samples.findLast(s=>s.name==='calendar-frame-1').active.find(a=>a.calendar)?.calendar
+    if(prepared){check(Math.abs(prepared.grid.y-reference.grid.y)<=1,'prepared grid equals adopted grid y',failures);for(let i=0;i<4;i++)check(JSON.stringify(prepared.controls[i].css)===JSON.stringify(reference.controls[i].css),'prepared/adopted computed styles',failures)}
+    for(let i=0;i<20;i++){await clickProgressNavigation(p,'[data-progress-view=trend]');gap(await capture('return-trend-'+i));await clickProgressNavigation(p,'[data-progress-view=calendar]');const m=await capture('return-calendar-'+i);gap(m);check(Math.abs(m.active[0].calendar.grid.y-reference.grid.y)<=1,'calendar grid stable '+i,failures);await clickProgressNavigation(p,'[data-progress-view=reports]');gap(await capture('cycle-reports-'+i));await clickProgressNavigation(p,'[data-progress-view=trend]');gap(await capture('cycle-trend-'+i));await clickProgressNavigation(p,'[data-progress-view=calendar]')}
    }
    await clickProgressNavigation(p,'[data-progress-view=reports]');gap(await capture('reports',true))
-   const parents=(await metrics(p)).navs.slice(0,2)
+   const parents=(await metrics(p)).navs.slice(0,3)
    for(const period of ['week','month','custom','day']){
     // Collect RAFs from the real click through adoption, including prefixed prepared IDs.
     await p.evaluate(()=>{window.qaLayoutFrames=[];window.qaLayoutCollect=true;const tick=()=>{const root=document.querySelector('.progress-deck-root'),els=[...root.querySelectorAll('.fitlog-date-trigger')];window.qaLayoutFrames.push(els.map(e=>({id:e.id,align:getComputedStyle(e).textAlign,justify:getComputedStyle(e).justifyContent,x:e.getBoundingClientRect().x})));if(window.qaLayoutCollect)requestAnimationFrame(tick)};requestAnimationFrame(tick)})
@@ -52,9 +53,9 @@ for(const engine of process.env.FITLOG_LAYOUT_ENGINE?[process.env.FITLOG_LAYOUT_
     const frames=await p.evaluate(()=>{window.qaLayoutCollect=false;return window.qaLayoutFrames});samples.push({name:'date-transition-'+period,frames})
     for(const values of frames)for(const e of values)check(e.align==='center'&&e.justify==='center','date centered during adoption '+e.id,failures)
     const m=await capture('period-'+period,true);gap(m);check(Math.abs(m.dateGap-12)<=1,`period gap ${m.dateGap}`,failures)
-    for(let i=0;i<2;i++)for(const f of ['x','y','width','height'])check(Math.abs(parents[i].rect[f]-m.navs[i].rect[f])<=1,'parent nav stable '+f,failures)
+    for(let i=0;i<3;i++)for(const f of ['x','y','width','height'])check(Math.abs(parents[i].rect[f]-m.navs[i].rect[f])<=1,'parent nav stable '+f,failures)
     check(m.documentWidth<=width+1,'no horizontal overflow',failures);check(m.leaf.height>=43.5,'usable leaf >=44px',failures)
-    for(const r of m.ranges)check(r.rect.height>=44&&r.rect.x>=-1&&r.rect.right<=width+1&&r.scroll<=r.client+1,'custom date target bounds',failures)
+    for(const r of m.ranges)check(r.rect.height>=44&&r.rect.x>=-1&&r.rect.right<=width+1&&r.scroll<=r.client+1&&r.scrollHeight<=r.clientHeight+1,'custom date target bounds',failures)
     if(m.ranges.length===2)check(Math.abs(m.ranges[0].rect.width-m.ranges[1].rect.width)<=1,'equal date columns',failures)
    }
    await clickProgressNavigation(p,'[data-progress-view=trend]');gap(await capture('reports-to-trend'))
