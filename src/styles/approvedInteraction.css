@@ -3,7 +3,7 @@
 .sort-handle:active { cursor:grabbing; }
 .sort-placeholder { box-sizing:border-box; flex:none; border:1px dashed var(--border); border-radius:var(--radius-md); background:var(--surface-soft); }
 .is-sorting { box-shadow:var(--shadow-float); opacity:.96; background:var(--surface); transition:none !important; will-change:transform; }
-.local-deck-stage { position:relative; min-width:0; overflow:hidden; }
+.local-deck-stage { position:relative; min-width:0; overflow:clip; }
 .local-deck-page { width:100%; min-width:0; box-sizing:border-box; }
 .local-deck-neighbor { position:absolute; top:0; left:0; }
 .local-deck-stage[data-dragging] > .local-deck-page { will-change:transform; }
