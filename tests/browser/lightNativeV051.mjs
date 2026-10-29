@@ -1,3 +1,4 @@
+import {clickProgressNavigation} from './navigationSettlement.mjs'
 // Approved v0.5.1. Fresh synthetic contexts only; never a personal browser profile.
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -72,7 +73,7 @@ for(const engine of process.env.FITLOG_LIGHT_ENGINE?[process.env.FITLOG_LIGHT_EN
     });const audit=await measure()
     await p.screenshot({path:path.join(dir,state+'-'+tab+'.png'),fullPage:true});await fs.writeFile(path.join(dir,state+'-'+tab+'.json'),JSON.stringify(audit,null,2));geometryCheck(audit.issues,name+'/'+state+'/'+tab);geometryCheck(audit.clipped,name+'/'+state+'/'+tab+' clipped facts')
     if(!baseline){assert(!audit.copy.includes('今天也继续保持'));if(tab==='workout'&&state!=='empty'){assert.equal(await p.locator('.training-card:has(#start-workout) .training-card-note').count(),0);assert.equal(await p.locator('.training-card:has(#add-cardio) .training-card-note').count(),0)}}
-    if(tab==='progress'&&((width===390&&font===100)||(width===320&&font===200))){for(const subview of ['calendar','reports']){await p.locator(`[data-progress-view=${subview}]`).click();await p.waitForTimeout(380);const sub=await measure();await p.screenshot({path:path.join(dir,state+'-progress-'+subview+'.png'),fullPage:true});await fs.writeFile(path.join(dir,state+'-progress-'+subview+'.json'),JSON.stringify(sub,null,2));geometryCheck(sub.issues,name+'/'+state+'/'+subview);geometryCheck(sub.clipped,name+'/'+state+'/'+subview+' clipped facts');checks.push({state,tab:'progress-'+subview,status:'PASS'})}}
+    if(tab==='progress'&&((width===390&&font===100)||(width===320&&font===200))){for(const subview of ['calendar','reports']){await clickProgressNavigation(p,`[data-progress-view=${subview}]`);await p.waitForTimeout(380);const sub=await measure();await p.screenshot({path:path.join(dir,state+'-progress-'+subview+'.png'),fullPage:true});await fs.writeFile(path.join(dir,state+'-progress-'+subview+'.json'),JSON.stringify(sub,null,2));geometryCheck(sub.issues,name+'/'+state+'/'+subview);geometryCheck(sub.clipped,name+'/'+state+'/'+subview+' clipped facts');checks.push({state,tab:'progress-'+subview,status:'PASS'})}}
     if(tab==='food'&&state!=='empty'){for(const toggle of await p.locator('[data-toggle-meal]').all()){await toggle.click();const records=p.locator('#'+await toggle.getAttribute('aria-controls'));await records.waitFor();assert((await records.innerText()).includes(data.foodLogs[0].foodName));assert(await records.evaluate(e=>[...e.querySelectorAll('.log-name,strong')].every(n=>n.scrollWidth<=n.clientWidth+1||getComputedStyle(n).overflowX==='visible')));await toggle.click()}}
     checks.push({state,tab,status:'PASS',semantic:audit.semantic,styles:audit.styles,summaryPreviews:audit.summaryPreviews})
    }

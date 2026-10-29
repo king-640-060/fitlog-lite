@@ -13,3 +13,26 @@ export async function waitForSurfaceSettlement(page, selector='dialog[open]') {
   await new Promise(requestAnimationFrame)
  },selector)
 }
+
+// v0.9 local decks animate real adjacent nodes with independent selection state.
+export async function waitForProgressNavigation(page, expected={}) {
+ await page.waitForFunction(expected=>{
+  const root=document.querySelector('#view .progress-deck-root')
+  if(!root)return false
+  if(root.querySelector('.local-deck-neighbor,[data-dragging]'))return false
+  for(const [key,value]of Object.entries(expected)){
+   const attribute=key==='view'?'data-progress-view':key==='kind'?'data-report-kind':'data-report-mode'
+   if(root.querySelector(`[${attribute}="${value}"]`)?.getAttribute(key==='view'?'aria-selected':'aria-pressed')!=='true')return false
+  }
+  return true
+ },expected)
+}
+
+export async function clickProgressNavigation(page, selector) {
+ await waitForMainNavigation(page,'progress')
+ await waitForProgressNavigation(page)
+ const button=page.locator(selector)
+ const view=await button.getAttribute('data-progress-view'),kind=await button.getAttribute('data-report-kind'),mode=await button.getAttribute('data-report-mode')
+ await button.click()
+ await waitForProgressNavigation(page,view?{view}:kind?{kind}:mode?{mode}:{})
+}

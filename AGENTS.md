@@ -466,3 +466,7 @@ Follow [five-part contract](docs/FIVE_COMBINED_V1.md) and its immutable referenc
 ## Native scroll preservation release guard
 
 Prepared main-tab pages already mounted for layout must not be appended again on promotion. Preserve native child scroll and the selected Food date; append only if the prepared node is not already in the stage. Keep existing preview ownership/disposal/motion and test full Chromium as well as headless-shell/WebKit.
+
+## Approved local interaction v0.9
+
+Follow [v0.9 interaction contract](docs/INTERACTION_V09.md) and the immutable approved reference. Diet meal decks preserve combo/unclassified semantics and explicit manual meal edits; only handles initiate draft sorting. Workout exercise snapshot rename/order preserve untouched raw set/journal fields and original autosave/source guards. Three Progress decks own independent neighbors/scroll/indicators; child changes never move ancestors or main tabs. Dispose aborted readonly mounts immediately and adopt prepared nodes unchanged. Designated-food steps share existing Sheet/footer/viewport and guarded real intake services. Retain DB13/130/22, Backup14/Restore1–14/Sync1, every existing release gate and independent physical-device Pending evidence. Read the current QA status before treating implementation as released.

@@ -41,6 +41,9 @@
 .progress-deck-root .local-deck-page { height:100%; }
 .deck-scroll { overflow-y:auto; overscroll-behavior-y:contain; padding-bottom:20px; }
 .report-deck-shell,.report-daily-shell { display:flex; flex-direction:column; min-height:0; height:100%; min-width:0; }
+.report-daily-shell { container-type:inline-size; }
+.report-daily-shell > .report-mode { grid-template-columns:repeat(4,minmax(0,1fr)); }
+@container (max-width:17rem) { .report-daily-shell > .report-mode { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 .report-deck-shell > .report-kinds, .report-daily-shell > .report-mode { flex:none; }
 .progress-deck-root .report-page { min-width:0; }
 @media(prefers-reduced-motion:reduce) { .is-sorting { will-change:auto; } }

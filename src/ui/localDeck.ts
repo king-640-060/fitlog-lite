@@ -1,5 +1,18 @@
 import { adjacentSwipe, bindHorizontalSwipe, shouldCommitSwipe, swipeControl } from './horizontalNavigation'
 export interface DeckPage { element: HTMLElement; activate?(): void; dispose(): void }
+let previewSerial=0
+/** Keep inactive panel IDs/label references distinct; restore the same nodes at adoption. */
+function isolatePanelIds(page:DeckPage):()=>void {
+  const prefix=`local-preview-${++previewSerial}-`,nodes=[page.element,...page.element.querySelectorAll<HTMLElement>('[id]')].filter(n=>n.id)
+  const ids=new Map(nodes.map(n=>[n.id,prefix+n.id])),undo:(()=>void)[]=[]
+  for(const node of nodes){const id=node.id;node.id=ids.get(id)!;undo.push(()=>{node.id=id})}
+  for(const node of [page.element,...page.element.querySelectorAll<HTMLElement>('[for],[aria-controls],[aria-labelledby],[aria-describedby]')])for(const attr of ['for','aria-controls','aria-labelledby','aria-describedby']){
+    const value=node.getAttribute(attr);if(value===null)continue
+    const next=value.split(' ').map(id=>ids.get(id)??id).join(' ')
+    if(next!==value){node.setAttribute(attr,next);undo.push(()=>node.setAttribute(attr,value))}
+  }
+  return ()=>{undo.splice(0).forEach(restore=>restore())}
+}
 /** One current + one bounded readonly neighbor. Nested decks arbitrate by closest owner. */
 export function createLocalDeck(options: {
   root: HTMLElement; nav: HTMLElement; stage: HTMLElement; keys: readonly string[]; active: string
@@ -11,19 +24,21 @@ export function createLocalDeck(options: {
   root.dataset.localDeck='';stage.classList.add('local-deck-stage')
   let current=options.initial,index=keys.indexOf(options.active),neighbor:DeckPage|undefined,target=index,revision=0,frame=0,settling=false,disposed=false,read:AbortController|undefined,dx=0,ended=false,requested:string|undefined,resolveTween:(()=>void)|undefined
   const positions=options.positions??new Map<string,number>(),reduced=matchMedia('(prefers-reduced-motion: reduce)')
+  const restoreIds=new WeakMap<DeckPage,()=>void>()
   const buttons=[...nav.querySelectorAll<HTMLButtonElement>(`[${options.buttonAttribute}]`)]
   const indicator=document.createElement('span');indicator.className='local-deck-indicator';indicator.setAttribute('aria-hidden','true');nav.classList.add('local-deck-nav');nav.prepend(indicator)
   const placeIndicator=(fraction=index)=>{const low=Math.floor(fraction),high=Math.ceil(fraction),a=buttons[low],b=buttons[high];if(!a||!b)return;const f=fraction-low;Object.assign(indicator.style,{left:`${a.offsetLeft+(b.offsetLeft-a.offsetLeft)*f}px`,top:`${a.offsetTop+(b.offsetTop-a.offsetTop)*f}px`,width:`${a.offsetWidth+(b.offsetWidth-a.offsetWidth)*f}px`,height:`${a.offsetHeight+(b.offsetHeight-a.offsetHeight)*f}px`})}
   const select=()=>{buttons.forEach(b=>{const yes=b.getAttribute(options.buttonAttribute)===keys[index];b.classList.toggle('active',yes);b.setAttribute(b.hasAttribute('aria-selected')?'aria-selected':'aria-pressed',String(yes))});placeIndicator()}
-  const clean=()=>{cancelAnimationFrame(frame);frame=0;resolveTween?.();resolveTween=undefined;read?.abort();read=undefined;neighbor?.dispose();neighbor?.element.remove();neighbor=undefined;current.element.style.removeProperty('transform');current.element.inert=false;stage.removeAttribute('data-dragging');settling=false}
+  const clean=()=>{cancelAnimationFrame(frame);frame=0;resolveTween?.();resolveTween=undefined;read?.abort();read=undefined;if(neighbor)restoreIds.get(neighbor)?.();neighbor?.dispose();neighbor?.element.remove();neighbor=undefined;current.element.style.removeProperty('transform');current.element.inert=false;stage.removeAttribute('data-dragging');settling=false}
   const cancel=()=>{revision++;clean();select()}
   const draw=(d:number)=>{if(!neighbor)return;const w=stage.clientWidth;if(!w)return;d=Math.max(-w,Math.min(w,d));stage.dataset.dragging='';current.element.style.transform=`translate3d(${d}px,0,0)`;neighbor.element.style.transform=`translate3d(${d+(target>index?1:-1)*w}px,0,0)`;current.element.inert=true;placeIndicator(index+(target-index)*Math.abs(d)/w)}
   const prepare=async(next:number,token:number)=>{
-    read?.abort();neighbor?.dispose();neighbor?.element.remove();neighbor=undefined
+    read?.abort();if(neighbor)restoreIds.get(neighbor)?.();neighbor?.dispose();neighbor?.element.remove();neighbor=undefined
     const request=new AbortController();read=request;target=next
     let page:DeckPage
     try { page=await options.prepare(keys[next]!,request.signal) } catch(error) { if(request.signal.aborted||token!==revision||disposed)return false;throw error }
     if(disposed||request.signal.aborted||token!==revision){page.dispose();page.element.remove();return false}
+    restoreIds.set(page,isolatePanelIds(page))
     neighbor=page;page.element.style.removeProperty('visibility');page.element.classList.add('local-deck-page','local-deck-neighbor');page.element.inert=true;page.element.setAttribute('aria-hidden','true')
     if(page.element.parentElement!==stage)stage.append(page.element)
     page.element.scrollTop=positions.get(keys[next]!)??0;return true
@@ -33,7 +48,7 @@ export function createLocalDeck(options: {
     settling=true;const start=performance.now(),duration=reduced.matches?0:commit?245:205,end=commit?(target>index?-1:1)*stage.clientWidth:0
     await new Promise<void>(resolve=>{resolveTween=resolve;const tick=(t:number)=>{if(token!==revision||disposed){resolve();return}const f=duration?Math.min(1,(t-start)/duration):1;draw(d+(end-d)*(1-(1-f)**3));if(f===1){resolveTween=undefined;resolve()}else frame=requestAnimationFrame(tick)};tick(start)})
     if(token!==revision||disposed)return
-    if(commit){positions.set(keys[index]!,current.element.scrollTop);const next=neighbor!;neighbor=undefined;current.dispose();current.element.remove();current=next;index=target;current.element.classList.remove('local-deck-neighbor');current.element.style.removeProperty('transform');current.element.inert=false;current.element.removeAttribute('aria-hidden');options.selected(keys[index]!);current.activate?.()}
+    if(commit){positions.set(keys[index]!,current.element.scrollTop);const next=neighbor!;neighbor=undefined;current.dispose();current.element.remove();current=next;restoreIds.get(current)?.();index=target;current.element.classList.remove('local-deck-neighbor');current.element.style.removeProperty('transform');current.element.inert=false;current.element.removeAttribute('aria-hidden');options.selected(keys[index]!);current.activate?.()}
     clean();select();nav.style.setProperty('--deck-progress',String(index))
   }
   const blocked=()=>disposed||document.body.classList.contains('keyboard-open')||(!options.modal&&!!document.querySelector('dialog[open]'))||!!document.activeElement?.matches('input,textarea,select,[contenteditable=true]')
