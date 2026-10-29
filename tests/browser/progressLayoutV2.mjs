@@ -29,7 +29,7 @@ for(const engine of process.env.FITLOG_LAYOUT_ENGINE?[process.env.FITLOG_LAYOUT_
   p.on('pageerror',e=>errors.push(e.message))
   try{
    await c.addInitScript(look=>{localStorage.setItem('fitlog-visual-theme-v1',look==='light-native'?'light-native':'classic');localStorage.setItem('fitlog-appearance-v1',look==='classic-dark'?'dark':'light')},look)
-   await p.goto(url,{waitUntil:'networkidle'});await p.locator('#today-food-details').waitFor();await seed(p);await p.addStyleTag({content:`html{font-size:${font}%}`});const before=await read(p)
+   await p.clock.setFixedTime(new Date('2026-09-28T12:00:00+08:00'));await p.goto(url,{waitUntil:'networkidle'});await p.locator('#today-food-details').waitFor();await seed(p);await p.addStyleTag({content:`html{font-size:${font}%}`});const before=await read(p)
    await p.locator('[data-tab=progress]').click();await waitForMainNavigation(p,'progress')
    const capture=async(name,screenshot=false)=>{await frame(p);const m=await metrics(p);samples.push({name,...m});if(screenshot)await p.screenshot({path:path.join(root,key+'-'+name+'.png')});return m}
    const gap=m=>{for(const page of m.active)if(page.first&&page.scrollTop===0)check(Math.abs(page.gap-14)<=1,`first gap ${page.gap}`,failures)}
