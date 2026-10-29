@@ -13,26 +13,11 @@ jobs:
       max-parallel: 8
       matrix:
         include:
-          - tag: 'production-0'
-            task: ''
-            full: '0'
-            width: ''
-            shard: '0'
-          - tag: 'production-1'
-            task: ''
-            full: '0'
-            width: ''
-            shard: '1'
-          - tag: 'production-2'
-            task: ''
+          - tag: 'production-pwa-retry'
+            task: 'pwa-upgrade'
             full: '0'
             width: ''
             shard: '2'
-          - tag: 'production-3'
-            task: ''
-            full: '0'
-            width: ''
-            shard: '3'
     env:
       QA_SHARD: ${{ matrix.shard }}
       QA_TAG: ${{ matrix.tag }}

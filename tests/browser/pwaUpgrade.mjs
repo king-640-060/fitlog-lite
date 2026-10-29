@@ -102,6 +102,7 @@ try{
     await page.waitForSelector('#open-management');assert.equal(navigations,beforeNav+1,'one explicit reload')
     await page.waitForTimeout(1200);assert.equal(navigations,beforeNav+1,'no reload loop')
    }
+   console.log('PWA_BUILD_DIAGNOSTIC',JSON.stringify({mode,expected,activeBuild:await workerBuild(page),page:await page.evaluate(async()=>{const r=await navigator.serviceWorker.getRegistration();return{app:document.querySelector('meta[name=fitlog-build]')?.content,active:r?.active?.state,waiting:r?.waiting?.state,controller:navigator.serviceWorker.controller?.scriptURL}})}));
    assert.equal(await page.locator('meta[name=fitlog-build]').getAttribute('content'),expected)
    assert.equal(await workerBuild(page),expected)
    await diagnostics(page)
