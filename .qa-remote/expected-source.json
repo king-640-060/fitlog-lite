@@ -22,7 +22,7 @@
   "src/build.d.ts": "99b7d47576a729f20d569d1369b0c80deb55a558de90b85347aef8e953f76164",
   "src/db/database.ts": "cd72bbc24447bfa6626cc91e332f69e0c5a6d9a3b8a4ff95cbb6f2ca8ea0b79f",
   "src/db/types.ts": "9accb4f5f34304dd2f6ef8d6b7ffbad5f45191520990aa846ab5ad7af2ed143f",
-  "src/main.ts": "8d77d34e7973424031a9a023ccd456f31f9f51eecd4c1555651928be9dfe9b2e",
+  "src/main.ts": "4222f859a480c4e8379927bb54ed930da471797cd075f0ab68e32185dcab3537",
   "src/pwa/diagnostics.ts": "1dbab9f49f96ce8233646e9c7f678eef47952b6c84e9fa5659b9f6c6e91d0185",
   "src/pwa/runtime.ts": "6bcd3fe7f20ab821eb5382fd22335227fa4722acfdc304f0ebdc7ca489253740",
   "src/services/aiProfiles.ts": "ec369b493352d3d7c2a046c3894effc6eb88854f8e437e090a9119289bc00091",

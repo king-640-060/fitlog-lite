@@ -718,6 +718,20 @@ function activateOwnedPage(host:HTMLElement):()=>void {
   recordsDispose=previousRecords;recoveryDispose=previousRecovery
   return ()=>{disposeRecords?.();disposeRecovery?.()}
 }
+function minimumProgressHeight(root:HTMLElement):number {
+  // Measure the same three navigation tiers even when a different page is active.
+  // In a short landscape viewport, reserve a usable native content scroller instead
+  // of shrinking it below a touch target. The outer page remains natively scrollable.
+  const probe=document.createElement('div')
+  probe.className='report-deck-shell';probe.inert=true;probe.setAttribute('aria-hidden','true')
+  Object.assign(probe.style,{position:'absolute',visibility:'hidden',width:`${root.clientWidth}px`,height:'auto',pointerEvents:'none'})
+  probe.innerHTML=`${reportKindsHtml(false)}<div class="report-daily-shell"><div class="report-mode"><button type="button">日报</button><button type="button">周报</button><button type="button">月报</button><button type="button">自定义</button></div><div class="deck-scroll"></div></div>`
+  root.append(probe)
+  const extent=(node:Element)=>{const css=getComputedStyle(node);return node.getBoundingClientRect().height+parseFloat(css.marginTop)+parseFloat(css.marginBottom)}
+  const padding=parseFloat(getComputedStyle(probe.querySelector('.deck-scroll')!).paddingBottom)
+  const minimum=extent(root.querySelector('.page-tabs')!)+extent(probe.querySelector('.report-kinds')!)+extent(probe.querySelector('.report-mode')!)+44+padding
+  probe.remove();return minimum
+}
 async function renderProgressPage(preview?:HTMLElement):Promise<void> {
   const view=preview??document.querySelector<HTMLElement>('#view')!
   if(!preview){progressDeckDispose?.();progressDeckDispose=undefined;recordsDispose?.();recordsDispose=undefined;recoveryDispose?.();recoveryDispose=undefined}
@@ -738,7 +752,7 @@ async function renderProgressPage(preview?:HTMLElement):Promise<void> {
   const controller=new AbortController(),initial=await prepare(progressView,controller.signal)
   if(!view.isConnected){initial.dispose();return}
   const deck=createLocalDeck({root,nav:root.querySelector('.page-tabs')!,stage,keys:['trend','calendar','reports'],active:progressView,initial,prepare,selected:key=>{progressView=key as ProgressView},buttonAttribute:'data-progress-view',positions:progressScroll,fail})
-  const measure=()=>{const frame=root.closest<HTMLElement>('.app-frame')!;const reserve=parseFloat(getComputedStyle(frame).paddingBottom);const top=root.getBoundingClientRect().top+window.scrollY;root.style.height=`${Math.max(0,innerHeight-top-reserve)}px`}
+  const measure=()=>{const frame=root.closest<HTMLElement>('.app-frame')!;const reserve=parseFloat(getComputedStyle(frame).paddingBottom);const top=root.getBoundingClientRect().top+window.scrollY;root.style.height=`${Math.max(minimumProgressHeight(root),innerHeight-top-reserve)}px`}
   const resize=new ResizeObserver(measure);const topbar=view.closest('.page-current,.page-preview')?.querySelector('.topbar');if(topbar)resize.observe(topbar);const nav=app.querySelector('.bottom-nav');if(nav)resize.observe(nav);window.addEventListener('resize',measure);measure()
   const release=()=>{controller.abort();deck.destroy();resize.disconnect();window.removeEventListener('resize',measure)}
   if(preview)previewDisposers.set(view,release)
