@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "originalCalls": 17,
+  "currentCalls": 18,
+  "other16AssertionsExactAST": true,
+  "onePixelThresholdUnchanged": true,
+  "addedXWidthHeightGuard": true,
+  "actualCIInitialScrollSample": {
+    "beforeY": 102,
+    "beforeScroll": 2,
+    "afterY": 46,
+    "afterScroll": 58
+  },
+  "documentDelta": 0,
+  "injectedUnaccountedTwoPixelShiftRejected": true,
+  "note": "Atomic before/after rect and native window scroll. Original business assertions unchanged; correct the prior zero-origin assumption."
+}

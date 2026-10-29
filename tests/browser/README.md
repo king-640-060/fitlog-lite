@@ -159,3 +159,12 @@ Use existing `FITLOG_PLAYWRIGHT_MODULE`, `FITLOG_QA_URL`, `FITLOG_QA_ARTIFACT_RO
 Short landscape views measure the actual three navigation tiers plus a usable44px content viewport and existing padding. The common root minimum applies to all Progress pages; outer native scrolling is allowed when the device is too short. Clipping stages must stay at zero scroll offsets; only actual deck content owns independent scroll. Do not force-click hidden/covered report controls or drop accessibility assertions to make a gate pass.
 
 `interactionV09SortFrames.mjs` preserves explicit start/30px/cross-two-rows/released PNGs plus clientY/row-top/placeholder-index evidence; Chromium uses native CDP touch and WebKit uses pointer input. Both keep all22 stores unchanged until explicit form Save. Edges runs six contexts across the two engines, including320px/200% Classic dark and430px/140% Native; synthetic composition has its own screenshots/trace and is not a physical IME claim. Cycle filtering waits for the actual requested value and nonempty matching options, never treating transient absence during rebuild as settled data.
+
+
+## Progress layout repair v2
+
+`progressLayoutV2.mjs` defaults to dual-engine393px frame capture, Chromium native CDP touch versus explicitly synthetic WebKit touch,20 calendar/trend return cycles, period adoption RAFs, parent rectangles,14/12px gaps and all22-store equality. Set `FITLOG_LAYOUT_MODE=matrix` for320/375/390/430×100/140/200×Classic light/dark/Native×normal/reduced plus two short landscapes per engine. `FITLOG_LAYOUT_ENGINE` selects one engine. Frozen START is an expected negative control with `FITLOG_LAYOUT_NEGATIVE=1`; its failures remain evidence, never release PASS.
+
+`progressLayoutLoadingV2.mjs` delays native initial Weight getAll/getAllRecords completions before a warm liveQuery cache exists. It records the hidden unready placeholder separately from visible/layout-ready frames, requires visible14px geometry and exact22-table preservation. Neither script is physical iPhone evidence. Use FITLOG_QA_URL/FITLOG_PLAYWRIGHT_MODULE/FITLOG_QA_ARTIFACT_ROOT as above; fresh synthetic contexts only.
+
+The existing `interactionV09Edges` navigation guard captures rectangle and native window scroll together at both endpoints, then compares document coordinates within1px. A CI WebKit case started at scrollY2 (screenY102/documentY104) and ended at scrollY58 (screenY46/documentY104); assuming an initial0 falsely failed. The threshold and sixteen other business assertions remain, with extra x/width/height checks.

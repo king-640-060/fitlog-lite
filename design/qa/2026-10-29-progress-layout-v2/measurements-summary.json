@@ -1,0 +1,46 @@
+[
+  {
+    "source": "negative-final",
+    "case": "chromium-393-852-100-classic-light-no-preference",
+    "status": "FAIL",
+    "failures": 132,
+    "gapMin": 0,
+    "gapMax": 12,
+    "preparedHeaderHeight": 88,
+    "adoptedHeaderHeight": 48,
+    "calendarGridYDelta": 40
+  },
+  {
+    "source": "negative-final",
+    "case": "webkit-393-852-100-classic-light-no-preference",
+    "status": "FAIL",
+    "failures": 132,
+    "gapMin": 0,
+    "gapMax": 12,
+    "preparedHeaderHeight": 88,
+    "adoptedHeaderHeight": 48,
+    "calendarGridYDelta": 40
+  },
+  {
+    "source": "verified-frames",
+    "case": "chromium-393-852-100-classic-light-no-preference",
+    "status": "PASS",
+    "failures": 0,
+    "gapMin": 14,
+    "gapMax": 14,
+    "preparedHeaderHeight": 48,
+    "adoptedHeaderHeight": 48,
+    "calendarGridYDelta": 0
+  },
+  {
+    "source": "verified-frames",
+    "case": "webkit-393-852-100-classic-light-no-preference",
+    "status": "PASS",
+    "failures": 0,
+    "gapMin": 14,
+    "gapMax": 14,
+    "preparedHeaderHeight": 48,
+    "adoptedHeaderHeight": 48,
+    "calendarGridYDelta": 0
+  }
+]

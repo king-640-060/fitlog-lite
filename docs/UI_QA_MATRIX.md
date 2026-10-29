@@ -318,3 +318,8 @@ Additional five-part v1 gate: foodNavigationPreservation.mjs verifies three brow
 新增 `interactionV09`、`interactionV09Geometry`、`interactionV09Gestures`、`interactionV09Lifecycle`、`interactionV09Edges`、`interactionV09Touch`、`interactionV09SortFrames`，结果见 [本轮 QA](INTERACTION_V09_QA.md)。使用现有 FITLOG_QA_URL / FITLOG_PLAYWRIGHT_MODULE / FITLOG_QA_ARTIFACT_ROOT。Geometry 默认每引擎73上下文：四宽×三字号×Classic浅深/Native×普通/减少动态，另844×390/200%横屏；完整两引擎146上下文。WIDTH/ENGINE 仅切分执行，SMOKE 不是完整门槛。
 
 实际测量拖拽连续帧、占位与释放/取消、三级导航及父级屏幕坐标、独立滚动恢复、原生只读查询晚到和20轮资源生命周期。既有foodWaterDayV04只将旧details/逐行下拉/上下按钮驱动改为批准的餐次Tab、按需调整和方向键把手；原克数、未分类、历史、重复写入、复制ID、删除及回滚断言保留。保留所有前轮必要门槛。未实际执行的真机、VoiceOver、IME、系统键盘、Safe Area、个人连续性不得计PASS。
+
+
+## Progress 布局回归修复 v2
+
+按[修复合同](PROGRESS_LAYOUT_V2.md)及[本轮QA](PROGRESS_LAYOUT_V2_QA.md)执行L01–L12。`progressLayoutV2.mjs`补393px原生Chromium触摸/明确标记的WebKit合成touch、0/25/50/75/100%截图、预备ID样式、三级父导航坐标及20轮三页间距/独立滚动；完整矩阵每引擎74上下文（四宽×三字号×三外观×两种动态，另两短横屏）。`progressLayoutLoadingV2.mjs`补初次冷读取的隐藏占位、真实原生异步完成及可见内容14px。冻结START必须出现预期FAIL，新版结果和真实Pages结果分别记载。保留所有既有单测及业务浏览器断言。实体iPhone/原PWA/IME/VoiceOver/Safe Area和个人数据仍须独立证据。

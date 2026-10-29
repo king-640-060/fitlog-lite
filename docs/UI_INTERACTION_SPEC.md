@@ -452,3 +452,10 @@ Prepared main-tab pages already mounted for layout must not be appended again. P
 Progress 三层导航各自拥有预备DOM、指示器和滚动位置，子层不移动父层。局部叶页在异步挂载前即移除旧导航；取消或过时查询清理节点和资源。高度按现有 app-frame 实际底部预留测量，不能猜固定补偿值。指定食物共用原 Sheet footer 与键盘控制，两个状态的按钮空间随字体一起缩放，防止切换时跳高。
 
 裁剪轨道使用非滚动 clip，防止程序化 scrollIntoView 滚动父级。短横屏由实际三级导航尺寸和44px最小可操作内容区决定所有Progress页共同最低高度，必要时保留原生外层滚动；不能把叶页压到零高或用内容裁切代替可达性。
+
+
+## Progress 布局稳定性修复 v2（2026-10-29）
+
+遵循[修复合同](PROGRESS_LAYOUT_V2.md)。一级内容轨道统一拥有14 CSS px顶部间距，覆盖趋势、日历、报告；报告类型顶部不叠加通用segmented margin，保留其底部12px；周期轨道独立拥有12px日期间距。最小高度测量包含实际轨道margin与三级导航，保留≥44px叶页和原生外层滚动。
+
+预备页面继续隔离ID/ARIA引用；日历三控件和日报日期按钮用稳定data-navigation-id命中原样式，不以取消隔离或提交后重建修复。只有隐藏、尚未完成布局的占位可以未测量；可见预备及活动内容遵守相同布局和独立滚动合同。

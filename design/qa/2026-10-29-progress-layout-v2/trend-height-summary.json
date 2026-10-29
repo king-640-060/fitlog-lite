@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "contexts": 60,
+  "heightGroups": 1080,
+  "fields": 9,
+  "maximumDeltaPx": 0,
+  "completeMatrixAsExplicitTenShards": true,
+  "perShardDiagnosticFlagDoesNotReduceFontOrTheme": true,
+  "dangerChecks": [
+    {
+      "engine": "chromium",
+      "width": 390,
+      "font": 100,
+      "theme": "light",
+      "checks": [
+        "closeDuringLockWait",
+        "closeDuringRwRollback",
+        "activePelvicCrossTab",
+        "activeSleep",
+        "foreignArchivedOverlap",
+        "healthStale",
+        "healthFaultAll22Rollback",
+        "lateWorkoutAutosaveRejected"
+      ]
+    },
+    {
+      "engine": "webkit",
+      "width": 390,
+      "font": 100,
+      "theme": "light",
+      "checks": [
+        "closeDuringLockWait",
+        "closeDuringRwRollback",
+        "activePelvicCrossTab",
+        "activeSleep",
+        "foreignArchivedOverlap",
+        "healthStale",
+        "healthFaultAll22Rollback",
+        "lateWorkoutAutosaveRejected"
+      ]
+    }
+  ]
+}

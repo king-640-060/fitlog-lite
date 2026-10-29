@@ -1,0 +1,32 @@
+[
+  {
+    "engine": "chromium",
+    "contexts": 74,
+    "allPass": true,
+    "firstGap": [
+      14,
+      14
+    ],
+    "dateGap": [
+      12,
+      12
+    ],
+    "minimumLeafHeight": 64,
+    "maximumParentNavRectDelta": 0
+  },
+  {
+    "engine": "webkit",
+    "contexts": 74,
+    "allPass": true,
+    "firstGap": [
+      14,
+      14
+    ],
+    "dateGap": [
+      12,
+      12
+    ],
+    "minimumLeafHeight": 64,
+    "maximumParentNavRectDelta": 0
+  }
+]

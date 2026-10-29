@@ -40,6 +40,10 @@
    must not scroll all ancestor navigation when a visible period button is focused. */
 html:has(#view > .progress-deck-root) { scroll-padding-block:0; }
 .progress-deck-root > .page-tabs { flex:none; }
+/* One owner for the first content inset across all three Progress pages. */
+.progress-deck-root > .progress-deck-stage { margin-top:14px; }
+.progress-deck-root .report-deck-shell > .report-kinds { margin-top:0; }
+.progress-deck-root .report-daily-shell > .report-period-stage { margin-top:12px; }
 .progress-deck-root > .local-deck-stage, .report-deck-shell > .local-deck-stage, .report-daily-shell > .local-deck-stage { flex:1 1 auto; min-height:0; }
 .progress-deck-root .local-deck-page { height:100%; }
 .deck-scroll { overflow-y:auto; overscroll-behavior-y:contain; padding-bottom:20px; }

@@ -1,0 +1,8 @@
+{
+  "contexts": 52,
+  "boundaries": 444,
+  "types": {
+    "geometry-matrix": 52,
+    "resources-state-and-functional-ownership": 2
+  }
+}
