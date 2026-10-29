@@ -1,0 +1,533 @@
+{
+  "url": "http://127.0.0.1:5470/",
+  "results": [
+    {
+      "engine": "chromium",
+      "width": 390,
+      "font": 100,
+      "look": "classic-light",
+      "nameMetrics": {
+        "width": 354,
+        "scrollWidth": 354,
+        "controls": [
+          {
+            "rect": {
+              "x": 18,
+              "y": 613.859375,
+              "width": 354,
+              "height": 46,
+              "top": 613.859375,
+              "right": 372,
+              "bottom": 659.859375,
+              "left": 18
+            },
+            "font": 16
+          },
+          {
+            "rect": {
+              "x": 18,
+              "y": 712,
+              "width": 354,
+              "height": 48,
+              "top": 712,
+              "right": 372,
+              "bottom": 760,
+              "left": 18
+            },
+            "font": 16
+          },
+          {
+            "rect": {
+              "x": 18,
+              "y": 776,
+              "width": 354,
+              "height": 44,
+              "top": 776,
+              "right": 372,
+              "bottom": 820,
+              "left": 18
+            },
+            "font": 16
+          }
+        ]
+      },
+      "status": "PASS",
+      "cancelAndBlurZeroWrites": true,
+      "failedDietSavePreservesDraft": true,
+      "blankNameRejected": true,
+      "syntheticCompositionSaved": true,
+      "setsAndOther21StoresExact": true,
+      "reportPreviousReturnClickable": true,
+      "navBefore": {
+        "x": 130,
+        "y": 88,
+        "width": 584,
+        "height": 45
+      },
+      "navAfter": {
+        "x": 130,
+        "y": 88,
+        "width": 584,
+        "height": 45
+      },
+      "stages": [
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        }
+      ],
+      "physicalIME": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "width": 320,
+      "font": 200,
+      "look": "classic-dark",
+      "nameMetrics": {
+        "width": 284,
+        "scrollWidth": 284,
+        "controls": [
+          {
+            "rect": {
+              "x": 18,
+              "y": 496.109375,
+              "width": 284,
+              "height": 60,
+              "top": 496.109375,
+              "right": 302,
+              "bottom": 556.109375,
+              "left": 18
+            },
+            "font": 32
+          },
+          {
+            "rect": {
+              "x": 18,
+              "y": 709,
+              "width": 284,
+              "height": 48,
+              "top": 709,
+              "right": 302,
+              "bottom": 757,
+              "left": 18
+            },
+            "font": 32
+          },
+          {
+            "rect": {
+              "x": 18,
+              "y": 773,
+              "width": 284,
+              "height": 47,
+              "top": 773,
+              "right": 302,
+              "bottom": 820,
+              "left": 18
+            },
+            "font": 32
+          }
+        ]
+      },
+      "status": "PASS",
+      "cancelAndBlurZeroWrites": true,
+      "failedDietSavePreservesDraft": true,
+      "blankNameRejected": true,
+      "syntheticCompositionSaved": true,
+      "setsAndOther21StoresExact": true,
+      "reportPreviousReturnClickable": true,
+      "navBefore": {
+        "x": 130,
+        "y": 104,
+        "width": 584,
+        "height": 45
+      },
+      "navAfter": {
+        "x": 130,
+        "y": 104,
+        "width": 584,
+        "height": 45
+      },
+      "stages": [
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        }
+      ],
+      "physicalIME": "Pending"
+    },
+    {
+      "engine": "chromium",
+      "width": 430,
+      "font": 140,
+      "look": "light-native",
+      "nameMetrics": {
+        "width": 394,
+        "scrollWidth": 394,
+        "controls": [
+          {
+            "rect": {
+              "x": 18,
+              "y": 574.59375,
+              "width": 394,
+              "height": 49,
+              "top": 574.59375,
+              "right": 412,
+              "bottom": 623.59375,
+              "left": 18
+            },
+            "font": 22.4
+          },
+          {
+            "rect": {
+              "x": 18,
+              "y": 712,
+              "width": 394,
+              "height": 48,
+              "top": 712,
+              "right": 412,
+              "bottom": 760,
+              "left": 18
+            },
+            "font": 22.4
+          },
+          {
+            "rect": {
+              "x": 18,
+              "y": 776,
+              "width": 394,
+              "height": 44,
+              "top": 776,
+              "right": 412,
+              "bottom": 820,
+              "left": 18
+            },
+            "font": 22.4
+          }
+        ]
+      },
+      "status": "PASS",
+      "cancelAndBlurZeroWrites": true,
+      "failedDietSavePreservesDraft": true,
+      "blankNameRejected": true,
+      "syntheticCompositionSaved": true,
+      "setsAndOther21StoresExact": true,
+      "reportPreviousReturnClickable": true,
+      "navBefore": {
+        "x": 130,
+        "y": 93.84375,
+        "width": 584,
+        "height": 45
+      },
+      "navAfter": {
+        "x": 130,
+        "y": 93.84375,
+        "width": 584,
+        "height": 45
+      },
+      "stages": [
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        }
+      ],
+      "physicalIME": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "width": 390,
+      "font": 100,
+      "look": "classic-light",
+      "nameMetrics": {
+        "width": 354,
+        "scrollWidth": 354,
+        "controls": [
+          {
+            "rect": {
+              "x": 18,
+              "y": 613.859375,
+              "width": 354,
+              "height": 46,
+              "top": 613.859375,
+              "right": 372,
+              "bottom": 659.859375,
+              "left": 18
+            },
+            "font": 16
+          },
+          {
+            "rect": {
+              "x": 18,
+              "y": 712,
+              "width": 354,
+              "height": 48,
+              "top": 712,
+              "right": 372,
+              "bottom": 760,
+              "left": 18
+            },
+            "font": 16
+          },
+          {
+            "rect": {
+              "x": 18,
+              "y": 776,
+              "width": 354,
+              "height": 44,
+              "top": 776,
+              "right": 372,
+              "bottom": 820,
+              "left": 18
+            },
+            "font": 16
+          }
+        ]
+      },
+      "status": "PASS",
+      "cancelAndBlurZeroWrites": true,
+      "failedDietSavePreservesDraft": true,
+      "blankNameRejected": true,
+      "syntheticCompositionSaved": true,
+      "setsAndOther21StoresExact": true,
+      "reportPreviousReturnClickable": true,
+      "navBefore": {
+        "x": 130,
+        "y": 88,
+        "width": 584,
+        "height": 45
+      },
+      "navAfter": {
+        "x": 130,
+        "y": 88,
+        "width": 584,
+        "height": 45
+      },
+      "stages": [
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        }
+      ],
+      "physicalIME": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "width": 320,
+      "font": 200,
+      "look": "classic-dark",
+      "nameMetrics": {
+        "width": 284,
+        "scrollWidth": 284,
+        "controls": [
+          {
+            "rect": {
+              "x": 18,
+              "y": 499.109375,
+              "width": 284,
+              "height": 60,
+              "top": 499.109375,
+              "right": 302,
+              "bottom": 559.109375,
+              "left": 18
+            },
+            "font": 32
+          },
+          {
+            "rect": {
+              "x": 18,
+              "y": 712,
+              "width": 284,
+              "height": 48,
+              "top": 712,
+              "right": 302,
+              "bottom": 760,
+              "left": 18
+            },
+            "font": 32
+          },
+          {
+            "rect": {
+              "x": 18,
+              "y": 776,
+              "width": 284,
+              "height": 44,
+              "top": 776,
+              "right": 302,
+              "bottom": 820,
+              "left": 18
+            },
+            "font": 32
+          }
+        ]
+      },
+      "status": "PASS",
+      "cancelAndBlurZeroWrites": true,
+      "failedDietSavePreservesDraft": true,
+      "blankNameRejected": true,
+      "syntheticCompositionSaved": true,
+      "setsAndOther21StoresExact": true,
+      "reportPreviousReturnClickable": true,
+      "navBefore": {
+        "x": 130,
+        "y": 104,
+        "width": 584,
+        "height": 45
+      },
+      "navAfter": {
+        "x": 130,
+        "y": 104,
+        "width": 584,
+        "height": 45
+      },
+      "stages": [
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        }
+      ],
+      "physicalIME": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "width": 430,
+      "font": 140,
+      "look": "light-native",
+      "nameMetrics": {
+        "width": 394,
+        "scrollWidth": 394,
+        "controls": [
+          {
+            "rect": {
+              "x": 18,
+              "y": 574.625,
+              "width": 394,
+              "height": 49,
+              "top": 574.625,
+              "right": 412,
+              "bottom": 623.625,
+              "left": 18
+            },
+            "font": 22.4
+          },
+          {
+            "rect": {
+              "x": 18,
+              "y": 712,
+              "width": 394,
+              "height": 48,
+              "top": 712,
+              "right": 412,
+              "bottom": 760,
+              "left": 18
+            },
+            "font": 22.4
+          },
+          {
+            "rect": {
+              "x": 18,
+              "y": 776,
+              "width": 394,
+              "height": 44,
+              "top": 776,
+              "right": 412,
+              "bottom": 820,
+              "left": 18
+            },
+            "font": 22.4
+          }
+        ]
+      },
+      "status": "PASS",
+      "cancelAndBlurZeroWrites": true,
+      "failedDietSavePreservesDraft": true,
+      "blankNameRejected": true,
+      "syntheticCompositionSaved": true,
+      "setsAndOther21StoresExact": true,
+      "reportPreviousReturnClickable": true,
+      "navBefore": {
+        "x": 130,
+        "y": 93.8125,
+        "width": 584,
+        "height": 45
+      },
+      "navAfter": {
+        "x": 130,
+        "y": 93.8125,
+        "width": 584,
+        "height": 45
+      },
+      "stages": [
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        }
+      ],
+      "physicalIME": "Pending"
+    }
+  ]
+}

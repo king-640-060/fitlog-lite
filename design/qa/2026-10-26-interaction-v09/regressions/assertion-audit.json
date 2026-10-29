@@ -1,0 +1,114 @@
+{
+  "results": [
+    {
+      "file": "tests/browser/README.md",
+      "before": 0,
+      "after": 0,
+      "missing": [],
+      "added": []
+    },
+    {
+      "file": "tests/browser/approvedJointV05.mjs",
+      "before": 61,
+      "after": 61,
+      "missing": [],
+      "added": []
+    },
+    {
+      "file": "tests/browser/coachReportExperience.mjs",
+      "before": 51,
+      "after": 51,
+      "missing": [],
+      "added": []
+    },
+    {
+      "file": "tests/browser/combinedHandoff.mjs",
+      "before": 65,
+      "after": 65,
+      "missing": [],
+      "added": []
+    },
+    {
+      "file": "tests/browser/dailyRecordsExperience.mjs",
+      "before": 74,
+      "after": 74,
+      "missing": [],
+      "added": []
+    },
+    {
+      "file": "tests/browser/dietEvents.mjs",
+      "before": 50,
+      "after": 50,
+      "missing": [],
+      "added": []
+    },
+    {
+      "file": "tests/browser/jointReportRanges.mjs",
+      "before": 11,
+      "after": 11,
+      "missing": [],
+      "added": []
+    },
+    {
+      "file": "tests/browser/jointUxReportsRange.mjs",
+      "before": 52,
+      "after": 52,
+      "missing": [],
+      "added": []
+    },
+    {
+      "file": "tests/browser/lightNativeV051.mjs",
+      "before": 9,
+      "after": 9,
+      "missing": [],
+      "added": []
+    },
+    {
+      "file": "tests/browser/trainingRecoveryExperience.mjs",
+      "before": 69,
+      "after": 69,
+      "missing": [],
+      "added": []
+    },
+    {
+      "file": "tests/browser/trainingRecoveryLifecycle.mjs",
+      "before": 26,
+      "after": 26,
+      "missing": [],
+      "added": []
+    },
+    {
+      "file": "tests/browser/uiQualityAudit.mjs",
+      "before": 37,
+      "after": 37,
+      "missing": [],
+      "added": []
+    },
+    {
+      "file": "tests/browser/unifiedExperience.mjs",
+      "before": 68,
+      "after": 69,
+      "missing": [
+        "assert.ok(awaitpage.evaluate(previous=>scrollY<previous-20,before))"
+      ],
+      "added": [
+        "assert.ok(before>20)",
+        "assert.ok(awaitowner.evaluate((e,previous)=>e.scrollTop<previous-20,before))"
+      ]
+    },
+    {
+      "file": "tests/browser/v421Consistency.mjs",
+      "before": 64,
+      "after": 64,
+      "missing": [],
+      "added": []
+    },
+    {
+      "file": "tests/browser/v4FoodPlanToday.mjs",
+      "before": 59,
+      "after": 59,
+      "missing": [],
+      "added": []
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "name": "chromium",
+    "width": 320,
+    "scenes": 4,
+    "actions": "meal/workout add/report period/food preview-return"
+  },
+  {
+    "name": "chromium",
+    "width": 375,
+    "scenes": 4,
+    "actions": "meal/workout add/report period/food preview-return"
+  },
+  {
+    "name": "chromium",
+    "width": 390,
+    "scenes": 4,
+    "actions": "meal/workout add/report period/food preview-return"
+  },
+  {
+    "name": "chromium",
+    "width": 430,
+    "scenes": 4,
+    "actions": "meal/workout add/report period/food preview-return"
+  },
+  {
+    "name": "webkit",
+    "width": 320,
+    "scenes": 4,
+    "actions": "meal/workout add/report period/food preview-return"
+  },
+  {
+    "name": "webkit",
+    "width": 375,
+    "scenes": 4,
+    "actions": "meal/workout add/report period/food preview-return"
+  },
+  {
+    "name": "webkit",
+    "width": 390,
+    "scenes": 4,
+    "actions": "meal/workout add/report period/food preview-return"
+  },
+  {
+    "name": "webkit",
+    "width": 430,
+    "scenes": 4,
+    "actions": "meal/workout add/report period/food preview-return"
+  }
+]

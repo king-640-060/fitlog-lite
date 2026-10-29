@@ -444,3 +444,11 @@ Use root visual tokens, never a second renderer. Preserve old appearance prefere
 ## Native scroll preservation release guard
 
 Prepared main-tab pages already mounted for layout must not be appended again. Preserve native child scroll and the selected Food date during promotion; insert only an unattached result, retaining existing ownership, cleanup and motion.
+
+## 批准局部交互 v0.9
+
+遵循 [v0.9 实现合同](INTERACTION_V09.md)。整日饮食模板固定四餐次页，合法旧未分类另有入口；当前餐次草稿和动作卡采用左侧44px把手跟手排序、释放落位、取消恢复、键盘替代。按需餐次操作保留手工调整，拖拽不能跨餐次改事实。本次动作快照改名与动作库及整次训练命名分开；不归一化未编辑历史组。
+
+Progress 三层导航各自拥有预备DOM、指示器和滚动位置，子层不移动父层。局部叶页在异步挂载前即移除旧导航；取消或过时查询清理节点和资源。高度按现有 app-frame 实际底部预留测量，不能猜固定补偿值。指定食物共用原 Sheet footer 与键盘控制，两个状态的按钮空间随字体一起缩放，防止切换时跳高。
+
+裁剪轨道使用非滚动 clip，防止程序化 scrollIntoView 滚动父级。短横屏由实际三级导航尺寸和44px最小可操作内容区决定所有Progress页共同最低高度，必要时保留原生外层滚动；不能把叶页压到零高或用内容裁切代替可达性。

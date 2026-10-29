@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<meta content="#f5f2eb" name="theme-color"/>
+<title>FitLog Lite · 跟手拖拽与报告整页切换原型 v0.9</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC",sans-serif;color-scheme:light;--bg:#f5f2eb;--paper:#fffefa;--soft:#f8f8f2;--ink:#282e28;--muted:#697369;--olive:#52723b;--leaf:#e9f0dc;--line:#e9e8df;--danger:#a65840;--shadow:0 12px 48px #1f2a1c20;--safe:env(safe-area-inset-bottom,0px);--radius:19px}
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{background:#e9e8e0;color:var(--ink);font-size:16px}button,input,select{font:inherit}button{cursor:pointer;touch-action:manipulation}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #6f98a3;outline-offset:2px}button:disabled{cursor:not-allowed;opacity:.36} .sr{position:absolute;clip:rect(0,0,0,0);width:1px;height:1px;overflow:hidden}
+.workspace{display:grid;grid-template-columns:260px minmax(320px,430px) 264px;gap:28px;align-items:start;justify-content:center;min-height:100vh;padding:28px 18px}aside{background:#fffefa;border:1px solid #dedfd5;border-radius:20px;padding:20px;line-height:1.6;box-shadow:0 5px 22px #2633200a}aside h1{font-size:21px;line-height:1.25;margin:8px 0 12px}aside h2{font-size:16px;margin:4px 0 10px}aside p{margin:7px 0;color:#556052;font-size:13px}aside ul{padding-left:18px;color:#556052;font-size:13px}aside li{margin:5px 0}.eyebrow{font-size:11px;letter-spacing:.1em;font-weight:750;color:var(--olive)}.side-tab{width:100%;min-height:44px;display:flex;align-items:center;gap:9px;padding:9px 11px;border:0;border-radius:12px;color:var(--ink);background:transparent;text-align:left;font-size:14px;font-weight:600;margin:3px 0}.side-tab.active{color:var(--olive);background:var(--leaf)}.side-tab small{margin-left:auto;color:var(--muted);font-size:10px}.side-split{height:1px;background:var(--line);margin:15px 0}.phone{position:relative;width:100%;height:min(850px,calc(100dvh - 56px));min-height:600px;border:6px solid #303932;border-radius:42px;background:var(--bg);overflow:hidden;box-shadow:0 20px 60px #24301f40}.status{height:37px;display:flex;align-items:center;justify-content:space-between;padding:9px 25px 0;font-size:13px;font-weight:750;letter-spacing:.01em;background:var(--bg)}.phone-main{height:calc(100% - 37px);position:relative;overflow:hidden}.screen{position:absolute;inset:0;display:none;flex-direction:column}.screen.active{display:flex}.sheet{background:var(--paper);border-radius:24px 24px 0 0;flex:1;min-height:0;display:flex;flex-direction:column;box-shadow:0 -1px 4px #00000008}.sheet-grip{height:4px;width:36px;border-radius:3px;background:#e9e8df;margin:10px auto 4px}.head{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:65px;padding:7px 17px 9px}.head strong{font-size:21px;letter-spacing:-.02em}.head button,.top-icon{display:grid;place-items:center;min-width:44px;min-height:44px;border:0;background:transparent;color:var(--muted);font-size:26px;border-radius:12px}.body-scroll{min-height:0;flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:12px 16px 18px;scrollbar-width:thin}.foot{z-index:3;flex:none;background:var(--paper);border-top:1px solid var(--line);padding:12px 16px calc(14px + var(--safe));display:flex;align-items:stretch;gap:9px;min-height:80px}.foot button{border-radius:12px;min-height:48px;padding:0 12px;font-weight:720;border:1px solid transparent;font-size:14px}.primary{background:var(--olive);color:#fff;border-color:var(--olive)!important}.secondary{color:var(--olive);background:var(--paper);border-color:var(--line)!important}.foot .primary{flex:1.15}.foot .secondary{flex:1}.foot-note{color:var(--muted);font-size:12px;margin:4px 0 13px}.subtext{color:var(--muted);font-size:13px;line-height:1.5}.section-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}.section-top strong{font-size:15px}.label-pill{display:inline-flex;align-items:center;border-radius:8px;background:#f2f4e9;padding:5px 9px;color:#536e45;font-size:11px;font-weight:750}.mini-button{border:0;background:var(--leaf);color:var(--olive);font-size:13px;font-weight:700;min-height:40px;border-radius:10px;padding:0 11px}.list{display:flex;flex-direction:column;gap:9px}.sort-item{position:relative;min-width:0;border:1px solid var(--line);border-radius:15px;background:var(--paper);display:flex;align-items:stretch;overflow:hidden;transition:background .16s}.sort-item.dragging{opacity:.9;background:#eff3e6;border:1px dashed var(--olive);box-shadow:0 6px 20px #2945211e;z-index:10}.handle{width:46px;min-width:46px;flex:none;display:flex;align-items:center;justify-content:center;gap:2px;border:0;border-right:1px solid var(--line);background:#f2f3ec;color:#63705b;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}.handle:active,.dragging .handle{cursor:grabbing;background:var(--leaf);color:var(--olive)}.handle svg{width:18px;height:27px}.item-body{min-width:0;flex:1;padding:10px 9px 10px 12px}.name-line{display:flex;gap:5px;align-items:flex-start;justify-content:space-between}.name{font-weight:750;font-size:15px;line-height:1.3;overflow-wrap:anywhere}.subbrand{font-size:12px;color:var(--muted);margin:3px 0 9px}.remove{border:0;background:transparent;color:var(--danger);min-width:40px;min-height:40px;font-size:18px;flex:none;border-radius:9px;margin:-8px -4px -8px 0}.fields{display:flex;align-items:center;gap:7px}.fields select,.fields input{background:var(--soft);border:1px solid transparent;border-radius:10px;min-height:44px;color:var(--ink);min-width:0;font-size:16px}.fields select{flex:1.1;padding:0 9px;appearance:auto}.weight-box{flex:.8;display:flex;align-items:center;gap:5px;white-space:nowrap}.weight-box input{width:100%;text-align:right;padding:0 9px}.weight-box span{color:var(--muted);font-size:13px}.add-row{width:100%;margin-top:12px;min-height:46px;background:var(--paper);border:1px dashed #b8c2a7;border-radius:13px;color:var(--olive);font-weight:700;font-size:14px}.notice{margin-top:12px;padding:10px 12px;background:#eff2e8;border-radius:12px;color:#556650;font-size:12px;line-height:1.5}.status-toast{position:absolute;z-index:100;left:14px;right:14px;bottom:93px;display:none;text-align:center;background:#29372d;color:white;border-radius:11px;padding:11px 16px;font-size:13px;box-shadow:var(--shadow)}.status-toast.show{display:block}
+.exercise-item{display:flex;border:1px solid var(--line);border-radius:15px;overflow:hidden;background:var(--paper)}.exercise-main{min-width:0;flex:1}.exercise-head{display:flex;align-items:center;gap:4px;padding:10px 6px 10px 12px}.exercise-title{flex:1;min-width:0;font-weight:750;font-size:15px;line-height:1.4}.ghost{border:0;background:transparent;color:var(--muted);min-width:41px;min-height:44px;font-size:18px;border-radius:8px}.exercise-details{padding:0 10px 10px 12px}.exercise-item.collapsed .exercise-details{display:none}.exercise-summary{font-size:12px;color:var(--muted);padding:0 12px 9px}.exercise-item:not(.collapsed) .exercise-summary{display:none}.set-head,.set-line{display:grid;grid-template-columns:23px minmax(0,1fr) minmax(0,1fr) 36px;gap:4px;align-items:center}.set-head{font-size:11px;color:var(--muted);padding-bottom:5px}.set-line{padding-bottom:6px}.set-line input{width:100%;min-width:0;min-height:44px;text-align:center;background:var(--soft);border:1px solid transparent;border-radius:10px;font-size:16px}.set-no{color:var(--muted);font-size:12px}.set-line button{border:0;color:var(--muted);background:transparent;font-size:18px;min-height:44px}.set-add{min-height:44px;width:100%;border:0;background:#eef2e7;color:var(--olive);border-radius:10px;font-size:13px;font-weight:700}.note-btn{display:block;background:none;border:0;padding:6px 0 9px;color:var(--muted);font-size:12px}.note-input{display:none;width:100%;min-height:42px;border:1px solid var(--line);border-radius:9px;padding:8px;font-size:16px;background:var(--soft)}.note-open .note-input{display:block}.set-note-fields{display:none}.note-open .set-note-fields{display:grid;gap:8px;padding:8px 0}.set-note-fields label{font-size:12px;color:var(--muted)}.set-note-fields input{width:100%;display:block;margin-top:5px;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--soft);font-size:16px}.compact-info{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:13px;margin-bottom:13px}
+.meal-label{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 9px}.meal-label strong{font-size:15px}.meal-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;border-radius:14px;background:var(--soft);padding:4px}.meal-tabs button{min-width:0;min-height:47px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:14px;font-weight:650;padding:3px 2px}.meal-tabs button.active{background:var(--leaf);color:var(--olive);font-weight:760}.meal-tabs small{display:block;font-size:10px;line-height:1.1;margin-top:2px}.sort-item .compact-grams{display:flex;align-items:center;gap:8px;margin-top:6px}.sort-item .compact-grams label{display:flex;gap:5px;align-items:center;justify-content:flex-end;margin-left:auto;min-width:96px}.sort-item .compact-grams input{width:92px;min-width:0;text-align:right;padding:0 10px;background:var(--soft);border:1px solid transparent;border-radius:10px;min-height:44px;font-size:16px;color:var(--ink)}.sort-item .compact-grams span{font-size:13px;color:var(--muted)}.meal-empty{border:1px dashed var(--line);padding:30px 10px;text-align:center;border-radius:14px;background:var(--paper);color:var(--muted);font-size:13px}
+/* report */
+.report-head{flex:none;display:flex;justify-content:space-between;align-items:center;padding:18px 17px 8px}.report-head h1{margin:0;font-size:24px;letter-spacing:-.03em}.report-nav{display:flex;flex-direction:column;gap:8px;margin:12px 15px 6px}.seg{--count:3;--index:0;--drag:0px;display:grid;grid-template-columns:repeat(var(--count),minmax(0,1fr));position:relative;isolation:isolate;background:var(--paper);border-radius:14px;padding:4px;gap:0;touch-action:pan-y;user-select:none;-webkit-user-select:none}.seg .rail-indicator{position:absolute;z-index:0;left:4px;top:4px;bottom:4px;width:calc((100% - 8px) / var(--count));border-radius:11px;background:var(--leaf);transform:translate3d(calc(var(--index) * 100% + var(--drag)),0,0);transition:transform .24s cubic-bezier(.2,0,0,1);pointer-events:none}.seg.tracking .rail-indicator{transition:none}.seg button{position:relative;z-index:1;background:transparent;color:var(--muted);border:0;min-height:46px;border-radius:11px;font-size:13px;white-space:nowrap;padding:0 3px}.seg button.active{color:var(--olive);font-weight:750}.seg.top{--count:3;background:transparent;border-bottom:1px solid var(--line);border-radius:0;padding-bottom:4px}.seg.top .rail-indicator{top:auto;height:3px;bottom:1px;border-radius:4px;background:var(--olive)}.seg.top button.active{background:transparent}.seg.middle{--count:2}.seg.bottom{--count:4}.seg[hidden]{display:none!important}.report-scroll{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;padding:12px 16px 18px;touch-action:pan-y}#report-content{width:100%;overflow:hidden}.report-scroll .report-gesture-track{width:300%;display:flex;align-items:flex-start;transform:translate3d(calc(-33.333333% + var(--slide-dx,0px)),0,0);will-change:transform}.report-scroll .report-gesture-track.animated{transition:transform .24s cubic-bezier(.2,0,0,1)}.report-scroll .report-slide{width:33.333333%;min-width:0;flex:0 0 33.333333%;padding:0 1px;contain:layout}.report-scroll .report-slide .report-card{max-width:100%}.report-scroll.swiping{cursor:grabbing}.report-scroll.swiping .report-gesture-track{pointer-events:none}.report-scroll.swiping .report-card{user-select:none}.period-range{display:flex;gap:7px;margin-bottom:9px}.period-range button{background:var(--paper);border:0;border-radius:12px;min-height:44px;font-size:12px;flex:1;color:var(--ink);white-space:nowrap}.report-card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:13px}.report-card h2{font-size:17px;margin:0 0 7px}.report-card p{color:var(--muted);font-size:12px;line-height:1.55}.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}.kpi{background:var(--soft);border-radius:13px;padding:11px}.kpi small{display:block;color:var(--muted);font-size:12px}.kpi strong{display:block;font-size:24px;margin:7px 0 4px}.kpi em{display:block;font-style:normal;color:var(--muted);font-size:11px;line-height:1.45}.swipe-hint{color:var(--muted);font-size:11px;margin:0 0 9px;text-align:center}.report-preview{height:94px;background:linear-gradient(180deg,#f8f8f2,#fffefa);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;align-items:flex-end;gap:13px}.bar{width:100%;border-radius:5px 5px 1px 1px;background:#9caf7f;min-height:4px}.bar:nth-child(2n){background:#b9c6a5}.bar:nth-child(3n){background:#d5e1c3}.tab-switch{position:relative;display:flex;flex:none;justify-content:space-around;align-items:center;background:var(--paper);border-top:1px solid var(--line);min-height:70px;padding-bottom:var(--safe)}.tab-switch button{border:0;min-width:54px;background:transparent;color:var(--muted);font-size:11px;min-height:50px}.tab-switch button.active{color:var(--olive);font-weight:750}.tab-switch span{display:block;font-size:20px}
+/* food selection */
+.food-intro{font-size:12px;color:var(--muted);margin:0 0 13px}.macro-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}.macro{border:1px solid var(--line);border-radius:11px;background:var(--paper);padding:9px 10px}.macro small{font-size:12px;color:var(--muted)}.macro strong{display:block;font-size:15px;margin-top:4px}.over{color:var(--danger)}.food-chips{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:13px;font-size:13px}.food-chips .chip{border:0;background:#edf0e7;min-height:38px;border-radius:12px;color:var(--olive);padding:0 10px}.search{min-height:46px;border:0;border-radius:14px;background:var(--soft);width:100%;padding:0 14px;margin:0 0 7px;font-size:16px}.food-option{width:100%;min-height:62px;display:flex;gap:9px;text-align:left;align-items:center;background:transparent;border:0;border-bottom:1px solid var(--line);padding:7px 3px}.food-option:disabled{opacity:.5}.food-opt-copy{flex:1;min-width:0}.food-opt-copy strong{display:block;font-size:14px}.food-opt-copy small{color:var(--muted);display:block;font-size:12px;margin-top:4px}.tick{border:2px solid #8f958e;width:23px;height:23px;border-radius:8px;display:grid;place-items:center;font-size:16px;color:#fff;flex:none}.tick.checked{border-color:#6d8c46;background:#6d8c46}.preview-section{padding-top:6px}.preview-title{font-size:15px;color:var(--olive);font-weight:750;margin:7px 0 13px}.preview-card{border:1px solid var(--line);border-radius:18px;background:var(--paper);padding:15px}.preview-card h2{font-size:16px;margin:0 0 11px}.preview-item{display:flex;justify-content:space-between;gap:8px;font-size:14px;font-weight:650;border-bottom:1px solid var(--line);padding-bottom:13px}.preview-break{margin:14px 0 8px;color:var(--muted);font-size:13px}.total{font-size:13px;line-height:1.6;color:var(--ink)}.total-meta{margin:9px 0 0;display:grid;gap:10px}.total-meta>div{display:flex;align-items:flex-start;justify-content:space-between;gap:7px}.total-meta small{color:var(--muted)}.preview-warning{font-size:12px;color:var(--muted);line-height:1.6;margin-top:14px}.back-top{color:var(--olive);font-size:13px;font-weight:700;min-height:44px;background:transparent;border:0}.form-hint{font-size:11px;color:var(--muted);line-height:1.5}.keyboard-tip{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px;margin-top:10px}
+.mobile-topper{display:none}.guide{display:block} .sim-tag{display:inline-block;border:1px solid #bac4ab;padding:4px 8px;border-radius:10px;color:#536c44;font-size:11px;font-weight:700;margin-bottom:10px}
+@media(max-width:1040px){.workspace{grid-template-columns:210px minmax(320px,430px);gap:18px}.right-note{grid-column:1/3;max-width:660px}.phone{height:min(850px,calc(100dvh - 56px))}}
+@media(max-width:710px){body{background:var(--bg)}.workspace{display:block;min-height:100dvh;padding:0}.phone{border:0;border-radius:0;min-width:320px;width:100%;height:100dvh;min-height:500px;box-shadow:none}.left-note,.right-note{display:none}.mobile-topper{display:flex;position:absolute;left:0;right:0;top:0;z-index:30;justify-content:center;background:var(--bg);border:0;border-bottom:1px solid var(--line);padding:4px 2px;gap:2px;box-shadow:none;border-radius:0}.screen{top:45px}.mobile-topper button{background:none;border:0;min-height:35px;font-size:11px;padding:0 8px;border-radius:9px;color:#5c6e51}.mobile-topper button.active{background:var(--leaf);font-weight:750;color:var(--olive)}.screen[data-screen="diet"] .head,.screen[data-screen="workout"] .head,.screen[data-screen="food"] .head{padding-right:12px}.screen.active .sheet-grip{margin-top:9px}}
+@media(max-width:350px){.mobile-topper button{padding:0 5px;font-size:10px}.head strong{font-size:19px}.foot button{font-size:13px;padding:0 7px}.period-range button{font-size:11px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+/* v0.3: true full-page horizontal decks, invariant widths and intentional gesture ownership */
+html,body,.workspace,.phone,.screen,.sheet,.body-scroll,.report-scroll,.report-nav,.report-head{max-width:100%;min-width:0}
+.phone,.screen,.sheet{width:100%;overflow:hidden}
+.body-scroll{overflow-x:hidden}
+.meal-label,.meal-tabs,.meal-viewport,.report-nav,.seg,#report-content{width:100%;min-width:0;max-width:100%}
+.meal-fixed-tabs{--index:0;position:relative;touch-action:pan-y;isolation:isolate;overflow:hidden}
+.meal-fixed-tabs .meal-indicator{position:absolute;z-index:0;left:4px;top:4px;bottom:4px;width:calc((100% - 8px) / 4);border-radius:10px;background:var(--leaf);transform:translate3d(calc(var(--index) * 100% + var(--indicator-dx,0px)),0,0);transition:transform .26s cubic-bezier(.2,0,0,1);pointer-events:none}
+.meal-fixed-tabs.tracking .meal-indicator{transition:none}
+.meal-fixed-tabs button{position:relative;z-index:1;background:transparent!important;white-space:nowrap}
+.meal-viewport{position:relative;overflow:hidden;touch-action:pan-y;overscroll-behavior-x:contain;contain:layout; margin-top:17px}
+.meal-track{display:flex;align-items:flex-start;width:100%;min-width:0;transition:transform .26s cubic-bezier(.2,0,0,1);will-change:transform;transform:translate3d(0,0,0)}
+.meal-track.tracking{transition:none}
+.meal-slide{flex:0 0 100%;width:100%;min-width:0;max-width:100%;padding:0 1px 3px;overflow:hidden}
+.meal-slide .section-top{margin:0 0 12px}
+.meal-slide .list{min-width:0;width:100%}
+.meal-slide .sort-item{width:100%;max-width:100%}
+.meal-slide .item-body,.meal-slide .name-line>div{min-width:0}
+.sliding-helper{color:var(--muted);font-size:12px;line-height:1.5;margin:12px 0 0;text-align:center}
+.seg{min-width:0;max-width:100%;overflow:hidden;touch-action:pan-y}
+.seg .rail-indicator{transform:translate3d(calc(var(--index) * 100% + var(--indicator-dx,0px)),0,0)}
+.report-nav{margin:12px 0 6px;padding:0 15px}
+.report-nav .seg button{overflow:hidden;min-width:0;white-space:normal;line-height:1.18;word-break:keep-all}
+.report-scroll{min-width:0;overflow-x:hidden;touch-action:pan-y}
+#report-content{position:relative;overflow:hidden;max-width:100%;min-width:0;contain:layout}
+.report-scroll .report-gesture-track{width:100%;min-width:0;display:flex;transform:translate3d(calc(-100% + var(--slide-dx,0px)),0,0)}
+.report-scroll .report-slide{flex:0 0 100%;width:100%;min-width:0;max-width:100%;padding:0 1px;contain:layout;overflow:hidden}
+.report-scroll .report-card{max-width:100%;overflow:hidden}
+.report-scroll .swipe-hint{font-size:11px;line-height:1.5}
+@media(max-width:350px){.report-nav{padding-inline:10px}.report-nav .seg button{font-size:12px}}
+@media(prefers-reduced-motion:reduce){.meal-track,.meal-indicator,.report-gesture-track,.seg .rail-indicator{transition-duration:0.01ms!important}}
+
+/* v0.4 pointer-following reorder: ghost is in a fixed overlay and moves via compositor transforms. */
+.sort-placeholder{visibility:hidden!important}
+.sort-ghost{position:fixed;z-index:9999;pointer-events:none;margin:0;overflow:visible;will-change:transform;contain:layout style paint}
+.sort-ghost > [data-sort-row]{width:100%;height:100%;margin:0!important;max-width:100%;background:var(--paper);border:1px solid var(--olive);box-shadow:0 14px 30px rgba(41,69,33,.22);border-radius:15px;opacity:1}
+.sort-ghost .handle{background:var(--leaf);color:var(--olive)}
+.is-sorting{user-select:none;-webkit-user-select:none}
+/* Reorder paint and scroll are owned by the item handle, not the horizontal meal swipe. */
+.meal-slide [data-diet-list],#exercise-list{isolation:isolate}
+
+/* v0.5: no CSS-driven snap on report pane or rail: gestures + settle share one composited transform. */
+.report-scroll .report-gesture-track,.report-scroll .report-gesture-track.animated{transition:none!important;}
+.report-nav .seg .rail-indicator,.report-nav .seg.tracking .rail-indicator{transition:none!important;will-change:transform;}
+.report-scroll .report-gesture-track{backface-visibility:hidden;}
+.report-scroll .report-slide{backface-visibility:hidden;}
+
+/* v0.6 · report deck visual isolation / calendar layout */
+.report-scroll{overflow-anchor:none;scrollbar-width:none;-ms-overflow-style:none}
+.report-scroll::-webkit-scrollbar{display:none}
+#report-content{position:relative;width:100%;min-width:0;height:0;overflow:hidden;overflow-anchor:none}
+.report-scroll .report-gesture-track{position:absolute;top:0;left:0;width:300%;height:auto;display:flex;align-items:flex-start;max-width:none}
+.report-scroll .report-slide{flex:0 0 33.333333%;width:33.333333%;min-width:0;max-width:33.333333%;overflow:hidden}
+.report-scroll .report-slide .report-card{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.demo-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-top:12px;min-width:0;width:100%}
+.demo-calendar span{display:grid;place-items:center;min-width:0;min-height:40px;border-radius:9px;background:var(--soft);font-size:12px;font-variant-numeric:tabular-nums}
+.demo-calendar span:empty{background:transparent}
+
+/* v0.6b: each report page, not the horizontal deck, owns its vertical scrolling */
+.report-scroll{overflow:hidden;min-height:0}
+#report-content{height:100%;min-height:0;overflow:hidden}
+.report-scroll .report-gesture-track{height:100%;align-items:stretch}
+.report-scroll .report-slide{height:100%;max-height:100%;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;contain:layout}
+.report-scroll .report-slide::-webkit-scrollbar{display:none}
+/* v0.7: secondary report navigation is owned by its page, not a late-inserted outer header. */
+.report-scroll,.report-scroll .report-slide,#report-content{touch-action:pan-y}
+.report-local-nav{position:sticky;top:0;z-index:3;display:grid;gap:8px;padding:7px 0 9px;margin-bottom:12px;background:var(--bg);isolation:isolate}
+.report-local-nav .seg{width:100%;min-width:0;max-width:100%;margin:0}
+.report-local-nav .seg button{overflow:hidden;min-width:0;white-space:normal;line-height:1.18;word-break:keep-all}
+.report-local-nav .seg .rail-indicator{transition:none!important;will-change:transform}
+@media(max-width:350px){.report-local-nav .seg button{font-size:12px}}
+
+/* v0.8: truly independent three-tier navigation. No tier's rail lives inside its child deck. */
+.report-scroll{flex:1;min-height:0;padding:0;overflow:hidden;touch-action:auto}
+.report-top-deck,.report-type-deck,.report-period-deck{
+  display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;width:100%;max-width:100%;height:100%;min-width:0;
+  scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none;
+  -webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;overscroll-behavior-y:none;
+}
+.report-top-deck::-webkit-scrollbar,.report-type-deck::-webkit-scrollbar,.report-period-deck::-webkit-scrollbar{display:none}
+.report-top-page,.report-type-page,.report-period-page{
+  flex:0 0 100%;width:100%;min-width:0;max-width:100%;height:100%;min-height:0;
+  scroll-snap-align:start;scroll-snap-stop:always;overflow:hidden;
+}
+.report-main-page,.report-type-page{display:flex;flex-direction:column;min-height:0}
+.report-main-page{padding:0 16px}
+.report-fixed-tier{flex:0 0 auto;display:grid;gap:8px;padding:12px 0 9px;background:var(--bg);z-index:2;position:relative}
+.report-fixed-tier .seg{width:100%;max-width:100%;margin:0}
+.report-type-deck,.report-period-deck{flex:1;min-height:0}
+.report-top-page>.report-leaf,.report-period-page>.report-leaf{
+  padding:12px 16px 18px;height:100%;min-height:0;overflow-y:auto;overflow-x:hidden;
+  overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-x pan-y;
+}
+.report-period-page>.report-leaf{padding:12px 0 18px}
+.report-leaf::-webkit-scrollbar{display:none}
+.report-nav .seg,.report-fixed-tier .seg{touch-action:none;user-select:none;-webkit-user-select:none}
+.report-nav .seg .rail-indicator,.report-fixed-tier .seg .rail-indicator{
+  transform:translate3d(0,0,0);transition:none!important;will-change:transform
+}
+.report-top-deck.drag-rail,.report-type-deck.drag-rail,.report-period-deck.drag-rail{scroll-snap-type:none!important;scroll-behavior:auto!important}
+.report-top-page .report-card,.report-period-page .report-card{min-width:0;max-width:100%;overflow-wrap:anywhere}
+
+/* v0.9: name editing is intentionally scoped to one workout snapshot; no library mutation. */
+.exercise-edit-name{flex:none;min-height:44px;min-width:44px;border:0;background:transparent;color:var(--olive);font-size:13px;font-weight:720;border-radius:8px}
+.exercise-name-editor{margin:0 11px 12px 12px;padding:12px;background:var(--soft);border:1px solid var(--line);border-radius:12px}
+.exercise-name-editor label{display:block;color:var(--ink);font-size:13px;font-weight:700}
+.exercise-name-editor label span{color:var(--muted);font-size:12px;font-weight:400}
+.exercise-name-editor input{display:block;margin-top:8px;width:100%;min-width:0;height:46px;padding:0 12px;border:1px solid #d3d8ca;background:var(--paper);border-radius:10px;font-size:16px;color:var(--ink)}
+.exercise-name-editor .name-help{margin:7px 0 0;color:var(--muted);font-size:12px;line-height:1.45}
+.exercise-name-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.exercise-name-actions button{min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--paper);color:var(--olive);font-size:14px;font-weight:700}
+.exercise-name-actions .name-save{color:white;background:var(--olive);border-color:var(--olive)}
+.name-error{font-size:12px;color:var(--danger);min-height:0;margin:3px 0 0}
+.name-error:empty{display:none}
+</style>
+</head>
+<body>
+<div class="workspace">
+<aside class="left-note"><div class="eyebrow">FITLOG LITE · 设计讨论稿</div><h1>交互优化原型 v0.9</h1><p>先在这里体验与确认，不连接真实业务数据。</p><div class="side-split"></div><nav aria-label="切换原型场景">
+<button class="side-tab active" data-go="diet">☷　饮食模板排序 <small>图 1</small></button>
+<button class="side-tab" data-go="workout">☷　训练动作排序 <small>图 2</small></button>
+<button class="side-tab" data-go="report">▤　报告三级导航 <small>图 3</small></button>
+<button class="side-tab" data-go="food">▰　指定食物底部栏 <small>图 4–5</small></button>
+</nav><div class="side-split"></div><p><b>体验方式</b></p><ul><li>餐次顶部选择或直接左右滑动食物区域；早餐/午餐/晚餐/加餐各是一张等宽页面，左侧把手只调整当前餐次的食物。</li><li>三个导航层级独立：主页面整体切换；报告类型保持第一级固定；时间维度切换时第一、二级保持静止。三个轨道都预先布局，不在动画结束后重建。</li><li>指定食物页：选食物 → 计算份量 → 返回；检查固定底部操作区。</li></ul></aside>
+<div aria-label="移动端原型" class="phone">
+<div class="status"><span>14:38</span><span>▮▮▮　◉　▰ 32</span></div>
+<div class="phone-main">
+<div aria-label="原型场景切换" class="mobile-topper">
+<button class="active" data-go="diet">饮食排序</button><button data-go="workout">训练排序</button><button data-go="report">报告</button><button data-go="food">指定食物</button>
+</div>
+<section aria-label="饮食模板" class="screen active" data-screen="diet">
+<div class="sheet"><div class="sheet-grip"></div><div class="head"><strong>新建饮食模板</strong><button aria-label="关闭示例" data-notice="演示页面，不会修改任何数据">×</button></div>
+<div class="body-scroll"><div class="meal-label"><strong>餐次</strong><span class="subtext" id="diet-total">模板合计 4 项</span></div><div aria-label="选择当前餐次" class="meal-tabs meal-fixed-tabs" id="meal-tabs" role="tablist"><span aria-hidden="true" class="meal-indicator"></span></div><div aria-label="左右滑动切换餐次内容" class="meal-viewport" id="meal-viewport"><div class="meal-track" id="meal-track"></div></div><p class="sliding-helper">左右滑动整块食物内容切换餐次；左侧六点按住上下拖动，条目跟手移动并自动让位。</p></div>
+<div class="foot"><button class="secondary" data-notice="已取消（演示，无数据变更）">取消</button><button class="primary" data-notice="示例已暂存于页面内；不会写入生产数据库">保存饮食模板</button></div>
+</div>
+</section>
+<section aria-label="力量训练" class="screen" data-screen="workout">
+<div class="sheet"><div class="sheet-grip"></div><div class="head"><strong>力量训练</strong><button class="top-icon" data-notice="演示结束；不会完成训练">完成</button></div>
+<div class="body-scroll"><p class="foot-note">新增动作可以先输入名称，之后可通过“改名”修改；左侧把手负责排序，组数据保留。</p><div class="list" id="exercise-list"></div><button class="add-row" id="add-exercise">＋ 添加动作</button><div class="notice">动作名称是<b>本次训练中的显示快照</b>，这里的修改不改变动作库或其他历史记录；组内重量、次数、可选备注保留可编辑。</div></div>
+<div class="foot"><button class="secondary" data-notice="退出示例，未保存生产记录">返回</button><button class="primary" data-notice="模拟完成动作；实际保存与训练校验由现有服务负责">完成训练</button></div>
+</div>
+</section>
+<section aria-label="进度报告" class="screen" data-screen="report">
+<div class="report-head"><h1>进度</h1><button class="top-icon" data-notice="此按钮为展示用">⋯</button></div>
+<div class="report-nav">
+<div aria-label="进度主导航" class="seg top" data-tier="top" role="tablist"></div>
+
+</div>
+<div class="report-scroll" id="report-scroll"><div class="report-top-deck" id="report-top-deck" aria-label="进度主页面">
+  <section class="report-top-page" id="report-trend-page" aria-label="趋势页面"><div class="report-leaf" id="report-trend-content"></div></section>
+  <section class="report-top-page" id="report-calendar-page" aria-label="日历页面"><div class="report-leaf" id="report-calendar-content"></div></section>
+  <section class="report-top-page report-main-page" id="report-main-page" aria-label="报告页面">
+    <div class="report-fixed-tier" aria-label="报告二级导航">
+      <div class="seg middle" data-tier="type" role="tablist"></div>
+      <div class="seg bottom" data-tier="period" role="tablist"></div>
+    </div>
+    <div class="report-type-deck" id="report-type-deck" aria-label="报告类型内容"></div>
+  </section>
+</div></div></div>
+<nav aria-label="底部主导航演示" class="tab-switch"><button><span>⌂</span>今日</button><button><span>▤</span>计划</button><button><span>♧</span>饮食</button><button><span>◇</span>训练</button><button class="active"><span>↗</span>进度</button></nav>
+</section>
+<section aria-label="指定食物" class="screen" data-screen="food">
+<div class="sheet"><div class="sheet-grip"></div><div class="head"><strong>指定食物</strong><button aria-label="关闭示例" data-notice="本原型不会记录真实摄入">×</button></div>
+<div class="body-scroll" id="food-scroll"><div id="food-selection"><p class="food-intro">2026-10-26 · 先选择食物，系统推荐份量；预览不会记账。</p><div class="macro-grid"><div class="macro"><small>热量</small><strong>还差 181 kcal</strong></div><div class="macro"><small>蛋白质</small><strong>还差 48.3 g</strong></div><div class="macro"><small>碳水</small><strong class="over">已超 11.7 g</strong></div><div class="macro"><small>脂肪</small><strong>还差 5.2 g</strong></div></div><div class="food-chips" id="selected-foods"></div><input aria-label="搜索食物或品牌" class="search" id="food-search" placeholder="搜索食物或品牌"/><div id="food-options"></div></div><div class="preview-section" hidden="" id="food-preview"></div></div>
+<div class="foot" id="food-footer"><button class="primary" id="food-calc">计算建议份量</button><button class="secondary" id="food-manual">改为记录实际摄入</button></div>
+</div>
+</section>
+<div aria-live="polite" class="status-toast" id="toast"></div>
+</div>
+</div>
+<aside class="right-note"><div class="eyebrow">交互边界</div><h2>原型需确认的设计方向</h2><p>紧凑排列保留实际数据的入口与字段，不删除食物来源、动作组、时间、备注等事实。</p><p><b>餐次分组：</b>顶端选择早餐/午餐/晚餐/加餐，下面仅展示和排序这一餐；示例数据只放在页面内存中。</p><p><b>拖拽：</b>只从左侧固定区域启动；拖动卡片实时跟手，其他条目平滑让位、边缘自动滚动；其余位置继续正常滚动。</p><p>三个导航层级独立：主页面整体切换；报告类型保持第一级固定；时间维度切换时第一、二级保持静止。三个轨道都预先布局，不在动画结束后重建。</p><p><b>底部 CTA：</b>统一由 Sheet 底部容器承载，内部内容滚动，不靠固定像素撑开。键盘 / Safari VisualViewport 由原项目的共享机制处理。</p><p><b>非生产：</b>本 HTML 是可交互演示。数字、食品、训练内容都是示意，不做营养计算、历史修改、IndexedDB 写入或真实恢复。</p></aside>
+</div>
+<script>
+(()=>{
+'use strict';
+const dietData=[{id:'oats',name:'燕麦片',brand:'欧扎克',g:60,meal:'早餐'},{id:'whey',name:'酵母蛋白粉',brand:'凯普瑞斯（80%）',g:25,meal:'早餐'},{id:'fruit',name:'复合果蔬粉',brand:'米当卡',g:10,meal:'早餐'},{id:'beet',name:'甜菜根粉',brand:'米当卡',g:10,meal:'早餐'},{id:'rice',name:'糙米饭',brand:'演示食物库',g:150,meal:'午餐'},{id:'chicken',name:'鸡胸肉',brand:'演示食物库',g:120,meal:'午餐'},{id:'fish',name:'鱼肉',brand:'演示食物库',g:140,meal:'晚餐'}];
+const mealOptions=['早餐','午餐','晚餐','加餐'];let selectedMeal='早餐';
+const workouts=[{id:'dl',name:'罗马尼亚硬拉（哑铃）',sets:[[12.5,12],[12.5,12],[12.5,12]]},{id:'ab',name:'坐姿髋外展',sets:[[35,12],[35,12],[35,12]]},{id:'sq',name:'哑铃深蹲',sets:[[15,12],[15,12]]}];
+let active='diet',toastTimer=null,dietCounter=0,exerciseCounter=0;const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=(s)=>String(s).replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
+function toast(s){const el=$('#toast');el.textContent=s;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2100)}
+function go(target){active=target;$$('.screen').forEach(el=>el.classList.toggle('active',el.dataset.screen===target));$$('[data-go]').forEach(el=>el.classList.toggle('active',el.dataset.go===target));if(target==='food')$('#food-scroll').scrollTop=0;if(target==='report')requestAnimationFrame(()=>{if(active==='report')alignReportDecks()})}
+$$('[data-go]').forEach(el=>el.addEventListener('click',()=>go(el.dataset.go)));
+$$('[data-notice]').forEach(el=>el.addEventListener('click',()=>toast(el.dataset.notice)));
+const handleSVG='<svg viewBox="0 0 18 27" fill="currentColor" aria-hidden="true"><circle cx="5" cy="6" r="1.7"/><circle cx="13" cy="6" r="1.7"/><circle cx="5" cy="13" r="1.7"/><circle cx="13" cy="13" r="1.7"/><circle cx="5" cy="20" r="1.7"/><circle cx="13" cy="20" r="1.7"/></svg>';
+function dietRow(x){return `<div class="sort-item" data-sort-row data-id="${esc(x.id)}"><button class="handle" aria-label="拖动${esc(x.name)}排序，键盘上下箭头调整" title="按住拖动排序">${handleSVG}</button><div class="item-body"><div class="name-line"><div><div class="name">${esc(x.name)}</div><div class="subbrand">${esc(x.brand)}</div></div><button class="remove" data-delete="diet" aria-label="移除${esc(x.name)}">×</button></div><div class="compact-grams"><span>实际克数</span><label><span class="sr">${esc(x.name)}克数</span><input inputmode="decimal" type="number" min="0" data-grams="${esc(x.id)}" value="${x.g}"><span>g</span></label></div></div></div>`}
+function renderMealTabs(){
+ const wrap=$('#meal-tabs');wrap.querySelectorAll('button').forEach(b=>b.remove());
+ mealOptions.forEach((meal,i)=>{
+  const b=document.createElement('button');b.type='button';b.setAttribute('role','tab');b.dataset.mealTab=meal;b.innerHTML=`${meal}<small>${dietData.filter(x=>x.meal===meal).length} 项</small>`;
+  b.addEventListener('click',()=>selectMeal(i));wrap.insertBefore(b,wrap.querySelector('.meal-indicator'));
+ });
+}
+let mealLocked=false;
+function selectMeal(i,force=false){
+ i=clamp(i,0,mealOptions.length-1);if(mealLocked&&!force)return;
+ selectedMeal=mealOptions[i];const wrap=$('#meal-tabs'),track=$('#meal-track');
+ wrap.style.setProperty('--index',i);wrap.style.setProperty('--indicator-dx','0px');
+ $$('#meal-tabs button').forEach((b,j)=>{b.classList.toggle('active',j===i);b.setAttribute('aria-selected',String(j===i));b.tabIndex=j===i?0:-1});
+ track.style.setProperty('--slide-dx','0px');track.style.transform=`translate3d(${-i*100}%,0,0)`;
+}
+function renderDiet(){
+ renderMealTabs();const track=$('#meal-track');
+ track.innerHTML=mealOptions.map(meal=>{
+  const current=dietData.filter(x=>x.meal===meal);
+  return `<section class="meal-slide" role="tabpanel" aria-label="${meal}食物列表" data-meal-slide="${meal}"><div class="section-top"><strong>${meal} · ${current.length} 项食物</strong><span class="label-pill">只调整本餐顺序</span></div><div class="list" data-diet-list="${meal}">${current.length?current.map(dietRow).join(''):`<div class="meal-empty">${meal}暂无食物</div>`}</div><button class="add-row" data-add-meal="${meal}">＋ 添加至${meal}</button></section>`
+ }).join('');
+ for(const meal of mealOptions){const list=$(`[data-diet-list="${meal}"]`);
+  bindReorder(list,ids=>{const positions=[];dietData.forEach((x,i)=>{if(x.meal===meal)positions.push(i)});const byId=new Map(dietData.map(x=>[x.id,x]));positions.forEach((p,i)=>{dietData[p]=byId.get(ids[i])})});
+  $$('[data-delete="diet"]',list).forEach(btn=>btn.onclick=()=>{const row=btn.closest('[data-id]'),i=dietData.findIndex(x=>x.id===row.dataset.id);if(i>=0){const [removed]=dietData.splice(i,1);renderDiet();toast(`已移除 ${removed.name}（演示）`)}});
+  $$('[data-grams]',list).forEach(el=>el.addEventListener('input',()=>{const x=dietData.find(x=>x.id===el.dataset.grams);if(x)x.g=el.value}));
+ }
+ $$('[data-add-meal]').forEach(el=>el.onclick=()=>{dietCounter++;dietData.push({id:'more'+dietCounter,name:'新增食物 '+dietCounter,brand:'演示条目',g:100,meal:el.dataset.addMeal});renderDiet();$('#meal-viewport').scrollIntoView({block:'nearest'})});
+ $('#diet-total').textContent=`模板合计 ${dietData.length} 项`;
+ selectMeal(mealOptions.indexOf(selectedMeal),true)
+}
+function exerciseRow(x){
+ const label=x.name||'未命名动作';
+ const editor=x.editing?`<div class="exercise-name-editor" role="group" aria-label="编辑动作名称"><label>动作名称 <span>（仅本次训练）</span><input type="text" data-ex-name="${esc(x.id)}" value="${esc(x.draftName??x.name)}" placeholder="例如：哑铃划船" aria-label="本次训练的动作名称" autocomplete="off"></label><p class="name-help">仅更改此条训练动作的显示名称，不修改动作库和已有历史。</p><p class="name-error" role="alert" data-ex-error="${esc(x.id)}"></p><div class="exercise-name-actions"><button type="button" data-cancel-ex-name="${esc(x.id)}">取消</button><button type="button" class="name-save" data-save-ex-name="${esc(x.id)}">保存名称</button></div></div>`:'';
+ return `<div class="exercise-item ${x.collapsed?'collapsed':''}" data-sort-row data-id="${esc(x.id)}"><button class="handle" ${x.editing?'disabled':''} aria-label="拖动${esc(label)}动作排序，键盘上下箭头调整">${handleSVG}</button><div class="exercise-main"><div class="exercise-head"><span class="exercise-title">${esc(label)}</span>${x.editing?'':`<button class="exercise-edit-name" data-edit-ex-name="${esc(x.id)}" aria-label="修改${esc(label)}名称">改名</button>`}<button class="ghost" data-fold="${esc(x.id)}" aria-label="折叠或展开${esc(label)}的训练组">${x.collapsed?'⌄':'⌃'}</button><button class="ghost" data-delete-ex="${esc(x.id)}" aria-label="移除${esc(label)}">×</button></div>${editor}<div class="exercise-summary">${x.sets.length} 组 · 点击右侧展开</div><div class="exercise-details ${x.noteOpen?'note-open':''}"><div class="set-head"><span>组</span><span>重量 kg</span><span>次数</span><span></span></div><div class="set-list">${x.sets.map((set,i)=>`<div class="set-line"><span class="set-no">${i+1}</span><input type="number" inputmode="decimal" aria-label="${esc(label)}第${i+1}组重量" data-set="${esc(x.id)}:${i}:0" value="${esc(set[0])}"><input type="number" inputmode="numeric" aria-label="${esc(label)}第${i+1}组次数" data-set="${esc(x.id)}:${i}:1" value="${esc(set[1])}"><button data-rem-set="${esc(x.id)}:${i}" aria-label="移除第${i+1}组">×</button></div>`).join('')}</div><button class="set-add" data-add-set="${esc(x.id)}">＋ 添加一组</button><button class="note-btn" data-note="${esc(x.id)}">${x.noteOpen?'− 收起每组备注':'＋ 展开每组备注（可选）'}</button><div class="set-note-fields">${x.sets.map((_,i)=>`<label>第${i+1}组备注<input type="text" placeholder="本组备注（可选）" data-group-note="${esc(x.id)}:${i}" value="${esc(x.groupNotes?.[i]||'')}"></label>`).join('')}</div></div></div></div>`
+}
+function exerciseById(id){return workouts.find(x=>x.id===id)}
+function renderExercise(){
+ const parent=$('#exercise-list');const scroll=parent.closest('.body-scroll');const prior=scroll.scrollTop;
+ parent.innerHTML=workouts.map(exerciseRow).join('');scroll.scrollTop=prior;
+ bindReorder(parent,ids=>{const m=new Map(workouts.map(x=>[x.id,x]));workouts.splice(0,workouts.length,...ids.map(id=>m.get(id)));});
+ $$('[data-fold]',parent).forEach(b=>b.onclick=()=>{const x=exerciseById(b.dataset.fold);if(!x)return;x.collapsed=!x.collapsed;const row=b.closest('.exercise-item');row.classList.toggle('collapsed',x.collapsed);b.textContent=x.collapsed?'⌄':'⌃'});
+ $$('[data-delete-ex]',parent).forEach(b=>b.onclick=()=>{const i=workouts.findIndex(x=>x.id===b.dataset.deleteEx);if(i>=0){workouts.splice(i,1);renderExercise();toast('已移除动作（演示）')}});
+ $$('[data-add-set]',parent).forEach(b=>b.onclick=()=>{const x=exerciseById(b.dataset.addSet);if(!x)return;x.sets.push([...x.sets.at(-1)||[0,0]]);x.groupNotes??=[];x.groupNotes.push('');rerenderSameParent(x.id)});
+ $$('[data-rem-set]',parent).forEach(b=>b.onclick=()=>{const [id,i]=b.dataset.remSet.split(':');const x=exerciseById(id);if(!x)return;x.sets.splice(Number(i),1);x.groupNotes?.splice(Number(i),1);rerenderSameParent(id)});
+ $$('[data-set]',parent).forEach(el=>el.addEventListener('input',()=>{const [id,i,j]=el.dataset.set.split(':');const x=exerciseById(id);if(x&&x.sets[Number(i)])x.sets[Number(i)][Number(j)]=el.value}));
+ $$('[data-note]',parent).forEach(el=>el.onclick=()=>{const x=exerciseById(el.dataset.note);x.noteOpen=!x.noteOpen;el.closest('.exercise-details').classList.toggle('note-open',x.noteOpen);el.textContent=x.noteOpen?'− 收起每组备注':'＋ 展开每组备注（可选）'});
+ $$('[data-group-note]',parent).forEach(el=>el.addEventListener('input',()=>{const [id,i]=el.dataset.groupNote.split(':');const x=exerciseById(id);if(x){x.groupNotes??=[];x.groupNotes[Number(i)]=el.value}}));
+ $$('[data-edit-ex-name]',parent).forEach(b=>b.onclick=()=>{const x=exerciseById(b.dataset.editExName);if(!x)return;x.editing=true;x.draftName=x.name;renderExercise()});
+ $$('[data-ex-name]',parent).forEach(input=>{
+  input.addEventListener('input',()=>{const x=exerciseById(input.dataset.exName);if(x)x.draftName=input.value;const error=$(`[data-ex-error="${input.dataset.exName}"]`,parent);if(error)error.textContent=''});
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();saveExerciseName(input.dataset.exName)}else if(e.key==='Escape'){e.preventDefault();cancelExerciseName(input.dataset.exName)}});
+ });
+ $$('[data-save-ex-name]',parent).forEach(b=>b.onclick=()=>saveExerciseName(b.dataset.saveExName));
+ $$('[data-cancel-ex-name]',parent).forEach(b=>b.onclick=()=>cancelExerciseName(b.dataset.cancelExName));
+}
+function saveExerciseName(id){
+ const x=exerciseById(id);if(!x)return;const name=String(x.draftName??'').trim();
+ if(!name){const error=$(`[data-ex-error="${id}"]`,$('#exercise-list'));if(error)error.textContent='请输入动作名称';return}
+ x.name=name;x.draftName=undefined;x.editing=false;x.isNew=false;
+ renderExercise();toast('已更新本次训练的动作名称（演示）');
+}
+function cancelExerciseName(id){const x=exerciseById(id);if(!x)return;if(x.isNew){workouts.splice(workouts.indexOf(x),1)}else{x.editing=false;x.draftName=undefined}renderExercise()}
+function rerenderSameParent(id){renderExercise();const el=$(`[data-id="${id}"]`);if(el)el.scrollIntoView({block:'nearest'})}
+$('#add-exercise').onclick=()=>{exerciseCounter++;const id='newex'+exerciseCounter;workouts.push({id,name:'',draftName:'',editing:true,isNew:true,sets:[[0,10]],groupNotes:[]});renderExercise();const row=$(`#exercise-list [data-id="${id}"]`);if(row)row.scrollIntoView({block:'nearest'})};
+// v0.4: the actual dragged card tracks the pointer continuously as a floating visual copy.
+// The stable original DOM node becomes a placeholder; only that placeholder changes index.
+// Commit business-order demo state once at release. Nothing is rerendered while dragging.
+let activeReorder=null;
+function bindReorder(container,save){
+ $$('.handle',container).forEach(handle=>{
+  handle.addEventListener('keydown',e=>{
+   if(e.key!=='ArrowUp'&&e.key!=='ArrowDown')return;
+   e.preventDefault();const row=handle.closest('[data-sort-row]');
+   const other=e.key==='ArrowUp'?row.previousElementSibling:row.nextElementSibling;
+   if(!other)return;
+   if(e.key==='ArrowUp')container.insertBefore(row,other);else container.insertBefore(other,row);
+   save($$('[data-sort-row]',container).map(x=>x.dataset.id));
+   handle.focus();toast('顺序已调整（演示）');
+  });
+  handle.addEventListener('pointerdown',e=>{
+   if(e.button!==0||activeReorder||!e.isPrimary)return;
+   const row=handle.closest('[data-sort-row]'),rect=row.getBoundingClientRect();
+   const state={id:e.pointerId,row,container,save,handle,startY:e.clientY,lastY:e.clientY,
+     rect,ghost:null,started:false,frame:0,original:$$('[data-sort-row]',container).map(x=>x.dataset.id),
+     scroll:container.closest('.body-scroll'),needsPaint:false,cancel:false,slotMids:null};
+   activeReorder=state;
+   // Prevent the browser's default touch panning on the dedicated 46px handle.
+   e.preventDefault();
+   try{handle.setPointerCapture(e.pointerId)}catch(_){/* desktop browser fallback */}
+   const activate=()=>{
+    if(state.started)return;
+    state.started=true;
+    const shell=document.createElement('div');shell.className='sort-ghost';
+    shell.style.left=state.rect.left+'px';shell.style.top=state.rect.top+'px';
+    shell.style.width=state.rect.width+'px';shell.style.height=state.rect.height+'px';
+    // This clone is visual-only; the original input, value and stable DOM stay in place.
+    const visual=state.row.cloneNode(true);visual.removeAttribute('data-id');
+    visual.querySelectorAll('input,button,select').forEach(el=>{el.tabIndex=-1;el.setAttribute('aria-hidden','true')});
+    shell.appendChild(visual);document.body.appendChild(shell);state.ghost=shell;
+    state.row.classList.add('sort-placeholder');state.row.setAttribute('aria-hidden','true');
+    state.slotMids=$$('[data-sort-row]',state.container).filter(el=>el!==state.row).map(el=>{const r=el.getBoundingClientRect();return {el,mid:r.top+r.height/2}});
+    document.body.classList.add('is-sorting');
+   };
+   const reorderSlot=(centerY)=>{
+    const other=state.slotMids.map(o=>o.el);
+    let placeAt=state.slotMids.findIndex(o=>centerY<o.mid);
+    if(placeAt<0)placeAt=other.length;
+    const current=$$('[data-sort-row]',state.container).indexOf(state.row);
+    if(placeAt===current)return;
+    const before=new Map(other.map(el=>[el,el.getBoundingClientRect().top]));
+    state.container.insertBefore(state.row,other[placeAt]||null);
+    // FLIP: neighboring cards visibly make room without recreating their DOM.
+    state.slotMids=other.map(el=>{const r=el.getBoundingClientRect();return {el,top:r.top,mid:r.top+r.height/2}});
+    for(const {el,top:to} of state.slotMids){
+     const from=before.get(el),d=from-to;
+     if(Math.abs(d)>0.5 && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+      el.getAnimations().forEach(a=>{if(a.id==='sort-shift')a.cancel()});
+      const a=el.animate([{transform:`translate3d(0,${d}px,0)`},{transform:'translate3d(0,0,0)'}],
+       {duration:145,easing:'cubic-bezier(.2,0,0,1)'});a.id='sort-shift';
+     }
+    }
+   };
+   const paint=()=>{
+    state.frame=0;
+    if(activeReorder!==state||!state.started||!state.ghost)return;
+    const dy=state.lastY-state.startY;
+    state.ghost.style.transform=`translate3d(0,${dy}px,0)`;
+    const center=state.rect.top+dy+state.rect.height/2;
+    reorderSlot(center);
+    // Auto-scroll at the edges; keep the floating card under the same finger.
+    let amount=0;
+    if(state.scroll){
+     const r=state.scroll.getBoundingClientRect(),zone=65;
+     if(state.lastY<r.top+zone)amount=-Math.min(16,((r.top+zone-state.lastY)/zone)*16);
+     else if(state.lastY>r.bottom-zone)amount=Math.min(16,((state.lastY-(r.bottom-zone))/zone)*16);
+     if(amount){
+      const before=state.scroll.scrollTop;state.scroll.scrollTop+=amount;
+      if(state.scroll.scrollTop!==before){
+       const delta=state.scroll.scrollTop-before;state.slotMids.forEach(x=>x.mid-=delta);
+       state.frame=requestAnimationFrame(paint);
+      }
+     }
+    }
+   };
+   const onMove=ev=>{
+    if(ev.pointerId!==state.id||activeReorder!==state)return;
+    state.lastY=ev.clientY;
+    if(!state.started && Math.abs(ev.clientY-state.startY)>=3)activate();
+    if(!state.started)return;
+    ev.preventDefault();
+    if(!state.frame)state.frame=requestAnimationFrame(paint);
+   };
+   const end=(ev,isCancel=false)=>{
+    if(ev.pointerId!==state.id||activeReorder!==state)return;
+    state.lastY=ev.clientY;
+    document.removeEventListener('pointermove',onMove);
+    document.removeEventListener('pointerup',onUp);
+    document.removeEventListener('pointercancel',onCancel);
+    if(state.frame)cancelAnimationFrame(state.frame);
+    state.frame=0;activeReorder=null;
+    try{handle.releasePointerCapture(state.id)}catch(_){/* may be canceled */}
+    if(!state.started){document.body.classList.remove('is-sorting');return}
+    // For pointercancel, the placeholder goes back to its starting slot.
+    if(isCancel){const origIndex=state.original.indexOf(state.row.dataset.id);
+     const remaining=$$('[data-sort-row]',container).filter(el=>el!==state.row);
+     container.insertBefore(state.row,remaining[origIndex]||null);
+    }
+    const landed=state.row.getBoundingClientRect();
+    const finishVisual=()=>{
+     if(state.ghost){state.ghost.remove();state.ghost=null}
+     state.row.classList.remove('sort-placeholder');state.row.removeAttribute('aria-hidden');
+     document.body.classList.remove('is-sorting');
+     const ids=$$('[data-sort-row]',container).map(x=>x.dataset.id);
+     if(!isCancel&&ids.join('|')!==state.original.join('|')){
+      state.save(ids);toast('已调整顺序（演示）')
+     }
+    };
+    const offsetY=landed.top-state.rect.top,offsetX=landed.left-state.rect.left;
+    const ghost=state.ghost;
+    if(!ghost){finishVisual();return}
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches){finishVisual();return}
+    // One compositor-only transform animates the floating card to its final slot.
+    ghost.style.transition='transform 155ms cubic-bezier(.2,0,0,1)';
+    ghost.style.transform=`translate3d(${offsetX}px,${offsetY}px,0)`;
+    let done=false;const complete=()=>{if(done)return;done=true;finishVisual()};
+    ghost.addEventListener('transitionend',complete,{once:true});setTimeout(complete,190);
+   };
+   const onUp=ev=>end(ev,false),onCancel=ev=>end(ev,true);
+   document.addEventListener('pointermove',onMove,{passive:false});
+   document.addEventListener('pointerup',onUp);
+   document.addEventListener('pointercancel',onCancel);
+  });
+ });
+}
+const report={top:2,type:0,period:2};
+const reportItems={top:['趋势','日历','报告'],type:['日常综合报告','营养周期报告'],period:['日报','周报','月报','自定义']};
+const reportTiers=['top','type','period'];
+function clamp(n,lo,hi){return Math.max(lo,Math.min(hi,n))}
+const prefersReduced=matchMedia('(prefers-reduced-motion: reduce)');
+function navSlotWidth(rail){return (rail.clientWidth-8)/reportItems[rail.dataset.tier].length}
+function reportPane(data){
+ if(data.top===0)return `<div class="report-card"><h2>趋势</h2><p>真实记录的体重、睡眠和饮水趋势（演示结构）。横向滑动可前往日历。</p><div class="report-preview"><div class="bar" style="height:47%"></div><div class="bar" style="height:75%"></div><div class="bar" style="height:56%"></div><div class="bar" style="height:84%"></div><div class="bar" style="height:71%"></div></div></div><div class="report-card"><h2>体重记录</h2><p>无记录的日期保持未知，不填写虚构零值。</p></div>`;
+ if(data.top===1)return `<div class="report-card"><h2>日历</h2><p>按设备本地日期查看真实保存记录。这里仅展示月历结构。</p><div class="demo-calendar">${Array.from({length:35},(_,i)=>`<span>${i>=3&&i<=33?i-2:''}</span>`).join('')}</div></div><div class="report-card"><h2>当天详情</h2><p>展开后读取原始记录，不在原型中修改生产历史。</p></div>`;
+ const type=reportItems.type[data.type],period=reportItems.period[data.period];
+ return `<div class="report-card"><div class="report-eyebrow">${type} · ${period}</div><h2>${data.type===0?'本期发展与执行':'营养周期事实'}</h2><p>仅基于实际记录；缺失信息保持未知。这些是原型演示数值。</p><div class="kpi-grid"><div class="kpi"><small>热量完整日</small><strong>${data.period===0?'0 / 1':data.period===1?'1 / 7':data.period===2?'2 / 30':'2 / 30'} 天</strong><em>缺失不当作零</em></div><div class="kpi"><small>已完成训练</small><strong>0 次</strong><em>仅真实完成记录</em></div><div class="kpi"><small>体重记录</small><strong>1 天</strong><em>同日取最新有效记录</em></div><div class="kpi"><small>恢复覆盖</small><strong>${data.period===0?'0 / 1':data.period===1?'0 / 7':'0 / 30'} 夜</strong><em>仅已完成睡眠</em></div></div></div><div class="report-card"><h2>${period} · 记录分布</h2><p>每个层级的导航固定在其父层级；切换时间维度只移动下方报告内容。</p><div class="report-preview"><div class="bar" style="height:25%"></div><div class="bar" style="height:35%"></div><div class="bar" style="height:10%"></div><div class="bar" style="height:64%"></div><div class="bar" style="height:42%"></div><div class="bar" style="height:54%"></div></div></div>`;
+}
+const reportDecks={top:$('#report-top-deck'),type:$('#report-type-deck')};
+const reportRail={top:$('.report-nav .seg.top'),type:$('#report-main-page .seg.middle'),period:$('#report-main-page .seg.bottom')};
+const periodDecks=[];
+let railDrag=null;
+const reportDeckFor=(tier)=>tier==='top'?reportDecks.top:tier==='type'?reportDecks.type:periodDecks[report.type];
+function syncPeriodDecks(except=null){
+ for(const deck of periodDecks){
+  if(deck===except||!deck.clientWidth)continue;
+  const saved=deck.style.scrollSnapType;
+  deck.style.scrollSnapType='none';deck.scrollLeft=report.period*deck.clientWidth;deck.style.scrollSnapType=saved;
+ }
+}
+const reportDeckPos=(deck)=>deck.clientWidth?deck.scrollLeft/deck.clientWidth:0;
+function reportIndicator(tier,fraction){
+ const rail=reportRail[tier];if(!rail)return;
+ const indicator=rail.querySelector('.rail-indicator');
+ if(indicator){const step=navSlotWidth(rail);indicator.style.transform=`translate3d(${step*fraction}px,0,0)`}
+}
+function reportSelected(tier,index){
+ const rail=reportRail[tier];if(!rail)return;
+ $$('button[data-idx]',rail).forEach((b,i)=>{const selected=i===index;b.classList.toggle('active',selected);b.setAttribute('aria-selected',String(selected));b.tabIndex=selected?0:-1});
+}
+function alignReportDecks(){
+ for(const tier of reportTiers){
+  const decks=tier==='period'?periodDecks:[reportDeckFor(tier)];
+  for(const deck of decks){if(deck&&deck.clientWidth){const snap=deck.style.scrollSnapType;deck.style.scrollSnapType='none';deck.scrollLeft=report[tier]*deck.clientWidth;deck.style.scrollSnapType=snap}}
+  reportIndicator(tier,report[tier]);reportSelected(tier,report[tier]);
+ }
+}
+function navigateReport(tier,n,{smooth=true}={}){
+ const deck=reportDeckFor(tier);if(!deck)return;
+ const next=clamp(n,0,reportItems[tier].length-1);
+ const duration=(!smooth||prefersReduced.matches)?'instant':'smooth';
+ report[tier]=next;reportSelected(tier,next);
+ if(tier==='period')syncPeriodDecks(deck);
+ if(tier==='type')syncPeriodDecks();
+ deck.scrollTo({left:next*deck.clientWidth,behavior:duration});
+ if(duration==='instant')reportIndicator(tier,next);
+}
+function renderReport(){
+ for(const tier of reportTiers){
+  const rail=reportRail[tier];
+  rail.innerHTML='<span class="rail-indicator" aria-hidden="true"></span>'+reportItems[tier].map((name,i)=>`<button type="button" role="tab" data-idx="${i}" aria-selected="${report[tier]===i}">${name}</button>`).join('');
+ }
+ $('#report-trend-content').innerHTML=reportPane({...report,top:0});
+ $('#report-calendar-content').innerHTML=reportPane({...report,top:1});
+ reportDecks.type.replaceChildren();periodDecks.length=0;
+ for(let t=0;t<reportItems.type.length;t++){
+  const page=document.createElement('section');page.className='report-type-page';page.setAttribute('aria-label',reportItems.type[t]);
+  const periods=document.createElement('div');periods.className='report-period-deck';periods.dataset.type=String(t);
+  for(let p=0;p<reportItems.period.length;p++){
+   const leafPage=document.createElement('section');leafPage.className='report-period-page';leafPage.setAttribute('aria-label',`${reportItems.type[t]} · ${reportItems.period[p]}`);
+   const content=document.createElement('div');content.className='report-leaf';content.innerHTML=reportPane({top:2,type:t,period:p});leafPage.append(content);periods.append(leafPage);
+  }
+  page.append(periods);reportDecks.type.append(page);periodDecks.push(periods);
+ }
+ requestAnimationFrame(alignReportDecks);
+ // Native content swiping does not reconstruct nodes, headers, or scroll positions.
+ [reportDecks.top,reportDecks.type,...periodDecks].forEach((deck)=>{
+  let endTimer=0;
+  const tier=deck===reportDecks.top?'top':deck===reportDecks.type?'type':'period';
+  deck.addEventListener('scroll',()=>{
+   if(deck!==reportDeckFor(tier))return;
+   reportIndicator(tier,reportDeckPos(deck));
+   clearTimeout(endTimer);
+   endTimer=setTimeout(()=>{
+    if(deck===reportDeckFor(tier)){
+     const idx=clamp(Math.round(reportDeckPos(deck)),0,reportItems[tier].length-1);
+     report[tier]=idx;reportSelected(tier,idx);reportIndicator(tier,idx);
+     if(tier==='type')syncPeriodDecks();
+     if(tier==='period')syncPeriodDecks(deck);
+    }
+   },300);
+  },{passive:true});
+  deck.addEventListener('scrollend',()=>{
+   if(deck!==reportDeckFor(tier))return;
+   const idx=clamp(Math.round(reportDeckPos(deck)),0,reportItems[tier].length-1);
+   report[tier]=idx;reportSelected(tier,idx);reportIndicator(tier,idx);
+   if(tier==='type')syncPeriodDecks();
+   if(tier==='period')syncPeriodDecks(deck);
+  },{passive:true});
+ });
+ for(const tier of reportTiers){
+  const rail=reportRail[tier];let drag=null,suppress=false;
+  rail.addEventListener('pointerdown',(e)=>{
+   if(e.button!==0||!e.isPrimary||drag)return;
+   const deck=reportDeckFor(tier);if(!deck)return;
+   const selected=clamp(Math.round(reportDeckPos(deck)),0,reportItems[tier].length-1);
+   drag={id:e.pointerId,startX:e.clientX,startY:e.clientY,lastX:e.clientX,startScroll:deck.scrollLeft,selected,stamp:performance.now(),deck,active:false};
+   // Do not capture on pointerdown: the browser must still deliver a real click to the tab button.
+  });
+  rail.addEventListener('pointermove',(e)=>{
+   if(!drag||e.pointerId!==drag.id)return;
+   const dx=e.clientX-drag.startX,dy=e.clientY-drag.startY;
+   if(!drag.active){if(Math.abs(dx)<7)return;if(Math.abs(dy)>Math.abs(dx)*1.3)return;drag.active=true;drag.deck.classList.add('drag-rail');rail.setPointerCapture?.(e.pointerId)}
+   e.preventDefault();drag.lastX=e.clientX;drag.deck.scrollLeft=drag.startScroll-dx;
+  });
+  const end=(e,cancel=false)=>{
+   if(!drag||e.pointerId!==drag.id)return;
+   const d=drag;drag=null;
+   if(d.active){
+    const dx=e.clientX-d.startX;const dt=Math.max(1,performance.now()-d.stamp),speed=Math.abs(dx)/dt;
+    let next=d.selected;
+    if(!cancel&&(Math.abs(dx)>Math.max(35,d.deck.clientWidth*.16)||(speed>.48&&Math.abs(dx)>19)))next=clamp(d.selected+(dx<0?1:-1),0,reportItems[tier].length-1);
+    d.deck.classList.remove('drag-rail');suppress=true;
+    navigateReport(tier,next,{smooth:true});setTimeout(()=>{suppress=false},300);
+   }
+  };
+  rail.addEventListener('pointerup',(e)=>end(e));
+  rail.addEventListener('pointercancel',(e)=>end(e,true));
+  // Implicit touch capture on a child is released when the rail takes ownership; this is not a cancel.
+  rail.addEventListener('click',(e)=>{
+   if(suppress){e.preventDefault();e.stopImmediatePropagation();return;}
+   const btn=e.target.closest('button[data-idx]');if(!btn)return;
+   navigateReport(tier,Number(btn.dataset.idx));
+  });
+ }
+}
+window.addEventListener('resize',()=>{if(active==='report')requestAnimationFrame(alignReportDecks)});
+// Food choice and preview share one persistent Sheet footer. No fixed pixel offset or external service.
+const foods=[{id:'w',name:'酵母蛋白粉',brand:'凯普瑞斯（80%）',cal:432},{id:'f',name:'复合果蔬粉',brand:'米当卡',cal:291},{id:'b',name:'甜菜根粉',brand:'米当卡',cal:327},{id:'o',name:'全麦脆麦片',brand:'欧扎克',cal:379},{id:'c',name:'鸡胸肉',brand:'食品库',cal:110},{id:'a',name:'苹果',brand:'食品库',cal:52}];let selected=['w'],foodMode='choose';
+function renderFood(){const sel=$('#selected-foods');sel.innerHTML=`<strong>已选 ${selected.length} / 4</strong>`+selected.map(id=>{const food=foods.find(f=>f.id===id);return `<button class="chip" data-unselect="${id}">${esc(food.name)} ×</button>`}).join('');$$('[data-unselect]',sel).forEach(b=>b.onclick=()=>{selected=selected.filter(s=>s!==b.dataset.unselect);renderFood()});const query=$('#food-search').value.trim();$('#food-options').innerHTML=foods.filter(f=>(f.name+f.brand).includes(query)).map(f=>`<button class="food-option" data-food="${f.id}" ${selected.length===4&&!selected.includes(f.id)?'disabled':''}><span class="food-opt-copy"><strong>${esc(f.name)}</strong><small>${esc(f.brand)} · ${f.cal} kcal / 100 g</small></span><span class="tick ${selected.includes(f.id)?'checked':''}">${selected.includes(f.id)?'✓':''}</span></button>`).join('');$$('[data-food]').forEach(b=>b.onclick=()=>{const id=b.dataset.food;if(selected.includes(id))selected=selected.filter(x=>x!==id);else if(selected.length<4)selected.push(id);renderFood()})}
+$('#food-search').addEventListener('input',renderFood);
+function foodView(mode){foodMode=mode;$('#food-selection').hidden=mode!=='choose';$('#food-preview').hidden=mode==='choose';const footer=$('#food-footer');footer.innerHTML=mode==='choose'?'<button class="primary" id="food-calc">计算建议份量</button><button class="secondary" id="food-manual">改为记录实际摄入</button>':'<button class="secondary" id="food-back">返回选择食物</button><button class="primary" id="food-confirm">确认已实际吃下</button>';if(mode==='choose'){$('#food-calc').onclick=()=>{if(!selected.length){toast('请至少选择一种食物');return}foodView('preview')};$('#food-manual').onclick=()=>toast('此处将进入既有真实摄入记录流程（原型不模拟写入）')}else{$('#food-back').onclick=()=>foodView('choose');$('#food-confirm').onclick=()=>toast('此处需真实确认和事务写入；本原型不记账');const items=selected.map(id=>foods.find(x=>x.id===id));const grams=items.length===1?55:Math.max(10,Math.floor(55/items.length));$('#food-preview').innerHTML=`<div class="preview-title">恢复系统建议</div><div class="preview-card"><h2>建议份量预览 <small style="color:var(--muted);font-weight:400;font-size:12px;float:right">仅用所选食物</small></h2>${items.map(f=>`<div class="preview-item" style="margin:7px 0"><span>${esc(f.name)}</span><span>${grams} g</span></div>`).join('')}<div class="preview-break">本次摄入 · 示意数值</div><p class="total">热量 238 kcal · 蛋白质 44 g · 碳水 2.5 g · 脂肪 5.5 g</p><div class="preview-break">记账后实际及目标差额</div><div class="total-meta"><div><small>热量</small><span>1956 kcal<br><small>已超 56 kcal</small></span></div><div><small>蛋白质</small><span>135.7 g<br><small>还差 4.3 g</small></span></div><div><small>碳水</small><span>264.2 g<br><small>已超 14.2 g</small></span></div><div><small>脂肪</small><span>38.3 g<br><small>已超 0.3 g</small></span></div></div><div class="preview-warning">这是目标间的折中，不保证四项同时达标；仍差或将超以实际差额为准。实际吃下后才确认记账。</div></div>`}$('#food-scroll').scrollTop=0}
+
+function attachMealSwipe(el){
+ let gesture=null,suppressClick=false;
+ el.addEventListener('pointerdown',e=>{
+  if(e.button!==0||gesture||mealLocked)return;
+  if(e.target.closest('input,textarea,select,.handle,.remove,.add-row,[contenteditable]'))return;
+  const index=mealOptions.indexOf(selectedMeal),track=$('#meal-track'),nav=$('#meal-tabs');
+  gesture={id:e.pointerId,x:e.clientX,y:e.clientY,stamp:performance.now(),dx:0,index,state:'pending',frame:0};
+  const onMove=ev=>{
+   if(!gesture||gesture.id!==ev.pointerId)return;
+   const dx=ev.clientX-gesture.x,dy=ev.clientY-gesture.y;
+   if(gesture.state==='pending'){
+    if(Math.abs(dy)>Math.abs(dx)*1.16&&Math.abs(dy)>9){gesture.state='vertical';return}
+    if(Math.abs(dx)<9)return;
+    gesture.state='horizontal';track.classList.add('tracking');nav.classList.add('tracking');
+   }
+   if(gesture.state!=='horizontal')return;
+   ev.preventDefault();const edge=(dx>0&&index===0)||(dx<0&&index===mealOptions.length-1);
+   gesture.dx=edge?dx*.22:dx;
+   if(!gesture.frame)gesture.frame=requestAnimationFrame(()=>{if(!gesture)return;gesture.frame=0;
+    track.style.transform=`translate3d(calc(${-index*100}% + ${gesture.dx}px),0,0)`;
+    nav.style.setProperty('--indicator-dx',`${-gesture.dx/el.clientWidth*((nav.clientWidth-8)/4)}px`);
+   });
+  };
+  const cleanup=()=>{document.removeEventListener('pointermove',onMove);document.removeEventListener('pointerup',onEnd);document.removeEventListener('pointercancel',onCancel);if(gesture?.frame)cancelAnimationFrame(gesture.frame);track.classList.remove('tracking');nav.classList.remove('tracking')};
+  const onEnd=ev=>{
+   if(!gesture||gesture.id!==ev.pointerId)return;
+   const {state,dx,index,stamp}=gesture;cleanup();gesture=null;if(state!=='horizontal')return;
+   suppressClick=true;setTimeout(()=>suppressClick=false,160);
+   const vx=Math.abs(dx)/Math.max(1,performance.now()-stamp),direction=dx<0?1:-1;
+   const target=clamp(index+direction,0,mealOptions.length-1);
+   if(target!==index&&(Math.abs(dx)>Math.max(48,el.clientWidth*.16)||vx>.52&&Math.abs(dx)>22)){
+    selectMeal(target);
+    // Retain one scroll owner: reposition only after selection, not during the drag.
+    setTimeout(()=>{if(active==='diet')$('#meal-viewport').closest('.body-scroll').scrollTop=0},settleDuration()+10);
+   } else selectMeal(index);
+  };
+  const onCancel=ev=>{if(!gesture||gesture.id!==ev.pointerId)return;cleanup();gesture=null;selectMeal(index)};
+  document.addEventListener('pointermove',onMove,{passive:false});document.addEventListener('pointerup',onEnd);document.addEventListener('pointercancel',onCancel);
+ });
+ if(el.id==='meal-tabs')el.addEventListener('click',e=>{if(suppressClick){e.preventDefault();e.stopPropagation();return}},true);
+}
+attachMealSwipe($('#meal-tabs'));attachMealSwipe($('#meal-viewport'));
+
+renderDiet();renderExercise();renderReport();renderFood();foodView('choose');
+})();
+</script>
+</body>
+</html>

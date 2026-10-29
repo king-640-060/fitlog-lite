@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "productSourceFiles": 181,
+  "sourceMatchesAll10FinalGRunners": true,
+  "protectedPathsUnchanged": [
+    "src/db",
+    "src/ai",
+    "src/ui/sheetController.ts",
+    "src/services/backupService.ts",
+    "src/services/githubSyncService.ts",
+    "src/services/syncCryptoService.ts",
+    "src/services/foodService.ts",
+    "src/services/nutritionStrategyService.ts",
+    "src/services/nutritionCompletionService.ts",
+    "src/services/nutritionCycleReportService.ts",
+    "src/services/coachReportService.ts",
+    "src/services/taskService.ts",
+    "tests/fixtures",
+    "package.json",
+    "package-lock.json",
+    ".github/workflows"
+  ],
+  "personalBrowserProfileOrHealthDataWrites": false,
+  "realProviderOrKeysUsed": false,
+  "database": "fitlog-lite-db",
+  "Dexie": 13,
+  "IDB": 130,
+  "stores": 22,
+  "Backup": 14,
+  "Restore": "1-14",
+  "Sync": 1
+}

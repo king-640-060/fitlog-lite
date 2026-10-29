@@ -1,0 +1,37 @@
+[
+  {
+    "original": "geometry/chromium.json",
+    "archive": "geometry/chromium.json.gz",
+    "rawBytes": 2742978,
+    "rawSha256": "108ee7454e1ce59ce9c4372244b406125ca3b1fa127cbae4694eb91509461d3a",
+    "compressedSha256": "b83f39c5d1d4c546818058841694002aafeffbd47556aa7c24743e8dabb6c896"
+  },
+  {
+    "original": "geometry/webkit.json",
+    "archive": "geometry/webkit.json.gz",
+    "rawBytes": 2778125,
+    "rawSha256": "9e675b7db969a109a1837512d15a925d0871c97d7680f1b351932edff1c1eb59",
+    "compressedSha256": "6b05487e19d624aa5601adead056ada6274f5f3fc5536f4e43c23cea48ab9b6d"
+  },
+  {
+    "original": "regressions/navigation-flicker-g.json",
+    "archive": "regressions/navigation-flicker-g.json.gz",
+    "rawBytes": 12352906,
+    "rawSha256": "5589a6233681c2e068b935d86572cf8b26c22746bdd94f0f3417f6f8fd1b2196",
+    "compressedSha256": "507d7f6bd2db8cee4ba460ace0b4a3a9b355782a7ed3d20055c30326ef0165c2"
+  },
+  {
+    "original": "visual/before-and-stage-after.json",
+    "archive": "visual/before-and-stage-after.json.gz",
+    "rawBytes": 440400,
+    "rawSha256": "c0013b399d06fbba44f75d2a458e617741989688277a34d8bf841542450d3b73",
+    "compressedSha256": "97fb9a0d418a633277292b3d1cab410063b05f37e524709c619fb8948682ad25"
+  },
+  {
+    "original": "visual/final-after.json",
+    "archive": "visual/final-after.json.gz",
+    "rawBytes": 216482,
+    "rawSha256": "1b6c6f20d67d7f0bf7c79ba92e068a1213fc310e26cdfd3db6d55ba88edaaea6",
+    "compressedSha256": "8751cf12f591715dbfac9c96fc219853d7e033a0a67352da6c82190aa9d27fc4"
+  }
+]

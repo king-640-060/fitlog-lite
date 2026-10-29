@@ -1,0 +1,107 @@
+{
+  "url": "http://127.0.0.1:5470/",
+  "results": [
+    {
+      "engine": "chromium",
+      "status": "PASS",
+      "input": "native Chromium CDP touch",
+      "samples": [
+        {
+          "name": "start",
+          "clientY": 506.28125,
+          "startTop": 485.28125,
+          "actualTop": 485.28125,
+          "placeholder": {
+            "index": 0,
+            "height": 138
+          }
+        },
+        {
+          "name": "30px",
+          "clientY": 536.28125,
+          "startTop": 485.28125,
+          "actualTop": 515.28125,
+          "placeholder": {
+            "index": 0,
+            "height": 138
+          }
+        },
+        {
+          "name": "cross-two",
+          "clientY": 810,
+          "startTop": 485.28125,
+          "actualTop": 789,
+          "placeholder": {
+            "index": 2,
+            "height": 138
+          }
+        }
+      ],
+      "original": [
+        "diet-0",
+        "diet-1",
+        "diet-2",
+        "diet-3"
+      ],
+      "sorted": [
+        "diet-1",
+        "diet-2",
+        "diet-0",
+        "diet-3"
+      ],
+      "all22Exact": true,
+      "physicalIPhone": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "status": "PASS",
+      "input": "WebKit pointer",
+      "samples": [
+        {
+          "name": "start",
+          "clientY": 500.25,
+          "startTop": 479.25,
+          "actualTop": 479.25,
+          "placeholder": {
+            "index": 0,
+            "height": 132
+          }
+        },
+        {
+          "name": "30px",
+          "clientY": 530.25,
+          "startTop": 479.25,
+          "actualTop": 509.25,
+          "placeholder": {
+            "index": 0,
+            "height": 132
+          }
+        },
+        {
+          "name": "cross-two",
+          "clientY": 810,
+          "startTop": 479.25,
+          "actualTop": 789.25,
+          "placeholder": {
+            "index": 2,
+            "height": 132
+          }
+        }
+      ],
+      "original": [
+        "diet-0",
+        "diet-1",
+        "diet-2",
+        "diet-3"
+      ],
+      "sorted": [
+        "diet-1",
+        "diet-2",
+        "diet-0",
+        "diet-3"
+      ],
+      "all22Exact": true,
+      "physicalIPhone": "Pending"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "contexts": 60,
+  "heightGroups": 1080,
+  "ranges": [
+    7,
+    30,
+    90,
+    7
+  ],
+  "maxDeltaPxByField": {
+    "card": 0,
+    "header": 0,
+    "selection": 0,
+    "scroll": 0,
+    "plot": 0,
+    "axis": 0,
+    "ranges": 0,
+    "coverage": 0,
+    "footer": 0
+  },
+  "sourceMatchesAll10Runners": true,
+  "sourceFiles": 181
+}

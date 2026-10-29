@@ -64,7 +64,7 @@ export async function createWorkout(date: string, database: FitLogDatabase = db)
   return workout
 }
 
-export interface WorkoutSaveOptions { requireExisting?: boolean; expectedFingerprint?: string }
+export interface WorkoutSaveOptions { requireExisting?: boolean; expectedFingerprint?: string; preserveUntouchedFacts?: boolean }
 export function workoutFingerprint(workout: Workout): string { return JSON.stringify(workout) }
 async function persistWorkout(normalized: Workout, database: FitLogDatabase, options: WorkoutSaveOptions): Promise<Workout> {
   if (!options.requireExisting && options.expectedFingerprint === undefined) { await database.workouts.put(normalized); return normalized }
@@ -92,7 +92,14 @@ export async function saveWorkoutName(id: string, value: unknown, expectedFinger
   })
 }
 export async function saveWorkout(workout: Workout, database: FitLogDatabase = db, options: WorkoutSaveOptions = {}): Promise<Workout> {
-  const normalized = normalizeWorkoutForSave(workout)
+  let normalized: Workout
+  const source = options.preserveUntouchedFacts ? await database.workouts.get(workout.id) : undefined
+  const facts = (value: Workout) => JSON.stringify({ ...value, exercises: value.exercises.map(e => ({ ...e, exerciseName: undefined })).sort((a,b)=>a.id.localeCompare(b.id)) })
+  if (source && facts(source) === facts(workout)) {
+    // A local snapshot rename/reorder must not normalize untouched historical sets/journal.
+    const names = new Map(workout.exercises.map(e=>[e.id, requiredText(e.exerciseName, '动作名称')]))
+    normalized = { ...source, exercises: workout.exercises.map(e=>({ ...source.exercises.find(old=>old.id===e.id)!, exerciseName:names.get(e.id)! })) }
+  } else normalized = normalizeWorkoutForSave(workout)
   normalized.updatedAt = new Date().toISOString()
   return persistWorkout(normalized, database, options)
 }

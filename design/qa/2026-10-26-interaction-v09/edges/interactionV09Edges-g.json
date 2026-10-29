@@ -1,0 +1,85 @@
+{
+  "url": "http://127.0.0.1:5470/",
+  "results": [
+    {
+      "engine": "chromium",
+      "status": "PASS",
+      "cancelAndBlurZeroWrites": true,
+      "failedDietSavePreservesDraft": true,
+      "blankNameRejected": true,
+      "syntheticCompositionSaved": true,
+      "setsAndOther21StoresExact": true,
+      "reportPreviousReturnClickable": true,
+      "navBefore": {
+        "x": 130,
+        "y": 88,
+        "width": 584,
+        "height": 45
+      },
+      "navAfter": {
+        "x": 130,
+        "y": 88,
+        "width": 584,
+        "height": 45
+      },
+      "stages": [
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        }
+      ],
+      "physicalIME": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "status": "PASS",
+      "cancelAndBlurZeroWrites": true,
+      "failedDietSavePreservesDraft": true,
+      "blankNameRejected": true,
+      "syntheticCompositionSaved": true,
+      "setsAndOther21StoresExact": true,
+      "reportPreviousReturnClickable": true,
+      "navBefore": {
+        "x": 130,
+        "y": 88,
+        "width": 584,
+        "height": 45
+      },
+      "navAfter": {
+        "x": 130,
+        "y": 88,
+        "width": 584,
+        "height": 45
+      },
+      "stages": [
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        },
+        {
+          "scrollTop": 0,
+          "scrollLeft": 0,
+          "overflow": "clip"
+        }
+      ],
+      "physicalIME": "Pending"
+    }
+  ]
+}

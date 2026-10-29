@@ -1,0 +1,88 @@
+{
+  "zipSha256RecordedAtExtraction": "da0ed4e621df46d9542a7e3c9626255d93e74845a5fa2fe3d582d9e918889a3c",
+  "CRCAtExtraction": "PASS, recorded during original task startup",
+  "originalDownloadPathPresentOnFinalRecheck": false,
+  "recheckedExtractedFiles": [
+    "00_请先阅读_README.md",
+    "01_CODEX_正式开发指令.md",
+    "03_设计基准与边界说明.md",
+    "02_逐项验收矩阵.md",
+    "SHA256SUMS.txt",
+    "references/user-evidence/03_用户原始图3_进度报告.png",
+    "references/user-evidence/05_用户原始图5_指定食物选择.png",
+    "references/user-evidence/04_用户原始图4_指定食物预览.png",
+    "references/user-evidence/02_用户原始图2_训练动作.png",
+    "references/user-evidence/06_用户补图_报告层级问题.png",
+    "references/user-evidence/07_用户录屏_原拖拽不跟手.mp4",
+    "references/user-evidence/01_用户原始图1_饮食模板.png",
+    "references/prototype-evidence/v09_动作名称编辑演示.png",
+    "prototype/fitlog_interaction_v09_APPROVED.html"
+  ],
+  "SHA256SUMS": [
+    {
+      "path": "00_请先阅读_README.md",
+      "sha256": "171dc526772b2661414576d150cf683b05c8a83d9470604ec9663e4923350812",
+      "status": "PASS"
+    },
+    {
+      "path": "01_CODEX_正式开发指令.md",
+      "sha256": "8b8bd75dc1af9dab7262e670068fb1790e62b03713303796e0c26b8ea0b038d3",
+      "status": "PASS"
+    },
+    {
+      "path": "02_逐项验收矩阵.md",
+      "sha256": "a2363bcfd272885749b4b4bb6665b5ac76cb4f5c762f846e78af4a1f4711655e",
+      "status": "PASS"
+    },
+    {
+      "path": "03_设计基准与边界说明.md",
+      "sha256": "4974ff78556f039cb9c2def45c0c0268b88607a52eb41bcbf1d26c60bd05b104",
+      "status": "PASS"
+    },
+    {
+      "path": "prototype/fitlog_interaction_v09_APPROVED.html",
+      "sha256": "d41171fc85af521cd6d6c1b3a7a249eb20aee369941296a117ee474d261f480d",
+      "status": "PASS"
+    },
+    {
+      "path": "references/prototype-evidence/v09_动作名称编辑演示.png",
+      "sha256": "9ea8e3b6ca542a6033c53e5ccb7dcd9d53937582853a3d9b38d5c61bf22b1c7d",
+      "status": "PASS"
+    },
+    {
+      "path": "references/user-evidence/01_用户原始图1_饮食模板.png",
+      "sha256": "ea2890a811510e15f2ca55e1122c6b544d622bb67341455c8e41af7ee504b092",
+      "status": "PASS"
+    },
+    {
+      "path": "references/user-evidence/02_用户原始图2_训练动作.png",
+      "sha256": "8cf142e1a452b618d75a08e48180886f5f96b9f4ce2aa6cb39fd70b72d8c591b",
+      "status": "PASS"
+    },
+    {
+      "path": "references/user-evidence/03_用户原始图3_进度报告.png",
+      "sha256": "a3a4f55ebdec4a8449fdaef0b70029ad6cde5d864eacc8d4975a8d2ff0df42b3",
+      "status": "PASS"
+    },
+    {
+      "path": "references/user-evidence/04_用户原始图4_指定食物预览.png",
+      "sha256": "96ccc331d11a779b002339f9bab23d1702ee801e7a0b92712f992e17112f56a3",
+      "status": "PASS"
+    },
+    {
+      "path": "references/user-evidence/05_用户原始图5_指定食物选择.png",
+      "sha256": "c4dfcbbb31cb3ff9abb7e5c8ca6ad6374d1be6273551dee20ab0f75f6d9b9551",
+      "status": "PASS"
+    },
+    {
+      "path": "references/user-evidence/06_用户补图_报告层级问题.png",
+      "sha256": "347fa50d4e4e1a92f26e76b04550d1106e71de83d2b0e5a3013757bc22969b56",
+      "status": "PASS"
+    },
+    {
+      "path": "references/user-evidence/07_用户录屏_原拖拽不跟手.mp4",
+      "sha256": "beb2f9f41949a4424f19b866d48435d3ebeb26a8f8e5cd2b66381f1432cdd041",
+      "status": "PASS"
+    }
+  ]
+}

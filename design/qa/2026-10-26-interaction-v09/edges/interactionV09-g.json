@@ -1,0 +1,1963 @@
+{
+  "url": "http://127.0.0.1:5470/",
+  "results": [
+    {
+      "engine": "chromium",
+      "status": "PASS",
+      "kind": "functional",
+      "cancelSamples": [
+        {
+          "dy": 30,
+          "top": 515.28125,
+          "placeholder": 1
+        },
+        {
+          "dy": 75,
+          "top": 560.28125,
+          "placeholder": 1
+        },
+        {
+          "dy": 230,
+          "top": 715.28125,
+          "placeholder": 1
+        }
+      ],
+      "sortSamples": [
+        {
+          "dy": 30,
+          "top": 515.28125,
+          "placeholder": 1
+        },
+        {
+          "dy": 75,
+          "top": 560.28125,
+          "placeholder": 1
+        },
+        {
+          "dy": 230,
+          "top": 715.28125,
+          "placeholder": 1
+        }
+      ],
+      "actionSort": [
+        {
+          "dy": 30,
+          "top": 316,
+          "placeholder": 1
+        },
+        {
+          "dy": 75,
+          "top": 361,
+          "placeholder": 1
+        },
+        {
+          "dy": 230,
+          "top": 516,
+          "placeholder": 1
+        }
+      ],
+      "timeline": [
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        }
+      ],
+      "cycles": 20
+    },
+    {
+      "engine": "webkit",
+      "status": "PASS",
+      "kind": "functional",
+      "cancelSamples": [
+        {
+          "dy": 30,
+          "top": 509.25,
+          "placeholder": 1
+        },
+        {
+          "dy": 75,
+          "top": 554.25,
+          "placeholder": 1
+        },
+        {
+          "dy": 230,
+          "top": 709.25,
+          "placeholder": 1
+        }
+      ],
+      "sortSamples": [
+        {
+          "dy": 30,
+          "top": 509.25,
+          "placeholder": 1
+        },
+        {
+          "dy": 75,
+          "top": 554.25,
+          "placeholder": 1
+        },
+        {
+          "dy": 230,
+          "top": 709.25,
+          "placeholder": 1
+        }
+      ],
+      "actionSort": [
+        {
+          "dy": 30,
+          "top": 306.265625,
+          "placeholder": 1
+        },
+        {
+          "dy": 75,
+          "top": 351.265625,
+          "placeholder": 1
+        },
+        {
+          "dy": 230,
+          "top": 506.265625,
+          "placeholder": 1
+        }
+      ],
+      "timeline": [
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "day",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "month",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "custom",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        },
+        {
+          "mode": "week",
+          "r": {
+            ".progress-deck-root>.page-tabs": {
+              "x": 16,
+              "y": 76,
+              "width": 358,
+              "height": 45
+            },
+            ".report-deck-shell>.report-kinds": {
+              "x": 16,
+              "y": 133,
+              "width": 358,
+              "height": 50
+            },
+            ".report-daily-shell>.report-mode": {
+              "x": 16,
+              "y": 195,
+              "width": 358,
+              "height": 50
+            }
+          }
+        }
+      ],
+      "cycles": 20
+    }
+  ]
+}

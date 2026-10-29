@@ -1,0 +1,30 @@
+{
+  "candidate": "G",
+  "sourceManifestSha256": "704ed28ebe648a5dde5ed8e4aec142aff74367f2191d6e7ac09567eed4accbde",
+  "trace": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/interaction-v09-2026-10-26/evidence/retake-g/interactionV09Gestures/chromium-performance.json",
+  "traceSha256": "6b2dcbec29f5b067f8eecf5d1b6084780ec389f412f912db15265dfb7df80676",
+  "metrics": {
+    "RunTask": {
+      "count": 108537,
+      "maxMs": 20.287,
+      "over50": 0
+    },
+    "Layout": {
+      "count": 2020,
+      "maxMs": 3.605,
+      "over50": 0
+    },
+    "UpdateLayoutTree": {
+      "count": 4539,
+      "maxMs": 1.479,
+      "over50": 0
+    },
+    "FireAnimationFrame": {
+      "count": 1345,
+      "maxMs": 3.033,
+      "over50": 0
+    }
+  },
+  "archivedTrace": "report-final-g.trace.json.gz",
+  "archivedTraceSha256": "6625106b2f0ff49527ce61692ec83434beb05bf2001fdbb040fd3297812fe07e"
+}

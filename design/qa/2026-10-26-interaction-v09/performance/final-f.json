@@ -1,0 +1,151 @@
+{
+  "candidate": "F",
+  "sourceManifestSha256": "1e49f73dfd1e9201c16e9222d457a3a8319ad69ecf5b56986068f47abc8acc7e",
+  "reportTrace": {
+    "path": "/Users/zhaozhantian/Documents/Codex/2026-10-10/king-640-060-fitlog-lite-agents/work/interaction-v09-2026-10-26/evidence/gestures-f/chromium-performance.json",
+    "sha256": "20af9797ac93cb301faa6cc6a6f9b730fe9ab6e96fb7d3462a0ee22183d13a96",
+    "metrics": {
+      "RunTask": {
+        "count": 106345,
+        "maxMs": 17.695,
+        "over50": 0
+      },
+      "Layout": {
+        "count": 2010,
+        "maxMs": 3.381,
+        "over50": 0
+      },
+      "UpdateLayoutTree": {
+        "count": 4526,
+        "maxMs": 1.622,
+        "over50": 0
+      },
+      "FireAnimationFrame": {
+        "count": 1345,
+        "maxMs": 3.481,
+        "over50": 0
+      }
+    }
+  },
+  "sortReceipt": {
+    "status": "PASS",
+    "rows": 40,
+    "rounds": 5,
+    "samples": [
+      {
+        "round": 0,
+        "dy": 30,
+        "top": 515.28125,
+        "start": 485.28125
+      },
+      {
+        "round": 0,
+        "dy": 70,
+        "top": 555.28125,
+        "start": 485.28125
+      },
+      {
+        "round": 0,
+        "dy": 120,
+        "top": 605.28125,
+        "start": 485.28125
+      },
+      {
+        "round": 1,
+        "dy": 30,
+        "top": 294.28125,
+        "start": 264.28125
+      },
+      {
+        "round": 1,
+        "dy": 70,
+        "top": 334.28125,
+        "start": 264.28125
+      },
+      {
+        "round": 1,
+        "dy": 120,
+        "top": 384.28125,
+        "start": 264.28125
+      },
+      {
+        "round": 2,
+        "dy": 30,
+        "top": 144.28125,
+        "start": 114.28125
+      },
+      {
+        "round": 2,
+        "dy": 70,
+        "top": 184.28125,
+        "start": 114.28125
+      },
+      {
+        "round": 2,
+        "dy": 120,
+        "top": 234.28125,
+        "start": 114.28125
+      },
+      {
+        "round": 3,
+        "dy": 30,
+        "top": 435.28125,
+        "start": 405.28125
+      },
+      {
+        "round": 3,
+        "dy": 70,
+        "top": 475.28125,
+        "start": 405.28125
+      },
+      {
+        "round": 3,
+        "dy": 120,
+        "top": 525.28125,
+        "start": 405.28125
+      },
+      {
+        "round": 4,
+        "dy": 30,
+        "top": 215.28125,
+        "start": 185.28125
+      },
+      {
+        "round": 4,
+        "dy": 70,
+        "top": 255.28125,
+        "start": 185.28125
+      },
+      {
+        "round": 4,
+        "dy": 120,
+        "top": 305.28125,
+        "start": 185.28125
+      }
+    ],
+    "all22Exact": true,
+    "metrics": {
+      "RunTask": {
+        "count": 24429,
+        "maxMs": 9.253,
+        "over50": 0
+      },
+      "Layout": {
+        "count": 135,
+        "maxMs": 2.073,
+        "over50": 0
+      },
+      "UpdateLayoutTree": {
+        "count": 546,
+        "maxMs": 1.767,
+        "over50": 0
+      },
+      "FireAnimationFrame": {
+        "count": 483,
+        "maxMs": 5.467,
+        "over50": 0
+      }
+    }
+  },
+  "sortTraceSha256": "b64db6ef698c019ffd1c58bac8610338b540b407cdc792556ad9923e3b6e0fa3"
+}

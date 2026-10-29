@@ -1,0 +1,112 @@
+[
+  {
+    "archive": "logs/build-c.log.gz",
+    "rawBytes": 1213,
+    "rawSha256": "f50768bfb80199ddfe1d9fed5090e4d6117e660632f56ded67c3db112cb89938"
+  },
+  {
+    "archive": "logs/daily-e-smoke-retry.log.gz",
+    "rawBytes": 1209,
+    "rawSha256": "7701f887f35a0336ec1eb1519ed92c614e7807029309d53c09a6a910088945e6"
+  },
+  {
+    "archive": "logs/edges-e-final.log.gz",
+    "rawBytes": 529,
+    "rawSha256": "69ec24c1346d67c63485a6f3859cb2920c0ecc9234a20e07ce00369457a322af"
+  },
+  {
+    "archive": "logs/edges-e.log.gz",
+    "rawBytes": 529,
+    "rawSha256": "69ec24c1346d67c63485a6f3859cb2920c0ecc9234a20e07ce00369457a322af"
+  },
+  {
+    "archive": "logs/edges-f.log.gz",
+    "rawBytes": 38,
+    "rawSha256": "218655567c7e4b7cccd1c16fc6ac955c9b5ca125f810e29763ec7b34e5a4e3b3"
+  },
+  {
+    "archive": "logs/edges-g-final.log.gz",
+    "rawBytes": 162,
+    "rawSha256": "bb1accb9fa3b9be3693674a4e76628d1d997c49116f6d1425bf0a55149fce923"
+  },
+  {
+    "archive": "logs/interactionV09.log-g.gz",
+    "rawBytes": 48,
+    "rawSha256": "2f46e65d5423422548d698e75c2b5d3bdf67528e27d22fdec0f85c2e78aa45c2"
+  },
+  {
+    "archive": "logs/interactionV09Edges.log-g.gz",
+    "rawBytes": 38,
+    "rawSha256": "218655567c7e4b7cccd1c16fc6ac955c9b5ca125f810e29763ec7b34e5a4e3b3"
+  },
+  {
+    "archive": "logs/interactionV09Gestures.log-g.gz",
+    "rawBytes": 44,
+    "rawSha256": "90abec1ee71742514a50da049663a492560ff70c9c13455a4bca7a9893e4035d"
+  },
+  {
+    "archive": "logs/joint-e-final-chromium.log.gz",
+    "rawBytes": 6458,
+    "rawSha256": "7fabdf24a55b760d80fed5125028b9af0f73fa052076f86bd15e1013c1f02129"
+  },
+  {
+    "archive": "logs/joint-e-final-webkit.log.gz",
+    "rawBytes": 7102,
+    "rawSha256": "05753673c54757e8bec01a24e8d5f7fe25787f21056e9410a86c440d3762807c"
+  },
+  {
+    "archive": "logs/navigation-flicker-g.log.gz",
+    "rawBytes": 1658,
+    "rawSha256": "37e5644e85d74a7d5574e07fa6ae7a00ee33034b7e8fa17bb812eebc22f7754c"
+  },
+  {
+    "archive": "logs/npm-ci.log.gz",
+    "rawBytes": 518,
+    "rawSha256": "b5aade1a8a4c5b2002c8f76c7d304f3527b57b88af4d39920b146dba4d896632"
+  },
+  {
+    "archive": "logs/sort-frames-g.log.gz",
+    "rawBytes": 50,
+    "rawSha256": "c5f1c0fc62474deefc41b101424d053e65178df9d6e7744aaddc179c3aca8e44"
+  },
+  {
+    "archive": "logs/start-client-build.log.gz",
+    "rawBytes": 1213,
+    "rawSha256": "ce916f89adf8442fa17c93acf2fbca6562594dfec27ab1913279a6e942ae150a"
+  },
+  {
+    "archive": "logs/typecheck-f.log.gz",
+    "rawBytes": 47,
+    "rawSha256": "71e9696712d8a6ac6e10955633641e90ffbe0f22331092ac0f60da8781e47f40"
+  },
+  {
+    "archive": "logs/typecheck-g.log.gz",
+    "rawBytes": 47,
+    "rawSha256": "71e9696712d8a6ac6e10955633641e90ffbe0f22331092ac0f60da8781e47f40"
+  },
+  {
+    "archive": "logs/unifiedExperience.log-g.gz",
+    "rawBytes": 37960,
+    "rawSha256": "7b6c6f45d701dbcd8b4fae2d92e5358934c59028bff20deaf0bb8b657cdd583c"
+  },
+  {
+    "archive": "logs/unit-d.log.gz",
+    "rawBytes": 515,
+    "rawSha256": "7c96485970e8eb7780daf8838c0327cfa18cefa53607a12970e58de482f90a16"
+  },
+  {
+    "archive": "logs/unit-f.log.gz",
+    "rawBytes": 515,
+    "rawSha256": "644cceea2353416f5c227557ebfe8a8e9c325723db1e06c0f1f370b447dd8097"
+  },
+  {
+    "archive": "logs/visual-final-g.log.gz",
+    "rawBytes": 194,
+    "rawSha256": "9159e43d62b26955a252936989991f30e12b9254d88606d2d03baee67e8ef37e"
+  },
+  {
+    "archive": "logs/visual-final.log.gz",
+    "rawBytes": 194,
+    "rawSha256": "9159e43d62b26955a252936989991f30e12b9254d88606d2d03baee67e8ef37e"
+  }
+]

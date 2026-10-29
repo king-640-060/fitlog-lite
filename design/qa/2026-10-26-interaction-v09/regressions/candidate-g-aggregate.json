@@ -1,0 +1,131 @@
+{
+  "run": "40879663483",
+  "commit": "902f8cde48686b6781c7bb6bff6e194f0ce2917e",
+  "total": 10,
+  "PASS": 10,
+  "FAIL": 0,
+  "sourceFiles": 181,
+  "allRunnerSourceMatchesFinalG": true,
+  "results": [
+    {
+      "name": "joint-chromium",
+      "file": "jointUxReportsRange",
+      "start": "2026-10-29T13:13:02.580Z",
+      "end": "2026-10-29T13:16:30.447Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "aa92794d66aefc658a3aff26299e15258901785bf9a3ee21d43ca9c48a23b96d",
+      "tag": "g-joint-chromium-320",
+      "fullJoint": true,
+      "width": "320"
+    },
+    {
+      "name": "joint-chromium",
+      "file": "jointUxReportsRange",
+      "start": "2026-10-29T13:12:27.135Z",
+      "end": "2026-10-29T13:15:14.622Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "aa92794d66aefc658a3aff26299e15258901785bf9a3ee21d43ca9c48a23b96d",
+      "tag": "g-joint-chromium-375",
+      "fullJoint": true,
+      "width": "375"
+    },
+    {
+      "name": "joint-chromium",
+      "file": "jointUxReportsRange",
+      "start": "2026-10-29T13:17:46.486Z",
+      "end": "2026-10-29T13:21:24.950Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "aa92794d66aefc658a3aff26299e15258901785bf9a3ee21d43ca9c48a23b96d",
+      "tag": "g-joint-chromium-390",
+      "fullJoint": true,
+      "width": "390"
+    },
+    {
+      "name": "joint-chromium",
+      "file": "jointUxReportsRange",
+      "start": "2026-10-29T13:17:31.479Z",
+      "end": "2026-10-29T13:20:42.286Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "aa92794d66aefc658a3aff26299e15258901785bf9a3ee21d43ca9c48a23b96d",
+      "tag": "g-joint-chromium-430",
+      "fullJoint": true,
+      "width": "430"
+    },
+    {
+      "name": "joint-chromium",
+      "file": "jointUxReportsRange",
+      "start": "2026-10-29T13:16:26.476Z",
+      "end": "2026-10-29T13:19:42.714Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "aa92794d66aefc658a3aff26299e15258901785bf9a3ee21d43ca9c48a23b96d",
+      "tag": "g-joint-chromium-844",
+      "fullJoint": true,
+      "width": "844"
+    },
+    {
+      "name": "joint-webkit",
+      "file": "jointUxReportsRange",
+      "start": "2026-10-29T13:12:55.853Z",
+      "end": "2026-10-29T13:16:18.948Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "aa92794d66aefc658a3aff26299e15258901785bf9a3ee21d43ca9c48a23b96d",
+      "tag": "g-joint-webkit-320",
+      "fullJoint": true,
+      "width": "320"
+    },
+    {
+      "name": "joint-webkit",
+      "file": "jointUxReportsRange",
+      "start": "2026-10-29T13:12:45.538Z",
+      "end": "2026-10-29T13:15:54.471Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "aa92794d66aefc658a3aff26299e15258901785bf9a3ee21d43ca9c48a23b96d",
+      "tag": "g-joint-webkit-375",
+      "fullJoint": true,
+      "width": "375"
+    },
+    {
+      "name": "joint-webkit",
+      "file": "jointUxReportsRange",
+      "start": "2026-10-29T13:12:30.262Z",
+      "end": "2026-10-29T13:15:59.744Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "aa92794d66aefc658a3aff26299e15258901785bf9a3ee21d43ca9c48a23b96d",
+      "tag": "g-joint-webkit-390",
+      "fullJoint": true,
+      "width": "390"
+    },
+    {
+      "name": "joint-webkit",
+      "file": "jointUxReportsRange",
+      "start": "2026-10-29T13:17:46.852Z",
+      "end": "2026-10-29T13:20:57.757Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "aa92794d66aefc658a3aff26299e15258901785bf9a3ee21d43ca9c48a23b96d",
+      "tag": "g-joint-webkit-430",
+      "fullJoint": true,
+      "width": "430"
+    },
+    {
+      "name": "joint-webkit",
+      "file": "jointUxReportsRange",
+      "start": "2026-10-29T13:18:12.966Z",
+      "end": "2026-10-29T13:21:52.675Z",
+      "exitCode": 0,
+      "status": "PASS",
+      "testSourceSha": "aa92794d66aefc658a3aff26299e15258901785bf9a3ee21d43ca9c48a23b96d",
+      "tag": "g-joint-webkit-844",
+      "fullJoint": true,
+      "width": "844"
+    }
+  ]
+}

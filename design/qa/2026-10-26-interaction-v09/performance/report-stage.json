@@ -1,0 +1,39 @@
+{
+  "RunTask": {
+    "count": 105842,
+    "maxMs": 17.728,
+    "over50": 0,
+    "totalMs": 7901.913000004895
+  },
+  "FunctionCall": {
+    "count": 33937,
+    "maxMs": 10.734,
+    "over50": 0,
+    "totalMs": 359.872999999911
+  },
+  "Layout": {
+    "count": 2097,
+    "maxMs": 4.869,
+    "over50": 0,
+    "totalMs": 232.4780000000001
+  },
+  "UpdateLayoutTree": {
+    "count": 4616,
+    "maxMs": 2.098,
+    "over50": 0,
+    "totalMs": 356.1889999999945
+  },
+  "FireAnimationFrame": {
+    "count": 1361,
+    "maxMs": 3.392,
+    "over50": 0,
+    "totalMs": 279.086
+  },
+  "Paint": {
+    "count": 5601,
+    "maxMs": 0.944,
+    "over50": 0,
+    "totalMs": 212.09799999999962
+  },
+  "longTop": []
+}

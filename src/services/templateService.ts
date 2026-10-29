@@ -51,10 +51,15 @@ export function normalizeWorkoutTemplate(template: Partial<WorkoutTemplate>): Wo
   }
 }
 
-export async function saveWorkoutTemplate(template: Partial<WorkoutTemplate>, database: FitLogDatabase = db): Promise<WorkoutTemplate> {
+export async function saveWorkoutTemplate(template: Partial<WorkoutTemplate>, database: FitLogDatabase = db, expectedFingerprint?: string): Promise<WorkoutTemplate> {
   const normalized = normalizeWorkoutTemplate(template)
-  await database.workoutTemplates.put(normalized)
-  return normalized
+  return database.transaction('rw', database.workoutTemplates, async()=>{
+    const source=await database.workoutTemplates.get(normalized.id)
+    if(expectedFingerprint!==undefined && JSON.stringify(source??null)!==expectedFingerprint)throw new Error('训练模板已变化，请重新打开；当前草稿未覆盖已保存内容')
+    const facts=(t:Partial<WorkoutTemplate>)=>JSON.stringify({...t,exercises:[...(t.exercises??[])].sort((a,b)=>a.id.localeCompare(b.id))})
+    const saved=source&&expectedFingerprint!==undefined&&facts(source)===facts(template)?{...source,exercises:template.exercises!,updatedAt:normalized.updatedAt}:normalized
+    await database.workoutTemplates.put(saved);return saved
+  })
 }
 
 export function workoutTemplateFromWorkout(workout: Workout, name: string): WorkoutTemplate {
@@ -155,10 +160,15 @@ export function normalizeDietTemplate(template: Partial<DietTemplate>): DietTemp
   }
 }
 
-export async function saveDietTemplate(template: Partial<DietTemplate>, database: FitLogDatabase = db): Promise<DietTemplate> {
+export async function saveDietTemplate(template: Partial<DietTemplate>, database: FitLogDatabase = db, expectedFingerprint?: string): Promise<DietTemplate> {
   const normalized = normalizeDietTemplate(template)
-  await database.dietTemplates.put(normalized)
-  return normalized
+  return database.transaction('rw',database.dietTemplates,async()=>{
+    const source=await database.dietTemplates.get(normalized.id)
+    if(expectedFingerprint!==undefined&&JSON.stringify(source??null)!==expectedFingerprint)throw new Error('饮食模板已变化，请重新打开；当前草稿未覆盖已保存内容')
+    const facts=(t:Partial<DietTemplate>)=>JSON.stringify({...t,items:[...(t.items??[])].sort((a,b)=>a.id.localeCompare(b.id))})
+    const saved=source&&expectedFingerprint!==undefined&&facts(source)===facts(template)?{...source,items:template.items!,updatedAt:normalized.updatedAt}:normalized
+    await database.dietTemplates.put(saved);return saved
+  })
 }
 
 export function dietTemplateItemFromFood(food: Food, grams: number): DietTemplateItem {

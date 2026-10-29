@@ -1,0 +1,823 @@
+{
+  "url": "http://127.0.0.1:5470/",
+  "results": [
+    {
+      "engine": "chromium",
+      "status": "PASS",
+      "input": "native Chromium CDP touch",
+      "samples": [
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 25,
+          "cancel": true,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -8.958934783935547,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 349.04107666015625,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 60,
+          "cancel": true,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -44,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 314,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 100,
+          "cancel": true,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -84,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 274,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 150,
+          "cancel": true,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -134,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 224,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 175,
+          "cancel": true,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -159,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 199,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 25,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -9,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 349,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 60,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -44,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 314,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 100,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -84,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 274,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 150,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -134,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 224,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 175,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -159,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 199,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".progress-deck-root > .page-tabs",
+          "distance": 25,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -9,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 349,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".progress-deck-root > .page-tabs",
+          "distance": 60,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -44,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 314,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".progress-deck-root > .page-tabs",
+          "distance": 100,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -84,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 274,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".progress-deck-root > .page-tabs",
+          "distance": 150,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -134,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 224,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".progress-deck-root > .page-tabs",
+          "distance": 175,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -159,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 199,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".report-daily-shell > .report-mode",
+          "distance": 25,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -9,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 349,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".report-daily-shell > .report-mode",
+          "distance": 60,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -44,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 314,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".report-daily-shell > .report-mode",
+          "distance": 100,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -84,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 274,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".report-daily-shell > .report-mode",
+          "distance": 150,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -134,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 224,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".report-daily-shell > .report-mode",
+          "distance": 175,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -159,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 199,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        }
+      ],
+      "all22Exact": true,
+      "physicalIPhone": "Pending"
+    },
+    {
+      "engine": "webkit",
+      "status": "PASS",
+      "input": "WebKit synthetic touch-event branch",
+      "samples": [
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 25,
+          "cancel": true,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -9,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 349,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 60,
+          "cancel": true,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -44,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 314,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 100,
+          "cancel": true,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -84,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 274,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 150,
+          "cancel": true,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -134,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 224,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 175,
+          "cancel": true,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -159,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 199,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 25,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -9,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 349,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 60,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -44,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 314,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 100,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -84,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 274,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 150,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -134,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 224,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".meal-fixed-tabs",
+          "distance": 175,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -159,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 199,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".progress-deck-root > .page-tabs",
+          "distance": 25,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -9,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 349,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".progress-deck-root > .page-tabs",
+          "distance": 60,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -44,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 314,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".progress-deck-root > .page-tabs",
+          "distance": 100,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -84,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 274,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".progress-deck-root > .page-tabs",
+          "distance": 150,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -134,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 224,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".progress-deck-root > .page-tabs",
+          "distance": 175,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -159,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 199,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".report-daily-shell > .report-mode",
+          "distance": 25,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -9,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 349,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".report-daily-shell > .report-mode",
+          "distance": 60,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -44,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 314,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".report-daily-shell > .report-mode",
+          "distance": 100,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -84,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 274,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".report-daily-shell > .report-mode",
+          "distance": 150,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -134,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 224,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        },
+        {
+          "nav": ".report-daily-shell > .report-mode",
+          "distance": 175,
+          "cancel": false,
+          "measured": {
+            "width": 358,
+            "children": [
+              {
+                "x": -159,
+                "width": 358,
+                "neighbor": false
+              },
+              {
+                "x": 199,
+                "width": 358,
+                "neighbor": true
+              }
+            ]
+          }
+        }
+      ],
+      "all22Exact": true,
+      "physicalIPhone": "Pending"
+    }
+  ]
+}

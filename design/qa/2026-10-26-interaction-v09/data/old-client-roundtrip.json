@@ -1,0 +1,24 @@
+[
+  {
+    "engine": "chromium",
+    "version": "151.0.7922.34",
+    "frozenStart": "8dac27a4399f6ab0a279308ad5f298bf25ca1482",
+    "oldToNew": true,
+    "newSnapshotNameToOld": true,
+    "all22StoresExact": true,
+    "backup14": true,
+    "encryptedSync1": true,
+    "status": "PASS"
+  },
+  {
+    "engine": "webkit",
+    "version": "26.5",
+    "frozenStart": "8dac27a4399f6ab0a279308ad5f298bf25ca1482",
+    "oldToNew": true,
+    "newSnapshotNameToOld": true,
+    "all22StoresExact": true,
+    "backup14": true,
+    "encryptedSync1": true,
+    "status": "PASS"
+  }
+]

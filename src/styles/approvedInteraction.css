@@ -1,0 +1,68 @@
+/* Approved v0.9 local interaction anatomy; all colors follow existing themes. */
+.sort-handle { flex:0 0 44px; width:44px; min-height:44px; padding:0; touch-action:none; cursor:grab; color:var(--text-tertiary); user-select:none; }
+.sort-handle:active { cursor:grabbing; }
+.sort-placeholder { box-sizing:border-box; flex:none; border:1px dashed var(--border); border-radius:var(--radius-md); background:var(--surface-soft); }
+.is-sorting { box-shadow:var(--shadow-float); opacity:.96; background:var(--surface); transition:none !important; will-change:transform; }
+.local-deck-stage { position:relative; min-width:0; overflow:clip; }
+.local-deck-page { width:100%; min-width:0; box-sizing:border-box; }
+.local-deck-neighbor { position:absolute; top:0; left:0; }
+.local-deck-stage[data-dragging] > .local-deck-page { will-change:transform; }
+.meal-fixed-tabs { display:flex; width:100%; gap:2px; padding:4px; border-radius:12px; background:var(--surface-soft); }
+.meal-fixed-tabs button { flex:1 1 0; min-width:0; min-height:44px; padding:8px 2px; white-space:normal; overflow-wrap:anywhere; font-size:.875rem; }
+.meal-fixed-tabs button.active { background:var(--surface); color:var(--accent-strong); }
+.diet-meal-deck { min-width:0; }
+.diet-meal-stage { margin-top:10px; }
+.diet-sort-list { display:grid; gap:6px; min-width:0; }
+.diet-meal-stage > .diet-template-meal { border:0; padding:0; border-radius:0; }
+.diet-template-meal .sortable-food { display:grid; grid-template-columns:44px minmax(0,1fr) 44px; align-items:start; gap:0; padding:0; margin:0; border:1px solid var(--border); border-radius:15px; background:var(--surface); overflow:hidden; }
+.sortable-food > .sort-handle { height:100%; align-self:stretch; border-radius:0; border-inline-end:1px solid var(--border); background:var(--surface-soft); }
+.sortable-food > .danger { margin-top:4px; }
+.sortable-food-copy { display:grid; gap:3px; min-width:0; padding:10px 6px 10px 10px; overflow-wrap:anywhere; }
+.sortable-food-copy strong { white-space:normal; overflow-wrap:anywhere; font-size:.9375rem; }
+.sortable-food-copy small { color:var(--text-secondary); }
+.sortable-food-copy label { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:6px; font-size:.8125rem; }
+.sortable-food-copy label input { flex:1 1 5rem; width:5rem; min-width:0; min-height:44px; font-size:1rem; }
+.form.template-editor .sortable-food-copy label { display:flex; flex-wrap:nowrap; }
+.form .sortable-food-copy label > span:not(.sr-only) { position:static; flex:none; font-size:1rem; }
+.form .sortable-food-copy label > input:has(+ span) { padding-right:8px; }
+.diet-item-actions { display:grid; padding-top:4px; }
+.diet-template-modes { display:flex; flex-wrap:wrap; }
+.diet-template-modes > button { flex:1 1 8.5rem; }
+#workout-exercises > .exercise-card, .template-editor-items > .template-exercise { position:relative; }
+.exercise-card .exercise-head { gap:4px; padding:6px; align-items:center; flex-wrap:wrap; }
+.exercise-head h3 { flex:1 1 5rem; min-width:0; overflow-wrap:anywhere; font-size:1rem; }
+.exercise-head > .sort-handle + div { flex:1 1 5rem; min-width:0; }
+.exercise-head .text-btn { min-height:44px; padding:6px; }
+.exercise-card .sets { padding-inline:10px; }
+.exercise-card .set-note { margin-top:2px; }
+.progress-deck-root { display:flex; flex-direction:column; min-height:0; min-width:0; }
+/* Progress owns internal scrollers. The document's general 120px focus reserve
+   must not scroll all ancestor navigation when a visible period button is focused. */
+html:has(#view > .progress-deck-root) { scroll-padding-block:0; }
+.progress-deck-root > .page-tabs { flex:none; }
+.progress-deck-root > .local-deck-stage, .report-deck-shell > .local-deck-stage, .report-daily-shell > .local-deck-stage { flex:1 1 auto; min-height:0; }
+.progress-deck-root .local-deck-page { height:100%; }
+.deck-scroll { overflow-y:auto; overscroll-behavior-y:contain; padding-bottom:20px; }
+.report-deck-shell,.report-daily-shell { display:flex; flex-direction:column; min-height:0; height:100%; min-width:0; }
+.report-daily-shell { container-type:inline-size; }
+.report-daily-shell > .report-mode { grid-template-columns:repeat(4,minmax(0,1fr)); }
+@container (max-width:17rem) { .report-daily-shell > .report-mode { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.report-deck-shell > .report-kinds, .report-daily-shell > .report-mode { flex:none; }
+.progress-deck-root .report-page { min-width:0; }
+@media(prefers-reduced-motion:reduce) { .is-sorting { will-change:auto; } }
+#workout-exercises > .exercise-card, .template-editor-items > .template-exercise { display:grid; grid-template-columns:44px minmax(0,1fr); }
+.exercise-card > .sort-handle { height:100%; align-self:stretch; border-radius:0; border-inline-end:1px solid var(--border); background:var(--surface-soft); }
+.exercise-main { min-width:0; }
+.exercise-main .exercise-head { padding:6px 4px; }
+.exercise-main .exercise-head h3 { font-size:.9375rem; }
+.exercise-main .set-header,.exercise-main .set-row { grid-template-columns:20px minmax(0,1fr) minmax(0,1fr) 44px; gap:5px; }
+.exercise-main .set-row input { min-width:0; padding-inline:4px; }
+.exercise-main .set-note { grid-column:2/4; }
+.local-deck-nav { position:relative; isolation:isolate; }
+.local-deck-nav > button { position:relative; z-index:1; }
+.local-deck-nav > button.active { background:transparent !important; }
+.local-deck-indicator { position:absolute; z-index:0; pointer-events:none; border-radius:10px; background:var(--accent-soft); }
+.page-tabs.local-deck-nav > .local-deck-indicator { border-radius:0; background:transparent; border-bottom:3px solid var(--accent); }
+.page-tabs.local-deck-nav > button::after { display:none; }
+.meal-fixed-tabs.segmented { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); }
+.meal-fixed-tabs [data-diet-meal-tab="unclassified"], .meal-fixed-tabs [data-diet-meal-tab="combo"] { grid-column:1/-1; }

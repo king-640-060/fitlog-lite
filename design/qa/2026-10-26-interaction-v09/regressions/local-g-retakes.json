@@ -1,0 +1,33 @@
+{
+  "source": "candidate-g-source.json",
+  "results": [
+    {
+      "file": "interactionV09",
+      "start": "2026-10-29T12:34:21.160Z",
+      "end": "2026-10-29T12:35:24.715Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "interactionV09Gestures",
+      "start": "2026-10-29T12:35:24.716Z",
+      "end": "2026-10-29T12:36:32.618Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "interactionV09Edges",
+      "start": "2026-10-29T12:36:32.620Z",
+      "end": "2026-10-29T12:36:43.881Z",
+      "exitCode": 0,
+      "status": "PASS"
+    },
+    {
+      "file": "unifiedExperience",
+      "start": "2026-10-29T12:36:43.882Z",
+      "end": "2026-10-29T12:53:48.463Z",
+      "exitCode": 0,
+      "status": "PASS"
+    }
+  ]
+}

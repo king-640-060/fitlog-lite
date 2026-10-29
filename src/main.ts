@@ -1,3 +1,5 @@
+import { bindSortableList, reorderByIds, sortHandleHtml } from './ui/sortableList'
+import { createLocalDeck, type DeckPage } from './ui/localDeck'
 import { createFoodDateNavigation } from './ui/foodDateNavigation'
 import { createPageNavigation, type NavigationPreview } from './ui/horizontalNavigation'
 import { replaceReportHtml } from './ui/reportChapters'
@@ -57,6 +59,7 @@ import './styles/history.css'
 import './styles/horizontalNavigation.css'
 import './styles/management.css'
 import './styles/lightNative.css'
+import './styles/approvedInteraction.css'
 import { showNutritionStrategyPicker, showNutritionStrategyManager } from './ui/nutritionStrategies'
 import { bindEnergyEditor } from './ui/energyEditor'
 import { showFoodVisionImport } from './ui/foodVisionImport'
@@ -90,7 +93,7 @@ import {
 import { workoutDisplayName, workoutTimeFacts, WORKOUT_NAME_MAX_LENGTH } from './utils/workoutName'
 import { saveWorkoutName, workoutFingerprint, createWorkout, findOpenWorkout, finishWorkout, normalizeWorkoutForSave, saveExercise, saveWorkout, WorkoutAutosaveController } from './services/workoutService'
 import {
-  dietFoodsFingerprint, moveDietTemplateItem, applyDietTemplate, dietTemplateFromLogs, dietTemplateItemFromFood, duplicateDietTemplate, duplicateWorkoutTemplate,
+  dietFoodsFingerprint, applyDietTemplate, dietTemplateFromLogs, dietTemplateItemFromFood, duplicateDietTemplate, duplicateWorkoutTemplate,
   resolveDietTemplateFoods, saveDietTemplate, saveWorkoutTemplate,
   sortTemplates, startWorkoutFromTemplate, saveWorkoutAsTemplateSnapshot,
 } from './services/templateService'
@@ -237,7 +240,7 @@ function fail(error: unknown): void {
 const workoutRevisions = new WeakMap<Workout, string>()
 const workoutAutosave = new WorkoutAutosaveController(
   async workout => {
-    const saved = await saveWorkout(workout, db, { requireExisting:true, expectedFingerprint:workoutRevisions.get(workout) })
+    const saved = await saveWorkout(workout, db, { requireExisting:true, expectedFingerprint:workoutRevisions.get(workout), preserveUntouchedFacts:true })
     workoutRevisions.set(workout, workoutFingerprint(saved))
     workout.updatedAt = saved.updatedAt
   },
@@ -312,6 +315,8 @@ function pageHeaderHtml(tab: Tab): string {
 }
 
 async function render(): Promise<void> {
+  workoutSortDispose?.(); workoutSortDispose=undefined
+  progressDeckDispose?.(); progressDeckDispose=undefined
   pageNavigation?.interrupt()
   foodNavigation?.destroy(); foodNavigation = undefined
   recordsDispose?.();recordsDispose=undefined
@@ -382,6 +387,8 @@ function activateTabPreview(tab: Tab, prepared: NavigationPreview): HTMLElement 
   const element = prepared.element, view = element.querySelector<HTMLElement>('[data-preview-tab]')!
   const bind = previewActivators.get(view)
   if (!bind || !element.isConnected) throw new Error('预备页面已失效，请重新切换')
+  workoutSortDispose?.(); workoutSortDispose=undefined
+  progressDeckDispose?.();progressDeckDispose=undefined
   foodNavigation?.destroy(); foodNavigation = undefined
   recordsDispose?.(); recordsDispose = undefined
   nutritionDispose?.(); nutritionDispose = undefined
@@ -431,9 +438,7 @@ async function prepareTabPreview(tab: Tab, signal: AbortSignal): Promise<Navigat
     else if (tab === 'plan') await renderPlanPage(view)
     else if (tab === 'food') await renderFoodPage(view)
     else if (tab === 'workout') await renderWorkoutPage(view)
-    else if (progressView === 'trend') await renderWeightPage(true, view)
-    else if (progressView === 'calendar') await renderCalendarOverview(true, view)
-    else await renderReportsPage(view)
+    else await renderProgressPage(view)
     if (signal.aborted) throw new DOMException('Navigation canceled', 'AbortError')
     concealIds()
     // Flush real layout/Chart.js before exposure; no route requery or visible commit render follows.
@@ -674,6 +679,13 @@ async function renderTodayPage(preview?: HTMLElement): Promise<void> {
 
 /** Keep tab controls connected so reversible CSS transitions survive content replacement. */
 function setTabbedViewHtml(view: HTMLElement, html: string): boolean {
+  if (view.closest('.progress-deck-root')) {
+    // Local deck owns all navigation tiers before any asynchronous chart mounting.
+    // Do not briefly insert duplicate legacy controls into a prepared leaf.
+    const content=document.createElement('div');content.innerHTML=html
+    content.querySelectorAll('.page-tabs,.report-kinds,.report-mode').forEach(node=>node.remove())
+    view.replaceChildren(...content.childNodes);return false
+  }
   const oldTabs = view.querySelector<HTMLElement>('.page-tabs, .plan-tabs')
   if (!oldTabs) { view.innerHTML = html; return false }
   const fresh = document.createElement('div'); fresh.innerHTML = html
@@ -693,29 +705,103 @@ function progressTabsHtml(): string {
   return `<div class="page-tabs" role="tablist" aria-label="进度视图"><button role="tab" data-progress-view="trend" class="${progressView === 'trend' ? 'active' : ''}" aria-selected="${progressView === 'trend'}">趋势</button><button role="tab" data-progress-view="calendar" class="${progressView === 'calendar' ? 'active' : ''}" aria-selected="${progressView === 'calendar'}">日历</button><button role="tab" data-progress-view="reports" class="${progressView === 'reports' ? 'active' : ''}" aria-selected="${progressView === 'reports'}">报告</button></div>`
 }
 
-function bindProgressTabs(root: ParentNode = document): void {
-  root.querySelectorAll<HTMLButtonElement>('[data-progress-view]').forEach((button) => button.addEventListener('click', () => {
-    if (progressView === button.dataset.progressView) return
-    progressView = button.dataset.progressView as ProgressView
-    void render().catch(fail)
-  }))
+// Progress uses three independently owned decks; no layer changes its parent's geometry.
+let progressDeckDispose:(()=>void)|undefined
+let dailyReportMode:ReportMode|'custom'='week'
+const progressScroll=new Map<string,number>(),kindScroll=new Map<string,number>(),periodScroll=new Map<string,number>()
+function bindProgressTabs(_root:ParentNode=document):void { /* owned by the local Progress deck */ }
+function activateOwnedPage(host:HTMLElement):()=>void {
+  const previousRecords=recordsDispose,previousRecovery=recoveryDispose
+  recordsDispose=undefined;recoveryDispose=undefined
+  previewActivators.get(host)?.();previewActivators.delete(host)
+  const disposeRecords=recordsDispose as (()=>void)|undefined,disposeRecovery=recoveryDispose as (()=>void)|undefined
+  recordsDispose=previousRecords;recoveryDispose=previousRecovery
+  return ()=>{disposeRecords?.();disposeRecovery?.()}
 }
-
-async function renderProgressPage(): Promise<void> {
-  recordsDispose?.();recordsDispose=undefined
-  recoveryDispose?.(); recoveryDispose = undefined
-  if (progressView === 'trend') { await renderWeightPage(true); return }
-  if (progressView === 'calendar') { await renderCalendarOverview(true); return }
-  await renderReportsPage()
+function minimumProgressHeight(root:HTMLElement):number {
+  // Measure the same three navigation tiers even when a different page is active.
+  // In a short landscape viewport, reserve a usable native content scroller instead
+  // of shrinking it below a touch target. The outer page remains natively scrollable.
+  const probe=document.createElement('div')
+  probe.className='report-deck-shell';probe.inert=true;probe.setAttribute('aria-hidden','true')
+  Object.assign(probe.style,{position:'absolute',visibility:'hidden',width:`${root.clientWidth}px`,height:'auto',pointerEvents:'none'})
+  probe.innerHTML=`${reportKindsHtml(false)}<div class="report-daily-shell"><div class="report-mode"><button type="button">日报</button><button type="button">周报</button><button type="button">月报</button><button type="button">自定义</button></div><div class="deck-scroll"></div></div>`
+  root.append(probe)
+  const extent=(node:Element)=>{const css=getComputedStyle(node);return node.getBoundingClientRect().height+parseFloat(css.marginTop)+parseFloat(css.marginBottom)}
+  const padding=parseFloat(getComputedStyle(probe.querySelector('.deck-scroll')!).paddingBottom)
+  const minimum=extent(root.querySelector('.page-tabs')!)+extent(probe.querySelector('.report-kinds')!)+extent(probe.querySelector('.report-mode')!)+44+padding
+  probe.remove();return minimum
+}
+async function renderProgressPage(preview?:HTMLElement):Promise<void> {
+  const view=preview??document.querySelector<HTMLElement>('#view')!
+  if(!preview){progressDeckDispose?.();progressDeckDispose=undefined;recordsDispose?.();recordsDispose=undefined;recoveryDispose?.();recoveryDispose=undefined}
+  view.innerHTML=`<section class="progress-deck-root">${progressTabsHtml()}<div class="progress-deck-stage"></div></section>`
+  const root=view.querySelector<HTMLElement>('.progress-deck-root')!,stage=root.querySelector<HTMLElement>('.progress-deck-stage')!
+  const prepare=async(key:string,signal:AbortSignal):Promise<DeckPage>=>{
+    const host=document.createElement('div');host.className=(key==='reports'?'report-deck-shell':'deck-scroll')+' local-deck-page local-deck-neighbor';host.style.visibility='hidden';host.dataset.renderVersion=String(++rootRenderVersion);stage.append(host)
+    let dispose=()=>{},active=false
+    const release=()=>{dispose();previewDisposers.get(host)?.();previewDisposers.delete(host);previewActivators.delete(host)}
+    try{
+      if(key==='reports')return await prepareReportDeck(host,signal)
+      if(key==='trend')await renderWeightPage(true,host);else await renderCalendarOverview(false,host)
+      host.querySelector('.page-tabs')?.remove()
+      if(signal.aborted)throw new DOMException('Canceled','AbortError')
+      return {element:host,activate:()=>{if(active)return;active=true;previewDisposers.delete(host);dispose=activateOwnedPage(host)},dispose:release}
+    }catch(error){release();host.remove();throw error}
+  }
+  const controller=new AbortController(),initial=await prepare(progressView,controller.signal)
+  if(!view.isConnected){initial.dispose();return}
+  const deck=createLocalDeck({root,nav:root.querySelector('.page-tabs')!,stage,keys:['trend','calendar','reports'],active:progressView,initial,prepare,selected:key=>{progressView=key as ProgressView},buttonAttribute:'data-progress-view',positions:progressScroll,fail})
+  const measure=()=>{const frame=root.closest<HTMLElement>('.app-frame')!;const reserve=parseFloat(getComputedStyle(frame).paddingBottom);const top=root.getBoundingClientRect().top+window.scrollY;root.style.height=`${Math.max(minimumProgressHeight(root),innerHeight-top-reserve)}px`}
+  const resize=new ResizeObserver(measure);const topbar=view.closest('.page-current,.page-preview')?.querySelector('.topbar');if(topbar)resize.observe(topbar);const nav=app.querySelector('.bottom-nav');if(nav)resize.observe(nav);window.addEventListener('resize',measure);measure()
+  const release=()=>{controller.abort();deck.destroy();resize.disconnect();window.removeEventListener('resize',measure)}
+  if(preview)previewDisposers.set(view,release)
+  activatePage(view,preview,()=>{initial.activate?.();progressDeckDispose=release})
+}
+async function prepareReportDeck(host:HTMLElement,signal:AbortSignal):Promise<DeckPage>{
+  const kind=reportMode==='cycle'?'cycle':'daily'
+  if(reportMode!=='cycle')dailyReportMode=reportMode
+  host.innerHTML=`${reportKindsHtml(kind==='cycle')}<div class="report-type-stage"></div>`
+  const stage=host.querySelector<HTMLElement>('.report-type-stage')!
+  const prepare=async(key:string,request:AbortSignal):Promise<DeckPage>=>{
+    const page=document.createElement('div');page.className='local-deck-page local-deck-neighbor';page.style.visibility='hidden';page.dataset.renderVersion=String(++rootRenderVersion);stage.append(page)
+    if(key==='daily'){
+      page.classList.add('report-daily-shell')
+      page.innerHTML=`<div class="report-mode" role="group" aria-label="报告周期">${(['day','week','month','custom'] as const).map(m=>`<button type="button" data-report-mode="${m}" class="${dailyReportMode===m?'active':''}" aria-pressed="${dailyReportMode===m}">${m==='day'?'日报':m==='week'?'周报':m==='month'?'月报':'自定义'}</button>`).join('')}</div><div class="report-period-stage"></div>`
+      const leafStage=page.querySelector<HTMLElement>('.report-period-stage')!
+      const prepareLeaf=async(mode:string,read:AbortSignal)=>{
+        const leaf=document.createElement('div');leaf.className='deck-scroll local-deck-page local-deck-neighbor';leaf.style.visibility='hidden';leaf.dataset.renderVersion=String(++rootRenderVersion);leafStage.append(leaf)
+        const releasePending=()=>{previewDisposers.get(leaf)?.();previewDisposers.delete(leaf);previewActivators.delete(leaf);leaf.remove()}
+        read.addEventListener('abort',releasePending,{once:true})
+        try {
+          await renderReportsPage(leaf,mode as ReportMode|'custom');leaf.querySelector('.page-tabs')?.remove();leaf.querySelector('.report-kinds')?.remove();leaf.querySelector('.report-mode')?.remove()
+          if(read.aborted)throw new DOMException('Canceled','AbortError')
+          let dispose=()=>{},activated=false
+          return {element:leaf,activate:()=>{if(activated)return;activated=true;previewDisposers.delete(leaf);dispose=activateOwnedPage(leaf)},dispose:()=>{dispose();previewDisposers.get(leaf)?.();previewDisposers.delete(leaf);previewActivators.delete(leaf)}}
+        } catch(error) { releasePending();throw error }
+        finally { read.removeEventListener('abort',releasePending) }
+      }
+      const initial=await prepareLeaf(dailyReportMode,request)
+      const deck=createLocalDeck({root:page,nav:page.querySelector('.report-mode')!,stage:leafStage,keys:['day','week','month','custom'],active:dailyReportMode,initial,prepare:prepareLeaf,selected:mode=>{dailyReportMode=mode as ReportMode|'custom';reportMode=dailyReportMode},buttonAttribute:'data-report-mode',positions:periodScroll,fail})
+      return {element:page,activate:()=>initial.activate?.(),dispose:()=>deck.destroy()}
+    }
+    page.classList.add('deck-scroll');await renderReportsPage(page,'cycle');page.querySelector('.page-tabs')?.remove();page.querySelector('.report-kinds')?.remove()
+    if(request.aborted){previewDisposers.get(page)?.();page.remove();throw new DOMException('Canceled','AbortError')}
+    let dispose=()=>{},activated=false
+    return {element:page,activate:()=>{if(activated)return;activated=true;previewDisposers.delete(page);dispose=activateOwnedPage(page)},dispose:()=>{dispose();previewDisposers.get(page)?.();previewDisposers.delete(page);previewActivators.delete(page)}}
+  }
+  const initial=await prepare(kind,signal)
+  const deck=createLocalDeck({root:host,nav:host.querySelector('.report-kinds')!,stage,keys:['daily','cycle'],active:kind,initial,prepare,selected:key=>{reportMode=key==='cycle'?'cycle':dailyReportMode},buttonAttribute:'data-report-kind',positions:kindScroll,fail})
+  return {element:host,activate:()=>initial.activate?.(),dispose:()=>deck.destroy()}
 }
 
 function reportDateLabel(date: string): string {
   return `${Number(date.slice(5, 7))}月${Number(date.slice(8))}日`
 }
 
-function reportPeriodLabel(report: ReportResult): string {
-  if (reportMode === 'day') return reportDateLabel(report.range.start)
-  if (reportMode === 'month') return `${report.range.start.slice(0, 4)}年${Number(report.range.start.slice(5, 7))}月`
+function reportPeriodLabel(report: ReportResult, mode = reportMode): string {
+  if (mode === 'day') return reportDateLabel(report.range.start)
+  if (mode === 'month') return `${report.range.start.slice(0, 4)}年${Number(report.range.start.slice(5, 7))}月`
   return `${reportDateLabel(report.range.start)}–${reportDateLabel(report.range.end)}`
 }
 
@@ -727,14 +813,14 @@ async function readReportSurface<T>(view:HTMLElement,version:string|undefined,re
  page?.setAttribute('aria-busy','true')
  try{return await read()}finally{if(view.dataset.renderVersion===version){for(const control of controls)if(control.isConnected){control.disabled=reportDisabledBeforeFetch.get(control)??false;reportDisabledBeforeFetch.delete(control)}page?.removeAttribute('aria-busy')}}
 }
-async function renderReportsPage(preview?: HTMLElement):Promise<void> {
-  const view=preview??document.querySelector<HTMLElement>('#view')!,viewVersion=view.dataset.renderVersion,today=getLocalDateString(),mode=reportMode,anchor=reportAnchorDate
+async function renderReportsPage(preview?: HTMLElement, requestedMode = reportMode):Promise<void> {
+  const view=preview??document.querySelector<HTMLElement>('#view')!,viewVersion=view.dataset.renderVersion,today=getLocalDateString(),mode=requestedMode,anchor=reportAnchorDate
   if(mode==='cycle'){await renderCycleReportsPage(view,viewVersion,today,preview);return}
   const analysisMode=mode==='custom'?'month':mode,override=mode==='custom'?customReportRange:undefined
   let data=await readReportSurface(view,viewVersion,()=>loadCoachReport(analysisMode,anchor,today,db,override)),report=data.report
   if((!preview&&(activeTab!=='progress'||progressView!=='reports'))||!view.isConnected||view.dataset.renderVersion!==viewVersion)return
   const isCurrent=mode==='custom'||report.range.start===getReportRange(analysisMode,today).start,period=mode==='day'?'天':mode==='week'?'周':'月'
-  const retainedTabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page">${reportKindsHtml()}<div class="report-mode" role="group" aria-label="报告周期">${(['day','week','month','custom'] as const).map(m=>`<button data-report-mode="${m}" class="${mode===m?'active':''}" aria-pressed="${mode===m}">${m==='day'?'日报':m==='week'?'周报':m==='month'?'月报':'自定义'}</button>`).join('')}</div><div class="report-period" ${mode==='custom'?'hidden':''}><button id="report-previous" aria-label="上一${period}">‹</button>${mode==='day'?`<button class="text-btn fitlog-date-trigger" id="report-date-picker">${reportPeriodLabel(report)}</button>`:`<strong>${reportPeriodLabel(report)}</strong>`}<button id="report-next" aria-label="下一${period}" ${isCurrent?'disabled':''}>›</button></div>${isCurrent?'':`<button class="report-return" id="report-return">${mode==='day'?'回到今天':'回到本'+period}</button>`}<div class="report-custom-range" ${mode==='custom'?'':'hidden'}><button class="secondary" type="button" data-report-start>开始 ${customReportRange.start}</button><button class="secondary" type="button" data-report-end>结束 ${customReportRange.end}</button><p class="report-note">最多366天；实际统计仅截至今天。</p></div><div class="report-content">${coachReportHtml(data,coachState,analysisMode,esc)}</div></div>`)
+  const retainedTabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page">${reportKindsHtml()}<div class="report-mode" role="group" aria-label="报告周期">${(['day','week','month','custom'] as const).map(m=>`<button data-report-mode="${m}" class="${mode===m?'active':''}" aria-pressed="${mode===m}">${m==='day'?'日报':m==='week'?'周报':m==='month'?'月报':'自定义'}</button>`).join('')}</div><div class="report-period" ${mode==='custom'?'hidden':''}><button id="report-previous" aria-label="上一${period}">‹</button>${mode==='day'?`<button class="text-btn fitlog-date-trigger" id="report-date-picker">${reportPeriodLabel(report,mode)}</button>`:`<strong>${reportPeriodLabel(report,mode)}</strong>`}<button id="report-next" aria-label="下一${period}" ${isCurrent?'disabled':''}>›</button></div>${isCurrent?'':`<button class="report-return" id="report-return">${mode==='day'?'回到今天':'回到本'+period}</button>`}<div class="report-custom-range" ${mode==='custom'?'':'hidden'}><button class="secondary" type="button" data-report-start>开始 ${customReportRange.start}</button><button class="secondary" type="button" data-report-end>结束 ${customReportRange.end}</button><p class="report-note">最多366天；实际统计仅截至今天。</p></div><div class="report-content">${coachReportHtml(data,coachState,analysisMode,esc)}</div></div>`)
   const host=view.querySelector<HTMLElement>('.report-content')!
   let plotsDispose=bindCoachPlots(host,id=>{if(!id.startsWith('weight:'))coachState.point=id})
   if (preview) previewDisposers.set(view, () => plotsDispose())
@@ -773,7 +859,7 @@ async function renderReportsPage(preview?: HTMLElement):Promise<void> {
 
 async function renderCycleReportsPage(view:HTMLElement,version:string|undefined,today:string,preview?:HTMLElement):Promise<void> {
   let data=await readReportSurface(view,version,()=>loadNutritionCycleReport(selectedCycleReport,today,db,reportTemplateFilter))
-  if(!view.isConnected||view.dataset.renderVersion!==version||(!preview&&progressView!=='reports')||reportMode!=='cycle')return
+  if(!view.isConnected||view.dataset.renderVersion!==version||(!preview&&progressView!=='reports'))return
   if (!preview) { selectedCycleReport=data.selected?.id; reportTemplateFilter=data.templateFilter }
   const tabs=setTabbedViewHtml(view,`${progressTabsHtml()}<div class="report-page">${reportKindsHtml(true)}<div class="report-content">${nutritionCycleReportHtml(data,esc,coachState)}</div></div>`)
   const host=view.querySelector<HTMLElement>('.report-content')!
@@ -2052,7 +2138,9 @@ async function showPelvicFloorHistory(): Promise<void> {
   }))
 }
 
+let workoutSortDispose: (() => void) | undefined
 function renderWorkoutEditor(workout: Workout, preview?: HTMLElement): void {
+  if (!preview) { workoutSortDispose?.(); workoutSortDispose=undefined }
   if (!workoutRevisions.has(workout)) workoutRevisions.set(workout, workoutFingerprint(workout))
   const completed = Boolean(workout.finishedAt)
   if (!preview) document.body.classList.add('immersive')
@@ -2083,7 +2171,7 @@ function trainingJournalHtml(note: string | undefined, id: string): string {
 }
 
 function workoutExerciseHtml(exercise: WorkoutExercise): string {
-  return `<article class="exercise-card" data-workout-exercise="${exercise.id}"><div class="exercise-head"><h3>${esc(exercise.exerciseName)}</h3><button class="icon-btn quiet danger" data-remove-exercise="${exercise.id}" aria-label="移除 ${esc(exercise.exerciseName)}">${icon('trash', 18)}</button></div><div class="sets"><div class="set-header"><span>组</span><span>重量 <small>kg</small></span><span>次数</span><span></span></div>${exercise.sets.map((set, index) => `<div class="set-row" data-set="${set.id}"><span>${index + 1}</span><input aria-label="第${index + 1}组重量" data-field="weightKg" type="number" inputmode="decimal" min="0" step="0.5" value="${set.weightKg === undefined ? '' : formatNumber(set.weightKg)}" placeholder="—"><input aria-label="第${index + 1}组次数" data-field="reps" type="number" inputmode="numeric" min="1" step="1" value="${set.reps || ''}" placeholder="—"><button aria-label="删除第${index + 1}组" class="icon-btn quiet danger" data-remove-set="${set.id}">${icon('x', 18)}</button><input class="set-note" aria-label="第${index + 1}组备注" data-field="note" placeholder="本组备注（可选）" value="${esc(set.note)}"></div>`).join('')}</div><button class="text-btn add-set" data-add-set="${exercise.id}">${icon('plus', 18)} 添加一组</button></article>`
+  return `<article class="exercise-card" data-workout-exercise="${exercise.id}">${sortHandleHtml(esc(exercise.exerciseName))}<div class="exercise-main"><div class="exercise-head"><h3 data-exercise-name>${esc(exercise.exerciseName)}</h3><button type="button" class="text-btn compact-action" data-rename-exercise="${exercise.id}">改名</button><button class="icon-btn quiet danger" data-remove-exercise="${exercise.id}" aria-label="移除 ${esc(exercise.exerciseName)}">${icon('trash', 18)}</button></div><div class="sets"><div class="set-header"><span>组</span><span>重量 <small>kg</small></span><span>次数</span><span></span></div>${exercise.sets.map((set, index) => `<div class="set-row" data-set="${set.id}"><span>${index + 1}</span><input aria-label="第${index + 1}组重量" data-field="weightKg" type="number" inputmode="decimal" min="0" step="0.5" value="${set.weightKg === undefined ? '' : formatNumber(set.weightKg)}" placeholder="—"><input aria-label="第${index + 1}组次数" data-field="reps" type="number" inputmode="numeric" min="1" step="1" value="${set.reps || ''}" placeholder="—"><button aria-label="删除第${index + 1}组" class="icon-btn quiet danger" data-remove-set="${set.id}">${icon('x', 18)}</button><input class="set-note" aria-label="第${index + 1}组备注" data-field="note" placeholder="本组备注（可选）" value="${esc(set.note)}"></div>`).join('')}</div><button class="text-btn add-set" data-add-set="${exercise.id}">${icon('plus', 18)} 添加一组</button></div></article>`
 }
 
 function workoutSetSummary(set: WorkoutSet): string {
@@ -2092,6 +2180,9 @@ function workoutSetSummary(set: WorkoutSet): string {
 
 function bindWorkoutEditor(workout: Workout): void {
   const view = document.querySelector<HTMLElement>('#view')!
+  const sort = bindSortableList(view.querySelector('#workout-exercises')!, { row: '[data-workout-exercise]', id:row=>row.dataset.workoutExercise!, commit:ids=>{workout.exercises=reorderByIds(workout.exercises,ids);scheduleWorkoutSave(workout)} })
+  workoutSortDispose=sort.destroy
+  view.querySelectorAll<HTMLButtonElement>('[data-rename-exercise]').forEach(button=>button.addEventListener('click',()=>void showWorkoutExerciseNameEditor(workout,button.dataset.renameExercise!).catch(fail)))
   view.querySelector('#exit-workout')?.addEventListener('click', async () => {
     try { await flushWorkoutAutosave(); currentWorkout = undefined; workoutEditorOpen = false; document.body.classList.remove('immersive'); await render() } catch (error) { fail(error) }
   })
@@ -2155,6 +2246,29 @@ function bindWorkoutEditor(workout: Workout): void {
 
 function scheduleWorkoutSave(workout: Workout): void {
   workoutAutosave.schedule(workout)
+}
+
+async function showWorkoutExerciseNameEditor(workout: Workout, exerciseId: string): Promise<void> {
+  await flushWorkoutAutosave()
+  const exercise=workout.exercises.find(e=>e.id===exerciseId);if(!exercise)return
+  const dialog=openModal('本次动作名称',`<form class="form" data-exercise-name-form><label>动作名称<input name="name" required value="${esc(exercise.exerciseName)}"></label><p class="report-note">仅修改本次动作快照，不改变动作库、训练模板或其他历史。</p><p role="alert" data-exercise-name-error hidden></p><button type="submit" class="primary">保存动作名称</button><button type="button" class="secondary" data-cancel-exercise-name>取消</button></form>`)
+  let busy=false
+  dialog.querySelector('[data-cancel-exercise-name]')!.addEventListener('click',()=>{if(!busy)dialog.close()})
+  dialog.querySelector<HTMLFormElement>('form')!.addEventListener('submit',async event=>{
+    event.preventDefault();if(busy)return;busy=true
+    const original=exercise.exerciseName,name=valueOf(new FormData(event.currentTarget as HTMLFormElement),'name').trim()
+    try{
+      if(!name)throw new Error('请填写动作名称')
+      const source=await db.workouts.get(workout.id)
+      if(!source||workoutFingerprint(source)!==workoutRevisions.get(workout))throw new Error('训练记录已变化，请重新打开；名称未保存')
+      const proposed=structuredClone(workout);proposed.exercises.find(e=>e.id===exerciseId)!.exerciseName=name
+      const saved=await saveWorkout(proposed,db,{requireExisting:true,expectedFingerprint:workoutFingerprint(source),preserveUntouchedFacts:true})
+      exercise.exerciseName=name;workout.updatedAt=saved.updatedAt;workoutRevisions.set(workout,workoutFingerprint(saved))
+      const row=[...document.querySelectorAll<HTMLElement>('[data-workout-exercise]')].find(e=>e.dataset.workoutExercise===exerciseId)
+      if(row){row.querySelector('[data-exercise-name]')!.textContent=name;row.querySelector('[data-sort-handle]')?.setAttribute('aria-label',`${name}；拖动或上下方向键排序`)}
+      updateWorkoutNameDisplay(workout);dialog.close()
+    }catch(error){exercise.exerciseName=original;const node=dialog.querySelector<HTMLElement>('[data-exercise-name-error]')!;node.hidden=false;node.textContent=error instanceof Error?error.message:'名称保存失败'}finally{busy=false}
+  })
 }
 
 async function showExercisePicker(workout: Workout): Promise<void> {
@@ -2306,14 +2420,19 @@ function bindWorkoutTemplateManagerActions(dialog: HTMLDialogElement, templates:
   }))
 }
 
-async function showWorkoutTemplateEditor(source?: WorkoutTemplate, surface?: ManagedSurfaceContext): Promise<void> {
-  const editing = source ? Boolean(await db.workoutTemplates.get(source.id)) : false
+async function showWorkoutTemplateEditor(source?: WorkoutTemplate, surface?: ManagedSurfaceContext, state: {expected?:string} = {}): Promise<void> {
+  const stored=source?await db.workoutTemplates.get(source.id):undefined
+  const editing=Boolean(stored);state.expected??=JSON.stringify(stored??null)
   const draft = source ? structuredClone(source) : { id: crypto.randomUUID(), name: '', exercises: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
   const exerciseIds = draft.exercises.map((item) => item.exerciseId).filter((id): id is string => Boolean(id))
   const existingIds = new Set((await db.exercises.bulkGet(exerciseIds)).filter((item): item is Exercise => Boolean(item)).map((item) => item.id))
   if (surface && !surface.alive) return
   const dialog = mountManagementModal(surface, editing ? '编辑训练模板' : '新建训练模板', '<div id="workout-template-editor"></div>', true)
+  let sortDispose:(()=>void)|undefined
+  const cleanup=()=>{sortDispose?.();sortDispose=undefined}
+  dialog.addEventListener('close',cleanup,{once:true});surface?.onDispose(cleanup);surface?.onSuspend(cleanup)
   const draw = () => {
+    cleanup()
     dialog.querySelector('#workout-template-editor')!.innerHTML = `<form id="workout-template-form" class="form template-editor manager-editor"><label>模板名称 *<input name="name" value="${esc(draft.name)}" placeholder="推举训练" required></label><label>说明<textarea name="description" rows="2" placeholder="可选">${esc(draft.description)}</textarea></label><div class="template-editor-items">${draft.exercises.map((exercise, index) => workoutTemplateExerciseEditorHtml(exercise, index, draft.exercises.length, Boolean(exercise.exerciseId && !existingIds.has(exercise.exerciseId)))).join('') || '<p class="muted padded">还没有动作</p>'}</div><button type="button" class="secondary" id="add-template-exercise">${icon('plus', 18)} 添加动作</button><button class="primary" type="submit">保存训练模板</button></form>`
     bindNumericPresentation(dialog)
     bindWorkoutTemplateEditor()
@@ -2321,10 +2440,11 @@ async function showWorkoutTemplateEditor(source?: WorkoutTemplate, surface?: Man
   const syncText = () => {
     const form = dialog.querySelector<HTMLFormElement>('#workout-template-form')
     if (!form) return
-    const data = new FormData(form); draft.name = valueOf(data, 'name'); draft.description = valueOf(data, 'description').trim() || undefined
+    const data = new FormData(form); draft.name = valueOf(data, 'name'); draft.description = valueOf(data, 'description') || undefined
   }
   const bindWorkoutTemplateEditor = () => {
     const form = dialog.querySelector<HTMLFormElement>('#workout-template-form')!
+    sortDispose=bindSortableList(form.querySelector('.template-editor-items')!,{row:'[data-template-exercise]',id:r=>r.dataset.templateExercise!,commit:ids=>{syncText();draft.exercises=reorderByIds(draft.exercises,ids)}}).destroy
     form.querySelectorAll<HTMLInputElement>('[data-template-set]').forEach((input) => input.addEventListener('input', () => {
       const exercise = draft.exercises.find((item) => item.id === input.closest<HTMLElement>('[data-template-exercise]')?.dataset.templateExercise)
       const set = exercise?.sets.find((item) => item.id === input.closest<HTMLElement>('[data-template-set-row]')?.dataset.templateSetRow)
@@ -2350,12 +2470,14 @@ async function showWorkoutTemplateEditor(source?: WorkoutTemplate, surface?: Man
       if (index < 0 || next < 0 || next >= draft.exercises.length) return
       const [moved] = draft.exercises.splice(index, 1); draft.exercises.splice(next, 0, moved!); draw()
     }))
-    form.querySelector('#add-template-exercise')?.addEventListener('click', () => { syncText(); leaveStandalone(dialog, surface); void showWorkoutTemplateExercisePicker(draft, surface) })
+    form.querySelector('#add-template-exercise')?.addEventListener('click', () => { syncText(); leaveStandalone(dialog, surface); void showWorkoutTemplateExercisePicker(draft, surface, state) })
+    let saving=false
     form.addEventListener('submit', async (event) => {
-      event.preventDefault(); syncText()
-      try { await saveWorkoutTemplate(draft); leaveStandalone(dialog, surface); toast('训练模板已保存'); await showWorkoutTemplateManager('', surface) } catch (error) { fail(error) }
+      event.preventDefault();if(saving)return;saving=true;syncText()
+      try { await saveWorkoutTemplate(draft,db,state.expected); leaveStandalone(dialog, surface); toast('训练模板已保存'); await showWorkoutTemplateManager('', surface) } catch (error) { fail(error) }finally{saving=false}
     })
   }
+  surface?.onResume(draw)
   draw()
   if (editing && source) {
     const actions = document.createElement('div'); actions.className = 'manager-editor-actions'
@@ -2364,11 +2486,11 @@ async function showWorkoutTemplateEditor(source?: WorkoutTemplate, surface?: Man
   }
 }
 
-function workoutTemplateExerciseEditorHtml(exercise: WorkoutTemplateExercise, index: number, count: number, missing: boolean): string {
-  return `<article class="exercise-card template-exercise" data-template-exercise="${exercise.id}"><div class="exercise-head"><div><h3>${esc(exercise.exerciseName)}</h3>${missing ? '<small class="warning-text">动作已删除，将使用名称快照</small>' : ''}</div><div class="reorder-actions"><button type="button" data-template-move="${exercise.id}" data-direction="-1" ${index === 0 ? 'disabled' : ''} aria-label="上移">↑</button><button type="button" data-template-move="${exercise.id}" data-direction="1" ${index === count - 1 ? 'disabled' : ''} aria-label="下移">↓</button><button type="button" class="icon-btn quiet danger" data-template-remove-exercise="${exercise.id}" aria-label="删除动作">${icon('trash', 18)}</button></div></div><div class="sets"><div class="set-header"><span>组</span><span>重量 <small>kg</small></span><span>次数</span><span></span></div>${exercise.sets.map((set, setIndex) => `<div class="set-row" data-template-set-row="${set.id}"><span>${setIndex + 1}</span><input data-template-set="weightKg" type="number" inputmode="decimal" min="0" step="0.5" value="${set.weightKg === undefined ? '' : formatNumber(set.weightKg)}" placeholder="—"><input data-template-set="reps" type="number" inputmode="numeric" min="1" step="1" value="${set.reps || ''}" placeholder="—"><button type="button" class="icon-btn quiet danger" data-template-remove-set="${set.id}" aria-label="删除第${setIndex + 1}组">${icon('x', 18)}</button><input class="set-note" data-template-set="note" value="${esc(set.note)}" placeholder="本组备注（可选）"></div>`).join('')}</div><button type="button" class="text-btn add-set" data-template-add-set="${exercise.id}">${icon('plus', 18)} 添加一组</button><label class="compact-label">动作备注<textarea data-template-exercise-note="${exercise.id}" rows="2" placeholder="可选">${esc(exercise.note)}</textarea></label></article>`
+function workoutTemplateExerciseEditorHtml(exercise: WorkoutTemplateExercise, _index: number, _count: number, missing: boolean): string {
+  return `<article class="exercise-card template-exercise" data-template-exercise="${exercise.id}">${sortHandleHtml(esc(exercise.exerciseName))}<div class="exercise-main"><div class="exercise-head"><div><h3>${esc(exercise.exerciseName)}</h3>${missing ? '<small class="warning-text">动作已删除，将使用名称快照</small>' : ''}</div><div class="reorder-actions"><button type="button" class="icon-btn quiet danger" data-template-remove-exercise="${exercise.id}" aria-label="删除动作">${icon('trash', 18)}</button></div></div><div class="sets"><div class="set-header"><span>组</span><span>重量 <small>kg</small></span><span>次数</span><span></span></div>${exercise.sets.map((set, setIndex) => `<div class="set-row" data-template-set-row="${set.id}"><span>${setIndex + 1}</span><input data-template-set="weightKg" type="number" inputmode="decimal" min="0" step="0.5" value="${set.weightKg === undefined ? '' : formatNumber(set.weightKg)}" placeholder="—"><input data-template-set="reps" type="number" inputmode="numeric" min="1" step="1" value="${set.reps || ''}" placeholder="—"><button type="button" class="icon-btn quiet danger" data-template-remove-set="${set.id}" aria-label="删除第${setIndex + 1}组">${icon('x', 18)}</button><input class="set-note" data-template-set="note" value="${esc(set.note)}" placeholder="本组备注（可选）"></div>`).join('')}</div><button type="button" class="text-btn add-set" data-template-add-set="${exercise.id}">${icon('plus', 18)} 添加一组</button><label class="compact-label">动作备注<textarea data-template-exercise-note="${exercise.id}" rows="2" placeholder="可选">${esc(exercise.note)}</textarea></label></div></article>`
 }
 
-async function showWorkoutTemplateExercisePicker(draft: WorkoutTemplate, surface?: ManagedSurfaceContext): Promise<void> {
+async function showWorkoutTemplateExercisePicker(draft: WorkoutTemplate, surface?: ManagedSurfaceContext, state?:{expected?:string}): Promise<void> {
   const exercises = await db.exercises.orderBy('name').toArray()
   if (surface && !surface.alive) return
   const dialog = mountManagementModal(surface, '添加模板动作', `<label class="search-field">${icon('search', 20)}<input id="template-exercise-search" type="search" placeholder="搜索动作"></label><div id="template-exercise-results" class="picker-list"></div>`, true)
@@ -2378,7 +2500,7 @@ async function showWorkoutTemplateExercisePicker(draft: WorkoutTemplate, surface
     dialog.querySelectorAll<HTMLButtonElement>('[data-pick-template-exercise]').forEach((button) => button.addEventListener('click', () => {
       const exercise = exercises.find((item) => item.id === button.dataset.pickTemplateExercise)!
       draft.exercises.push({ id: crypto.randomUUID(), exerciseId: exercise.id, exerciseName: exercise.name, sets: [{ id: crypto.randomUUID(), reps: 10 }] })
-      leaveStandalone(dialog, surface); void showWorkoutTemplateEditor(draft, surface)
+      leaveStandalone(dialog, surface); void showWorkoutTemplateEditor(draft, surface, state)
     }))
   }
   draw(); dialog.querySelector<HTMLInputElement>('#template-exercise-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
@@ -2516,40 +2638,60 @@ function bindDietTemplateManagerActions(dialog: HTMLDialogElement, templates: Di
   actionRoot.querySelectorAll<HTMLButtonElement>('[data-delete-diet-template]').forEach((button) => button.addEventListener('click', async () => { if(button.dataset.busy)return;button.dataset.busy='true';const template=templates.find(t=>t.id===button.dataset.deleteDietTemplate);if (!await confirmAction('删除饮食模板？', `「${template?.name??''}」：只删除模板，历史饮食记录与排程名称快照不会受影响。`)){delete button.dataset.busy;return} try { await db.dietTemplates.delete(button.dataset.deleteDietTemplate!); leaveStandalone(dialog, surface); toast('模板已删除，历史记录未受影响'); await showDietTemplateManager('', surface) } catch (error) { fail(error) }finally{delete button.dataset.busy} }))
 }
 
-async function showDietTemplateEditor(source?: DietTemplate, surface?: ManagedSurfaceContext): Promise<void> {
-  const editing = source ? Boolean(await db.dietTemplates.get(source.id)) : false
+interface DietEditorState { meal: string; scroll: number; expected?: string }
+async function showDietTemplateEditor(source?: DietTemplate, surface?: ManagedSurfaceContext, state: DietEditorState = {meal:'breakfast',scroll:0}): Promise<void> {
+  const stored=source?await db.dietTemplates.get(source.id):undefined
+  const editing=Boolean(stored);state.expected??=JSON.stringify(stored??null)
   const draft: DietTemplate = source ? structuredClone(source) : { id: crypto.randomUUID(), name: '', mode:'day', items: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
-  const resolved = await resolveDietTemplateFoods(draft)
-  const foodByItem=new Map(resolved.map(v=>[v.item.id,v.food]))
+  const resolved = await resolveDietTemplateFoods(draft), foodByItem = new Map(resolved.map(v=>[v.item.id,v.food]))
   const caloriesFor=(items:DietTemplate['items'])=>items.reduce((sum,item)=>sum+calculateNutrition(foodByItem.get(item.id)??{...item.fallback},item.grams).calories,0)
-  const missingIds = new Set(resolved.filter((item) => item.missing).map((item) => item.item.id))
-  if (surface && !surface.alive) return
-  const dialog = mountManagementModal(surface, editing ? '编辑饮食模板' : '新建饮食模板', '<div id="diet-template-editor"></div>', true)
-  const syncText = () => {
-    const form = dialog.querySelector<HTMLFormElement>('#diet-template-form'); if (!form) return
-    const data = new FormData(form); draft.name = valueOf(data, 'name'); draft.description = valueOf(data, 'description').trim() || undefined; draft.nutritionGoal = nutritionGoalFromForm(data)
-  }
-  const opened=new Set<string>(['breakfast','lunch','combo','unclassified'])
-  const itemHtml=(item:DietTemplate['items'][number],index:number,groupCount:number)=>`<article class="diet-template-item" data-diet-template-item="${item.id}"><div><strong>${esc(item.foodName)}</strong>${item.brand?`<small>${esc(item.brand)}</small>`:''}${missingIds.has(item.id)?'<small class="warning-text">食物已删除，将使用营养快照</small>':''}</div><label><input aria-label="${esc(item.foodName)}重量（克）" data-diet-grams type="number" inputmode="decimal" min="0" step="any" required value="${item.grams}"><span aria-hidden="true">g</span></label><div class="reorder-actions">${draft.mode==='day'?`<select data-diet-item-meal="${item.id}" aria-label="${esc(item.foodName)}餐次"><option value="" ${!item.meal?'selected':''}>未分类</option>${mealTypes.map(m=>`<option value="${m}" ${item.meal===m?'selected':''}>${mealNames[m]}</option>`).join('')}</select>`:''}<button type="button" data-diet-move="${item.id}" aria-label="上移食物" data-direction="-1" ${index===0?'disabled':''}>↑</button><button type="button" data-diet-move="${item.id}" aria-label="下移食物" data-direction="1" ${index===groupCount-1?'disabled':''}>↓</button><button type="button" class="icon-btn quiet danger" data-remove-diet-item="${item.id}" aria-label="移除食物">${icon('trash',18)}</button></div></article>`
-  const draw = () => {
+  const missingIds=new Set(resolved.filter(v=>v.missing).map(v=>v.item.id))
+  if(surface&&!surface.alive)return
+  const dialog=mountManagementModal(surface,editing?'编辑饮食模板':'新建饮食模板','<div id="diet-template-editor"></div>',true)
+  let cleanups:(()=>void)[]=[]
+  const cleanup=()=>{for(const dispose of cleanups)dispose();cleanups=[]}
+  dialog.addEventListener('close',cleanup,{once:true});surface?.onDispose(cleanup);surface?.onSuspend(cleanup)
+  const syncText=()=>{const form=dialog.querySelector<HTMLFormElement>('#diet-template-form');if(!form)return;const data=new FormData(form);draft.name=valueOf(data,'name');draft.description=valueOf(data,'description')||undefined;draft.nutritionGoal=nutritionGoalFromForm(data)}
+  const itemsFor=(group:string)=>draft.items.filter(i=>group==='combo'||(group==='unclassified'?!i.meal:i.meal===group))
+  const itemHtml=(item:DietTemplate['items'][number])=>`<article class="diet-template-item sortable-food" data-diet-template-item="${item.id}">${sortHandleHtml(esc(item.foodName))}<div class="sortable-food-copy"><strong>${esc(item.foodName)}</strong>${item.brand?`<small>${esc(item.brand)}</small>`:''}${missingIds.has(item.id)?'<small class="warning-text">食物已删除，将使用营养快照</small>':''}<label><span class="sr-only">实际克数</span><input aria-label="${esc(item.foodName)}重量（克）" data-diet-grams type="number" inputmode="decimal" min="0" step="any" required value="${item.grams}"><span>g</span></label></div><div class="diet-item-actions"><button type="button" class="icon-btn quiet danger" data-remove-diet-item="${item.id}" aria-label="移除 ${esc(item.foodName)}">${icon('trash',18)}</button>${draft.mode==='day'?`<button type="button" class="icon-btn quiet" data-change-diet-meal="${item.id}" aria-label="调整 ${esc(item.foodName)} 的餐次">⋯</button>`:''}</div></article>`
+  const draw=()=>{
+    cleanup()
+    const body=dialog.querySelector<HTMLElement>('.modal-body')!,y=body.scrollTop
     const groups=draft.mode==='day'?[...mealTypes,...(draft.items.some(i=>!i.meal)?['unclassified']:[])]:['combo']
-    dialog.querySelector('#diet-template-editor')!.innerHTML=`<form id="diet-template-form" class="form template-editor manager-editor"><div class="diet-template-modes" role="group" aria-label="模板类型"><button type="button" class="secondary" data-diet-mode="combo" aria-pressed="${draft.mode!=='day'}">单餐 / 组合</button><button type="button" class="secondary" data-diet-mode="day" aria-pressed="${draft.mode==='day'}">整日模板</button></div><label>模板名称 *<input name="name" value="${esc(draft.name)}" placeholder="休息日饮食" required></label><label>说明<textarea name="description" rows="2" placeholder="可选">${esc(draft.description)}</textarea></label><p class="report-note">模板是计划，不代表已摄入。按实际需求编辑重量与餐次。</p><div class="template-editor-items">${groups.map((group,groupIndex)=>{const items=draft.items.filter(i=>group==='combo'||(group==='unclassified'?!i.meal:i.meal===group));return `<details class="diet-template-meal" data-diet-meal="${group}" ${opened.has(group)?'open':''}><summary><strong>${group==='combo'?'组合':group==='unclassified'?'未分类':mealNames[group as MealType]}</strong><small data-diet-meal-total="${group}">${items.length} 项 · ${formatEnergyInputValue(caloriesFor(items))} kcal</small></summary>${items.map((i,index)=>itemHtml(i,index,items.length)).join('')}${!items.length?'<p class="report-note">还没有食物</p>':''}<button type="button" class="text-btn" ${groupIndex===0?'id="add-diet-template-food"':''} data-add-diet-meal="${group}">${icon('plus',18)} 添加食物</button></details>`}).join('')}</div><p class="report-note" data-diet-total>共 ${draft.items.length} 项食物 · ${formatEnergyInputValue(caloriesFor(draft.items))} kcal</p><details class="diet-template-goal"><summary>营养目标（可选）${icon('chevron',16)}</summary>${nutritionGoalFields(draft.nutritionGoal).replace('<legend>','<legend class="sr-only">')}</details><button class="primary" type="submit">保存饮食模板</button></form>`
-    bind()
-  }
-  const bind = () => {
+    if(!groups.includes(state.meal as MealType))state.meal=groups[0]!
+    dialog.querySelector('#diet-template-editor')!.innerHTML=`<form id="diet-template-form" class="form template-editor manager-editor"><div class="diet-template-modes" role="group" aria-label="模板类型"><button type="button" class="secondary" data-diet-mode="combo" aria-pressed="${draft.mode!=='day'}">单餐 / 组合</button><button type="button" class="secondary" data-diet-mode="day" aria-pressed="${draft.mode==='day'}">整日模板</button></div><label>模板名称 *<input name="name" value="${esc(draft.name)}" required></label><label>说明<textarea name="description" rows="2">${esc(draft.description)}</textarea></label><p class="report-note">模板是计划，不代表已摄入。</p><section class="diet-meal-deck"><div class="meal-fixed-tabs segmented" role="tablist" aria-label="模板餐次">${groups.map(g=>`<button role="tab" type="button" data-diet-meal-tab="${g}" aria-selected="${g===state.meal}">${g==='combo'?'组合':g==='unclassified'?'未分类':mealNames[g as MealType]}</button>`).join('')}</div><div class="diet-meal-stage"></div></section><p class="report-note" data-diet-total>共 ${draft.items.length} 项食物 · ${formatEnergyInputValue(caloriesFor(draft.items))} kcal</p><details class="diet-template-goal"><summary>营养目标（可选）${icon('chevron',16)}</summary>${nutritionGoalFields(draft.nutritionGoal).replace('<legend>','<legend class="sr-only">')}</details><button class="primary" type="submit">保存饮食模板</button></form>`
+    const form=dialog.querySelector<HTMLFormElement>('form#diet-template-form')!,root=form.querySelector<HTMLElement>('.diet-meal-deck')!,stage=root.querySelector<HTMLElement>('.diet-meal-stage')!,pages=new Map<string,HTMLElement>()
+    const pageFor=(group:string):DeckPage=>{
+      let page=pages.get(group)
+      if(!page){
+        page=document.createElement('section');page.className='diet-template-meal';page.dataset.dietMeal=group
+        const items=itemsFor(group)
+        page.innerHTML=`<p data-diet-meal-total="${group}" class="report-note">${items.length} 项 · ${formatEnergyInputValue(caloriesFor(items))} kcal</p><div class="diet-sort-list">${items.map(itemHtml).join('')}</div>${!items.length?'<p class="report-note">还没有食物</p>':''}<button type="button" class="text-btn" id="add-diet-template-food" data-add-diet-meal="${group}">${icon('plus',18)} 添加食物</button>`
+        pages.set(group,page)
+        const sort=bindSortableList(page.querySelector('.diet-sort-list')!,{row:'[data-diet-template-item]',id:r=>r.dataset.dietTemplateItem!,commit:ids=>{
+          const ordered=reorderByIds(itemsFor(group),ids),set=new Set(ids);let index=0
+          draft.items=draft.items.map(item=>set.has(item.id)?ordered[index++]!:item)
+        }});cleanups.push(sort.destroy)
+        page.addEventListener('input',event=>{const input=event.target as HTMLInputElement;if(!input.matches('[data-diet-grams]'))return;const item=draft.items.find(i=>i.id===input.closest<HTMLElement>('[data-diet-template-item]')!.dataset.dietTemplateItem)!;item.grams=Number(input.value);page!.querySelector('[data-diet-meal-total]')!.textContent=`${itemsFor(group).length} 项 · ${formatEnergyInputValue(caloriesFor(itemsFor(group)))} kcal`;form.querySelector('[data-diet-total]')!.textContent=`共 ${draft.items.length} 项食物 · ${formatEnergyInputValue(caloriesFor(draft.items))} kcal`})
+        page.addEventListener('click',event=>{const button=(event.target as Element).closest<HTMLButtonElement>('button');if(!button)return
+          if(button.dataset.removeDietItem){syncText();draft.items=draft.items.filter(i=>i.id!==button.dataset.removeDietItem);draw()}
+          if(button.dataset.changeDietMeal){syncText();state.scroll=body.scrollTop;cleanup();leaveStandalone(dialog,surface);void showDietTemplateMealPicker(draft,button.dataset.changeDietMeal,surface,state)}
+          if(button.dataset.addDietMeal){syncText();state.meal=group;state.scroll=body.scrollTop;cleanup();leaveStandalone(dialog,surface);void showDietTemplateFoodPicker(draft,surface,isMealType(group)?group:undefined,state)}
+        })
+      }
+      return {element:page,dispose:()=>{}}
+    }
+    const initial=pageFor(state.meal);stage.append(initial.element)
+    const deck=createLocalDeck({root,nav:root.querySelector('.meal-fixed-tabs')!,stage,keys:groups,active:state.meal,initial,buttonAttribute:'data-diet-meal-tab',modal:true,prepare:async key=>pageFor(key),selected:key=>{state.meal=key},fail})
+    cleanups.push(deck.destroy)
     bindNumericPresentation(dialog)
-    const form = dialog.querySelector<HTMLFormElement>('#diet-template-form')!
-    form.querySelectorAll<HTMLInputElement>('[data-diet-grams]').forEach((input) => input.addEventListener('input', () => { const item = draft.items.find((value) => value.id === input.closest<HTMLElement>('[data-diet-template-item]')?.dataset.dietTemplateItem); if (item) item.grams = Number(input.value);if(Number.isFinite(item?.grams)&&item!.grams>0){form.querySelector('[data-diet-total]')!.textContent=`共 ${draft.items.length} 项食物 · ${formatEnergyInputValue(caloriesFor(draft.items))} kcal`;const group=input.closest('[data-diet-meal]')!,key=group.getAttribute('data-diet-meal'),items=draft.items.filter(i=>key==='combo'||(key==='unclassified'?!i.meal:i.meal===key));group.querySelector('[data-diet-meal-total]')!.textContent=`${items.length} 项 · ${formatEnergyInputValue(caloriesFor(items))} kcal`} }))
-    form.querySelectorAll<HTMLButtonElement>('[data-remove-diet-item]').forEach((button) => button.addEventListener('click', () => { syncText(); draft.items = draft.items.filter((item) => item.id !== button.dataset.removeDietItem); draw() }))
-    form.querySelectorAll<HTMLButtonElement>('[data-diet-move]').forEach((button) => button.addEventListener('click', () => { syncText(); draft.items=moveDietTemplateItem(draft.items,button.dataset.dietMove!,Number(button.dataset.direction),draft.mode);draw() }))
     form.querySelectorAll<HTMLButtonElement>('[data-diet-mode]').forEach(b=>b.addEventListener('click',()=>{syncText();draft.mode=b.dataset.dietMode as 'combo'|'day';draw()}))
-    form.querySelectorAll<HTMLDetailsElement>('[data-diet-meal]').forEach(d=>d.addEventListener('toggle',()=>{if(d.open)opened.add(d.dataset.dietMeal!);else opened.delete(d.dataset.dietMeal!)}))
-    form.querySelectorAll<HTMLSelectElement>('[data-diet-item-meal]').forEach(select=>select.addEventListener('change',()=>{syncText();const item=draft.items.find(i=>i.id===select.dataset.dietItemMeal)!;if(isMealType(select.value)){item.meal=select.value;opened.add(select.value)}else delete item.meal;draw()}))
-    form.querySelectorAll<HTMLButtonElement>('[data-add-diet-meal]').forEach(b=>b.addEventListener('click',()=>{syncText();leaveStandalone(dialog,surface);void showDietTemplateFoodPicker(draft,surface,isMealType(b.dataset.addDietMeal)?b.dataset.addDietMeal:undefined)}))
     let saving=false
-    form.addEventListener('submit', async (event) => { event.preventDefault();if(saving)return;saving=true; syncText(); try { await saveDietTemplate(draft); leaveStandalone(dialog, surface); toast('饮食模板已保存'); await showDietTemplateManager('', surface) } catch (error) { fail(error) }finally{saving=false} })
+    form.addEventListener('submit',async event=>{event.preventDefault();if(saving)return;saving=true;syncText();try{await saveDietTemplate(draft,db,state.expected);cleanup();leaveStandalone(dialog,surface);toast('饮食模板已保存');await showDietTemplateManager('',surface)}catch(error){fail(error)}finally{saving=false}})
+    body.scrollTop=y
   }
-  draw()
+  surface?.onResume(draw)
+  draw();dialog.querySelector<HTMLElement>('.modal-body')!.scrollTop=state.scroll
   if (editing && source) {
     const actions = document.createElement('div'); actions.className = 'manager-editor-actions'
     actions.innerHTML = `<button class="text-btn" data-apply-diet-template="${source.id}">添加到饮食</button><button class="text-btn" data-duplicate-diet-template="${source.id}">复制为新模板</button><div class="manager-danger-zone"><button class="text-btn danger" data-delete-diet-template="${source.id}">删除饮食模板</button></div>`
@@ -2557,14 +2699,23 @@ async function showDietTemplateEditor(source?: DietTemplate, surface?: ManagedSu
   }
 }
 
-async function showDietTemplateFoodPicker(draft: DietTemplate, surface?: ManagedSurfaceContext, meal?:MealType): Promise<void> {
+async function showDietTemplateMealPicker(draft:DietTemplate,itemId:string,surface:ManagedSurfaceContext|undefined,state:DietEditorState):Promise<void>{
+  const item=draft.items.find(i=>i.id===itemId);if(!item)return
+  const dialog=mountManagementModal(surface,'调整餐次',`<p>${esc(item.foodName)}</p><div class="picker-list">${[...mealTypes,'unclassified'].map(meal=>`<button type="button" class="picker-item" data-set-diet-meal="${meal}">${meal==='unclassified'?'未分类':mealNames[meal as MealType]}</button>`).join('')}</div><button type="button" class="secondary full-btn" data-cancel-diet-meal>取消</button>`,true)
+  let leaving=false
+  const back=()=>{if(leaving)return;leaving=true;leaveStandalone(dialog,surface);void showDietTemplateEditor(draft,surface,state)}
+  dialog.querySelector('[data-cancel-diet-meal]')!.addEventListener('click',back)
+  dialog.querySelectorAll<HTMLButtonElement>('[data-set-diet-meal]').forEach(button=>button.addEventListener('click',()=>{if(leaving)return;const meal=button.dataset.setDietMeal!;if(isMealType(meal))item.meal=meal;else delete item.meal;state.meal=meal;back()}))
+}
+
+async function showDietTemplateFoodPicker(draft: DietTemplate, surface?: ManagedSurfaceContext, meal?:MealType, state?:DietEditorState): Promise<void> {
   const foods = await db.foods.orderBy('name').toArray()
   if (surface && !surface.alive) return
   const dialog = mountManagementModal(surface, '添加模板食物', `<label class="search-field">${icon('search', 20)}<input id="diet-template-food-search" type="search" placeholder="搜索食物或品牌"></label><div id="diet-template-food-results" class="picker-list"></div>`, true)
   const draw = (query = '') => {
     const normalized = query.trim().toLocaleLowerCase(); const matches = foods.filter((food) => `${food.name} ${food.brand ?? ''}`.toLocaleLowerCase().includes(normalized))
     dialog.querySelector('#diet-template-food-results')!.innerHTML = matches.map((food) => `<button class="picker-item" data-pick-diet-food="${food.id}"><span><strong>${esc(food.name)}</strong>${food.brand ? `<small>${esc(food.brand)}</small>` : ''}</span><em>${formatEnergyInputValue(food.calories)} kcal / ${formatNumber(food.referenceGrams)}g</em></button>`).join('') || '<p class="muted">食物库中没有匹配项</p>'
-    dialog.querySelectorAll<HTMLButtonElement>('[data-pick-diet-food]').forEach((button) => button.addEventListener('click', () => { const food = foods.find((item) => item.id === button.dataset.pickDietFood)!; draft.items.push({...dietTemplateItemFromFood(food, 100),...(meal?{meal}:{})}); leaveStandalone(dialog, surface); void showDietTemplateEditor(draft, surface) }))
+    dialog.querySelectorAll<HTMLButtonElement>('[data-pick-diet-food]').forEach((button) => button.addEventListener('click', () => { const food = foods.find((item) => item.id === button.dataset.pickDietFood)!; draft.items.push({...dietTemplateItemFromFood(food, 100),...(meal?{meal}:{})}); leaveStandalone(dialog, surface); void showDietTemplateEditor(draft, surface, state) }))
   }
   draw(); dialog.querySelector<HTMLInputElement>('#diet-template-food-search')?.addEventListener('input', (event) => draw((event.target as HTMLInputElement).value))
 }

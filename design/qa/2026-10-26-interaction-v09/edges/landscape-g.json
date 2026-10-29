@@ -1,0 +1,2627 @@
+{
+  "url": "http://127.0.0.1:5470/",
+  "results": [
+    {
+      "key": "chromium-844-200-light-native-reduce",
+      "engine": "chromium",
+      "width": 844,
+      "font": 200,
+      "look": "light-native",
+      "motion": "reduce",
+      "status": "PASS",
+      "widths": [
+        608,
+        608,
+        608,
+        608
+      ],
+      "scenes": [
+        {
+          "name": "diet",
+          "metrics": {
+            "bounds": {
+              "x": 102,
+              "y": 12,
+              "width": 640,
+              "height": 378,
+              "right": 742,
+              "bottom": 390
+            },
+            "documentWidth": 844,
+            "width": 844,
+            "controls": [
+              {
+                "text": "单餐 / 组合",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 122,
+                  "y": 108.34375,
+                  "width": 298,
+                  "height": 47,
+                  "right": 420,
+                  "bottom": 155.34375
+                },
+                "font": 32
+              },
+              {
+                "text": "整日模板",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 424,
+                  "y": 108.34375,
+                  "width": 298,
+                  "height": 47,
+                  "right": 722,
+                  "bottom": 155.34375
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 118,
+                  "y": 215.34375,
+                  "width": 608,
+                  "height": 60,
+                  "right": 726,
+                  "bottom": 275.34375
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "TEXTAREA",
+                "rect": {
+                  "x": 118,
+                  "y": 331.34375,
+                  "width": 608,
+                  "height": 98,
+                  "right": 726,
+                  "bottom": 429.34375
+                },
+                "font": 32
+              },
+              {
+                "text": "早餐",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 122,
+                  "y": 509.640625,
+                  "width": 148.5,
+                  "height": 56,
+                  "right": 270.5,
+                  "bottom": 565.640625
+                },
+                "font": 28
+              },
+              {
+                "text": "午餐",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 272.5,
+                  "y": 509.640625,
+                  "width": 148.5,
+                  "height": 56,
+                  "right": 421,
+                  "bottom": 565.640625
+                },
+                "font": 28
+              },
+              {
+                "text": "晚餐",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 423,
+                  "y": 509.640625,
+                  "width": 148.5,
+                  "height": 56,
+                  "right": 571.5,
+                  "bottom": 565.640625
+                },
+                "font": 28
+              },
+              {
+                "text": "加餐",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 573.5,
+                  "y": 509.640625,
+                  "width": 148.5,
+                  "height": 56,
+                  "right": 722,
+                  "bottom": 565.640625
+                },
+                "font": 28
+              },
+              {
+                "text": "合成食物 0 长中文名称 Latin product；拖动或上下方向键排序",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 119,
+                  "y": 620.9375,
+                  "width": 44,
+                  "height": 171,
+                  "right": 163,
+                  "bottom": 791.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "合成食物 0 长中文名称 Latin product重量（克）",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 173,
+                  "y": 721.9375,
+                  "width": 475.859375,
+                  "height": 60,
+                  "right": 648.859375,
+                  "bottom": 781.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "移除 合成食物 0 长中文名称 Latin product",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 624.9375,
+                  "width": 44,
+                  "height": 44,
+                  "right": 725,
+                  "bottom": 668.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "调整 合成食物 0 长中文名称 Latin product 的餐次",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 668.9375,
+                  "width": 44,
+                  "height": 47,
+                  "right": 725,
+                  "bottom": 715.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "合成食物 1 长中文名称 Latin product；拖动或上下方向键排序",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 119,
+                  "y": 799.9375,
+                  "width": 44,
+                  "height": 171,
+                  "right": 163,
+                  "bottom": 970.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "合成食物 1 长中文名称 Latin product重量（克）",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 173,
+                  "y": 900.9375,
+                  "width": 475.859375,
+                  "height": 60,
+                  "right": 648.859375,
+                  "bottom": 960.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "移除 合成食物 1 长中文名称 Latin product",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 803.9375,
+                  "width": 44,
+                  "height": 44,
+                  "right": 725,
+                  "bottom": 847.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "调整 合成食物 1 长中文名称 Latin product 的餐次",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 847.9375,
+                  "width": 44,
+                  "height": 47,
+                  "right": 725,
+                  "bottom": 894.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "合成食物 2 长中文名称 Latin product；拖动或上下方向键排序",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 119,
+                  "y": 978.9375,
+                  "width": 44,
+                  "height": 171,
+                  "right": 163,
+                  "bottom": 1149.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "合成食物 2 长中文名称 Latin product重量（克）",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 173,
+                  "y": 1079.9375,
+                  "width": 475.859375,
+                  "height": 60,
+                  "right": 648.859375,
+                  "bottom": 1139.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "移除 合成食物 2 长中文名称 Latin product",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 982.9375,
+                  "width": 44,
+                  "height": 44,
+                  "right": 725,
+                  "bottom": 1026.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "调整 合成食物 2 长中文名称 Latin product 的餐次",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 1026.9375,
+                  "width": 44,
+                  "height": 47,
+                  "right": 725,
+                  "bottom": 1073.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "合成食物 3 长中文名称 Latin product；拖动或上下方向键排序",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 119,
+                  "y": 1157.9375,
+                  "width": 44,
+                  "height": 171,
+                  "right": 163,
+                  "bottom": 1328.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "合成食物 3 长中文名称 Latin product重量（克）",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 173,
+                  "y": 1258.9375,
+                  "width": 475.859375,
+                  "height": 60,
+                  "right": 648.859375,
+                  "bottom": 1318.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "移除 合成食物 3 长中文名称 Latin product",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 1161.9375,
+                  "width": 44,
+                  "height": 44,
+                  "right": 725,
+                  "bottom": 1205.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "调整 合成食物 3 长中文名称 Latin product 的餐次",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 1205.9375,
+                  "width": 44,
+                  "height": 47,
+                  "right": 725,
+                  "bottom": 1252.9375
+                },
+                "font": 32
+              },
+              {
+                "text": " 添加食物",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 118,
+                  "y": 1329.9375,
+                  "width": 152,
+                  "height": 45,
+                  "right": 270,
+                  "bottom": 1374.9375
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 131,
+                  "y": 1531.234375,
+                  "width": 285,
+                  "height": 60,
+                  "right": 416,
+                  "bottom": 1591.234375
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 428,
+                  "y": 1531.234375,
+                  "width": 285,
+                  "height": 60,
+                  "right": 713,
+                  "bottom": 1591.234375
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 131,
+                  "y": 1647.234375,
+                  "width": 285,
+                  "height": 60,
+                  "right": 416,
+                  "bottom": 1707.234375
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 428,
+                  "y": 1647.234375,
+                  "width": 285,
+                  "height": 60,
+                  "right": 713,
+                  "bottom": 1707.234375
+                },
+                "font": 32
+              },
+              {
+                "text": "保存饮食模板",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 118,
+                  "y": 1516.234375,
+                  "width": 608,
+                  "height": 48,
+                  "right": 726,
+                  "bottom": 1564.234375
+                },
+                "font": 32
+              }
+            ]
+          }
+        },
+        {
+          "name": "reports",
+          "metrics": {
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 844,
+              "height": 444.78125,
+              "right": 844,
+              "bottom": 444.78125
+            },
+            "documentWidth": 844,
+            "width": 844,
+            "controls": [
+              {
+                "text": "趋势",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 130,
+                  "y": 115.1875,
+                  "width": 194.65625,
+                  "height": 44,
+                  "right": 324.65625,
+                  "bottom": 159.1875
+                },
+                "font": 27.52
+              },
+              {
+                "text": "日历",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 324.65625,
+                  "y": 115.1875,
+                  "width": 194.671875,
+                  "height": 44,
+                  "right": 519.328125,
+                  "bottom": 159.1875
+                },
+                "font": 27.52
+              },
+              {
+                "text": "报告",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 519.328125,
+                  "y": 115.1875,
+                  "width": 194.671875,
+                  "height": 44,
+                  "right": 714,
+                  "bottom": 159.1875
+                },
+                "font": 27.52
+              },
+              {
+                "text": "日常综合报告",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 133,
+                  "y": 175.1875,
+                  "width": 287.5,
+                  "height": 44,
+                  "right": 420.5,
+                  "bottom": 219.1875
+                },
+                "font": 24.96
+              },
+              {
+                "text": "营养周期报告",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 423.5,
+                  "y": 175.1875,
+                  "width": 287.5,
+                  "height": 44,
+                  "right": 711,
+                  "bottom": 219.1875
+                },
+                "font": 24.96
+              },
+              {
+                "text": "日报",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 133,
+                  "y": 237.1875,
+                  "width": 144.5,
+                  "height": 44,
+                  "right": 277.5,
+                  "bottom": 281.1875
+                },
+                "font": 27.2
+              },
+              {
+                "text": "周报",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 277.5,
+                  "y": 237.1875,
+                  "width": 144.5,
+                  "height": 44,
+                  "right": 422,
+                  "bottom": 281.1875
+                },
+                "font": 27.2
+              },
+              {
+                "text": "月报",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 422,
+                  "y": 237.1875,
+                  "width": 144.5,
+                  "height": 44,
+                  "right": 566.5,
+                  "bottom": 281.1875
+                },
+                "font": 27.2
+              },
+              {
+                "text": "自定义",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 566.5,
+                  "y": 237.1875,
+                  "width": 144.5,
+                  "height": 44,
+                  "right": 711,
+                  "bottom": 281.1875
+                },
+                "font": 27.2
+              },
+              {
+                "text": "上一周",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 130,
+                  "y": 284.1875,
+                  "width": 44,
+                  "height": 56,
+                  "right": 174,
+                  "bottom": 340.1875
+                },
+                "font": 48
+              },
+              {
+                "text": "下一周",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 670,
+                  "y": 284.1875,
+                  "width": 44,
+                  "height": 56,
+                  "right": 714,
+                  "bottom": 340.1875
+                },
+                "font": 48
+              },
+              {
+                "text": "合成动作 0 · 本期无记录",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 147,
+                  "y": 2042.21875,
+                  "width": 319.390625,
+                  "height": 58,
+                  "right": 466.390625,
+                  "bottom": 2100.21875
+                },
+                "font": 28
+              },
+              {
+                "text": "最高负重",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 150,
+                  "y": 2176.8125,
+                  "width": 270.5,
+                  "height": 56,
+                  "right": 420.5,
+                  "bottom": 2232.8125
+                },
+                "font": 28
+              },
+              {
+                "text": "记录总负荷",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 423.5,
+                  "y": 2176.8125,
+                  "width": 270.5,
+                  "height": 56,
+                  "right": 694,
+                  "bottom": 2232.8125
+                },
+                "font": 28
+              },
+              {
+                "text": "查看该动作逐次训练明细 ›",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 147,
+                  "y": 2827,
+                  "width": 329.890625,
+                  "height": 44,
+                  "right": 476.890625,
+                  "bottom": 2871
+                },
+                "font": 28
+              }
+            ]
+          }
+        },
+        {
+          "name": "food-picker",
+          "metrics": {
+            "bounds": {
+              "x": 102,
+              "y": 12,
+              "width": 640,
+              "height": 378,
+              "right": 742,
+              "bottom": 390
+            },
+            "documentWidth": 844,
+            "width": 844,
+            "controls": [
+              {
+                "text": "关闭",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 680,
+                  "y": 39.34375,
+                  "width": 44,
+                  "height": 44,
+                  "right": 724,
+                  "bottom": 83.34375
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 120,
+                  "y": 479.328125,
+                  "width": 604,
+                  "height": 60,
+                  "right": 724,
+                  "bottom": 539.328125
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 120,
+                  "y": 554.328125,
+                  "width": 604,
+                  "height": 86,
+                  "right": 724,
+                  "bottom": 640.328125
+                },
+                "font": 32
+              },
+              {
+                "text": "计算建议份量",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 120,
+                  "y": 282,
+                  "width": 300.390625,
+                  "height": 96,
+                  "right": 420.390625,
+                  "bottom": 378
+                },
+                "font": 32
+              },
+              {
+                "text": "改为记录实际摄入",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 429.390625,
+                  "y": 282,
+                  "width": 294.609375,
+                  "height": 96,
+                  "right": 724,
+                  "bottom": 378
+                },
+                "font": 32
+              }
+            ]
+          }
+        },
+        {
+          "name": "food-preview",
+          "metrics": {
+            "bounds": {
+              "x": 102,
+              "y": 12,
+              "width": 640,
+              "height": 378,
+              "right": 742,
+              "bottom": 390
+            },
+            "documentWidth": 844,
+            "width": 844,
+            "controls": [
+              {
+                "text": "关闭",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 680,
+                  "y": 39.34375,
+                  "width": 44,
+                  "height": 44,
+                  "right": 724,
+                  "bottom": 83.34375
+                },
+                "font": 32
+              },
+              {
+                "text": "减少 PRIVATE_TEST_FOOD_123 5克",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 133,
+                  "y": 200.390625,
+                  "width": 44,
+                  "height": 44,
+                  "right": 177,
+                  "bottom": 244.390625
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 183,
+                  "y": 192.390625,
+                  "width": 454.03125,
+                  "height": 60,
+                  "right": 637.03125,
+                  "bottom": 252.390625
+                },
+                "font": 32
+              },
+              {
+                "text": "增加 PRIVATE_TEST_FOOD_123 5克",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 667,
+                  "y": 198.890625,
+                  "width": 44,
+                  "height": 47,
+                  "right": 711,
+                  "bottom": 245.890625
+                },
+                "font": 32
+              },
+              {
+                "text": "恢复系统建议",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 120,
+                  "y": 291.390625,
+                  "width": 604,
+                  "height": 50,
+                  "right": 724,
+                  "bottom": 341.390625
+                },
+                "font": 32
+              },
+              {
+                "text": "返回选择食物",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 120,
+                  "y": 282,
+                  "width": 294.609375,
+                  "height": 96,
+                  "right": 414.609375,
+                  "bottom": 378
+                },
+                "font": 32
+              },
+              {
+                "text": "确认已实际吃下",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 423.609375,
+                  "y": 282,
+                  "width": 300.390625,
+                  "height": 96,
+                  "right": 724,
+                  "bottom": 378
+                },
+                "font": 26.56
+              }
+            ]
+          }
+        },
+        {
+          "name": "workout",
+          "metrics": {
+            "bounds": {
+              "x": 0,
+              "y": -154,
+              "width": 844,
+              "height": 2229.28125,
+              "right": 844,
+              "bottom": 2075.28125
+            },
+            "documentWidth": 844,
+            "width": 844,
+            "controls": [
+              {
+                "text": "合成动作 0；拖动或上下方向键排序",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 131,
+                  "y": 226,
+                  "width": 44,
+                  "height": 449,
+                  "right": 175,
+                  "bottom": 675
+                },
+                "font": 32
+              },
+              {
+                "text": "改名",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 585,
+                  "y": 232,
+                  "width": 76,
+                  "height": 57,
+                  "right": 661,
+                  "bottom": 289
+                },
+                "font": 32
+              },
+              {
+                "text": "移除 合成动作 0",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 665,
+                  "y": 238.5,
+                  "width": 44,
+                  "height": 44,
+                  "right": 709,
+                  "bottom": 282.5
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组重量",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 349,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 429.5,
+                  "bottom": 409
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组次数",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 434.5,
+                  "y": 349,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 409
+                },
+                "font": 32
+              },
+              {
+                "text": "删除第1组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 659,
+                  "y": 357,
+                  "width": 44,
+                  "height": 44,
+                  "right": 703,
+                  "bottom": 401
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组备注",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 416,
+                  "width": 444,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 476
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组重量",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 493,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 429.5,
+                  "bottom": 553
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组次数",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 434.5,
+                  "y": 493,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 553
+                },
+                "font": 32
+              },
+              {
+                "text": "删除第2组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 659,
+                  "y": 501,
+                  "width": 44,
+                  "height": 44,
+                  "right": 703,
+                  "bottom": 545
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组备注",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 560,
+                  "width": 444,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 620
+                },
+                "font": 32
+              },
+              {
+                "text": " 添加一组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 175,
+                  "y": 630,
+                  "width": 538,
+                  "height": 45,
+                  "right": 713,
+                  "bottom": 675
+                },
+                "font": 32
+              },
+              {
+                "text": "合成动作 1；拖动或上下方向键排序",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 131,
+                  "y": 690,
+                  "width": 44,
+                  "height": 449,
+                  "right": 175,
+                  "bottom": 1139
+                },
+                "font": 32
+              },
+              {
+                "text": "改名",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 585,
+                  "y": 696,
+                  "width": 76,
+                  "height": 57,
+                  "right": 661,
+                  "bottom": 753
+                },
+                "font": 32
+              },
+              {
+                "text": "移除 合成动作 1",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 665,
+                  "y": 702.5,
+                  "width": 44,
+                  "height": 44,
+                  "right": 709,
+                  "bottom": 746.5
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组重量",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 813,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 429.5,
+                  "bottom": 873
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组次数",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 434.5,
+                  "y": 813,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 873
+                },
+                "font": 32
+              },
+              {
+                "text": "删除第1组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 659,
+                  "y": 821,
+                  "width": 44,
+                  "height": 44,
+                  "right": 703,
+                  "bottom": 865
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组备注",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 880,
+                  "width": 444,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 940
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组重量",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 957,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 429.5,
+                  "bottom": 1017
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组次数",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 434.5,
+                  "y": 957,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 1017
+                },
+                "font": 32
+              },
+              {
+                "text": "删除第2组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 659,
+                  "y": 965,
+                  "width": 44,
+                  "height": 44,
+                  "right": 703,
+                  "bottom": 1009
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组备注",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 1024,
+                  "width": 444,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 1084
+                },
+                "font": 32
+              },
+              {
+                "text": " 添加一组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 175,
+                  "y": 1094,
+                  "width": 538,
+                  "height": 45,
+                  "right": 713,
+                  "bottom": 1139
+                },
+                "font": 32
+              },
+              {
+                "text": "合成动作 2；拖动或上下方向键排序",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 131,
+                  "y": 1154,
+                  "width": 44,
+                  "height": 449,
+                  "right": 175,
+                  "bottom": 1603
+                },
+                "font": 32
+              },
+              {
+                "text": "改名",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 585,
+                  "y": 1160,
+                  "width": 76,
+                  "height": 57,
+                  "right": 661,
+                  "bottom": 1217
+                },
+                "font": 32
+              },
+              {
+                "text": "移除 合成动作 2",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 665,
+                  "y": 1166.5,
+                  "width": 44,
+                  "height": 44,
+                  "right": 709,
+                  "bottom": 1210.5
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组重量",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 1277,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 429.5,
+                  "bottom": 1337
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组次数",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 434.5,
+                  "y": 1277,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 1337
+                },
+                "font": 32
+              },
+              {
+                "text": "删除第1组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 659,
+                  "y": 1285,
+                  "width": 44,
+                  "height": 44,
+                  "right": 703,
+                  "bottom": 1329
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组备注",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 1344,
+                  "width": 444,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 1404
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组重量",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 1421,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 429.5,
+                  "bottom": 1481
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组次数",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 434.5,
+                  "y": 1421,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 1481
+                },
+                "font": 32
+              },
+              {
+                "text": "删除第2组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 659,
+                  "y": 1429,
+                  "width": 44,
+                  "height": 44,
+                  "right": 703,
+                  "bottom": 1473
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组备注",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 1488,
+                  "width": 444,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 1548
+                },
+                "font": 32
+              },
+              {
+                "text": " 添加一组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 175,
+                  "y": 1558,
+                  "width": 538,
+                  "height": 45,
+                  "right": 713,
+                  "bottom": 1603
+                },
+                "font": 32
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "key": "webkit-844-200-light-native-reduce",
+      "engine": "webkit",
+      "width": 844,
+      "font": 200,
+      "look": "light-native",
+      "motion": "reduce",
+      "status": "PASS",
+      "widths": [
+        608,
+        608,
+        608,
+        608
+      ],
+      "scenes": [
+        {
+          "name": "diet",
+          "metrics": {
+            "bounds": {
+              "x": 102,
+              "y": 12,
+              "width": 640,
+              "height": 378,
+              "right": 742,
+              "bottom": 390
+            },
+            "documentWidth": 844,
+            "width": 844,
+            "controls": [
+              {
+                "text": "单餐 / 组合",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 122,
+                  "y": 108.34375,
+                  "width": 298,
+                  "height": 44,
+                  "right": 420,
+                  "bottom": 152.34375
+                },
+                "font": 32
+              },
+              {
+                "text": "整日模板",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 424,
+                  "y": 108.34375,
+                  "width": 298,
+                  "height": 44,
+                  "right": 722,
+                  "bottom": 152.34375
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 118,
+                  "y": 207.328125,
+                  "width": 608,
+                  "height": 60,
+                  "right": 726,
+                  "bottom": 267.328125
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "TEXTAREA",
+                "rect": {
+                  "x": 118,
+                  "y": 318.3125,
+                  "width": 608,
+                  "height": 98,
+                  "right": 726,
+                  "bottom": 416.3125
+                },
+                "font": 32
+              },
+              {
+                "text": "早餐",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 122,
+                  "y": 496.609375,
+                  "width": 148.5,
+                  "height": 49,
+                  "right": 270.5,
+                  "bottom": 545.609375
+                },
+                "font": 28
+              },
+              {
+                "text": "午餐",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 272.5,
+                  "y": 496.609375,
+                  "width": 148.5,
+                  "height": 49,
+                  "right": 421,
+                  "bottom": 545.609375
+                },
+                "font": 28
+              },
+              {
+                "text": "晚餐",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 423,
+                  "y": 496.609375,
+                  "width": 148.5,
+                  "height": 49,
+                  "right": 571.5,
+                  "bottom": 545.609375
+                },
+                "font": 28
+              },
+              {
+                "text": "加餐",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 573.5,
+                  "y": 496.609375,
+                  "width": 148.5,
+                  "height": 49,
+                  "right": 722,
+                  "bottom": 545.609375
+                },
+                "font": 28
+              },
+              {
+                "text": "合成食物 0 长中文名称 Latin product；拖动或上下方向键排序",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 119,
+                  "y": 600.90625,
+                  "width": 44,
+                  "height": 159,
+                  "right": 163,
+                  "bottom": 759.90625
+                },
+                "font": 32
+              },
+              {
+                "text": "合成食物 0 长中文名称 Latin product重量（克）",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 173,
+                  "y": 689.90625,
+                  "width": 475.84375,
+                  "height": 60,
+                  "right": 648.84375,
+                  "bottom": 749.90625
+                },
+                "font": 32
+              },
+              {
+                "text": "移除 合成食物 0 长中文名称 Latin product",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 604.90625,
+                  "width": 44,
+                  "height": 44,
+                  "right": 725,
+                  "bottom": 648.90625
+                },
+                "font": 32
+              },
+              {
+                "text": "调整 合成食物 0 长中文名称 Latin product 的餐次",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 648.90625,
+                  "width": 44,
+                  "height": 44,
+                  "right": 725,
+                  "bottom": 692.90625
+                },
+                "font": 32
+              },
+              {
+                "text": "合成食物 1 长中文名称 Latin product；拖动或上下方向键排序",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 119,
+                  "y": 767.90625,
+                  "width": 44,
+                  "height": 159,
+                  "right": 163,
+                  "bottom": 926.90625
+                },
+                "font": 32
+              },
+              {
+                "text": "合成食物 1 长中文名称 Latin product重量（克）",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 173,
+                  "y": 856.90625,
+                  "width": 475.84375,
+                  "height": 60,
+                  "right": 648.84375,
+                  "bottom": 916.90625
+                },
+                "font": 32
+              },
+              {
+                "text": "移除 合成食物 1 长中文名称 Latin product",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 771.90625,
+                  "width": 44,
+                  "height": 44,
+                  "right": 725,
+                  "bottom": 815.90625
+                },
+                "font": 32
+              },
+              {
+                "text": "调整 合成食物 1 长中文名称 Latin product 的餐次",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 815.90625,
+                  "width": 44,
+                  "height": 44,
+                  "right": 725,
+                  "bottom": 859.90625
+                },
+                "font": 32
+              },
+              {
+                "text": "合成食物 2 长中文名称 Latin product；拖动或上下方向键排序",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 119,
+                  "y": 934.90625,
+                  "width": 44,
+                  "height": 159,
+                  "right": 163,
+                  "bottom": 1093.90625
+                },
+                "font": 32
+              },
+              {
+                "text": "合成食物 2 长中文名称 Latin product重量（克）",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 173,
+                  "y": 1023.90625,
+                  "width": 475.84375,
+                  "height": 60,
+                  "right": 648.84375,
+                  "bottom": 1083.90625
+                },
+                "font": 32
+              },
+              {
+                "text": "移除 合成食物 2 长中文名称 Latin product",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 938.90625,
+                  "width": 44,
+                  "height": 44,
+                  "right": 725,
+                  "bottom": 982.90625
+                },
+                "font": 32
+              },
+              {
+                "text": "调整 合成食物 2 长中文名称 Latin product 的餐次",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 982.90625,
+                  "width": 44,
+                  "height": 44,
+                  "right": 725,
+                  "bottom": 1026.90625
+                },
+                "font": 32
+              },
+              {
+                "text": "合成食物 3 长中文名称 Latin product；拖动或上下方向键排序",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 119,
+                  "y": 1101.90625,
+                  "width": 44,
+                  "height": 159,
+                  "right": 163,
+                  "bottom": 1260.90625
+                },
+                "font": 32
+              },
+              {
+                "text": "合成食物 3 长中文名称 Latin product重量（克）",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 173,
+                  "y": 1190.90625,
+                  "width": 475.84375,
+                  "height": 60,
+                  "right": 648.84375,
+                  "bottom": 1250.90625
+                },
+                "font": 32
+              },
+              {
+                "text": "移除 合成食物 3 长中文名称 Latin product",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 1105.90625,
+                  "width": 44,
+                  "height": 44,
+                  "right": 725,
+                  "bottom": 1149.90625
+                },
+                "font": 32
+              },
+              {
+                "text": "调整 合成食物 3 长中文名称 Latin product 的餐次",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 681,
+                  "y": 1149.90625,
+                  "width": 44,
+                  "height": 44,
+                  "right": 725,
+                  "bottom": 1193.90625
+                },
+                "font": 32
+              },
+              {
+                "text": " 添加食物",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 118,
+                  "y": 1262,
+                  "width": 149.640625,
+                  "height": 44,
+                  "right": 267.640625,
+                  "bottom": 1306
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 131,
+                  "y": 1457.28125,
+                  "width": 285,
+                  "height": 60,
+                  "right": 416,
+                  "bottom": 1517.28125
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 428,
+                  "y": 1457.28125,
+                  "width": 285,
+                  "height": 60,
+                  "right": 713,
+                  "bottom": 1517.28125
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 131,
+                  "y": 1568.265625,
+                  "width": 285,
+                  "height": 60,
+                  "right": 416,
+                  "bottom": 1628.265625
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 428,
+                  "y": 1568.265625,
+                  "width": 285,
+                  "height": 60,
+                  "right": 713,
+                  "bottom": 1628.265625
+                },
+                "font": 32
+              },
+              {
+                "text": "保存饮食模板",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 118,
+                  "y": 1447.296875,
+                  "width": 608,
+                  "height": 48,
+                  "right": 726,
+                  "bottom": 1495.296875
+                },
+                "font": 32
+              }
+            ]
+          }
+        },
+        {
+          "name": "reports",
+          "metrics": {
+            "bounds": {
+              "x": 0,
+              "y": 0,
+              "width": 844,
+              "height": 444.78125,
+              "right": 844,
+              "bottom": 444.78125
+            },
+            "documentWidth": 844,
+            "width": 844,
+            "controls": [
+              {
+                "text": "趋势",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 130,
+                  "y": 115.1875,
+                  "width": 194.65625,
+                  "height": 44,
+                  "right": 324.65625,
+                  "bottom": 159.1875
+                },
+                "font": 27.52
+              },
+              {
+                "text": "日历",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 324.65625,
+                  "y": 115.1875,
+                  "width": 194.671875,
+                  "height": 44,
+                  "right": 519.328125,
+                  "bottom": 159.1875
+                },
+                "font": 27.52
+              },
+              {
+                "text": "报告",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 519.328125,
+                  "y": 115.1875,
+                  "width": 194.65625,
+                  "height": 44,
+                  "right": 713.984375,
+                  "bottom": 159.1875
+                },
+                "font": 27.52
+              },
+              {
+                "text": "日常综合报告",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 133,
+                  "y": 175.1875,
+                  "width": 287.5,
+                  "height": 44,
+                  "right": 420.5,
+                  "bottom": 219.1875
+                },
+                "font": 24.959999
+              },
+              {
+                "text": "营养周期报告",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 423.5,
+                  "y": 175.1875,
+                  "width": 287.5,
+                  "height": 44,
+                  "right": 711,
+                  "bottom": 219.1875
+                },
+                "font": 24.959999
+              },
+              {
+                "text": "日报",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 133,
+                  "y": 237.1875,
+                  "width": 144.5,
+                  "height": 44,
+                  "right": 277.5,
+                  "bottom": 281.1875
+                },
+                "font": 27.200001
+              },
+              {
+                "text": "周报",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 277.5,
+                  "y": 237.1875,
+                  "width": 144.5,
+                  "height": 44,
+                  "right": 422,
+                  "bottom": 281.1875
+                },
+                "font": 27.200001
+              },
+              {
+                "text": "月报",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 422,
+                  "y": 237.1875,
+                  "width": 144.5,
+                  "height": 44,
+                  "right": 566.5,
+                  "bottom": 281.1875
+                },
+                "font": 27.200001
+              },
+              {
+                "text": "自定义",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 566.5,
+                  "y": 237.1875,
+                  "width": 144.5,
+                  "height": 44,
+                  "right": 711,
+                  "bottom": 281.1875
+                },
+                "font": 27.200001
+              },
+              {
+                "text": "上一周",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 130,
+                  "y": 284.1875,
+                  "width": 44,
+                  "height": 56,
+                  "right": 174,
+                  "bottom": 340.1875
+                },
+                "font": 48
+              },
+              {
+                "text": "下一周",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 670,
+                  "y": 284.1875,
+                  "width": 44,
+                  "height": 56,
+                  "right": 714,
+                  "bottom": 340.1875
+                },
+                "font": 48
+              },
+              {
+                "text": "合成动作 0 · 本期无记录",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 147,
+                  "y": 2010.21875,
+                  "width": 321.90625,
+                  "height": 52.125,
+                  "right": 468.90625,
+                  "bottom": 2062.34375
+                },
+                "font": 28
+              },
+              {
+                "text": "最高负重",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 150,
+                  "y": 2138.9375,
+                  "width": 270.5,
+                  "height": 49,
+                  "right": 420.5,
+                  "bottom": 2187.9375
+                },
+                "font": 28
+              },
+              {
+                "text": "记录总负荷",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 423.5,
+                  "y": 2138.9375,
+                  "width": 270.5,
+                  "height": 49,
+                  "right": 694,
+                  "bottom": 2187.9375
+                },
+                "font": 28
+              },
+              {
+                "text": "查看该动作逐次训练明细 ›",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 147,
+                  "y": 2763.28125,
+                  "width": 325.40625,
+                  "height": 44,
+                  "right": 472.40625,
+                  "bottom": 2807.28125
+                },
+                "font": 28
+              }
+            ]
+          }
+        },
+        {
+          "name": "food-picker",
+          "metrics": {
+            "bounds": {
+              "x": 102,
+              "y": 12,
+              "width": 640,
+              "height": 378,
+              "right": 742,
+              "bottom": 390
+            },
+            "documentWidth": 844,
+            "width": 844,
+            "controls": [
+              {
+                "text": "关闭",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 680,
+                  "y": 39.34375,
+                  "width": 44,
+                  "height": 44,
+                  "right": 724,
+                  "bottom": 83.34375
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 120,
+                  "y": 479.25,
+                  "width": 604,
+                  "height": 60,
+                  "right": 724,
+                  "bottom": 539.25
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 120,
+                  "y": 554.25,
+                  "width": 604,
+                  "height": 87.03125,
+                  "right": 724,
+                  "bottom": 641.28125
+                },
+                "font": 32
+              },
+              {
+                "text": "计算建议份量",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 120,
+                  "y": 282,
+                  "width": 300.390625,
+                  "height": 96,
+                  "right": 420.390625,
+                  "bottom": 378
+                },
+                "font": 32
+              },
+              {
+                "text": "改为记录实际摄入",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 429.390625,
+                  "y": 282,
+                  "width": 294.609375,
+                  "height": 96,
+                  "right": 724,
+                  "bottom": 378
+                },
+                "font": 32
+              }
+            ]
+          }
+        },
+        {
+          "name": "food-preview",
+          "metrics": {
+            "bounds": {
+              "x": 102,
+              "y": 12,
+              "width": 640,
+              "height": 378,
+              "right": 742,
+              "bottom": 390
+            },
+            "documentWidth": 844,
+            "width": 844,
+            "controls": [
+              {
+                "text": "关闭",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 680,
+                  "y": 39.34375,
+                  "width": 44,
+                  "height": 44,
+                  "right": 724,
+                  "bottom": 83.34375
+                },
+                "font": 32
+              },
+              {
+                "text": "减少 PRIVATE_TEST_FOOD_123 5克",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 133,
+                  "y": 385.25,
+                  "width": 44,
+                  "height": 44,
+                  "right": 177,
+                  "bottom": 429.25
+                },
+                "font": 32
+              },
+              {
+                "text": "",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 183,
+                  "y": 377.25,
+                  "width": 454.03125,
+                  "height": 60,
+                  "right": 637.03125,
+                  "bottom": 437.25
+                },
+                "font": 32
+              },
+              {
+                "text": "增加 PRIVATE_TEST_FOOD_123 5克",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 667,
+                  "y": 385.25,
+                  "width": 44,
+                  "height": 44,
+                  "right": 711,
+                  "bottom": 429.25
+                },
+                "font": 32
+              },
+              {
+                "text": "恢复系统建议",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 120,
+                  "y": 476.25,
+                  "width": 604,
+                  "height": 50,
+                  "right": 724,
+                  "bottom": 526.25
+                },
+                "font": 32
+              },
+              {
+                "text": "返回选择食物",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 120,
+                  "y": 282,
+                  "width": 294.609375,
+                  "height": 96,
+                  "right": 414.609375,
+                  "bottom": 378
+                },
+                "font": 32
+              },
+              {
+                "text": "确认已实际吃下",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 423.609375,
+                  "y": 282,
+                  "width": 300.390625,
+                  "height": 96,
+                  "right": 724,
+                  "bottom": 378
+                },
+                "font": 26.559999
+              }
+            ]
+          }
+        },
+        {
+          "name": "workout",
+          "metrics": {
+            "bounds": {
+              "x": 0,
+              "y": -136,
+              "width": 844,
+              "height": 2148.765625,
+              "right": 844,
+              "bottom": 2012.765625
+            },
+            "documentWidth": 844,
+            "width": 844,
+            "controls": [
+              {
+                "text": "合成动作 0；拖动或上下方向键排序",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 131,
+                  "y": 214.203125,
+                  "width": 44,
+                  "height": 434.09375,
+                  "right": 175,
+                  "bottom": 648.296875
+                },
+                "font": 32
+              },
+              {
+                "text": "改名",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 586.171875,
+                  "y": 220.203125,
+                  "width": 74.828125,
+                  "height": 50,
+                  "right": 661,
+                  "bottom": 270.203125
+                },
+                "font": 32
+              },
+              {
+                "text": "移除 合成动作 0",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 665,
+                  "y": 223.203125,
+                  "width": 44,
+                  "height": 44,
+                  "right": 709,
+                  "bottom": 267.203125
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组重量",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 323.203125,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 429.5,
+                  "bottom": 383.203125
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组次数",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 434.5,
+                  "y": 323.203125,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 383.203125
+                },
+                "font": 32
+              },
+              {
+                "text": "删除第1组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 659,
+                  "y": 331.203125,
+                  "width": 44,
+                  "height": 44,
+                  "right": 703,
+                  "bottom": 375.203125
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组备注",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 390.203125,
+                  "width": 444,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 450.203125
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组重量",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 467.203125,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 429.5,
+                  "bottom": 527.203125
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组次数",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 434.5,
+                  "y": 467.203125,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 527.203125
+                },
+                "font": 32
+              },
+              {
+                "text": "删除第2组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 659,
+                  "y": 475.203125,
+                  "width": 44,
+                  "height": 44,
+                  "right": 703,
+                  "bottom": 519.203125
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组备注",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 534.203125,
+                  "width": 444,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 594.203125
+                },
+                "font": 32
+              },
+              {
+                "text": " 添加一组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 175,
+                  "y": 604.296875,
+                  "width": 538,
+                  "height": 44,
+                  "right": 713,
+                  "bottom": 648.296875
+                },
+                "font": 32
+              },
+              {
+                "text": "合成动作 1；拖动或上下方向键排序",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 131,
+                  "y": 663.296875,
+                  "width": 44,
+                  "height": 434.09375,
+                  "right": 175,
+                  "bottom": 1097.390625
+                },
+                "font": 32
+              },
+              {
+                "text": "改名",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 586.171875,
+                  "y": 669.296875,
+                  "width": 74.828125,
+                  "height": 50,
+                  "right": 661,
+                  "bottom": 719.296875
+                },
+                "font": 32
+              },
+              {
+                "text": "移除 合成动作 1",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 665,
+                  "y": 672.296875,
+                  "width": 44,
+                  "height": 44,
+                  "right": 709,
+                  "bottom": 716.296875
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组重量",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 772.296875,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 429.5,
+                  "bottom": 832.296875
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组次数",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 434.5,
+                  "y": 772.296875,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 832.296875
+                },
+                "font": 32
+              },
+              {
+                "text": "删除第1组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 659,
+                  "y": 780.296875,
+                  "width": 44,
+                  "height": 44,
+                  "right": 703,
+                  "bottom": 824.296875
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组备注",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 839.296875,
+                  "width": 444,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 899.296875
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组重量",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 916.296875,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 429.5,
+                  "bottom": 976.296875
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组次数",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 434.5,
+                  "y": 916.296875,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 976.296875
+                },
+                "font": 32
+              },
+              {
+                "text": "删除第2组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 659,
+                  "y": 924.296875,
+                  "width": 44,
+                  "height": 44,
+                  "right": 703,
+                  "bottom": 968.296875
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组备注",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 983.296875,
+                  "width": 444,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 1043.296875
+                },
+                "font": 32
+              },
+              {
+                "text": " 添加一组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 175,
+                  "y": 1053.390625,
+                  "width": 538,
+                  "height": 44,
+                  "right": 713,
+                  "bottom": 1097.390625
+                },
+                "font": 32
+              },
+              {
+                "text": "合成动作 2；拖动或上下方向键排序",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 131,
+                  "y": 1112.390625,
+                  "width": 44,
+                  "height": 434.09375,
+                  "right": 175,
+                  "bottom": 1546.484375
+                },
+                "font": 32
+              },
+              {
+                "text": "改名",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 586.171875,
+                  "y": 1118.390625,
+                  "width": 74.828125,
+                  "height": 50,
+                  "right": 661,
+                  "bottom": 1168.390625
+                },
+                "font": 32
+              },
+              {
+                "text": "移除 合成动作 2",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 665,
+                  "y": 1121.390625,
+                  "width": 44,
+                  "height": 44,
+                  "right": 709,
+                  "bottom": 1165.390625
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组重量",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 1221.390625,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 429.5,
+                  "bottom": 1281.390625
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组次数",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 434.5,
+                  "y": 1221.390625,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 1281.390625
+                },
+                "font": 32
+              },
+              {
+                "text": "删除第1组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 659,
+                  "y": 1229.390625,
+                  "width": 44,
+                  "height": 44,
+                  "right": 703,
+                  "bottom": 1273.390625
+                },
+                "font": 32
+              },
+              {
+                "text": "第1组备注",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 1288.390625,
+                  "width": 444,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 1348.390625
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组重量",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 1365.390625,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 429.5,
+                  "bottom": 1425.390625
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组次数",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 434.5,
+                  "y": 1365.390625,
+                  "width": 219.5,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 1425.390625
+                },
+                "font": 32
+              },
+              {
+                "text": "删除第2组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 659,
+                  "y": 1373.390625,
+                  "width": 44,
+                  "height": 44,
+                  "right": 703,
+                  "bottom": 1417.390625
+                },
+                "font": 32
+              },
+              {
+                "text": "第2组备注",
+                "tag": "INPUT",
+                "rect": {
+                  "x": 210,
+                  "y": 1432.390625,
+                  "width": 444,
+                  "height": 60,
+                  "right": 654,
+                  "bottom": 1492.390625
+                },
+                "font": 32
+              },
+              {
+                "text": " 添加一组",
+                "tag": "BUTTON",
+                "rect": {
+                  "x": 175,
+                  "y": 1502.484375,
+                  "width": 538,
+                  "height": 44,
+                  "right": 713,
+                  "bottom": 1546.484375
+                },
+                "font": 32
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

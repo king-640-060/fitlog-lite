@@ -17,6 +17,8 @@ export function navigationBlocked(editing = true): boolean {
 /** Touch is handled locally, after direction/owner arbitration. Native vertical and child scroll stay native. */
 export function bindHorizontalSwipe(surface: HTMLElement, options: {
   allowed(target: Element): boolean
+  blocked?(): boolean
+  allowText?: boolean
   start(): void
   move(dx: number): void
   end(dx: number, velocity: number, canceled: boolean): void
@@ -25,14 +27,14 @@ export function bindHorizontalSwipe(surface: HTMLElement, options: {
   let gesture: { id: number; x: number; y: number; axis: 'pending' | 'horizontal'; samples: { x: number; t: number }[]; dx: number } | undefined
   let suppressUntil = 0
   const begin = (id: number, x: number, y: number, target: EventTarget | null) => {
-    if (gesture || navigationBlocked() || document.getSelection()?.toString() || !(target instanceof Element) || !options.allowed(target) || x - surface.getBoundingClientRect().left < 26) return
+    if (gesture || (options.blocked?.() ?? navigationBlocked()) || document.getSelection()?.toString() || !(target instanceof Element) || !options.allowed(target) || x - surface.getBoundingClientRect().left < 26) return
     // Text remains selectable. Desktop drag navigation starts only on whitespace, not a text run.
-    if (target.matches('p,span,strong,small,h1,h2,h3,h4,label,time,text')) return
+    if (!options.allowText && target.matches('p,span,strong,small,h1,h2,h3,h4,label,time,text')) return
     gesture = { id, x, y, axis: 'pending', samples: [{ x, t: performance.now() }], dx: 0 }; options.start()
   }
   const move = (id: number, x: number, y: number, event: Event) => {
     const g = gesture; if (!g || g.id !== id) return
-    if (navigationBlocked()) { finish(true); return }
+    if (options.blocked?.() ?? navigationBlocked()) { finish(true); return }
     const dx = x - g.x, axis = swipeAxis(dx, y - g.y)
     if (g.axis === 'pending') {
       if (axis === 'vertical') { finish(true); return }
@@ -168,7 +170,7 @@ export function createPageNavigation<T extends string>(options: {
     if (await prepare(target, token)) await finish(0, true, token)
   }
   const swipe = bindHorizontalSwipe(stage, {
-    allowed: target => !ownCommit && !target.closest(`${swipeControl},.food-content,.food-date-navigation,.trend-chart-shell,.calendar-grid,[data-no-page-swipe]`),
+    allowed: target => !ownCommit && !target.closest(`${swipeControl},.food-content,.food-date-navigation,.trend-chart-shell,.calendar-grid,[data-local-deck],[data-no-page-swipe]`),
     start: () => { interrupt(); from = index(); to = from; dx = 0; ended = false },
     move: distance => {
       dx = distance; const target = adjacentSwipe(from, dx, tabs.length)
