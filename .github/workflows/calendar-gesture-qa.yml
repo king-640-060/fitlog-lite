@@ -13,12 +13,42 @@ jobs:
       max-parallel: 8
       matrix:
         include:
-          - tag: retake-chromium-430
+          - tag: final-chromium-320
+            shard: '0'
+            task: calendar-matrix
+            engine: chromium
+            width: '320'
+          - tag: final-chromium-375
+            shard: '0'
+            task: calendar-matrix
+            engine: chromium
+            width: '375'
+          - tag: final-chromium-390
+            shard: '0'
+            task: calendar-matrix
+            engine: chromium
+            width: '390'
+          - tag: final-chromium-430
             shard: '0'
             task: calendar-matrix
             engine: chromium
             width: '430'
-          - tag: retake-webkit-430
+          - tag: final-webkit-320
+            shard: '0'
+            task: calendar-matrix
+            engine: webkit
+            width: '320'
+          - tag: final-webkit-375
+            shard: '0'
+            task: calendar-matrix
+            engine: webkit
+            width: '375'
+          - tag: final-webkit-390
+            shard: '0'
+            task: calendar-matrix
+            engine: webkit
+            width: '390'
+          - tag: final-webkit-430
             shard: '0'
             task: calendar-matrix
             engine: webkit
