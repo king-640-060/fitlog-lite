@@ -168,3 +168,14 @@ Short landscape views measure the actual three navigation tiers plus a usable44p
 `progressLayoutLoadingV2.mjs` delays native initial Weight getAll/getAllRecords completions before a warm liveQuery cache exists. It records the hidden unready placeholder separately from visible/layout-ready frames, requires visible14px geometry and exact22-table preservation. Neither script is physical iPhone evidence. Use FITLOG_QA_URL/FITLOG_PLAYWRIGHT_MODULE/FITLOG_QA_ARTIFACT_ROOT as above; fresh synthetic contexts only.
 
 The existing `interactionV09Edges` navigation guard captures rectangle and native window scroll together at both endpoints, then compares document coordinates within1px. A CI WebKit case started at scrollY2 (screenY102/documentY104) and ended at scrollY58 (screenY46/documentY104); assuming an initial0 falsely failed. The threshold and sixteen other business assertions remain, with extra x/width/height checks.
+
+
+## Calendar Gesture v1
+
+`calendarGestureV1.mjs` runs the real Calendar DOM in Chromium CDP touch and WebKit synthetic-touch branches. Default: two detailed390px contexts, nine hit origins, seven gestures each, intermediate coordinates, top-nav tracking/commit/bounce/cancel, keyboard/month/day/history and20 cycles. `FITLOG_CALENDAR_MATRIX=1` runs the full4width×3font×3visual×2motion matrix plus2landscapes per engine (148 total). Optional FITLOG_CALENDAR_ENGINE and FITLOG_CALENDAR_WIDTH shard execution only; require the full union. `FITLOG_CALENDAR_NEGATIVE=1` retains a START failure and requires actual reproduction; never count negative mode as a product PASS.
+
+`calendarGestureLoadingV1.mjs` holds actual native IDB completions, cancels pending Calendar for Reports, releases stale reads and reenters Calendar. Original progressLayoutV2/loading, interactionV09 navigation/geometry/touch/lifecycle, report/range and data/PWA gates remain required. Read [contract](../../docs/CALENDAR_GESTURE_FIX_V1.md) and [QA](../../docs/CALENDAR_GESTURE_FIX_V1_QA.md). Real iPhone/PWA/VoiceOver/Safe Area remain separate Pending.
+
+The Calendar harness verifies actual hit ownership, including real month-header background on both halves and the scroll owner's bottom padding. It scans real DOM background instead of calling a Today button or legend “blank”. Every hit and intermediate frame is retained. Default detailed runs also hold650ms, drag slowly for1000ms and hold650ms before release in both directions.
+
+`FITLOG_CALENDAR_LANDSCAPE_ONLY=1` partitions the existing two landscape cases per engine; `FITLOG_CALENDAR_ZONES_ONLY=1` partitions the three actual blank origins while retaining all seven directions/cancel actions and data/top-navigation checks. Neither partition alone replaces the full148-context matrix. This release combines the complete base matrix with an additional full148-context strict-blank audit. Raw source SHA and executed partition flags stay in each receipt; retain failed hit guards and corrections.

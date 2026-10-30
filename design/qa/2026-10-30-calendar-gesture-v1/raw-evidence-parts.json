@@ -1,0 +1,125 @@
+{
+  "format": "ordered-byte-parts-v1",
+  "originalFile": "raw-evidence.json.gz",
+  "bytes": 11996753,
+  "sha256": "567bebe6ea9e48a28c3c6ac194afceb4973dc7674c2a25e3e71c93e59016dd80",
+  "parts": [
+    {
+      "file": "raw-evidence.json.gz.part01",
+      "bytes": 524288,
+      "sha256": "92c29852aab1d11de686d63708817049c16837af53859357feb01e58c34a9040"
+    },
+    {
+      "file": "raw-evidence.json.gz.part02",
+      "bytes": 524288,
+      "sha256": "58fc5f185a66aff1a0ad26c40255e47a2bba9fbf97c01fb5e4311e6a2d38124f"
+    },
+    {
+      "file": "raw-evidence.json.gz.part03",
+      "bytes": 524288,
+      "sha256": "e958d839cd330bac24aedd6cd15ee2a0403db6bed218c3a1a27c1cb64984dc10"
+    },
+    {
+      "file": "raw-evidence.json.gz.part04",
+      "bytes": 524288,
+      "sha256": "95012984b6850f2f2c659b3ece4a600bf6e91537fe4cd14c0a44b21236bd0a3f"
+    },
+    {
+      "file": "raw-evidence.json.gz.part05",
+      "bytes": 524288,
+      "sha256": "c8636ea1302d51c85dcbe6c562a0f3df6c13a6d77a0cea94287ec2008d4d4b1f"
+    },
+    {
+      "file": "raw-evidence.json.gz.part06",
+      "bytes": 524288,
+      "sha256": "f0991d34e647e47a602f0fcdec03772a410d2a3fb98978f485b94d60eb215321"
+    },
+    {
+      "file": "raw-evidence.json.gz.part07",
+      "bytes": 524288,
+      "sha256": "f077cc9ba2ac8e8f76f791f733238bcff77a9f68950d44442df24c406f6b0589"
+    },
+    {
+      "file": "raw-evidence.json.gz.part08",
+      "bytes": 524288,
+      "sha256": "f396c4a3dc53f587cc0eb8bc23867a42feab33c55b2b570f901b93b5a20ccf09"
+    },
+    {
+      "file": "raw-evidence.json.gz.part09",
+      "bytes": 524288,
+      "sha256": "a6994ce00f89eeea9b04f3ae0da82fe62e78a42d8904ba97f3a1a6aa40889bb6"
+    },
+    {
+      "file": "raw-evidence.json.gz.part10",
+      "bytes": 524288,
+      "sha256": "7f616335eff05df2b19f8044e000c048f75ee885ea76e5ab4da05f3dcd0946e7"
+    },
+    {
+      "file": "raw-evidence.json.gz.part11",
+      "bytes": 524288,
+      "sha256": "a098dd02e959de215311f2f2fc19785f440f2bdd289576ca773b2a9f2d7bdc12"
+    },
+    {
+      "file": "raw-evidence.json.gz.part12",
+      "bytes": 524288,
+      "sha256": "b8d7f269b24631cf386f397ca80a04d642384dcd646b6fcea72026fa2ed27d59"
+    },
+    {
+      "file": "raw-evidence.json.gz.part13",
+      "bytes": 524288,
+      "sha256": "8e15e878bd8219f44051020d4a1711d791e0fffe513477cd3b901413046abce7"
+    },
+    {
+      "file": "raw-evidence.json.gz.part14",
+      "bytes": 524288,
+      "sha256": "94257d03471892d6f71ffe7086b25fea973d77195ac4fbb61bc87f274eb4476f"
+    },
+    {
+      "file": "raw-evidence.json.gz.part15",
+      "bytes": 524288,
+      "sha256": "5944e3bf78ab26f18f487ea6451da3bc45154de7a2275f79e1680360e6761fc8"
+    },
+    {
+      "file": "raw-evidence.json.gz.part16",
+      "bytes": 524288,
+      "sha256": "674816a353023bcfd507230533ae0bd20cfd4245e024c1db43ab9bca04edd634"
+    },
+    {
+      "file": "raw-evidence.json.gz.part17",
+      "bytes": 524288,
+      "sha256": "6bf15750f898c4eda7feaee9452626ff2e29a7693b7939cb97ef679bdaa09996"
+    },
+    {
+      "file": "raw-evidence.json.gz.part18",
+      "bytes": 524288,
+      "sha256": "12443c8a3ba5f67877e71971f9cb50e43914e6e658af5f33d07624f5ecf2abcd"
+    },
+    {
+      "file": "raw-evidence.json.gz.part19",
+      "bytes": 524288,
+      "sha256": "40dbfed47b8b972a172594deba2caa401d9ee2ef467e9a0988a08d630f3741a5"
+    },
+    {
+      "file": "raw-evidence.json.gz.part20",
+      "bytes": 524288,
+      "sha256": "57de0a044a2ce8aaf6fd0969820a717e90141c58d1e6bf6af08da7291c889ce8"
+    },
+    {
+      "file": "raw-evidence.json.gz.part21",
+      "bytes": 524288,
+      "sha256": "e817c2d4460969696c7f21a3ad7c99dffd586a83c9b9e211d7e7afb84ca75dbb"
+    },
+    {
+      "file": "raw-evidence.json.gz.part22",
+      "bytes": 524288,
+      "sha256": "87664a95acd29756ded668e3563fac11ed95547c15e0e4186a7d210e8d48821b"
+    },
+    {
+      "file": "raw-evidence.json.gz.part23",
+      "bytes": 462417,
+      "sha256": "a70858814b9ad9e275102432e606fc4c477391813bf2a16d0600cf6e9634eda7"
+    }
+  ],
+  "decodedIndex": "raw-index.json",
+  "privateVideoIncluded": false
+}

@@ -1,0 +1,222 @@
+{
+  "conclusion": "success",
+  "headSha": "9edf678f1530cfecd0f816e4f2ceaeb263a96611",
+  "jobs": [
+    {
+      "completedAt": "2026-10-30T08:58:38Z",
+      "conclusion": "success",
+      "databaseId": 123963026085,
+      "name": "browser (retake-chromium-430, 0, calendar-matrix, chromium, 430)",
+      "startedAt": "2026-10-30T08:43:48Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-30T08:43:51Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-30T08:43:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:43:58Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 2,
+          "startedAt": "2026-10-30T08:43:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:44:07Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "number": 3,
+          "startedAt": "2026-10-30T08:43:58Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:44:13Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-10-30T08:44:07Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:44:49Z",
+          "conclusion": "success",
+          "name": "Run npm run typecheck && npm test -- --maxWorkers=4 && npm run build",
+          "number": 5,
+          "startedAt": "2026-10-30T08:44:13Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:45:18Z",
+          "conclusion": "success",
+          "name": "Install independent browsers",
+          "number": 6,
+          "startedAt": "2026-10-30T08:44:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:45:18Z",
+          "conclusion": "success",
+          "name": "Run python3 .qa-remote/setup.py",
+          "number": 7,
+          "startedAt": "2026-10-30T08:45:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:58:30Z",
+          "conclusion": "success",
+          "name": "Run node .qa-remote/run.mjs",
+          "number": 8,
+          "startedAt": "2026-10-30T08:45:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:58:32Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "number": 9,
+          "startedAt": "2026-10-30T08:58:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:58:34Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "number": 17,
+          "startedAt": "2026-10-30T08:58:32Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:58:34Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 18,
+          "startedAt": "2026-10-30T08:58:34Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:58:35Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 19,
+          "startedAt": "2026-10-30T08:58:34Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/king-640-060/fitlog-lite/actions/runs/41025651841/job/123963026085"
+    },
+    {
+      "completedAt": "2026-10-30T08:56:56Z",
+      "conclusion": "success",
+      "databaseId": 123963026393,
+      "name": "browser (retake-webkit-430, 0, calendar-matrix, webkit, 430)",
+      "startedAt": "2026-10-30T08:45:51Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-10-30T08:45:54Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-10-30T08:45:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:46:01Z",
+          "conclusion": "success",
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 2,
+          "startedAt": "2026-10-30T08:45:54Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:46:09Z",
+          "conclusion": "success",
+          "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "number": 3,
+          "startedAt": "2026-10-30T08:46:01Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:46:16Z",
+          "conclusion": "success",
+          "name": "Run npm ci",
+          "number": 4,
+          "startedAt": "2026-10-30T08:46:09Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:46:51Z",
+          "conclusion": "success",
+          "name": "Run npm run typecheck && npm test -- --maxWorkers=4 && npm run build",
+          "number": 5,
+          "startedAt": "2026-10-30T08:46:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:47:22Z",
+          "conclusion": "success",
+          "name": "Install independent browsers",
+          "number": 6,
+          "startedAt": "2026-10-30T08:46:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:47:23Z",
+          "conclusion": "success",
+          "name": "Run python3 .qa-remote/setup.py",
+          "number": 7,
+          "startedAt": "2026-10-30T08:47:22Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:56:43Z",
+          "conclusion": "success",
+          "name": "Run node .qa-remote/run.mjs",
+          "number": 8,
+          "startedAt": "2026-10-30T08:47:23Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:56:46Z",
+          "conclusion": "success",
+          "name": "Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+          "number": 9,
+          "startedAt": "2026-10-30T08:56:43Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:56:50Z",
+          "conclusion": "success",
+          "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "number": 17,
+          "startedAt": "2026-10-30T08:56:46Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:56:50Z",
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "number": 18,
+          "startedAt": "2026-10-30T08:56:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-10-30T08:56:53Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 19,
+          "startedAt": "2026-10-30T08:56:50Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/king-640-060/fitlog-lite/actions/runs/41025651841/job/123963026393"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/king-640-060/fitlog-lite/actions/runs/41025651841"
+}

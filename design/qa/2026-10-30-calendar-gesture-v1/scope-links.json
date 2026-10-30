@@ -1,0 +1,655 @@
+{
+  "status": "PASS",
+  "source": [
+    "src/main.ts",
+    "src/styles/approvedInteraction.css"
+  ],
+  "allFiles": [
+    "\"design/reference/2026-10-30-calendar-gesture-v1/00_README_\\350\\257\\267\\345\\205\\210\\351\\230\\205\\350\\257\\273.md\"",
+    "\"design/reference/2026-10-30-calendar-gesture-v1/01_CODEX_\\346\\255\\243\\345\\274\\217\\345\\274\\200\\345\\217\\221\\346\\214\\207\\344\\273\\244.md\"",
+    "\"design/reference/2026-10-30-calendar-gesture-v1/02_\\351\\200\\220\\351\\241\\271\\351\\252\\214\\346\\224\\266\\347\\237\\251\\351\\230\\265.md\"",
+    "design/qa/2026-10-30-calendar-gesture-v1/README.md",
+    "design/qa/2026-10-30-calendar-gesture-v1/SHA256SUMS",
+    "design/qa/2026-10-30-calendar-gesture-v1/calendarGestureV1-9edf678.mjs",
+    "design/qa/2026-10-30-calendar-gesture-v1/calendarGestureV1-abe83d2.mjs",
+    "design/qa/2026-10-30-calendar-gesture-v1/calendarGestureV1-before-native-frames.mjs",
+    "design/qa/2026-10-30-calendar-gesture-v1/calendarGestureV1-first-strict-zones.mjs",
+    "design/qa/2026-10-30-calendar-gesture-v1/calendarGestureV1-zone-landscape-pre-filter.mjs",
+    "design/qa/2026-10-30-calendar-gesture-v1/calendarGestureV1-zone-scan-before-slow.mjs",
+    "design/qa/2026-10-30-calendar-gesture-v1/ci-coordinate-status.json",
+    "design/qa/2026-10-30-calendar-gesture-v1/ci-final-status.json",
+    "design/qa/2026-10-30-calendar-gesture-v1/ci-first-canceled.json",
+    "design/qa/2026-10-30-calendar-gesture-v1/ci-native-frames-status.json",
+    "design/qa/2026-10-30-calendar-gesture-v1/current-summary.json",
+    "design/qa/2026-10-30-calendar-gesture-v1/expected-gates.json",
+    "design/qa/2026-10-30-calendar-gesture-v1/final-matrix-summary.json",
+    "design/qa/2026-10-30-calendar-gesture-v1/input-verification.json",
+    "design/qa/2026-10-30-calendar-gesture-v1/local-source-manifest.json",
+    "design/qa/2026-10-30-calendar-gesture-v1/raw-evidence.json.gz",
+    "design/qa/2026-10-30-calendar-gesture-v1/raw-index.json",
+    "design/qa/2026-10-30-calendar-gesture-v1/scope-links.json",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-320-844-100-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-320-844-100-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-320-844-100-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-320-844-100-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-320-844-100-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-320-844-100-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-320-844-200-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-320-844-200-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-320-844-200-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-320-844-200-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-320-844-200-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-320-844-200-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-375-844-100-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-375-844-100-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-375-844-100-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-375-844-100-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-375-844-100-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-375-844-100-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-375-844-200-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-375-844-200-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-375-844-200-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-375-844-200-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-375-844-200-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-375-844-200-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-390-844-100-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-390-844-100-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-390-844-100-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-390-844-100-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-390-844-100-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-390-844-100-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-390-844-200-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-390-844-200-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-390-844-200-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-390-844-200-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-390-844-200-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-390-844-200-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-430-844-100-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-430-844-100-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-430-844-100-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-430-844-100-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-430-844-100-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-430-844-100-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-430-844-200-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-430-844-200-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-430-844-200-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-430-844-200-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-430-844-200-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/chromium-430-844-200-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/comparison.html",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-below-grid-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-date-blank-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-date-marker-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-date-number-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-legend-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-month-2021-02-15.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-month-2024-02-29.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-month-2026-02-15.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-month-2026-08-15.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-month-2026-12-31.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-month-2027-01-01.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-month-left-blank-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-month-right-blank-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-month-title-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-nav--175-false.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-nav--175-true.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-nav--38-false.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-nav-175-false.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-chromium-390-844-100-classic-light-no-preference-weekday-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-below-grid-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-date-blank-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-date-marker-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-date-number-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-legend-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-month-2021-02-15.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-month-2024-02-29.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-month-2026-02-15.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-month-2026-08-15.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-month-2026-12-31.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-month-2027-01-01.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-month-left-blank-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-month-right-blank-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-month-title-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-nav--175-false.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-nav--175-true.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-nav--38-false.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-nav-175-false.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-detail-3-webkit-390-844-100-classic-light-no-preference-weekday-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-landscape-retake-chromium-844-390-200-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-landscape-retake-chromium-844-390-200-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-landscape-retake-webkit-844-390-200-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-landscape-retake-webkit-844-390-200-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-below-grid-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-date-blank-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-date-marker-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-date-number-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-legend-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-month-2021-02-15.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-month-2024-02-29.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-month-2026-02-15.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-month-2026-08-15.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-month-2026-12-31.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-month-2027-01-01.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-month-left-blank-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-month-right-blank-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-month-title-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-nav--175-false.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-nav--175-true.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-nav--38-false.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-nav-175-false.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-chromium-390-844-100-classic-light-no-preference-weekday-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-below-grid-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-date-blank-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-date-marker-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-date-number-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-legend-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-month-2021-02-15.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-month-2024-02-29.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-month-2026-02-15.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-month-2026-08-15.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-month-2026-12-31.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-month-2027-01-01.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-month-left-blank-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-month-right-blank-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-month-title-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-nav--175-false.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-nav--175-true.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-nav--38-false.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-nav-175-false.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/final-strict-detail-webkit-390-844-100-classic-light-no-preference-weekday-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/negative-chromium-390-844-100-classic-light-no-preference-date-blank-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/negative-chromium-390-844-100-classic-light-no-preference-date-marker-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/negative-chromium-390-844-100-classic-light-no-preference-date-number-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/negative-chromium-390-844-100-classic-light-no-preference-month-title-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/negative-exact-final-chromium-390-844-100-classic-light-no-preference-date-number-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/negative-exact-final-webkit-390-844-100-classic-light-no-preference-date-blank-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/negative-exact-final-webkit-390-844-100-classic-light-no-preference-date-marker-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/negative-exact-final-webkit-390-844-100-classic-light-no-preference-date-number-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/negative-exact-final-webkit-390-844-100-classic-light-no-preference-month-title-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/negative-webkit-390-844-100-classic-light-no-preference-date-blank-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/negative-webkit-390-844-100-classic-light-no-preference-date-marker-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/negative-webkit-390-844-100-classic-light-no-preference-date-number-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/negative-webkit-390-844-100-classic-light-no-preference-month-title-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/reference-chromium-prototype-nav-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/reference-chromium-prototype.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/reference-webkit-prototype-nav-mid.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/reference-webkit-prototype.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-320-844-100-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-320-844-100-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-320-844-100-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-320-844-100-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-320-844-100-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-320-844-100-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-320-844-200-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-320-844-200-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-320-844-200-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-320-844-200-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-320-844-200-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-320-844-200-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-375-844-100-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-375-844-100-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-375-844-100-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-375-844-100-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-375-844-100-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-375-844-100-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-375-844-200-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-375-844-200-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-375-844-200-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-375-844-200-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-375-844-200-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-375-844-200-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-390-844-100-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-390-844-100-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-390-844-100-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-390-844-100-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-390-844-100-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-390-844-100-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-390-844-200-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-390-844-200-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-390-844-200-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-390-844-200-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-390-844-200-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-390-844-200-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-430-844-100-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-430-844-100-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-430-844-100-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-430-844-100-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-430-844-100-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-430-844-100-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-430-844-200-classic-dark-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-430-844-200-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-430-844-200-classic-light-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-430-844-200-classic-light-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-430-844-200-light-native-no-preference-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-430-844-200-light-native-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-844-390-200-classic-dark-reduce-calendar.png",
+    "design/qa/2026-10-30-calendar-gesture-v1/visual/webkit-844-390-200-light-native-no-preference-calendar.png",
+    "design/reference/2026-10-30-calendar-gesture-v1/README.md",
+    "design/reference/2026-10-30-calendar-gesture-v1/SHA256SUMS.txt",
+    "design/reference/2026-10-30-calendar-gesture-v1/prototype/FitLog_Lite_Calendar_Gesture_Prototype_v1_APPROVED.html",
+    "design/reference/2026-10-30-calendar-gesture-v1/prototype/calendar_v1_preview.png",
+    "docs/CALENDAR_GESTURE_FIX_V1.md",
+    "docs/CALENDAR_GESTURE_FIX_V1_QA.md",
+    "docs/UI_INTERACTION_SPEC.md",
+    "docs/UI_QA_MATRIX.md",
+    "src/main.ts",
+    "src/styles/approvedInteraction.css",
+    "tests/browser/README.md",
+    "tests/browser/calendarGestureLoadingV1.mjs",
+    "tests/browser/calendarGestureV1.mjs"
+  ],
+  "existingTestAssertionsChanged": false,
+  "protectedPathsUnchanged": true,
+  "localLinks": [
+    {
+      "file": "design/qa/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "../../../docs/CALENDAR_GESTURE_FIX_V1.md",
+      "exists": true
+    },
+    {
+      "file": "design/qa/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "../../../docs/CALENDAR_GESTURE_FIX_V1_QA.md",
+      "exists": true
+    },
+    {
+      "file": "design/qa/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "../../reference/2026-10-30-calendar-gesture-v1/README.md",
+      "exists": true
+    },
+    {
+      "file": "design/qa/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "final-matrix-summary.json",
+      "exists": true
+    },
+    {
+      "file": "design/qa/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "current-summary.json",
+      "exists": true
+    },
+    {
+      "file": "design/qa/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "raw-evidence.json.gz",
+      "exists": true
+    },
+    {
+      "file": "design/qa/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "raw-index.json",
+      "exists": true
+    },
+    {
+      "file": "design/qa/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "input-verification.json",
+      "exists": true
+    },
+    {
+      "file": "design/qa/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "scope-links.json",
+      "exists": true
+    },
+    {
+      "file": "design/qa/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "local-source-manifest.json",
+      "exists": true
+    },
+    {
+      "file": "design/qa/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "visual/comparison.html",
+      "exists": true
+    },
+    {
+      "file": "design/reference/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "01_CODEX_正式开发指令.md",
+      "exists": true
+    },
+    {
+      "file": "design/reference/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "02_逐项验收矩阵.md",
+      "exists": true
+    },
+    {
+      "file": "design/reference/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "prototype/FitLog_Lite_Calendar_Gesture_Prototype_v1_APPROVED.html",
+      "exists": true
+    },
+    {
+      "file": "design/reference/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "prototype/calendar_v1_preview.png",
+      "exists": true
+    },
+    {
+      "file": "design/reference/2026-10-30-calendar-gesture-v1/README.md",
+      "target": "SHA256SUMS.txt",
+      "exists": true
+    },
+    {
+      "file": "docs/CALENDAR_GESTURE_FIX_V1.md",
+      "target": "../design/reference/2026-10-30-calendar-gesture-v1/README.md",
+      "exists": true
+    },
+    {
+      "file": "docs/CALENDAR_GESTURE_FIX_V1.md",
+      "target": "CALENDAR_GESTURE_FIX_V1_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/CALENDAR_GESTURE_FIX_V1_QA.md",
+      "target": "../design/reference/2026-10-30-calendar-gesture-v1/02_逐项验收矩阵.md",
+      "exists": true
+    },
+    {
+      "file": "docs/CALENDAR_GESTURE_FIX_V1_QA.md",
+      "target": "../design/qa/2026-10-30-calendar-gesture-v1/README.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "FIVE_COMBINED_V1.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "COMBINED_INTERACTION_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "INTERACTION_VISUAL_SYSTEM.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "PWA_RUNTIME.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "DAILY_RECORDS_UX_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "TRAINING_RECOVERY_UX_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "UNIFIED_MODULE_VISUAL_HIERARCHY_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "PROFESSIONAL_FITNESS_REPORT_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "V4_2_IMPLEMENTATION_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "V4_2_1_VISUAL_REPAIR_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "../design/reference/2026-10-11-combined/DESIGN_REFERENCE.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "NUTRITION_CYCLE_SCHEDULE.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "APPROVED_JOINT_V05.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "FOOD_WATER_DAY_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "UX_WATER_CASCADE_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "JOINT_UX_REPORTS_RANGE_V03.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "TODAY_WATER_SHEET_V01.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "NUTRITION_GOAL_TEMPLATE_V02.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "AUTO_PORTION_GOAL_DESELECT_V021.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "COMBINED_INTERACTION_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "NAVIGATION_FLICKER_V041.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "MANAGEMENT_V061.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "LIGHT_NATIVE_V051.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "LIGHT_NATIVE_V051_COPY_AUDIT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "FIVE_COMBINED_V1.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "INTERACTION_V09.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "PROGRESS_LAYOUT_V2.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_INTERACTION_SPEC.md",
+      "target": "CALENDAR_GESTURE_FIX_V1.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "DAILY_RECORDS_UX_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "TRAINING_RECOVERY_UX_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "UNIFIED_MODULE_VISUAL_HIERARCHY_CONTRACT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "../design/reference/2026-10-11-combined/ACCEPTANCE_MATRIX.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "APPROVED_JOINT_V05.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "FOOD_WATER_DAY_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "UX_WATER_CASCADE_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "JOINT_UX_REPORTS_RANGE_V03_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "../design/reference/2026-10-17-joint-v0.3/05_ACCEPTANCE_MATRIX.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "TODAY_WATER_SHEET_V01.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "../design/reference/2026-10-18-today-water-sheet-v0.1/04_ACCEPTANCE_MATRIX.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "TODAY_WATER_SHEET_V01_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "../design/reference/2026-10-20-nutrition-goal-sheet-v0.2/05_ACCEPTANCE_MATRIX.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "NUTRITION_GOAL_TEMPLATE_V02_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "AUTO_PORTION_GOAL_DESELECT_V021_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "COMBINED_INTERACTION_V04.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "COMBINED_INTERACTION_V04_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "MANAGEMENT_V061_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "LIGHT_NATIVE_V051.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "LIGHT_NATIVE_V051_COPY_AUDIT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "LIGHT_NATIVE_V051_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "FIVE_COMBINED_V1.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "FIVE_COMBINED_V1_COPY_AUDIT.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "FIVE_COMBINED_V1_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "INTERACTION_V09_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "PROGRESS_LAYOUT_V2.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "PROGRESS_LAYOUT_V2_QA.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "../design/reference/2026-10-30-calendar-gesture-v1/02_逐项验收矩阵.md",
+      "exists": true
+    },
+    {
+      "file": "docs/UI_QA_MATRIX.md",
+      "target": "CALENDAR_GESTURE_FIX_V1_QA.md",
+      "exists": true
+    },
+    {
+      "file": "tests/browser/README.md",
+      "target": "../../docs/INTERACTION_V09_QA.md",
+      "exists": true
+    },
+    {
+      "file": "tests/browser/README.md",
+      "target": "../../docs/CALENDAR_GESTURE_FIX_V1.md",
+      "exists": true
+    },
+    {
+      "file": "tests/browser/README.md",
+      "target": "../../docs/CALENDAR_GESTURE_FIX_V1_QA.md",
+      "exists": true
+    }
+  ],
+  "bad": []
+}

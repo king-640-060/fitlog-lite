@@ -740,7 +740,11 @@ async function renderProgressPage(preview?:HTMLElement):Promise<void> {
   view.innerHTML=`<section class="progress-deck-root">${progressTabsHtml()}<div class="progress-deck-stage"></div></section>`
   const root=view.querySelector<HTMLElement>('.progress-deck-root')!,stage=root.querySelector<HTMLElement>('.progress-deck-stage')!
   const prepare=async(key:string,signal:AbortSignal):Promise<DeckPage>=>{
-    const host=document.createElement('div');host.className=(key==='reports'?'report-deck-shell':'deck-scroll')+' local-deck-page local-deck-neighbor';host.style.visibility='hidden';host.dataset.renderVersion=String(++rootRenderVersion);stage.append(host)
+    const host=document.createElement('div');host.className=(key==='reports'?'report-deck-shell':'deck-scroll')+' local-deck-page local-deck-neighbor';host.style.visibility='hidden';host.dataset.renderVersion=String(++rootRenderVersion)
+    // The entire calendar scroll owner is read-only gesture territory, including its whitespace.
+    // Keep the sibling Progress tabs outside this boundary so their existing deck swipe still tracks.
+    if(key==='calendar')host.dataset.noPageSwipe=''
+    stage.append(host)
     let dispose=()=>{},active=false
     const release=()=>{dispose();previewDisposers.get(host)?.();previewDisposers.delete(host);previewActivators.delete(host)}
     try{

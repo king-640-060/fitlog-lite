@@ -1,0 +1,6 @@
+# Exact upstream and runtime evidence bytes are frozen with SHA256SUMS.
+# Their original trailing whitespace is evidence, not authored product/document whitespace.
+design/reference/2026-10-30-calendar-gesture-v1/02_逐项验收矩阵.md -whitespace
+design/qa/2026-10-30-calendar-gesture-v1/typecheck-final.txt -whitespace
+design/qa/2026-10-30-calendar-gesture-v1/unit-final.txt -whitespace
+design/qa/2026-10-30-calendar-gesture-v1/build-final-precommit.txt -whitespace

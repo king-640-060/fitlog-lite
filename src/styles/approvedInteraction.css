@@ -47,6 +47,9 @@ html:has(#view > .progress-deck-root) { scroll-padding-block:0; }
 .progress-deck-root > .local-deck-stage, .report-deck-shell > .local-deck-stage, .report-daily-shell > .local-deck-stage { flex:1 1 auto; min-height:0; }
 .progress-deck-root .local-deck-page { height:100%; }
 .deck-scroll { overflow-y:auto; overscroll-behavior-y:contain; padding-bottom:20px; }
+/* Calendar owns native vertical scrolling, never a horizontal pan (including the month-head
+   optical overhang). Preserve pinch zoom; the sibling Progress tabs retain deck gestures. */
+.progress-deck-stage > .deck-scroll[data-no-page-swipe] { touch-action:pan-y pinch-zoom; overscroll-behavior-x:none; }
 .report-deck-shell,.report-daily-shell { display:flex; flex-direction:column; min-height:0; height:100%; min-width:0; }
 .report-daily-shell { container-type:inline-size; }
 .report-daily-shell > .report-mode { grid-template-columns:repeat(4,minmax(0,1fr)); }
