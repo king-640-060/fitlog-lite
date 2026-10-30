@@ -13,8 +13,18 @@ jobs:
       max-parallel: 8
       matrix:
         include:
-          - tag: 'production-pwa-retry'
-            task: 'pwa-upgrade'
+          - tag: 'end-production-0'
+            task: ''
+            full: '0'
+            width: ''
+            shard: '0'
+          - tag: 'end-production-1'
+            task: ''
+            full: '0'
+            width: ''
+            shard: '1'
+          - tag: 'end-production-2'
+            task: ''
             full: '0'
             width: ''
             shard: '2'
@@ -58,6 +68,6 @@ jobs:
             .qa-remote/source-manifest.json
             .qa-remote/runner.txt
             dist/build-info.json
-            .qa-remote/production-application-all-resources.json
+            .qa-remote/production-end-all-resources.json
           include-hidden-files: true
           retention-days: 14
