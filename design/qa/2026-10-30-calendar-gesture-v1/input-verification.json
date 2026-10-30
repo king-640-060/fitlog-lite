@@ -1,0 +1,43 @@
+{
+  "originalZIPAccessibleNow": false,
+  "note": "OriginalZIP was successfully read/extracted at task start; at receipt generation original Downloads path no longer exists. Extracted6 source files all present and verified against suppliedSHA256SUMS.",
+  "items": [
+    {
+      "file": "00_README_请先阅读.md",
+      "expected": "3117cd3ca3fba5fb41bd75f45a0698463b4e38d9b12a0e52087d5473c95a2bcd",
+      "actual": "3117cd3ca3fba5fb41bd75f45a0698463b4e38d9b12a0e52087d5473c95a2bcd",
+      "status": "PASS"
+    },
+    {
+      "file": "01_CODEX_正式开发指令.md",
+      "expected": "eb7eb53e637e769eb99d7faa3fdbf2b937a928e9388a031f4a6ce0ff3a044e04",
+      "actual": "eb7eb53e637e769eb99d7faa3fdbf2b937a928e9388a031f4a6ce0ff3a044e04",
+      "status": "PASS"
+    },
+    {
+      "file": "02_逐项验收矩阵.md",
+      "expected": "55827b7127631fc7844a20e1d3744db9e5b214f967e93c833cfd7ecc82c45edf",
+      "actual": "55827b7127631fc7844a20e1d3744db9e5b214f967e93c833cfd7ecc82c45edf",
+      "status": "PASS"
+    },
+    {
+      "file": "evidence/USER_calendar_unintended_drag_recording.mp4",
+      "expected": "3e3a7f08d5cc6a96eba3dbe455e30c135ceeda7d4348cd838990ffce15653baf",
+      "actual": "3e3a7f08d5cc6a96eba3dbe455e30c135ceeda7d4348cd838990ffce15653baf",
+      "status": "PASS"
+    },
+    {
+      "file": "prototype/FitLog_Lite_Calendar_Gesture_Prototype_v1_APPROVED.html",
+      "expected": "4207d932fcfe90d2d4e41d119f3eb28f6f767d0e2f63c83a59804ef94c5df177",
+      "actual": "4207d932fcfe90d2d4e41d119f3eb28f6f767d0e2f63c83a59804ef94c5df177",
+      "status": "PASS"
+    },
+    {
+      "file": "prototype/calendar_v1_preview.png",
+      "expected": "9c7e628890c5c91d99ab13414b5a5725f48e8d72870f8d2378471cbdb4b63eb8",
+      "actual": "9c7e628890c5c91d99ab13414b5a5725f48e8d72870f8d2378471cbdb4b63eb8",
+      "status": "PASS"
+    }
+  ],
+  "privateVideoPublicUpload": false
+}

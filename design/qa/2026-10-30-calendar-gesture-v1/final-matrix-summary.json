@@ -1,0 +1,983 @@
+{
+  "status": "PASS",
+  "finalSourceCommit": "e33e94b98ee67dd7902022287732cd2eec7ba8df",
+  "actualCI": "https://github.com/king-640-060/fitlog-lite/actions/runs/41034281432",
+  "contexts": 148,
+  "cases": [
+    "chromium-320-844-100-classic-dark-no-preference",
+    "chromium-320-844-100-classic-dark-reduce",
+    "chromium-320-844-100-classic-light-no-preference",
+    "chromium-320-844-100-classic-light-reduce",
+    "chromium-320-844-100-light-native-no-preference",
+    "chromium-320-844-100-light-native-reduce",
+    "chromium-320-844-140-classic-dark-no-preference",
+    "chromium-320-844-140-classic-dark-reduce",
+    "chromium-320-844-140-classic-light-no-preference",
+    "chromium-320-844-140-classic-light-reduce",
+    "chromium-320-844-140-light-native-no-preference",
+    "chromium-320-844-140-light-native-reduce",
+    "chromium-320-844-200-classic-dark-no-preference",
+    "chromium-320-844-200-classic-dark-reduce",
+    "chromium-320-844-200-classic-light-no-preference",
+    "chromium-320-844-200-classic-light-reduce",
+    "chromium-320-844-200-light-native-no-preference",
+    "chromium-320-844-200-light-native-reduce",
+    "chromium-375-844-100-classic-dark-no-preference",
+    "chromium-375-844-100-classic-dark-reduce",
+    "chromium-375-844-100-classic-light-no-preference",
+    "chromium-375-844-100-classic-light-reduce",
+    "chromium-375-844-100-light-native-no-preference",
+    "chromium-375-844-100-light-native-reduce",
+    "chromium-375-844-140-classic-dark-no-preference",
+    "chromium-375-844-140-classic-dark-reduce",
+    "chromium-375-844-140-classic-light-no-preference",
+    "chromium-375-844-140-classic-light-reduce",
+    "chromium-375-844-140-light-native-no-preference",
+    "chromium-375-844-140-light-native-reduce",
+    "chromium-375-844-200-classic-dark-no-preference",
+    "chromium-375-844-200-classic-dark-reduce",
+    "chromium-375-844-200-classic-light-no-preference",
+    "chromium-375-844-200-classic-light-reduce",
+    "chromium-375-844-200-light-native-no-preference",
+    "chromium-375-844-200-light-native-reduce",
+    "chromium-390-844-100-classic-dark-no-preference",
+    "chromium-390-844-100-classic-dark-reduce",
+    "chromium-390-844-100-classic-light-no-preference",
+    "chromium-390-844-100-classic-light-reduce",
+    "chromium-390-844-100-light-native-no-preference",
+    "chromium-390-844-100-light-native-reduce",
+    "chromium-390-844-140-classic-dark-no-preference",
+    "chromium-390-844-140-classic-dark-reduce",
+    "chromium-390-844-140-classic-light-no-preference",
+    "chromium-390-844-140-classic-light-reduce",
+    "chromium-390-844-140-light-native-no-preference",
+    "chromium-390-844-140-light-native-reduce",
+    "chromium-390-844-200-classic-dark-no-preference",
+    "chromium-390-844-200-classic-dark-reduce",
+    "chromium-390-844-200-classic-light-no-preference",
+    "chromium-390-844-200-classic-light-reduce",
+    "chromium-390-844-200-light-native-no-preference",
+    "chromium-390-844-200-light-native-reduce",
+    "chromium-430-844-100-classic-dark-no-preference",
+    "chromium-430-844-100-classic-dark-reduce",
+    "chromium-430-844-100-classic-light-no-preference",
+    "chromium-430-844-100-classic-light-reduce",
+    "chromium-430-844-100-light-native-no-preference",
+    "chromium-430-844-100-light-native-reduce",
+    "chromium-430-844-140-classic-dark-no-preference",
+    "chromium-430-844-140-classic-dark-reduce",
+    "chromium-430-844-140-classic-light-no-preference",
+    "chromium-430-844-140-classic-light-reduce",
+    "chromium-430-844-140-light-native-no-preference",
+    "chromium-430-844-140-light-native-reduce",
+    "chromium-430-844-200-classic-dark-no-preference",
+    "chromium-430-844-200-classic-dark-reduce",
+    "chromium-430-844-200-classic-light-no-preference",
+    "chromium-430-844-200-classic-light-reduce",
+    "chromium-430-844-200-light-native-no-preference",
+    "chromium-430-844-200-light-native-reduce",
+    "chromium-844-390-200-classic-dark-reduce",
+    "chromium-844-390-200-light-native-no-preference",
+    "webkit-320-844-100-classic-dark-no-preference",
+    "webkit-320-844-100-classic-dark-reduce",
+    "webkit-320-844-100-classic-light-no-preference",
+    "webkit-320-844-100-classic-light-reduce",
+    "webkit-320-844-100-light-native-no-preference",
+    "webkit-320-844-100-light-native-reduce",
+    "webkit-320-844-140-classic-dark-no-preference",
+    "webkit-320-844-140-classic-dark-reduce",
+    "webkit-320-844-140-classic-light-no-preference",
+    "webkit-320-844-140-classic-light-reduce",
+    "webkit-320-844-140-light-native-no-preference",
+    "webkit-320-844-140-light-native-reduce",
+    "webkit-320-844-200-classic-dark-no-preference",
+    "webkit-320-844-200-classic-dark-reduce",
+    "webkit-320-844-200-classic-light-no-preference",
+    "webkit-320-844-200-classic-light-reduce",
+    "webkit-320-844-200-light-native-no-preference",
+    "webkit-320-844-200-light-native-reduce",
+    "webkit-375-844-100-classic-dark-no-preference",
+    "webkit-375-844-100-classic-dark-reduce",
+    "webkit-375-844-100-classic-light-no-preference",
+    "webkit-375-844-100-classic-light-reduce",
+    "webkit-375-844-100-light-native-no-preference",
+    "webkit-375-844-100-light-native-reduce",
+    "webkit-375-844-140-classic-dark-no-preference",
+    "webkit-375-844-140-classic-dark-reduce",
+    "webkit-375-844-140-classic-light-no-preference",
+    "webkit-375-844-140-classic-light-reduce",
+    "webkit-375-844-140-light-native-no-preference",
+    "webkit-375-844-140-light-native-reduce",
+    "webkit-375-844-200-classic-dark-no-preference",
+    "webkit-375-844-200-classic-dark-reduce",
+    "webkit-375-844-200-classic-light-no-preference",
+    "webkit-375-844-200-classic-light-reduce",
+    "webkit-375-844-200-light-native-no-preference",
+    "webkit-375-844-200-light-native-reduce",
+    "webkit-390-844-100-classic-dark-no-preference",
+    "webkit-390-844-100-classic-dark-reduce",
+    "webkit-390-844-100-classic-light-no-preference",
+    "webkit-390-844-100-classic-light-reduce",
+    "webkit-390-844-100-light-native-no-preference",
+    "webkit-390-844-100-light-native-reduce",
+    "webkit-390-844-140-classic-dark-no-preference",
+    "webkit-390-844-140-classic-dark-reduce",
+    "webkit-390-844-140-classic-light-no-preference",
+    "webkit-390-844-140-classic-light-reduce",
+    "webkit-390-844-140-light-native-no-preference",
+    "webkit-390-844-140-light-native-reduce",
+    "webkit-390-844-200-classic-dark-no-preference",
+    "webkit-390-844-200-classic-dark-reduce",
+    "webkit-390-844-200-classic-light-no-preference",
+    "webkit-390-844-200-classic-light-reduce",
+    "webkit-390-844-200-light-native-no-preference",
+    "webkit-390-844-200-light-native-reduce",
+    "webkit-430-844-100-classic-dark-no-preference",
+    "webkit-430-844-100-classic-dark-reduce",
+    "webkit-430-844-100-classic-light-no-preference",
+    "webkit-430-844-100-classic-light-reduce",
+    "webkit-430-844-100-light-native-no-preference",
+    "webkit-430-844-100-light-native-reduce",
+    "webkit-430-844-140-classic-dark-no-preference",
+    "webkit-430-844-140-classic-dark-reduce",
+    "webkit-430-844-140-classic-light-no-preference",
+    "webkit-430-844-140-classic-light-reduce",
+    "webkit-430-844-140-light-native-no-preference",
+    "webkit-430-844-140-light-native-reduce",
+    "webkit-430-844-200-classic-dark-no-preference",
+    "webkit-430-844-200-classic-dark-reduce",
+    "webkit-430-844-200-classic-light-no-preference",
+    "webkit-430-844-200-classic-light-reduce",
+    "webkit-430-844-200-light-native-no-preference",
+    "webkit-430-844-200-light-native-reduce",
+    "webkit-844-390-200-classic-dark-reduce",
+    "webkit-844-390-200-light-native-no-preference"
+  ],
+  "bodyGestures": 9324,
+  "bodyIntermediateFrames": 46620,
+  "bodyMaxXDelta": 0,
+  "internalMaxXDelta": 0,
+  "topGestureFrames": 2368,
+  "topMaxTrackingError": 2.4414062497868372e-05,
+  "chromiumActualNativeUpDownContexts": 74,
+  "chromiumDownTraces": [
+    {
+      "key": "chromium-430-844-100-classic-light-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-100-classic-light-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-100-classic-dark-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-100-classic-dark-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-100-light-native-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-100-light-native-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-140-classic-light-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-140-classic-light-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-140-classic-dark-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        80
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-140-classic-dark-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-140-light-native-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-140-light-native-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-200-classic-light-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-200-classic-light-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-200-classic-dark-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-200-classic-dark-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-200-light-native-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-430-844-200-light-native-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-844-390-200-classic-dark-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-844-390-200-light-native-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-100-classic-light-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-100-classic-light-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-100-classic-dark-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        80
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-100-classic-dark-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-100-light-native-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-100-light-native-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-140-classic-light-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-140-classic-light-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-140-classic-dark-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-140-classic-dark-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-140-light-native-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-140-light-native-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-200-classic-light-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-200-classic-light-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-200-classic-dark-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-200-classic-dark-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-200-light-native-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-390-844-200-light-native-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-100-classic-light-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-100-classic-light-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-100-classic-dark-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-100-classic-dark-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-100-light-native-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-100-light-native-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-140-classic-light-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-140-classic-light-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-140-classic-dark-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-140-classic-dark-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-140-light-native-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-140-light-native-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-200-classic-light-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-200-classic-light-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-200-classic-dark-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-200-classic-dark-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-200-light-native-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-320-844-200-light-native-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-100-classic-light-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-100-classic-light-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-100-classic-dark-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-100-classic-dark-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-100-light-native-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-100-light-native-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-140-classic-light-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-140-classic-light-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-140-classic-dark-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-140-classic-dark-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-140-light-native-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-140-light-native-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-200-classic-light-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-200-classic-light-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-200-classic-dark-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-200-classic-dark-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-200-light-native-no-preference",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    },
+    {
+      "key": "chromium-375-844-200-light-native-reduce",
+      "before": 145,
+      "frames": [
+        140,
+        120,
+        80,
+        40
+      ],
+      "after": 40
+    }
+  ],
+  "webkit": "74 contexts: synthetic touch JS arbitration plus native scrollTop capability; no claim of physical touch",
+  "all22Exact": true,
+  "allReadOnlyMutationCalls": 0,
+  "physicalIPhone": "Pending"
+}

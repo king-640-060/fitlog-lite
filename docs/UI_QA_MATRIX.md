@@ -323,3 +323,8 @@ Additional five-part v1 gate: foodNavigationPreservation.mjs verifies three brow
 ## Progress 布局回归修复 v2
 
 按[修复合同](PROGRESS_LAYOUT_V2.md)及[本轮QA](PROGRESS_LAYOUT_V2_QA.md)执行L01–L12。`progressLayoutV2.mjs`补393px原生Chromium触摸/明确标记的WebKit合成touch、0/25/50/75/100%截图、预备ID样式、三级父导航坐标及20轮三页间距/独立滚动；完整矩阵每引擎74上下文（四宽×三字号×三外观×两种动态，另两短横屏）。`progressLayoutLoadingV2.mjs`补初次冷读取的隐藏占位、真实原生异步完成及可见内容14px。冻结START必须出现预期FAIL，新版结果和真实Pages结果分别记载。保留所有既有单测及业务浏览器断言。实体iPhone/原PWA/IME/VoiceOver/Safe Area和个人数据仍须独立证据。
+
+
+## 日历手势稳定性 v1（2026-10-30）
+
+[逐项C01–C31矩阵](../design/reference/2026-10-30-calendar-gesture-v1/02_逐项验收矩阵.md)与[真实结果](CALENDAR_GESTURE_FIX_V1_QA.md)。实际DOM覆盖日期数字/标记/空白、月份标题/左右空白、星期、图例、底部空白，双引擎四宽/三字号/三外观/双动效及短横屏。记录正文0/25/50/75/100%坐标与顶部20/50/80%跟手，≤1px容差；真实纵向滚动、取消、月切换/日期详情、20轮独立滚动/资源、冷异步完成、22表/配置零写和原v2套件不可省略。C31实体设备独立Pending，不能用WebKit合成touch代替。
