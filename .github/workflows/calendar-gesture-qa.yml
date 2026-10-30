@@ -1,0 +1,137 @@
+name: Calendar Gesture nonpublishing regression
+on:
+  push:
+    branches: ['codex/calendar-gesture-v1-qa-*']
+permissions:
+  contents: read
+jobs:
+  browser:
+    runs-on: macos-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        include:
+          - tag: retained-0
+            shard: '0'
+            task: ''
+            engine: ''
+            width: ''
+          - tag: retained-1
+            shard: '1'
+            task: ''
+            engine: ''
+            width: ''
+          - tag: retained-2
+            shard: '2'
+            task: ''
+            engine: ''
+            width: ''
+          - tag: retained-3
+            shard: '3'
+            task: ''
+            engine: ''
+            width: ''
+          - tag: retained-4
+            shard: '4'
+            task: ''
+            engine: ''
+            width: ''
+          - tag: retained-5
+            shard: '5'
+            task: ''
+            engine: ''
+            width: ''
+          - tag: retained-6
+            shard: '6'
+            task: ''
+            engine: ''
+            width: ''
+          - tag: retained-7
+            shard: '7'
+            task: ''
+            engine: ''
+            width: ''
+          - tag: retained-8
+            shard: '8'
+            task: ''
+            engine: ''
+            width: ''
+          - tag: retained-9
+            shard: '9'
+            task: ''
+            engine: ''
+            width: ''
+          - tag: calendar-chromium-320
+            shard: '0'
+            task: calendar-matrix
+            engine: chromium
+            width: '320'
+          - tag: calendar-chromium-375
+            shard: '0'
+            task: calendar-matrix
+            engine: chromium
+            width: '375'
+          - tag: calendar-chromium-390
+            shard: '0'
+            task: calendar-matrix
+            engine: chromium
+            width: '390'
+          - tag: calendar-chromium-430
+            shard: '0'
+            task: calendar-matrix
+            engine: chromium
+            width: '430'
+          - tag: calendar-webkit-320
+            shard: '0'
+            task: calendar-matrix
+            engine: webkit
+            width: '320'
+          - tag: calendar-webkit-375
+            shard: '0'
+            task: calendar-matrix
+            engine: webkit
+            width: '375'
+          - tag: calendar-webkit-390
+            shard: '0'
+            task: calendar-matrix
+            engine: webkit
+            width: '390'
+          - tag: calendar-webkit-430
+            shard: '0'
+            task: calendar-matrix
+            engine: webkit
+            width: '430'
+    env:
+      QA_TAG: ${{ matrix.tag }}
+      QA_SHARD: ${{ matrix.shard }}
+      QA_ONLY: ${{ matrix.task }}
+      FITLOG_CALENDAR_ENGINE: ${{ matrix.engine }}
+      FITLOG_CALENDAR_WIDTH: ${{ matrix.width }}
+      GITHUB_REPOSITORY: king-640-060/fitlog-lite
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '24.16.0'
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck && npm test -- --maxWorkers=4 && npm run build
+      - name: Install independent browsers
+        run: |
+          npm install --prefix "$RUNNER_TEMP/pw" --no-save playwright@1.62.1
+          node "$RUNNER_TEMP/pw/node_modules/playwright/cli.js" install chromium webkit
+          echo "FITLOG_PLAYWRIGHT_MODULE=$RUNNER_TEMP/pw/node_modules/playwright/index.mjs" >> "$GITHUB_ENV"
+      - run: python3 .qa-remote/setup.py
+      - run: node .qa-remote/run.mjs
+      - if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: calendar-gesture-${{ matrix.tag }}
+          path: |
+            qa-results/
+            .qa-remote/source-manifest.json
+            dist/build-info.json
+          include-hidden-files: true
+          retention-days: 14
