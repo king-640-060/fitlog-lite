@@ -6,7 +6,7 @@ import assert from 'node:assert/strict'
 import {createHash} from 'node:crypto'
 import {pw,url,root,seed,read,frame} from './interactionV09Harness.mjs'
 import {waitForMainNavigation,clickProgressNavigation} from './navigationSettlement.mjs'
-await fs.mkdir(root,{recursive:true})
+await fs.mkdir(root,{recursive:true});await fs.writeFile(path.join(root,'test-source.json'),JSON.stringify({sha256:createHash('sha256').update(await fs.readFile(new URL(import.meta.url))).digest('hex')},null,2))
 const negative=process.env.FITLOG_CALENDAR_NEGATIVE==='1',matrix=process.env.FITLOG_CALENDAR_MATRIX==='1',results=[]
 const engines=process.env.FITLOG_CALENDAR_ENGINE?[process.env.FITLOG_CALENDAR_ENGINE]:['chromium','webkit']
 const widths=process.env.FITLOG_CALENDAR_WIDTH?[Number(process.env.FITLOG_CALENDAR_WIDTH)]:[320,375,390,430]
@@ -18,7 +18,7 @@ const metrics=p=>p.locator('.progress-deck-root').evaluate(root=>{
 })
 for(const engine of engines){
  const b=await pw[engine].launch()
- try{for(const[width,height,font,theme,motion]of cases){
+ try{for(const[width,height,font,theme,motion]of cases.filter(c=>process.env.FITLOG_CALENDAR_LANDSCAPE_ONLY==='1'?c[1]===390:true)){
   const key=`${engine}-${width}-${height}-${font}-${theme}-${motion}`,c=await b.newContext({viewport:{width,height},hasTouch:true,isMobile:true,timezoneId:'Asia/Shanghai',serviceWorkers:'block',reducedMotion:motion}),p=await c.newPage(),samples=[],failures=[],errors=[]
   let cdp
   const check=(ok,message)=>{if(!ok){failures.push(message);if(!negative)assert.fail(message)}}
@@ -38,11 +38,11 @@ for(const engine of engines){
    const origins=[['date-number','.calendar-day-number'],['date-marker','.calendar-day-details'],['date-blank','.calendar-day'],['month-title','.calendar-month'],['month-left-blank','.calendar-overview-head'],['month-right-blank','.calendar-overview-head'],['weekday','.calendar-weekdays'],['legend','.calendar-legend'],['below-grid',owner]]
    const point=async(label,selector)=>{
     const el=p.locator(selector).first();await el.scrollIntoViewIfNeeded();await frame(p)
-    return el.evaluate((e,label)=>{const r=e.getBoundingClientRect(),o=e.closest('.deck-scroll'),or=o.getBoundingClientRect(),min=Math.max(or.top+3,document.querySelector('.progress-deck-root > .page-tabs').getBoundingClientRect().bottom+2),max=Math.min(or.bottom-3,document.querySelector('.bottom-nav').getBoundingClientRect().top-3);let x=r.x+r.width/2,y=Math.max(min,Math.min(max,r.y+Math.min(r.height/2,20)));if(label==='month-left-blank'){x=r.x+48;y=r.y+2}else if(label==='month-right-blank'){x=r.right-48;y=r.y+2}else if(label==='date-blank'){x=r.x+r.width-3;y=r.y+r.height-4}else if(label==='below-grid'){o.scrollTop=o.scrollHeight;y=Math.min(max,or.bottom-5);x=or.x+or.width/2}o.scrollLeft=0;const target=document.elementFromPoint(x,y);return{x,y,actual:target?.outerHTML.slice(0,500),inside:!!target&&o.contains(target),owner:target?.closest('.deck-scroll')===o}},label)
+    return el.evaluate((e,label)=>{const r=e.getBoundingClientRect(),o=e.closest('.deck-scroll'),or=o.getBoundingClientRect(),min=Math.max(or.top+3,document.querySelector('.progress-deck-root > .page-tabs').getBoundingClientRect().bottom+2),max=Math.min(or.bottom-3,document.querySelector('.bottom-nav').getBoundingClientRect().top-3);let x=r.x+r.width/2,y=Math.max(min,Math.min(max,r.y+Math.min(r.height/2,20)));if(label==='month-left-blank'){x=r.x+48;y=r.y+2}else if(label==='month-right-blank'){x=r.right-48;y=r.y+2}else if(label==='date-blank'){x=r.x+r.width-3;y=r.y+r.height-4}else if(label==='below-grid'){o.scrollTop=o.scrollHeight;y=Math.min(max,or.bottom-5);x=or.x+or.width/2}y=Math.max(min,Math.min(max,y));o.scrollLeft=0;const target=document.elementFromPoint(x,y);return{x,y,actual:target?.outerHTML.slice(0,500),inside:!!target&&o.contains(target),owner:target?.closest('.deck-scroll')===o}},label)
    }
    for(const[label,selector]of origins){for(const[gesture,dx,dy,cancel]of [['left',-100,0,false],['right',100,0,false],['diagonal',-85,-60,false],['vertical',0,-90,false],['vertical-down',0,90,false],['diagonal-down',85,60,false],['cancel',-90,0,true]]){
     await clickProgressNavigation(p,'[data-progress-view=calendar]');await p.locator(owner).evaluate(e=>{e.scrollTop=0;e.scrollLeft=0});await p.evaluate(()=>window.scrollTo(0,0));const start=await point(label,selector)
-    check(start.inside,label+' actual DOM hit belongs to calendar');const initial=await metrics(p),frames=[]
+    check(start.inside,label+' actual DOM hit belongs to calendar '+JSON.stringify(start));const initial=await metrics(p),frames=[]
     // Keep both directions on-screen without altering the real target ownership.
     const distance=dx>0?Math.min(dx,width-start.x-4):Math.max(dx,4-start.x)
     await dispatch('start',start.x,start.y)
