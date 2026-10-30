@@ -69,16 +69,16 @@ try{
    await page.locator('#vision-album-file').setInputFiles({name:'synthetic.png',mimeType:'image/png',buffer:png});await page.waitForSelector('.vision-images img')
    const image=await page.locator('.vision-images img').getAttribute('src'),beforeNav=navigations
    serving=next
-   await page.evaluate(async()=>{await(await navigator.serviceWorker.getRegistration()).update()})
-   await page.waitForFunction(async()=>!!(await navigator.serviceWorker.getRegistration()).waiting)
+   await page.evaluate(async()=>{window.fitlogUpgradeRegistration=await navigator.serviceWorker.getRegistration();await window.fitlogUpgradeRegistration.update()})
+   await page.waitForFunction(()=>!!window.fitlogUpgradeRegistration.waiting)
    await page.waitForTimeout(800)
    assert.equal(navigations,beforeNav,'no automatic reload during image editing');assert.equal(await page.locator('.vision-images img').getAttribute('src'),image)
    if(mode==='legacy'){
     // An old client cannot acquire the new prompt retroactively: close all old scope clients.
-    const observer=await context.newPage();await observer.goto(origin+'/observer.html');await observer.evaluate(async()=>{window.fitlogExpectedWaiting=(await navigator.serviceWorker.getRegistration('/fitlog-lite/'))?.waiting});await page.close()
+    const observer=await context.newPage();await observer.goto(origin+'/observer.html');await observer.evaluate(async()=>{window.fitlogObserverRegistration=await navigator.serviceWorker.getRegistration('/fitlog-lite/');window.fitlogExpectedWaiting=window.fitlogObserverRegistration?.waiting});await page.close()
     // The out-of-scope observer may not start an idle worker for MessageChannel diagnostics.
     // Wait for native activation, then prove the executing build on a real controlled App client below.
-    await observer.waitForFunction(async()=>{const r=await navigator.serviceWorker.getRegistration('/fitlog-lite/');return !!window.fitlogExpectedWaiting&&window.fitlogExpectedWaiting.state==='activated'&&r?.active===window.fitlogExpectedWaiting&&!r.waiting&&!r.installing})
+    await observer.waitForFunction(()=>{const r=window.fitlogObserverRegistration;return !!window.fitlogExpectedWaiting&&window.fitlogExpectedWaiting.state==='activated'&&r?.active===window.fitlogExpectedWaiting&&!r.waiting&&!r.installing})
     page=await context.newPage();await open(page);await observer.close()
    }else{
     await close(page)
